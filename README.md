@@ -21,6 +21,12 @@ We are working to make `tai` production quality software.
 | Binance        | [x] | [x] | [x] | [x] | [x] |
 | Poloniex       | [x] | [x] | [x] | [x] | [x] |
 
+## In Progress Exchanges
+
+| Exchange       | Live Order Book  | Account Balance | Orders | Products | Fees |
+|----------------|:---:|:---:|:---:|:---:|:---:|
+| Bitmex         | [x] | [] | [] | [x] | [x] |
+
 ## Planned Exchanges
 
 | Exchange       |

@@ -1,7 +1,8 @@
 defmodule Tai.VenueAdapters.Mock do
   use Tai.Exchanges.Adapter
-
   import Tai.TestSupport.Mocks.Client
+
+  def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
 
   def order_book_feed, do: Tai.VenueAdapters.Mock.OrderBookFeed
 

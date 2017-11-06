@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Gdax.ProductStatus do
-  @type status :: Tai.Exchanges.ProductStatus.t()
+  @type status :: Tai.Exchanges.Product.status()
 
   @spec normalize(gdax_status :: String.t()) :: {:ok, status} | {:error, :unknown_status}
   def normalize(gdax_status)

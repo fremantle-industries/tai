@@ -1,6 +1,8 @@
 defmodule Tai.VenueAdapters.Binance do
   use Tai.Exchanges.Adapter
 
+  def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
+
   def order_book_feed, do: Tai.VenueAdapters.Binance.OrderBookFeed
 
   defdelegate products(venue_id), to: Tai.VenueAdapters.Binance.Products

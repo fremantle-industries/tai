@@ -1,6 +1,8 @@
 defmodule Tai.VenueAdapters.Poloniex do
   use Tai.Exchanges.Adapter
 
+  def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
+
   def order_book_feed, do: Tai.VenueAdapters.Poloniex.OrderBookFeed
 
   defdelegate products(venue_id), to: Tai.VenueAdapters.Poloniex.Products

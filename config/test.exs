@@ -28,6 +28,10 @@ config(:tai,
       adapter: Tai.VenueAdapters.Mock,
       accounts: %{main: %{}}
     ],
+    bitmex: [
+      adapter: Tai.VenueAdapters.Bitmex,
+      accounts: %{main: %{}}
+    ],
     binance: [
       adapter: Tai.VenueAdapters.Binance,
       accounts: %{main: %{}}
@@ -97,6 +101,8 @@ config :exvcr,
     [pattern: "signature=[A-Z0-9]+", placeholder: "signature=***"]
   ]
 
+config :logger, backends: [{LoggerFileBackend, :file_log}]
+
 config(:echo_boy, port: 4100)
 
 config :ex_poloniex,
@@ -107,4 +113,6 @@ config :binance,
   api_key: System.get_env("BINANCE_API_KEY"),
   secret_key: System.get_env("BINANCE_API_SECRET")
 
-config :logger, backends: [{LoggerFileBackend, :file_log}]
+config :bitmex, api_key: System.get_env("BITMEX_API_KEY")
+config :bitmex, api_secret: System.get_env("BITMEX_SECRET")
+config :bitmex, test_mode: false

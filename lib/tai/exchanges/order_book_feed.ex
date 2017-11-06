@@ -79,8 +79,10 @@ defmodule Tai.Exchanges.OrderBookFeed do
       # state should use the type Tai.Exchanges.OrderBookFeed.t but there is 
       # and outstanding dialyzer problem.
       # https://github.com/elixir-lang/elixir/issues/7700
-      @spec init_subscriptions({:ok, pid} | {:error, term}, state :: term) ::
-              {:ok, pid} | {:error | term}
+      @spec init_subscriptions(
+              {:ok, pid} | {:error, term},
+              state :: Tai.Exchanges.OrderBookFeed.t()
+            ) :: {:ok, pid} | {:error | term}
       defp(init_subscriptions(_websockex_result, _state))
 
       defp init_subscriptions({:ok, pid}, %Tai.Exchanges.OrderBookFeed{
@@ -96,6 +98,17 @@ defmodule Tai.Exchanges.OrderBookFeed do
           {:error, _} = error ->
             error
         end
+      end
+
+      defp init_subscriptions(
+             {:error, %WebSockex.RequestError{code: 429, message: "Too Many Requests"}} = error,
+             %Tai.Exchanges.OrderBookFeed{feed_id: feed_id}
+           ) do
+        Logger.error(
+          "Could not connect to feed: #{inspect(feed_id)}. Too many requests. Try again later."
+        )
+
+        error
       end
 
       defp init_subscriptions(

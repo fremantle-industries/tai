@@ -28,9 +28,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
         assert product.exchange_id == @adapter.id
         assert product.symbol != nil
         assert product.status != nil
-        assert %Decimal{} = product.min_notional
         assert %Decimal{} = product.min_size
-        assert %Decimal{} = product.min_price
         assert %Decimal{} = product.size_increment
       end
     end

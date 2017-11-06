@@ -23,6 +23,12 @@ config :tai,
 
 config :tai,
   venues: %{
+    bitmex: [
+      adapter: Tai.VenueAdapters.Bitmex,
+      products: "xbtz18 xbth19",
+      accounts: %{main: %{}},
+      timeout: 60_000
+    ],
     binance: [
       adapter: Tai.VenueAdapters.Binance,
       products: "btc_usdt ltc_usdt eth_usdt",
@@ -76,6 +82,8 @@ config :tai,
 
 config :echo_boy, port: 4200
 
+config :logger, backends: [{LoggerFileBackend, :file_log}]
+
 config :ex_poloniex,
   api_key: System.get_env("POLONIEX_API_KEY"),
   api_secret: System.get_env("POLONIEX_API_SECRET")
@@ -83,3 +91,7 @@ config :ex_poloniex,
 config :binance,
   api_key: System.get_env("BINANCE_API_KEY"),
   secret_key: System.get_env("BINANCE_API_SECRET")
+
+config :bitmex, api_key: System.get_env("BITMEX_API_KEY")
+config :bitmex, api_secret: System.get_env("BITMEX_SECRET")
+config :bitmex, test_mode: false

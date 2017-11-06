@@ -1,13 +1,24 @@
 defmodule Tai.Exchanges.Product do
+  @type status ::
+          :pre_trading
+          | :trading
+          | :post_trading
+          | :end_of_day
+          | :halt
+          | :auction_match
+          | :break
+          | :settled
+          | :unlisted
+
   @type t :: %Tai.Exchanges.Product{
           exchange_id: atom,
           symbol: atom,
           exchange_symbol: String.t(),
-          status: atom,
-          min_notional: Decimal.t(),
-          min_price: Decimal.t(),
+          status: status,
           min_size: Decimal.t(),
           size_increment: Decimal.t(),
+          min_notional: Decimal.t() | nil,
+          min_price: Decimal.t() | nil,
           price_increment: Decimal.t() | nil,
           max_price: Decimal.t() | nil,
           max_size: Decimal.t() | nil,
@@ -20,8 +31,6 @@ defmodule Tai.Exchanges.Product do
     :symbol,
     :exchange_symbol,
     :status,
-    :min_notional,
-    :min_price,
     :min_size,
     :size_increment
   ]

@@ -16,6 +16,7 @@ defmodule Tai do
       Tai.Trading.OrderStore,
       Tai.Exchanges.AdaptersSupervisor,
       Tai.Exchanges.OrderBookFeedsSupervisor,
+      Tai.Venues.StreamsSupervisor,
       {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},
       Tai.AdvisorsSupervisor
     ]
@@ -34,7 +35,8 @@ defmodule Tai do
           Tai.TaskSupervisor,
           Tai.Exchanges.Boot,
           :run,
-          [adapter]
+          [adapter],
+          timeout: adapter.timeout
         )
 
       {task, adapter}

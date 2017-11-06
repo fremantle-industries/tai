@@ -9,6 +9,7 @@ defmodule Tai.Exchanges.Adapter do
   @type product :: Tai.Exchanges.Product.t()
   @type asset_balance :: Tai.Exchanges.AssetBalance.t()
 
+  @callback stream_supervisor :: atom
   @callback order_book_feed :: atom
   @callback products(exchange_id :: atom) :: {:ok, [product]} | {:error, reason :: term}
   @callback asset_balances(exchange_id :: atom, account_id :: atom, credentials :: map) ::

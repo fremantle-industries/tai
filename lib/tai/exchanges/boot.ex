@@ -16,7 +16,7 @@ defmodule Tai.Exchanges.Boot do
     adapter
     |> hydrate_products_and_balances
     |> wait_for_products
-    |> hydrate_fees_and_start_order_books
+    |> hydrate_fees_and_start_streams
     |> wait_for_balances_and_fees
   end
 
@@ -39,15 +39,17 @@ defmodule Tai.Exchanges.Boot do
     end
   end
 
-  defp hydrate_fees_and_start_order_books({:ok, adapter, working_tasks, products}) do
+  defp hydrate_fees_and_start_streams({:ok, adapter, working_tasks, products}) do
     t_fees = Task.async(Boot.Fees, :hydrate, [adapter, products])
+    t_stream = Task.async(Boot.Stream, :start, [adapter, products])
     t_order_books = Task.async(Boot.OrderBooks, :start, [adapter, products])
     new_working_tasks = [{:fees, t_fees} | working_tasks]
+    new_working_tasks = [{:order_books, t_stream} | new_working_tasks]
     new_working_tasks = [{:order_books, t_order_books} | new_working_tasks]
     {:ok, adapter, new_working_tasks}
   end
 
-  defp hydrate_fees_and_start_order_books({:error, _, _, _} = error), do: error
+  defp hydrate_fees_and_start_streams({:error, _, _, _} = error), do: error
 
   defp wait_for_balances_and_fees({:ok, adapter, working_tasks}) do
     adapter

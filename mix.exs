@@ -32,6 +32,7 @@ defmodule Tai.Mixfile do
   defp deps do
     [
       {:binance, "~> 0.6.0"},
+      {:bitmex, "~> 0.2.0"},
       {:decimal, "~> 1.5.0"},
       {:ex_gdax, "~> 0.1.4"},
       {:ex_poloniex, "~> 0.0.2"},
@@ -41,7 +42,7 @@ defmodule Tai.Mixfile do
       {:timex, "~> 3.1"},
       {:uuid, "~> 1.1"},
       # Fixes dialyzer warning, but can't release new hex package
-      {:websockex, github: "Azolo/websockex"},
+      {:websockex, github: "Azolo/websockex", override: true},
       # {:websockex, "~> 0.4"},
       {:logger_file_backend, "~> 0.0.10", only: [:dev, :test]},
       {:logger_json, "~> 3.0.0", only: [:dev, :test]},

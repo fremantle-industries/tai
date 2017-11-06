@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Poloniex.ProductStatus do
-  @type status :: Tai.Exchanges.ProductStatus.t()
+  @type status :: Tai.Exchanges.Product.status()
 
   @spec normalize(poloniex_status :: String.t()) :: {:ok, status} | {:error, :unknown_status}
   def normalize(poloniex_status)

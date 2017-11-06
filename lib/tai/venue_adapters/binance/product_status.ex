@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Binance.ProductStatus do
-  @type status :: Tai.Exchanges.ProductStatus.t()
+  @type status :: Tai.Exchanges.Product.status()
 
   @spec normalize(binance_status :: String.t()) :: {:ok, status} | {:error, :unknown_status}
   def normalize(binance_status)
