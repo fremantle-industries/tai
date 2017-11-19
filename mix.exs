@@ -23,7 +23,9 @@ defmodule Tai.Mixfile do
       {:httpoison, "~> 0.13"},
       {:json, "~> 1.0"},
       {:websockex, "~> 0.4"},
-      {:poloniex, path: "~/workspace/fremantle_capital/poloniex_elixir"}
+      {:poloniex, path: "~/workspace/fremantle_capital/poloniex_elixir"},
+      {:ex_unit_notifier, "~> 0.1", only: :test},
+      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false}
     ]
   end
 end
