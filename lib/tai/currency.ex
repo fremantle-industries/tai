@@ -1,6 +1,9 @@
 defmodule Tai.Currency do
   def add(a, b) do
-    Decimal.add(a, b)
+    Decimal.add(
+      Decimal.new(a),
+      Decimal.new(b)
+    )
   end
 
   def sum(enumerable) do
