@@ -1,9 +1,9 @@
 use Mix.Config
 
-config :tai, accounts: %{
-  bitmex: [
-    Tai.Adapters.Bitmex,
-    api_key: System.get_env("BITMEX_API_KEY"),
-    secret: System.get_env("BITMEX_SECRET")
-  ]
+config :ex_gdax, api_key:        System.get_env("GDAX_API_KEY"),
+                 api_secret:     System.get_env("GDAX_API_SECRET"),
+                 api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
+
+config :tai, exchanges: %{
+  gdax: [Tai.Exchanges.Adapters.Gdax, []]
 }

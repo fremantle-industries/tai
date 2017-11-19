@@ -1,7 +1,7 @@
 defmodule Tai.Fund do
   use GenServer
   alias Tai.Currency
-  alias Tai.Account
+  alias Tai.Exchange
 
   def start_link(state) do
     GenServer.start_link(__MODULE__, state, name: __MODULE__)
@@ -12,15 +12,15 @@ defmodule Tai.Fund do
   end
 
   def handle_call(:balance, _from, state) do
-    balance = account_balances()
+    balance = exchange_balances()
               |> Currency.sum(:btc)
 
     {:reply, balance, state}
   end
 
-  defp account_balances do
-    Tai.Settings.account_ids
-    |> Enum.map(fn(name) -> Account.balance(name) end)
+  defp exchange_balances do
+    Tai.Settings.exchange_ids
+    |> Enum.map(fn(name) -> Exchange.balance(name) end)
   end
 
   def balance do

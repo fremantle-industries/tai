@@ -1,11 +1,11 @@
 use Mix.Config
 
-config :tai, accounts: %{
-  test_account_a: [
-    Tai.Adapters.Test
+config :tai, exchanges: %{
+  test_exchange_a: [
+    Tai.Exchanges.Adapters.Test
   ],
-  test_account_b: [
-    Tai.Adapters.Test,
+  test_exchange_b: [
+    Tai.Exchanges.Adapters.Test,
     config_key: "some_key"
   ]
 }

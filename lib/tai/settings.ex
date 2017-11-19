@@ -1,10 +1,10 @@
 defmodule Tai.Settings do
-  def accounts do
-    Application.get_env(:tai, :accounts)
+  def exchanges do
+    Application.get_env(:tai, :exchanges)
   end
 
-  def account_ids do
-    accounts()
+  def exchange_ids do
+    exchanges()
     |> Enum.map(fn {id, _config} -> id end)
   end
 end

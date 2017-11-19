@@ -1,4 +1,4 @@
-defmodule Tai.Account do
+defmodule Tai.Exchange do
   use GenServer
 
   def start_link({name, config}) do
@@ -18,7 +18,7 @@ defmodule Tai.Account do
   end
 
   defp to_pid(name) do
-    "account_#{name}" |> String.to_atom
+    "exchange_#{name}" |> String.to_atom
   end
 
   defp adapter_balance({_name, [adapter]}) do

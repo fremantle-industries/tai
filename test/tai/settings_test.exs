@@ -2,19 +2,19 @@ defmodule Tai.SettingsTest do
   use ExUnit.Case
   doctest Tai.Settings
 
-  test "accounts returns the application config" do
-    assert Tai.Settings.accounts == %{
-      test_account_a: [
-        Tai.Adapters.Test
+  test "exchanges returns the application config" do
+    assert Tai.Settings.exchanges == %{
+      test_exchange_a: [
+        Tai.Exchanges.Adapters.Test
       ],
-      test_account_b: [
-        Tai.Adapters.Test,
+      test_exchange_b: [
+        Tai.Exchanges.Adapters.Test,
         config_key: "some_key"
       ]
     }
   end
 
-  test "account_ids returns the keys from accounts" do
-    assert Tai.Settings.account_ids == [:test_account_a, :test_account_b]
+  test "exchange_ids returns the keys from exchanges" do
+    assert Tai.Settings.exchange_ids == [:test_exchange_a, :test_exchange_b]
   end
 end

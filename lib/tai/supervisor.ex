@@ -7,7 +7,7 @@ defmodule Tai.Supervisor do
 
   def init(_) do
     children = [
-      {Tai.AccountsSupervisor, []},
+      {Tai.ExchangesSupervisor, []},
       {Tai.Fund, []}
     ]
 
