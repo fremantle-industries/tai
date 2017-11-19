@@ -1,5 +1,5 @@
 defmodule TaiHelper do
   def status do
-    "#{Tai.Fund.balance} BTC"
+    "#{Tai.Fund.balance} USD"
   end
 end

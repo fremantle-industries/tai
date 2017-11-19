@@ -1,0 +1,40 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "CB-ACCESS-KEY": "api_key",
+        "CB-ACCESS-SIGN": "GD0mUDe5Q4luMZPPAafgykZ5M1c0Hir+8pt7HtdiZZE=",
+        "CB-ACCESS-TIMESTAMP": "1511074038",
+        "CB-ACCESS-PASSPHRASE": "passphrase"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.gdax.com/accounts"
+    },
+    "response": {
+      "body": "[{\"id\":\"06ed1dc6-44f0-4b0f-9910-48d1b1f86f94\",\"currency\":\"USD\",\"balance\":\"1337.2477450660000000\",\"available\":\"0.0000190563\",\"hold\":\"1337.2477260097000000\",\"profile_id\":\"18bee8e2-0557-4802-8dc7-a3c0681b151c\"},{\"id\":\"1de95594-5318-4d0a-b8ae-60612963d6d7\",\"currency\":\"BTC\",\"balance\":\"0.0000000000000000\",\"available\":\"0\",\"hold\":\"0.0000000000000000\",\"profile_id\":\"7a880a13-8ba5-4725-b44d-903a268c11c4\"},{\"id\":\"312bfbc0-1023-488a-b9bc-453c42db3788\",\"currency\":\"LTC\",\"balance\":\"0.0000000000000000\",\"available\":\"0\",\"hold\":\"0.0000000000000000\",\"profile_id\":\"085b461e-c2bd-440e-8574-80966d528da8\"},{\"id\":\"17d97418-6bd9-4a99-8b79-22972e161f76\",\"currency\":\"ETH\",\"balance\":\"0.0000000000000000\",\"available\":\"0\",\"hold\":\"0.0000000000000000\",\"profile_id\":\"9b36898c-5786-4c6b-b07f-a4248d4ad8b5\"}]",
+      "headers": {
+        "Date": "Sun, 19 Nov 2017 06:47:18 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "780",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=db9ec35b30e4d8a55a5a374bfb30daed61511074038; expires=Mon, 19-Nov-18 06:47:18 GMT; path=/; domain=.gdax.com; HttpOnly",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, cb-session",
+        "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "cb-before, cb-after",
+        "Access-Control-Max-Age": "7200",
+        "ETag": "W/\"30c-jMK+wJMbFe9ZPxwPBxWq99s0SeM\"",
+        "Strict-Transport-Security": "max-age=15552000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Server": "cloudflare-nginx",
+        "CF-RAY": "3c0137a3ddd97955-SEA"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

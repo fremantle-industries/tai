@@ -20,10 +20,12 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
+      {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1"},
       {:httpoison, "~> 0.12"},
       {:json, "~> 1.0"},
       {:websockex, "~> 0.4"},
+      {:exvcr, "~> 0.8", only: [:test]},
       {:ex_unit_notifier, "~> 0.1", only: :test},
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false}
     ]
