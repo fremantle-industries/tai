@@ -1,4 +1,4 @@
-defmodule TaiHelper do
+defmodule Tai.CommandsHelper do
   def status do
     IO.puts "#{Tai.Fund.balance} USD"
   end
