@@ -29,4 +29,15 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
       assert Tai.Exchanges.Adapters.Gdax.balance == Decimal.new(11503.403745066)
     end
   end
+
+  test "quotes returns a bid/ask tuple for the given symbol" do
+    use_cassette "quotes" do
+      {bid, ask} = Tai.Exchanges.Adapters.Gdax.quotes(:btcusd)
+
+      assert bid.volume == Decimal.new(0.05)
+      assert bid.price == Decimal.new(8015.01)
+      assert ask.volume == Decimal.new(4.222)
+      assert ask.price == Decimal.new(8019.87)
+    end
+  end
 end

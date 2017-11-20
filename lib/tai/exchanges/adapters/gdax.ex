@@ -17,6 +17,35 @@ defmodule Tai.Exchanges.Adapters.Gdax do
     |> Tai.Currency.sum
   end
 
+  def quotes(symbol) do
+    start = Timex.now
+
+    symbol
+    |> product_id
+    |> ExGdax.get_order_book
+    |> case do
+      {
+        :ok,
+        %{
+          "bids" => [[bid_price, bid_volume, _bid_order_count]],
+          "asks" => [[ask_price, ask_volume, _ask_order_count]]
+        }
+      } ->
+        {
+          %Tai.Quote{
+            volume: Tai.Currency.parse!(bid_volume),
+            price: Tai.Currency.parse!(bid_price),
+            age: Timex.diff(Timex.now, start)
+          },
+          %Tai.Quote{
+            volume: Tai.Currency.parse!(ask_volume),
+            price: Tai.Currency.parse!(ask_price),
+            age: Timex.diff(Timex.now, start)
+          }
+        }
+    end
+  end
+
   defp parse_account_balances(response) do
     case response do
       {:ok, accounts} ->

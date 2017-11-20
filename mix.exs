@@ -24,6 +24,7 @@ defmodule Tai.Mixfile do
       {:ex_gdax, "~> 0.1"},
       {:httpoison, "~> 0.12"},
       {:json, "~> 1.0"},
+      {:timex, "~> 3.1"},
       {:websockex, "~> 0.4"},
       {:exvcr, "~> 0.8", only: [:test]},
       {:ex_unit_notifier, "~> 0.1", only: :test},
