@@ -17,9 +17,7 @@ defmodule Tai.Exchanges.Adapters.Gdax do
     |> Tai.Currency.sum
   end
 
-  def quotes(symbol) do
-    start = Timex.now
-
+  def quotes(symbol, start \\ Timex.now) do
     symbol
     |> product_id
     |> ExGdax.get_order_book
