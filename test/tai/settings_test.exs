@@ -4,13 +4,8 @@ defmodule Tai.SettingsTest do
 
   test "exchanges returns the application config" do
     assert Tai.Settings.exchanges == %{
-      test_exchange_a: [
-        Tai.Exchanges.Adapters.Test
-      ],
-      test_exchange_b: [
-        Tai.Exchanges.Adapters.Test,
-        config_key: "some_key"
-      ]
+      test_exchange_a: Tai.Exchanges.Adapters.Test,
+      test_exchange_b: Tai.Exchanges.Adapters.Test
     }
   end
 

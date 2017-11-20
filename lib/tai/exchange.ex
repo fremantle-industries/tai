@@ -1,19 +1,19 @@
 defmodule Tai.Exchange do
   use GenServer
 
-  def start_link({name, adapter_config}) do
+  def start_link({name, adapter}) do
     name
     |> to_pid
-    |> (&GenServer.start_link(__MODULE__, adapter_config, name: &1)).()
+    |> (&GenServer.start_link(__MODULE__, adapter, name: &1)).()
   end
 
-  def init(adapter_config) do
-    {:ok, adapter_config}
+  def init(adapter) do
+    {:ok, adapter}
   end
 
-  def handle_call(:balance, _from, [adapter | opts]) do
+  def handle_call(:balance, _from, adapter) do
     adapter.balance
-    |> (&{:reply, &1, [adapter | opts]}).()
+    |> (&{:reply, &1, adapter}).()
   end
 
   def balance(name) do
