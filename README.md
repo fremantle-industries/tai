@@ -1,4 +1,5 @@
 # Tai
+[![Build Status](https://circleci.com/gh/fremantle-capital/tai.png)](https://circleci.com/gh/fremantle-capital/tai)
 
 **TODO: Add description**
 
