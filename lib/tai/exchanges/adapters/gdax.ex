@@ -56,6 +56,8 @@ defmodule Tai.Exchanges.Adapters.Gdax do
     |> case do
       {:ok, %{"id" => id, "status" => status}} ->
         {:ok, %Tai.OrderResponse{id: id, status: status |> parse_order_status}}
+      {:error, message, _status_code} ->
+        {:error, message}
     end
   end
 

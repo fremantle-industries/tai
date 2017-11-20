@@ -18,9 +18,15 @@ defmodule TaiHelperTest do
     end) == "8003.22/0.66 [0.000143s]\n---\n8003.21/1.55 [0.001044s]\n\n"
   end
 
-  test "buy_limit creates an order on the exchange" do
+  test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
       TaiHelper.buy_limit(:test_exchange_a, :btcusd, 10.1, 2.2)
-    end) == "created id: f9df7435-34d5-4861-8ddc-80f0fd2c83d7, status: pending\n"
+    end) == "create order success - id: f9df7435-34d5-4861-8ddc-80f0fd2c83d7, status: pending\n"
+  end
+
+  test "buy_limit displays an error message when the order can't be created" do
+    assert capture_io(fn ->
+      TaiHelper.buy_limit(:test_exchange_a, :btcusd, 10.1, 3.3)
+    end) == "create order failure - Insufficient funds\n"
   end
 end

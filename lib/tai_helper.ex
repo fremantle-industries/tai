@@ -15,9 +15,17 @@ defmodule TaiHelper do
   end
 
   def buy_limit(exchange, symbol, price, size) do
-    case Tai.Exchange.buy_limit(exchange, symbol, price, size) do
+    Tai.Exchange.buy_limit(
+      exchange,
+      symbol,
+      price,
+      size
+    )
+    |> case do
       {:ok, order_response} ->
-        IO.puts "created id: #{order_response.id}, status: #{order_response.status}"
+        IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
+      {:error, message} ->
+        IO.puts "create order failure - #{message}"
     end
   end
 end

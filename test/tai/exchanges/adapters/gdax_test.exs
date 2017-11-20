@@ -49,4 +49,12 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
       assert order_response.status == :pending
     end
   end
+
+  test "buy_limit returns an error tuple with a message when it can't create the order" do
+    use_cassette "buy_limit_error" do
+      {:error, message} = Tai.Exchanges.Adapters.Gdax.buy_limit(:btcusd, 101.1, 0.3)
+
+      assert message == "Insufficient funds"
+    end
+  end
 end
