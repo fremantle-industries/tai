@@ -6,7 +6,7 @@ defmodule Tai.Exchanges.Adapters.Gdax do
     |> case do
       {:ok, %{"price" => price}} ->
         price
-        |> Tai.Currency.parse!
+        |> Decimal.new
     end
   end
 
@@ -32,13 +32,13 @@ defmodule Tai.Exchanges.Adapters.Gdax do
         age = Decimal.new(Timex.diff(Timex.now, start) / 1_000_000)
         {
           %Tai.Quote{
-            size: Tai.Currency.parse!(bid_size),
-            price: Tai.Currency.parse!(bid_price),
+            size: Decimal.new(bid_size),
+            price: Decimal.new(bid_price),
             age: age
           },
           %Tai.Quote{
-            size: Tai.Currency.parse!(ask_size),
-            price: Tai.Currency.parse!(ask_price),
+            size: Decimal.new(ask_size),
+            price: Decimal.new(ask_price),
             age: age
           }
         }
@@ -69,7 +69,7 @@ defmodule Tai.Exchanges.Adapters.Gdax do
         |> Enum.map(
           fn(%{"currency" => currency, "balance" => balance}) ->
             balance
-            |> Tai.Currency.parse!
+            |> Decimal.new
             |> (&{currency, &1}).()
           end
         )

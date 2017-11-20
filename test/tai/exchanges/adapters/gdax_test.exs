@@ -10,13 +10,13 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
 
   test "price returns value of the last trade for the pair" do
     use_cassette "price" do
-      assert Tai.Exchanges.Adapters.Gdax.price(:btcusd) == Decimal.new(152.18)
+      assert Tai.Exchanges.Adapters.Gdax.price(:btcusd) == Decimal.new("152.18000000")
     end
   end
 
   test "price supports upper and lower case symbols" do
     use_cassette "price" do
-      assert Tai.Exchanges.Adapters.Gdax.price(:BtcusD) == Decimal.new(152.18)
+      assert Tai.Exchanges.Adapters.Gdax.price(:BtcusD) == Decimal.new("152.18000000")
     end
   end
 
@@ -26,7 +26,7 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
       # 1.1 BTC
       # 2.2 LTC
       # 3.3 ETH
-      assert Tai.Exchanges.Adapters.Gdax.balance == Decimal.new(11503.403745066)
+      assert Tai.Exchanges.Adapters.Gdax.balance == Decimal.new("11503.40374506600000000000000")
     end
   end
 
