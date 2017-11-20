@@ -46,13 +46,14 @@ defmodule Tai.Exchanges.Adapters.Gdax do
   end
 
   def buy_limit(symbol, price, size) do
-    ExGdax.create_order(%{
+    %{
       "type" => "limit",
       "side" => "buy",
       "product_id" => symbol |> product_id,
       "price" => price |> Float.to_string,
       "size" => size |> Float.to_string
-    })
+    }
+    |> ExGdax.create_order
     |> case do
       {:ok, %{"id" => id, "status" => status}} ->
         {:ok, %Tai.OrderResponse{id: id, status: status |> parse_order_status}}

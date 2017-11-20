@@ -4,7 +4,8 @@ defmodule Tai.CommandsHelper do
   end
 
   def quotes(exchange, symbol) do
-    Tai.Exchange.quotes(exchange, symbol) 
+    exchange
+    |> Tai.Exchange.quotes(symbol)
     |> case do
       {bid, ask} ->
         IO.puts """
@@ -16,12 +17,8 @@ defmodule Tai.CommandsHelper do
   end
 
   def buy_limit(exchange, symbol, price, size) do
-    Tai.Exchange.buy_limit(
-      exchange,
-      symbol,
-      price,
-      size
-    )
+    exchange
+    |> Tai.Exchange.buy_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
         IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
