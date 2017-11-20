@@ -2,6 +2,10 @@ defmodule Tai.CurrencyTest do
   use ExUnit.Case
   doctest Tai.Currency
 
+  test "parses a string into a decimal" do
+    assert Tai.Currency.parse!("10.1a") == Decimal.new(10.1)
+  end
+
   test "adds 2 decimals together and returns a decimal" do
     assert Tai.Currency.add(Decimal.new(1.1), Decimal.new(2.2)) == Decimal.new(3.3)
   end
