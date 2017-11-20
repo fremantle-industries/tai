@@ -40,4 +40,13 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
       assert ask.price == Decimal.new(8019.87)
     end
   end
+
+  test "buy_limit creates an order for the symbol at the given price" do
+    use_cassette "buy_limit_success" do
+      {:ok, order_response} = Tai.Exchanges.Adapters.Gdax.buy_limit(:btcusd, 101.1, 0.2)
+
+      assert order_response.id == "467d09c8-1e41-4e28-8fae-2641182d8d1a"
+      assert order_response.status == :pending
+    end
+  end
 end

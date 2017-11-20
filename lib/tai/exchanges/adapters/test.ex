@@ -17,4 +17,8 @@ defmodule Tai.Exchanges.Adapters.Test do
       }
     }
   end
+
+  def buy_limit(symbol, price, size) do
+    {:ok, %Tai.OrderResponse{id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7", status: :pending}}
+  end
 end

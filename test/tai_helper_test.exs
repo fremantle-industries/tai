@@ -17,4 +17,10 @@ defmodule TaiHelperTest do
       TaiHelper.quotes(:test_exchange_a, :btcusd)
     end) == "8003.22/0.66 [0.000143s]\n---\n8003.21/1.55 [0.001044s]\n\n"
   end
+
+  test "buy_limit creates an order on the exchange" do
+    assert capture_io(fn ->
+      TaiHelper.buy_limit(:test_exchange_a, :btcusd, 10.1, 2.2)
+    end) == "created id: f9df7435-34d5-4861-8ddc-80f0fd2c83d7, status: pending\n"
+  end
 end

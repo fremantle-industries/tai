@@ -10,4 +10,10 @@ defmodule Tai.Exchange do
     |> Tai.Exchanges.Config.adapter
     |> (&(&1.quotes(symbol))).()
   end
+
+  def buy_limit(name, symbol, price, size) do
+    name
+    |> Tai.Exchanges.Config.adapter
+    |> (&(&1.buy_limit(symbol, price, size))).()
+  end
 end
