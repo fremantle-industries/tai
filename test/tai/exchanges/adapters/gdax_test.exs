@@ -34,9 +34,9 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
     use_cassette "quotes" do
       {bid, ask} = Tai.Exchanges.Adapters.Gdax.quotes(:btcusd)
 
-      assert bid.volume == Decimal.new(0.05)
+      assert bid.size == Decimal.new(0.05)
       assert bid.price == Decimal.new(8015.01)
-      assert ask.volume == Decimal.new(4.222)
+      assert ask.size == Decimal.new(4.222)
       assert ask.price == Decimal.new(8019.87)
     end
   end

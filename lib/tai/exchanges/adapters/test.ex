@@ -6,12 +6,12 @@ defmodule Tai.Exchanges.Adapters.Test do
   def quotes(_symbol) do
     {
       %Tai.Quote{
-        volume: Decimal.new(1.55),
+        size: Decimal.new(1.55),
         price: Decimal.new(8003.21),
         age: Decimal.new(0.001044)
       },
       %Tai.Quote{
-        volume: Decimal.new(0.66),
+        size: Decimal.new(0.66),
         price: Decimal.new(8003.22),
         age: Decimal.new(0.000143)
       }
