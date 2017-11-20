@@ -27,6 +27,7 @@ defmodule Tai.Mixfile do
       {:timex, "~> 3.1"},
       {:websockex, "~> 0.4"},
       {:exvcr, "~> 0.8", only: [:test]},
+      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:ex_unit_notifier, "~> 0.1", only: :test},
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false}
     ]
