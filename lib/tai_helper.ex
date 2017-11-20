@@ -4,7 +4,8 @@ defmodule TaiHelper do
   end
 
   def quotes(exchange, symbol) do
-    case Tai.Exchange.quotes(exchange, symbol) do
+    Tai.Exchange.quotes(exchange, symbol) 
+    |> case do
       {bid, ask} ->
         IO.puts """
         #{ask.price}/#{ask.size} [#{ask.age}s]
