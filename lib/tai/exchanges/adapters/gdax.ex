@@ -29,16 +29,17 @@ defmodule Tai.Exchanges.Adapters.Gdax do
           "asks" => [[ask_price, ask_volume, _ask_order_count]]
         }
       } ->
+        age = Decimal.new(Timex.diff(Timex.now, start) / 1_000_000)
         {
           %Tai.Quote{
             volume: Tai.Currency.parse!(bid_volume),
             price: Tai.Currency.parse!(bid_price),
-            age: Timex.diff(Timex.now, start)
+            age: age
           },
           %Tai.Quote{
             volume: Tai.Currency.parse!(ask_volume),
             price: Tai.Currency.parse!(ask_price),
-            age: Timex.diff(Timex.now, start)
+            age: age
           }
         }
     end
