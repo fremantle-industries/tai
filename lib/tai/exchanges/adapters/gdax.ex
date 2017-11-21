@@ -2,13 +2,7 @@ defmodule Tai.Exchanges.Adapters.Gdax do
   alias Tai.Exchanges.Adapters.Gdax.Product
 
   defdelegate price(symbol), to: Tai.Exchanges.Adapters.Gdax.Price
-
-  def balance do
-    ExGdax.list_accounts
-    |> parse_account_balances
-    |> convert_account_balances_to_usd
-    |> Tai.Currency.sum
-  end
+  defdelegate balance, to: Tai.Exchanges.Adapters.Gdax.Balance
 
   def quotes(symbol, start \\ Timex.now) do
     symbol
@@ -53,34 +47,6 @@ defmodule Tai.Exchanges.Adapters.Gdax do
       {:error, message, _status_code} ->
         {:error, message}
     end
-  end
-
-  defp parse_account_balances(response) do
-    case response do
-      {:ok, accounts} ->
-        accounts
-        |> Enum.map(
-          fn(%{"currency" => currency, "balance" => balance}) ->
-            balance
-            |> Decimal.new
-            |> (&{currency, &1}).()
-          end
-        )
-    end
-  end
-
-  defp convert_account_balances_to_usd(balances) do
-    balances
-    |> Enum.map(
-      fn({currency, balance}) ->
-        case currency do
-          "USD" -> balance
-          "BTC" -> Decimal.mult(balance, price(:btcusd))
-          "ETH" -> Decimal.mult(balance, price(:ethusd))
-          "LTC" -> Decimal.mult(balance, price(:ltcusd))
-        end
-      end
-    )
   end
 
   def parse_order_status(status) do
