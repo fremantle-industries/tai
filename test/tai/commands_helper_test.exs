@@ -29,4 +29,10 @@ defmodule Tai.CommandsHelperTest do
       Tai.CommandsHelper.buy_limit(:test_exchange_a, :btcusd, 10.1, 3.3)
     end) == "create order failure - Insufficient funds\n"
   end
+
+  test "order_status displays the order info" do
+    assert capture_io(fn ->
+      Tai.CommandsHelper.order_status(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
+    end) == "status: open\n"
+  end
 end

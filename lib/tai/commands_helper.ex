@@ -26,4 +26,13 @@ defmodule Tai.CommandsHelper do
         IO.puts "create order failure - #{message}"
     end
   end
+
+  def order_status(exchange, order_id) do
+    exchange
+    |> Tai.Exchange.order_status(order_id)
+    |> case do
+      {:ok, status} ->
+        IO.puts "status: #{status}"
+    end
+  end
 end

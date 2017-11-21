@@ -13,6 +13,15 @@ defmodule Tai.Exchanges.Adapters.Gdax.Orders do
     |> handle_order
   end
 
+  def order_status(order_id) do
+    order_id
+    |> ExGdax.get_order
+    |> case do
+      {:ok, %{"status" => status}} ->
+        {:ok, status |> status_to_atom}
+    end
+  end
+
   defp handle_order({:ok, %{"id" => id, "status" => status}}) do
     {:ok, %Tai.OrderResponse{id: id, status: status |> status_to_atom}}
   end
@@ -23,5 +32,9 @@ defmodule Tai.Exchanges.Adapters.Gdax.Orders do
 
   defp status_to_atom("pending") do
     :pending
+  end
+
+  defp status_to_atom("open") do
+    :open
   end
 end

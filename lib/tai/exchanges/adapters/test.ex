@@ -25,4 +25,8 @@ defmodule Tai.Exchanges.Adapters.Test do
   def buy_limit(_symbol, _price, _size) do
     {:error, "Insufficient funds"}
   end
+
+  def order_status(_order_id) do
+    {:ok, :open}
+  end
 end

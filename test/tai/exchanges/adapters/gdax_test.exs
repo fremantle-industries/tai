@@ -57,4 +57,13 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
       assert message == "Insufficient funds"
     end
   end
+
+  test "order_status returns the status" do
+    use_cassette "order_status" do
+      {:ok, order_response} = Tai.Exchanges.Adapters.Gdax.buy_limit(:btcusd, 101.1, 0.2)
+      {:ok, status} = Tai.Exchanges.Adapters.Gdax.order_status(order_response.id)
+
+      assert status == :open
+    end
+  end
 end
