@@ -3,34 +3,7 @@ defmodule Tai.Exchanges.Adapters.Gdax do
 
   defdelegate price(symbol), to: Tai.Exchanges.Adapters.Gdax.Price
   defdelegate balance, to: Tai.Exchanges.Adapters.Gdax.Balance
-
-  def quotes(symbol, start \\ Timex.now) do
-    symbol
-    |> Product.to_product_id
-    |> ExGdax.get_order_book
-    |> case do
-      {
-        :ok,
-        %{
-          "bids" => [[bid_price, bid_size, _bid_order_count]],
-          "asks" => [[ask_price, ask_size, _ask_order_count]]
-        }
-      } ->
-        age = Decimal.new(Timex.diff(Timex.now, start) / 1_000_000)
-        {
-          %Tai.Quote{
-            size: Decimal.new(bid_size),
-            price: Decimal.new(bid_price),
-            age: age
-          },
-          %Tai.Quote{
-            size: Decimal.new(ask_size),
-            price: Decimal.new(ask_price),
-            age: age
-          }
-        }
-    end
-  end
+  defdelegate quotes(symbol), to: Tai.Exchanges.Adapters.Gdax.Quotes
 
   def buy_limit(symbol, price, size) do
     %{
