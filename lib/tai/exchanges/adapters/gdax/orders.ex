@@ -13,15 +13,15 @@ defmodule Tai.Exchanges.Adapters.Gdax.Orders do
     |> handle_order
   end
 
-  def handle_order({:ok, %{"id" => id, "status" => status}}) do
+  defp handle_order({:ok, %{"id" => id, "status" => status}}) do
     {:ok, %Tai.OrderResponse{id: id, status: status |> status_to_atom}}
   end
 
-  def handle_order({:error, message, _status_code}) do
+  defp handle_order({:error, message, _status_code}) do
     {:error, message}
   end
 
-  def status_to_atom("pending") do
+  defp status_to_atom("pending") do
     :pending
   end
 end

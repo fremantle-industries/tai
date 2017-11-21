@@ -18,13 +18,11 @@ defmodule Tai.Exchanges.Adapters.Test do
     }
   end
 
-  def buy_limit(_symbol, _price, size) do
-    case size do
-      2.2 ->
-        {:ok, %Tai.OrderResponse{id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7", status: :pending}}
-      _default ->
-        {:error, "Insufficient funds"}
-    end
+  def buy_limit(_symbol, _price, 2.2 = _size) do
+    {:ok, %Tai.OrderResponse{id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7", status: :pending}}
+  end
 
+  def buy_limit(_symbol, _price, _size) do
+    {:error, "Insufficient funds"}
   end
 end
