@@ -35,4 +35,10 @@ defmodule Tai.CommandsHelperTest do
       Tai.CommandsHelper.order_status(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
     end) == "status: open\n"
   end
+
+  test "order_status displays error messages" do
+    assert capture_io(fn ->
+      Tai.CommandsHelper.order_status(:test_exchange_a, "invalid-id")
+    end) == "error: Invalid order id\n"
+  end
 end

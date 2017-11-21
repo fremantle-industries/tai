@@ -1,5 +1,7 @@
 defmodule Tai.Exchanges.Adapters.Gdax.Orders do
+  alias Tai.OrderResponse
   alias Tai.Exchanges.Adapters.Gdax.Product
+  alias Tai.Exchanges.Adapters.Gdax.OrderStatus
 
   def buy_limit(symbol, price, size) do
     %{
@@ -10,31 +12,26 @@ defmodule Tai.Exchanges.Adapters.Gdax.Orders do
       "size" => size
     }
     |> ExGdax.create_order
-    |> handle_order
+    |> handle_create_order
   end
 
   def order_status(order_id) do
     order_id
     |> ExGdax.get_order
-    |> case do
-      {:ok, %{"status" => status}} ->
-        {:ok, status |> status_to_atom}
-    end
+    |> handle_order_status
   end
 
-  defp handle_order({:ok, %{"id" => id, "status" => status}}) do
-    {:ok, %Tai.OrderResponse{id: id, status: status |> status_to_atom}}
+  defp handle_create_order({:ok, %{"id" => id, "status" => status}}) do
+    {:ok, %OrderResponse{id: id, status: status |> OrderStatus.to_atom}}
   end
-
-  defp handle_order({:error, message, _status_code}) do
+  defp handle_create_order({:error, message, _status_code}) do
     {:error, message}
   end
 
-  defp status_to_atom("pending") do
-    :pending
+  defp handle_order_status({:ok, %{"status" => status}}) do
+    {:ok, status |> OrderStatus.to_atom}
   end
-
-  defp status_to_atom("open") do
-    :open
+  defp handle_order_status({:error, message, _status_code}) do
+    {:error, message}
   end
 end

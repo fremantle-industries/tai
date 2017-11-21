@@ -33,6 +33,8 @@ defmodule Tai.CommandsHelper do
     |> case do
       {:ok, status} ->
         IO.puts "status: #{status}"
+      {:error, message} ->
+        IO.puts "error: #{message}"
     end
   end
 end

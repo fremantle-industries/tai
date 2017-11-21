@@ -59,11 +59,19 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
   end
 
   test "order_status returns the status" do
-    use_cassette "order_status" do
+    use_cassette "order_status_success" do
       {:ok, order_response} = Tai.Exchanges.Adapters.Gdax.buy_limit(:btcusd, 101.1, 0.2)
       {:ok, status} = Tai.Exchanges.Adapters.Gdax.order_status(order_response.id)
 
       assert status == :open
+    end
+  end
+
+  test "order_status returns an error tuple with a message when it can't find the order" do
+    use_cassette "order_status_error" do
+      {:error, message} = Tai.Exchanges.Adapters.Gdax.order_status("invalid-id")
+
+      assert message == "Invalid order id"
     end
   end
 end
