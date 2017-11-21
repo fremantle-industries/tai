@@ -1,14 +1,7 @@
 defmodule Tai.Exchanges.Adapters.Gdax do
-  def price(symbol) do
-    symbol
-    |> product_id
-    |> ExGdax.get_ticker
-    |> case do
-      {:ok, %{"price" => price}} ->
-        price
-        |> Decimal.new
-    end
-  end
+  alias Tai.Exchanges.Adapters.Gdax.Product
+
+  defdelegate price(symbol), to: Tai.Exchanges.Adapters.Gdax.Price
 
   def balance do
     ExGdax.list_accounts
@@ -19,7 +12,7 @@ defmodule Tai.Exchanges.Adapters.Gdax do
 
   def quotes(symbol, start \\ Timex.now) do
     symbol
-    |> product_id
+    |> Product.to_product_id
     |> ExGdax.get_order_book
     |> case do
       {
@@ -49,9 +42,9 @@ defmodule Tai.Exchanges.Adapters.Gdax do
     %{
       "type" => "limit",
       "side" => "buy",
-      "product_id" => symbol |> product_id,
-      "price" => price |> Float.to_string,
-      "size" => size |> Float.to_string
+      "product_id" => symbol |> Product.to_product_id,
+      "price" => price,
+      "size" => size
     }
     |> ExGdax.create_order
     |> case do
@@ -88,26 +81,6 @@ defmodule Tai.Exchanges.Adapters.Gdax do
         end
       end
     )
-  end
-
-  defp product_id(symbol) do
-    ExGdax.list_products
-    |> case do
-      {:ok, products} ->
-        products
-        |> Enum.map(fn(%{"id" => id}) -> id end)
-        |> Enum.find(&match_product(symbol, &1))
-    end
-  end
-
-  def match_product(symbol, product_id) do
-    symbol
-    |> Atom.to_string
-    |> String.downcase
-    ==
-    product_id
-    |> String.replace("-", "")
-    |> String.downcase
   end
 
   def parse_order_status(status) do
