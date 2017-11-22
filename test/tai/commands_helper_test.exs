@@ -15,7 +15,11 @@ defmodule Tai.CommandsHelperTest do
   test "quotes returns the orderbook for the exchange and symbol" do
     assert capture_io(fn ->
       Tai.CommandsHelper.quotes(:test_exchange_a, :btcusd)
-    end) == "8003.22/0.66 [0.000143s]\n---\n8003.21/1.55 [0.001044s]\n\n"
+    end) == """
+    8003.22/0.66 [0.000143s]
+    ---
+    8003.21/1.55 [0.001044s]\n
+    """
   end
 
   test "quotes displays errors" do
@@ -70,5 +74,11 @@ defmodule Tai.CommandsHelperTest do
     assert capture_io(fn ->
       Tai.CommandsHelper.cancel_order(:test_exchange_a, "invalid-order-id")
     end) == "error: Invalid order id\n"
+  end
+
+  test "strategy shows runtime info" do
+    assert capture_io(fn ->
+      Tai.CommandsHelper.strategy(:test_strategy_a)
+    end) == "started: 2010-01-13 14:21:06Z\n"
   end
 end

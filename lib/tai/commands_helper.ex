@@ -61,4 +61,13 @@ defmodule Tai.CommandsHelper do
         IO.puts "error: #{message}"
     end
   end
+
+  def strategy(name) do
+    name
+    |> Tai.Strategy.info
+    |> case do
+      {:ok, info} ->
+        IO.puts "started: #{info.started_at}"
+    end
+  end
 end

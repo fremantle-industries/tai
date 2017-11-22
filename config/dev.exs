@@ -7,3 +7,7 @@ config :ex_gdax, api_key:        System.get_env("GDAX_API_KEY"),
 config :tai,  exchanges: %{
                 gdax: Tai.Exchanges.Adapters.Gdax
               }
+
+config :tai,  strategies: %{
+                info: Tai.Strategies.Info
+              }

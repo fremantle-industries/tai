@@ -6,7 +6,9 @@ defmodule Tai.Supervisor do
   end
 
   def init(_) do
-    children = []
+    children = [
+      Tai.Strategies.Supervisor
+    ]
 
     Supervisor.init(children, strategy: :one_for_one)
   end

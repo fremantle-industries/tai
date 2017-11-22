@@ -8,3 +8,8 @@ config :tai,  exchanges: %{
                 test_exchange_a: Tai.Exchanges.Adapters.Test,
                 test_exchange_b: Tai.Exchanges.Adapters.Test
               }
+
+config :tai,  strategies: %{
+                test_strategy_a: Tai.Strategies.Info,
+                test_strategy_b: Tai.Strategies.Info
+              }
