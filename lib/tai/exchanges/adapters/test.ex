@@ -25,6 +25,13 @@ defmodule Tai.Exchanges.Adapters.Test do
     {:error, "Insufficient funds"}
   end
 
+  def sell_limit(_symbol, _price, 2.2 = _size) do
+    {:ok, %Tai.OrderResponse{id: "41541912-ebc1-4173-afa5-4334ccf7a1a8", status: :pending}}
+  end
+  def sell_limit(_symbol, _price, _size) do
+    {:error, "Insufficient funds"}
+  end
+
   def order_status("invalid-order-id" = _order_id) do
     {:error, "Invalid order id"}
   end

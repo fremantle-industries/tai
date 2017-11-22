@@ -19,6 +19,12 @@ defmodule Tai.Exchange do
     |> (&(&1.buy_limit(symbol, price, size))).()
   end
 
+  def sell_limit(name, symbol, price, size) do
+    name
+    |> Config.adapter
+    |> (&(&1.sell_limit(symbol, price, size))).()
+  end
+
   def order_status(name, order_id) do
     name
     |> Config.adapter

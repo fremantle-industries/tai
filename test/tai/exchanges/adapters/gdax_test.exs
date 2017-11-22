@@ -58,6 +58,23 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
     end
   end
 
+  test "sell_limit creates an order for the symbol at the given price" do
+    use_cassette "sell_limit_success" do
+      {:ok, order_response} = Tai.Exchanges.Adapters.Gdax.sell_limit(:btcusd, 99_999_999.1, 0.2)
+
+      assert order_response.id == "467d09c8-1e41-4e28-8fae-2641182d8d1a"
+      assert order_response.status == :pending
+    end
+  end
+
+  test "sell_limit returns an error tuple with a message when it can't create the order" do
+    use_cassette "sell_limit_error" do
+      {:error, message} = Tai.Exchanges.Adapters.Gdax.sell_limit(:btcusd, 99_999_999.1, 0.3)
+
+      assert message == "Insufficient funds"
+    end
+  end
+
   test "order_status returns the status" do
     use_cassette "order_status_success" do
       {:ok, order_response} = Tai.Exchanges.Adapters.Gdax.buy_limit(:btcusd, 101.1, 0.2)

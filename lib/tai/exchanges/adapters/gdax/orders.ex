@@ -4,15 +4,30 @@ defmodule Tai.Exchanges.Adapters.Gdax.Orders do
   alias Tai.Exchanges.Adapters.Gdax.OrderStatus
 
   def buy_limit(symbol, price, size) do
+    {"buy", symbol, price, size}
+    |> create_limit_order
+  end
+
+  def sell_limit(symbol, price, size) do
+    {"sell", symbol, price, size}
+    |> create_limit_order
+  end
+
+  defp create_limit_order(order) do
+    order
+    |> build_limit_order
+    |> ExGdax.create_order
+    |> handle_create_order
+  end
+
+  defp build_limit_order({side, symbol, price, size}) do
     %{
       "type" => "limit",
-      "side" => "buy",
+      "side" => side,
       "product_id" => symbol |> Product.to_product_id,
       "price" => price,
       "size" => size
     }
-    |> ExGdax.create_order
-    |> handle_create_order
   end
 
   defp handle_create_order({:ok, %{"id" => id, "status" => status}}) do
