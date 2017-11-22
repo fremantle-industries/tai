@@ -24,4 +24,10 @@ defmodule Tai.Exchange do
     |> Config.adapter
     |> (&(&1.order_status(order_id))).()
   end
+
+  def cancel_order(name, order_id) do
+    name
+    |> Config.adapter
+    |> (&(&1.cancel_order(order_id))).()
+  end
 end

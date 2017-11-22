@@ -15,23 +15,10 @@ defmodule Tai.Exchanges.Adapters.Gdax.Orders do
     |> handle_create_order
   end
 
-  def order_status(order_id) do
-    order_id
-    |> ExGdax.get_order
-    |> handle_order_status
-  end
-
   defp handle_create_order({:ok, %{"id" => id, "status" => status}}) do
     {:ok, %OrderResponse{id: id, status: status |> OrderStatus.to_atom}}
   end
   defp handle_create_order({:error, message, _status_code}) do
-    {:error, message}
-  end
-
-  defp handle_order_status({:ok, %{"status" => status}}) do
-    {:ok, status |> OrderStatus.to_atom}
-  end
-  defp handle_order_status({:error, message, _status_code}) do
     {:error, message}
   end
 end

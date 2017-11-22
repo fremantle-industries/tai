@@ -74,4 +74,13 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
       assert message == "Invalid order id"
     end
   end
+
+  test "cancel_order returns an ok tuple with the order id when it's successfully cancelled" do
+    use_cassette "cancel_order_success" do
+      {:ok, order_response} = Tai.Exchanges.Adapters.Gdax.buy_limit(:btcusd, 101.1, 0.2)
+      {:ok, cancelled_order_id} = Tai.Exchanges.Adapters.Gdax.cancel_order(order_response.id)
+
+      assert cancelled_order_id == order_response.id
+    end
+  end
 end
