@@ -38,7 +38,7 @@ defmodule Tai.CommandsHelperTest do
 
   test "order_status displays error messages" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.order_status(:test_exchange_a, "invalid-id")
+      Tai.CommandsHelper.order_status(:test_exchange_a, "invalid-order-id")
     end) == "error: Invalid order id\n"
   end
 
@@ -46,5 +46,11 @@ defmodule Tai.CommandsHelperTest do
     assert capture_io(fn ->
       Tai.CommandsHelper.cancel_order(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
     end) == "cancel order success\n"
+  end
+
+  test "cancel_order displays error messages" do
+    assert capture_io(fn ->
+      Tai.CommandsHelper.cancel_order(:test_exchange_a, "invalid-order-id")
+    end) == "error: Invalid order id\n"
   end
 end

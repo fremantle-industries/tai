@@ -6,10 +6,10 @@
         "Content-Type": "application/json",
         "CB-ACCESS-KEY": "api_key",
         "CB-ACCESS-SIGN": "8SoX/mF/f380PLEQSIKkn+htyyMkZwEQsYTJImhkUVc=",
-        "CB-ACCESS-TIMESTAMP": "1511254953",
+        "CB-ACCESS-TIMESTAMP": "1511319924",
         "CB-ACCESS-PASSPHRASE": "passphrase"
       },
-      "method": "get",
+      "method": "delete",
       "options": [],
       "request_body": "",
       "url": "https://api.gdax.com/orders/invalid-order-id"
@@ -17,11 +17,11 @@
     "response": {
       "body": "{\"message\":\"Invalid order id\"}",
       "headers": {
-        "Date": "Tue, 21 Nov 2017 09:02:33 GMT",
+        "Date": "Wed, 22 Nov 2017 03:05:25 GMT",
         "Content-Type": "application/json; charset=utf-8",
         "Content-Length": "30",
         "Connection": "keep-alive",
-        "Set-Cookie": "__cfduid=d62dbdf1b42b6e3f36e9ea485d2f0bce81511254953; expires=Wed, 21-Nov-18 09:02:33 GMT; path=/; domain=.gdax.com; HttpOnly",
+        "Set-Cookie": "__cfduid=d6538f52ccf02053477afacf828e639c41511319925; expires=Thu, 22-Nov-18 03:05:25 GMT; path=/; domain=.gdax.com; HttpOnly",
         "Access-Control-Allow-Headers": "Content-Type, Accept, cb-session",
         "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
         "Access-Control-Allow-Origin": "*",
@@ -31,7 +31,7 @@
         "Strict-Transport-Security": "max-age=15552000; includeSubDomains; preload",
         "X-Content-Type-Options": "nosniff",
         "Server": "cloudflare-nginx",
-        "CF-RAY": "3c127884d96579b5-SEA"
+        "CF-RAY": "3c18aabbd96a79bb-SEA"
       },
       "status_code": 400,
       "type": "ok"

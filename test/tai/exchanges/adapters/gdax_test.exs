@@ -69,7 +69,7 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
 
   test "order_status returns an error tuple with a message when it can't find the order" do
     use_cassette "order_status_error" do
-      {:error, message} = Tai.Exchanges.Adapters.Gdax.order_status("invalid-id")
+      {:error, message} = Tai.Exchanges.Adapters.Gdax.order_status("invalid-order-id")
 
       assert message == "Invalid order id"
     end
@@ -81,6 +81,14 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
       {:ok, cancelled_order_id} = Tai.Exchanges.Adapters.Gdax.cancel_order(order_response.id)
 
       assert cancelled_order_id == order_response.id
+    end
+  end
+
+  test "cancel_order returns an error tuple when it can't cancel the order" do
+    use_cassette "cancel_order_error" do
+      {:error, message} = Tai.Exchanges.Adapters.Gdax.cancel_order("invalid-order-id")
+
+      assert message == "Invalid order id"
     end
   end
 end

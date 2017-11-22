@@ -44,6 +44,8 @@ defmodule Tai.CommandsHelper do
     |> case do
       {:ok, _canceled_order_id} ->
         IO.puts "cancel order success"
+      {:error, message} ->
+        IO.puts "error: #{message}"
     end
   end
 end
