@@ -18,6 +18,12 @@ defmodule Tai.CommandsHelperTest do
     end) == "8003.22/0.66 [0.000143s]\n---\n8003.21/1.55 [0.001044s]\n\n"
   end
 
+  test "quotes displays errors" do
+    assert capture_io(fn ->
+      Tai.CommandsHelper.quotes(:test_exchange_a, :notfound)
+    end) == "error: NotFound\n"
+  end
+
   test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
       Tai.CommandsHelper.buy_limit(:test_exchange_a, :btcusd, 10.1, 2.2)

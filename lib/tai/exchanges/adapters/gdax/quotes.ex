@@ -23,6 +23,7 @@ defmodule Tai.Exchanges.Adapters.Gdax.Quotes do
     age
   ) do
     {
+      :ok,
       %Quote{
         size: Decimal.new(bid_size),
         price: Decimal.new(bid_price),
@@ -34,5 +35,8 @@ defmodule Tai.Exchanges.Adapters.Gdax.Quotes do
         age: age
       }
     }
+  end
+  defp extract_quotes({:error, message, _status_code}, _age) do
+    {:error, message}
   end
 end

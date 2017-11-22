@@ -1,0 +1,80 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "CB-ACCESS-KEY": "api_key",
+        "CB-ACCESS-SIGN": "8SoX/mF/f380PLEQSIKkn+htyyMkZwEQsYTJImhkUVc=",
+        "CB-ACCESS-TIMESTAMP": "1511329971",
+        "CB-ACCESS-PASSPHRASE": "passphrase"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.gdax.com/products"
+    },
+    "response": {
+      "body": "[{\"id\":\"LTC-EUR\",\"base_currency\":\"LTC\",\"quote_currency\":\"EUR\",\"base_min_size\":\"0.01\",\"base_max_size\":\"1000000\",\"quote_increment\":\"0.01\",\"display_name\":\"LTC/EUR\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null},{\"id\":\"LTC-BTC\",\"base_currency\":\"LTC\",\"quote_currency\":\"BTC\",\"base_min_size\":\"0.01\",\"base_max_size\":\"1000000\",\"quote_increment\":\"0.00001\",\"display_name\":\"LTC/BTC\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null},{\"id\":\"LTC-USD\",\"base_currency\":\"LTC\",\"quote_currency\":\"USD\",\"base_min_size\":\"0.01\",\"base_max_size\":\"1000000\",\"quote_increment\":\"0.01\",\"display_name\":\"LTC/USD\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null},{\"id\":\"ETH-USD\",\"base_currency\":\"ETH\",\"quote_currency\":\"USD\",\"base_min_size\":\"0.01\",\"base_max_size\":\"5000\",\"quote_increment\":\"0.01\",\"display_name\":\"ETH/USD\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null},{\"id\":\"ETH-EUR\",\"base_currency\":\"ETH\",\"quote_currency\":\"EUR\",\"base_min_size\":\"0.01\",\"base_max_size\":\"5000\",\"quote_increment\":\"0.01\",\"display_name\":\"ETH/EUR\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null},{\"id\":\"ETH-BTC\",\"base_currency\":\"ETH\",\"quote_currency\":\"BTC\",\"base_min_size\":\"0.01\",\"base_max_size\":\"5000\",\"quote_increment\":\"0.00001\",\"display_name\":\"ETH/BTC\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null},{\"id\":\"BTC-USD\",\"base_currency\":\"BTC\",\"quote_currency\":\"USD\",\"base_min_size\":\"0.01\",\"base_max_size\":\"250\",\"quote_increment\":\"0.01\",\"display_name\":\"BTC/USD\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null},{\"id\":\"BTC-EUR\",\"base_currency\":\"BTC\",\"quote_currency\":\"EUR\",\"base_min_size\":\"0.01\",\"base_max_size\":\"250\",\"quote_increment\":\"0.01\",\"display_name\":\"BTC/EUR\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null},{\"id\":\"BTC-GBP\",\"base_currency\":\"BTC\",\"quote_currency\":\"GBP\",\"base_min_size\":\"0.01\",\"base_max_size\":\"250\",\"quote_increment\":\"0.01\",\"display_name\":\"BTC/GBP\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null}]",
+      "headers": {
+        "Date": "Wed, 22 Nov 2017 05:52:52 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "2002",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d1506af0294bba09be5292acbe7b3ff381511329971; expires=Thu, 22-Nov-18 05:52:51 GMT; path=/; domain=.gdax.com; HttpOnly",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, cb-session",
+        "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "cb-before, cb-after",
+        "Access-Control-Max-Age": "7200",
+        "Cache-Control": "public, max-age=1",
+        "ETag": "W/\"7d2-Rw8GnJaAFleElgWXkXig1NcGN1M\"",
+        "Strict-Transport-Security": "max-age=15552000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Server": "cloudflare-nginx",
+        "CF-RAY": "3c19a004da3829f5-SEA"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "CB-ACCESS-KEY": "api_key",
+        "CB-ACCESS-SIGN": "8SoX/mF/f380PLEQSIKkn+htyyMkZwEQsYTJImhkUVc=",
+        "CB-ACCESS-TIMESTAMP": "1511329971",
+        "CB-ACCESS-PASSPHRASE": "passphrase"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.gdax.com/products//book"
+    },
+    "response": {
+      "body": "{\"message\":\"NotFound\"}",
+      "headers": {
+        "Date": "Wed, 22 Nov 2017 05:52:52 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "22",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d48a4022ecbaa7b8a395f3eebbc3943fb1511329972; expires=Thu, 22-Nov-18 05:52:52 GMT; path=/; domain=.gdax.com; HttpOnly",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, cb-session",
+        "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "cb-before, cb-after",
+        "Access-Control-Max-Age": "7200",
+        "Cache-Control": "public, max-age=1",
+        "ETag": "W/\"16-osMlA0gxCAnmtiKBe1inhP+EK48\"",
+        "Strict-Transport-Security": "max-age=15552000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Server": "cloudflare-nginx",
+        "CF-RAY": "3c19a007dc4a29f5-SEA"
+      },
+      "status_code": 404,
+      "type": "ok"
+    }
+  }
+]

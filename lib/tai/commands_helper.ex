@@ -7,12 +7,14 @@ defmodule Tai.CommandsHelper do
     exchange
     |> Tai.Exchange.quotes(symbol)
     |> case do
-      {bid, ask} ->
+      {:ok, bid, ask} ->
         IO.puts """
         #{ask.price}/#{ask.size} [#{ask.age}s]
         ---
         #{bid.price}/#{bid.size} [#{bid.age}s]
         """
+      {:error, message} ->
+        IO.puts "error: #{message}"
     end
   end
 
