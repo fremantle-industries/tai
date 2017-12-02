@@ -21,7 +21,7 @@ defmodule Tai.Mixfile do
   defp deps do
     [
       {:decimal, "~> 1.0"},
-      {:ex_gdax, github: "fremantle-capital/ex_gdax", branch: "improvements"},
+      {:ex_gdax, "~> 0.1.2"},
       {:httpoison, "~> 0.12"},
       {:json, "~> 1.0"},
       {:timex, "~> 3.1"},
