@@ -2,14 +2,11 @@ defmodule Tai.Exchanges.Adapters.Gdax.Quotes do
   alias Tai.Exchanges.Adapters.Gdax.Product
   alias Tai.Quote
 
-  def quotes(symbol, start \\ Timex.now) do
+  def quotes(symbol, started_at \\ Timex.now) do
     symbol
     |> Product.to_product_id
     |> ExGdax.get_order_book
-    |> extract_quotes(
-      Timex.diff(Timex.now, start) / 1_000_000
-      |> Decimal.new
-    )
+    |> extract_quotes(started_at)
   end
 
   defp extract_quotes(
@@ -20,8 +17,11 @@ defmodule Tai.Exchanges.Adapters.Gdax.Quotes do
         "asks" => [[ask_price, ask_size, _ask_order_count]]
       }
     },
-    age
+    started_at
   ) do
+    age = Timex.diff(Timex.now, started_at) / 1_000_000
+          |> Decimal.new
+
     {
       :ok,
       %Quote{
@@ -36,7 +36,7 @@ defmodule Tai.Exchanges.Adapters.Gdax.Quotes do
       }
     }
   end
-  defp extract_quotes({:error, message, _status_code}, _age) do
+  defp extract_quotes({:error, message, _status_code}, _started_at) do
     {:error, message}
   end
 end
