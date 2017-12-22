@@ -5,7 +5,8 @@ config :ex_gdax, api_key:        System.get_env("GDAX_API_KEY"),
                  api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
 
 config :tai,  exchanges: %{
-                gdax: Tai.Exchanges.Adapters.Gdax
+                gdax: Tai.Exchanges.Adapters.Gdax,
+                bitstamp: Tai.Exchanges.Adapters.Bitstamp
               }
 
 config :tai,  strategies: %{
