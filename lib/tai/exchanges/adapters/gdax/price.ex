@@ -9,7 +9,12 @@ defmodule Tai.Exchanges.Adapters.Gdax.Price do
   end
 
   defp extract_price({:ok, %{"price" => price}}) do
-    price
-    |> Decimal.new
+    {:ok, Decimal.new(price)}
+  end
+  defp extract_price({:error, "NotFound", _status_code}) do
+    {:error, "not found"}
+  end
+  defp extract_price({:error, message, _status_code}) do
+    {:error, message}
   end
 end

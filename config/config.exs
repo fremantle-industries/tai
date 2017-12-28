@@ -14,7 +14,6 @@ use Mix.Config
 #
 #     Application.get_env(:tai, :key)
 #
-config :tai, accounts: %{}
 
 # You can also configure a 3rd-party app:
 #

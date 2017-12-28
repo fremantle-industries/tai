@@ -8,15 +8,21 @@ defmodule Tai.Exchanges.Adapters.GdaxTest do
     ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchanges/adapters/gdax")
   end
 
-  test "price returns value of the last trade for the pair" do
-    use_cassette "price" do
-      assert Tai.Exchanges.Adapters.Gdax.price(:btcusd) == Decimal.new("152.18000000")
+  test "price returns value of the last trade for the symbol" do
+    use_cassette "price_success" do
+      assert Tai.Exchanges.Adapters.Gdax.price(:btcusd) == {:ok, Decimal.new("152.18000000")}
     end
   end
 
   test "price supports upper and lower case symbols" do
-    use_cassette "price" do
-      assert Tai.Exchanges.Adapters.Gdax.price(:BtcusD) == Decimal.new("152.18000000")
+    use_cassette "price_success" do
+      assert Tai.Exchanges.Adapters.Gdax.price(:BtcusD) == {:ok, Decimal.new("152.18000000")}
+    end
+  end
+
+  test "price returns an error/message tuple when the symbol is not found" do
+    use_cassette "price_not_found" do
+      assert Tai.Exchanges.Adapters.Gdax.price(:idontexist) == {:error, "not found"}
     end
   end
 

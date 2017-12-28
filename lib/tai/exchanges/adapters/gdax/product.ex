@@ -1,8 +1,10 @@
 defmodule Tai.Exchanges.Adapters.Gdax.Product do
+  alias Tai.Symbol
+
   def to_product_id(symbol) do
     ExGdax.list_products
     |> extract_product_ids
-    |> Enum.find(&(&1 |> strip_and_downcase == symbol |> downcase))
+    |> Enum.find(&(&1 |> strip_and_downcase == Symbol.downcase(symbol)))
   end
 
   defp extract_product_ids({:ok, products}) do
@@ -10,15 +12,9 @@ defmodule Tai.Exchanges.Adapters.Gdax.Product do
     |> Enum.map(fn(%{"id" => id}) -> id end)
   end
 
-  def strip_and_downcase(product_id) do
+  defp strip_and_downcase(product_id) do
     product_id
     |> String.replace("-", "")
-    |> String.downcase
-  end
-
-  def downcase(symbol) do
-    symbol
-    |> Atom.to_string
     |> String.downcase
   end
 end

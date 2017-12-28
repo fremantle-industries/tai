@@ -1,5 +1,6 @@
 defmodule Tai.Exchanges.Adapters.Gdax.Balance do
   alias Tai.Exchanges.Adapters.Gdax.Price
+  alias Tai.Symbol
 
   def balance do
     ExGdax.list_accounts
@@ -16,22 +17,18 @@ defmodule Tai.Exchanges.Adapters.Gdax.Balance do
     balance
     |> Decimal.new
   end
-
-  defp convert_account_to_usd(%{"currency" => "BTC", "balance" => balance}) do
+  defp convert_account_to_usd(%{"currency" => currency, "balance" => balance}) do
     balance
     |> Decimal.new
-    |> Decimal.mult(Price.price(:btcusd))
+    |> Decimal.mult(usd_price(currency))
   end
 
-  defp convert_account_to_usd(%{"currency" => "LTC", "balance" => balance}) do
-    balance
-    |> Decimal.new
-    |> Decimal.mult(Price.price(:ltcusd))
-  end
-
-  defp convert_account_to_usd(%{"currency" => "ETH", "balance" => balance}) do
-    balance
-    |> Decimal.new
-    |> Decimal.mult(Price.price(:ethusd))
+  defp usd_price(currency) do
+    "#{currency}usd"
+    |> Symbol.downcase
+    |> Price.price
+    |> case do
+      {:ok, price} -> price
+    end
   end
 end

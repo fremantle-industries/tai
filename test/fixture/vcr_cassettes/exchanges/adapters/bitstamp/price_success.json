@@ -1,0 +1,28 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/ticker/btcusd"
+    },
+    "response": {
+      "body": "{\"high\": \"16480.52\", \"last\": \"15243.98\", \"timestamp\": \"1514423377\", \"bid\": \"15215.00\", \"vwap\": \"15444.88\", \"volume\": \"15514.90201471\", \"low\": \"14484.00\", \"ask\": \"15243.99\", \"open\": \"15390.05\"}",
+      "headers": {
+        "Etag": "W/\"6232f-c0-5615c2b77d41c\"",
+        "Last-Modified": "Thu, 28 Dec 2017 01:09:37 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "192",
+        "Connection": "keep-alive",
+        "Date": "Thu, 28 Dec 2017 01:09:37 GMT",
+        "Set-Cookie": "visid_incap_99025=uSt1vZXpTAKBbbQlfqH+f1FERFoAAAAAQUIPAAAAAAAxzB/+n1m7D9nbTnQRrtcV; expires=Thu, 27 Dec 2018 10:18:21 GMT; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "13-100150578-100149501 2CNN RT(1514423377686 116) q(0 0 0 -1) r(0 0)",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

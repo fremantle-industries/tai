@@ -8,6 +8,24 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
     ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchanges/adapters/bitstamp")
   end
 
+  test "price returns the value of the last trade for the symbol" do
+    use_cassette "price_success" do
+      assert Tai.Exchanges.Adapters.Bitstamp.price(:btcusd) == {:ok, Decimal.new(15243.98)}
+    end
+  end
+
+  test "price supports upper and lower case symbols" do
+    use_cassette "price_success" do
+      assert Tai.Exchanges.Adapters.Bitstamp.price(:BtcusD) == {:ok, Decimal.new(15243.98)}
+    end
+  end
+
+  test "price returns an error/message tuple when the symbol doesn't exist" do
+    use_cassette "price_not_found" do
+      assert Tai.Exchanges.Adapters.Bitstamp.price(:idontexist) == {:error, "not found"}
+    end
+  end
+
   test "quotes returns a bid/ask tuple for the given symbol" do
     use_cassette "quotes_success" do
       {:ok, bid, ask} = Tai.Exchanges.Adapters.Bitstamp.quotes(:btcusd)
