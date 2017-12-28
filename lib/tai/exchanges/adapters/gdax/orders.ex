@@ -24,14 +24,14 @@ defmodule Tai.Exchanges.Adapters.Gdax.Orders do
     %{
       "type" => "limit",
       "side" => side,
-      "product_id" => symbol |> Product.to_product_id,
+      "product_id" => Product.to_product_id(symbol),
       "price" => price,
       "size" => size
     }
   end
 
   defp handle_create_order({:ok, %{"id" => id, "status" => status}}) do
-    {:ok, %OrderResponse{id: id, status: status |> OrderStatus.to_atom}}
+    {:ok, %OrderResponse{id: id, status: OrderStatus.to_atom(status)}}
   end
   defp handle_create_order({:error, message, _status_code}) do
     {:error, message}
