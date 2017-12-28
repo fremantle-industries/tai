@@ -26,6 +26,12 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
     end
   end
 
+  test "balance returns the USD sum of all accounts" do
+    use_cassette "balance_success" do
+      assert Tai.Exchanges.Adapters.Bitstamp.balance == Decimal.new("14349.6900000000000")
+    end
+  end
+
   test "quotes returns a bid/ask tuple for the given symbol" do
     use_cassette "quotes_success" do
       {:ok, bid, ask} = Tai.Exchanges.Adapters.Bitstamp.quotes(:btcusd)

@@ -1,0 +1,219 @@
+[
+  {
+    "request": {
+      "body": "key=the_api_key&nonce=1514439423221575000&signature=the_signature",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/balance/"
+    },
+    "response": {
+      "body": "{\"bch_available\": \"0.00000000\", \"bch_balance\": \"0.00000000\", \"bch_reserved\": \"0.00000000\", \"bchbtc_fee\": \"0.00\", \"bcheur_fee\": \"0.00\", \"bchusd_fee\": \"0.00\", \"btc_available\": \"1.00000000\", \"btc_balance\": \"1.00000000\", \"btc_reserved\": \"0.00000000\", \"btceur_fee\": \"0.20\", \"btcusd_fee\": \"0.20\", \"eth_available\": \"0.00000000\", \"eth_balance\": \"0.00000000\", \"eth_reserved\": \"0.00000000\", \"ethbtc_fee\": \"0.15\", \"etheur_fee\": \"0.15\", \"ethusd_fee\": \"0.15\", \"eur_available\": \"0.00\", \"eur_balance\": \"0.00\", \"eur_reserved\": \"0.00\", \"eurusd_fee\": \"0.20\", \"ltc_available\": \"0.00000000\", \"ltc_balance\": \"0.00000000\", \"ltc_reserved\": \"0.00000000\", \"ltcbtc_fee\": \"0.20\", \"ltceur_fee\": \"0.20\", \"ltcusd_fee\": \"0.20\", \"usd_available\": \"200.00\", \"usd_balance\": \"200.00\", \"usd_reserved\": \"0.00\", \"xrp_available\": \"0.00000000\", \"xrp_balance\": \"0.00000000\", \"xrp_reserved\": \"0.00000000\", \"xrpbtc_fee\": \"0.20\", \"xrpeur_fee\": \"0.20\", \"xrpusd_fee\": \"0.20\"}",
+      "headers": {
+        "Access-Control-Allow-Headers": "x-requested-with, Content-Type, origin, accept, cache-control",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "max-age=0",
+        "Content-Language": "en",
+        "Content-Type": "application/json",
+        "Date": "Thu, 28 Dec 2017 05:37:03 GMT",
+        "Expires": "Thu, 28 Dec 2017 05:37:03 GMT",
+        "Last-Modified": "Thu, 28 Dec 2017 05:37:03 GMT",
+        "Server": "Apache",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "Vary": "Accept-Language",
+        "X-Frame-Options": "SAMEORIGIN",
+        "transfer-encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "visid_incap_99025=i5yzGQoET6eHsFyWSCa2j1SCRFoAAAAAQUIPAAAAAABSKA+1tWIbS0josrnU2UiX; expires=Thu, 27 Dec 2018 10:18:29 GMT; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "14-122331158-122327920 PNNN RT(1514439422660 68) q(0 0 0 0) r(2 2) U6",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/ticker/xrpusd"
+    },
+    "response": {
+      "body": "{\"high\": \"1.27000\", \"last\": \"1.15997\", \"timestamp\": \"1514439419\", \"bid\": \"1.15967\", \"vwap\": \"1.17299\", \"volume\": \"71012446.59405665\", \"low\": \"1.07580\", \"ask\": \"1.15997\", \"open\": \"1.20620\"}",
+      "headers": {
+        "Etag": "\"61625-bc-5615fe7b56817\"",
+        "Last-Modified": "Thu, 28 Dec 2017 05:37:00 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "188",
+        "Connection": "Close",
+        "Date": "Thu, 28 Dec 2017 05:37:03 GMT",
+        "Set-Cookie": "visid_incap_99025=e6WuARa4TFmkULPWGq3pq/6CRFoAAAAAQUIPAAAAAADU460wouIbHcud/Ztj4uWT; expires=Thu, 27 Dec 2018 10:18:29 GMT; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "14-122331158-122328878 2CNN RT(1514439422660 326) q(0 0 0 -1) r(0 0)",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/ticker/bchusd"
+    },
+    "response": {
+      "body": "{\"high\": \"2891.99\", \"last\": \"2467.00\", \"timestamp\": \"1514439421\", \"bid\": \"2453.61\", \"vwap\": \"2673.50\", \"volume\": \"8969.87569306\", \"low\": \"2400.00\", \"ask\": \"2475.55\", \"open\": \"2690.39\"}",
+      "headers": {
+        "Accept-Ranges": "bytes",
+        "Access-Control-Allow-Headers": "x-requested-with, Content-Type, origin, accept, cache-control",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Date": "Thu, 28 Dec 2017 05:37:03 GMT",
+        "ETag": "\"6275e-b8-5615fe7c47b66\"",
+        "Last-Modified": "Thu, 28 Dec 2017 05:37:01 GMT",
+        "Server": "Apache",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "Content-Length": "184",
+        "Connection": "keep-alive",
+        "Set-Cookie": "nlbi_99025=FlXfcTjcMivWTtru8F1n9AAAAACsfv3Pev+EipJxWRusPVh7; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "12-87685637-87683573 2NNN RT(1514439423023 90) q(0 0 0 -1) r(1 1)",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/ticker/eurusd"
+    },
+    "response": {
+      "body": "{\"high\": \"1.21333\", \"last\": \"1.19099\", \"timestamp\": \"1514439423\", \"bid\": \"1.18780\", \"vwap\": \"1.19211\", \"volume\": \"14521239.83638\", \"low\": \"1.18444\", \"ask\": \"1.19099\", \"open\": \"1.19012\"}",
+      "headers": {
+        "Accept-Ranges": "bytes",
+        "Access-Control-Allow-Headers": "x-requested-with, Content-Type, origin, accept, cache-control",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Date": "Thu, 28 Dec 2017 05:37:04 GMT",
+        "ETag": "W/\"61611-b9-5615fe7e08a50\"",
+        "Last-Modified": "Thu, 28 Dec 2017 05:37:03 GMT",
+        "Server": "Apache",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "Content-Length": "185",
+        "Connection": "keep-alive",
+        "Set-Cookie": "nlbi_99025=aVsEEujJQTE7mrqB8F1n9AAAAACqxVNHtalHB0Ck4+MQHutI; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "12-87685637-87680687 2NNN RT(1514439423023 245) q(0 0 0 -1) r(2 2)",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/ticker/ethusd"
+    },
+    "response": {
+      "body": "{\"high\": \"770.00\", \"last\": \"697.31\", \"timestamp\": \"1514439423\", \"bid\": \"696.82\", \"vwap\": \"734.86\", \"volume\": \"54208.82009747\", \"low\": \"680.00\", \"ask\": \"699.67\", \"open\": \"738.73\"}",
+      "headers": {
+        "Accept-Ranges": "bytes",
+        "Access-Control-Allow-Headers": "x-requested-with, Content-Type, origin, accept, cache-control",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Date": "Thu, 28 Dec 2017 05:37:04 GMT",
+        "ETag": "W/\"62635-b2-5615fe7e34d80\"",
+        "Last-Modified": "Thu, 28 Dec 2017 05:37:03 GMT",
+        "Server": "Apache",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "Content-Length": "178",
+        "Connection": "keep-alive",
+        "Set-Cookie": "nlbi_99025=MgNYXuRzJyMBazjL8F1n9AAAAAARl0mE1N1v5pV3NWbq3FCC; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "12-87685637-87683573 2NNN RT(1514439423023 408) q(0 0 0 -1) r(1 1)",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/ticker/btcusd"
+    },
+    "response": {
+      "body": "{\"high\": \"16480.52\", \"last\": \"14149.69\", \"timestamp\": \"1514439422\", \"bid\": \"14111.21\", \"vwap\": \"15135.96\", \"volume\": \"17653.93488833\", \"low\": \"13941.75\", \"ask\": \"14149.69\", \"open\": \"15390.05\"}",
+      "headers": {
+        "Etag": "\"6155c-c0-5615fe7d1d185\"",
+        "Last-Modified": "Thu, 28 Dec 2017 05:37:02 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "192",
+        "Connection": "keep-alive",
+        "Date": "Thu, 28 Dec 2017 05:37:03 GMT",
+        "Set-Cookie": "visid_incap_99025=/wgRPT9BRB+bp8CXTOO4Yf+CRFoAAAAAQUIPAAAAAAAWsogxVsSt9v+zYHRbrgba; expires=Thu, 27 Dec 2018 10:18:29 GMT; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "12-87685637-0 0CNN RT(1514439423023 565) q(0 -1 -1 -1) r(0 -1)",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/ticker/ltcusd"
+    },
+    "response": {
+      "body": "{\"high\": \"283.75\", \"last\": \"246.48\", \"timestamp\": \"1514439422\", \"bid\": \"244.53\", \"vwap\": \"264.19\", \"volume\": \"69600.38031921\", \"low\": \"236.51\", \"ask\": \"246.38\", \"open\": \"263.01\"}",
+      "headers": {
+        "Accept-Ranges": "bytes",
+        "Access-Control-Allow-Headers": "x-requested-with, Content-Type, origin, accept, cache-control",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Date": "Thu, 28 Dec 2017 05:37:04 GMT",
+        "ETag": "\"6163c-b2-5615fe7d4a7f3\"",
+        "Last-Modified": "Thu, 28 Dec 2017 05:37:02 GMT",
+        "Server": "Apache",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "Content-Length": "178",
+        "Connection": "keep-alive",
+        "Set-Cookie": "nlbi_99025=ozQkZTi59nnt998+8F1n9AAAAAB/MpePl7hbwsXuzy7xrHDi; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "12-87685637-87683573 2NNN RT(1514439423023 576) q(0 0 0 -1) r(2 2)",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]
