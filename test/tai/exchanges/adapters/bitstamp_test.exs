@@ -48,4 +48,21 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
       assert Tai.Exchanges.Adapters.Bitstamp.quotes(:notfound) == {:error, "not found"}
     end
   end
+
+  test "buy_limit creates an order for the symbol at the given price" do
+    use_cassette "buy_limit_success" do
+      {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
+
+      assert order_response.id == "674873684"
+      assert order_response.status == :pending
+    end
+  end
+
+  test "buy_limit returns an error/details tuple when it can't create the order" do
+    use_cassette "buy_limit_error" do
+      {:error, message} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.2)
+
+      assert message == %{"__all__" => ["You need 20.27 USD to open that order. You have only 0.82 USD available. Check your account balance for details."]}
+    end
+  end
 end
