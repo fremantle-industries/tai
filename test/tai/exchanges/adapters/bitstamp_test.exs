@@ -53,7 +53,7 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
     use_cassette "buy_limit_success" do
       {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
 
-      assert order_response.id == "674873684"
+      assert order_response.id == 674873684
       assert order_response.status == :pending
     end
   end
@@ -70,7 +70,7 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
     use_cassette "sell_limit_success" do
       {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.sell_limit(:btcusd, 99_999.01, 0.01)
 
-      assert order_response.id == "680258903"
+      assert order_response.id == 680258903
       assert order_response.status == :pending
     end
   end
@@ -94,6 +94,23 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
   test "order_status returns an error/reason tuple when it can't find the order" do
     use_cassette "order_status_not_found" do
       assert Tai.Exchanges.Adapters.Bitstamp.order_status(1234) == {:error, "Order not found."}
+    end
+  end
+
+  test "cancel_order returns an ok tuple with the order id when it's successfully cancelled" do
+    use_cassette "cancel_order_success" do
+      {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
+      {:ok, cancelled_order_id} = Tai.Exchanges.Adapters.Bitstamp.cancel_order(order_response.id)
+
+      assert cancelled_order_id == order_response.id
+    end
+  end
+
+  test "cancel_order returns an error tuple when it can't cancel the order" do
+    use_cassette "cancel_order_error" do
+      {:error, message} = Tai.Exchanges.Adapters.Bitstamp.cancel_order("invalid-order-id")
+
+      assert message == "Invalid order id"
     end
   end
 end

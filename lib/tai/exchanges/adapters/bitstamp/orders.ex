@@ -11,7 +11,8 @@ defmodule Tai.Exchanges.Adapters.Bitstamp.Orders do
     |> handle_create_order
   end
 
-  defp handle_create_order({:ok, %{"id" => id}}) do
+  defp handle_create_order({:ok, %{"id" => str_id}}) do
+    {id, _} = Integer.parse(str_id)
     {:ok, %OrderResponse{id: id, status: :pending}}
   end
   defp handle_create_order({:error, details}) do

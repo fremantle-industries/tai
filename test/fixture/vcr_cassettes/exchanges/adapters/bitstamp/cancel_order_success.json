@@ -1,0 +1,76 @@
+[
+  {
+    "request": {
+      "body": "key=the_api_key&nonce=1514530763924505000&signature=the_signature&amount=0.1&price=101.1",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/buy/btcusd/"
+    },
+    "response": {
+      "body": "{\"price\": \"101.10\", \"amount\": \"0.10000000\", \"type\": \"0\", \"id\": \"680354231\", \"datetime\": \"2017-12-29 06:59:24.145338\"}",
+      "headers": {
+        "Access-Control-Allow-Headers": "x-requested-with, Content-Type, origin, accept, cache-control",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "max-age=0",
+        "Content-Language": "en",
+        "Content-Type": "application/json",
+        "Date": "Fri, 29 Dec 2017 06:59:24 GMT",
+        "Expires": "Fri, 29 Dec 2017 06:59:24 GMT",
+        "Last-Modified": "Fri, 29 Dec 2017 06:59:24 GMT",
+        "Server": "Apache",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "Vary": "Accept-Language",
+        "X-Frame-Options": "SAMEORIGIN",
+        "transfer-encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "visid_incap_99025=Z/syMLLzSqCbU4NCJR33zsvnRVoAAAAAQUIPAAAAAAAMEEdOzvsv81+9FqvkSdeY; expires=Fri, 28 Dec 2018 10:18:18 GMT; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "4-24950229-24950231 SNNN RT(1514530762195 1094) q(0 0 0 -1) r(2 2) U6",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "key=the_api_key&nonce=1514530764246875000&signature=the_signature&id=680354231",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.bitstamp.net/api/v2/cancel_order/"
+    },
+    "response": {
+      "body": "{\"price\": 101.10000000, \"amount\": 0.10000000, \"type\": 0, \"id\": 680354231}",
+      "headers": {
+        "Access-Control-Allow-Headers": "x-requested-with, Content-Type, origin, accept, cache-control",
+        "Access-Control-Allow-Methods": "POST, GET",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "max-age=0",
+        "Content-Language": "en",
+        "Content-Type": "application/json",
+        "Date": "Fri, 29 Dec 2017 06:59:24 GMT",
+        "Expires": "Fri, 29 Dec 2017 06:59:24 GMT",
+        "Last-Modified": "Fri, 29 Dec 2017 06:59:24 GMT",
+        "Server": "Apache",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "Vary": "Accept-Language",
+        "X-Frame-Options": "SAMEORIGIN",
+        "transfer-encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "visid_incap_99025=QvQMi6E9T0e2wgIox+PlLcvnRVoAAAAAQUIPAAAAAADcnLM8gV04rKAmGlOFsNPh; expires=Fri, 28 Dec 2018 10:18:18 GMT; path=/; Domain=.bitstamp.net",
+        "X-Iinfo": "4-24950229-24950231 SNNN RT(1514530762195 1412) q(0 0 0 -1) r(2 2) U6",
+        "X-CDN": "Incapsula"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

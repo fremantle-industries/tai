@@ -5,4 +5,5 @@ defmodule Tai.Exchanges.Adapters.Bitstamp do
   defdelegate buy_limit(symbol, price, size), to: Tai.Exchanges.Adapters.Bitstamp.Orders
   defdelegate sell_limit(symbol, price, size), to: Tai.Exchanges.Adapters.Bitstamp.Orders
   defdelegate order_status(order_id), to: Tai.Exchanges.Adapters.Bitstamp.OrderStatus
+  defdelegate cancel_order(order_id), to: Tai.Exchanges.Adapters.Bitstamp.CancelOrder
 end
