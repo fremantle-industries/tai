@@ -66,6 +66,23 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
     end
   end
 
+  test "sell_limit creates an order for the symbol at the given price" do
+    use_cassette "sell_limit_success" do
+      {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.sell_limit(:btcusd, 99_999.01, 0.01)
+
+      assert order_response.id == "680258903"
+      assert order_response.status == :pending
+    end
+  end
+
+  test "sell_limit returns an error/details tuple when it can't create the order" do
+    use_cassette "sell_limit_error" do
+      {:error, message} = Tai.Exchanges.Adapters.Bitstamp.sell_limit(:btcusd, 99_999.01, 0.2)
+
+      assert message == %{"__all__" => ["You have only 0.01000000 BTC available. Check your account balance for details."]}
+    end
+  end
+
   test "order_status returns the status" do
     use_cassette "order_status_success" do
       {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
