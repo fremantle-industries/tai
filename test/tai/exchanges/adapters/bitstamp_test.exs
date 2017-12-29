@@ -65,4 +65,18 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
       assert message == %{"__all__" => ["You need 20.27 USD to open that order. You have only 0.82 USD available. Check your account balance for details."]}
     end
   end
+
+  test "order_status returns the status" do
+    use_cassette "order_status_success" do
+      {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
+
+      assert Tai.Exchanges.Adapters.Bitstamp.order_status(order_response.id) == {:ok, :open}
+    end
+  end
+
+  test "order_status returns an error/reason tuple when it can't find the order" do
+    use_cassette "order_status_not_found" do
+      assert Tai.Exchanges.Adapters.Bitstamp.order_status(1234) == {:error, "Order not found."}
+    end
+  end
 end
