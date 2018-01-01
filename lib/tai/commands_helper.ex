@@ -14,7 +14,7 @@ defmodule Tai.CommandsHelper do
     IO.puts "#{Tai.Fund.balance} USD"
   end
 
-  def quotes(exchange, symbol) do
+  def quotes(exchange, symbol, :remote) do
     exchange
     |> Tai.Exchange.quotes(symbol)
     |> case do

@@ -25,9 +25,9 @@ defmodule Tai.CommandsHelperTest do
     end) == "0.22 USD\n"
   end
 
-  test "quotes returns the orderbook for the exchange and symbol" do
+  test "quotes with remote requests the orderbook from the server" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.quotes(:test_exchange_a, :btcusd)
+      Tai.CommandsHelper.quotes(:test_exchange_a, :btcusd, :remote)
     end) == """
     8003.22/0.66 [0.000143s]
     ---
@@ -35,9 +35,9 @@ defmodule Tai.CommandsHelperTest do
     """
   end
 
-  test "quotes displays errors" do
+  test "quotes with remote displays errors from the server" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.quotes(:test_exchange_a, :notfound)
+      Tai.CommandsHelper.quotes(:test_exchange_a, :notfound, :remote)
     end) == "error: NotFound\n"
   end
 
