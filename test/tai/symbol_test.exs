@@ -6,7 +6,15 @@ defmodule Tai.SymbolTest do
     assert Tai.Symbol.downcase(:FOO) == "foo"
   end
 
-  test "downcase converts uppercase strings to downcase" do
+  test "downcase convert an uppercase string to downcase" do
     assert Tai.Symbol.downcase("FOO") == "foo"
+  end
+
+  test "downcase_all converts atoms to downcased strings" do
+    assert Tai.Symbol.downcase_all([:FOO, :Bar]) == ["foo", "bar"]
+  end
+
+  test "downcase_all converts uppercase strings to downcase" do
+    assert Tai.Symbol.downcase_all(["FOO", "Bar"]) == ["foo", "bar"]
   end
 end
