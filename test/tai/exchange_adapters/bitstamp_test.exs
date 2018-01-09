@@ -1,7 +1,7 @@
-defmodule Tai.Exchanges.Adapters.BitstampTest do
+defmodule Tai.ExchangeAdapters.BitstampTest do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  doctest Tai.Exchanges.Adapters.Bitstamp
+  doctest Tai.ExchangeAdapters.Bitstamp
 
   setup_all do
     HTTPoison.start
@@ -10,31 +10,31 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
 
   test "price returns the value of the last trade for the symbol" do
     use_cassette "price_success" do
-      assert Tai.Exchanges.Adapters.Bitstamp.price(:btcusd) == {:ok, Decimal.new(15243.98)}
+      assert Tai.ExchangeAdapters.Bitstamp.price(:btcusd) == {:ok, Decimal.new(15243.98)}
     end
   end
 
   test "price supports upper and lower case symbols" do
     use_cassette "price_success" do
-      assert Tai.Exchanges.Adapters.Bitstamp.price(:BtcusD) == {:ok, Decimal.new(15243.98)}
+      assert Tai.ExchangeAdapters.Bitstamp.price(:BtcusD) == {:ok, Decimal.new(15243.98)}
     end
   end
 
   test "price returns an error/message tuple when the symbol doesn't exist" do
     use_cassette "price_not_found" do
-      assert Tai.Exchanges.Adapters.Bitstamp.price(:idontexist) == {:error, "not found"}
+      assert Tai.ExchangeAdapters.Bitstamp.price(:idontexist) == {:error, "not found"}
     end
   end
 
   test "balance returns the USD sum of all accounts" do
     use_cassette "balance_success" do
-      assert Tai.Exchanges.Adapters.Bitstamp.balance == Decimal.new("14349.6900000000000")
+      assert Tai.ExchangeAdapters.Bitstamp.balance == Decimal.new("14349.6900000000000")
     end
   end
 
   test "quotes returns a bid/ask tuple for the given symbol" do
     use_cassette "quotes_success" do
-      {:ok, bid, ask} = Tai.Exchanges.Adapters.Bitstamp.quotes(:btcusd)
+      {:ok, bid, ask} = Tai.ExchangeAdapters.Bitstamp.quotes(:btcusd)
 
       assert bid.size == Decimal.new(0.66809283)
       assert bid.price == Decimal.new("15378.00")
@@ -45,13 +45,13 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
 
   test "quotes returns an error tuple with a message when it can't find the symbol" do
     use_cassette "quotes_error" do
-      assert Tai.Exchanges.Adapters.Bitstamp.quotes(:notfound) == {:error, "not found"}
+      assert Tai.ExchangeAdapters.Bitstamp.quotes(:notfound) == {:error, "not found"}
     end
   end
 
   test "buy_limit creates an order for the symbol at the given price" do
     use_cassette "buy_limit_success" do
-      {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
+      {:ok, order_response} = Tai.ExchangeAdapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
 
       assert order_response.id == 674873684
       assert order_response.status == :pending
@@ -60,7 +60,7 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
 
   test "buy_limit returns an error/details tuple when it can't create the order" do
     use_cassette "buy_limit_error" do
-      {:error, message} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.2)
+      {:error, message} = Tai.ExchangeAdapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.2)
 
       assert message == %{"__all__" => ["You need 20.27 USD to open that order. You have only 0.82 USD available. Check your account balance for details."]}
     end
@@ -68,7 +68,7 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
 
   test "sell_limit creates an order for the symbol at the given price" do
     use_cassette "sell_limit_success" do
-      {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.sell_limit(:btcusd, 99_999.01, 0.01)
+      {:ok, order_response} = Tai.ExchangeAdapters.Bitstamp.sell_limit(:btcusd, 99_999.01, 0.01)
 
       assert order_response.id == 680258903
       assert order_response.status == :pending
@@ -77,7 +77,7 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
 
   test "sell_limit returns an error/details tuple when it can't create the order" do
     use_cassette "sell_limit_error" do
-      {:error, message} = Tai.Exchanges.Adapters.Bitstamp.sell_limit(:btcusd, 99_999.01, 0.2)
+      {:error, message} = Tai.ExchangeAdapters.Bitstamp.sell_limit(:btcusd, 99_999.01, 0.2)
 
       assert message == %{"__all__" => ["You have only 0.01000000 BTC available. Check your account balance for details."]}
     end
@@ -85,22 +85,22 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
 
   test "order_status returns the status" do
     use_cassette "order_status_success" do
-      {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
+      {:ok, order_response} = Tai.ExchangeAdapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
 
-      assert Tai.Exchanges.Adapters.Bitstamp.order_status(order_response.id) == {:ok, :open}
+      assert Tai.ExchangeAdapters.Bitstamp.order_status(order_response.id) == {:ok, :open}
     end
   end
 
   test "order_status returns an error/reason tuple when it can't find the order" do
     use_cassette "order_status_not_found" do
-      assert Tai.Exchanges.Adapters.Bitstamp.order_status(1234) == {:error, "Order not found."}
+      assert Tai.ExchangeAdapters.Bitstamp.order_status(1234) == {:error, "Order not found."}
     end
   end
 
   test "cancel_order returns an ok tuple with the order id when it's successfully cancelled" do
     use_cassette "cancel_order_success" do
-      {:ok, order_response} = Tai.Exchanges.Adapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
-      {:ok, cancelled_order_id} = Tai.Exchanges.Adapters.Bitstamp.cancel_order(order_response.id)
+      {:ok, order_response} = Tai.ExchangeAdapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)
+      {:ok, cancelled_order_id} = Tai.ExchangeAdapters.Bitstamp.cancel_order(order_response.id)
 
       assert cancelled_order_id == order_response.id
     end
@@ -108,7 +108,7 @@ defmodule Tai.Exchanges.Adapters.BitstampTest do
 
   test "cancel_order returns an error tuple when it can't cancel the order" do
     use_cassette "cancel_order_error" do
-      {:error, message} = Tai.Exchanges.Adapters.Bitstamp.cancel_order("invalid-order-id")
+      {:error, message} = Tai.ExchangeAdapters.Bitstamp.cancel_order("invalid-order-id")
 
       assert message == "Invalid order id"
     end

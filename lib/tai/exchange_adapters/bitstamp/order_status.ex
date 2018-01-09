@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Adapters.Bitstamp.OrderStatus do
+defmodule Tai.ExchangeAdapters.Bitstamp.OrderStatus do
   def order_status(order_id) do
     order_id
     |> ExBitstamp.order_status

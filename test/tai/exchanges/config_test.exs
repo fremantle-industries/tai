@@ -4,12 +4,12 @@ defmodule Tai.Exchanges.ConfigTest do
 
   test "all returns the application config" do
     assert Tai.Exchanges.Config.all == %{
-      test_exchange_a: Tai.Exchanges.Adapters.Test,
-      test_exchange_b: Tai.Exchanges.Adapters.Test
+      test_exchange_a: Tai.ExchangeAdapters.Test,
+      test_exchange_b: Tai.ExchangeAdapters.Test
     }
   end
 
   test "adapter returns the configured module for the exchange name" do
-    assert Tai.Exchanges.Config.adapter(:test_exchange_a) == Tai.Exchanges.Adapters.Test
+    assert Tai.Exchanges.Config.adapter(:test_exchange_a) == Tai.ExchangeAdapters.Test
   end
 end

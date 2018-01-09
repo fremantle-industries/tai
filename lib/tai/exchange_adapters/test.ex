@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Adapters.Test do
+defmodule Tai.ExchangeAdapters.Test do
   def balance do
     Decimal.new(0.11)
   end

@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.Adapters.Bitstamp.Balance do
-  alias Tai.Exchanges.Adapters.Bitstamp.Price
+defmodule Tai.ExchangeAdapters.Bitstamp.Balance do
+  alias Tai.ExchangeAdapters.Bitstamp.Price
   alias Tai.Symbol
 
   def balance do

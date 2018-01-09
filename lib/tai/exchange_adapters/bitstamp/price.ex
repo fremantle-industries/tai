@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Adapters.Bitstamp.Price do
+defmodule Tai.ExchangeAdapters.Bitstamp.Price do
   def price(symbol) do
     symbol
     |> ExBitstamp.ticker

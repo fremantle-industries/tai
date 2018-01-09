@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Adapters.Gdax.OrderStatus do
+defmodule Tai.ExchangeAdapters.Gdax.OrderStatus do
   def order_status(order_id) do
     order_id
     |> ExGdax.get_order

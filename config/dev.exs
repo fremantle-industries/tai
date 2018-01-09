@@ -9,8 +9,8 @@ config :ex_bitstamp,  api_key:         System.get_env("BITSTAMP_API_KEY"),
                       customer_id:     System.get_env("BITSTAMP_CUSTOMER_ID")
 
 config :tai,          exchanges: %{
-                        gdax: Tai.Exchanges.Adapters.Gdax,
-                        bitstamp: Tai.Exchanges.Adapters.Bitstamp
+                        gdax: Tai.ExchangeAdapters.Gdax,
+                        bitstamp: Tai.ExchangeAdapters.Bitstamp
                       }
 
 config :tai,          strategies: %{

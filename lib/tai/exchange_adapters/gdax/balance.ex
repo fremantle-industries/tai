@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.Adapters.Gdax.Balance do
-  alias Tai.Exchanges.Adapters.Gdax.Price
+defmodule Tai.ExchangeAdapters.Gdax.Balance do
+  alias Tai.ExchangeAdapters.Gdax.Price
   alias Tai.Symbol
 
   def balance do

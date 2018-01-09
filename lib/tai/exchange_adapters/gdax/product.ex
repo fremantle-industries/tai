@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Adapters.Gdax.Product do
+defmodule Tai.ExchangeAdapters.Gdax.Product do
   alias Tai.Symbol
 
   def to_product_id(symbol) do

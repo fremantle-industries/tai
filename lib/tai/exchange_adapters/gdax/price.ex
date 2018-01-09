@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.Adapters.Gdax.Price do
-  alias Tai.Exchanges.Adapters.Gdax.Product
+defmodule Tai.ExchangeAdapters.Gdax.Price do
+  alias Tai.ExchangeAdapters.Gdax.Product
 
   def price(symbol) do
     symbol
