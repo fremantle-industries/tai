@@ -27,6 +27,7 @@ defmodule Tai.Mixfile do
       {:json, "~> 1.0"},
       {:timex, "~> 3.1"},
       {:websockex, "~> 0.4"},
+      {:logger_file_backend, "~> 0.0.10"},
       {:exvcr, "~> 0.8", only: [:test]},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:ex_unit_notifier, "~> 0.1", only: :test},

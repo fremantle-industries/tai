@@ -1,4 +1,6 @@
 defmodule Tai.CommandsHelper do
+  alias Tai.{Exchange, Fund, Markets, Strategy}
+
   def help do
     IO.puts """
     * status
@@ -11,27 +13,36 @@ defmodule Tai.CommandsHelper do
   end
 
   def status do
-    IO.puts "#{Tai.Fund.balance} USD"
+    IO.puts "#{Fund.balance} USD"
   end
 
-  def quotes(exchange, symbol, :remote) do
-    exchange
-    |> Tai.Exchange.quotes(symbol)
-    |> case do
-      {:ok, bid, ask} ->
-        IO.puts """
-        #{ask.price}/#{ask.size} [#{ask.age}s]
-        ---
-        #{bid.price}/#{bid.size} [#{bid.age}s]
-        """
-      {:error, message} ->
-        IO.puts "error: #{message}"
-    end
+  def quotes(feed_id, symbol) do
+    [feed_id: feed_id, symbol: symbol]
+    |> Markets.OrderBook.to_name
+    |> Markets.OrderBook.quotes
+    |> print_quotes
   end
+  defp print_quotes({
+    :ok,
+    %{
+      bids: [[price: bid_price, size: bid_size] | _remaining_bids],
+      asks: [[price: ask_price, size: ask_size] | _remaining_asks]}
+    }
+  ) do
+    IO.puts """
+    #{Decimal.new(ask_price)}/#{Decimal.new(ask_size)}
+    ---
+    #{Decimal.new(bid_price)}/#{Decimal.new(bid_size)}
+    """
+  end
+  # TODO: Figure out how to trap calls to process with name that doesn't exist
+  # defp print_quotes({:error, message}) do
+  #   IO.puts "error: #{message}"
+  # end
 
   def buy_limit(exchange, symbol, price, size) do
     exchange
-    |> Tai.Exchange.buy_limit(symbol, price, size)
+    |> Exchange.buy_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
         IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
@@ -42,7 +53,7 @@ defmodule Tai.CommandsHelper do
 
   def sell_limit(exchange, symbol, price, size) do
     exchange
-    |> Tai.Exchange.sell_limit(symbol, price, size)
+    |> Exchange.sell_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
         IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
@@ -53,7 +64,7 @@ defmodule Tai.CommandsHelper do
 
   def order_status(exchange, order_id) do
     exchange
-    |> Tai.Exchange.order_status(order_id)
+    |> Exchange.order_status(order_id)
     |> case do
       {:ok, status} ->
         IO.puts "status: #{status}"
@@ -64,7 +75,7 @@ defmodule Tai.CommandsHelper do
 
   def cancel_order(exchange, order_id) do
     exchange
-    |> Tai.Exchange.cancel_order(order_id)
+    |> Exchange.cancel_order(order_id)
     |> case do
       {:ok, _canceled_order_id} ->
         IO.puts "cancel order success"
@@ -75,7 +86,7 @@ defmodule Tai.CommandsHelper do
 
   def strategy(name) do
     name
-    |> Tai.Strategy.info
+    |> Strategy.info
     |> case do
       {:ok, info} ->
         IO.puts "started: #{info.started_at}"

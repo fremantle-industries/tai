@@ -1,5 +1,4 @@
 defmodule Tai.ExchangeAdapters.Bitstamp do
-  defdelegate quotes(symbol), to: Tai.ExchangeAdapters.Bitstamp.Quotes
   defdelegate price(symbol), to: Tai.ExchangeAdapters.Bitstamp.Price
   defdelegate balance, to: Tai.ExchangeAdapters.Bitstamp.Balance
   defdelegate buy_limit(symbol, price, size), to: Tai.ExchangeAdapters.Bitstamp.Orders

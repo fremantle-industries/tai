@@ -1,6 +1,12 @@
 defmodule Tai.ExchangeAdapters.Gdax.Product do
   alias Tai.Symbol
 
+  def to_symbol(product_id) do
+    product_id
+    |> strip_and_downcase
+    |> String.to_atom
+  end
+
   def to_product_id(symbol) do
     symbol
     |> Symbol.downcase

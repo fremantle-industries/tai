@@ -32,23 +32,6 @@ defmodule Tai.ExchangeAdapters.BitstampTest do
     end
   end
 
-  test "quotes returns a bid/ask tuple for the given symbol" do
-    use_cassette "quotes_success" do
-      {:ok, bid, ask} = Tai.ExchangeAdapters.Bitstamp.quotes(:btcusd)
-
-      assert bid.size == Decimal.new(0.66809283)
-      assert bid.price == Decimal.new("15378.00")
-      assert ask.size == Decimal.new("0.96630000")
-      assert ask.price == Decimal.new(15408.77)
-    end
-  end
-
-  test "quotes returns an error tuple with a message when it can't find the symbol" do
-    use_cassette "quotes_error" do
-      assert Tai.ExchangeAdapters.Bitstamp.quotes(:notfound) == {:error, "not found"}
-    end
-  end
-
   test "buy_limit creates an order for the symbol at the given price" do
     use_cassette "buy_limit_success" do
       {:ok, order_response} = Tai.ExchangeAdapters.Bitstamp.buy_limit(:btcusd, 101.1, 0.1)

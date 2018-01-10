@@ -36,25 +36,6 @@ defmodule Tai.ExchangeAdapters.GdaxTest do
     end
   end
 
-  test "quotes returns a bid/ask tuple for the given symbol" do
-    use_cassette "quotes_success" do
-      {:ok, bid, ask} = Tai.ExchangeAdapters.Gdax.quotes(:btcusd)
-
-      assert bid.size == Decimal.new(0.05)
-      assert bid.price == Decimal.new(8015.01)
-      assert ask.size == Decimal.new(4.222)
-      assert ask.price == Decimal.new(8019.87)
-    end
-  end
-
-  test "quotes returns an error tuple with a message when it can't find the symbol" do
-    use_cassette "quotes_error" do
-      {:error, message} = Tai.ExchangeAdapters.Gdax.quotes(:notfound)
-
-      assert message == "NotFound"
-    end
-  end
-
   test "buy_limit creates an order for the symbol at the given price" do
     use_cassette "buy_limit_success" do
       {:ok, order_response} = Tai.ExchangeAdapters.Gdax.buy_limit(:btcusd, 101.1, 0.2)

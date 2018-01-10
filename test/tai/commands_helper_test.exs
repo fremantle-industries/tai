@@ -25,21 +25,33 @@ defmodule Tai.CommandsHelperTest do
     end) == "0.22 USD\n"
   end
 
-  test "quotes with remote requests the orderbook from the server" do
+  test "quotes shows the snapshot of the live order book" do
+    name = [feed_id: :test_feed_a, symbol: :btcusd]
+           |> Tai.Markets.OrderBook.to_name
+
+    :ok = Tai.Markets.OrderBook.replace(
+      name,
+      bids: [{12999.99, 0.000021}, {12999.98, 1.0}],
+      asks: [{13000.01, 1.11}, {13000.02, 1.25}]
+    )
+
     assert capture_io(fn ->
-      Tai.CommandsHelper.quotes(:test_exchange_a, :btcusd, :remote)
+      Tai.CommandsHelper.quotes(:test_feed_a, :btcusd)
     end) == """
-    8003.22/0.66 [0.000143s]
+    13000.01/1.11
     ---
-    8003.21/1.55 [0.001044s]\n
+    12999.99/0.000021\n
     """
+
+    :ok = GenServer.stop(name)
   end
 
-  test "quotes with remote displays errors from the server" do
-    assert capture_io(fn ->
-      Tai.CommandsHelper.quotes(:test_exchange_a, :notfound, :remote)
-    end) == "error: NotFound\n"
-  end
+  # TODO: Figure out how to trap calls to process with name that doesn't exist
+  # test "quotes with remote displays errors from the server" do
+  #   assert capture_io(fn ->
+  #     Tai.CommandsHelper.quotes(:test_exchange_a, :notfound)
+  #   end) == "error: NotFound\n"
+  # end
 
   test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->

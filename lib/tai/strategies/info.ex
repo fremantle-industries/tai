@@ -5,17 +5,15 @@ defmodule Tai.Strategies.Info do
   def start_link(name) do
     {:ok, started_at, _offset} = DateTime.from_iso8601("2010-01-13T14:21:06+00:00")
 
-    name
-    |> Strategy.to_pid
-    |> (&GenServer.start_link(
+    GenServer.start_link(
       __MODULE__,
       {name, started_at},
-      name: &1
-    )).()
+      name: name |> Strategy.to_pid
+    )
   end
 
-  def init(state) do
-    {:ok, state}
+  def init(name) do
+    {:ok, name}
   end
 
   def handle_call(:info, _from, {name, started_at}) do

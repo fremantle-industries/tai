@@ -1,12 +1,13 @@
 defmodule Tai.Strategies.Supervisor do
   use Supervisor
   alias Tai.Strategies.Config
+  alias Tai.Strategy
 
-  def start_link(_state) do
-    Supervisor.start_link(__MODULE__, [])
+  def start_link(_) do
+    Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
-  def init(_) do
+  def init(:ok) do
     Config.all
     |> to_children
     |> Supervisor.init(strategy: :one_for_one)
@@ -18,6 +19,6 @@ defmodule Tai.Strategies.Supervisor do
   end
 
   defp config_to_child_spec({name, strategy}) do
-    Supervisor.child_spec({strategy, name}, id: name)
+    Supervisor.child_spec({strategy, name}, id: name |> Strategy.to_pid)
   end
 end

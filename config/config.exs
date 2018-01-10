@@ -19,7 +19,12 @@ use Mix.Config
 #
 #     config :logger, level: :info
 #
-config :logger, level: :info
+config :logger, backends: [{LoggerFileBackend, :tai}]
+config :logger, :tai, path: "./log/#{Mix.env}.log"
+case System.get_env("DEBUG") do
+  "true" -> config :logger, :tai, level: :debug
+  _ -> config :logger, :tai, level: :info
+end
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

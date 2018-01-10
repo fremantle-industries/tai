@@ -2,11 +2,12 @@ defmodule Tai.Supervisor do
   use Supervisor
 
   def start_link do
-    Supervisor.start_link(__MODULE__, [])
+    Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
-  def init(_) do
+  def init(:ok) do
     children = [
+      Tai.Exchanges.OrderBookFeedsSupervisor,
       Tai.Strategies.Supervisor
     ]
 
