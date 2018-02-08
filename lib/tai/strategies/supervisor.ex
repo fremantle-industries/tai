@@ -18,7 +18,7 @@ defmodule Tai.Strategies.Supervisor do
     |> Enum.map(&config_to_child_spec/1)
   end
 
-  defp config_to_child_spec({name, strategy}) do
-    Supervisor.child_spec({strategy, name}, id: name |> Strategy.to_pid)
+  defp config_to_child_spec({strategy_id, strategy}) do
+    Supervisor.child_spec({strategy, strategy_id}, id: strategy_id |> Strategy.to_name)
   end
 end
