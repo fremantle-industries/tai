@@ -29,15 +29,10 @@ defmodule Tai.Exchanges.OrderBookFeedSupervisor do
     feed_id
     |> Config.order_book_feed_symbols
     |> Enum.map(
-      fn symbol ->
-        %{
-          id: "#{Tai.Markets.OrderBook}_#{feed_id}_#{symbol}",
-          start: {Tai.Markets.OrderBook, :start_link, [[feed_id: feed_id, symbol: symbol]]},
-          type: :worker,
-          restart: :permanent,
-          shutdown: 500
-        }
-      end
+      &Supervisor.child_spec(
+        {Tai.Markets.OrderBook, feed_id: feed_id, symbol: &1},
+        id: "#{Tai.Markets.OrderBook}_#{feed_id}_#{&1}"
+      )
     )
   end
 
