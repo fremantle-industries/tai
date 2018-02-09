@@ -19,7 +19,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       @behaviour Tai.Exchanges.OrderBookFeed
 
-      defp url, do: raise "No url in #{__MODULE__}"
+      defp url, do: raise "No url/0 in #{__MODULE__}"
 
       def start_link(id) do
         url()
