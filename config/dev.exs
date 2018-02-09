@@ -21,5 +21,5 @@ config :tai,          exchanges: %{
                       }
 
 config :tai,          strategies: %{
-                        info: Tai.Strategies.Info
+                        info: Support.Strategies.Info
                       }

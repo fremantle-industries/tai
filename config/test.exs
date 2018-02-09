@@ -25,6 +25,6 @@ config :tai,          exchanges: %{
                       }
 
 config :tai,          strategies: %{
-                        test_strategy_a: Tai.Strategies.Info,
-                        test_strategy_b: Tai.Strategies.Info
+                        test_strategy_a: Support.Strategies.Info,
+                        test_strategy_b: Support.Strategies.Info
                       }

@@ -1,4 +1,4 @@
-defmodule Tai.Strategies.Info do
+defmodule Support.Strategies.Info do
   use GenServer
   alias Tai.Strategy
 
