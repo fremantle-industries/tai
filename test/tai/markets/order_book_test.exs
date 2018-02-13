@@ -1,23 +1,23 @@
 defmodule Tai.Markets.OrderBookTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Tai.Markets.OrderBook
 
   alias Tai.Markets.OrderBook
 
   setup do
-    {:ok, _pid} = OrderBook.start_link(feed_id: :test_feed, symbol: :btcusd)
+    book = start_supervised!({OrderBook, feed_id: :test_feed, symbol: :btcusd})
 
-    {:ok, name: [feed_id: :test_feed, symbol: :btcusd] |> OrderBook.to_name}
+    %{book: book}
   end
 
-  test "replace converts and overrides the bids & asks", context do
-    :ok = context[:name]
+  test "replace converts and overrides the bids & asks", %{book: book} do
+    :ok = book
           |> OrderBook.replace(
             bids: [{999.9, 1.1}, {999.8, 1.0}],
             asks: [{1000.0, 0.1}, {1000.1, 0.11}]
           )
 
-    {:ok, %{bids: bids, asks: asks}} = context[:name] |> OrderBook.quotes
+    {:ok, %{bids: bids, asks: asks}} = book |> OrderBook.quotes
     assert bids == [
       [price: 999.9, size: 1.1],
       [price: 999.8, size: 1.0]
@@ -37,8 +37,8 @@ defmodule Tai.Markets.OrderBookTest do
     assert name == :"Elixir.Tai.Markets.OrderBook_test_feed_btcusd"
   end
 
-  test "update replaces the given bids and asks", context do
-    :ok = context[:name]
+  test "update replaces the given bids and asks", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 147.52, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -48,7 +48,7 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, %{bids: bids, asks: asks}} = context[:name] |> OrderBook.quotes
+    {:ok, %{bids: bids, asks: asks}} = book |> OrderBook.quotes
     assert bids == [
       [price: 147.53, size: 10.3],
       [price: 147.52, size: 10.1],
@@ -61,15 +61,15 @@ defmodule Tai.Markets.OrderBookTest do
     ]
   end
 
-  test "update removes prices when they have a size of 0", context do
-    :ok = context[:name] |> OrderBook.update([
+  test "update removes prices when they have a size of 0", %{book: book} do
+    :ok = book |> OrderBook.update([
       [side: :bid, price: 100.0, size: 1.0],
       [side: :bid, price: 101.0, size: 1.0],
       [side: :ask, price: 102.0, size: 1.0],
       [side: :ask, price: 103.0, size: 1.0],
     ])
 
-    {:ok, %{bids: bids, asks: asks}} = context[:name] |> OrderBook.quotes
+    {:ok, %{bids: bids, asks: asks}} = book |> OrderBook.quotes
     assert bids == [
       [price: 101.0, size: 1.0],
       [price: 100.0, size: 1.0]
@@ -79,19 +79,19 @@ defmodule Tai.Markets.OrderBookTest do
       [price: 103, size: 1.0]
     ]
 
-    :ok = context[:name]
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 100.0, size: 0.0],
             [side: :ask, price: 102.0, size: 0],
           ])
 
-    {:ok, %{bids: bids, asks: asks}} = context[:name] |> OrderBook.quotes
+    {:ok, %{bids: bids, asks: asks}} = book |> OrderBook.quotes
     assert bids == [[price: 101.0, size: 1.0]]
     assert asks == [[price: 103.0, size: 1.0]]
   end
 
-  test "quotes returns a price ordered list of all bids and asks", context do
-    :ok = context[:name]
+  test "quotes returns a price ordered list of all bids and asks", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 146.00, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -101,7 +101,7 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, %{bids: bids, asks: asks}} = context[:name] |> OrderBook.quotes
+    {:ok, %{bids: bids, asks: asks}} = book |> OrderBook.quotes
 
     assert bids == [
       [price: 147.51, size: 10.2],
@@ -115,8 +115,8 @@ defmodule Tai.Markets.OrderBookTest do
     ]
   end
 
-  test "quotes can limit the depth of bids and asks returned", context do
-    :ok = context[:name]
+  test "quotes can limit the depth of bids and asks returned", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 146.00, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -126,7 +126,7 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, %{bids: bids, asks: asks}} = context[:name] |> OrderBook.quotes(2)
+    {:ok, %{bids: bids, asks: asks}} = book |> OrderBook.quotes(2)
 
     assert bids == [
       [price: 147.51, size: 10.2],
@@ -138,8 +138,8 @@ defmodule Tai.Markets.OrderBookTest do
     ]
   end
 
-  test "bids returns a full price ordered list", context do
-    :ok = context[:name]
+  test "bids returns a full price ordered list", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 146.00, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -149,7 +149,7 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, bids} = context[:name] |> OrderBook.bids
+    {:ok, bids} = book |> OrderBook.bids
 
     assert bids == [
       [price: 147.51, size: 10.2],
@@ -158,8 +158,8 @@ defmodule Tai.Markets.OrderBookTest do
     ]
   end
 
-  test "bids can limit the depth returned", context do
-    :ok = context[:name]
+  test "bids can limit the depth returned", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 146.00, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -169,7 +169,7 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, bids} = context[:name] |> OrderBook.bids(2)
+    {:ok, bids} = book |> OrderBook.bids(2)
 
     assert bids == [
       [price: 147.51, size: 10.2],
@@ -177,8 +177,8 @@ defmodule Tai.Markets.OrderBookTest do
     ]
   end
 
-  test "bid returns the first item", context do
-    :ok = context[:name]
+  test "bid returns the first item", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 146.00, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -188,13 +188,13 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, bid} = context[:name] |> OrderBook.bid()
+    {:ok, bid} = book |> OrderBook.bid()
 
     assert bid == [price: 147.51, size: 10.2]
   end
 
-  test "asks returns a full price ordered list", context do
-    :ok = context[:name]
+  test "asks returns a full price ordered list", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 146.00, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -204,7 +204,7 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, asks} = context[:name] |> OrderBook.asks
+    {:ok, asks} = book |> OrderBook.asks
 
     assert asks == [
       [price: 150.00, size: 1.3],
@@ -213,8 +213,8 @@ defmodule Tai.Markets.OrderBookTest do
     ]
   end
 
-  test "asks can limit the depth returned", context do
-    :ok = context[:name]
+  test "asks can limit the depth returned", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 146.00, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -224,7 +224,7 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, asks} = context[:name] |> OrderBook.asks(2)
+    {:ok, asks} = book |> OrderBook.asks(2)
 
     assert asks == [
       [price: 150.00, size: 1.3],
@@ -232,8 +232,8 @@ defmodule Tai.Markets.OrderBookTest do
     ]
   end
 
-  test "ask returns the first item", context do
-    :ok = context[:name]
+  test "ask returns the first item", %{book: book} do
+    :ok = book
           |> OrderBook.update([
             [side: :bid, price: 146.00, size: 10.1],
             [side: :bid, price: 147.51, size: 10.2],
@@ -243,7 +243,7 @@ defmodule Tai.Markets.OrderBookTest do
             [side: :ask, price: 150.00, size: 1.3]
           ])
 
-    {:ok, ask} = context[:name] |> OrderBook.ask()
+    {:ok, ask} = book |> OrderBook.ask()
 
     assert ask == [price: 150.00, size: 1.3]
   end
