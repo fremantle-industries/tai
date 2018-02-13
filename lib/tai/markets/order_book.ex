@@ -19,23 +19,32 @@ defmodule Tai.Markets.OrderBook do
       {
         :ok,
         %{
-          bids: state.bids |> ordered_bids |> take(depth),
-          asks: state.asks |> ordered_asks |> take(depth)
+          bids: state |> ordered_bids |> take(depth),
+          asks: state |> ordered_asks |> take(depth)
         }
       },
       state
     }
   end
 
+  def handle_call({:bids, depth}, _from, state) do
+    {:reply, {:ok, state |> ordered_bids |> take(depth)}, state}
+  end
+
   def handle_call({:replace, bids, asks}, _from, _state) do
     {:reply, :ok, %{bids: bids |> Map.new, asks: asks |> Map.new}}
   end
+
   def handle_call({:update, changes}, _from, state) do
     {:reply, :ok, state |> update_changes(changes)}
   end
 
   def quotes(name, depth \\ :all) do
     GenServer.call(name, {:quotes, depth: depth})
+  end
+
+  def bids(name, depth \\ :all) do
+    GenServer.call(name, {:bids, depth})
   end
 
   def replace(name, bids: bids, asks: asks) do
@@ -50,19 +59,19 @@ defmodule Tai.Markets.OrderBook do
     :"#{__MODULE__}_#{feed_id}_#{symbol}"
   end
 
-  defp ordered_bids(bids) do
-    bids
+  defp ordered_bids(state) do
+    state.bids
     |> Map.keys
     |> Enum.sort
     |> Enum.reverse
-    |> to_keyword_list(bids)
+    |> to_keyword_list(state.bids)
   end
 
-  defp ordered_asks(asks) do
-    asks
+  defp ordered_asks(state) do
+    state.asks
     |> Map.keys
     |> Enum.sort
-    |> to_keyword_list(asks)
+    |> to_keyword_list(state.asks)
   end
 
   defp take(list, :all), do: list
