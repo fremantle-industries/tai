@@ -13,8 +13,18 @@ defmodule Tai.Markets.OrderBook do
     {:ok, state}
   end
 
-  def handle_call(:quotes, _from, state) do
-    {:reply, {:ok, %{bids: state.bids |> ordered_bids, asks: state.asks |> ordered_asks}}, state}
+  def handle_call({:quotes, depth: depth}, _from, state) do
+    {
+      :reply,
+      {
+        :ok,
+        %{
+          bids: state.bids |> ordered_bids |> take(depth),
+          asks: state.asks |> ordered_asks |> take(depth)
+        }
+      },
+      state
+    }
   end
 
   def handle_call({:replace, bids, asks}, _from, _state) do
@@ -24,8 +34,8 @@ defmodule Tai.Markets.OrderBook do
     {:reply, :ok, state |> update_changes(changes)}
   end
 
-  def quotes(name) do
-    GenServer.call(name, :quotes)
+  def quotes(name, depth \\ :all) do
+    GenServer.call(name, {:quotes, depth: depth})
   end
 
   def replace(name, bids: bids, asks: asks) do
@@ -53,6 +63,12 @@ defmodule Tai.Markets.OrderBook do
     |> Map.keys
     |> Enum.sort
     |> to_keyword_list(asks)
+  end
+
+  defp take(list, :all), do: list
+  defp take(list, depth) do
+    list
+    |> Enum.take(depth)
   end
 
   defp to_keyword_list(keys, side) do

@@ -114,4 +114,27 @@ defmodule Tai.Markets.OrderBookTest do
       [price: 151, size: 1.1]
     ]
   end
+
+  test "quotes can limit the depth of bids and asks returned", context do
+    :ok = context[:name]
+          |> OrderBook.update([
+            [side: :bid, price: 146.00, size: 10.1],
+            [side: :bid, price: 147.51, size: 10.2],
+            [side: :bid, price: 147, size: 10.3],
+            [side: :ask, price: 151, size: 1.1],
+            [side: :ask, price: 150.02, size: 1.2],
+            [side: :ask, price: 150.00, size: 1.3]
+          ])
+
+    {:ok, %{bids: bids, asks: asks}} = context[:name] |> OrderBook.quotes(2)
+
+    assert bids == [
+      [price: 147.51, size: 10.2],
+      [price: 147, size: 10.3],
+    ]
+    assert asks == [
+      [price: 150.00, size: 1.3],
+      [price: 150.02, size: 1.2],
+    ]
+  end
 end
