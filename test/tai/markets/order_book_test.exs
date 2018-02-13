@@ -176,4 +176,43 @@ defmodule Tai.Markets.OrderBookTest do
       [price: 147, size: 10.3]
     ]
   end
+
+  test "asks returns a full price ordered list", context do
+    :ok = context[:name]
+          |> OrderBook.update([
+            [side: :bid, price: 146.00, size: 10.1],
+            [side: :bid, price: 147.51, size: 10.2],
+            [side: :bid, price: 147, size: 10.3],
+            [side: :ask, price: 151, size: 1.1],
+            [side: :ask, price: 150.02, size: 1.2],
+            [side: :ask, price: 150.00, size: 1.3]
+          ])
+
+    {:ok, asks} = context[:name] |> OrderBook.asks
+
+    assert asks == [
+      [price: 150.00, size: 1.3],
+      [price: 150.02, size: 1.2],
+      [price: 151, size: 1.1]
+    ]
+  end
+
+  test "asks can limit the depth returned", context do
+    :ok = context[:name]
+          |> OrderBook.update([
+            [side: :bid, price: 146.00, size: 10.1],
+            [side: :bid, price: 147.51, size: 10.2],
+            [side: :bid, price: 147, size: 10.3],
+            [side: :ask, price: 151, size: 1.1],
+            [side: :ask, price: 150.02, size: 1.2],
+            [side: :ask, price: 150.00, size: 1.3]
+          ])
+
+    {:ok, asks} = context[:name] |> OrderBook.asks(2)
+
+    assert asks == [
+      [price: 150.00, size: 1.3],
+      [price: 150.02, size: 1.2]
+    ]
+  end
 end
