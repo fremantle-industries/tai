@@ -27,8 +27,16 @@ defmodule Tai.Markets.OrderBook do
     }
   end
 
+  def handle_call(:bid, _from, state) do
+    {:reply, {:ok, state |> ordered_bids |> List.first}, state}
+  end
+
   def handle_call({:bids, depth}, _from, state) do
     {:reply, {:ok, state |> ordered_bids |> take(depth)}, state}
+  end
+
+  def handle_call(:ask, _from, state) do
+    {:reply, {:ok, state |> ordered_asks |> List.first}, state}
   end
 
   def handle_call({:asks, depth}, _from, state) do
@@ -47,8 +55,16 @@ defmodule Tai.Markets.OrderBook do
     GenServer.call(name, {:quotes, depth: depth})
   end
 
+  def bid(name) do
+    GenServer.call(name, :bid)
+  end
+
   def bids(name, depth \\ :all) do
     GenServer.call(name, {:bids, depth})
+  end
+
+  def ask(name) do
+    GenServer.call(name, :ask)
   end
 
   def asks(name, depth \\ :all) do

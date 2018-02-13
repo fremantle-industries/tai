@@ -177,6 +177,22 @@ defmodule Tai.Markets.OrderBookTest do
     ]
   end
 
+  test "bid returns the first item", context do
+    :ok = context[:name]
+          |> OrderBook.update([
+            [side: :bid, price: 146.00, size: 10.1],
+            [side: :bid, price: 147.51, size: 10.2],
+            [side: :bid, price: 147, size: 10.3],
+            [side: :ask, price: 151, size: 1.1],
+            [side: :ask, price: 150.02, size: 1.2],
+            [side: :ask, price: 150.00, size: 1.3]
+          ])
+
+    {:ok, bid} = context[:name] |> OrderBook.bid()
+
+    assert bid == [price: 147.51, size: 10.2]
+  end
+
   test "asks returns a full price ordered list", context do
     :ok = context[:name]
           |> OrderBook.update([
@@ -214,5 +230,21 @@ defmodule Tai.Markets.OrderBookTest do
       [price: 150.00, size: 1.3],
       [price: 150.02, size: 1.2]
     ]
+  end
+
+  test "ask returns the first item", context do
+    :ok = context[:name]
+          |> OrderBook.update([
+            [side: :bid, price: 146.00, size: 10.1],
+            [side: :bid, price: 147.51, size: 10.2],
+            [side: :bid, price: 147, size: 10.3],
+            [side: :ask, price: 151, size: 1.1],
+            [side: :ask, price: 150.02, size: 1.2],
+            [side: :ask, price: 150.00, size: 1.3]
+          ])
+
+    {:ok, ask} = context[:name] |> OrderBook.ask()
+
+    assert ask == [price: 150.00, size: 1.3]
   end
 end
