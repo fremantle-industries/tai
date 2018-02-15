@@ -6,14 +6,14 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
   alias Tai.Markets.OrderBook
   alias Tai.ExchangeAdapters.Gdax.Product
 
+  def url, do: "wss://ws-feed.gdax.com/"
+
   def subscribe_to_order_books(name, symbols) do
     [name: name, symbols: symbols, channels: ["level2"]]
     |> subscribe
   end
 
-  defp url, do: "wss://ws-feed.gdax.com/"
-
-  defp handle_msg(
+  def handle_msg(
     %{
       "type" => "snapshot",
       "product_id" => product_id,
@@ -26,7 +26,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     |> OrderBook.to_name
     |> OrderBook.replace(bids: bids |> normalize_snapshot, asks: asks |> normalize_snapshot)
   end
-  defp handle_msg(
+  def handle_msg(
     %{
       "type" => "l2update",
       "time" => _time,
@@ -39,7 +39,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     |> OrderBook.to_name
     |> OrderBook.update(changes |> normalize_changes)
   end
-  defp handle_msg(unhandled_msg, feed_id) do
+  def handle_msg(unhandled_msg, feed_id) do
     Logger.warn "#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name} unhandled message: #{inspect unhandled_msg}"
   end
 

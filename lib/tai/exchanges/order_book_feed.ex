@@ -1,12 +1,28 @@
 defmodule Tai.Exchanges.OrderBookFeed do
-  @doc """
-  Invoked when setting up subscriptions
+  @moduledoc """
+  Behaviour to connect to a WebSocket that streams quotes from order books
   """
-  @callback subscribe_to_order_books(pid :: term, symbols :: term) :: :ok | :error
 
-  def to_name(id) do
-    "order_book_feed_#{id}"
-    |> String.to_atom
+  @doc """
+  Invoked after the process is started and should be used to setup subscriptions
+  """
+  @callback subscribe_to_order_books(pid :: Pid.t, symbols :: List.t) :: :ok | :error
+
+  @doc """
+  Invoked after a message is received on the socket and should be used to process the message
+  """
+  @callback handle_msg(msg :: Map.t, feed_id :: Atom.t) :: nil
+
+  @doc """
+  Returns an atom that will identify the process
+
+  ## Examples
+
+    iex> Tai.Exchanges.OrderBookFeed.to_name(:my_test_feed)
+    :order_book_feed_my_test_feed
+  """
+  def to_name(feed_id) do
+    :"order_book_feed_#{feed_id}"
   end
 
   defmacro __using__(_) do
@@ -19,22 +35,22 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       @behaviour Tai.Exchanges.OrderBookFeed
 
-      defp url, do: raise "No url/0 in #{__MODULE__}"
+      def url, do: raise "No url/0 in #{__MODULE__}"
 
-      def start_link(id) do
+      def start_link(feed_id) do
         url()
         |> WebSockex.start_link(
           __MODULE__,
-          id,
-          name: id |> Tai.Exchanges.OrderBookFeed.to_name
+          feed_id,
+          name: feed_id |> Tai.Exchanges.OrderBookFeed.to_name
         )
-        |> init_subscriptions(id)
+        |> init_subscriptions(feed_id)
       end
 
       @doc false
-      defp init_subscriptions({:ok, pid}, id) do
+      defp init_subscriptions({:ok, pid}, feed_id) do
         pid
-        |> subscribe_to_order_books(id |> Config.order_book_feed_symbols)
+        |> subscribe_to_order_books(feed_id |> Config.order_book_feed_symbols)
         |> case do
           :ok -> {:ok, pid}
           :error -> {:error, "could not subscribe to order books"}
@@ -46,19 +62,14 @@ defmodule Tai.Exchanges.OrderBookFeed do
       end
 
       @doc false
-      def subscribe_to_order_books(pid, symbols) do
-        raise "No subscribe_to_order_books/2 in #{__MODULE__} for #{inspect pid}, #{inspect symbols}"
-      end
-
-      @doc false
-      def handle_frame({:text, msg}, id) do
-        Logger.debug "#{id |> Tai.Exchanges.OrderBookFeed.to_name} msg: #{msg}"
+      def handle_frame({:text, msg}, feed_id) do
+        Logger.debug "#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name} msg: #{msg}"
 
         msg
         |> JSON.decode!
-        |> parse_msg(id)
+        |> parse_msg(feed_id)
 
-        {:ok, id}
+        {:ok, feed_id}
       end
       @doc false
       def handle_frame({type, msg}, state) do
@@ -75,19 +86,13 @@ defmodule Tai.Exchanges.OrderBookFeed do
         |> handle_msg(feed_id)
       end
 
-      @doc false
-      defp handle_msg(msg, name) do
-        raise "No handle_msg/2 clause in #{__MODULE__} provided for #{inspect msg}, #{inspect name}"
+      def handle_disconnect(conn_status, feed_id) do
+        Logger.error "#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name} disconnected - reason: #{inspect conn_status.reason}"
+
+        {:ok, feed_id}
       end
 
-      @doc false
-      def handle_disconnect(conn_status, id) do
-        Logger.error "#{id |> Tai.Exchanges.OrderBookFeed.to_name} disconnected - reason: #{inspect conn_status.reason}"
-
-        {:ok, id}
-      end
-
-      defoverridable [handle_msg: 2, subscribe_to_order_books: 2, url: 0]
+      defoverridable [url: 0]
     end
   end
 end
