@@ -57,7 +57,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
         end
       end
       @doc false
-      defp init_subscriptions({:error, reason}) do
+      defp init_subscriptions({:error, reason}, feed_id) do
         {:error, reason}
       end
 
