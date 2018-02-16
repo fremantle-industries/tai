@@ -1,4 +1,4 @@
-defmodule Tai.Symbol do
+defmodule Tai.Markets.Symbol do
   def downcase(symbol) when is_atom(symbol) do
     symbol
     |> Atom.to_string
