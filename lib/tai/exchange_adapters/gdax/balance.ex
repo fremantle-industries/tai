@@ -1,10 +1,10 @@
 defmodule Tai.ExchangeAdapters.Gdax.Balance do
-  alias Tai.{ExchangeAdapters.Gdax.Price, Markets.Symbol}
+  alias Tai.{ExchangeAdapters.Gdax.Price, Markets.Currency, Markets.Symbol}
 
   def balance do
     ExGdax.list_accounts
     |> convert_to_usd
-    |> Tai.Currency.sum
+    |> Currency.sum
   end
 
   defp convert_to_usd({:ok, accounts}) do

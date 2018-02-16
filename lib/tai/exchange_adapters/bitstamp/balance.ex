@@ -1,11 +1,11 @@
 defmodule Tai.ExchangeAdapters.Bitstamp.Balance do
-  alias Tai.{ExchangeAdapters.Bitstamp.Price, Markets.Symbol}
+  alias Tai.{ExchangeAdapters.Bitstamp.Price, Markets.Currency, Markets.Symbol}
 
   def balance do
     ExBitstamp.balance
     |> extract_balances
     |> convert_to_usd
-    |> Tai.Currency.sum
+    |> Currency.sum
   end
 
   defp extract_balances({:ok, accounts}) do

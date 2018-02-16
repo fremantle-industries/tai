@@ -1,4 +1,4 @@
-defmodule Tai.Currency do
+defmodule Tai.Markets.Currency do
   def add(a, b) do
     Decimal.add(
       Decimal.new(a),
