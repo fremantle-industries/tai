@@ -1,5 +1,5 @@
 defmodule Tai.CommandsHelper do
-  alias Tai.{Exchange, Fund, Markets, Strategy}
+  alias Tai.{Exchange, Fund, Markets}
 
   def help do
     IO.puts """
@@ -81,15 +81,6 @@ defmodule Tai.CommandsHelper do
         IO.puts "cancel order success"
       {:error, message} ->
         IO.puts "error: #{message}"
-    end
-  end
-
-  def strategy(name) do
-    name
-    |> Strategy.info
-    |> case do
-      {:ok, info} ->
-        IO.puts "started: #{info.started_at}"
     end
   end
 end

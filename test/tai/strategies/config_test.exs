@@ -1,15 +1,15 @@
-defmodule Tai.Strategies.ConfigTest do
+defmodule Tai.Advisors.ConfigTest do
   use ExUnit.Case
-  doctest Tai.Strategies.Config
+  doctest Tai.Advisors.Config
 
   test "all returns the application config" do
-    assert Tai.Strategies.Config.all == %{
-      test_strategy_a: Support.Strategies.Info,
-      test_strategy_b: Support.Strategies.Info
+    assert Tai.Advisors.Config.all == %{
+      test_advisor_a: Support.Advisors.Info,
+      test_advisor_b: Support.Advisors.Info
     }
   end
 
-  test "all returns an empty map when no strategies have been configured" do
-    assert Tai.Strategies.Config.all(nil) == %{}
+  test "all returns an empty map when no advisors have been configured" do
+    assert Tai.Advisors.Config.all(nil) == %{}
   end
 end

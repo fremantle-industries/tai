@@ -1,6 +1,6 @@
-defmodule Tai.Strategy do
-  def info(strategy_id) do
-    strategy_id
+defmodule Tai.Advisor do
+  def info(advisor_id) do
+    advisor_id
     |> to_name
     |> GenServer.call(:info)
     |> case do
@@ -9,5 +9,5 @@ defmodule Tai.Strategy do
     end
   end
 
-  def to_name(strategy_id), do: :"strategy_#{strategy_id}"
+  def to_name(advisor_id), do: :"advisor_#{advisor_id}"
 end

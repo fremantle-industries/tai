@@ -8,7 +8,7 @@ defmodule Tai.Supervisor do
   def init(:ok) do
     children = [
       Tai.Exchanges.OrderBookFeedsSupervisor,
-      Tai.Strategies.Supervisor
+      Tai.Advisors.Supervisor
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

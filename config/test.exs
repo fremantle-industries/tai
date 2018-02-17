@@ -24,7 +24,7 @@ config :tai,          exchanges: %{
                         test_exchange_b: Tai.ExchangeAdapters.Test
                       }
 
-config :tai,          strategies: %{
-                        test_strategy_a: Support.Strategies.Info,
-                        test_strategy_b: Support.Strategies.Info
+config :tai,          advisors: %{
+                        test_advisor_a: Support.Advisors.Info,
+                        test_advisor_b: Support.Advisors.Info
                       }

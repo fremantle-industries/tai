@@ -100,10 +100,4 @@ defmodule Tai.CommandsHelperTest do
       Tai.CommandsHelper.cancel_order(:test_exchange_a, "invalid-order-id")
     end) == "error: Invalid order id\n"
   end
-
-  test "strategy shows runtime info" do
-    assert capture_io(fn ->
-      Tai.CommandsHelper.strategy(:test_strategy_a)
-    end) == "started: 2010-01-13 14:21:06Z\n"
-  end
 end

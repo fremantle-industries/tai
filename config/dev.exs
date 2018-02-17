@@ -20,6 +20,6 @@ config :tai,          exchanges: %{
                         bitstamp: Tai.ExchangeAdapters.Bitstamp
                       }
 
-config :tai,          strategies: %{
-                        info: Support.Strategies.Info
+config :tai,          advisors: %{
+                        info: Support.Advisors.Info
                       }
