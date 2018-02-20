@@ -7,6 +7,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
   alias Tai.ExchangeAdapters.Gdax.Product
 
   def url, do: "wss://ws-feed.gdax.com/"
+  def default_url, do: "wss://ws-feed.gdax.com/"
 
   def subscribe_to_order_books(name, symbols) do
     [name: name, symbols: symbols, channels: ["level2"]]

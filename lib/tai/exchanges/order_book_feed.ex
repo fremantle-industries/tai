@@ -21,9 +21,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
     iex> Tai.Exchanges.OrderBookFeed.to_name(:my_test_feed)
     :order_book_feed_my_test_feed
   """
-  def to_name(feed_id) do
-    :"order_book_feed_#{feed_id}"
-  end
+  def to_name(feed_id), do: :"order_book_feed_#{feed_id}"
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -31,39 +29,37 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       require Logger
 
-      alias Tai.Exchanges.Config
-
       @behaviour Tai.Exchanges.OrderBookFeed
 
-      def url, do: raise "No url/0 in #{__MODULE__}"
+      def default_url, do: raise "No default_url/0 in #{__MODULE__}"
 
-      def start_link(feed_id) do
-        url()
+      def start_link(feed_id: feed_id, symbols: symbols) do
+        default_url()
         |> WebSockex.start_link(
           __MODULE__,
           feed_id,
           name: feed_id |> Tai.Exchanges.OrderBookFeed.to_name
         )
-        |> init_subscriptions(feed_id)
+        |> init_subscriptions(feed_id, symbols)
       end
 
       @doc false
-      defp init_subscriptions({:ok, pid}, feed_id) do
+      defp init_subscriptions({:ok, pid}, feed_id, symbols) do
         pid
-        |> subscribe_to_order_books(feed_id |> Config.order_book_feed_symbols)
+        |> subscribe_to_order_books(symbols)
         |> case do
           :ok -> {:ok, pid}
           :error -> {:error, "could not subscribe to order books"}
         end
       end
       @doc false
-      defp init_subscriptions({:error, reason}, feed_id) do
+      defp init_subscriptions({:error, reason}, feed_id, symbols) do
         {:error, reason}
       end
 
       @doc false
       def handle_frame({:text, msg}, feed_id) do
-        Logger.debug "#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name} msg: #{msg}"
+        Logger.debug "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] msg: #{msg}"
 
         msg
         |> JSON.decode!
@@ -72,27 +68,28 @@ defmodule Tai.Exchanges.OrderBookFeed do
         {:ok, feed_id}
       end
       @doc false
-      def handle_frame({type, msg}, state) do
-        Logger.debug "Unhandled frame #{__MODULE__} - type: #{inspect type}, msg: #{inspect msg}"
+      def handle_frame({type, msg}, feed_id) do
+        Logger.debug "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] unhandled frame - type: #{inspect type}, msg: #{inspect msg}"
 
-        {:ok, state}
+        {:ok, feed_id}
       end
 
       @doc false
       defp parse_msg(msg, feed_id) do
-        Logger.debug "#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name} received msg: #{inspect msg}"
+        Logger.debug "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] received msg: #{inspect msg}"
 
         msg
         |> handle_msg(feed_id)
       end
 
+      @doc false
       def handle_disconnect(conn_status, feed_id) do
-        Logger.error "#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name} disconnected - reason: #{inspect conn_status.reason}"
+        Logger.error "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] disconnected - reason: #{inspect conn_status.reason}"
 
         {:ok, feed_id}
       end
 
-      defoverridable [url: 0]
+      defoverridable [default_url: 0]
     end
   end
 end

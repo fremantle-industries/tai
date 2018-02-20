@@ -1,5 +1,7 @@
 use Mix.Config
 
+config :echo_boy,     port:             4100
+
 config :ex_gdax,      api_key:         System.get_env("GDAX_API_KEY"),
                       api_secret:      System.get_env("GDAX_API_SECRET"),
                       api_passphrase:  System.get_env("GDAX_API_PASSPHRASE")

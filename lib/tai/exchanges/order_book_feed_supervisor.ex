@@ -39,7 +39,11 @@ defmodule Tai.Exchanges.OrderBookFeedSupervisor do
   defp feed_child_spec(feed_id) do
     %{
       id: feed_id |> Tai.Exchanges.OrderBookFeed.to_name,
-      start: {feed_id |> Config.order_book_feed_adapter, :start_link, [feed_id]},
+      start: {
+        feed_id |> Config.order_book_feed_adapter,
+        :start_link,
+        [[feed_id: feed_id, symbols: feed_id |> Config.order_book_feed_symbols]]
+      },
       type: :worker,
       restart: :permanent,
       shutdown: 500

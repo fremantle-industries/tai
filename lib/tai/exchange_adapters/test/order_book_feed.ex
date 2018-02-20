@@ -1,7 +1,7 @@
 defmodule Tai.ExchangeAdapters.Test.OrderBookFeed do
   use Tai.Exchanges.OrderBookFeed
 
-  def url, do: "ws://demos.kaazing.com/echo"
+  def default_url, do: "ws://localhost:#{EchoBoy.Config.port}/ws"
 
   def subscribe_to_order_books(_pid, _symbols), do: :ok
 
