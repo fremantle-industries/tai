@@ -33,14 +33,19 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       def default_url, do: raise "No default_url/0 in #{__MODULE__}"
 
-      def start_link(feed_id: feed_id, symbols: symbols) do
-        default_url()
+      def start_link(url, feed_id: feed_id, symbols: symbols) do
+        url
         |> WebSockex.start_link(
           __MODULE__,
           feed_id,
           name: feed_id |> Tai.Exchanges.OrderBookFeed.to_name
         )
         |> init_subscriptions(feed_id, symbols)
+      end
+
+      def start_link([feed_id: feed_id, symbols: symbols] = args) do
+        default_url()
+        |> start_link(args)
       end
 
       @doc false

@@ -1,5 +1,5 @@
 defmodule Tai.Exchanges.OrderBookFeedTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Tai.Exchanges.OrderBookFeed
 
   alias Tai.Exchanges.OrderBookFeed
