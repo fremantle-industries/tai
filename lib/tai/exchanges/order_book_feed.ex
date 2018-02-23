@@ -94,7 +94,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
         {:ok, feed_id}
       end
 
-      defoverridable [default_url: 0]
+      defoverridable [default_url: 0, handle_disconnect: 2]
     end
   end
 end

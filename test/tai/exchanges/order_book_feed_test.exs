@@ -2,6 +2,8 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
   use ExUnit.Case, async: true
   doctest Tai.Exchanges.OrderBookFeed
 
+  import ExUnit.CaptureLog
+
   alias Tai.Exchanges.OrderBookFeed
 
   defmodule ExampleOrderBookFeed do
@@ -10,6 +12,13 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     def default_url, do: "ws://localhost:#{EchoBoy.Config.port}/ws/"
     def subscribe_to_order_books(_pid, _symbols), do: :ok
     def handle_msg(msg, feed_id), do: send :test, {msg, feed_id}
+
+    def handle_disconnect(conn_status, feed_id) do
+      val = super(conn_status, feed_id)
+      send :test, :disconnected
+
+      val
+    end
   end
 
   test "start_link returns an :ok, pid tuple when successful" do
@@ -47,6 +56,18 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     assert_receive {%{"hello" => "world!"}, :example_feed}
   end
 
-  @tag :skip
-  test "logs an error message when disconnected"
+  test "logs an error message when disconnected" do
+    Process.register self(), :test
+
+    {:ok, pid} = ExampleOrderBookFeed.start_link(
+      feed_id: :example_feed,
+      symbols: [:btcusd, :ltcusd]
+    )
+
+    assert capture_log(fn ->
+      WebSockex.send_frame(pid, {:text, "close"})
+
+      assert_receive :disconnected
+    end) =~ "[error] [order_book_feed_example_feed] disconnected - reason: {:remote, 1000, \"\"}"
+  end
 end
