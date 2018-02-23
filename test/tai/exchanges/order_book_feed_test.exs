@@ -21,6 +21,12 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     end
   end
 
+  setup do
+    Process.register self(), :test
+
+    :ok
+  end
+
   test "start_link returns an :ok, pid tuple when successful" do
     assert {:ok, _pid} = ExampleOrderBookFeed.start_link(
       feed_id: :example_feed,
@@ -44,8 +50,6 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
   end
 
   test "calls the handle_msg callback when it receives a WebSocket message" do
-    Process.register self(), :test
-
     {:ok, pid} = ExampleOrderBookFeed.start_link(
       feed_id: :example_feed,
       symbols: [:btcusd, :ltcusd]
@@ -57,7 +61,6 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
   end
 
   test "raises an error when the message is not valid JSON" do
-    Process.register self(), :test
     Process.flag :trap_exit, true
 
     {:ok, pid} = ExampleOrderBookFeed.start_link(
@@ -71,8 +74,6 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
   end
 
   test "logs a debug message for each frame received with a :text msg" do
-    Process.register self(), :test
-
     {:ok, pid} = ExampleOrderBookFeed.start_link(
       feed_id: :example_feed,
       symbols: [:btcusd, :ltcusd]
@@ -86,8 +87,6 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
   end
 
   test "logs an error message when disconnected" do
-    Process.register self(), :test
-
     {:ok, pid} = ExampleOrderBookFeed.start_link(
       feed_id: :example_feed,
       symbols: [:btcusd, :ltcusd]

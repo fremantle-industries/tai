@@ -7,6 +7,22 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   alias Tai.ExchangeAdapters.Gdax.OrderBookFeed
   alias Tai.Markets.OrderBook
 
+  def send_feed_msg(pid, msg) do
+    WebSockex.send_frame(pid, {:text, msg |> JSON.encode!})
+  end
+
+  def send_feed_l2update(pid, product_id, changes) do
+    send_feed_msg(
+      pid,
+      %{
+        type: "l2update",
+        time: "time not used yet",
+        product_id: product_id,
+        changes: changes
+      }
+    )
+  end
+
   setup do
     {:ok, feed_a_pid} = OrderBookFeed.start_link(
       "ws://localhost:#{EchoBoy.Config.port}/ws",
@@ -53,16 +69,13 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       feed_b_btcusd_pid: feed_b_btcusd_pid
     }
   ) do
-    WebSockex.send_frame(
+    send_feed_msg(
       feed_a_pid,
-      {
-        :text,
-        %{
-          type: "snapshot",
-          product_id: "BTC-USD",
-          bids: [["110.0", "100.0"], ["100.0", "110.0"]],
-          asks: [["120.0", "10.0"], ["130.0", "11.0"]]
-        } |> JSON.encode!
+      %{
+        type: "snapshot",
+        product_id: "BTC-USD",
+        bids: [["110.0", "100.0"], ["100.0", "110.0"]],
+        asks: [["120.0", "10.0"], ["130.0", "11.0"]]
       }
     )
 
@@ -99,24 +112,17 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       feed_b_btcusd_pid: feed_b_btcusd_pid
     }
   ) do
-    WebSockex.send_frame(
+    send_feed_l2update(
       feed_a_pid,
-      {
-        :text,
-        %{
-          type: "l2update",
-          time: "time not used yet",
-          product_id: "BTC-USD",
-          changes: [
-            ["buy", "0.9", "0.1"],
-            ["sell", "1.4", "0.12"],
-            ["buy", "1.0", "1.2"],
-            ["sell", "1.2", "0.11"],
-            ["buy", "1.1", "0"],
-            ["sell", "1.3", "0.0"]
-          ]
-        } |> JSON.encode!
-      }
+      "BTC-USD", 
+      [
+        ["buy", "0.9", "0.1"],
+        ["sell", "1.4", "0.12"],
+        ["buy", "1.0", "1.2"],
+        ["sell", "1.2", "0.11"],
+        ["buy", "1.1", "0"],
+        ["sell", "1.3", "0.0"]
+      ]
     )
 
     :timer.sleep 10
@@ -141,6 +147,37 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
         asks: [[price: 1.2, size: 0.1]]
       }
     }
+  end
+
+  test(
+    "broadcasts the order book changes to the pubsub subscribers",
+    %{feed_a_pid: feed_a_pid}
+  ) do
+    defmodule Subscriber do
+      use GenServer
+
+      def start_link, do: GenServer.start_link(__MODULE__, :ok)
+      def init(state), do: {:ok, state}
+      def subscribe_to_order_book, do: Tai.PubSub.subscribe(:order_book)
+      def unsubscribe_from_order_book, do: Tai.PubSub.unsubscribe(:order_book)
+
+      def handle_info({:quotes, _feed_id, _symbol, _changes} = msg, state) do
+        send :test, msg
+        {:noreply, state}
+      end
+    end
+
+    {:ok, _} = Subscriber.start_link()
+    Subscriber.subscribe_to_order_book()
+
+    send_feed_l2update(
+      feed_a_pid,
+      "BTC-USD",
+      [["buy", "0.9", "0.1"]]
+    )
+
+    assert_receive {:quotes, :feed_a, :btcusd, [[side: :bid, price: 0.9, size: 0.1]]}
+    Subscriber.unsubscribe_from_order_book()
   end
 
   test "logs a warning for unhandled messages", %{feed_a_pid: feed_a_pid} do

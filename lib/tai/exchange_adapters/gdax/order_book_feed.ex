@@ -7,7 +7,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
 
   require Logger
 
-  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook}
+  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook, PubSub}
   alias Tai.ExchangeAdapters.Gdax.{Product, Serializers.Snapshot, Serializers.L2Update}
 
   @doc """
@@ -60,12 +60,17 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name
     |> OrderBook.update(normalized_changes)
+    |> broadcast_quotes(feed_id, symbol, normalized_changes)
   end
   @doc """
   Log a warning message when the WebSocket receives a message that is not explicitly handled
   """
   def handle_msg(unhandled_msg, feed_id) do
     Logger.warn "[#{feed_id |> OrderBookFeed.to_name}] unhandled message: #{inspect unhandled_msg}"
+  end
+
+  defp broadcast_quotes(:ok, feed_id, symbol, changes) do
+    PubSub.broadcast(:order_book, {:quotes, feed_id, symbol, changes})
   end
 
   defp subscribe(name: name, symbols: symbols, channels: channels) do
