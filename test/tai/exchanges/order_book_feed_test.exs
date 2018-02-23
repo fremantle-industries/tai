@@ -56,6 +56,20 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     assert_receive {%{"hello" => "world!"}, :example_feed}
   end
 
+  test "raises an error when the message is not valid JSON" do
+    Process.register self(), :test
+    Process.flag :trap_exit, true
+
+    {:ok, pid} = ExampleOrderBookFeed.start_link(
+      feed_id: :example_feed,
+      symbols: [:btcusd, :ltcusd]
+    )
+
+    WebSockex.send_frame(pid, {:text, "not-json"})
+
+    assert_receive({:EXIT, ^pid, {%JSON.Decoder.UnexpectedTokenError{token: "not-json"}, _}})
+  end
+
   test "logs a debug message for each frame received with a :text msg" do
     Process.register self(), :test
 
