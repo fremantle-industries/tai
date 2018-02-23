@@ -64,26 +64,18 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       @doc false
       def handle_frame({:text, msg}, feed_id) do
-        Logger.debug "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] msg: #{msg}"
+        Logger.debug "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] received msg: #{msg}"
 
         msg
-        |> JSON.decode!
         |> parse_msg(feed_id)
-
-        {:ok, feed_id}
-      end
-      @doc false
-      def handle_frame({type, msg}, feed_id) do
-        Logger.debug "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] unhandled frame - type: #{inspect type}, msg: #{inspect msg}"
 
         {:ok, feed_id}
       end
 
       @doc false
       defp parse_msg(msg, feed_id) do
-        Logger.debug "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] received msg: #{inspect msg}"
-
         msg
+        |> JSON.decode!
         |> handle_msg(feed_id)
       end
 

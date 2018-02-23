@@ -56,6 +56,21 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     assert_receive {%{"hello" => "world!"}, :example_feed}
   end
 
+  test "logs a debug message for each frame received with a :text msg" do
+    Process.register self(), :test
+
+    {:ok, pid} = ExampleOrderBookFeed.start_link(
+      feed_id: :example_feed,
+      symbols: [:btcusd, :ltcusd]
+    )
+
+    assert capture_log(fn ->
+      WebSockex.send_frame(pid, {:text, %{type: "test_message"} |> JSON.encode!})
+
+      assert_receive {%{"type" => "test_message"}, :example_feed}
+    end) =~ "[debug] [order_book_feed_example_feed] received msg: {\"type\":\"test_message\"}"
+  end
+
   test "logs an error message when disconnected" do
     Process.register self(), :test
 
