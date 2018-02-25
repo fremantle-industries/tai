@@ -3,9 +3,15 @@ defmodule Support.Advisors.Info do
 
   require Logger
 
-  def handle_quotes(state, feed_id, symbol, changes) do
-    Logger.debug "[#{state.advisor_id |> Tai.Advisor.to_name}] handle_quotes - feed_id: #{feed_id}, symbol: #{symbol}, changes: #{inspect changes}"
+  def handle_order_book_changes(feed_id, symbol, changes, state) do
+    Logger.debug "[#{state.advisor_id |> Tai.Advisor.to_name}] handle_order_book_changes - feed_id: #{feed_id}, symbol: #{symbol}, changes: #{inspect changes}"
 
-    {:ok, %{}}
+    :ok
+  end
+
+  def handle_inside_quote(feed_id, symbol, bid, ask, changes, state) do
+    Logger.debug "[#{state.advisor_id |> Tai.Advisor.to_name}] handle_inside_quote - feed_id: #{feed_id}, symbol: #{symbol}, bid/ask: #{inspect bid}/#{inspect ask}, changes: #{inspect changes}"
+
+    :ok
   end
 end
