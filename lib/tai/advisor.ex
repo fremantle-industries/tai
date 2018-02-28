@@ -13,7 +13,7 @@ defmodule Tai.Advisor do
   @doc """
   Callback when the highest bid or lowest ask changes price or size
   """
-  @callback handle_inside_quote(feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, changes :: List.t, state :: Map.t) :: :ok
+  @callback handle_inside_quote(feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, snapshot_or_changes :: Map.t | List.t, state :: Map.t) :: :ok
 
   alias Tai.PubSub
 
@@ -48,7 +48,7 @@ defmodule Tai.Advisor do
       @doc false
       def init(%{order_book_feed_ids: order_book_feed_ids} = state) do
         order_book_feed_ids
-        |> subscribe_to_order_book_changes
+        |> subscribe_to_order_book_channels
 
         {:ok, state}
       end
@@ -74,13 +74,40 @@ defmodule Tai.Advisor do
 
         {:noreply, state}
       end
+      @doc false
+      def handle_info({:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}, state) do
+        inside_quote(feed_id, symbol)
+        |> handle_snapshot_inside_quote(feed_id, symbol, %{bids: normalized_bids, asks: normalized_asks}, state)
 
-      defp subscribe_to_order_book_changes([]), do: nil
-      defp subscribe_to_order_book_changes([feed_id | tail]) do
+        {:noreply, state}
+      end
+
+      defp handle_snapshot_inside_quote(
+        {:ok, [bid: inside_bid, ask: inside_ask]},
+        feed_id,
+        symbol,
+        snapshot,
+        state
+      ) do
+        handle_inside_quote(feed_id, symbol, inside_bid, inside_ask, snapshot, state)
+      end
+
+      defp inside_quote(feed_id, symbol) do
+        [feed_id: feed_id, symbol: symbol, depth: 1]
+        |> quotes
+        |> case do
+          {:ok, %{bids: bids, asks: asks}} ->
+            {:ok, [bid: bids |> List.first, ask: asks |> List.first]}
+        end
+      end
+
+      defp subscribe_to_order_book_channels([]), do: nil
+      defp subscribe_to_order_book_channels([feed_id | tail]) do
         PubSub.subscribe({:order_book_changes, feed_id})
+        PubSub.subscribe({:order_book_snapshot, feed_id})
 
         tail
-        |> subscribe_to_order_book_changes
+        |> subscribe_to_order_book_channels
       end
 
       defp check_inside_quote(feed_id, symbol, changes, state) do

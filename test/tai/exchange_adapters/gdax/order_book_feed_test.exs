@@ -7,6 +7,34 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   alias Tai.ExchangeAdapters.Gdax.OrderBookFeed
   alias Tai.Markets.OrderBook
 
+  defmodule Subscriber do
+    use GenServer
+
+    def start_link, do: GenServer.start_link(__MODULE__, :ok)
+    def init(state), do: {:ok, state}
+    def subscribe_to_order_book_changes do
+      Tai.PubSub.subscribe({:order_book_changes, :my_feed_a})
+    end
+    def subscribe_to_order_book_snapshot do
+      Tai.PubSub.subscribe({:order_book_snapshot, :my_feed_a})
+    end
+    def unsubscribe_from_order_book_changes do
+      Tai.PubSub.unsubscribe({:order_book_changes, :my_feed_a})
+    end
+    def unsubscribe_from_order_book_snapshot do
+      Tai.PubSub.unsubscribe({:order_book_snapshot, :my_feed_a})
+    end
+
+    def handle_info({:order_book_changes, _feed_id, _symbol, _changes} = msg, state) do
+      send :test, msg
+      {:noreply, state}
+    end
+    def handle_info({:order_book_snapshot, _feed_id, _symbol, _snapshot} = msg, state) do
+      send :test, msg
+      {:noreply, state}
+    end
+  end
+
   def send_feed_msg(pid, msg) do
     WebSockex.send_frame(pid, {:text, msg |> JSON.encode!})
   end
@@ -19,6 +47,18 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
         time: "time not used yet",
         product_id: product_id,
         changes: changes
+      }
+    )
+  end
+
+  def send_feed_snapshot(pid, product_id, bids, asks) do
+    send_feed_msg(
+      pid,
+      %{
+        type: "snapshot",
+        product_id: product_id,
+        bids: bids,
+        asks: asks
       }
     )
   end
@@ -150,27 +190,9 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   end
 
   test(
-    "broadcasts the order book changes to the pubsub subscribers",
+    "broadcasts the order book snapshot to the pubsub subscribers",
     %{my_feed_a_pid: my_feed_a_pid}
   ) do
-    defmodule Subscriber do
-      use GenServer
-
-      def start_link, do: GenServer.start_link(__MODULE__, :ok)
-      def init(state), do: {:ok, state}
-      def subscribe_to_order_book_changes do
-        Tai.PubSub.subscribe({:order_book_changes, :my_feed_a})
-      end
-      def unsubscribe_from_order_book_changes do
-        Tai.PubSub.unsubscribe({:order_book_changes, :my_feed_a})
-      end
-
-      def handle_info({:order_book_changes, _feed_id, _symbol, _changes} = msg, state) do
-        send :test, msg
-        {:noreply, state}
-      end
-    end
-
     {:ok, _} = Subscriber.start_link()
     Subscriber.subscribe_to_order_book_changes()
 
@@ -181,6 +203,30 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     )
 
     assert_receive {:order_book_changes, :my_feed_a, :btcusd, [[side: :bid, price: 0.9, size: 0.1]]}
+    Subscriber.unsubscribe_from_order_book_changes()
+  end
+
+  test(
+    "broadcasts the order book changes to the pubsub subscribers",
+    %{my_feed_a_pid: my_feed_a_pid}
+  ) do
+    {:ok, _} = Subscriber.start_link()
+    Subscriber.subscribe_to_order_book_snapshot()
+
+    send_feed_snapshot(
+      my_feed_a_pid,
+      "BTC-USD",
+      [["110.0", "100.0"], ["100.0", "110.0"]],
+      [["120.0", "10.0"], ["130.0", "11.0"]]
+    )
+
+    assert_receive {
+      :order_book_snapshot,
+      :my_feed_a,
+      :btcusd,
+      [{100.0, 110.0}, {110.0, 100.0}],
+      [{130.0, 11.0}, {120.0, 10.0}]
+    }
     Subscriber.unsubscribe_from_order_book_changes()
   end
 

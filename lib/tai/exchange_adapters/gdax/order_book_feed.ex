@@ -35,12 +35,17 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     },
     feed_id
   ) do
-    [feed_id: feed_id, symbol: Product.to_symbol(product_id)]
+    normalized_bids = bids |> Snapshot.normalize
+    normalized_asks = asks |> Snapshot.normalize
+    symbol = Product.to_symbol(product_id)
+
+    [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name
     |> OrderBook.replace(
-      bids: bids |> Snapshot.normalize,
-      asks: asks |> Snapshot.normalize
+      bids: normalized_bids,
+      asks: normalized_asks
     )
+    |> broadcast_order_book_snapshot(feed_id, symbol, normalized_bids, normalized_asks)
   end
   @doc """
   Update the bids/asks in the order books that have changed
@@ -70,7 +75,17 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
   end
 
   defp broadcast_order_book_changes(:ok, feed_id, symbol, changes) do
-    PubSub.broadcast({:order_book_changes, feed_id}, {:order_book_changes, feed_id, symbol, changes})
+    PubSub.broadcast(
+      {:order_book_changes, feed_id},
+      {:order_book_changes, feed_id, symbol, changes}
+    )
+  end
+
+  defp broadcast_order_book_snapshot(:ok, feed_id, symbol, normalized_bids, normalized_asks) do
+    PubSub.broadcast(
+      {:order_book_snapshot, feed_id},
+      {:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}
+    )
   end
 
   defp subscribe(name: name, symbols: symbols, channels: channels) do
