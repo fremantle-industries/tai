@@ -1,14 +1,16 @@
 require IEx;
 
-defmodule Tai.CommandsHelperTest do
+defmodule Tai.Commands.HelperTest do
   use ExUnit.Case
-  doctest Tai.CommandsHelper
+  doctest Tai.Commands.Helper
 
   import ExUnit.CaptureIO
 
+  alias Tai.{Commands.Helper, Markets.OrderBook}
+
   test "help returns the usage for the supported commands" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.help
+      Helper.help
     end) == """
     * status
     * quotes exchange(:gdax), symbol(:btcusd)
@@ -27,17 +29,15 @@ defmodule Tai.CommandsHelperTest do
 
   test "quotes shows the snapshot of the live order book" do
     name = [feed_id: :test_feed_a, symbol: :btcusd]
-           |> Tai.Markets.OrderBook.to_name
+           |> OrderBook.to_name
 
-    :ok = Tai.Markets.OrderBook.replace(
+    :ok = OrderBook.replace(
       name,
       bids: [{12999.99, 0.000021}, {12999.98, 1.0}],
       asks: [{13000.01, 1.11}, {13000.02, 1.25}]
     )
 
-    assert capture_io(fn ->
-      Tai.CommandsHelper.quotes(:test_feed_a, :btcusd)
-    end) == """
+    assert capture_io(fn -> Helper.quotes(:test_feed_a, :btcusd) end) == """
     13000.01/1.11
     ---
     12999.99/0.000021\n
@@ -55,49 +55,49 @@ defmodule Tai.CommandsHelperTest do
 
   test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.buy_limit(:test_exchange_a, :btcusd, 10.1, 2.2)
+      Helper.buy_limit(:test_exchange_a, :btcusd, 10.1, 2.2)
     end) == "create order success - id: f9df7435-34d5-4861-8ddc-80f0fd2c83d7, status: pending\n"
   end
 
   test "buy_limit displays an error message when the order can't be created" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.buy_limit(:test_exchange_a, :btcusd, 10.1, 3.3)
+      Helper.buy_limit(:test_exchange_a, :btcusd, 10.1, 3.3)
     end) == "create order failure - Insufficient funds\n"
   end
 
   test "sell_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.sell_limit(:test_exchange_a, :btcusd, 10.1, 2.2)
+      Helper.sell_limit(:test_exchange_a, :btcusd, 10.1, 2.2)
     end) == "create order success - id: 41541912-ebc1-4173-afa5-4334ccf7a1a8, status: pending\n"
   end
 
   test "sell_limit displays an error message when the order can't be created" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.sell_limit(:test_exchange_a, :btcusd, 10.1, 3.3)
+      Helper.sell_limit(:test_exchange_a, :btcusd, 10.1, 3.3)
     end) == "create order failure - Insufficient funds\n"
   end
 
   test "order_status displays the order info" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.order_status(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
+      Helper.order_status(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
     end) == "status: open\n"
   end
 
   test "order_status displays error messages" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.order_status(:test_exchange_a, "invalid-order-id")
+      Helper.order_status(:test_exchange_a, "invalid-order-id")
     end) == "error: Invalid order id\n"
   end
 
   test "cancel_order cancels a previous order" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.cancel_order(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
+      Helper.cancel_order(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
     end) == "cancel order success\n"
   end
 
   test "cancel_order displays error messages" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.cancel_order(:test_exchange_a, "invalid-order-id")
+      Helper.cancel_order(:test_exchange_a, "invalid-order-id")
     end) == "error: Invalid order id\n"
   end
 end
