@@ -1,7 +1,7 @@
-defmodule Tai.CommandsHelper do
+defmodule Tai.Commands.Balances do
   alias Tai.Fund
 
-  def status do
+  def balance do
     IO.puts "#{Fund.balance} USD"
   end
 end

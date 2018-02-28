@@ -12,7 +12,7 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(fn ->
       Helper.help
     end) == """
-    * status
+    * balance
     * quotes exchange(:gdax), symbol(:btcusd)
     * buy_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
     * sell_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
@@ -21,9 +21,9 @@ defmodule Tai.Commands.HelperTest do
     """
   end
 
-  test "status is the sum of USD balances across accounts as a formatted string" do
+  test "balance is the sum of USD balances across accounts as a formatted string" do
     assert capture_io(fn ->
-      Tai.CommandsHelper.status
+      Helper.balance
     end) == "0.22 USD\n"
   end
 

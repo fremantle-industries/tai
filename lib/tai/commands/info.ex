@@ -1,7 +1,7 @@
 defmodule Tai.Commands.Info do
   def help do
     IO.puts """
-    * status
+    * balance
     * quotes exchange(:gdax), symbol(:btcusd)
     * buy_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
     * sell_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
