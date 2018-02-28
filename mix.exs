@@ -26,6 +26,7 @@ defmodule Tai.Mixfile do
       {:ex_gdax, "~> 0.1.2"},
       {:httpoison, "~> 0.12"},
       {:json, "~> 1.0"},
+      {:table_rex, "~> 0.10"},
       {:timex, "~> 3.1"},
       {:websockex, "~> 0.4"},
       {:logger_file_backend, "~> 0.0.10"},

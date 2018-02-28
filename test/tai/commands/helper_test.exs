@@ -9,10 +9,9 @@ defmodule Tai.Commands.HelperTest do
   alias Tai.{Commands.Helper, Markets.OrderBook}
 
   test "help returns the usage for the supported commands" do
-    assert capture_io(fn ->
-      Helper.help
-    end) == """
+    assert capture_io(&Helper.help/0) == """
     * balance
+    * order_book_status
     * quotes exchange(:gdax), symbol(:btcusd)
     * buy_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
     * sell_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
@@ -21,10 +20,30 @@ defmodule Tai.Commands.HelperTest do
     """
   end
 
-  test "balance is the sum of USD balances across accounts as a formatted string" do
-    assert capture_io(fn ->
-      Helper.balance
-    end) == "0.22 USD\n"
+  test "balance is the sum of USD balances across accounts" do
+    assert capture_io(fn -> Helper.balance end) == "0.22 USD\n"
+  end
+
+  test "order_book_status displays all inside quotes" do
+    name = [feed_id: :test_feed_a, symbol: :btcusd]
+           |> OrderBook.to_name
+
+    :ok = OrderBook.replace(
+      name,
+      bids: [{12999.99, 0.000021}, {12999.98, 1.0}],
+      asks: [{13000.01, 1.11}, {13000.02, 1.25}]
+    )
+
+    assert capture_io(fn -> Helper.order_book_status() end) == """
+    +-------------+--------+-----------+-----------+----------+----------+
+    |        Feed | Symbol | Bid Price | Ask Price | Bid Size | Ask Size |
+    +-------------+--------+-----------+-----------+----------+----------+
+    | test_feed_a | btcusd |  12999.99 |  13000.01 | 0.000021 |     1.11 |
+    | test_feed_a | ltcusd |         0 |         0 |        0 |        0 |
+    | test_feed_b | ethusd |         0 |         0 |        0 |        0 |
+    | test_feed_b | ltcusd |         0 |         0 |        0 |        0 |
+    +-------------+--------+-----------+-----------+----------+----------+\n
+    """
   end
 
   test "quotes shows the snapshot of the live order book" do
@@ -37,21 +56,20 @@ defmodule Tai.Commands.HelperTest do
       asks: [{13000.01, 1.11}, {13000.02, 1.25}]
     )
 
-    assert capture_io(fn -> Helper.quotes(:test_feed_a, :btcusd) end) == """
+    assert capture_io(fn -> Helper.quotes(feed_id: :test_feed_a, symbol: :btcusd) end) == """
     13000.01/1.11
     ---
     12999.99/0.000021\n
     """
-
-    :ok = GenServer.stop(name)
   end
 
   # TODO: Figure out how to trap calls to process with name that doesn't exist
-  # test "quotes with remote displays errors from the server" do
-  #   assert capture_io(fn ->
-  #     Tai.CommandsHelper.quotes(:test_exchange_a, :notfound)
-  #   end) == "error: NotFound\n"
-  # end
+  @tag :skip
+  test "quotes with remote displays errors from the server" do
+    assert capture_io(fn ->
+      Helper.quotes(feed_id: :test_exchange_a, symbol: :notfound)
+    end) == "error: NotFound\n"
+  end
 
   test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
