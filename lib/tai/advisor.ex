@@ -40,7 +40,11 @@ defmodule Tai.Advisor do
       def start_link(advisor_id: advisor_id, order_book_feed_ids: order_book_feed_ids) do
         GenServer.start_link(
           __MODULE__,
-          %{advisor_id: advisor_id, order_book_feed_ids: order_book_feed_ids},
+          %{
+            advisor_id: advisor_id,
+            order_book_feed_ids: order_book_feed_ids,
+            inside_quotes: %{}
+          },
           name: advisor_id |> Advisor.to_name
         )
       end
@@ -51,6 +55,26 @@ defmodule Tai.Advisor do
         |> subscribe_to_order_book_channels
 
         {:ok, state}
+      end
+
+      @doc false
+      def handle_info({:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}, state) do
+        new_state = inside_quote(feed_id, symbol)
+                    |> put_inside_quote_in_state(feed_id, symbol, state)
+                    |> call_handle_inside_quote(feed_id, symbol, %{bids: normalized_bids, asks: normalized_asks})
+
+        {:noreply, new_state}
+      end
+      @doc false
+      def handle_info({:order_book_changes, feed_id, symbol, changes}, state) do
+        previous_inside_quote = state |> inside_quote_from_state(feed_id, symbol)
+
+        handle_order_book_changes(feed_id, symbol, changes, state)
+        new_state = inside_quote(feed_id, symbol)
+                    |> put_inside_quote_in_state(feed_id, symbol, state)
+                    |> call_handle_inside_quote_if_changed(feed_id, symbol, changes, previous_inside_quote)
+
+        {:noreply, new_state}
       end
 
       @doc """
@@ -67,40 +91,6 @@ defmodule Tai.Advisor do
         |> OrderBook.quotes(depth)
       end
 
-      @doc false
-      def handle_info({:order_book_changes, feed_id, symbol, changes}, state) do
-        handle_order_book_changes(feed_id, symbol, changes, state)
-        check_inside_quote(feed_id, symbol, changes, state)
-
-        {:noreply, state}
-      end
-      @doc false
-      def handle_info({:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}, state) do
-        inside_quote(feed_id, symbol)
-        |> handle_snapshot_inside_quote(feed_id, symbol, %{bids: normalized_bids, asks: normalized_asks}, state)
-
-        {:noreply, state}
-      end
-
-      defp handle_snapshot_inside_quote(
-        {:ok, [bid: inside_bid, ask: inside_ask]},
-        feed_id,
-        symbol,
-        snapshot,
-        state
-      ) do
-        handle_inside_quote(feed_id, symbol, inside_bid, inside_ask, snapshot, state)
-      end
-
-      defp inside_quote(feed_id, symbol) do
-        [feed_id: feed_id, symbol: symbol, depth: 1]
-        |> quotes
-        |> case do
-          {:ok, %{bids: bids, asks: asks}} ->
-            {:ok, [bid: bids |> List.first, ask: asks |> List.first]}
-        end
-      end
-
       defp subscribe_to_order_book_channels([]), do: nil
       defp subscribe_to_order_book_channels([feed_id | tail]) do
         PubSub.subscribe({:order_book_changes, feed_id})
@@ -110,68 +100,42 @@ defmodule Tai.Advisor do
         |> subscribe_to_order_book_channels
       end
 
-      defp check_inside_quote(feed_id, symbol, changes, state) do
+      defp inside_quote(feed_id, symbol) do
         [feed_id: feed_id, symbol: symbol, depth: 1]
         |> quotes
         |> case do
-          {:ok, %{bids: bids, asks: asks}} ->
-            inside_bid = bids |> List.first
-            inside_ask = asks |> List.first
-
-            changes
-            |> to_quotes
-            |> contains_inside_quote?(inside_bid, inside_ask)
-            |> call_handle_inside_quote(feed_id, symbol, inside_bid, inside_ask, changes, state)
+          {:ok, %{bids: bids, asks: asks}} -> [bid: bids |> List.first, ask: asks |> List.first]
         end
       end
 
-      defp to_quotes(changes) do
-        changes
-        |> Enum.reduce(
-          %{bids: [], asks: []},
-          fn [side: side, price: price, size: size], acc ->
-            case side do
-              :bid -> Map.put(acc, :bids, [[price: price, size: size] | acc[:bids]])
-              :ask -> Map.put(acc, :asks, [[price: price, size: size] | acc[:asks]])
-            end
-          end
-        )
+      defp put_inside_quote_in_state(inside_quote, feed_id, symbol, state) do
+        key = [feed_id: feed_id, symbol: symbol] |> OrderBook.to_name
+        new_inside_quote = state.inside_quotes |> Map.put(key, inside_quote)
+
+        state |> Map.put(:inside_quotes, new_inside_quote)
       end
 
-      defp contains_inside_quote?(%{bids: change_bids, asks: change_asks} = quote_changes, inside_bid, inside_ask) do
-        {false, quote_changes}
-        |> contains_inside?(:bids, inside_bid)
-        |> contains_inside?(:asks, inside_ask)
-        |> deleted_prior_inside?(:bids, inside_bid)
-        |> deleted_prior_inside?(:asks, inside_ask)
+      defp inside_quote_from_state(%{inside_quotes: inside_quotes}, feed_id, symbol) do
+        inside_quotes
+        |> Map.get([feed_id: feed_id, symbol: symbol] |> OrderBook.to_name)
       end
-      defp contains_inside?({false, quote_changes}, side, inside) do
-        {
-          quote_changes[side] |> Enum.member?(inside),
-          quote_changes
-        }
-      end
-      defp contains_inside?({true, quote_changes}, _side, _inside), do: {true, quote_changes}
-      defp deleted_prior_inside?({false, quote_changes}, _side, nil), do: {false, quote_changes}
-      defp deleted_prior_inside?({false, %{bids: bids} = quote_changes}, :bids, [price: inside_price, size: _]) do
-        has_higher_deletion_bids = bids
-                                  |> Enum.filter(fn([price: price, size: size]) -> size == 0 && price > inside_price end)
-                                  |> Enum.any?
 
-        {has_higher_deletion_bids, quote_changes}
-      end
-      defp deleted_prior_inside?({false, %{asks: asks} = quote_changes}, :asks, [price: inside_price, size: _]) do
-        has_lower_deletion_asks = asks
-                                  |> Enum.filter(fn([price: price, size: size]) -> size == 0 && price < inside_price end)
-                                  |> Enum.any?
+      defp call_handle_inside_quote(state, feed_id, symbol, snapshot) do
+        [bid: inside_bid, ask: inside_ask] = current_inside_quote = state |> inside_quote_from_state(feed_id, symbol)
 
-        {has_lower_deletion_asks, quote_changes}
-      end
-      defp deleted_prior_inside?({true, quote_changes}, _side, _inside), do: {true, quote_changes}
+        handle_inside_quote(feed_id, symbol, inside_bid, inside_ask, snapshot, state)
 
-      defp call_handle_inside_quote({false, _}, _feed_id, _symbol, _bid, _ask, _changes, _state), do: nil
-      defp call_handle_inside_quote({true, _}, feed_id, symbol, bid, ask, changes, state) do
-        handle_inside_quote(feed_id, symbol, bid, ask, changes, state)
+        state
+      end
+
+      defp call_handle_inside_quote_if_changed(state, feed_id, symbol, changes, previous_inside_quote) do
+        [bid: inside_bid, ask: inside_ask] = current_inside_quote = state |> inside_quote_from_state(feed_id, symbol)
+
+        unless current_inside_quote == previous_inside_quote do
+          handle_inside_quote(feed_id, symbol, inside_bid, inside_ask, changes, state)
+        end
+
+        state
       end
     end
   end
