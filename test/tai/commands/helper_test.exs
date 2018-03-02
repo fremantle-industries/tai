@@ -8,6 +8,13 @@ defmodule Tai.Commands.HelperTest do
 
   alias Tai.{Commands.Helper, Markets.OrderBook}
 
+  setup do
+    test_feed_a_btcusd = [feed_id: :test_feed_a, symbol: :btcusd] |> OrderBook.to_name
+    stop_supervised(test_feed_a_btcusd)
+
+    {:ok, %{test_feed_a_btcusd: test_feed_a_btcusd}}
+  end
+
   test "help returns the usage for the supported commands" do
     assert capture_io(&Helper.help/0) == """
     * balance
@@ -24,36 +31,46 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(fn -> Helper.balance end) == "0.22 USD\n"
   end
 
-  test "order_book_status displays all inside quotes" do
-    name = [feed_id: :test_feed_a, symbol: :btcusd]
-           |> OrderBook.to_name
-
+  test "order_book_status displays all inside quotes and the time they were last processed and changed", %{test_feed_a_btcusd: test_feed_a_btcusd} do
     :ok = OrderBook.replace(
-      name,
-      bids: [{12999.99, 0.000021}, {12999.98, 1.0}],
-      asks: [{13000.01, 1.11}, {13000.02, 1.25}]
+      test_feed_a_btcusd,
+      %{
+        bids: %{
+          12999.99 => {0.000021, nil, nil},
+          12999.98 => {1.0, nil, nil}
+        },
+        asks: %{
+          13000.01 => {1.11, nil, nil},
+          13000.02 => {1.25, nil, nil}
+        }
+      }
     )
 
     assert capture_io(fn -> Helper.order_book_status() end) == """
-    +-------------+--------+-----------+-----------+----------+----------+
-    |        Feed | Symbol | Bid Price | Ask Price | Bid Size | Ask Size |
-    +-------------+--------+-----------+-----------+----------+----------+
-    | test_feed_a | btcusd |  12999.99 |  13000.01 | 0.000021 |     1.11 |
-    | test_feed_a | ltcusd |         0 |         0 |        0 |        0 |
-    | test_feed_b | ethusd |         0 |         0 |        0 |        0 |
-    | test_feed_b | ltcusd |         0 |         0 |        0 |        0 |
-    +-------------+--------+-----------+-----------+----------+----------+\n
+    +-------------+--------+-----------+-----------+----------+----------+-------------------+-----------------+
+    |        Feed | Symbol | Bid Price | Ask Price | Bid Size | Ask Size | Last Processed At | Last Changed At |
+    +-------------+--------+-----------+-----------+----------+----------+-------------------+-----------------+
+    | test_feed_a | btcusd |  12999.99 |  13000.01 | 0.000021 |     1.11 |                   |                 |
+    | test_feed_a | ltcusd |         0 |         0 |        0 |        0 |                   |                 |
+    | test_feed_b | ethusd |         0 |         0 |        0 |        0 |                   |                 |
+    | test_feed_b | ltcusd |         0 |         0 |        0 |        0 |                   |                 |
+    +-------------+--------+-----------+-----------+----------+----------+-------------------+-----------------+\n
     """
   end
 
-  test "quotes shows the snapshot of the live order book" do
-    name = [feed_id: :test_feed_a, symbol: :btcusd]
-           |> OrderBook.to_name
-
+  test "quotes shows the snapshot of the live order book", %{test_feed_a_btcusd: test_feed_a_btcusd} do
     :ok = OrderBook.replace(
-      name,
-      bids: [{12999.99, 0.000021}, {12999.98, 1.0}],
-      asks: [{13000.01, 1.11}, {13000.02, 1.25}]
+      test_feed_a_btcusd,
+      %{
+        bids: %{
+          12999.99 => {0.000021, nil, nil},
+          12999.98 => {1.0, nil, nil}
+        },
+        asks: %{
+          13000.01 => {1.11, nil, nil},
+          13000.02 => {1.25, nil, nil}
+        }
+      }
     )
 
     assert capture_io(fn -> Helper.quotes(feed_id: :test_feed_a, symbol: :btcusd) end) == """

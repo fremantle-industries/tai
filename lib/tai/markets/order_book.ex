@@ -1,4 +1,8 @@
 defmodule Tai.Markets.OrderBook do
+  @moduledoc """
+  Manage and query the state for an order book for a symbol on a feed
+  """
+
   use GenServer
 
   def start_link(feed_id: feed_id, symbol: symbol) do
@@ -43,12 +47,16 @@ defmodule Tai.Markets.OrderBook do
     {:reply, {:ok, state |> ordered_asks |> take(depth)}, state}
   end
 
-  def handle_call({:replace, bids, asks}, _from, _state) do
-    {:reply, :ok, %{bids: bids |> Map.new, asks: asks |> Map.new}}
+  def handle_call({:replace, replacement}, _from, _state) do
+    {:reply, :ok, replacement}
   end
 
-  def handle_call({:update, changes}, _from, state) do
-    {:reply, :ok, state |> update_changes(changes)}
+  def handle_call({:update, %{bids: bids, asks: asks}}, _from, state) do
+    new_state = state
+                |> update_side(:bids, bids)
+                |> update_side(:asks, asks)
+
+    {:reply, :ok, new_state}
   end
 
   def quotes(name, depth \\ :all) do
@@ -71,14 +79,22 @@ defmodule Tai.Markets.OrderBook do
     GenServer.call(name, {:asks, depth})
   end
 
-  def replace(name, bids: bids, asks: asks) do
-    GenServer.call(name, {:replace, bids, asks})
+  def replace(name, %{bids: _b, asks: _a} = replacement) do
+    GenServer.call(name, {:replace, replacement})
   end
 
-  def update(name, changes) do
+  def update(name, %{bids: _b, asks: _a} = changes) do
     GenServer.call(name, {:update, changes})
   end
 
+  @doc """
+  Returns an atom that will identify the process
+
+  ## Examples
+
+    iex> Tai.Markets.OrderBook.to_name(feed_id: :my_test_feed, symbol: :btcusd)
+    Tai.Markets.OrderBook_my_test_feed_btcusd
+  """
   def to_name(feed_id: feed_id, symbol: symbol) do
     :"#{__MODULE__}_#{feed_id}_#{symbol}"
   end
@@ -98,36 +114,32 @@ defmodule Tai.Markets.OrderBook do
     |> to_keyword_list(state.asks)
   end
 
+  defp to_keyword_list(prices, price_levels) do
+    prices
+    |> Enum.map(fn price ->
+      {size, updated_at, processed_at} = price_levels[price]
+      [price: price, size: size, processed_at: processed_at, updated_at: updated_at]
+    end)
+  end
+
   defp take(list, :all), do: list
   defp take(list, depth) do
     list
     |> Enum.take(depth)
   end
 
-  defp to_keyword_list(keys, side) do
-    keys
-    |> Enum.map(&([price: &1, size: side[&1]]))
-  end
+  defp update_side(state, side, price_levels) do
+    new_side = state[side]
+               |> Map.merge(price_levels)
+               |> Map.drop(price_levels |> drop_prices)
 
-  defp update_changes(state, []), do: state
-  defp update_changes(state, [[side: side, price: price, size: size] | remaining_changes]) do
     state
-    |> update_change(side |> to_book_side, price, size)
-    |> update_changes(remaining_changes)
+    |> Map.put(side, new_side)
   end
 
-  defp update_change(state, side, price, size) do
-    state
-    |> Map.put(side, state[side] |> update_or_delete_price(price, size))
-  end
-
-  defp to_book_side(:bid), do: :bids
-  defp to_book_side(:ask), do: :asks
-
-  defp update_or_delete_price(side, price, size) do
-    case size == 0 do
-      true -> Map.delete(side, price)
-      false -> Map.put(side, price, size)
-    end
+  defp drop_prices(price_levels) do
+    price_levels
+    |> Enum.filter(fn {_price, {size, _processed_at, _updated_at}} -> size == 0 end)
+    |> Enum.map(fn {price, _} -> price end)
   end
 end

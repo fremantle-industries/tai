@@ -41,10 +41,10 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
 
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name
-    |> OrderBook.replace(
+    |> OrderBook.replace(%{
       bids: normalized_bids,
       asks: normalized_asks
-    )
+    })
     |> broadcast_order_book_snapshot(feed_id, symbol, normalized_bids, normalized_asks)
   end
   @doc """

@@ -5,7 +5,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   import ExUnit.CaptureLog
 
   alias Tai.ExchangeAdapters.Gdax.OrderBookFeed
-  alias Tai.Markets.OrderBook
+  alias Tai.Markets.{OrderBook}
 
   defmodule Subscriber do
     use GenServer
@@ -75,18 +75,30 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
 
     OrderBook.replace(
       my_feed_a_btcusd_pid,
-      bids: [{1.0, 1.1}, {1.1, 1.0}],
-      asks: [{1.2, 0.1}, {1.3, 0.11}]
+      %{
+        bids: %{
+          1.0 => {1.1, nil, nil},
+          1.1 => {1.0, nil, nil}
+        },
+        asks: %{
+          1.2 => {0.1, nil, nil},
+          1.3 => {0.11, nil, nil}
+        }
+      }
     )
     OrderBook.replace(
       my_feed_a_ltcusd_pid,
-      bids: [{100.0, 0.1}],
-      asks: [{100.1, 0.1}]
+      %{
+        bids: %{100.0 => {0.1, nil, nil}},
+        asks: %{100.1 => {0.1, nil, nil}}
+      }
     )
     OrderBook.replace(
       my_feed_b_btcusd_pid,
-      bids: [{1.0, 1.1}],
-      asks: [{1.2, 0.1}]
+      %{
+        bids: %{1.0 => {1.1, nil, nil}},
+        asks: %{1.2 => {0.1, nil, nil}}
+      }
     )
 
     {
@@ -123,22 +135,28 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     assert OrderBook.quotes(my_feed_a_btcusd_pid) == {
       :ok,
       %{
-        bids: [[price: 110.0, size: 100.0], [price: 100.0, size: 110.0]],
-        asks: [[price: 120.0, size: 10.0], [price: 130.0, size: 11.0]]
+        bids: [
+          [price: 110.0, size: 100.0, processed_at: nil, updated_at: nil],
+          [price: 100.0, size: 110.0, processed_at: nil, updated_at: nil]
+        ],
+        asks: [
+          [price: 120.0, size: 10.0, processed_at: nil, updated_at: nil],
+          [price: 130.0, size: 11.0, processed_at: nil, updated_at: nil]
+        ]
       }
     }
     assert OrderBook.quotes(my_feed_a_ltcusd_pid) == {
       :ok,
       %{
-        bids: [[price: 100.0, size: 0.1]],
-        asks: [[price: 100.1, size: 0.1]]
+        bids: [[price: 100.0, size: 0.1, processed_at: nil, updated_at: nil]],
+        asks: [[price: 100.1, size: 0.1, processed_at: nil, updated_at: nil]]
       }
     }
     assert OrderBook.quotes(my_feed_b_btcusd_pid) == {
       :ok,
       %{
-        bids: [[price: 1.0, size: 1.1]],
-        asks: [[price: 1.2, size: 0.1]]
+        bids: [[price: 1.0, size: 1.1, processed_at: nil, updated_at: nil]],
+        asks: [[price: 1.2, size: 0.1, processed_at: nil, updated_at: nil]]
       }
     }
   end
@@ -169,45 +187,34 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     assert OrderBook.quotes(my_feed_a_btcusd_pid) == {
       :ok,
       %{
-        bids: [[price: 1.0, size: 1.2], [price: 0.9, size: 0.1]],
-        asks: [[price: 1.2, size: 0.11], [price: 1.4, size: 0.12]]
+        bids: [
+          [price: 1.0, size: 1.2, processed_at: nil, updated_at: nil],
+          [price: 0.9, size: 0.1, processed_at: nil, updated_at: nil]
+        ],
+        asks: [
+          [price: 1.2, size: 0.11, processed_at: nil, updated_at: nil],
+          [price: 1.4, size: 0.12, processed_at: nil, updated_at: nil]
+        ]
       }
     }
     assert OrderBook.quotes(my_feed_a_ltcusd_pid) == {
       :ok,
       %{
-        bids: [[price: 100.0, size: 0.1]],
-        asks: [[price: 100.1, size: 0.1]]
+        bids: [[price: 100.0, size: 0.1, processed_at: nil, updated_at: nil]],
+        asks: [[price: 100.1, size: 0.1, processed_at: nil, updated_at: nil]]
       }
     }
     assert OrderBook.quotes(my_feed_b_btcusd_pid) == {
       :ok,
       %{
-        bids: [[price: 1.0, size: 1.1]],
-        asks: [[price: 1.2, size: 0.1]]
+        bids: [[price: 1.0, size: 1.1, processed_at: nil, updated_at: nil]],
+        asks: [[price: 1.2, size: 0.1, processed_at: nil, updated_at: nil]]
       }
     }
   end
 
   test(
     "broadcasts the order book snapshot to the pubsub subscribers",
-    %{my_feed_a_pid: my_feed_a_pid}
-  ) do
-    {:ok, _} = Subscriber.start_link()
-    Subscriber.subscribe_to_order_book_changes()
-
-    send_feed_l2update(
-      my_feed_a_pid,
-      "BTC-USD",
-      [["buy", "0.9", "0.1"]]
-    )
-
-    assert_receive {:order_book_changes, :my_feed_a, :btcusd, [[side: :bid, price: 0.9, size: 0.1]]}
-    Subscriber.unsubscribe_from_order_book_changes()
-  end
-
-  test(
-    "broadcasts the order book changes to the pubsub subscribers",
     %{my_feed_a_pid: my_feed_a_pid}
   ) do
     {:ok, _} = Subscriber.start_link()
@@ -224,8 +231,39 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       :order_book_snapshot,
       :my_feed_a,
       :btcusd,
-      [{100.0, 110.0}, {110.0, 100.0}],
-      [{130.0, 11.0}, {120.0, 10.0}]
+      %{
+        100.0 => {110.0, nil, nil},
+        110.0 => {100.0, nil, nil}
+      },
+      %{
+        130.0 => {11.0, nil, nil},
+        120.0 => {10.0, nil, nil}
+      }
+    }
+    Subscriber.unsubscribe_from_order_book_snapshot()
+  end
+
+  test(
+    "broadcasts the order book changes to the pubsub subscribers",
+    %{my_feed_a_pid: my_feed_a_pid}
+  ) do
+    {:ok, _} = Subscriber.start_link()
+    Subscriber.subscribe_to_order_book_changes()
+
+    send_feed_l2update(
+      my_feed_a_pid,
+      "BTC-USD",
+      [["buy", "0.9", "0.1"]]
+    )
+
+    assert_receive {
+      :order_book_changes,
+      :my_feed_a,
+      :btcusd,
+      %{
+        bids: %{0.9 => {0.1, nil, nil}},
+        asks: %{}
+      }
     }
     Subscriber.unsubscribe_from_order_book_changes()
   end

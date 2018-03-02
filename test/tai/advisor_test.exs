@@ -17,11 +17,17 @@ defmodule Tai.AdvisorTest do
   end
 
   defp broadcast_order_book_changes(feed_id, symbol, changes) do
-    PubSub.broadcast({:order_book_changes, feed_id}, {:order_book_changes, feed_id, symbol, changes})
+    PubSub.broadcast(
+      {:order_book_changes, feed_id},
+      {:order_book_changes, feed_id, symbol, changes}
+    )
   end
 
   defp broadcast_order_book_snapshot(feed_id, symbol, normalized_bids, normalized_asks) do
-    PubSub.broadcast({:order_book_snapshot, feed_id}, {:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks})
+    PubSub.broadcast(
+      {:order_book_snapshot, feed_id},
+      {:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}
+    )
   end
 
   setup do
@@ -35,30 +41,39 @@ defmodule Tai.AdvisorTest do
     {:ok, %{book_pid: book_pid}}
   end
 
-  test "handle_order_book_changes is called when it receives an :order_book broadcast message" do
-   broadcast_order_book_changes(:my_order_book_feed, :btcusd, [[side: :bid, price: 101.1, size: 1.1]])
+  test(
+    "handle_order_book_changes is called when it receives a broadcast message",
+    %{book_pid: book_pid}
+  ) do
+    changes = %{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+    book_pid |> OrderBook.update(changes)
+    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [[side: :bid, price: 101.1, size: 1.1]],
+      ^changes,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
   end
 
   test(
-    "handle_inside_quote is called after the snapshot",
+    "handle_inside_quote is called after the snapshot broadcast message",
     %{book_pid: book_pid}
   ) do
-    book_pid |> OrderBook.replace(bids: [{101.2, 1.0}], asks: [{101.3, 0.1}])
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, [{101.2, 1.0}], [{101.3, 0.1}])
+    replacement = %{
+      bids: %{101.2 => {1.0, nil, nil}},
+      asks: %{101.3 => {0.1, nil, nil}}
+    }
+    book_pid |> OrderBook.replace(replacement)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
 
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0],
-      [price: 101.3, size: 0.1],
-      %{bids: [{101.2, 1.0}], asks: [{101.3, 0.1}]},
+      [price: 101.2, size: 1.0, processed_at: nil, updated_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      ^replacement,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
   end
@@ -67,19 +82,24 @@ defmodule Tai.AdvisorTest do
     "handle_inside_quote is called when the order book changes",
     %{book_pid: book_pid}
   ) do
-    book_pid |> OrderBook.replace(bids: [{101.2, 1.0}], asks: [{101.3, 0.1}])
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, [{101.2, 1.0}], [{101.3, 0.1}])
+    replacement = %{
+      bids: %{101.2 => {1.0, nil, nil}},
+      asks: %{101.3 => {0.1, nil, nil}}
+    }
+    book_pid |> OrderBook.replace(replacement)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
 
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0],
-      [price: 101.3, size: 0.1],
-      %{bids: [{101.2, 1.0}], asks: [{101.3, 0.1}]},
+      [price: 101.2, size: 1.0, processed_at: nil, updated_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      ^replacement,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
 
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, [[side: :bid, price: 101.2, size: 1.0]])
+    changes = %{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
 
     refute_receive {
       _feed_id,
@@ -90,15 +110,15 @@ defmodule Tai.AdvisorTest do
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
 
-    book_pid |> OrderBook.replace(bids: [{101.2, 1.1}], asks: [{101.3, 0.1}])
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, [[side: :bid, price: 101.2, size: 1.1]])
+    book_pid |> OrderBook.update(changes)
+    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.1],
-      [price: 101.3, size: 0.1],
-      [[side: :bid, price: 101.2, size: 1.1]],
+      [price: 101.2, size: 1.1, processed_at: nil, updated_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      ^changes,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
   end
