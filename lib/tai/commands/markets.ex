@@ -1,17 +1,10 @@
 defmodule Tai.Commands.Markets do
   alias Tai.{Exchanges, Markets.OrderBook}
 
-  def order_book_status do
+  def markets do
     Exchanges.Config.order_book_feed_ids
     |> fetch_order_book_status
     |> print_order_book_status
-  end
-
-  def quotes([feed_id: _feed_id, symbol: _symbol] = feed_id_and_symbol) do
-    feed_id_and_symbol
-    |> inside_quote
-    |> format_inside_quote
-    |> print_inside_quote
   end
 
   defp inside_quote([feed_id: _feed_id, symbol: _symbol] = feed_id_and_symbol) do
@@ -42,17 +35,6 @@ defmodule Tai.Commands.Markets do
     ])
   end
   defp format_inside_quote([bid: _bid, ask: _ask] = inside_quote), do: inside_quote
-
-  defp print_inside_quote([
-    bid: [price: bid_price, size: bid_size, processed_at: _bid_processed_at, updated_at: _bid_updated_at],
-    ask: [price: ask_price, size: ask_size, processed_at: _ask_processed_at, updated_at: _ask_updated_at]
-  ]) do
-    IO.puts """
-    #{Decimal.new(ask_price)}/#{Decimal.new(ask_size)}
-    ---
-    #{Decimal.new(bid_price)}/#{Decimal.new(bid_size)}
-    """
-  end
 
   defp fetch_order_book_status([_head | _tail] = feed_ids) do
     feed_ids

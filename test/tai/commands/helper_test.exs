@@ -31,7 +31,7 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(fn -> Helper.balance end) == "0.22 USD\n"
   end
 
-  test "order_book_status displays all inside quotes and the time they were last processed and changed", %{test_feed_a_btcusd: test_feed_a_btcusd} do
+  test "markets displays all inside quotes and the time they were last processed and changed", %{test_feed_a_btcusd: test_feed_a_btcusd} do
     :ok = OrderBook.replace(
       test_feed_a_btcusd,
       %{
@@ -46,7 +46,7 @@ defmodule Tai.Commands.HelperTest do
       }
     )
 
-    assert capture_io(fn -> Helper.order_book_status() end) == """
+    assert capture_io(fn -> Helper.markets() end) == """
     +-------------+--------+-----------+-----------+----------+----------+-------------------+-----------------+
     |        Feed | Symbol | Bid Price | Ask Price | Bid Size | Ask Size | Last Processed At | Last Changed At |
     +-------------+--------+-----------+-----------+----------+----------+-------------------+-----------------+
@@ -56,36 +56,6 @@ defmodule Tai.Commands.HelperTest do
     | test_feed_b | ltcusd |         0 |         0 |        0 |        0 |                   |                 |
     +-------------+--------+-----------+-----------+----------+----------+-------------------+-----------------+\n
     """
-  end
-
-  test "quotes shows the snapshot of the live order book", %{test_feed_a_btcusd: test_feed_a_btcusd} do
-    :ok = OrderBook.replace(
-      test_feed_a_btcusd,
-      %{
-        bids: %{
-          12999.99 => {0.000021, nil, nil},
-          12999.98 => {1.0, nil, nil}
-        },
-        asks: %{
-          13000.01 => {1.11, nil, nil},
-          13000.02 => {1.25, nil, nil}
-        }
-      }
-    )
-
-    assert capture_io(fn -> Helper.quotes(feed_id: :test_feed_a, symbol: :btcusd) end) == """
-    13000.01/1.11
-    ---
-    12999.99/0.000021\n
-    """
-  end
-
-  # TODO: Figure out how to trap calls to process with name that doesn't exist
-  @tag :skip
-  test "quotes with remote displays errors from the server" do
-    assert capture_io(fn ->
-      Helper.quotes(feed_id: :test_exchange_a, symbol: :notfound)
-    end) == "error: NotFound\n"
   end
 
   test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do
