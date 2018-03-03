@@ -35,16 +35,19 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     },
     feed_id
   ) do
-    normalized_bids = bids |> Snapshot.normalize
-    normalized_asks = asks |> Snapshot.normalize
+    processed_at = Timex.now
+    normalized_bids = bids |> Snapshot.normalize(processed_at)
+    normalized_asks = asks |> Snapshot.normalize(processed_at)
     symbol = Product.to_symbol(product_id)
 
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name
-    |> OrderBook.replace(%{
-      bids: normalized_bids,
-      asks: normalized_asks
-    })
+    |> OrderBook.replace(
+      %{
+        bids: normalized_bids,
+        asks: normalized_asks
+      }
+    )
     |> broadcast_order_book_snapshot(feed_id, symbol, normalized_bids, normalized_asks)
   end
   @doc """
@@ -59,7 +62,8 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     },
     feed_id
   ) do
-    normalized_changes = changes |> L2Update.normalize
+    processed_at = Timex.now
+    normalized_changes = changes |> L2Update.normalize(processed_at)
     symbol = product_id |> Product.to_symbol
 
     [feed_id: feed_id, symbol: symbol]

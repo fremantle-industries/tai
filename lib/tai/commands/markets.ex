@@ -59,8 +59,8 @@ defmodule Tai.Commands.Markets do
     symbol,
     feed_id,
     [
-      bid: [price: bid_price, size: bid_size, processed_at: _bid_processed_at, updated_at: _bid_updated_at],
-      ask: [price: ask_price, size: ask_size, processed_at: _ask_processed_at, updated_at: _ask_updated_at]
+      bid: [price: bid_price, size: bid_size, processed_at: bid_processed_at, updated_at: _bid_updated_at],
+      ask: [price: ask_price, size: ask_size, processed_at: ask_processed_at, updated_at: _ask_updated_at]
     ]
   }) do
     [
@@ -71,12 +71,14 @@ defmodule Tai.Commands.Markets do
       bid_size |> Decimal.new,
       ask_size |> Decimal.new,
       nil,
-      nil
+      nil,
+      bid_processed_at && Timex.from_now(bid_processed_at),
+      ask_processed_at && Timex.from_now(ask_processed_at)
     ]
   end
 
   defp print_order_book_status(rows) do
-    header = ["Feed", "Symbol", "Bid Price", "Ask Price", "Bid Size", "Ask Size", "Last Processed At", "Last Changed At"]
+    header = ["Feed", "Symbol", "Bid Price", "Ask Price", "Bid Size", "Ask Size", "Last Processed At", "Last Changed At", "Bid Processed At", "Ask Processed At"]
 
     TableRex.Table.new(rows, header)
     |> TableRex.Table.put_column_meta(:all, align: :right)
