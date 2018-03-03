@@ -44,7 +44,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       pid,
       %{
         type: "l2update",
-        time: "time not used yet",
+        time: Timex.now |> DateTime.to_string,
         product_id: product_id,
         changes: changes
       }
@@ -131,7 +131,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       }
     )
 
-    :timer.sleep 10
+    :timer.sleep 100
     {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_feed_a_btcusd_pid)
     [
       [price: 110.0, size: 100.0, processed_at: bid_a_processed_at, updated_at: nil],
@@ -182,19 +182,22 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       ]
     )
 
-    :timer.sleep 10
+    :timer.sleep 100
     {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_feed_a_btcusd_pid)
     [
-      [price: 1.0, size: 1.2, processed_at: bid_a_processed_at, updated_at: nil],
-      [price: 0.9, size: 0.1, processed_at: bid_b_processed_at, updated_at: nil]
+      [price: 1.0, size: 1.2, processed_at: bid_a_processed_at, updated_at: bid_a_updated_at],
+      [price: 0.9, size: 0.1, processed_at: bid_b_processed_at, updated_at: bid_b_updated_at]
     ] = bids
     [
-      [price: 1.2, size: 0.11, processed_at: ask_a_processed_at, updated_at: nil],
-      [price: 1.4, size: 0.12, processed_at: ask_b_processed_at, updated_at: nil]
+      [price: 1.2, size: 0.11, processed_at: ask_a_processed_at, updated_at: ask_a_updated_at],
+      [price: 1.4, size: 0.12, processed_at: ask_b_processed_at, updated_at: ask_b_updated_at]
     ] = asks
     assert DateTime.compare(bid_a_processed_at, bid_b_processed_at)
     assert DateTime.compare(bid_a_processed_at, ask_a_processed_at)
     assert DateTime.compare(bid_a_processed_at, ask_b_processed_at)
+    assert DateTime.compare(bid_a_updated_at, bid_b_updated_at)
+    assert DateTime.compare(bid_a_updated_at, ask_a_updated_at)
+    assert DateTime.compare(bid_a_updated_at, ask_b_updated_at)
     assert OrderBook.quotes(my_feed_a_ltcusd_pid) == {
       :ok,
       %{
@@ -262,7 +265,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       :my_feed_a,
       :btcusd,
       %{
-        bids: %{0.9 => {0.1, _processed_at, nil}},
+        bids: %{0.9 => {0.1, _processed_at, _updated_at}},
         asks: %{}
       }
     }
@@ -272,7 +275,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   test "logs a warning for unhandled messages", %{my_feed_a_pid: my_feed_a_pid} do
     assert capture_log(fn ->
       WebSockex.send_frame(my_feed_a_pid, {:text, %{type: "unknown_type"} |> JSON.encode!})
-      :timer.sleep 10
+      :timer.sleep 100
     end) =~ "[order_book_feed_my_feed_a] unhandled message: %{\"type\" => \"unknown_type\"}"
   end
 end

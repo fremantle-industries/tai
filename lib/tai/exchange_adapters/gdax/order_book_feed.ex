@@ -56,14 +56,15 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
   def handle_msg(
     %{
       "type" => "l2update",
-      "time" => _time,
+      "time" => time,
       "product_id" => product_id,
       "changes" => changes
     },
     feed_id
   ) do
     processed_at = Timex.now
-    normalized_changes = changes |> L2Update.normalize(processed_at)
+    updated_at = Timex.parse!(time, "{ISO:Extended}")
+    normalized_changes = changes |> L2Update.normalize(processed_at, updated_at)
     symbol = product_id |> Product.to_symbol
 
     [feed_id: feed_id, symbol: symbol]
