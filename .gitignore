@@ -21,3 +21,6 @@ erl_crash.dump
 
 # Environment configurations
 .env*
+
+# Ignore dev config from repo. Use the example file to recreate a local config
+config/dev.exs
