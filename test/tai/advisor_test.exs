@@ -79,7 +79,7 @@ defmodule Tai.AdvisorTest do
   end
 
   test(
-    "handle_inside_quote is called when the order book changes",
+    "handle_inside_quote is called on broadcast changes when the inside bid price is >= to the previous bid or != size ",
     %{book_pid: book_pid}
   ) do
     replacement = %{
@@ -118,6 +118,51 @@ defmodule Tai.AdvisorTest do
       :btcusd,
       [price: 101.2, size: 1.1, processed_at: nil, updated_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      ^changes,
+      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+    }
+  end
+
+  test(
+    "handle_inside_quote is called on broadcast changes when the inside ask price is <= to the previous ask or != size ",
+    %{book_pid: book_pid}
+  ) do
+    replacement = %{
+      bids: %{101.2 => {1.0, nil, nil}},
+      asks: %{101.3 => {0.1, nil, nil}}
+    }
+    book_pid |> OrderBook.replace(replacement)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+
+    assert_receive {
+      :my_order_book_feed,
+      :btcusd,
+      [price: 101.2, size: 1.0, processed_at: nil, updated_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      ^replacement,
+      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+    }
+
+    changes = %{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+
+    refute_receive {
+      _feed_id,
+      _symbol,
+      _bid,
+      _ask,
+      _changes,
+      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+    }
+
+    book_pid |> OrderBook.update(changes)
+    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+
+    assert_receive {
+      :my_order_book_feed,
+      :btcusd,
+      [price: 101.2, size: 1.0, processed_at: nil, updated_at: nil],
+      [price: 101.3, size: 0.2, processed_at: nil, updated_at: nil],
       ^changes,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }

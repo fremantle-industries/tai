@@ -32,6 +32,7 @@ defmodule Tai.Advisor do
       use GenServer
 
       require Logger
+      require Tai.TimeFrame
 
       alias Tai.{Advisor, Markets.OrderBook}
 
@@ -66,13 +67,20 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
       @doc false
-      def handle_info({:order_book_changes, feed_id, symbol, changes}, state) do
-        previous_inside_quote = state |> inside_quote_from_state(feed_id, symbol)
+      def handle_info({:order_book_changes, feed_id, symbol, changes} = msg, state) do
+        new_state = Tai.TimeFrame.debug "[#{state.advisor_id |> Advisor.to_name}] handle_info({:order_book_changes...})" do
+          handle_order_book_changes(feed_id, symbol, changes, state)
 
-        handle_order_book_changes(feed_id, symbol, changes, state)
-        new_state = inside_quote(feed_id, symbol)
-                    |> put_inside_quote_in_state(feed_id, symbol, state)
-                    |> call_handle_inside_quote_if_changed(feed_id, symbol, changes, previous_inside_quote)
+          previous_inside_quote = state
+                                  |> inside_quote_from_state(feed_id, symbol)
+          if changes |> changed_inside_quote?(previous_inside_quote) do
+            inside_quote(feed_id, symbol)
+            |> put_inside_quote_in_state(feed_id, symbol, state)
+            |> call_handle_inside_quote_if_changed(feed_id, symbol, changes, previous_inside_quote)
+          else
+            state
+          end
+        end
 
         {:noreply, new_state}
       end
@@ -136,6 +144,26 @@ defmodule Tai.Advisor do
         end
 
         state
+      end
+
+      defp changed_inside_quote?(%{bids: bids, asks: asks} = changes, previous_inside_quote) do
+        (bids |> Enum.any? && bids |> changed_inside_bid?(previous_inside_quote)) || (asks |> Enum.any? && asks |> changed_inside_ask?(previous_inside_quote))
+      end
+
+      defp changed_inside_bid?(bids, nil), do: false
+      defp changed_inside_bid?(bids, [bid: [price: prev_bid_price, size: prev_bid_size, processed_at: _pa, updated_at: _ua], ask: ask]) do
+        bids
+        |> Enum.any?(fn {price, {size, _processed_at, _updated_at}} ->
+          price >= prev_bid_price || (price == prev_bid_price && size != prev_bid_size)
+        end)
+      end
+
+      defp changed_inside_ask?(asks, nil), do: false
+      defp changed_inside_ask?(asks, [bid: bid, ask: [price: prev_ask_price, size: prev_ask_size, processed_at: _pa, updated_at: _ua]]) do
+        asks
+        |> Enum.any?(fn {price, {size, _processed_at, _updated_at}} ->
+          price <= prev_ask_price || (price == prev_ask_price && size != prev_ask_size)
+        end)
       end
     end
   end
