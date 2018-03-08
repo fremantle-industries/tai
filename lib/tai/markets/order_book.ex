@@ -117,8 +117,8 @@ defmodule Tai.Markets.OrderBook do
   defp to_keyword_list(prices, price_levels) do
     prices
     |> Enum.map(fn price ->
-      {size, processed_at, updated_at} = price_levels[price]
-      [price: price, size: size, processed_at: processed_at, updated_at: updated_at]
+      {size, processed_at, server_changed_at} = price_levels[price]
+      [price: price, size: size, processed_at: processed_at, server_changed_at: server_changed_at]
     end)
   end
 
@@ -139,7 +139,7 @@ defmodule Tai.Markets.OrderBook do
 
   defp drop_prices(price_levels) do
     price_levels
-    |> Enum.filter(fn {_price, {size, _processed_at, _updated_at}} -> size == 0 end)
+    |> Enum.filter(fn {_price, {size, _processed_at, _server_changed_at}} -> size == 0 end)
     |> Enum.map(fn {price, _} -> price end)
   end
 end

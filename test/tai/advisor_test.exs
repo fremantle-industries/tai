@@ -71,8 +71,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, updated_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^replacement,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
@@ -92,8 +92,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, updated_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^replacement,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
@@ -116,8 +116,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.1, processed_at: nil, updated_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      [price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^changes,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
@@ -137,8 +137,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, updated_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, updated_at: nil],
+      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^replacement,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
@@ -161,8 +161,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, updated_at: nil],
-      [price: 101.3, size: 0.2, processed_at: nil, updated_at: nil],
+      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
+      [price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil],
       ^changes,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }

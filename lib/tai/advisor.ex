@@ -151,17 +151,17 @@ defmodule Tai.Advisor do
       end
 
       defp changed_inside_bid?(bids, nil), do: false
-      defp changed_inside_bid?(bids, [bid: [price: prev_bid_price, size: prev_bid_size, processed_at: _pa, updated_at: _ua], ask: ask]) do
+      defp changed_inside_bid?(bids, [bid: [price: prev_bid_price, size: prev_bid_size, processed_at: _pa, server_changed_at: _sca], ask: ask]) do
         bids
-        |> Enum.any?(fn {price, {size, _processed_at, _updated_at}} ->
+        |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
           price >= prev_bid_price || (price == prev_bid_price && size != prev_bid_size)
         end)
       end
 
       defp changed_inside_ask?(asks, nil), do: false
-      defp changed_inside_ask?(asks, [bid: bid, ask: [price: prev_ask_price, size: prev_ask_size, processed_at: _pa, updated_at: _ua]]) do
+      defp changed_inside_ask?(asks, [bid: bid, ask: [price: prev_ask_price, size: prev_ask_size, processed_at: _pa, server_changed_at: _sca]]) do
         asks
-        |> Enum.any?(fn {price, {size, _processed_at, _updated_at}} ->
+        |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
           price <= prev_ask_price || (price == prev_ask_price && size != prev_ask_size)
         end)
       end

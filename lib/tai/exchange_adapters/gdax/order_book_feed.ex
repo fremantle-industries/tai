@@ -63,8 +63,8 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     feed_id
   ) do
     processed_at = Timex.now
-    updated_at = Timex.parse!(time, "{ISO:Extended}")
-    normalized_changes = changes |> L2Update.normalize(processed_at, updated_at)
+    server_changed_at = Timex.parse!(time, "{ISO:Extended}")
+    normalized_changes = changes |> L2Update.normalize(processed_at, server_changed_at)
     symbol = product_id |> Product.to_symbol
 
     [feed_id: feed_id, symbol: symbol]
