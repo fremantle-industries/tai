@@ -4,18 +4,40 @@ defmodule Tai.Exchanges.Config do
   """
 
   @doc """
-  Return a map of exchange adapters
+  Return a map of exchange configuration
 
   ## Examples
 
     iex> Tai.Exchanges.Config.exchanges
     %{
-      test_exchange_a: Tai.ExchangeAdapters.Test,
-      test_exchange_b: Tai.ExchangeAdapters.Test
+      test_exchange_a: [
+        supervisor: Tai.ExchangeAdapters.Test.Supervisor
+      ],
+      test_exchange_b: [
+        supervisor: Tai.ExchangeAdapters.Test.Supervisor
+      ]
     }
   """
   def exchanges do
     Application.get_env(:tai, :exchanges)
+  end
+
+  @doc """
+  Return a keyword list of the configured exchange id & supervisor
+
+  ## Examples
+
+    iex> Tai.Exchanges.Config.exchange_supervisors
+    [
+      test_exchange_a: Tai.ExchangeAdapters.Test.Supervisor,
+      test_exchange_b: Tai.ExchangeAdapters.Test.Supervisor
+    ]
+  """
+  def exchange_supervisors do
+    exchanges()
+    |> Enum.map(fn {exchange_id, config} ->
+      {exchange_id, Keyword.get(config, :supervisor)}
+    end)
   end
 
   @doc """
@@ -27,22 +49,9 @@ defmodule Tai.Exchanges.Config do
     [:test_exchange_a, :test_exchange_b]
   """
   def exchange_ids do
-    exchanges()
-    |> Enum.map(fn {id, _config} -> id end)
+    for {id, _} <- exchanges(), do: id
   end
 
-  @doc """
-  Return the module for the exchange adapter id
-
-  ## Examples
-
-    iex> Tai.Exchanges.Config.exchange_adapter(:test_exchange_a)
-    Tai.ExchangeAdapters.Test
-  """
-  def exchange_adapter(id) do
-    exchanges()
-    |> Map.fetch!(id)
-  end
 
   @doc """
   Return a map of order book feed adapters and the books to subscribe to

@@ -1,5 +1,5 @@
-defmodule Tai.ExchangeAdapters.Gdax.CancelOrder do
-  def cancel_order(order_id) do
+defmodule Tai.ExchangeAdapters.Gdax.Account.CancelOrder do
+  def execute(order_id) do
     order_id
     |> ExGdax.cancel_order
     |> handle_cancel_order(order_id)

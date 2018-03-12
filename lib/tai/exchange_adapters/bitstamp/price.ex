@@ -1,5 +1,5 @@
 defmodule Tai.ExchangeAdapters.Bitstamp.Price do
-  def price(symbol) do
+  def fetch(symbol) do
     symbol
     |> ExBitstamp.ticker
     |> extract_last_price

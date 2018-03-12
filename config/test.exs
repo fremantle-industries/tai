@@ -22,8 +22,12 @@ config :tai,          order_book_feeds: %{
                       }
 
 config :tai,          exchanges: %{
-                        test_exchange_a: Tai.ExchangeAdapters.Test,
-                        test_exchange_b: Tai.ExchangeAdapters.Test
+                        test_exchange_a: [
+                          supervisor: Tai.ExchangeAdapters.Test.Supervisor
+                        ],
+                        test_exchange_b: [
+                          supervisor: Tai.ExchangeAdapters.Test.Supervisor
+                        ],
                       }
 
 config :tai,          advisors: %{

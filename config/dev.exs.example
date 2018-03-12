@@ -18,8 +18,12 @@ config :tai,          order_book_feeds: %{
                       }
 
 config :tai,          exchanges: %{
-                        gdax: Tai.ExchangeAdapters.Gdax,
-                        bitstamp: Tai.ExchangeAdapters.Bitstamp
+                        gdax: [
+                          supervisor: Tai.ExchangeAdapters.Gdax.Supervisor
+                        ],
+                        bitstamp: [
+                          supervisor: Tai.ExchangeAdapters.Bitstamp.Supervisor
+                        ]
                       }
 
 config :tai,          advisors: %{

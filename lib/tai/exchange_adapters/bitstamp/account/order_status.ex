@@ -1,5 +1,5 @@
-defmodule Tai.ExchangeAdapters.Bitstamp.OrderStatus do
-  def order_status(order_id) do
+defmodule Tai.ExchangeAdapters.Bitstamp.Account.OrderStatus do
+  def fetch(order_id) do
     order_id
     |> ExBitstamp.order_status
     |> case do

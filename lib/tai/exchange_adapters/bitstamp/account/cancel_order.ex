@@ -1,5 +1,5 @@
-defmodule Tai.ExchangeAdapters.Bitstamp.CancelOrder do
-  def cancel_order(order_id) do
+defmodule Tai.ExchangeAdapters.Bitstamp.Account.CancelOrder do
+  def execute(order_id) do
     order_id
     |> ExBitstamp.cancel_order
     |> handle_cancel_order

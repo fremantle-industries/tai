@@ -1,9 +1,9 @@
 defmodule Tai.Fund do
-  alias Tai.Markets.Currency
+  alias Tai.{Exchanges.Account, Exchanges.Config, Markets.Currency}
 
   def balance do
-    Tai.Exchanges.Config.exchange_ids
-    |> Enum.map(&Tai.Exchange.balance/1)
+    Config.exchange_ids
+    |> Enum.map(&Account.balance/1)
     |> Currency.sum
   end
 end

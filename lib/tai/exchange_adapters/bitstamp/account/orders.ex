@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Bitstamp.Orders do
+defmodule Tai.ExchangeAdapters.Bitstamp.Account.Orders do
   alias Tai.OrderResponse
 
   def buy_limit(symbol, price, size) do

@@ -1,7 +1,7 @@
 defmodule Tai.ExchangeAdapters.Gdax.Price do
   alias Tai.ExchangeAdapters.Gdax.Product
 
-  def price(symbol) do
+  def fetch(symbol) do
     symbol
     |> Product.to_product_id
     |> ExGdax.get_ticker

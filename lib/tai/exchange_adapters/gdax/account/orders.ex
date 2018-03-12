@@ -1,7 +1,7 @@
-defmodule Tai.ExchangeAdapters.Gdax.Orders do
+defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
   alias Tai.OrderResponse
   alias Tai.ExchangeAdapters.Gdax.Product
-  alias Tai.ExchangeAdapters.Gdax.OrderStatus
+  alias Tai.ExchangeAdapters.Gdax.Account.OrderStatus
 
   def buy_limit(symbol, price, size) do
     {"buy", symbol, price, size}

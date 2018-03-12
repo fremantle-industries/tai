@@ -1,7 +1,7 @@
-defmodule Tai.ExchangeAdapters.Bitstamp.Balance do
+defmodule Tai.ExchangeAdapters.Bitstamp.Account.Balance do
   alias Tai.{ExchangeAdapters.Bitstamp.Price, Markets.Currency, Markets.Symbol}
 
-  def balance do
+  def fetch do
     ExBitstamp.balance
     |> extract_balances
     |> convert_to_usd
@@ -36,7 +36,7 @@ defmodule Tai.ExchangeAdapters.Bitstamp.Balance do
   defp usd_price(symbol) do
     "#{symbol}usd"
     |> Symbol.downcase
-    |> Price.price
+    |> Price.fetch
     |> case do
       {:ok, price} -> price
     end

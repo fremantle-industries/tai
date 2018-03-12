@@ -1,5 +1,5 @@
-defmodule Tai.ExchangeAdapters.Gdax.OrderStatus do
-  def order_status(order_id) do
+defmodule Tai.ExchangeAdapters.Gdax.Account.OrderStatus do
+  def fetch(order_id) do
     order_id
     |> ExGdax.get_order
     |> handle_order_status

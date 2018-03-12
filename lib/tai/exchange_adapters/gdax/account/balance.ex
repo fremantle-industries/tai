@@ -1,7 +1,7 @@
-defmodule Tai.ExchangeAdapters.Gdax.Balance do
+defmodule Tai.ExchangeAdapters.Gdax.Account.Balance do
   alias Tai.{ExchangeAdapters.Gdax.Price, Markets.Currency, Markets.Symbol}
 
-  def balance do
+  def fetch do
     ExGdax.list_accounts
     |> convert_to_usd
     |> Currency.sum
@@ -25,7 +25,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Balance do
   defp usd_price(currency) do
     "#{currency}usd"
     |> Symbol.downcase
-    |> Price.price
+    |> Price.fetch
     |> case do
       {:ok, price} -> price
     end

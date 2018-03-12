@@ -1,9 +1,9 @@
 defmodule Tai.Commands.Orders do
-  alias Tai.Exchange
+  alias Tai.Exchanges.Account
 
   def buy_limit(exchange, symbol, price, size) do
     exchange
-    |> Exchange.buy_limit(symbol, price, size)
+    |> Account.buy_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
         IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
@@ -14,7 +14,7 @@ defmodule Tai.Commands.Orders do
 
   def sell_limit(exchange, symbol, price, size) do
     exchange
-    |> Exchange.sell_limit(symbol, price, size)
+    |> Account.sell_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
         IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
@@ -25,7 +25,7 @@ defmodule Tai.Commands.Orders do
 
   def order_status(exchange, order_id) do
     exchange
-    |> Exchange.order_status(order_id)
+    |> Account.order_status(order_id)
     |> case do
       {:ok, status} ->
         IO.puts "status: #{status}"
@@ -36,7 +36,7 @@ defmodule Tai.Commands.Orders do
 
   def cancel_order(exchange, order_id) do
     exchange
-    |> Exchange.cancel_order(order_id)
+    |> Account.cancel_order(order_id)
     |> case do
       {:ok, _canceled_order_id} ->
         IO.puts "cancel order success"
