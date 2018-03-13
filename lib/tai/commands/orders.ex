@@ -19,6 +19,12 @@ defmodule Tai.Commands.Orders do
     |> print_table
   end
 
+  defp print_table([]) do
+    [
+      ["-", "-", "-", "-", "-", "-", "-", "-"]
+    ]
+    |> print_table
+  end
   defp print_table(rows) do
     header = ["Exchange", "Symbol", "Price", "Size", "Client ID", "Server ID", "Enqueued At", "Created At"]
 

@@ -59,6 +59,14 @@ defmodule Tai.Commands.HelperTest do
   end
 
   test "orders displays items in ascending order from when they were enqueued" do
+    assert capture_io(fn -> Helper.orders() end) == """
+    +----------+--------+-------+------+-----------+-----------+-------------+------------+
+    | Exchange | Symbol | Price | Size | Client ID | Server ID | Enqueued At | Created At |
+    +----------+--------+-------+------+-----------+-----------+-------------+------------+
+    |        - |      - |     - |    - |         - |         - |           - |          - |
+    +----------+--------+-------+------+-----------+-----------+-------------+------------+\n
+    """
+
     [btcusd_order] = Orders.add({:test_feed_a, :btcusd, 12999.99, 1.1})
     [ltcusd_order] = Orders.add({:test_feed_b, :ltcusd, 75.23, 1.0})
 
