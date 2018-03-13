@@ -52,6 +52,10 @@ defmodule Tai.Trading.Orders do
     {:reply, updated_order, new_state}
   end
 
+  def handle_call(:all, _from, state) do
+    {:reply, state |> Map.values, state}
+  end
+
   @doc """
   Deletes all existing tracked orders
   """
@@ -88,6 +92,13 @@ defmodule Tai.Trading.Orders do
   """
   def update(client_id, attributes \\ %{}) do
     GenServer.call(__MODULE__, {:update, client_id, attributes})
+  end
+
+  @doc """
+  Return a list of current orders
+  """
+  def all do
+    GenServer.call(__MODULE__, :all)
   end
 
   defp add_orders({_exchange, _symbol, _price, _size} = submission, state) do

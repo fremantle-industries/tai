@@ -35,9 +35,12 @@ defmodule Tai.Trading.OrderOutboxTest do
 
   setup do
     Process.register self(), :test
-    Orders.clear()
     start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_exchange})
     start_supervised!(OrderEnqueuedSubscriber)
+
+    on_exit fn ->
+      Orders.clear()
+    end
 
     :ok
   end

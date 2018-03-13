@@ -6,7 +6,7 @@ defmodule Tai.Commands.HelperTest do
 
   import ExUnit.CaptureIO
 
-  alias Tai.{Commands.Helper, Markets.OrderBook}
+  alias Tai.{Commands.Helper, Markets.OrderBook, Trading.Orders}
 
   setup do
     test_feed_a_btcusd = [feed_id: :test_feed_a, symbol: :btcusd] |> OrderBook.to_name
@@ -19,6 +19,7 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(&Helper.help/0) == """
     * balance
     * markets
+    * orders
     * buy_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
     * sell_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
     * order_status exchange(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
@@ -55,6 +56,22 @@ defmodule Tai.Commands.HelperTest do
     | test_feed_b | ltcusd |         0 |         0 |        0 |        0 |                  |                  |                       |                       |
     +-------------+--------+-----------+-----------+----------+----------+------------------+------------------+-----------------------+-----------------------+\n
     """
+  end
+
+  test "orders displays items in ascending order from when they were enqueued" do
+    [btcusd_order] = Orders.add({:test_feed_a, :btcusd, 12999.99, 1.1})
+    [ltcusd_order] = Orders.add({:test_feed_b, :ltcusd, 75.23, 1.0})
+
+    assert capture_io(fn -> Helper.orders() end) == """
+    +-------------+--------+----------+------+--------------------------------------+-----------+-------------+------------+
+    |    Exchange | Symbol |    Price | Size |                            Client ID | Server ID | Enqueued At | Created At |
+    +-------------+--------+----------+------+--------------------------------------+-----------+-------------+------------+
+    | test_feed_a | btcusd | 12999.99 |  1.1 | #{btcusd_order.client_id           } |           |         now |            |
+    | test_feed_b | ltcusd |    75.23 |  1.0 | #{ltcusd_order.client_id           } |           |         now |            |
+    +-------------+--------+----------+------+--------------------------------------+-----------+-------------+------------+\n
+    """
+
+    Orders.clear()
   end
 
   test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do

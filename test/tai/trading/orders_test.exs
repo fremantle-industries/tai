@@ -5,7 +5,9 @@ defmodule Tai.Trading.OrdersTest do
   alias Tai.Trading.{Orders}
 
   setup do
-    Orders.clear()
+    on_exit fn ->
+      Orders.clear()
+    end
 
     :ok
   end
@@ -82,5 +84,13 @@ defmodule Tai.Trading.OrdersTest do
     assert updated_order.created_at == created_at
     assert updated_order.client_id != "should_not_replace_client_id"
     assert Orders.get(order.client_id) == updated_order
+  end
+
+  test "all returns a list of current orders" do
+    assert Orders.all == []
+
+    [order] = Orders.add({:my_test_exchange, :btcusd, 100.0, 1.0})
+
+    assert Orders.all == [order]
   end
 end

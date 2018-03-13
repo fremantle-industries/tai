@@ -2,7 +2,8 @@ defmodule Tai.AdvisorTest do
   use ExUnit.Case
   doctest Tai.Advisor
 
-  alias Tai.{Advisor, Markets.OrderBook, PubSub, Trading.Order, Trading.OrderResponses}
+  alias Tai.{Advisor, Markets.OrderBook, PubSub}
+  alias Tai.Trading.{Order, Orders, OrderResponses}
 
   defmodule MyAdvisor do
     use Advisor
@@ -39,6 +40,10 @@ defmodule Tai.AdvisorTest do
     Process.register self(), :test
     book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btcusd})
     start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_exchange})
+
+    on_exit fn ->
+      Orders.clear()
+    end
 
     {:ok, %{book_pid: book_pid}}
   end
