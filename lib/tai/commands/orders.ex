@@ -1,5 +1,5 @@
 defmodule Tai.Commands.Orders do
-  alias Tai.Exchanges.Account
+  alias Tai.{Exchanges.Account, Trading.OrderResponses}
 
   def buy_limit(exchange, symbol, price, size) do
     exchange
@@ -7,8 +7,8 @@ defmodule Tai.Commands.Orders do
     |> case do
       {:ok, order_response} ->
         IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
-      {:error, message} ->
-        IO.puts "create order failure - #{message}"
+      {:error, %OrderResponses.InsufficientFunds{}} ->
+        IO.puts "create order failure - insufficient funds"
     end
   end
 
@@ -18,8 +18,8 @@ defmodule Tai.Commands.Orders do
     |> case do
       {:ok, order_response} ->
         IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
-      {:error, message} ->
-        IO.puts "create order failure - #{message}"
+      {:error, %OrderResponses.InsufficientFunds{}} ->
+        IO.puts "create order failure - insufficient funds"
     end
   end
 

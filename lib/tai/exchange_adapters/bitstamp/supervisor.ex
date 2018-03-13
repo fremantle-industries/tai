@@ -2,7 +2,7 @@ defmodule Tai.ExchangeAdapters.Bitstamp.Supervisor do
   use Supervisor
 
   def start_link(exchange_id) do
-    Supervisor.start_link(__MODULE__, exchange_id)
+    Supervisor.start_link(__MODULE__, exchange_id, name: :"#{__MODULE__}_#{exchange_id}")
   end
 
   def init(exchange_id) do

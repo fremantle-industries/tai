@@ -30,6 +30,7 @@ defmodule Tai.Mixfile do
       {:timex, "~> 3.1"},
       {:websockex, "~> 0.4"},
       {:logger_file_backend, "~> 0.0.10"},
+      {:uuid, "~> 1.1"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
       {:echo_boy, "~> 0.1.0", github: "rupurt/echo_boy", only: [:dev, :test]},

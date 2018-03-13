@@ -1,16 +1,14 @@
-defmodule Tai.Supervisor do
+defmodule Tai.Trading.Supervisor do
   use Supervisor
 
-  def start_link do
+  def start_link(_) do
     Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
   def init(:ok) do
     children = [
-      Tai.PubSub,
-      Tai.Trading.Supervisor,
-      Tai.Exchanges.Supervisor,
-      Tai.Advisors.Supervisor
+      Tai.Trading.OrderOutbox,
+      Tai.Trading.Orders
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

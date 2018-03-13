@@ -17,8 +17,9 @@ defmodule Tai.ExchangeAdapters.Bitstamp.AccountTest do
     use_cassette "buy_limit_success" do
       {:ok, order_response} = Account.buy_limit(:my_bitstamp_exchange, :btcusd, 101.1, 0.1)
 
-      assert order_response.id == 674873684
+      assert order_response.id == "674873684"
       assert order_response.status == :pending
+      assert %DateTime{} = order_response.created_at
     end
   end
 
@@ -34,8 +35,9 @@ defmodule Tai.ExchangeAdapters.Bitstamp.AccountTest do
     use_cassette "sell_limit_success" do
       {:ok, order_response} = Account.sell_limit(:my_bitstamp_exchange, :btcusd, 99_999.01, 0.01)
 
-      assert order_response.id == 680258903
+      assert order_response.id == "680258903"
       assert order_response.status == :pending
+      assert %DateTime{} = order_response.created_at
     end
   end
 

@@ -6,7 +6,7 @@ defmodule Tai.ExchangeAdapters.Bitstamp.Account.CancelOrder do
   end
 
   defp handle_cancel_order({:ok, %{"id" => order_id}}) do
-    {:ok, order_id}
+    {:ok, order_id |> Integer.to_string}
   end
   defp handle_cancel_order({:error, reason}) do
     {:error, reason}

@@ -4,8 +4,8 @@ defmodule Tai.Advisors.ConfigTest do
 
   test "all returns the application config" do
     assert Tai.Advisors.Config.all == %{
-      test_advisor_a: Support.Advisors.Info,
-      test_advisor_b: Support.Advisors.Info
+      test_advisor_a: Support.Advisors.SpreadCapture,
+      test_advisor_b: Support.Advisors.SpreadCapture
     }
   end
 

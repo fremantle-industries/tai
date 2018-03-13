@@ -31,6 +31,6 @@ config :tai,          exchanges: %{
                       }
 
 config :tai,          advisors: %{
-                        test_advisor_a: Support.Advisors.Info,
-                        test_advisor_b: Support.Advisors.Info
+                        test_advisor_a: Support.Advisors.SpreadCapture,
+                        test_advisor_b: Support.Advisors.SpreadCapture
                       }

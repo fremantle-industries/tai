@@ -1,7 +1,6 @@
 defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
-  alias Tai.OrderResponse
-  alias Tai.ExchangeAdapters.Gdax.Product
-  alias Tai.ExchangeAdapters.Gdax.Account.OrderStatus
+  alias Tai.Trading.OrderResponses
+  alias Tai.ExchangeAdapters.Gdax.{Account.OrderStatus, Product}
 
   def buy_limit(symbol, price, size) do
     {"buy", symbol, price, size}
@@ -30,8 +29,21 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
     }
   end
 
-  defp handle_create_order({:ok, %{"id" => id, "status" => status}}) do
-    {:ok, %OrderResponse{id: id, status: OrderStatus.to_atom(status)}}
+  defp handle_create_order({
+    :ok,
+    %{"id" => id, "status" => status, "created_at" => created_at_str}
+  }) do
+    created_at = Timex.parse!(created_at_str, "{ISO:Extended}")
+    order_response = %OrderResponses.Created{
+      id: id,
+      status: OrderStatus.to_atom(status),
+      created_at: created_at
+    }
+
+    {:ok, order_response}
+  end
+  defp handle_create_order({:error, "Insufficient funds", _status_code}) do
+    {:error, %OrderResponses.InsufficientFunds{}}
   end
   defp handle_create_order({:error, message, _status_code}) do
     {:error, message}

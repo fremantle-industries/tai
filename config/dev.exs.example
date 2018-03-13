@@ -27,5 +27,5 @@ config :tai,          exchanges: %{
                       }
 
 config :tai,          advisors: %{
-                        info: Support.Advisors.Info
+                        spread_capture: Support.Advisors.SpreadCapture
                       }

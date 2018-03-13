@@ -60,26 +60,26 @@ defmodule Tai.Commands.HelperTest do
 
   test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
-      Helper.buy_limit(:test_exchange_a, :btcusd, 10.1, 2.2)
+      Helper.buy_limit(:test_exchange_a, :btcusd_success, 10.1, 2.2)
     end) == "create order success - id: f9df7435-34d5-4861-8ddc-80f0fd2c83d7, status: pending\n"
   end
 
   test "buy_limit displays an error message when the order can't be created" do
     assert capture_io(fn ->
-      Helper.buy_limit(:test_exchange_a, :btcusd, 10.1, 3.3)
-    end) == "create order failure - Insufficient funds\n"
+      Helper.buy_limit(:test_exchange_a, :btcusd_insufficient_funds, 10.1, 3.3)
+    end) == "create order failure - insufficient funds\n"
   end
 
   test "sell_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
-      Helper.sell_limit(:test_exchange_a, :btcusd, 10.1, 2.2)
+      Helper.sell_limit(:test_exchange_a, :btcusd_success, 10.1, 2.2)
     end) == "create order success - id: 41541912-ebc1-4173-afa5-4334ccf7a1a8, status: pending\n"
   end
 
   test "sell_limit displays an error message when the order can't be created" do
     assert capture_io(fn ->
-      Helper.sell_limit(:test_exchange_a, :btcusd, 10.1, 3.3)
-    end) == "create order failure - Insufficient funds\n"
+      Helper.sell_limit(:test_exchange_a, :btcusd_insufficient_funds, 10.1, 3.3)
+    end) == "create order failure - insufficient funds\n"
   end
 
   test "order_status displays the order info" do

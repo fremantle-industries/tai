@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Gdax.Account
 
-  alias Tai.Exchanges.Account
+  alias Tai.{Exchanges.Account, Trading.OrderResponses}
 
   setup_all do
     HTTPoison.start
@@ -29,12 +29,16 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
       assert order_response.id == "467d09c8-1e41-4e28-8fae-2641182d8d1a"
       assert order_response.status == :pending
+      assert %DateTime{} = order_response.created_at
     end
   end
 
-  test "buy_limit returns an error/message tuple when it can't create the order" do
+  test "buy_limit returns an {:error, reason} tuple when it can't create the order" do
     use_cassette "buy_limit_error" do
-      assert Account.buy_limit(:my_gdax_exchange, :btcusd, 101.1, 0.3) == {:error, "Insufficient funds"}
+      assert Account.buy_limit(:my_gdax_exchange, :btcusd, 101.1, 0.3) == {
+        :error,
+        %OrderResponses.InsufficientFunds{}
+      }
     end
   end
 
@@ -44,12 +48,16 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
       assert order_response.id == "467d09c8-1e41-4e28-8fae-2641182d8d1a"
       assert order_response.status == :pending
+      assert %DateTime{} = order_response.created_at
     end
   end
 
-  test "sell_limit returns an error tuple with a message when it can't create the order" do
+  test "sell_limit returns an {:error, reason} tuple when it can't create the order" do
     use_cassette "sell_limit_error" do
-      assert Account.sell_limit(:my_gdax_exchange, :btcusd, 99_999_999.1, 0.3) == {:error, "Insufficient funds"}
+      assert Account.sell_limit(:my_gdax_exchange, :btcusd, 99_999_999.1, 0.3) == {
+        :error,
+        %OrderResponses.InsufficientFunds{}
+      }
     end
   end
 
