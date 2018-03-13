@@ -4,8 +4,8 @@ defmodule Tai.Commands.Helper do
   defdelegate help, to: Commands.Info
   defdelegate balance, to: Commands.Balances
   defdelegate markets, to: Commands.Markets
-  defdelegate buy_limit(exchange, symbol, price, size), to: Commands.Orders
-  defdelegate sell_limit(exchange, symbol, price, size), to: Commands.Orders
-  defdelegate order_status(exchange, order_id), to: Commands.Orders
-  defdelegate cancel_order(exchange, order_id), to: Commands.Orders
+  defdelegate buy_limit(exchange, symbol, price, size), to: Commands.Trading
+  defdelegate sell_limit(exchange, symbol, price, size), to: Commands.Trading
+  defdelegate order_status(exchange, order_id), to: Commands.Trading
+  defdelegate cancel_order(exchange, order_id), to: Commands.Trading
 end
