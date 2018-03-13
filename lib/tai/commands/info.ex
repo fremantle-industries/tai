@@ -3,7 +3,6 @@ defmodule Tai.Commands.Info do
     IO.puts """
     * balance
     * markets
-    * quotes exchange(:gdax), symbol(:btcusd)
     * buy_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
     * sell_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
     * order_status exchange(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
