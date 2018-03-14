@@ -239,7 +239,8 @@ defmodule Tai.AdvisorTest do
         exchange: :my_test_exchange,
         symbol: :btcusd_success,
         price: 101.1,
-        size: 0.1
+        size: 0.1,
+        status: :enqueued
       },
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
@@ -250,7 +251,8 @@ defmodule Tai.AdvisorTest do
         exchange: :my_test_exchange,
         symbol: :btcusd_success,
         price: 10.1,
-        size: 0.11
+        size: 0.11,
+        status: :enqueued
       },
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
@@ -261,7 +263,8 @@ defmodule Tai.AdvisorTest do
         exchange: :my_test_exchange,
         symbol: :btcusd_insufficient_funds,
         price: 1.1,
-        size: 0.1
+        size: 0.1,
+        status: :enqueued
       },
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
@@ -273,7 +276,8 @@ defmodule Tai.AdvisorTest do
         exchange: :my_test_exchange,
         symbol: :btcusd_success,
         price: 101.1,
-        size: 0.1
+        size: 0.1,
+        status: :pending
       },
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
@@ -285,12 +289,12 @@ defmodule Tai.AdvisorTest do
         exchange: :my_test_exchange,
         symbol: :btcusd_success,
         price: 10.1,
-        size: 0.11
+        size: 0.11,
+        status: :pending
       },
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
     assert server_id_2 != nil
-
     assert_receive {
       %OrderResponses.InsufficientFunds{},
       %Order{
@@ -299,7 +303,8 @@ defmodule Tai.AdvisorTest do
         exchange: :my_test_exchange,
         symbol: :btcusd_insufficient_funds,
         price: 1.1,
-        size: 0.1
+        size: 0.1,
+        status: :error
       },
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
@@ -347,7 +352,8 @@ defmodule Tai.AdvisorTest do
         exchange: :my_test_exchange,
         symbol: :btcusd,
         price: 101.1,
-        size: -0.1
+        size: -0.1,
+        status: :enqueued
       },
       %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
@@ -358,7 +364,8 @@ defmodule Tai.AdvisorTest do
         exchange: :my_test_exchange,
         symbol: :btcusd,
         price: 10.1,
-        size: -0.11
+        size: -0.11,
+        status: :enqueued,
       },
       %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
