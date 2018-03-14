@@ -7,7 +7,8 @@ defmodule Tai.Trading.OrderOutbox do
 
   require Logger
 
-  alias Tai.{PubSub, Trading.Orders, Trading.OrderResponses}
+  alias Tai.PubSub
+  alias Tai.Trading.{Orders, OrderResponses, OrderStatus}
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -30,17 +31,7 @@ defmodule Tai.Trading.OrderOutbox do
   def handle_info({:order_enqueued, order}, state) do
     {:ok, _pid} = Task.start_link(fn ->
       Tai.Exchanges.Account.buy_limit(order.exchange, order.symbol, order.price, order.size)
-      |> case do
-        {:ok, %OrderResponses.Created{id: server_id, created_at: created_at}} ->
-          updated_order = Orders.update(
-            order.client_id,
-            server_id: server_id,
-            created_at: created_at
-          )
-          PubSub.broadcast(:order_create_ok, {:order_create_ok, updated_order})
-        {:error, reason} ->
-          PubSub.broadcast(:order_create_error, {:order_create_error, reason, order})
-      end
+      |> handle_buy_limit_response(order)
     end)
 
     {:noreply, state}
@@ -56,5 +47,25 @@ defmodule Tai.Trading.OrderOutbox do
   defp broadcast_enqueued_order(order) do
     PubSub.broadcast(:order_enqueued, {:order_enqueued, order})
     order
+  end
+
+  defp handle_buy_limit_response(
+    {
+      :ok,
+      %OrderResponses.Created{id: server_id, created_at: created_at}
+    },
+    order
+  ) do
+    pending_order = Orders.update(
+      order.client_id,
+      server_id: server_id,
+      created_at: created_at,
+      status: OrderStatus.pending
+    )
+    PubSub.broadcast(:order_create_ok, {:order_create_ok, pending_order})
+  end
+  defp handle_buy_limit_response({:error, reason}, order) do
+    error_order = Orders.update(order.client_id, status: OrderStatus.error)
+    PubSub.broadcast(:order_create_error, {:order_create_error, reason, error_order})
   end
 end

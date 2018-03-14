@@ -2,7 +2,7 @@ defmodule Tai.Trading.OrderOutboxTest do
   use ExUnit.Case
   doctest Tai.Trading.OrderOutbox
 
-  alias Tai.Trading.{OrderOutbox, Orders, OrderResponses}
+  alias Tai.Trading.{OrderOutbox, Orders, OrderResponses, OrderStatus}
 
   defmodule OrderEnqueuedSubscriber do
     use GenServer
@@ -57,15 +57,17 @@ defmodule Tai.Trading.OrderOutboxTest do
     assert enqueued_order.enqueued_at == new_order.enqueued_at
     assert enqueued_order.server_id == nil
     assert enqueued_order.created_at == nil
+    assert enqueued_order.status == OrderStatus.enqueued
 
     assert_receive {:order_create_ok, created_order}
     assert created_order.client_id == new_order.client_id
     assert created_order.enqueued_at == new_order.enqueued_at
     assert created_order.server_id != nil
-    assert created_order.created_at != nil
+    assert %DateTime{} = created_order.created_at
+    assert created_order.status == OrderStatus.pending
   end
 
-  test "add broadcasts failed orders" do
+  test "add broadcasts failed orders and updates the status" do
     assert Orders.count() == 0
 
     [new_order] = new_orders = OrderOutbox.add({:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1})
@@ -74,9 +76,11 @@ defmodule Tai.Trading.OrderOutboxTest do
     assert Orders.count() == 1
     assert_receive {:order_enqueued, enqueued_order}
     assert enqueued_order.client_id == new_order.client_id
+    assert enqueued_order.status == OrderStatus.enqueued
 
     assert_receive {:order_create_error, error_reason, error_order}
     assert %OrderResponses.InsufficientFunds{} = error_reason
     assert error_order.client_id == new_order.client_id
+    assert error_order.status == OrderStatus.error
   end
 end
