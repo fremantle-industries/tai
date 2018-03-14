@@ -2,7 +2,7 @@ defmodule Tai.Trading.OrdersTest do
   use ExUnit.Case
   doctest Tai.Trading.Orders
 
-  alias Tai.Trading.{Orders}
+  alias Tai.Trading.{Orders, OrderStatus}
 
   setup do
     on_exit fn ->
@@ -12,7 +12,7 @@ defmodule Tai.Trading.OrdersTest do
     :ok
   end
 
-  test "count returns the number of orders" do
+  test "count returns the total number of orders" do
     assert Orders.count() == 0
 
     Orders.add({:my_test_exchange, :btcusd, 100.0, 1.0})
@@ -31,6 +31,7 @@ defmodule Tai.Trading.OrdersTest do
     assert order.symbol == :btcusd
     assert order.price == 100.0
     assert order.size == 1.0
+    assert order.status == OrderStatus.enqueued
     assert %DateTime{} = order.enqueued_at
   end
 
@@ -49,6 +50,7 @@ defmodule Tai.Trading.OrdersTest do
     assert order_1.symbol == :btcusd
     assert order_1.price == 100.0
     assert order_1.size == 1.0
+    assert order_1.status == OrderStatus.enqueued
     assert %DateTime{} = order_1.enqueued_at
 
     assert {:ok, _} = UUID.info(order_2.client_id)
@@ -56,7 +58,7 @@ defmodule Tai.Trading.OrdersTest do
     assert order_2.symbol == :ltcusd
     assert order_2.price == -10.0
     assert order_2.size == 1.1
-    assert order_1.enqueued_at != nil
+    assert order_2.status == OrderStatus.enqueued
     assert %DateTime{} = order_2.enqueued_at
   end
 
@@ -77,11 +79,13 @@ defmodule Tai.Trading.OrdersTest do
       order.client_id,
       client_id: "should_not_replace_client_id",
       server_id: "the_server_id",
-      created_at: created_at = Timex.now
+      created_at: created_at = Timex.now,
+      status: OrderStatus.pending
     )
 
     assert updated_order.server_id == "the_server_id"
     assert updated_order.created_at == created_at
+    assert updated_order.status == OrderStatus.pending
     assert updated_order.client_id != "should_not_replace_client_id"
     assert Orders.get(order.client_id) == updated_order
   end

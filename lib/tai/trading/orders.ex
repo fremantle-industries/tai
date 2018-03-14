@@ -5,7 +5,7 @@ defmodule Tai.Trading.Orders do
 
   use GenServer
 
-  alias Tai.Trading.Order
+  alias Tai.Trading.{Order, OrderStatus}
 
   require Logger
 
@@ -40,7 +40,7 @@ defmodule Tai.Trading.Orders do
       state,
       client_id,
       fn current_order ->
-        attr_whitelist = [:server_id, :created_at]
+        attr_whitelist = [:server_id, :created_at, :status]
         accepted_attrs = attrs |> Keyword.take(attr_whitelist) |> Map.new
         updated_order = current_order |> Map.merge(accepted_attrs)
 
@@ -117,6 +117,7 @@ defmodule Tai.Trading.Orders do
       symbol: symbol,
       price: price,
       size: size,
+      status: OrderStatus.enqueued,
       enqueued_at: Timex.now
     }
     new_state = state |> Map.put(order.client_id, order)

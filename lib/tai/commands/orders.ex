@@ -10,6 +10,7 @@ defmodule Tai.Commands.Orders do
         order.symbol,
         order.price,
         order.size,
+        order.status,
         order.client_id,
         order.server_id,
         Timex.from_now(order.enqueued_at),
@@ -21,16 +22,29 @@ defmodule Tai.Commands.Orders do
 
   defp print_table([]) do
     [
-      ["-", "-", "-", "-", "-", "-", "-", "-"]
+      "-"
+      |> List.duplicate(header() |> Enum.count)
     ]
     |> print_table
   end
   defp print_table(rows) do
-    header = ["Exchange", "Symbol", "Price", "Size", "Client ID", "Server ID", "Enqueued At", "Created At"]
-
-    TableRex.Table.new(rows, header)
+    TableRex.Table.new(rows, header())
     |> TableRex.Table.put_column_meta(:all, align: :right)
     |> TableRex.Table.render!
     |> IO.puts
+  end
+
+  defp header do
+    [
+      "Exchange",
+      "Symbol",
+      "Price",
+      "Size",
+      "Status",
+      "Client ID",
+      "Server ID",
+      "Enqueued At",
+      "Created At"
+    ]
   end
 end
