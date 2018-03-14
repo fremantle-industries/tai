@@ -105,6 +105,7 @@ defmodule Tai.Trading.Orders do
     [submission]
     |> add_orders(state)
   end
+  defp add_orders([], state), do: {[], state}
   defp add_orders([_head | _tail] = submissions, state) do
     submissions
     |> add_orders(state, [])

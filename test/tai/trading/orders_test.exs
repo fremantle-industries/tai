@@ -62,6 +62,14 @@ defmodule Tai.Trading.OrdersTest do
     assert %DateTime{} = order_2.enqueued_at
   end
 
+  test "add can take an empty list" do
+    assert Orders.count() == 0
+
+    [] = Orders.add([])
+
+    assert Orders.count() == 0
+  end
+
   test "get returns the order by client_id" do
     [order] = Orders.add({:my_test_exchange, :btcusd, 100.0, 1.0})
 
