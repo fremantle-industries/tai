@@ -1,22 +1,26 @@
 # Tai
 [![Build Status](https://circleci.com/gh/fremantle-capital/tai.png)](https://circleci.com/gh/fremantle-capital/tai)
 
-**TODO: Add description**
+A trading toolkit built with [Elixir](https://elixir-lang.org/) and running on the [Erlang virtual machine](http://erlang.org/faq/implementations.html)
+
+## WARNING
+
+`tai` is alpha quality software. It passes our test suite but the API is highly 
+likely to change and no effort will be made to maintain backwards compatibility.
+We are working to make `tai` production quality software.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `tai_otp` to your list of dependencies in `mix.exs`:
+Tai requires Elixir 1.6. Add `tai` to your list of dependencies in `mix.exs`
 
 ```elixir
 def deps do
   [
-    {:tai, "~> 0.1.0"}
+    {:tai, "~> 0.0.1"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/tai](https://hexdocs.pm/tai).
+## License
 
+`tai` is released under the [MIT license](./LICENSE.md)
