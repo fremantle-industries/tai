@@ -6,7 +6,9 @@ defmodule Tai.Mixfile do
       app: :tai,
       version: "0.0.1",
       elixir: "~> 1.6",
+      package: package(),
       start_permanent: Mix.env == :prod,
+      description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()
     ]
@@ -39,6 +41,18 @@ defmodule Tai.Mixfile do
       {:exvcr, "~> 0.8", only: [:test]},
       {:ex_unit_notifier, "~> 0.1", only: :test}
     ]
+  end
+
+  defp description do
+    "A trading toolkit built with Elixir and running on the Erlang virtual machine"
+  end
+
+  defp package do
+    %{
+      licenses: ["MIT"],
+      maintainers: ["Alex Kwiatkowski"],
+      links: %{"GitHub" => "https://github.com/fremantle-capital/tai"}
+    }
   end
 
   defp elixirc_paths(:dev), do: ["lib", "test/support"]
