@@ -15,7 +15,10 @@ defmodule Tai.Trading.OrderOutbox do
   end
 
   def init(state) do
-    PubSub.subscribe(:order_enqueued)
+    PubSub.subscribe([
+      :order_enqueued,
+      :order_cancelling
+    ])
 
     {:ok, state}
   end
@@ -28,10 +31,28 @@ defmodule Tai.Trading.OrderOutbox do
     {:reply, new_orders, state}
   end
 
+  def handle_call({:cancel, client_ids}, _from, state) do
+    orders_to_cancel = [client_id: client_ids, status: OrderStatus.pending]
+                        |> Orders.where
+                        |> Enum.map(&Orders.update(&1.client_id, status: OrderStatus.cancelling))
+                        |> Enum.map(&broadcast_cancelling_order/1)
+
+    {:reply, orders_to_cancel, state}
+  end
+
   def handle_info({:order_enqueued, order}, state) do
     {:ok, _pid} = Task.start_link(fn ->
       Tai.Exchanges.Account.buy_limit(order.exchange, order.symbol, order.price, order.size)
       |> handle_buy_limit_response(order)
+    end)
+
+    {:noreply, state}
+  end
+
+  def handle_info({:order_cancelling, order}, state) do
+    {:ok, _pid} = Task.start_link(fn ->
+      Tai.Exchanges.Account.cancel_order(order.exchange, order.server_id)
+      |> handle_cancel_order_response(order)
     end)
 
     {:noreply, state}
@@ -44,8 +65,20 @@ defmodule Tai.Trading.OrderOutbox do
     GenServer.call(__MODULE__, {:add, submissions})
   end
 
+  @doc """
+  Cancel pending orders in the background by client id
+  """
+  def cancel(client_ids) do
+    GenServer.call(__MODULE__, {:cancel, client_ids})
+  end
+
   defp broadcast_enqueued_order(order) do
     PubSub.broadcast(:order_enqueued, {:order_enqueued, order})
+    order
+  end
+
+  defp broadcast_cancelling_order(order) do
+    PubSub.broadcast(:order_cancelling, {:order_cancelling, order})
     order
   end
 
@@ -67,5 +100,10 @@ defmodule Tai.Trading.OrderOutbox do
   defp handle_buy_limit_response({:error, reason}, order) do
     error_order = Orders.update(order.client_id, status: OrderStatus.error)
     PubSub.broadcast(:order_create_error, {:order_create_error, reason, error_order})
+  end
+
+  defp handle_cancel_order_response({:ok, _order_id}, order) do
+    cancelled_order = Orders.update(order.client_id, status: OrderStatus.cancelled)
+    PubSub.broadcast(:order_cancelled, {:order_cancelled, cancelled_order})
   end
 end

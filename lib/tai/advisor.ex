@@ -33,6 +33,17 @@ defmodule Tai.Advisor do
   @callback handle_order_create_error(reason :: term, order :: Order.t, state :: Map.t) :: :ok
 
   @doc """
+  Callback when an order has been cancelled in the outbox but before the 
+  request has been sent to the exchange.
+  """
+  @callback handle_order_cancelling(order :: Order.t, state :: Map.t) :: :ok
+
+  @doc """
+  Callback when an order has been cancelled on the exchange
+  """
+  @callback handle_order_cancelled(order :: Order.t, state :: Map.t) :: :ok
+
+  @doc """
   Returns an atom that will identify the process
 
   ## Examples
@@ -82,7 +93,7 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
       @doc false
-      def handle_info({:order_book_changes, order_book_feed_id, symbol, changes} = msg, state) do
+      def handle_info({:order_book_changes, order_book_feed_id, symbol, changes}, state) do
         new_state = Tai.TimeFrame.debug "[#{state.advisor_id |> Advisor.to_name}] handle_info({:order_book_changes...})" do
           handle_order_book_changes(order_book_feed_id, symbol, changes, state)
 
@@ -99,20 +110,32 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
       @doc false
-      def handle_info({:order_enqueued, order} = msg, state) do
+      def handle_info({:order_enqueued, order}, state) do
         handle_order_enqueued(order, state)
 
         {:noreply, state}
       end
       @doc false
-      def handle_info({:order_create_ok, order} = msg, state) do
+      def handle_info({:order_create_ok, order}, state) do
         handle_order_create_ok(order, state)
 
         {:noreply, state}
       end
       @doc false
-      def handle_info({:order_create_error, reason, order} = msg, state) do
+      def handle_info({:order_create_error, reason, order}, state) do
         handle_order_create_error(reason, order, state)
+
+        {:noreply, state}
+      end
+      @doc false
+      def handle_info({:order_cancelling, order}, state) do
+        handle_order_cancelling(order, state)
+
+        {:noreply, state}
+      end
+      @doc false
+      def handle_info({:order_cancelled, order}, state) do
+        handle_order_cancelled(order, state)
 
         {:noreply, state}
       end
@@ -138,7 +161,9 @@ defmodule Tai.Advisor do
           {:order_book_snapshot, order_book_feed_id},
           :order_enqueued,
           :order_create_ok,
-          :order_create_error
+          :order_create_error,
+          :order_cancelling,
+          :order_cancelled
         ])
 
         tail
@@ -191,16 +216,35 @@ defmodule Tai.Advisor do
 
         unless current_inside_quote == previous_inside_quote do
           handle_inside_quote(order_book_feed_id, symbol, inside_bid, inside_ask, snapshot_or_changes, state)
+          |> normalize_handler_response
+          |> cancel_orders
           |> submit_orders
         end
 
         state
       end
 
-      defp submit_orders(:ok), do: []
-      defp submit_orders({:ok, %{limit_orders: limit_orders}}) do
+      defp normalize_handler_response(:ok) do
+        {:ok, %{}}
+        |> normalize_handler_response
+      end
+      defp normalize_handler_response({:ok, actions}) do
+        default_actions = %{cancel_orders: [], limit_orders: []}
+        {:ok, default_actions |> Map.merge(actions)}
+      end
+
+      defp cancel_orders({:ok, %{cancel_orders: cancel_orders}} = handler_response) do
+        cancel_orders
+        |> OrderOutbox.cancel
+
+        handler_response
+      end
+
+      defp submit_orders({:ok, %{limit_orders: limit_orders, cancel_orders: _}} = handler_response) do
         limit_orders
         |> OrderOutbox.add
+
+        handler_response
       end
     end
   end
