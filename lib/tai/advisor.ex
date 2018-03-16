@@ -133,11 +133,13 @@ defmodule Tai.Advisor do
 
       defp subscribe_to_internal_channels([]), do: nil
       defp subscribe_to_internal_channels([feed_id | tail]) do
-        PubSub.subscribe({:order_book_changes, feed_id})
-        PubSub.subscribe({:order_book_snapshot, feed_id})
-        PubSub.subscribe(:order_enqueued)
-        PubSub.subscribe(:order_create_ok)
-        PubSub.subscribe(:order_create_error)
+        PubSub.subscribe([
+          {:order_book_changes, feed_id},
+          {:order_book_snapshot, feed_id},
+          :order_enqueued,
+          :order_create_ok,
+          :order_create_error
+        ])
 
         tail
         |> subscribe_to_internal_channels
