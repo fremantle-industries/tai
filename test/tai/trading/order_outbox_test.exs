@@ -11,10 +11,12 @@ defmodule Tai.Trading.OrderOutboxTest do
       GenServer.start_link(__MODULE__, :ok)
     end
 
-    def init(:ok) do
+    def init(state) do
       Tai.PubSub.subscribe(:order_enqueued)
       Tai.PubSub.subscribe(:order_create_ok)
       Tai.PubSub.subscribe(:order_create_error)
+
+      {:ok, state}
     end
 
     def handle_info({:order_enqueued, _order} = msg, state) do
