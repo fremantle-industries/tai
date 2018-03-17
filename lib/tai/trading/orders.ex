@@ -21,18 +21,10 @@ defmodule Tai.Trading.Orders do
     {:reply, :ok, %{}}
   end
 
-  def handle_call(:count, _from, state) do
-    {:reply, Enum.count(state), state}
-  end
-
   def handle_call({:add, submissions}, _from, state) do
     {new_orders, new_state} = add_orders(submissions, state)
 
     {:reply, new_orders, new_state}
-  end
-
-  def handle_call({:get, client_id}, _from, state) do
-    {:reply, Map.get(state, client_id), state}
   end
 
   def handle_call({:update, client_id, attrs}, _from, state) do
@@ -52,22 +44,30 @@ defmodule Tai.Trading.Orders do
     {:reply, updated_order, new_state}
   end
 
+  def handle_call({:find, client_id}, _from, state) do
+    {:reply, Map.get(state, client_id), state}
+  end
+
   def handle_call(:all, _from, state) do
     {:reply, state |> Map.values, state}
   end
 
-  @doc """
-  Deletes all existing tracked orders
-  """
-  def clear do
-    GenServer.call(__MODULE__, :clear)
+  def handle_call({:where, [_head | _tail] = filters}, _from, state) do
+    {:reply, state |> filter(filters) |> Map.values, state}
+  end
+
+  def handle_call(:count, _from, state) do
+    {:reply, state |> Enum.count, state}
+  end
+  def handle_call({:count, status: status}, _from, state) do
+    {:reply, state |> filter(status: status) |> Enum.count, state}
   end
 
   @doc """
-  Returns the number of tracked orders
+  Deletes the record of all existing orders
   """
-  def count do
-    GenServer.call(__MODULE__, :count)
+  def clear do
+    GenServer.call(__MODULE__, :clear)
   end
 
   @doc """
@@ -81,24 +81,48 @@ defmodule Tai.Trading.Orders do
   end
 
   @doc """
-  Returns the order matching the client_id or nil otherwise
-  """
-  def get(client_id) do
-    GenServer.call(__MODULE__, {:get, client_id})
-  end
-
-  @doc """
   Update the whitelisted attributes for the given order
+
+  - server_id
+  - created_at
+  - status
   """
   def update(client_id, attributes \\ %{}) do
     GenServer.call(__MODULE__, {:update, client_id, attributes})
   end
 
   @doc """
-  Return a list of current orders
+  Return the order matching the client_id or nil otherwise
+  """
+  def find(client_id) do
+    GenServer.call(__MODULE__, {:find, client_id})
+  end
+
+  @doc """
+  Return a list of all the orders
   """
   def all do
     GenServer.call(__MODULE__, :all)
+  end
+
+  @doc """
+  Return a list of orders filtered by their attributes
+  """
+  def where([_head | _tail] = filters) do
+    GenServer.call(__MODULE__, {:where, filters})
+  end
+
+  @doc """
+  Return the total number of orders
+  """
+  def count do
+    GenServer.call(__MODULE__, :count)
+  end
+  @doc """
+  Return the total number of orders with the given status
+  """
+  def count(status: status) do
+    GenServer.call(__MODULE__, {:count, status: status})
   end
 
   defp add_orders({_exchange, _symbol, _price, _size} = submission, state) do
@@ -124,5 +148,24 @@ defmodule Tai.Trading.Orders do
     new_state = state |> Map.put(order.client_id, order)
 
     add_orders(tail, new_state, [order | new_orders])
+  end
+
+  defp filter(state, [{attr, [_head | _tail] = vals}]) do
+    state
+    |> Enum.filter(fn {_, order} ->
+      vals
+      |> Enum.any?(& &1 == Map.get(order, attr))
+    end)
+    |> Map.new
+  end
+  defp filter(state, [{attr, val}]) do
+    state
+    |> Enum.filter(fn {_, order} -> Map.get(order, attr) == val end)
+    |> Map.new
+  end
+  defp filter(state, [{_attr, _val} = head | tail]) do
+    state
+    |> filter([head])
+    |> filter(tail)
   end
 end

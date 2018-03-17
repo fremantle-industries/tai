@@ -20,6 +20,16 @@ defmodule Tai.Trading.OrdersTest do
     assert Orders.count() == 1
   end
 
+  test "count can filter by status" do
+    assert Orders.count(status: OrderStatus.enqueued) == 0
+    assert Orders.count(status: OrderStatus.pending) == 0
+
+    Orders.add({:my_test_exchange, :btcusd, 100.0, 1.0})
+
+    assert Orders.count(status: OrderStatus.enqueued) == 1
+    assert Orders.count(status: OrderStatus.pending) == 0
+  end
+
   test "add can take a single submission" do
     assert Orders.count() == 0
 
@@ -70,14 +80,14 @@ defmodule Tai.Trading.OrdersTest do
     assert Orders.count() == 0
   end
 
-  test "get returns the order by client_id" do
+  test "find returns the order by client_id" do
     [order] = Orders.add({:my_test_exchange, :btcusd, 100.0, 1.0})
 
-    assert Orders.get(order.client_id) == order
+    assert Orders.find(order.client_id) == order
   end
 
-  test "get returns nil when the order doesn't exist" do
-    assert Orders.get("i_dont_exist") == nil
+  test "find returns nil when the client_id doesn't exist" do
+    assert Orders.find("client_id_doesnt_exist") == nil
   end
 
   test "update can change the whitelist of attributes" do
@@ -95,7 +105,7 @@ defmodule Tai.Trading.OrdersTest do
     assert updated_order.created_at == created_at
     assert updated_order.status == OrderStatus.pending
     assert updated_order.client_id != "should_not_replace_client_id"
-    assert Orders.get(order.client_id) == updated_order
+    assert Orders.find(order.client_id) == updated_order
   end
 
   test "all returns a list of current orders" do
@@ -104,5 +114,80 @@ defmodule Tai.Trading.OrdersTest do
     [order] = Orders.add({:my_test_exchange, :btcusd, 100.0, 1.0})
 
     assert Orders.all == [order]
+  end
+
+  test "where can filter by a singular client_id" do
+    [_order_1, order_2, _order_3] = Orders.add([
+      {:my_test_exchange, :btcusd, 100.0, 0.1},
+      {:my_test_exchange, :btcusd, 100.0, 1.0},
+      {:my_test_exchange, :btcusd, 100.0, 2.0}
+    ])
+
+    assert Orders.where(client_id: order_2.client_id) == [order_2]
+    assert Orders.where(client_id: "client_id_does_not_exist") == []
+  end
+
+  test "where can filter by multiple client_ids" do
+    [_order_1, order_2, order_3] = Orders.add([
+      {:my_test_exchange, :btcusd, 100.0, 0.1},
+      {:my_test_exchange, :btcusd, 100.0, 1.0},
+      {:my_test_exchange, :btcusd, 100.0, 2.0}
+    ])
+
+    found_orders =  [client_id: [order_2.client_id, order_3.client_id]]
+                    |> Orders.where
+                    |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
+    assert found_orders == [order_2, order_3]
+    assert Orders.where(client_id: []) == []
+    assert Orders.where(client_id: ["client_id_does_not_exist"]) == []
+  end
+
+  test "where can filter by a single status" do
+    [order_1, order_2] = Orders.add([
+      {:my_test_exchange, :btcusd, 100.0, 0.1},
+      {:my_test_exchange, :btcusd, 100.0, 1.0}
+    ])
+
+    found_orders =  [status: OrderStatus.enqueued]
+                    |> Orders.where
+                    |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
+    assert found_orders == [order_1, order_2]
+    assert Orders.where(status: OrderStatus.pending) == []
+    assert Orders.where(status: :status_does_not_exist) == []
+  end
+
+  test "where can filter by multiple status'" do
+    [order_1, order_2, order_3] = Orders.add([
+      {:my_test_exchange, :btcusd, 100.0, 0.1},
+      {:my_test_exchange, :btcusd, 100.0, 1.0},
+      {:my_test_exchange, :btcusd, 100.0, 1.0}
+    ])
+    order_2 = Orders.update(order_2.client_id, status: OrderStatus.pending)
+    Orders.update(order_3.client_id, status: OrderStatus.error)
+
+    found_orders =  [status: [OrderStatus.enqueued, OrderStatus.pending]]
+                    |> Orders.where
+                    |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
+    assert found_orders == [order_1, order_2]
+    assert Orders.where(status: []) == []
+    assert Orders.where(status: [:status_does_not_exist]) == []
+  end
+
+  test "where can filter by client_ids and status" do
+    [_order_1, order_2, order_3] = Orders.add([
+      {:my_test_exchange, :btcusd, 100.0, 0.1},
+      {:my_test_exchange, :btcusd, 100.0, 1.0},
+      {:my_test_exchange, :btcusd, 100.0, 2.0}
+    ])
+    order_2 = Orders.update(order_2.client_id, status: OrderStatus.error)
+    order_3 = Orders.update(order_3.client_id, status: OrderStatus.error)
+
+    error_orders =  [
+      client_id: [order_2.client_id, order_3.client_id],
+      status: OrderStatus.error
+    ]
+    |> Orders.where
+    |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
+    assert error_orders == [order_2, order_3]
   end
 end
