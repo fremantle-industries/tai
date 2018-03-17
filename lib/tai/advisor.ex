@@ -10,12 +10,12 @@ defmodule Tai.Advisor do
   @doc """
   Callback when order book has bid or ask changes
   """
-  @callback handle_order_book_changes(feed_id :: Atom.t, symbol :: Atom.t, changes :: term, state :: Map.t) :: :ok
+  @callback handle_order_book_changes(order_book_feed_id :: Atom.t, symbol :: Atom.t, changes :: term, state :: Map.t) :: :ok
 
   @doc """
   Callback when the highest bid or lowest ask changes price or size
   """
-  @callback handle_inside_quote(feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, snapshot_or_changes :: Map.t | List.t, state :: Map.t) :: :ok | {:ok, actions :: Map.t}
+  @callback handle_inside_quote(order_book_feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, snapshot_or_changes :: Map.t | List.t, state :: Map.t) :: :ok | {:ok, actions :: Map.t}
 
   @doc """
   Callback when an order is enqueued
@@ -74,23 +74,23 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def handle_info({:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}, state) do
+      def handle_info({:order_book_snapshot, order_book_feed_id, symbol, normalized_bids, normalized_asks}, state) do
         new_state = state
-                    |> cache_inside_quote(feed_id, symbol)
-                    |> execute_handle_inside_quote(feed_id, symbol, %{bids: normalized_bids, asks: normalized_asks})
+                    |> cache_inside_quote(order_book_feed_id, symbol)
+                    |> execute_handle_inside_quote(order_book_feed_id, symbol, %{bids: normalized_bids, asks: normalized_asks})
 
         {:noreply, new_state}
       end
       @doc false
-      def handle_info({:order_book_changes, feed_id, symbol, changes} = msg, state) do
+      def handle_info({:order_book_changes, order_book_feed_id, symbol, changes} = msg, state) do
         new_state = Tai.TimeFrame.debug "[#{state.advisor_id |> Advisor.to_name}] handle_info({:order_book_changes...})" do
-          handle_order_book_changes(feed_id, symbol, changes, state)
+          handle_order_book_changes(order_book_feed_id, symbol, changes, state)
 
-          previous_inside_quote = state |> cached_inside_quote(feed_id, symbol)
+          previous_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
           if previous_inside_quote |> inside_quote_is_stale?(changes) do
             state
-            |> cache_inside_quote(feed_id, symbol)
-            |> execute_handle_inside_quote(feed_id, symbol, changes, previous_inside_quote)
+            |> cache_inside_quote(order_book_feed_id, symbol)
+            |> execute_handle_inside_quote(order_book_feed_id, symbol, changes, previous_inside_quote)
           else
             state
           end
@@ -125,17 +125,17 @@ defmodule Tai.Advisor do
         iex> Tai.Advisor.quotes(feed_id: :test_feed_a, symbol: :btcusd, depth: 1)
         {:ok, %{bids: [], asks: []}
       """
-      def quotes(feed_id: feed_id, symbol: symbol, depth: depth) do
-        [feed_id: feed_id, symbol: symbol]
+      def quotes(feed_id: order_book_feed_id, symbol: symbol, depth: depth) do
+        [feed_id: order_book_feed_id, symbol: symbol]
         |> OrderBook.to_name
         |> OrderBook.quotes(depth)
       end
 
       defp subscribe_to_internal_channels([]), do: nil
-      defp subscribe_to_internal_channels([feed_id | tail]) do
+      defp subscribe_to_internal_channels([order_book_feed_id | tail]) do
         PubSub.subscribe([
-          {:order_book_changes, feed_id},
-          {:order_book_snapshot, feed_id},
+          {:order_book_changes, order_book_feed_id},
+          {:order_book_snapshot, order_book_feed_id},
           :order_enqueued,
           :order_create_ok,
           :order_create_error
@@ -145,25 +145,25 @@ defmodule Tai.Advisor do
         |> subscribe_to_internal_channels
       end
 
-      defp inside_quote(feed_id, symbol) do
-        [feed_id: feed_id, symbol: symbol, depth: 1]
+      defp inside_quote(order_book_feed_id, symbol) do
+        [feed_id: order_book_feed_id, symbol: symbol, depth: 1]
         |> quotes
         |> case do
           {:ok, %{bids: bids, asks: asks}} -> [bid: bids |> List.first, ask: asks |> List.first]
         end
       end
 
-      defp cache_inside_quote(state, feed_id, symbol) do
-        current_inside_quote = inside_quote(feed_id, symbol)
-        order_book_key = [feed_id: feed_id, symbol: symbol] |> OrderBook.to_name
+      defp cache_inside_quote(state, order_book_feed_id, symbol) do
+        current_inside_quote = inside_quote(order_book_feed_id, symbol)
+        order_book_key = [feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name
         new_inside_quotes = state.inside_quotes |> Map.put(order_book_key, current_inside_quote)
 
         state |> Map.put(:inside_quotes, new_inside_quotes)
       end
 
-      defp cached_inside_quote(%{inside_quotes: inside_quotes}, feed_id, symbol) do
+      defp cached_inside_quote(%{inside_quotes: inside_quotes}, order_book_feed_id, symbol) do
         inside_quotes
-        |> Map.get([feed_id: feed_id, symbol: symbol] |> OrderBook.to_name)
+        |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name)
       end
 
       defp inside_quote_is_stale?(previous_inside_quote, %{bids: bids, asks: asks} = changes) do
@@ -186,11 +186,11 @@ defmodule Tai.Advisor do
         end)
       end
 
-      defp execute_handle_inside_quote(state, feed_id, symbol, snapshot_or_changes, previous_inside_quote \\ nil) do
-        [bid: inside_bid, ask: inside_ask] = current_inside_quote = state |> cached_inside_quote(feed_id, symbol)
+      defp execute_handle_inside_quote(state, order_book_feed_id, symbol, snapshot_or_changes, previous_inside_quote \\ nil) do
+        [bid: inside_bid, ask: inside_ask] = current_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
 
         unless current_inside_quote == previous_inside_quote do
-          handle_inside_quote(feed_id, symbol, inside_bid, inside_ask, snapshot_or_changes, state)
+          handle_inside_quote(order_book_feed_id, symbol, inside_bid, inside_ask, snapshot_or_changes, state)
           |> submit_orders
         end
 
