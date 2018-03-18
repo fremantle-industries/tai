@@ -140,9 +140,9 @@ defmodule Tai.Trading.Orders do
       client_id: UUID.uuid4(),
       exchange: exchange_id,
       symbol: symbol,
-      type: size |> to_order_type,
+      type: to_order_type(size),
       price: price,
-      size: size,
+      size: abs(size),
       status: OrderStatus.enqueued,
       enqueued_at: Timex.now
     }

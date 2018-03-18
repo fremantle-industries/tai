@@ -69,7 +69,7 @@ defmodule Tai.Trading.OrdersTest do
     assert order_2.exchange == :my_test_exchange
     assert order_2.symbol == :ltcusd
     assert order_2.price == 10.0
-    assert order_2.size == -1.1
+    assert order_2.size == 1.1
     assert order_2.status == OrderStatus.enqueued
     assert order_2.type == OrderTypes.sell_limit
     assert %DateTime{} = order_2.enqueued_at

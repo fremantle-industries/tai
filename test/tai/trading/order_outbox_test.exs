@@ -92,7 +92,9 @@ defmodule Tai.Trading.OrderOutboxTest do
     assert_receive {:order_create_ok, created_order_b}
 
     [created_order_1, created_order_2] = [created_order_a, created_order_b]
-                                         |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
+                                         |> Enum.sort(
+                                           &(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt)
+                                         )
 
     assert created_order_1.client_id == new_buy_limit_order.client_id
     assert created_order_1.status == OrderStatus.pending
@@ -112,18 +114,38 @@ defmodule Tai.Trading.OrderOutboxTest do
   test "add broadcasts failed orders and updates the status" do
     assert Orders.count() == 0
 
-    [new_order] = new_orders = OrderOutbox.add({:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1})
+    [new_order_1, new_order_2] = OrderOutbox.add([
+      {:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1},
+      {:my_test_exchange, :btcusd_insufficient_funds, 100.0, -0.1}
+    ])
 
-    assert Enum.count(new_orders) == 1
-    assert Orders.count() == 1
-    assert_receive {:order_enqueued, enqueued_order}
-    assert enqueued_order.client_id == new_order.client_id
-    assert enqueued_order.status == OrderStatus.enqueued
+    assert Orders.count() == 2
+    assert_receive {:order_enqueued, enqueued_order_1}
+    assert enqueued_order_1.client_id == new_order_1.client_id
+    assert enqueued_order_1.status == OrderStatus.enqueued
 
-    assert_receive {:order_create_error, error_reason, error_order}
-    assert %OrderResponses.InsufficientFunds{} = error_reason
-    assert error_order.client_id == new_order.client_id
-    assert error_order.status == OrderStatus.error
+    assert_receive {:order_create_error, error_reason_a, error_order_a}
+    assert_receive {:order_create_error, error_reason_b, error_order_b}
+
+    unsorted_errors = [{error_reason_a, error_order_a}, {error_reason_b, error_order_b}]
+
+    [
+      {error_reason_1, error_order_1},
+      {error_reason_2, error_order_2}
+    ] = unsorted_errors
+        |> Enum.sort(fn {_ra, oa}, {_rb, ob} ->
+          DateTime.compare(oa.enqueued_at, ob.enqueued_at) == :lt
+        end)
+
+    assert %OrderResponses.InsufficientFunds{} = error_reason_1
+    assert error_order_1.client_id == new_order_1.client_id
+    assert error_order_1.type == OrderTypes.buy_limit
+    assert error_order_1.status == OrderStatus.error
+
+    assert %OrderResponses.InsufficientFunds{} = error_reason_2
+    assert error_order_2.client_id == new_order_2.client_id
+    assert error_order_2.type == OrderTypes.sell_limit
+    assert error_order_2.status == OrderStatus.error
   end
 
   test "cancel changes the given pending orders to cancelling and sends the request to the exchange in the background" do

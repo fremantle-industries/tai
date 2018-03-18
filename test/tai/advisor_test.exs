@@ -3,7 +3,7 @@ defmodule Tai.AdvisorTest do
   doctest Tai.Advisor
 
   alias Tai.{Advisor, Markets.OrderBook, PubSub}
-  alias Tai.Trading.{Order, Orders, OrderResponses}
+  alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderTypes}
 
   defmodule MyAdvisor do
     use Advisor
@@ -238,81 +238,83 @@ defmodule Tai.AdvisorTest do
     broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
 
     assert_receive {
-      %Order{
-        client_id: _,
-        server_id: nil,
-        exchange: :my_test_exchange,
-        symbol: :btcusd_success,
-        price: 101.1,
-        size: 0.1,
-        status: :enqueued
-      },
+      enqueued_order_1,
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
     assert_receive {
-      %Order{
-        client_id: _,
-        server_id: nil,
-        exchange: :my_test_exchange,
-        symbol: :btcusd_success,
-        price: 10.1,
-        size: 0.11,
-        status: :enqueued
-      },
+      enqueued_order_2,
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
     assert_receive {
-      %Order{
-        client_id: _,
-        server_id: nil,
-        exchange: :my_test_exchange,
-        symbol: :btcusd_insufficient_funds,
-        price: 1.1,
-        size: 0.1,
-        status: :enqueued
-      },
+      enqueued_order_3,
+      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+    }
+    assert enqueued_order_1.server_id == nil
+    assert enqueued_order_1.exchange == :my_test_exchange
+    assert enqueued_order_1.symbol == :btcusd_success
+    assert enqueued_order_1.type == OrderTypes.buy_limit
+    assert enqueued_order_1.price == 101.1
+    assert enqueued_order_1.size == 0.1
+    assert enqueued_order_1.status == OrderStatus.enqueued
+
+    assert enqueued_order_2.server_id == nil
+    assert enqueued_order_2.exchange == :my_test_exchange
+    assert enqueued_order_2.symbol == :btcusd_success
+    assert enqueued_order_2.type == OrderTypes.buy_limit
+    assert enqueued_order_2.price == 10.1
+    assert enqueued_order_2.size == 0.11
+    assert enqueued_order_2.status == OrderStatus.enqueued
+
+    assert enqueued_order_3.server_id == nil
+    assert enqueued_order_3.exchange == :my_test_exchange
+    assert enqueued_order_3.symbol == :btcusd_insufficient_funds
+    assert enqueued_order_3.type == OrderTypes.buy_limit
+    assert enqueued_order_3.price == 1.1
+    assert enqueued_order_3.size == 0.1
+    assert enqueued_order_3.status == OrderStatus.enqueued
+
+    assert_receive {
+      created_order_a,
+      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+    }
+    assert_receive {
+      created_order_b,
+      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+    }
+    assert_receive {
+      %OrderResponses.InsufficientFunds{},
+      error_order,
       %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
 
-    assert_receive {
-      %Order{
-        client_id: _,
-        server_id: server_id_1,
-        exchange: :my_test_exchange,
-        symbol: :btcusd_success,
-        price: 101.1,
-        size: 0.1,
-        status: :pending
-      },
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert server_id_1 != nil
-    assert_receive {
-      %Order{
-        client_id: _,
-        server_id: server_id_2,
-        exchange: :my_test_exchange,
-        symbol: :btcusd_success,
-        price: 10.1,
-        size: 0.11,
-        status: :pending
-      },
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert server_id_2 != nil
-    assert_receive {
-      %OrderResponses.InsufficientFunds{},
-      %Order{
-        client_id: _,
-        server_id: nil,
-        exchange: :my_test_exchange,
-        symbol: :btcusd_insufficient_funds,
-        price: 1.1,
-        size: 0.1,
-        status: :error
-      },
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
+    [created_order_1, created_order_2] = [created_order_a, created_order_b]
+                                         |> Enum.sort(
+                                           &(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt)
+                                         )
+
+    assert created_order_1.server_id != nil
+    assert created_order_1.exchange == :my_test_exchange
+    assert created_order_1.symbol == :btcusd_success
+    assert created_order_1.type == OrderTypes.buy_limit
+    assert created_order_1.price == 101.1
+    assert created_order_1.size == 0.1
+    assert created_order_1.status == OrderStatus.pending
+
+    assert created_order_2.server_id != nil
+    assert created_order_2.exchange == :my_test_exchange
+    assert created_order_2.symbol == :btcusd_success
+    assert created_order_2.type == OrderTypes.buy_limit
+    assert created_order_2.price == 10.1
+    assert created_order_2.size == 0.11
+    assert created_order_2.status == OrderStatus.pending
+
+    assert error_order.server_id == nil
+    assert error_order.exchange == :my_test_exchange
+    assert error_order.symbol == :btcusd_insufficient_funds
+    assert error_order.type == OrderTypes.buy_limit
+    assert error_order.price == 1.1
+    assert error_order.size == 0.1
+    assert error_order.status == OrderStatus.error
   end
 
   test "handle_inside_quote can create multiple sell_limit orders", %{book_pid: book_pid} do
@@ -323,8 +325,9 @@ defmodule Tai.AdvisorTest do
 
       def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _snapshot_or_changes, _state) do
         limit_orders = [
-          {:my_test_exchange, :btcusd, 101.1, -0.1},
-          {:my_test_exchange, :btcusd, 10.1, -0.11}
+          {:my_test_exchange, :btcusd_success, 101.1, -0.1},
+          {:my_test_exchange, :btcusd_success, 10.1, -0.11},
+          {:my_test_exchange, :btcusd_insufficient_funds, 1.1, -0.1}
         ]
 
         {:ok, %{limit_orders: limit_orders}}
@@ -334,8 +337,14 @@ defmodule Tai.AdvisorTest do
         send :test, {order, state}
       end
 
-      def handle_order_create_ok(_order, _state), do: nil
-      def handle_order_create_error(_reason, _order, _state), do: nil
+      def handle_order_create_ok(order, state) do
+        send :test, {order, state}
+      end
+
+      def handle_order_create_error(reason, order, state) do
+        send :test, {reason, order, state}
+      end
+
       def handle_order_cancelling(_order, _state), do: nil
       def handle_order_cancelled(_order, _state), do: nil
     end
@@ -353,29 +362,84 @@ defmodule Tai.AdvisorTest do
     broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
 
     assert_receive {
-      %Order{
-        client_id: _,
-        server_id: nil,
-        exchange: :my_test_exchange,
-        symbol: :btcusd,
-        price: 101.1,
-        size: -0.1,
-        status: :enqueued
-      },
+      enqueued_order_1,
       %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
     assert_receive {
-      %Order{
-        client_id: _,
-        server_id: nil,
-        exchange: :my_test_exchange,
-        symbol: :btcusd,
-        price: 10.1,
-        size: -0.11,
-        status: :enqueued
-      },
+      enqueued_order_2,
       %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
+    assert_receive {
+      enqueued_order_3,
+      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+    }
+
+    assert enqueued_order_1.server_id == nil
+    assert enqueued_order_1.exchange == :my_test_exchange
+    assert enqueued_order_1.symbol == :btcusd_success
+    assert enqueued_order_1.type == OrderTypes.sell_limit
+    assert enqueued_order_1.price == 101.1
+    assert enqueued_order_1.size == 0.1
+    assert enqueued_order_1.status == OrderStatus.enqueued
+
+    assert enqueued_order_2.server_id == nil
+    assert enqueued_order_2.exchange == :my_test_exchange
+    assert enqueued_order_2.symbol == :btcusd_success
+    assert enqueued_order_2.type == OrderTypes.sell_limit
+    assert enqueued_order_2.price == 10.1
+    assert enqueued_order_2.size == 0.11
+    assert enqueued_order_2.status == OrderStatus.enqueued
+
+    assert enqueued_order_3.server_id == nil
+    assert enqueued_order_3.exchange == :my_test_exchange
+    assert enqueued_order_3.symbol == :btcusd_insufficient_funds
+    assert enqueued_order_3.type == OrderTypes.sell_limit
+    assert enqueued_order_3.price == 1.1
+    assert enqueued_order_3.size == 0.1
+    assert enqueued_order_3.status == OrderStatus.enqueued
+
+    assert_receive {
+      created_order_a,
+      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+    }
+    assert_receive {
+      created_order_b,
+      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+    }
+    assert_receive {
+      %OrderResponses.InsufficientFunds{},
+      error_order,
+      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+    }
+
+    [created_order_1, created_order_2] = [created_order_a, created_order_b]
+                                         |> Enum.sort(
+                                           &(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt)
+                                         )
+
+    assert created_order_1.server_id != nil
+    assert created_order_1.exchange == :my_test_exchange
+    assert created_order_1.symbol == :btcusd_success
+    assert created_order_1.type == OrderTypes.sell_limit
+    assert created_order_1.price == 101.1
+    assert created_order_1.size == 0.1
+    assert created_order_1.status == OrderStatus.pending
+
+    assert created_order_2.server_id != nil
+    assert created_order_2.exchange == :my_test_exchange
+    assert created_order_2.symbol == :btcusd_success
+    assert created_order_2.type == OrderTypes.sell_limit
+    assert created_order_2.price == 10.1
+    assert created_order_2.size == 0.11
+    assert created_order_2.status == OrderStatus.pending
+
+    assert error_order.server_id == nil
+    assert error_order.exchange == :my_test_exchange
+    assert error_order.symbol == :btcusd_insufficient_funds
+    assert error_order.type == OrderTypes.sell_limit
+    assert error_order.price == 1.1
+    assert error_order.size == 0.1
+    assert error_order.status == OrderStatus.error
   end
 
   test "handle_inside_quote can cancel orders", %{book_pid: book_pid} do

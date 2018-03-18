@@ -3,6 +3,8 @@ defmodule Tai.Exchanges.Account do
   Uniform interface for private exchange actions
   """
 
+  alias Tai.Trading.{Order, OrderResponses, OrderTypes}
+
   @doc """
   """
   def balance(exchange_id) do
@@ -12,21 +14,55 @@ defmodule Tai.Exchanges.Account do
   end
 
   @doc """
-  Create a buy limit order on the exchange
+  Create a buy limit order on the exchange with the given
+
+  - symbol
+  - price
+  - size
   """
   def buy_limit(exchange_id, symbol, price, size) do
     exchange_id
     |> to_name
     |> GenServer.call({:buy_limit, symbol, price, size})
   end
+  @doc """
+  Create a buy limit order from the given order struct. It returns an error tuple
+  when the type is not accepted.
+
+  {:error, %OrderResponses.InvalidOrderType{}}
+  """
+  def buy_limit(%Order{} = order) do
+    if order.type == OrderTypes.buy_limit do
+      buy_limit(order.exchange, order.symbol, order.price, order.size)
+    else
+      {:error, %OrderResponses.InvalidOrderType{}}
+    end
+  end
 
   @doc """
-  Create a sell limit order on the exchange
+  Create a sell limit order on the exchange with the given
+
+  - symbol
+  - price
+  - size
   """
   def sell_limit(exchange_id, symbol, price, size) do
     exchange_id
     |> to_name
     |> GenServer.call({:sell_limit, symbol, price, size})
+  end
+  @doc """
+  Create a sell limit order from the given order struct. It returns an error tuple
+  when the type is not accepted.
+
+  {:error, %OrderResponses.InvalidOrderType{}}
+  """
+  def sell_limit(%Order{} = order) do
+    if order.type == OrderTypes.sell_limit do
+      sell_limit(order.exchange, order.symbol, order.price, order.size)
+    else
+      {:error, %OrderResponses.InvalidOrderType{}}
+    end
   end
 
   @doc """
