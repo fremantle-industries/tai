@@ -5,7 +5,7 @@ defmodule Tai.Trading.Orders do
 
   use GenServer
 
-  alias Tai.Trading.{Order, OrderStatus}
+  alias Tai.Trading.{Order, OrderStatus, OrderTypes}
 
   require Logger
 
@@ -140,6 +140,7 @@ defmodule Tai.Trading.Orders do
       client_id: UUID.uuid4(),
       exchange: exchange_id,
       symbol: symbol,
+      type: size |> to_order_type,
       price: price,
       size: size,
       status: OrderStatus.enqueued,
@@ -149,6 +150,9 @@ defmodule Tai.Trading.Orders do
 
     add_orders(tail, new_state, [order | new_orders])
   end
+
+  defp to_order_type(size) when size > 0, do: OrderTypes.buy_limit
+  defp to_order_type(size) when size < 0, do: OrderTypes.sell_limit
 
   defp filter(state, [{attr, [_head | _tail] = vals}]) do
     state

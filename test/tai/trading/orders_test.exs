@@ -2,7 +2,7 @@ defmodule Tai.Trading.OrdersTest do
   use ExUnit.Case
   doctest Tai.Trading.Orders
 
-  alias Tai.Trading.{Orders, OrderStatus}
+  alias Tai.Trading.{Orders, OrderStatus, OrderTypes}
 
   setup do
     on_exit fn ->
@@ -42,6 +42,7 @@ defmodule Tai.Trading.OrdersTest do
     assert order.price == 100.0
     assert order.size == 1.0
     assert order.status == OrderStatus.enqueued
+    assert order.type == OrderTypes.buy_limit
     assert %DateTime{} = order.enqueued_at
   end
 
@@ -50,7 +51,7 @@ defmodule Tai.Trading.OrdersTest do
 
     [order_1, order_2] = Orders.add([
       {:my_test_exchange, :btcusd, 100.0, 1.0},
-      {:my_test_exchange, :ltcusd, -10.0, 1.1}
+      {:my_test_exchange, :ltcusd, 10.0, -1.1}
     ])
 
     assert Orders.count() == 2
@@ -61,14 +62,16 @@ defmodule Tai.Trading.OrdersTest do
     assert order_1.price == 100.0
     assert order_1.size == 1.0
     assert order_1.status == OrderStatus.enqueued
+    assert order_1.type == OrderTypes.buy_limit
     assert %DateTime{} = order_1.enqueued_at
 
     assert {:ok, _} = UUID.info(order_2.client_id)
     assert order_2.exchange == :my_test_exchange
     assert order_2.symbol == :ltcusd
-    assert order_2.price == -10.0
-    assert order_2.size == 1.1
+    assert order_2.price == 10.0
+    assert order_2.size == -1.1
     assert order_2.status == OrderStatus.enqueued
+    assert order_2.type == OrderTypes.sell_limit
     assert %DateTime{} = order_2.enqueued_at
   end
 

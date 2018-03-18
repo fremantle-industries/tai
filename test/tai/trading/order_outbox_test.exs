@@ -2,7 +2,7 @@ defmodule Tai.Trading.OrderOutboxTest do
   use ExUnit.Case
   doctest Tai.Trading.OrderOutbox
 
-  alias Tai.Trading.{OrderOutbox, Orders, OrderResponses, OrderStatus}
+  alias Tai.Trading.{OrderOutbox, Orders, OrderResponses, OrderStatus, OrderTypes}
 
   defmodule OrderLifecycleSubscriber do
     use GenServer
@@ -61,26 +61,52 @@ defmodule Tai.Trading.OrderOutboxTest do
     :ok
   end
 
-  test "add converts the submission into an order then broadcasts it to be sent to the exchange in the background" do
+  test "add enqueues the submissions as orders and then executes it on the exchange" do
     assert Orders.count() == 0
 
-    [new_order] = new_orders = OrderOutbox.add({:my_test_exchange, :btcusd_success, 100.0, 0.1})
+    [new_buy_limit_order, new_sell_limit_order] = new_orders = OrderOutbox.add([
+      {:my_test_exchange, :btcusd_success, 100.0, 0.1},
+      {:my_test_exchange, :btcusd_success, 100.0, -0.1}
+    ])
 
-    assert Enum.count(new_orders) == 1
-    assert Orders.count() == 1
-    assert_receive {:order_enqueued, enqueued_order}
-    assert enqueued_order.client_id == new_order.client_id
-    assert enqueued_order.enqueued_at == new_order.enqueued_at
-    assert enqueued_order.server_id == nil
-    assert enqueued_order.created_at == nil
-    assert enqueued_order.status == OrderStatus.enqueued
+    assert Enum.count(new_orders) == 2
+    assert Orders.count() == 2
 
-    assert_receive {:order_create_ok, created_order}
-    assert created_order.client_id == new_order.client_id
-    assert created_order.enqueued_at == new_order.enqueued_at
-    assert created_order.server_id != nil
-    assert %DateTime{} = created_order.created_at
-    assert created_order.status == OrderStatus.pending
+    assert_receive {:order_enqueued, enqueued_order_1}
+    assert enqueued_order_1.client_id == new_buy_limit_order.client_id
+    assert enqueued_order_1.status == OrderStatus.enqueued
+    assert enqueued_order_1.type == OrderTypes.buy_limit
+    assert enqueued_order_1.enqueued_at == new_buy_limit_order.enqueued_at
+    assert enqueued_order_1.server_id == nil
+    assert enqueued_order_1.created_at == nil
+
+    assert_receive {:order_enqueued, enqueued_order_2}
+    assert enqueued_order_2.client_id == new_sell_limit_order.client_id
+    assert enqueued_order_2.status == OrderStatus.enqueued
+    assert enqueued_order_2.type == OrderTypes.sell_limit
+    assert enqueued_order_2.enqueued_at == new_sell_limit_order.enqueued_at
+    assert enqueued_order_2.server_id == nil
+    assert enqueued_order_2.created_at == nil
+
+    assert_receive {:order_create_ok, created_order_a}
+    assert_receive {:order_create_ok, created_order_b}
+
+    [created_order_1, created_order_2] = [created_order_a, created_order_b]
+                                         |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
+
+    assert created_order_1.client_id == new_buy_limit_order.client_id
+    assert created_order_1.status == OrderStatus.pending
+    assert created_order_1.type == OrderTypes.buy_limit
+    assert created_order_1.enqueued_at == new_buy_limit_order.enqueued_at
+    assert created_order_1.server_id != nil
+    assert %DateTime{} = created_order_1.created_at
+
+    assert created_order_2.client_id == new_sell_limit_order.client_id
+    assert created_order_2.status == OrderStatus.pending
+    assert created_order_2.type == OrderTypes.sell_limit
+    assert created_order_2.enqueued_at == new_sell_limit_order.enqueued_at
+    assert created_order_2.server_id != nil
+    assert %DateTime{} = created_order_2.created_at
   end
 
   test "add broadcasts failed orders and updates the status" do
