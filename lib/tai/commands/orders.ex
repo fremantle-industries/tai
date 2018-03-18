@@ -8,6 +8,7 @@ defmodule Tai.Commands.Orders do
       [
         order.exchange,
         order.symbol,
+        order.type,
         order.price,
         order.size,
         order.status,
@@ -38,6 +39,7 @@ defmodule Tai.Commands.Orders do
     [
       "Exchange",
       "Symbol",
+      "Type",
       "Price",
       "Size",
       "Status",
