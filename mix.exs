@@ -36,6 +36,7 @@ defmodule Tai.Mixfile do
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
       {:echo_boy, "~> 0.1.0", github: "rupurt/echo_boy", only: [:dev, :test]},
       {:plug, "~> 1.0", only: [:dev, :test]},
+      {:ex_doc, ">= 0.0.0", only: :dev},
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
       {:exvcr, "~> 0.8", only: [:test]},
       {:ex_unit_notifier, "~> 0.1", only: :test}
