@@ -99,7 +99,7 @@ defmodule Tai.Advisor do
           handle_order_book_changes(order_book_feed_id, symbol, changes, state)
 
           previous_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
-          if previous_inside_quote |> inside_quote_is_stale?(changes) do
+          if inside_quote_is_stale?(previous_inside_quote, changes) do
             state
             |> cache_inside_quote(order_book_feed_id, symbol)
             |> execute_handle_inside_quote(order_book_feed_id, symbol, changes, previous_inside_quote)
@@ -155,6 +155,22 @@ defmodule Tai.Advisor do
         |> OrderBook.quotes(depth)
       end
 
+      @doc """
+      Returns the inside quote stored before the last 'handle_inside_quote' callback
+
+      ## Examples
+
+        iex> Tai.Advisor.cached_inside_quote(state, :test_feed_a, :btcusd)
+        [
+          bid: [price: 101.1, size: 1.1, processed_at: nil, server_changed_at: nil],
+          [ask: [price: 101.2, size: 0.1, processed_at: nil, server_changed_at: nil]
+        ]
+      """
+      def cached_inside_quote(%{inside_quotes: inside_quotes}, order_book_feed_id, symbol) do
+        inside_quotes
+        |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name)
+      end
+
       defp subscribe_to_internal_channels([]), do: nil
       defp subscribe_to_internal_channels([order_book_feed_id | tail]) do
         PubSub.subscribe([
@@ -171,7 +187,7 @@ defmodule Tai.Advisor do
         |> subscribe_to_internal_channels
       end
 
-      defp inside_quote(order_book_feed_id, symbol) do
+      defp fetch_inside_quote(order_book_feed_id, symbol) do
         [feed_id: order_book_feed_id, symbol: symbol, depth: 1]
         |> quotes
         |> case do
@@ -180,16 +196,11 @@ defmodule Tai.Advisor do
       end
 
       defp cache_inside_quote(state, order_book_feed_id, symbol) do
-        current_inside_quote = inside_quote(order_book_feed_id, symbol)
+        current_inside_quote = fetch_inside_quote(order_book_feed_id, symbol)
         order_book_key = [feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name
         new_inside_quotes = state.inside_quotes |> Map.put(order_book_key, current_inside_quote)
 
         state |> Map.put(:inside_quotes, new_inside_quotes)
-      end
-
-      defp cached_inside_quote(%{inside_quotes: inside_quotes}, order_book_feed_id, symbol) do
-        inside_quotes
-        |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name)
       end
 
       defp inside_quote_is_stale?(previous_inside_quote, %{bids: bids, asks: asks} = changes) do
