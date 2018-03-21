@@ -8,7 +8,7 @@ defmodule Tai.Markets.SymbolTest do
     assert Symbol.downcase(:FOO) == "foo"
   end
 
-  test "downcase convert an uppercase string to downcase" do
+  test "downcase converts an uppercase string to downcase" do
     assert Symbol.downcase("FOO") == "foo"
   end
 
