@@ -70,7 +70,8 @@ defmodule Tai.Advisor do
           %{
             advisor_id: advisor_id,
             order_book_feed_ids: order_book_feed_ids,
-            inside_quotes: %{}
+            inside_quotes: %{},
+            store: %{}
           },
           name: advisor_id |> Advisor.to_name
         )
@@ -214,14 +215,15 @@ defmodule Tai.Advisor do
       defp execute_handle_inside_quote(state, order_book_feed_id, symbol, snapshot_or_changes, previous_inside_quote \\ nil) do
         [bid: inside_bid, ask: inside_ask] = current_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
 
-        unless current_inside_quote == previous_inside_quote do
+        if current_inside_quote == previous_inside_quote do
+          state
+        else
           handle_inside_quote(order_book_feed_id, symbol, inside_bid, inside_ask, snapshot_or_changes, state)
           |> normalize_handler_response
           |> cancel_orders
           |> submit_orders
+          |> update_store(state)
         end
-
-        state
       end
 
       defp normalize_handler_response(:ok) do
@@ -240,12 +242,15 @@ defmodule Tai.Advisor do
         handler_response
       end
 
-      defp submit_orders({:ok, %{limit_orders: limit_orders, cancel_orders: _}} = handler_response) do
+      defp submit_orders({:ok, %{limit_orders: limit_orders}} = handler_response) do
         limit_orders
         |> OrderOutbox.add
 
         handler_response
       end
+
+      defp update_store({:ok, %{store: store}}, state), do: state |> Map.put(:store, store)
+      defp update_store({:ok, %{}}, state), do: state
     end
   end
 end

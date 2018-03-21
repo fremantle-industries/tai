@@ -14,7 +14,8 @@ defmodule Tai.AdvisorTest do
 
     def handle_inside_quote(feed_id, symbol, bid, ask, snapshot_or_changes, state) do
       send :test, {feed_id, symbol, bid, ask, snapshot_or_changes, state}
-      :ok
+
+      {:ok, %{store: %{hello: "world"}}}
     end
 
     def handle_order_enqueued(_order, _state), do: nil
@@ -190,6 +191,41 @@ defmodule Tai.AdvisorTest do
       [price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil],
       ^changes,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+    }
+  end
+
+  test "handle_inside_quote can store data in the state", %{book_pid: book_pid} do
+    start_supervised!({
+      MyAdvisor,
+      [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
+    })
+    replacement = %{
+      bids: %{101.2 => {1.0, nil, nil}},
+      asks: %{101.3 => {0.1, nil, nil}}
+    }
+    book_pid |> OrderBook.replace(replacement)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+
+    assert_receive {
+      :my_order_book_feed,
+      :btcusd,
+      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
+      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
+      ^replacement,
+      %{advisor_id: :my_advisor, store: %{}}
+    }
+
+    changes = %{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+    book_pid |> OrderBook.update(changes)
+    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+
+    assert_receive {
+      :my_order_book_feed,
+      :btcusd,
+      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
+      [price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil],
+      ^changes,
+      %{advisor_id: :my_advisor, store: %{hello: "world"}}
     }
   end
 

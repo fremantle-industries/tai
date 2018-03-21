@@ -11,7 +11,7 @@ defmodule Support.Advisors.SpreadCapture do
   end
 
   def handle_inside_quote(order_book_feed_id, symbol, bid, ask, changes, state) do
-    Logger.debug "[#{state.advisor_id |> Advisor.to_name}] handle_inside_quote - order_book_feed_id: #{order_book_feed_id}, symbol: #{symbol}, bid/ask: #{inspect bid}/#{inspect ask}, changes: #{inspect changes}"
+    Logger.debug "[#{state.advisor_id |> Advisor.to_name}] handle_inside_quote - order_book_feed_id: #{order_book_feed_id}, symbol: #{symbol}, bid/ask: #{inspect bid}/#{inspect ask}, changes: #{inspect changes}, state: #{inspect state}"
 
     cond do
       Orders.count() == 0 ->
