@@ -18,7 +18,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
   @doc """
   Subscribe to the level2 channel for the configured symbols
   """
-  def subscribe_to_order_books(pid, symbols) do
+  def subscribe_to_order_books(pid, _feed_id, symbols) do
     send_msg(
       pid,
       %{
@@ -48,12 +48,10 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
 
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name
-    |> OrderBook.replace(
-      %{
-        bids: normalized_bids,
-        asks: normalized_asks
-      }
-    )
+    |> OrderBook.replace(%{
+      bids: normalized_bids,
+      asks: normalized_asks
+    })
     |> broadcast_order_book_snapshot(feed_id, symbol, normalized_bids, normalized_asks)
   end
   @doc """

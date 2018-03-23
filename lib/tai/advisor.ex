@@ -171,16 +171,19 @@ defmodule Tai.Advisor do
         |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name)
       end
 
-      defp subscribe_to_internal_channels([]), do: nil
-      defp subscribe_to_internal_channels([order_book_feed_id | tail]) do
+      defp subscribe_to_internal_channels([]) do
         PubSub.subscribe([
-          {:order_book_changes, order_book_feed_id},
-          {:order_book_snapshot, order_book_feed_id},
           :order_enqueued,
           :order_create_ok,
           :order_create_error,
           :order_cancelling,
           :order_cancelled
+        ])
+      end
+      defp subscribe_to_internal_channels([order_book_feed_id | tail]) do
+        PubSub.subscribe([
+          {:order_book_changes, order_book_feed_id},
+          {:order_book_snapshot, order_book_feed_id}
         ])
 
         tail

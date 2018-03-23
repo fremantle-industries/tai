@@ -19,4 +19,12 @@ defmodule Tai.Markets.SymbolTest do
   test "downcase_all converts uppercase strings to downcase" do
     assert Symbol.downcase_all(["FOO", "Bar"]) == ["foo", "bar"]
   end
+
+  test "upcase converts an atom to an upcased string" do
+    assert Symbol.upcase(:foo) == "FOO"
+  end
+
+  test "upcase converts a downcase string to uppercase" do
+    assert Symbol.upcase("foo") == "FOO"
+  end
 end

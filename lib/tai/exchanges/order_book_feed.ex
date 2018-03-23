@@ -6,7 +6,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
   @doc """
   Invoked after the process is started and should be used to setup subscriptions
   """
-  @callback subscribe_to_order_books(pid :: Pid.t, symbols :: List.t) :: :ok | :error
+  @callback subscribe_to_order_books(pid :: Pid.t, feed_id :: Atom.t, symbols :: List.t) :: :ok | :error
 
   @doc """
   Invoked after a message is received on the socket and should be used to process the message
@@ -37,6 +37,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       def start_link(url, feed_id: feed_id, symbols: symbols) do
         url
+        |> build_connection_url(symbols)
         |> WebSockex.start_link(
           __MODULE__,
           feed_id,
@@ -49,6 +50,11 @@ defmodule Tai.Exchanges.OrderBookFeed do
         default_url()
         |> start_link(args)
       end
+
+      @doc """
+      Hook to create a connection URL with symbols
+      """
+      def build_connection_url(url, symbols), do: url
 
       @doc """
       Broadcast the normalized order book snapshot via the PubSub mechanism
@@ -73,7 +79,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
       @doc false
       defp init_subscriptions({:ok, pid}, feed_id, symbols) do
         pid
-        |> subscribe_to_order_books(symbols)
+        |> subscribe_to_order_books(feed_id, symbols)
         |> case do
           :ok -> {:ok, pid}
           :error -> {:error, "could not subscribe to order books"}
@@ -108,7 +114,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
         {:ok, feed_id}
       end
 
-      defoverridable [default_url: 0, handle_disconnect: 2]
+      defoverridable [build_connection_url: 2, default_url: 0, handle_disconnect: 2]
     end
   end
 end

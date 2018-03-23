@@ -10,6 +10,10 @@ config :tai,          order_book_feeds: %{
                         gdax: [
                           adapter: Tai.ExchangeAdapters.Gdax.OrderBookFeed,
                           order_books: [:btcusd, :ltcusd, :ethusd]
+                        ],
+                        binance: [
+                          adapter: Tai.ExchangeAdapters.Binance.OrderBookFeed,
+                          order_books: [:btcusdt, :ltcusdt, :ethusdt]
                         ]
                       }
 

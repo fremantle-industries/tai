@@ -1,5 +1,6 @@
 defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
+  use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Gdax.OrderBookFeed
 
   import ExUnit.CaptureLog
@@ -64,14 +65,20 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   end
 
   setup do
-    {:ok, my_feed_a_pid} = OrderBookFeed.start_link(
-      "ws://localhost:#{EchoBoy.Config.port}/ws",
-      feed_id: :my_feed_a,
-      symbols: [:btcusd, :ltcusd]
-    )
-    {:ok, my_feed_a_btcusd_pid} = OrderBook.start_link(feed_id: :my_feed_a, symbol: :btcusd)
-    {:ok, my_feed_a_ltcusd_pid} = OrderBook.start_link(feed_id: :my_feed_a, symbol: :ltcusd)
-    {:ok, my_feed_b_btcusd_pid} = OrderBook.start_link(feed_id: :my_feed_b, symbol: :btcusd)
+    HTTPoison.start
+    ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchange_adapters/gdax")
+
+    my_feed_a_btcusd_pid = start_supervised!({OrderBook, [feed_id: :my_feed_a, symbol: :btcusd]}, id: :my_feed_a_btcusd)
+    my_feed_a_ltcusd_pid = start_supervised!({OrderBook, [feed_id: :my_feed_a, symbol: :ltcusd]}, id: :my_feed_a_ltcusd)
+    my_feed_b_btcusd_pid = start_supervised!({OrderBook, [feed_id: :my_feed_b, symbol: :btcusd]}, id: :my_feed_b_btcusd)
+
+    {:ok, my_feed_a_pid} = use_cassette "order_book_feed" do
+      OrderBookFeed.start_link(
+        "ws://localhost:#{EchoBoy.Config.port}/ws",
+        feed_id: :my_feed_a,
+        symbols: [:btcusd, :ltcusd]
+      )
+    end
 
     OrderBook.replace(
       my_feed_a_btcusd_pid,
