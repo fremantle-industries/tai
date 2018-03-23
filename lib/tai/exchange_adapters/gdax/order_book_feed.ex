@@ -18,9 +18,15 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
   @doc """
   Subscribe to the level2 channel for the configured symbols
   """
-  def subscribe_to_order_books(name, symbols) do
-    [name: name, symbols: symbols, channels: ["level2"]]
-    |> subscribe
+  def subscribe_to_order_books(pid, symbols) do
+    send_msg(
+      pid,
+      %{
+        "type" => "subscribe",
+        "product_ids" => Product.to_product_ids(symbols),
+        "channels" => ["level2"]
+      }
+    )
   end
 
   @doc """
@@ -93,20 +99,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     )
   end
 
-  defp subscribe(name: name, symbols: symbols, channels: channels) do
-    [
-      name: name,
-      msg: %{
-        "type" => "subscribe",
-        "product_ids" => Product.to_product_ids(symbols),
-        "channels" => channels
-      }
-    ]
-    |> send_msg
-  end
-
-  defp send_msg(name: name, msg: msg) do
-    name
-    |> WebSockex.send_frame({:text, JSON.encode!(msg)})
+  defp send_msg(pid, msg) do
+    WebSockex.send_frame(pid, {:text, JSON.encode!(msg)})
   end
 end
