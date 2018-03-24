@@ -85,20 +85,6 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     Logger.warn "[#{feed_id |> OrderBookFeed.to_name}] unhandled message: #{inspect unhandled_msg}"
   end
 
-  defp broadcast_order_book_changes(:ok, feed_id, symbol, changes) do
-    PubSub.broadcast(
-      {:order_book_changes, feed_id},
-      {:order_book_changes, feed_id, symbol, changes}
-    )
-  end
-
-  defp broadcast_order_book_snapshot(:ok, feed_id, symbol, normalized_bids, normalized_asks) do
-    PubSub.broadcast(
-      {:order_book_snapshot, feed_id},
-      {:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}
-    )
-  end
-
   defp send_msg(pid, msg) do
     WebSockex.send_frame(pid, {:text, JSON.encode!(msg)})
   end

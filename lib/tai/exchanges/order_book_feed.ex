@@ -29,6 +29,8 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       require Logger
 
+      alias Tai.PubSub
+
       @behaviour Tai.Exchanges.OrderBookFeed
 
       def default_url, do: raise "No default_url/0 in #{__MODULE__}"
@@ -46,6 +48,26 @@ defmodule Tai.Exchanges.OrderBookFeed do
       def start_link([feed_id: feed_id, symbols: symbols] = args) do
         default_url()
         |> start_link(args)
+      end
+
+      @doc """
+      Broadcast the normalized order book snapshot via the PubSub mechanism
+      """
+      def broadcast_order_book_snapshot(:ok, feed_id, symbol, normalized_bids, normalized_asks) do
+        PubSub.broadcast(
+          {:order_book_snapshot, feed_id},
+          {:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}
+        )
+      end
+
+      @doc """
+      Broadcast the normalized order book changes via the PubSub mechanism
+      """
+      def broadcast_order_book_changes(:ok, feed_id, symbol, changes) do
+        PubSub.broadcast(
+          {:order_book_changes, feed_id},
+          {:order_book_changes, feed_id, symbol, changes}
+        )
       end
 
       @doc false
