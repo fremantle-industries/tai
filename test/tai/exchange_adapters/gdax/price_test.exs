@@ -7,7 +7,7 @@ defmodule Tai.ExchangeAdapters.Gdax.PriceTest do
 
   setup_all do
     HTTPoison.start
-    ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchanges/adapters/gdax")
+    ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchange_adapters/gdax")
   end
 
   test "fetch returns value of the last trade for the symbol" do

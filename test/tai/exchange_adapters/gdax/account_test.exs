@@ -7,7 +7,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
   setup_all do
     HTTPoison.start
-    ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchanges/adapters/gdax/account")
+    ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchange_adapters/gdax/account")
     start_supervised!({Tai.ExchangeAdapters.Gdax.Account, :my_gdax_exchange})
 
     :ok
