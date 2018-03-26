@@ -71,14 +71,25 @@ defmodule Tai.Commands.Markets do
       bid_size |> Decimal.new,
       ask_size |> Decimal.new,
       bid_processed_at && Timex.from_now(bid_processed_at),
-      ask_processed_at && Timex.from_now(ask_processed_at),
       bid_server_changed_at && Timex.from_now(bid_server_changed_at),
+      ask_processed_at && Timex.from_now(ask_processed_at),
       ask_server_changed_at && Timex.from_now(ask_server_changed_at)
     ]
   end
 
   defp print_order_book_status(rows) do
-    header = ["Feed", "Symbol", "Bid Price", "Ask Price", "Bid Size", "Ask Size", "Bid Processed At", "Ask Processed At", "Bid Server Changed At", "Ask Server Changed At"]
+    header = [
+      "Feed",
+      "Symbol",
+      "Bid Price",
+      "Ask Price",
+      "Bid Size",
+      "Ask Size",
+      "Bid Processed At",
+      "Bid Server Changed At",
+      "Ask Processed At",
+      "Ask Server Changed At"
+    ]
 
     TableRex.Table.new(rows, header)
     |> TableRex.Table.put_column_meta(:all, align: :right)
