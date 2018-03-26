@@ -1,5 +1,5 @@
 %{
-  "binance": {:git, "https://github.com/fremantle-capital/binance.ex.git", "baa6e1264d3112bb39de7a39059b2c55097dcda0", [branch: "add-test-and-depth"]},
+  "binance": {:hex, :binance, "0.3.0", "91418171543a88e182e9aa805f9decba5c1e1179fb05cb90186c131a5a7194c3", [:mix], [{:exconstructor, "~> 1.1.0", [hex: :exconstructor, repo: "hexpm", optional: false]}, {:httpoison, "~> 0.13", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 3.1", [hex: :poison, repo: "hexpm", optional: false]}], "hexpm"},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
   "certifi": {:hex, :certifi, "2.0.0", "a0c0e475107135f76b8c1d5bc7efb33cd3815cb3cf3dea7aefdd174dabead064", [:rebar3], [], "hexpm"},
   "combine": {:hex, :combine, "0.10.0", "eff8224eeb56498a2af13011d142c5e7997a80c8f5b97c499f84c841032e429f", [:mix], [], "hexpm"},

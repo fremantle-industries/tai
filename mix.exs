@@ -25,8 +25,7 @@ defmodule Tai.Mixfile do
     [
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.2"},
-      # {:binance, github: "dvcrn/binance.ex"},
-      {:binance, github: "fremantle-capital/binance.ex", branch: "add-test-and-depth"},
+      {:binance, "~> 0.3"},
       {:httpoison, "~> 0.13", override: true},
       {:json, "~> 1.0"},
       {:table_rex, "~> 0.10"},
