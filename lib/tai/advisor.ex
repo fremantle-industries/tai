@@ -87,7 +87,7 @@ defmodule Tai.Advisor do
 
       @doc false
       def init(%Advisor{order_books: order_books} = state) do
-        subscribe_to_order_and_order_book_channels(order_books)
+        subscribe_to_order_book_and_order_channels(order_books)
 
         {:ok, state}
       end
@@ -186,13 +186,16 @@ defmodule Tai.Advisor do
       def handle_order_cancelling(order, state), do: :ok
       def handle_order_cancelled(order, state), do: :ok
 
-      defp subscribe_to_order_and_order_book_channels(order_books) do
+      defp subscribe_to_order_book_and_order_channels(order_books) do
         order_books
         |> Enum.each(fn {order_book_feed_id, symbols} ->
-          PubSub.subscribe([
-            {:order_book_changes, order_book_feed_id},
-            {:order_book_snapshot, order_book_feed_id}
-          ])
+          symbols
+          |> Enum.each(fn symbol ->
+            PubSub.subscribe([
+              {:order_book_snapshot, order_book_feed_id, symbol},
+              {:order_book_changes, order_book_feed_id, symbol}
+            ])
+          end)
         end)
 
         PubSub.subscribe([

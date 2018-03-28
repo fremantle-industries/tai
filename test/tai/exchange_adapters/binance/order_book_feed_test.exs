@@ -9,26 +9,13 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
   defmodule Subscriber do
     use GenServer
 
-    def start_link, do: GenServer.start_link(__MODULE__, :ok)
+    def start_link(_), do: GenServer.start_link(__MODULE__, :ok)
     def init(state), do: {:ok, state}
     def subscribe_to_order_book_changes do
-      Tai.PubSub.subscribe({:order_book_changes, :my_binance_feed})
-    end
-    def subscribe_to_order_book_snapshot do
-      Tai.PubSub.subscribe({:order_book_snapshot, :my_binance_feed})
-    end
-    def unsubscribe_from_order_book_changes do
-      Tai.PubSub.unsubscribe({:order_book_changes, :my_binance_feed})
-    end
-    def unsubscribe_from_order_book_snapshot do
-      Tai.PubSub.unsubscribe({:order_book_snapshot, :my_binance_feed})
+      Tai.PubSub.subscribe({:order_book_changes, :my_binance_feed, :btcusdt})
     end
 
     def handle_info({:order_book_changes, _feed_id, _symbol, _changes} = msg, state) do
-      send :test, msg
-      {:noreply, state}
-    end
-    def handle_info({:order_book_snapshot, _feed_id, _symbol, _snapshot} = msg, state) do
       send :test, msg
       {:noreply, state}
     end
@@ -185,7 +172,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
     "broadcasts the order book changes to the pubsub subscribers",
     %{my_binance_feed_pid: my_binance_feed_pid}
   ) do
-    {:ok, _} = Subscriber.start_link()
+    start_supervised!(Subscriber)
     Subscriber.subscribe_to_order_book_changes()
 
     send_depth_update(
@@ -204,6 +191,5 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
         asks: %{}
       }
     }
-    Subscriber.unsubscribe_from_order_book_changes()
   end
 end

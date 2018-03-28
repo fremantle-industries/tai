@@ -61,7 +61,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
       """
       def broadcast_order_book_snapshot(:ok, feed_id, symbol, snapshot) do
         PubSub.broadcast(
-          {:order_book_snapshot, feed_id},
+          {:order_book_snapshot, feed_id, symbol},
           {:order_book_snapshot, feed_id, symbol, snapshot}
         )
       end
@@ -71,7 +71,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
       """
       def broadcast_order_book_changes(:ok, feed_id, symbol, changes) do
         PubSub.broadcast(
-          {:order_book_changes, feed_id},
+          {:order_book_changes, feed_id, symbol},
           {:order_book_changes, feed_id, symbol, changes}
         )
       end

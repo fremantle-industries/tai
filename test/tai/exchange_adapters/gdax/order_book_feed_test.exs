@@ -11,19 +11,13 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   defmodule Subscriber do
     use GenServer
 
-    def start_link, do: GenServer.start_link(__MODULE__, :ok)
+    def start_link(_), do: GenServer.start_link(__MODULE__, :ok)
     def init(state), do: {:ok, state}
     def subscribe_to_order_book_changes do
-      Tai.PubSub.subscribe({:order_book_changes, :my_feed_a})
+      Tai.PubSub.subscribe({:order_book_changes, :my_feed_a, :btcusd})
     end
     def subscribe_to_order_book_snapshot do
-      Tai.PubSub.subscribe({:order_book_snapshot, :my_feed_a})
-    end
-    def unsubscribe_from_order_book_changes do
-      Tai.PubSub.unsubscribe({:order_book_changes, :my_feed_a})
-    end
-    def unsubscribe_from_order_book_snapshot do
-      Tai.PubSub.unsubscribe({:order_book_snapshot, :my_feed_a})
+      Tai.PubSub.subscribe({:order_book_snapshot, :my_feed_a, :btcusd})
     end
 
     def handle_info({:order_book_changes, _feed_id, _symbol, _changes} = msg, state) do
@@ -225,7 +219,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     "broadcasts the order book snapshot to the pubsub subscribers",
     %{my_feed_a_pid: my_feed_a_pid}
   ) do
-    {:ok, _} = Subscriber.start_link()
+    start_supervised!(Subscriber)
     Subscriber.subscribe_to_order_book_snapshot()
 
     send_feed_snapshot(
@@ -253,14 +247,13 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     assert DateTime.compare(bid_a_processed_at, bid_b_processed_at)
     assert DateTime.compare(bid_a_processed_at, ask_a_processed_at)
     assert DateTime.compare(bid_a_processed_at, ask_b_processed_at)
-    Subscriber.unsubscribe_from_order_book_snapshot()
   end
 
   test(
     "broadcasts the order book changes to the pubsub subscribers",
     %{my_feed_a_pid: my_feed_a_pid}
   ) do
-    {:ok, _} = Subscriber.start_link()
+    start_supervised!(Subscriber)
     Subscriber.subscribe_to_order_book_changes()
 
     send_feed_l2update(
@@ -278,7 +271,6 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
         asks: %{}
       }
     }
-    Subscriber.unsubscribe_from_order_book_changes()
   end
 
   test "logs a warning for unhandled messages", %{my_feed_a_pid: my_feed_a_pid} do
