@@ -21,7 +21,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshot do
   defp to_price_levels(raw_price_levels, processed_at) do
     to_price_levels(raw_price_levels, processed_at, %{})
   end
-  defp to_price_levels([], processed_at, acc), do: acc
+  defp to_price_levels([], _processed_at, acc), do: acc
   defp to_price_levels([[price_str, size_str, _] | tail], processed_at, acc) do
     {price, _} = Float.parse(price_str)
     {size, _} = Float.parse(size_str)
