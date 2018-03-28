@@ -82,7 +82,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
 
     OrderBook.replace(
       my_feed_a_btcusd_pid,
-      %{
+      %OrderBook{
         bids: %{
           1.0 => {1.1, nil, nil},
           1.1 => {1.0, nil, nil}
@@ -95,14 +95,14 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     )
     OrderBook.replace(
       my_feed_a_ltcusd_pid,
-      %{
+      %OrderBook{
         bids: %{100.0 => {0.1, nil, nil}},
         asks: %{100.1 => {0.1, nil, nil}}
       }
     )
     OrderBook.replace(
       my_feed_b_btcusd_pid,
-      %{
+      %OrderBook{
         bids: %{1.0 => {1.1, nil, nil}},
         asks: %{1.2 => {0.1, nil, nil}}
       }
@@ -139,7 +139,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     )
 
     :timer.sleep 100
-    {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_feed_a_btcusd_pid)
+    {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(my_feed_a_btcusd_pid)
     [
       [price: 110.0, size: 100.0, processed_at: bid_a_processed_at, server_changed_at: nil],
       [price: 100.0, size: 110.0, processed_at: bid_b_processed_at, server_changed_at: nil]
@@ -153,14 +153,14 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     assert DateTime.compare(bid_a_processed_at, ask_b_processed_at)
     assert OrderBook.quotes(my_feed_a_ltcusd_pid) == {
       :ok,
-      %{
+      %OrderBook{
         bids: [[price: 100.0, size: 0.1, processed_at: nil, server_changed_at: nil]],
         asks: [[price: 100.1, size: 0.1, processed_at: nil, server_changed_at: nil]]
       }
     }
     assert OrderBook.quotes(my_feed_b_btcusd_pid) == {
       :ok,
-      %{
+      %OrderBook{
         bids: [[price: 1.0, size: 1.1, processed_at: nil, server_changed_at: nil]],
         asks: [[price: 1.2, size: 0.1, processed_at: nil, server_changed_at: nil]]
       }
@@ -190,7 +190,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     )
 
     :timer.sleep 100
-    {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_feed_a_btcusd_pid)
+    {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(my_feed_a_btcusd_pid)
     [
       [price: 1.0, size: 1.2, processed_at: bid_a_processed_at, server_changed_at: bid_a_server_changed_at],
       [price: 0.9, size: 0.1, processed_at: bid_b_processed_at, server_changed_at: bid_b_server_changed_at]
@@ -207,14 +207,14 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     assert DateTime.compare(bid_a_server_changed_at, ask_b_server_changed_at)
     assert OrderBook.quotes(my_feed_a_ltcusd_pid) == {
       :ok,
-      %{
+      %OrderBook{
         bids: [[price: 100.0, size: 0.1, processed_at: nil, server_changed_at: nil]],
         asks: [[price: 100.1, size: 0.1, processed_at: nil, server_changed_at: nil]]
       }
     }
     assert OrderBook.quotes(my_feed_b_btcusd_pid) == {
       :ok,
-      %{
+      %OrderBook{
         bids: [[price: 1.0, size: 1.1, processed_at: nil, server_changed_at: nil]],
         asks: [[price: 1.2, size: 0.1, processed_at: nil, server_changed_at: nil]]
       }
@@ -239,7 +239,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       :order_book_snapshot,
       :my_feed_a,
       :btcusd,
-      %{
+      %OrderBook{
         bids: %{
           100.0 => {110.0, bid_a_processed_at, nil},
           110.0 => {100.0, bid_b_processed_at, nil}
@@ -273,7 +273,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       :order_book_changes,
       :my_feed_a,
       :btcusd,
-      %{
+      %OrderBook{
         bids: %{0.9 => {0.1, _processed_at, _server_changed_at}},
         asks: %{}
       }

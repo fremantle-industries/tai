@@ -53,7 +53,7 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    changes = %{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+    changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
     book_pid |> OrderBook.update(changes)
     broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
 
@@ -73,7 +73,7 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    snapshot = %{
+    snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
@@ -98,7 +98,7 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    snapshot = %{
+    snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
@@ -114,7 +114,7 @@ defmodule Tai.AdvisorTest do
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
 
-    changes = %{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+    changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
     broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
 
     refute_receive {
@@ -147,7 +147,7 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    snapshot = %{
+    snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
@@ -163,7 +163,7 @@ defmodule Tai.AdvisorTest do
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
 
-    changes = %{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+    changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
     broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
 
     refute_receive {
@@ -193,7 +193,7 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    snapshot = %{
+    snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
@@ -209,7 +209,7 @@ defmodule Tai.AdvisorTest do
       %{advisor_id: :my_advisor, store: %{}}
     }
 
-    changes = %{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+    changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
     book_pid |> OrderBook.update(changes)
     broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
 
@@ -255,7 +255,7 @@ defmodule Tai.AdvisorTest do
       [advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
 
-    snapshot = %{
+    snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
@@ -374,7 +374,7 @@ defmodule Tai.AdvisorTest do
       [advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
 
-    snapshot = %{
+    snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
@@ -510,7 +510,7 @@ defmodule Tai.AdvisorTest do
       [advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
 
-    snapshot = %{
+    snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
@@ -567,7 +567,7 @@ defmodule Tai.AdvisorTest do
       %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
     }
 
-    changes = %{
+    changes = %OrderBook{
       bids: %{101.2 => {1.1, nil, nil}},
       asks: %{}
     }

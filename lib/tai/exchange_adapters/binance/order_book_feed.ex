@@ -65,7 +65,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   ) do
     processed_at = Timex.now
     {:ok, server_changed_at} = DateTime.from_unix(event_time, :millisecond)
-    normalized_changes = %{
+    normalized_changes = %OrderBook{
       bids: changed_bids |> DepthUpdate.normalize(processed_at, server_changed_at),
       asks: changed_asks |> DepthUpdate.normalize(processed_at, server_changed_at)
     }

@@ -13,7 +13,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "replace overrides the bids & asks", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           999.9 => {1.1, nil, nil},
           999.8 => {1.0, nil, nil}
@@ -39,7 +39,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "update replaces the given bids and asks", %{book_pid: book_pid} do
     :ok = OrderBook.update(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           147.52 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},
@@ -53,7 +53,7 @@ defmodule Tai.Markets.OrderBookTest do
       }
     )
 
-    {:ok, %{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
+    {:ok, %OrderBook{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
     assert bids == [
       [price: 147.53, size: 10.3, processed_at: nil, server_changed_at: nil],
       [price: 147.52, size: 10.1, processed_at: nil, server_changed_at: nil],
@@ -69,7 +69,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "update removes prices when they have a size of 0", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           100.0 => {1.0, nil, nil},
           101.0 => {1.0, nil, nil}
@@ -81,7 +81,7 @@ defmodule Tai.Markets.OrderBookTest do
       }
     )
 
-    {:ok, %{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
+    {:ok, %OrderBook{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
     assert bids == [
       [price: 101.0, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 100.0, size: 1.0, processed_at: nil, server_changed_at: nil]
@@ -93,7 +93,7 @@ defmodule Tai.Markets.OrderBookTest do
 
     :ok = OrderBook.update(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{100.0 => {0.0, nil, nil}},
         asks: %{102.0 => {0, nil, nil}}
       }
@@ -107,7 +107,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "quotes returns a price ordered list of all bids and asks", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           146.00 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},
@@ -138,7 +138,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "quotes can limit the depth of bids and asks returned", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           146.00 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},
@@ -167,7 +167,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "bids returns a full price ordered list", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           146.00 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},
@@ -193,7 +193,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "bids can limit the depth returned", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           146.00 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},
@@ -218,7 +218,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "bid returns the first item", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           146.00 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},
@@ -240,7 +240,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "asks returns a full price ordered list", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           146.00 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},
@@ -266,7 +266,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "asks can limit the depth returned", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           146.00 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},
@@ -291,7 +291,7 @@ defmodule Tai.Markets.OrderBookTest do
   test "ask returns the first item", %{book_pid: book_pid} do
     :ok = OrderBook.replace(
       book_pid,
-      %{
+      %OrderBook{
         bids: %{
           146.00 => {10.1, nil, nil},
           147.51 => {10.2, nil, nil},

@@ -5,10 +5,14 @@ defmodule Tai.Markets.OrderBook do
 
   use GenServer
 
+  alias Tai.Markets.OrderBook
+
+  defstruct bids: %{}, asks: %{}
+
   def start_link(feed_id: feed_id, symbol: symbol) do
     GenServer.start_link(
       __MODULE__,
-      %{bids: %{}, asks: %{}},
+      %OrderBook{},
       name: to_name(feed_id: feed_id, symbol: symbol)
     )
   end
@@ -22,7 +26,7 @@ defmodule Tai.Markets.OrderBook do
       :reply,
       {
         :ok,
-        %{
+        %OrderBook{
           bids: state |> ordered_bids |> take(depth),
           asks: state |> ordered_asks |> take(depth)
         }
@@ -51,7 +55,7 @@ defmodule Tai.Markets.OrderBook do
     {:reply, :ok, replacement}
   end
 
-  def handle_call({:update, %{bids: bids, asks: asks}}, _from, state) do
+  def handle_call({:update, %OrderBook{bids: bids, asks: asks}}, _from, state) do
     new_state = state
                 |> update_side(:bids, bids)
                 |> update_side(:asks, asks)
@@ -79,11 +83,11 @@ defmodule Tai.Markets.OrderBook do
     GenServer.call(name, {:asks, depth})
   end
 
-  def replace(name, %{bids: _b, asks: _a} = replacement) do
+  def replace(name, %OrderBook{} = replacement) do
     GenServer.call(name, {:replace, replacement})
   end
 
-  def update(name, %{bids: _b, asks: _a} = changes) do
+  def update(name, %OrderBook{} = changes) do
     GenServer.call(name, {:update, changes})
   end
 
@@ -129,7 +133,8 @@ defmodule Tai.Markets.OrderBook do
   end
 
   defp update_side(state, side, price_levels) do
-    new_side = state[side]
+    new_side = state
+               |> Map.get(side)
                |> Map.merge(price_levels)
                |> Map.drop(price_levels |> drop_prices)
 

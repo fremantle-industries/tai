@@ -1,4 +1,6 @@
 defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshot do
+  alias Tai.Markets
+
   def fetch(symbol, depth) do
     symbol
     |> Tai.Markets.Symbol.upcase
@@ -7,8 +9,8 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshot do
       {:ok, %Binance.OrderBook{bids: bids, asks: asks}} ->
         processed_at = Timex.now
         {
-          :ok, 
-          %{
+          :ok,
+          %Markets.OrderBook{
             bids: bids |> to_price_levels(processed_at),
             asks: asks |> to_price_levels(processed_at)
           }

@@ -34,7 +34,7 @@ defmodule Tai.Commands.HelperTest do
   test "markets displays all inside quotes and the time they were last processed and changed", %{test_feed_a_btcusd: test_feed_a_btcusd} do
     :ok = OrderBook.replace(
       test_feed_a_btcusd,
-      %{
+      %OrderBook{
         bids: %{
           12999.99 => {0.000021, Timex.now, Timex.now},
           12999.98 => {1.0, nil, nil}

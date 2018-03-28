@@ -3,6 +3,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshotTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Binance.OrderBookSnapshot
 
+  alias Tai.Markets.OrderBook
   alias Tai.ExchangeAdapters.Binance.OrderBookSnapshot
 
   setup_all do
@@ -15,7 +16,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshotTest do
 
   test "fetch returns an ok, order book tuple" do
     use_cassette "snapshot_ok" do
-      assert {:ok, %{bids: bids, asks: asks}} = OrderBookSnapshot.fetch(:ltcbtc, 5)
+      assert {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBookSnapshot.fetch(:ltcbtc, 5)
 
       assert %{
         0.018689 => {2.12, bid_processed_at_a, nil},

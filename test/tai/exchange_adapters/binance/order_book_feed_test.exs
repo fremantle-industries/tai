@@ -74,14 +74,14 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
 
     OrderBook.replace(
       my_binance_feed_ltcusdt_pid,
-      %{
+      %OrderBook{
         bids: %{100.0 => {0.1, nil, nil}},
         asks: %{100.1 => {0.1, nil, nil}}
       }
     )
     OrderBook.replace(
       my_feed_b_btcusdt_pid,
-      %{
+      %OrderBook{
         bids: %{1.0 => {1.1, nil, nil}},
         asks: %{1.2 => {0.1, nil, nil}}
       }
@@ -167,14 +167,14 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
 
     assert OrderBook.quotes(my_binance_feed_ltcusdt_pid) == {
       :ok,
-      %{
+      %OrderBook{
         bids: [[price: 100.0, size: 0.1, processed_at: nil, server_changed_at: nil]],
         asks: [[price: 100.1, size: 0.1, processed_at: nil, server_changed_at: nil]]
       }
     }
     assert OrderBook.quotes(my_feed_b_btcusdt_pid) == {
       :ok,
-      %{
+      %OrderBook{
         bids: [[price: 1.0, size: 1.1, processed_at: nil, server_changed_at: nil]],
         asks: [[price: 1.2, size: 0.1, processed_at: nil, server_changed_at: nil]]
       }

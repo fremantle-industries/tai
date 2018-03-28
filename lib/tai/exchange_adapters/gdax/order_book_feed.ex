@@ -42,7 +42,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     feed_id
   ) do
     processed_at = Timex.now
-    snapshot = %{
+    snapshot = %OrderBook{
       bids: bids |> Snapshot.normalize(processed_at),
       asks: asks |> Snapshot.normalize(processed_at)
     }

@@ -147,7 +147,7 @@ defmodule Tai.Advisor do
       ## Examples
 
         iex> Tai.Advisor.quotes(feed_id: :test_feed_a, symbol: :btcusd, depth: 1)
-        {:ok, %{bids: [], asks: []}
+        {:ok, %OrderBook{bids: [], asks: []}
       """
       def quotes(feed_id: order_book_feed_id, symbol: symbol, depth: depth) do
         [feed_id: order_book_feed_id, symbol: symbol]
@@ -202,7 +202,7 @@ defmodule Tai.Advisor do
         [feed_id: order_book_feed_id, symbol: symbol, depth: 1]
         |> quotes
         |> case do
-          {:ok, %{bids: bids, asks: asks}} -> [bid: bids |> List.first, ask: asks |> List.first]
+          {:ok, %OrderBook{bids: bids, asks: asks}} -> [bid: bids |> List.first, ask: asks |> List.first]
         end
       end
 
@@ -214,7 +214,7 @@ defmodule Tai.Advisor do
         state |> Map.put(:inside_quotes, new_inside_quotes)
       end
 
-      defp inside_quote_is_stale?(previous_inside_quote, %{bids: bids, asks: asks} = changes) do
+      defp inside_quote_is_stale?(previous_inside_quote, %OrderBook{bids: bids, asks: asks} = changes) do
         (bids |> Enum.any? && bids |> inside_bid_is_stale?(previous_inside_quote)) || (asks |> Enum.any? && asks |> inside_ask_is_stale?(previous_inside_quote))
       end
 
