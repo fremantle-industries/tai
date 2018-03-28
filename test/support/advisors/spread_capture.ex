@@ -6,12 +6,8 @@ defmodule Support.Advisors.SpreadCapture do
 
   require Logger
 
-  def handle_order_book_changes(order_book_feed_id, symbol, changes, state) do
-    Logger.debug "[#{state.advisor_id |> Advisor.to_name}] handle_order_book_changes - order_book_feed_id: #{order_book_feed_id}, symbol: #{symbol}, changes: #{inspect changes}"
-  end
-
   def handle_inside_quote(order_book_feed_id, symbol, bid, ask, changes, state) do
-    Logger.info "[#{state.advisor_id |> Advisor.to_name}] handle_inside_quote - order_book_feed_id: #{order_book_feed_id}, symbol: #{symbol}, bid/ask: #{inspect bid}/#{inspect ask}, changes: #{inspect changes}, state: #{inspect state}"
+    Logger.debug "[#{state.advisor_id |> Advisor.to_name}] handle_inside_quote - order_book_feed_id: #{order_book_feed_id}, symbol: #{symbol}, bid/ask: #{inspect bid}/#{inspect ask}, changes: #{inspect changes}, state: #{inspect state}"
 
     cond do
       Orders.count() == 0 ->

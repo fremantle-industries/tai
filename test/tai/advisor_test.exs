@@ -5,6 +5,13 @@ defmodule Tai.AdvisorTest do
   alias Tai.{Advisor, Markets.OrderBook, PubSub}
   alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderTypes}
 
+  defmodule MyOrderBookFeed do
+    use Tai.Exchanges.OrderBookFeed
+
+    def subscribe_to_order_books(_pid, _feed_id, _symbols), do: :ok
+    def handle_msg(_msg, _feed_id), do: :ok
+  end
+
   defmodule MyAdvisor do
     use Advisor
 
@@ -17,20 +24,6 @@ defmodule Tai.AdvisorTest do
 
       {:ok, %{store: %{hello: "world"}}}
     end
-  end
-
-  defp broadcast_order_book_changes(feed_id, symbol, changes) do
-    PubSub.broadcast(
-      {:order_book_changes, feed_id},
-      {:order_book_changes, feed_id, symbol, changes}
-    )
-  end
-
-  defp broadcast_order_book_snapshot(feed_id, symbol, snapshot) do
-    PubSub.broadcast(
-      {:order_book_snapshot, feed_id},
-      {:order_book_snapshot, feed_id, symbol, snapshot}
-    )
   end
 
   setup do
@@ -55,7 +48,7 @@ defmodule Tai.AdvisorTest do
     })
     changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
     book_pid |> OrderBook.update(changes)
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
@@ -78,7 +71,7 @@ defmodule Tai.AdvisorTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
+    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       :my_order_book_feed,
@@ -103,7 +96,7 @@ defmodule Tai.AdvisorTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
+    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       :my_order_book_feed,
@@ -115,7 +108,7 @@ defmodule Tai.AdvisorTest do
     }
 
     changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     refute_receive {
       _feed_id,
@@ -127,7 +120,7 @@ defmodule Tai.AdvisorTest do
     }
 
     book_pid |> OrderBook.update(changes)
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
@@ -152,7 +145,7 @@ defmodule Tai.AdvisorTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
+    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       :my_order_book_feed,
@@ -164,7 +157,7 @@ defmodule Tai.AdvisorTest do
     }
 
     changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     refute_receive {
       _feed_id,
@@ -176,7 +169,7 @@ defmodule Tai.AdvisorTest do
     }
 
     book_pid |> OrderBook.update(changes)
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
@@ -198,7 +191,7 @@ defmodule Tai.AdvisorTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
+    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       :my_order_book_feed,
@@ -211,7 +204,7 @@ defmodule Tai.AdvisorTest do
 
     changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
     book_pid |> OrderBook.update(changes)
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
@@ -260,7 +253,7 @@ defmodule Tai.AdvisorTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
+    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       enqueued_order_1,
@@ -379,7 +372,7 @@ defmodule Tai.AdvisorTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
+    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       enqueued_order_1,
@@ -515,7 +508,7 @@ defmodule Tai.AdvisorTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
+    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       %Order{
@@ -572,7 +565,7 @@ defmodule Tai.AdvisorTest do
       asks: %{}
     }
     book_pid |> OrderBook.update(changes)
-    broadcast_order_book_changes(:my_order_book_feed, :btcusd, changes)
+    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       %Order{
