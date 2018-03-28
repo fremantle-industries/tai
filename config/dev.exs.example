@@ -24,5 +24,11 @@ config :tai,          exchanges: %{
                       }
 
 config :tai,          advisors: %{
-                        spread_capture: Support.Advisors.SpreadCapture
+                        spread_capture: [
+                          server: Support.Advisors.SpreadCapture,
+                          order_books: %{
+                            gdax: [:btcusd, :ltcusd, :ethusd],
+                            binance: [:btcusdt, :ltcusdt, :ethusdt]
+                          }
+                        ]
                       }
