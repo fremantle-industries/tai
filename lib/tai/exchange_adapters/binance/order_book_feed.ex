@@ -35,11 +35,11 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
     symbol
     |> OrderBookSnapshot.fetch(5)
     |> case do
-      {:ok, %{bids: normalized_bids, asks: normalized_asks} = snapshot} ->
+      {:ok, snapshot} ->
         [feed_id: feed_id, symbol: symbol]
         |> OrderBook.to_name
         |> OrderBook.replace(snapshot)
-        |> broadcast_order_book_snapshot(feed_id, symbol, normalized_bids, normalized_asks)
+        |> broadcast_order_book_snapshot(feed_id, symbol, snapshot)
     end
 
     subscribe_to_order_books(pid, feed_id, tail)

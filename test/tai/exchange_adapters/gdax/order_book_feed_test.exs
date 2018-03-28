@@ -240,12 +240,14 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       :my_feed_a,
       :btcusd,
       %{
-        100.0 => {110.0, bid_a_processed_at, nil},
-        110.0 => {100.0, bid_b_processed_at, nil}
-      },
-      %{
-        130.0 => {11.0, ask_a_processed_at, nil},
-        120.0 => {10.0, ask_b_processed_at, nil}
+        bids: %{
+          100.0 => {110.0, bid_a_processed_at, nil},
+          110.0 => {100.0, bid_b_processed_at, nil}
+        },
+        asks: %{
+          130.0 => {11.0, ask_a_processed_at, nil},
+          120.0 => {10.0, ask_b_processed_at, nil}
+        }
       }
     }
     assert DateTime.compare(bid_a_processed_at, bid_b_processed_at)

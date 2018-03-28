@@ -42,17 +42,16 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     feed_id
   ) do
     processed_at = Timex.now
-    normalized_bids = bids |> Snapshot.normalize(processed_at)
-    normalized_asks = asks |> Snapshot.normalize(processed_at)
+    snapshot = %{
+      bids: bids |> Snapshot.normalize(processed_at),
+      asks: asks |> Snapshot.normalize(processed_at)
+    }
     symbol = Product.to_symbol(product_id)
 
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name
-    |> OrderBook.replace(%{
-      bids: normalized_bids,
-      asks: normalized_asks
-    })
-    |> broadcast_order_book_snapshot(feed_id, symbol, normalized_bids, normalized_asks)
+    |> OrderBook.replace(snapshot)
+    |> broadcast_order_book_snapshot(feed_id, symbol, snapshot)
   end
   @doc """
   Update the bids/asks in the order books that have changed

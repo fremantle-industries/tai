@@ -15,7 +15,7 @@ defmodule Tai.Advisor do
   @doc """
   Callback when the highest bid or lowest ask changes price or size
   """
-  @callback handle_inside_quote(order_book_feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, snapshot_or_changes :: Map.t | List.t, state :: Map.t) :: :ok | {:ok, actions :: Map.t}
+  @callback handle_inside_quote(order_book_feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, changes :: Map.t | List.t, state :: Map.t) :: :ok | {:ok, actions :: Map.t}
 
   @doc """
   Callback when an order is enqueued
@@ -86,10 +86,10 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def handle_info({:order_book_snapshot, order_book_feed_id, symbol, normalized_bids, normalized_asks}, state) do
+      def handle_info({:order_book_snapshot, order_book_feed_id, symbol, snapshot}, state) do
         new_state = state
                     |> cache_inside_quote(order_book_feed_id, symbol)
-                    |> execute_handle_inside_quote(order_book_feed_id, symbol, %{bids: normalized_bids, asks: normalized_asks})
+                    |> execute_handle_inside_quote(order_book_feed_id, symbol, snapshot)
 
         {:noreply, new_state}
       end
@@ -172,7 +172,7 @@ defmodule Tai.Advisor do
       end
 
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
-      def handle_inside_quote(order_book_feed_id, symbol, bid, ask, snapshot_or_changes, state), do: :ok
+      def handle_inside_quote(order_book_feed_id, symbol, bid, ask, changes, state), do: :ok
       def handle_order_enqueued(order, state), do: :ok
       def handle_order_create_ok(order, state), do: :ok
       def handle_order_create_error(reason, order, state), do: :ok
@@ -234,13 +234,13 @@ defmodule Tai.Advisor do
         end)
       end
 
-      defp execute_handle_inside_quote(state, order_book_feed_id, symbol, snapshot_or_changes, previous_inside_quote \\ nil) do
+      defp execute_handle_inside_quote(state, order_book_feed_id, symbol, changes, previous_inside_quote \\ nil) do
         [bid: inside_bid, ask: inside_ask] = current_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
 
         if current_inside_quote == previous_inside_quote do
           state
         else
-          handle_inside_quote(order_book_feed_id, symbol, inside_bid, inside_ask, snapshot_or_changes, state)
+          handle_inside_quote(order_book_feed_id, symbol, inside_bid, inside_ask, changes, state)
           |> normalize_handler_response
           |> cancel_orders
           |> submit_orders

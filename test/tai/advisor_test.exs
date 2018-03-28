@@ -12,8 +12,8 @@ defmodule Tai.AdvisorTest do
       send :test, {feed_id, symbol, changes, state}
     end
 
-    def handle_inside_quote(feed_id, symbol, bid, ask, snapshot_or_changes, state) do
-      send :test, {feed_id, symbol, bid, ask, snapshot_or_changes, state}
+    def handle_inside_quote(feed_id, symbol, bid, ask, changes, state) do
+      send :test, {feed_id, symbol, bid, ask, changes, state}
 
       {:ok, %{store: %{hello: "world"}}}
     end
@@ -26,10 +26,10 @@ defmodule Tai.AdvisorTest do
     )
   end
 
-  defp broadcast_order_book_snapshot(feed_id, symbol, normalized_bids, normalized_asks) do
+  defp broadcast_order_book_snapshot(feed_id, symbol, snapshot) do
     PubSub.broadcast(
       {:order_book_snapshot, feed_id},
-      {:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}
+      {:order_book_snapshot, feed_id, symbol, snapshot}
     )
   end
 
@@ -73,19 +73,19 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    replacement = %{
+    snapshot = %{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
-    book_pid |> OrderBook.replace(replacement)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+    book_pid |> OrderBook.replace(snapshot)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       :my_order_book_feed,
       :btcusd,
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
-      ^replacement,
+      ^snapshot,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
   end
@@ -98,19 +98,19 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    replacement = %{
+    snapshot = %{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
-    book_pid |> OrderBook.replace(replacement)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+    book_pid |> OrderBook.replace(snapshot)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       :my_order_book_feed,
       :btcusd,
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
-      ^replacement,
+      ^snapshot,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
 
@@ -147,19 +147,19 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    replacement = %{
+    snapshot = %{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
-    book_pid |> OrderBook.replace(replacement)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+    book_pid |> OrderBook.replace(snapshot)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       :my_order_book_feed,
       :btcusd,
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
-      ^replacement,
+      ^snapshot,
       %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
     }
 
@@ -193,19 +193,19 @@ defmodule Tai.AdvisorTest do
       MyAdvisor,
       [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
-    replacement = %{
+    snapshot = %{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
-    book_pid |> OrderBook.replace(replacement)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+    book_pid |> OrderBook.replace(snapshot)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       :my_order_book_feed,
       :btcusd,
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
-      ^replacement,
+      ^snapshot,
       %{advisor_id: :my_advisor, store: %{}}
     }
 
@@ -227,7 +227,7 @@ defmodule Tai.AdvisorTest do
     defmodule MyBuyLimitAdvisor do
       use Advisor
 
-      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _snapshot_or_changes, _state) do
+      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _changes, _state) do
         limit_orders = [
           {:my_test_exchange, :btcusd_success, 101.1, 0.1},
           {:my_test_exchange, :btcusd_success, 10.1, 0.11},
@@ -255,12 +255,12 @@ defmodule Tai.AdvisorTest do
       [advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
 
-    replacement = %{
+    snapshot = %{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
-    book_pid |> OrderBook.replace(replacement)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+    book_pid |> OrderBook.replace(snapshot)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       enqueued_order_1,
@@ -346,7 +346,7 @@ defmodule Tai.AdvisorTest do
     defmodule MySellLimitAdvisor do
       use Advisor
 
-      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _snapshot_or_changes, _state) do
+      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _changes, _state) do
         limit_orders = [
           {:my_test_exchange, :btcusd_success, 101.1, -0.1},
           {:my_test_exchange, :btcusd_success, 10.1, -0.11},
@@ -374,12 +374,12 @@ defmodule Tai.AdvisorTest do
       [advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
 
-    replacement = %{
+    snapshot = %{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
-    book_pid |> OrderBook.replace(replacement)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+    book_pid |> OrderBook.replace(snapshot)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       enqueued_order_1,
@@ -468,7 +468,7 @@ defmodule Tai.AdvisorTest do
 
       alias Tai.Trading.OrderStatus
 
-      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _snapshot_or_changes, _state) do
+      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _changes, _state) do
         cond do
           Orders.count() == 0 ->
             limit_orders = [
@@ -510,12 +510,12 @@ defmodule Tai.AdvisorTest do
       [advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed]]
     })
 
-    replacement = %{
+    snapshot = %{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
-    book_pid |> OrderBook.replace(replacement)
-    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, replacement.bids, replacement.asks)
+    book_pid |> OrderBook.replace(snapshot)
+    broadcast_order_book_snapshot(:my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       %Order{

@@ -59,10 +59,10 @@ defmodule Tai.Exchanges.OrderBookFeed do
       @doc """
       Broadcast the normalized order book snapshot via the PubSub mechanism
       """
-      def broadcast_order_book_snapshot(:ok, feed_id, symbol, normalized_bids, normalized_asks) do
+      def broadcast_order_book_snapshot(:ok, feed_id, symbol, snapshot) do
         PubSub.broadcast(
           {:order_book_snapshot, feed_id},
-          {:order_book_snapshot, feed_id, symbol, normalized_bids, normalized_asks}
+          {:order_book_snapshot, feed_id, symbol, snapshot}
         )
       end
 
