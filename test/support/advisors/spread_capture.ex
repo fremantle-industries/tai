@@ -26,23 +26,11 @@ defmodule Support.Advisors.SpreadCapture do
     end
   end
 
-  def handle_order_enqueued(order, state) do
-    Logger.debug "[#{state.advisor_id |> Advisor.to_name}] handle_order_enqueued - order: #{inspect order}"
-  end
-
   def handle_order_create_ok(order, state) do
     Logger.info "[#{state.advisor_id |> Advisor.to_name}] handle_order_create_ok - order: #{inspect order}"
   end
 
   def handle_order_create_error(reason, order, state) do
     Logger.warn "[#{state.advisor_id |> Advisor.to_name}] handle_order_create_error - reason: #{inspect reason}, order: #{inspect order}"
-  end
-
-  def handle_order_cancelling(order, state) do
-    Logger.info "[#{state.advisor_id |> Advisor.to_name}] handle_order_cancelling - order: #{inspect order}"
-  end
-
-  def handle_order_cancelled(order, state) do
-    Logger.info "[#{state.advisor_id |> Advisor.to_name}] handle_order_cancelled - order: #{inspect order}"
   end
 end

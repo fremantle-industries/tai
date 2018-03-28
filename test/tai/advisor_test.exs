@@ -17,12 +17,6 @@ defmodule Tai.AdvisorTest do
 
       {:ok, %{store: %{hello: "world"}}}
     end
-
-    def handle_order_enqueued(_order, _state), do: nil
-    def handle_order_create_ok(_order, _state), do: nil
-    def handle_order_create_error(_reason, _order, _state), do: nil
-    def handle_order_cancelling(_order, _state), do: nil
-    def handle_order_cancelled(_order, _state), do: nil
   end
 
   defp broadcast_order_book_changes(feed_id, symbol, changes) do
@@ -233,8 +227,6 @@ defmodule Tai.AdvisorTest do
     defmodule MyBuyLimitAdvisor do
       use Advisor
 
-      def handle_order_book_changes(_feed_id, _symbol, _changes, _state), do: nil
-
       def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _snapshot_or_changes, _state) do
         limit_orders = [
           {:my_test_exchange, :btcusd_success, 101.1, 0.1},
@@ -256,9 +248,6 @@ defmodule Tai.AdvisorTest do
       def handle_order_create_error(reason, order, state) do
         send :test, {reason, order, state}
       end
-
-      def handle_order_cancelling(_order, _state), do: nil
-      def handle_order_cancelled(_order, _state), do: nil
     end
 
     start_supervised!({
@@ -357,8 +346,6 @@ defmodule Tai.AdvisorTest do
     defmodule MySellLimitAdvisor do
       use Advisor
 
-      def handle_order_book_changes(_feed_id, _symbol, _changes, _state), do: nil
-
       def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _snapshot_or_changes, _state) do
         limit_orders = [
           {:my_test_exchange, :btcusd_success, 101.1, -0.1},
@@ -380,9 +367,6 @@ defmodule Tai.AdvisorTest do
       def handle_order_create_error(reason, order, state) do
         send :test, {reason, order, state}
       end
-
-      def handle_order_cancelling(_order, _state), do: nil
-      def handle_order_cancelled(_order, _state), do: nil
     end
 
     start_supervised!({
@@ -483,8 +467,6 @@ defmodule Tai.AdvisorTest do
       use Advisor
 
       alias Tai.Trading.OrderStatus
-
-      def handle_order_book_changes(_feed_id, _symbol, _changes, _state), do: nil
 
       def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _snapshot_or_changes, _state) do
         cond do

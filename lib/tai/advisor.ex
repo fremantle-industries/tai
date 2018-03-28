@@ -171,6 +171,14 @@ defmodule Tai.Advisor do
         |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name)
       end
 
+      def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
+      def handle_inside_quote(order_book_feed_id, symbol, bid, ask, snapshot_or_changes, state), do: :ok
+      def handle_order_enqueued(order, state), do: :ok
+      def handle_order_create_ok(order, state), do: :ok
+      def handle_order_create_error(reason, order, state), do: :ok
+      def handle_order_cancelling(order, state), do: :ok
+      def handle_order_cancelled(order, state), do: :ok
+
       defp subscribe_to_internal_channels([]) do
         PubSub.subscribe([
           :order_enqueued,
@@ -265,6 +273,16 @@ defmodule Tai.Advisor do
 
       defp update_store({:ok, %{store: store}}, state), do: state |> Map.put(:store, store)
       defp update_store({:ok, %{}}, state), do: state
+
+      defoverridable [
+        handle_order_book_changes: 4,
+        handle_inside_quote: 6,
+        handle_order_enqueued: 2,
+        handle_order_create_ok: 2,
+        handle_order_create_error: 3,
+        handle_order_cancelling: 2,
+        handle_order_cancelled: 2
+      ]
     end
   end
 end
