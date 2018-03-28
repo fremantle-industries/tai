@@ -5,43 +5,51 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  alias Tai.{PubSub, Markets.OrderBook, Trading.Order}
+  alias Tai.{Advisor, PubSub, Markets.OrderBook, Trading.Order}
+
+  @typedoc """
+  The state of the running advisor
+  """
+  @type t :: Advisor
+
+  @enforce_keys [:advisor_id, :order_books, :inside_quotes, :store]
+  defstruct advisor_id: nil, order_books: %{}, inside_quotes: %{}, store: %{}
 
   @doc """
   Callback when order book has bid or ask changes
   """
-  @callback handle_order_book_changes(order_book_feed_id :: Atom.t, symbol :: Atom.t, changes :: term, state :: Map.t) :: :ok
+  @callback handle_order_book_changes(order_book_feed_id :: Atom.t, symbol :: Atom.t, changes :: term, state :: Advisor.t) :: :ok
 
   @doc """
   Callback when the highest bid or lowest ask changes price or size
   """
-  @callback handle_inside_quote(order_book_feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, changes :: Map.t | List.t, state :: Map.t) :: :ok | {:ok, actions :: Map.t}
+  @callback handle_inside_quote(order_book_feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, changes :: Map.t | List.t, state :: Advisor.t) :: :ok | {:ok, actions :: Map.t}
 
   @doc """
   Callback when an order is enqueued
   """
-  @callback handle_order_enqueued(order :: Order.t, state :: Map.t) :: :ok
+  @callback handle_order_enqueued(order :: Order.t, state :: Advisor.t) :: :ok
 
   @doc """
   Callback when an order is created on the server
   """
-  @callback handle_order_create_ok(order :: Order.t, state :: Map.t) :: :ok
+  @callback handle_order_create_ok(order :: Order.t, state :: Advisor.t) :: :ok
 
   @doc """
   Callback when an order creation fails
   """
-  @callback handle_order_create_error(reason :: term, order :: Order.t, state :: Map.t) :: :ok
+  @callback handle_order_create_error(reason :: term, order :: Order.t, state :: Advisor.t) :: :ok
 
   @doc """
   Callback when an order has been cancelled in the outbox but before the 
   request has been sent to the exchange.
   """
-  @callback handle_order_cancelling(order :: Order.t, state :: Map.t) :: :ok
+  @callback handle_order_cancelling(order :: Order.t, state :: Advisor.t) :: :ok
 
   @doc """
   Callback when an order has been cancelled on the exchange
   """
-  @callback handle_order_cancelled(order :: Order.t, state :: Map.t) :: :ok
+  @callback handle_order_cancelled(order :: Order.t, state :: Advisor.t) :: :ok
 
   @doc """
   Returns an atom that will identify the process
@@ -64,12 +72,12 @@ defmodule Tai.Advisor do
 
       @behaviour Advisor
 
-      def start_link(advisor_id: advisor_id, order_book_feed_ids: order_book_feed_ids) do
+      def start_link(advisor_id: advisor_id, order_books: order_books) do
         GenServer.start_link(
           __MODULE__,
-          %{
+          %Advisor{
             advisor_id: advisor_id,
-            order_book_feed_ids: order_book_feed_ids,
+            order_books: order_books,
             inside_quotes: %{},
             store: %{}
           },
@@ -78,9 +86,8 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def init(%{order_book_feed_ids: order_book_feed_ids} = state) do
-        order_book_feed_ids
-        |> subscribe_to_internal_channels
+      def init(%Advisor{order_books: order_books} = state) do
+        subscribe_to_order_and_order_book_channels(order_books)
 
         {:ok, state}
       end
@@ -147,7 +154,7 @@ defmodule Tai.Advisor do
       ## Examples
 
         iex> Tai.Advisor.quotes(feed_id: :test_feed_a, symbol: :btcusd, depth: 1)
-        {:ok, %OrderBook{bids: [], asks: []}
+        {:ok, %Tai.Markets.OrderBook{bids: [], asks: []}
       """
       def quotes(feed_id: order_book_feed_id, symbol: symbol, depth: depth) do
         [feed_id: order_book_feed_id, symbol: symbol]
@@ -179,7 +186,15 @@ defmodule Tai.Advisor do
       def handle_order_cancelling(order, state), do: :ok
       def handle_order_cancelled(order, state), do: :ok
 
-      defp subscribe_to_internal_channels([]) do
+      defp subscribe_to_order_and_order_book_channels(order_books) do
+        order_books
+        |> Enum.each(fn {order_book_feed_id, symbols} ->
+          PubSub.subscribe([
+            {:order_book_changes, order_book_feed_id},
+            {:order_book_snapshot, order_book_feed_id}
+          ])
+        end)
+
         PubSub.subscribe([
           :order_enqueued,
           :order_create_ok,
@@ -187,15 +202,6 @@ defmodule Tai.Advisor do
           :order_cancelling,
           :order_cancelled
         ])
-      end
-      defp subscribe_to_internal_channels([order_book_feed_id | tail]) do
-        PubSub.subscribe([
-          {:order_book_changes, order_book_feed_id},
-          {:order_book_snapshot, order_book_feed_id}
-        ])
-
-        tail
-        |> subscribe_to_internal_channels
       end
 
       defp fetch_inside_quote(order_book_feed_id, symbol) do

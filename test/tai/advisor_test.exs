@@ -44,7 +44,10 @@ defmodule Tai.AdvisorTest do
   ) do
     start_supervised!({
       MyAdvisor,
-      [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
+      [
+        advisor_id: :my_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]}
+      ]
     })
     changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
     book_pid |> OrderBook.update(changes)
@@ -54,7 +57,7 @@ defmodule Tai.AdvisorTest do
       :my_order_book_feed,
       :btcusd,
       ^changes,
-      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+      %Advisor{}
     }
   end
 
@@ -64,7 +67,10 @@ defmodule Tai.AdvisorTest do
   ) do
     start_supervised!({
       MyAdvisor,
-      [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
+      [
+        advisor_id: :my_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]}
+      ]
     })
     snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
@@ -79,7 +85,7 @@ defmodule Tai.AdvisorTest do
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^snapshot,
-      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+      %Advisor{}
     }
   end
 
@@ -89,7 +95,10 @@ defmodule Tai.AdvisorTest do
   ) do
     start_supervised!({
       MyAdvisor,
-      [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
+      [
+        advisor_id: :my_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]}
+      ]
     })
     snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
@@ -104,7 +113,7 @@ defmodule Tai.AdvisorTest do
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^snapshot,
-      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+      %Advisor{}
     }
 
     changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
@@ -116,7 +125,7 @@ defmodule Tai.AdvisorTest do
       _bid,
       _ask,
       _changes,
-      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+      %Advisor{}
     }
 
     book_pid |> OrderBook.update(changes)
@@ -128,7 +137,7 @@ defmodule Tai.AdvisorTest do
       [price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^changes,
-      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+      %Advisor{}
     }
   end
 
@@ -138,7 +147,10 @@ defmodule Tai.AdvisorTest do
   ) do
     start_supervised!({
       MyAdvisor,
-      [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
+      [
+        advisor_id: :my_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]}
+      ]
     })
     snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
@@ -153,7 +165,7 @@ defmodule Tai.AdvisorTest do
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^snapshot,
-      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+      %Advisor{}
     }
 
     changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
@@ -165,7 +177,7 @@ defmodule Tai.AdvisorTest do
       _bid,
       _ask,
       _changes,
-      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+      %Advisor{}
     }
 
     book_pid |> OrderBook.update(changes)
@@ -177,14 +189,17 @@ defmodule Tai.AdvisorTest do
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil],
       ^changes,
-      %{advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]}
+      %Advisor{}
     }
   end
 
   test "handle_inside_quote can store data in the state", %{book_pid: book_pid} do
     start_supervised!({
       MyAdvisor,
-      [advisor_id: :my_advisor, order_book_feed_ids: [:my_order_book_feed]]
+      [
+        advisor_id: :my_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]}
+      ]
     })
     snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
@@ -199,7 +214,7 @@ defmodule Tai.AdvisorTest do
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
       ^snapshot,
-      %{advisor_id: :my_advisor, store: %{}}
+      %Advisor{}
     }
 
     changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
@@ -212,7 +227,7 @@ defmodule Tai.AdvisorTest do
       [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
       [price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil],
       ^changes,
-      %{advisor_id: :my_advisor, store: %{hello: "world"}}
+      %Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
     }
   end
 
@@ -245,7 +260,10 @@ defmodule Tai.AdvisorTest do
 
     start_supervised!({
       MyBuyLimitAdvisor,
-      [advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed]]
+      [
+        advisor_id: :my_buy_limit_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]}
+      ]
     })
 
     snapshot = %OrderBook{
@@ -255,18 +273,10 @@ defmodule Tai.AdvisorTest do
     book_pid |> OrderBook.replace(snapshot)
     MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
-    assert_receive {
-      enqueued_order_1,
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert_receive {
-      enqueued_order_2,
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert_receive {
-      enqueued_order_3,
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
+    assert_receive {enqueued_order_1, %Advisor{}}
+    assert_receive {enqueued_order_2, %Advisor{}}
+    assert_receive {enqueued_order_3, %Advisor{}}
+
     assert enqueued_order_1.server_id == nil
     assert enqueued_order_1.exchange == :my_test_exchange
     assert enqueued_order_1.symbol == :btcusd_success
@@ -291,19 +301,9 @@ defmodule Tai.AdvisorTest do
     assert enqueued_order_3.size == 0.1
     assert enqueued_order_3.status == OrderStatus.enqueued
 
-    assert_receive {
-      created_order_a,
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert_receive {
-      created_order_b,
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert_receive {
-      %OrderResponses.InsufficientFunds{},
-      error_order,
-      %{advisor_id: :my_buy_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
+    assert_receive {created_order_a, %Advisor{}}
+    assert_receive {created_order_b, %Advisor{}}
+    assert_receive {%OrderResponses.InsufficientFunds{}, error_order, %Advisor{}}
 
     [created_order_1, created_order_2] = [created_order_a, created_order_b]
                                          |> Enum.sort(
@@ -364,7 +364,10 @@ defmodule Tai.AdvisorTest do
 
     start_supervised!({
       MySellLimitAdvisor,
-      [advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed]]
+      [
+        advisor_id: :my_sell_limit_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]}
+      ]
     })
 
     snapshot = %OrderBook{
@@ -374,18 +377,9 @@ defmodule Tai.AdvisorTest do
     book_pid |> OrderBook.replace(snapshot)
     MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
-    assert_receive {
-      enqueued_order_1,
-      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert_receive {
-      enqueued_order_2,
-      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert_receive {
-      enqueued_order_3,
-      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
+    assert_receive {enqueued_order_1, %Advisor{}}
+    assert_receive {enqueued_order_2, %Advisor{}}
+    assert_receive {enqueued_order_3, %Advisor{}}
 
     assert enqueued_order_1.server_id == nil
     assert enqueued_order_1.exchange == :my_test_exchange
@@ -411,19 +405,9 @@ defmodule Tai.AdvisorTest do
     assert enqueued_order_3.size == 0.1
     assert enqueued_order_3.status == OrderStatus.enqueued
 
-    assert_receive {
-      created_order_a,
-      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert_receive {
-      created_order_b,
-      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
-    assert_receive {
-      %OrderResponses.InsufficientFunds{},
-      error_order,
-      %{advisor_id: :my_sell_limit_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
-    }
+    assert_receive {created_order_a, %Advisor{}}
+    assert_receive {created_order_b, %Advisor{}}
+    assert_receive {%OrderResponses.InsufficientFunds{}, error_order, %Advisor{}}
 
     [created_order_1, created_order_2] = [created_order_a, created_order_b]
                                          |> Enum.sort(
@@ -500,7 +484,10 @@ defmodule Tai.AdvisorTest do
 
     start_supervised!({
       MyCancelOrdersAdvisor,
-      [advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed]]
+      [
+        advisor_id: :my_cancel_orders_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]}
+      ]
     })
 
     snapshot = %OrderBook{
@@ -520,7 +507,7 @@ defmodule Tai.AdvisorTest do
         size: 0.1,
         status: :enqueued
       },
-      %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+      %Advisor{}
     }
     assert_receive {
       %Order{
@@ -532,7 +519,7 @@ defmodule Tai.AdvisorTest do
         size: 0.11,
         status: :enqueued
       },
-      %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+      %Advisor{}
     }
 
     assert_receive {
@@ -545,7 +532,7 @@ defmodule Tai.AdvisorTest do
         size: 0.1,
         status: :pending
       },
-      %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+      %Advisor{}
     }
     assert_receive {
       %Order{
@@ -557,7 +544,7 @@ defmodule Tai.AdvisorTest do
         size: 0.11,
         status: :pending
       },
-      %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+      %Advisor{}
     }
 
     changes = %OrderBook{
@@ -577,7 +564,7 @@ defmodule Tai.AdvisorTest do
         size: 0.1,
         status: :cancelling
       },
-      %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+      %Advisor{}
     }
     assert_receive {
       %Order{
@@ -589,7 +576,7 @@ defmodule Tai.AdvisorTest do
         size: 0.11,
         status: :cancelling
       },
-      %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+      %Advisor{}
     }
     assert_receive {
       %Order{
@@ -601,7 +588,7 @@ defmodule Tai.AdvisorTest do
         size: 0.1,
         status: :cancelled
       },
-      %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+      %Advisor{}
     }
     assert_receive {
       %Order{
@@ -613,7 +600,7 @@ defmodule Tai.AdvisorTest do
         size: 0.11,
         status: :cancelled
       },
-      %{advisor_id: :my_cancel_orders_advisor, order_book_feed_ids: [:my_order_book_feed], inside_quotes: _}
+      %Advisor{}
     }
   end
 end
