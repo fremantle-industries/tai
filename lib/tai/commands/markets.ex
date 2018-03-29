@@ -1,6 +1,6 @@
 defmodule Tai.Commands.Markets do
   alias Tai.Exchanges
-  alias Tai.Markets.{OrderBook, PriceLevel}
+  alias Tai.Markets.{OrderBook, PriceLevel, Quote}
 
   def markets do
     Exchanges.Config.order_book_feed_ids
@@ -13,29 +13,30 @@ defmodule Tai.Commands.Markets do
     |> OrderBook.to_name
     |> OrderBook.quotes
     |> case do
-      {:ok, %{bids: bids, asks: asks}} -> [bid: bids |> List.first, ask: asks |> List.first]
+      {:ok, %{bids: bids, asks: asks}} ->
+        %Quote{bid: bids |> List.first, ask: asks |> List.first}
     end
   end
 
-  defp format_inside_quote([bid: nil, ask: nil]) do
-    format_inside_quote([
+  defp format_inside_quote(%Quote{bid: nil, ask: nil}) do
+    format_inside_quote(%Quote{
       bid: %PriceLevel{price: 0, size: 0},
       ask: %PriceLevel{price: 0, size: 0}
-    ])
+    })
   end
-  defp format_inside_quote([bid: bid, ask: nil]) do
-    format_inside_quote([
+  defp format_inside_quote(%Quote{bid: bid, ask: nil}) do
+    format_inside_quote(%Quote{
       bid: bid,
       ask: %PriceLevel{price: 0, size: 0}
-    ])
+    })
   end
-  defp format_inside_quote([bid: nil, ask: ask]) do
-    format_inside_quote([
+  defp format_inside_quote(%Quote{bid: nil, ask: ask}) do
+    format_inside_quote(%Quote{
       bid: %PriceLevel{price: 0, size: 0},
       ask: ask
-    ])
+    })
   end
-  defp format_inside_quote([bid: _bid, ask: _ask] = inside_quote), do: inside_quote
+  defp format_inside_quote(%Quote{} = inside_quote), do: inside_quote
 
   defp fetch_order_book_status([_head | _tail] = feed_ids) do
     feed_ids
@@ -53,17 +54,16 @@ defmodule Tai.Commands.Markets do
   end
 
   def to_feed_and_symbol_inside_quote(symbol, feed_id) do
-    {symbol, feed_id, [feed_id: feed_id, symbol: symbol] |> inside_quote |> format_inside_quote}
+    {
+      symbol,
+      feed_id,
+      [feed_id: feed_id, symbol: symbol]
+      |> inside_quote
+      |> format_inside_quote
+    }
   end
 
-  defp to_order_book_status_row({
-    symbol,
-    feed_id,
-    [
-      bid: %PriceLevel{} = bid,
-      ask: %PriceLevel{} = ask
-    ]
-  }) do
+  defp to_order_book_status_row({symbol, feed_id, %Quote{bid: bid, ask: ask}}) do
     [
       feed_id,
       symbol,

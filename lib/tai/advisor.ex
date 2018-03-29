@@ -6,7 +6,7 @@ defmodule Tai.Advisor do
   """
 
   alias Tai.{Advisor, PubSub, Trading.Order}
-  alias Tai.Markets.{OrderBook, PriceLevel}
+  alias Tai.Markets.{OrderBook, Quote}
 
   @typedoc """
   The state of the running advisor
@@ -212,7 +212,8 @@ defmodule Tai.Advisor do
         [feed_id: order_book_feed_id, symbol: symbol, depth: 1]
         |> quotes
         |> case do
-          {:ok, %OrderBook{bids: bids, asks: asks}} -> [bid: bids |> List.first, ask: asks |> List.first]
+          {:ok, %OrderBook{bids: bids, asks: asks}} ->
+            %Quote{bid: bids |> List.first, ask: asks |> List.first}
         end
       end
 
@@ -229,28 +230,28 @@ defmodule Tai.Advisor do
       end
 
       defp inside_bid_is_stale?(_bids, nil), do: false
-      defp inside_bid_is_stale?(bids, [bid: %PriceLevel{} = prev_bid, ask: _]) do
+      defp inside_bid_is_stale?(bids, %Quote{} = prev_quote) do
         bids
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
-          price >= prev_bid.price || (price == prev_bid.price && size != prev_bid.size)
+          price >= prev_quote.bid.price || (price == prev_quote.bid.price && size != prev_quote.bid.size)
         end)
       end
 
       defp inside_ask_is_stale?(asks, nil), do: false
-      defp inside_ask_is_stale?(asks, [bid: bid, ask: %PriceLevel{} = prev_ask]) do
+      defp inside_ask_is_stale?(asks, %Quote{} = prev_quote) do
         asks
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
-          price <= prev_ask.price || (price == prev_ask.price && size != prev_ask.size)
+          price <= prev_quote.ask.price || (price == prev_quote.ask.price && size != prev_quote.ask.size)
         end)
       end
 
       defp execute_handle_inside_quote(state, order_book_feed_id, symbol, changes, previous_inside_quote \\ nil) do
-        [bid: inside_bid, ask: inside_ask] = current_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
+        current_inside_quote = cached_inside_quote(state, order_book_feed_id, symbol)
 
         if current_inside_quote == previous_inside_quote do
           state
         else
-          handle_inside_quote(order_book_feed_id, symbol, inside_bid, inside_ask, changes, state)
+          handle_inside_quote(order_book_feed_id, symbol, current_inside_quote.bid, current_inside_quote.ask, changes, state)
           |> normalize_handler_response
           |> cancel_orders
           |> submit_orders
