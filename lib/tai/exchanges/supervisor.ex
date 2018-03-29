@@ -9,10 +9,8 @@ defmodule Tai.Exchanges.Supervisor do
 
   def init(:ok) do
     Enum.concat(
-      [
-        Tai.Exchanges.OrderBookFeedsSupervisor,
-      ],
-      exchange_supervisors()
+      exchange_supervisors(),
+      [Tai.Exchanges.OrderBookFeedsSupervisor]
     )
     |> Supervisor.init(strategy: :one_for_one)
   end
