@@ -23,7 +23,6 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
 
   setup do
     HTTPoison.start()
-    ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchange_adapters/binance")
 
     Process.register(self(), :test)
 
@@ -46,7 +45,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
       )
 
     {:ok, my_binance_feed_pid} =
-      use_cassette "order_book_feed" do
+      use_cassette "exchange_adapters/binance/order_book_feed" do
         OrderBookFeed.start_link(
           "ws://localhost:#{EchoBoy.Config.port()}/ws",
           feed_id: :my_binance_feed,

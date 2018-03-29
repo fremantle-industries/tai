@@ -4,10 +4,10 @@
       "body": "",
       "headers": {
         "Content-Type": "application/json",
-        "CB-ACCESS-KEY": "e39c6a223cc0791d5c38181008dd0266",
-        "CB-ACCESS-SIGN": "gATgxXiA2Aub5ONs8p0+7Yi1QaSyVaJ1NUREQ53TDsk=",
-        "CB-ACCESS-TIMESTAMP": "1521957458",
-        "CB-ACCESS-PASSPHRASE": "sinwdusb2q8"
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
       },
       "method": "get",
       "options": [],

@@ -25,8 +25,8 @@ defmodule Tai.Mixfile do
     [
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.2"},
-      {:binance, "~> 0.3"},
-      {:httpoison, "~> 0.13", override: true},
+      {:binance, "~> 0.4"},
+      {:httpoison, "~> 1.0", override: true},
       {:json, "~> 1.0"},
       {:table_rex, "~> 1.0"},
       {:timex, "~> 3.1"},
@@ -36,10 +36,10 @@ defmodule Tai.Mixfile do
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
       {:echo_boy, "~> 0.1.0", github: "rupurt/echo_boy", only: [:dev, :test]},
+      {:exvcr, "~> 0.10.1", only: [:dev, :test]},
       {:plug, "~> 1.0", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
-      {:exvcr, "~> 0.8", only: [:test]},
       {:ex_unit_notifier, "~> 0.1", only: :test}
     ]
   end

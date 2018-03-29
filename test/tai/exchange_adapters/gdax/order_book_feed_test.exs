@@ -28,8 +28,6 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
 
   setup do
     HTTPoison.start()
-    ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchange_adapters/gdax")
-
     Process.register(self(), :test)
 
     my_gdax_feed_btcusd_pid =
@@ -51,7 +49,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       )
 
     {:ok, my_gdax_feed_pid} =
-      use_cassette "order_book_feed" do
+      use_cassette "exchange_adapters/gdax/order_book_feed" do
         OrderBookFeed.start_link(
           "ws://localhost:#{EchoBoy.Config.port()}/ws",
           feed_id: :my_gdax_feed,
