@@ -3,7 +3,7 @@ defmodule Tai.AdvisorTest do
   doctest Tai.Advisor
 
   alias Tai.{Advisor, PubSub}
-  alias Tai.Markets.{OrderBook, PriceLevel}
+  alias Tai.Markets.{OrderBook, PriceLevel, Quote}
   alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderTypes}
 
   defmodule MyOrderBookFeed do
@@ -20,8 +20,8 @@ defmodule Tai.AdvisorTest do
       send :test, {feed_id, symbol, changes, state}
     end
 
-    def handle_inside_quote(feed_id, symbol, bid, ask, changes, state) do
-      send :test, {feed_id, symbol, bid, ask, changes, state}
+    def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
+      send :test, {feed_id, symbol, inside_quote, changes, state}
 
       {:ok, %{store: %{hello: "world"}}}
     end
@@ -83,8 +83,10 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
+      %Quote{
+        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+      },
       ^snapshot,
       %Advisor{}
     }
@@ -111,8 +113,10 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
+      %Quote{
+        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
+      },
       ^snapshot,
       %Advisor{}
     }
@@ -135,8 +139,10 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      %PriceLevel{price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil},
-      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
+      %Quote{
+        bid: %PriceLevel{price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil},
+        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+      },
       ^changes,
       %Advisor{}
     }
@@ -163,8 +169,10 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
+      %Quote{
+        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+      },
       ^snapshot,
       %Advisor{}
     }
@@ -187,8 +195,10 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-      %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil},
+      %Quote{
+        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+        ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
+      },
       ^changes,
       %Advisor{}
     }
@@ -212,8 +222,10 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
+      %Quote{
+        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+      },
       ^snapshot,
       %Advisor{}
     }
@@ -225,8 +237,10 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-      %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil},
+      %Quote{
+        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+        ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
+      },
       ^changes,
       %Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
     }
@@ -236,7 +250,7 @@ defmodule Tai.AdvisorTest do
     defmodule MyBuyLimitAdvisor do
       use Advisor
 
-      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _changes, _state) do
+      def handle_inside_quote(_feed_id, _symbol, _inside_quote, _changes, _state) do
         limit_orders = [
           {:my_test_exchange, :btcusd_success, 101.1, 0.1},
           {:my_test_exchange, :btcusd_success, 10.1, 0.11},
@@ -340,7 +354,7 @@ defmodule Tai.AdvisorTest do
     defmodule MySellLimitAdvisor do
       use Advisor
 
-      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _changes, _state) do
+      def handle_inside_quote(_feed_id, _symbol, _inside_quote, _changes, _state) do
         limit_orders = [
           {:my_test_exchange, :btcusd_success, 101.1, -0.1},
           {:my_test_exchange, :btcusd_success, 10.1, -0.11},
@@ -446,7 +460,7 @@ defmodule Tai.AdvisorTest do
 
       alias Tai.Trading.OrderStatus
 
-      def handle_inside_quote(_feed_id, _symbol, _bid, _ask, _changes, _state) do
+      def handle_inside_quote(_feed_id, _symbol, _inside_quote, _changes, _state) do
         cond do
           Orders.count() == 0 ->
             limit_orders = [

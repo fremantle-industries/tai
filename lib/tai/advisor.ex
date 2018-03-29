@@ -24,7 +24,7 @@ defmodule Tai.Advisor do
   @doc """
   Callback when the highest bid or lowest ask changes price or size
   """
-  @callback handle_inside_quote(order_book_feed_id :: Atom.t, symbol :: Atom.t, bid :: Map.t, ask :: Map.t, changes :: Map.t | List.t, state :: Advisor.t) :: :ok | {:ok, actions :: Map.t}
+  @callback handle_inside_quote(order_book_feed_id :: Atom.t, symbol :: Atom.t, inside_quote :: Quote.t, changes :: Map.t | List.t, state :: Advisor.t) :: :ok | {:ok, actions :: Map.t}
 
   @doc """
   Callback when an order is enqueued
@@ -169,10 +169,10 @@ defmodule Tai.Advisor do
       ## Examples
 
         iex> Tai.Advisor.cached_inside_quote(state, :test_feed_a, :btcusd)
-        [
+        %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{price: 101.1, size: 1.1, processed_at: nil, server_changed_at: nil},
           ask: %Tai.Markets.PriceLevel{price: 101.2, size: 0.1, processed_at: nil, server_changed_at: nil}
-        ]
+        }
       """
       def cached_inside_quote(%{inside_quotes: inside_quotes}, order_book_feed_id, symbol) do
         inside_quotes
@@ -180,7 +180,7 @@ defmodule Tai.Advisor do
       end
 
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
-      def handle_inside_quote(order_book_feed_id, symbol, bid, ask, changes, state), do: :ok
+      def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state), do: :ok
       def handle_order_enqueued(order, state), do: :ok
       def handle_order_create_ok(order, state), do: :ok
       def handle_order_create_error(reason, order, state), do: :ok
@@ -251,7 +251,7 @@ defmodule Tai.Advisor do
         if current_inside_quote == previous_inside_quote do
           state
         else
-          handle_inside_quote(order_book_feed_id, symbol, current_inside_quote.bid, current_inside_quote.ask, changes, state)
+          handle_inside_quote(order_book_feed_id, symbol, current_inside_quote, changes, state)
           |> normalize_handler_response
           |> cancel_orders
           |> submit_orders
@@ -287,7 +287,7 @@ defmodule Tai.Advisor do
 
       defoverridable [
         handle_order_book_changes: 4,
-        handle_inside_quote: 6,
+        handle_inside_quote: 5,
         handle_order_enqueued: 2,
         handle_order_create_ok: 2,
         handle_order_create_error: 3,
