@@ -2,7 +2,7 @@ defmodule Tai.Markets.OrderBookTest do
   use ExUnit.Case, async: true
   doctest Tai.Markets.OrderBook
 
-  alias Tai.Markets.OrderBook
+  alias Tai.Markets.{OrderBook, PriceLevel}
 
   setup do
     book_pid = start_supervised!({OrderBook, feed_id: :my_test_feed, symbol: :btcusd})
@@ -27,12 +27,12 @@ defmodule Tai.Markets.OrderBookTest do
 
     {:ok, %{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
     assert bids == [
-      [price: 999.9, size: 1.1, processed_at: nil, server_changed_at: nil],
-      [price: 999.8, size: 1.0, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 999.9, size: 1.1, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 999.8, size: 1.0, processed_at: nil, server_changed_at: nil}
     ]
     assert asks == [
-      [price: 1000.0, size: 0.1, processed_at: nil, server_changed_at: nil],
-      [price: 1000.1, size: 0.11, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 1000.0, size: 0.1, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 1000.1, size: 0.11, processed_at: nil, server_changed_at: nil}
     ]
   end
 
@@ -55,14 +55,14 @@ defmodule Tai.Markets.OrderBookTest do
 
     {:ok, %OrderBook{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
     assert bids == [
-      [price: 147.53, size: 10.3, processed_at: nil, server_changed_at: nil],
-      [price: 147.52, size: 10.1, processed_at: nil, server_changed_at: nil],
-      [price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 147.53, size: 10.3, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 147.52, size: 10.1, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil}
     ]
     assert asks == [
-      [price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil],
-      [price: 150.01, size: 1.1, processed_at: nil, server_changed_at: nil],
-      [price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 150.01, size: 1.1, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil}
     ]
   end
 
@@ -83,12 +83,12 @@ defmodule Tai.Markets.OrderBookTest do
 
     {:ok, %OrderBook{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
     assert bids == [
-      [price: 101.0, size: 1.0, processed_at: nil, server_changed_at: nil],
-      [price: 100.0, size: 1.0, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 101.0, size: 1.0, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 100.0, size: 1.0, processed_at: nil, server_changed_at: nil}
     ]
     assert asks == [
-      [price: 102, size: 1.0, processed_at: nil, server_changed_at: nil],
-      [price: 103, size: 1.0, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 102, size: 1.0, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 103, size: 1.0, processed_at: nil, server_changed_at: nil}
     ]
 
     :ok = OrderBook.update(
@@ -100,8 +100,8 @@ defmodule Tai.Markets.OrderBookTest do
     )
 
     {:ok, %{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
-    assert bids == [[price: 101.0, size: 1.0, processed_at: nil, server_changed_at: nil]]
-    assert asks == [[price: 103.0, size: 1.0, processed_at: nil, server_changed_at: nil]]
+    assert bids == [%PriceLevel{price: 101.0, size: 1.0, processed_at: nil, server_changed_at: nil}]
+    assert asks == [%PriceLevel{price: 103.0, size: 1.0, processed_at: nil, server_changed_at: nil}]
   end
 
   test "quotes returns a price ordered list of all bids and asks", %{book_pid: book_pid} do
@@ -124,14 +124,14 @@ defmodule Tai.Markets.OrderBookTest do
     {:ok, %{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
 
     assert bids == [
-      [price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil],
-      [price: 147, size: 10.3, processed_at: nil, server_changed_at: nil],
-      [price: 146.00, size: 10.1, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 147, size: 10.3, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 146.00, size: 10.1, processed_at: nil, server_changed_at: nil}
     ]
     assert asks == [
-      [price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil],
-      [price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil],
-      [price: 151, size: 1.1, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 151, size: 1.1, processed_at: nil, server_changed_at: nil}
     ]
   end
 
@@ -155,12 +155,12 @@ defmodule Tai.Markets.OrderBookTest do
     {:ok, %{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes(2)
 
     assert bids == [
-      [price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil],
-      [price: 147, size: 10.3, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 147, size: 10.3, processed_at: nil, server_changed_at: nil}
     ]
     assert asks == [
-      [price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil],
-      [price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil}
     ]
   end
 
@@ -184,9 +184,9 @@ defmodule Tai.Markets.OrderBookTest do
     {:ok, bids} = book_pid |> OrderBook.bids
 
     assert bids == [
-      [price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil],
-      [price: 147, size: 10.3, processed_at: nil, server_changed_at: nil],
-      [price: 146.00, size: 10.1, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 147, size: 10.3, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 146.00, size: 10.1, processed_at: nil, server_changed_at: nil}
     ]
   end
 
@@ -210,8 +210,8 @@ defmodule Tai.Markets.OrderBookTest do
     {:ok, bids} = book_pid |> OrderBook.bids(2)
 
     assert bids == [
-      [price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil],
-      [price: 147, size: 10.3, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 147, size: 10.3, processed_at: nil, server_changed_at: nil}
     ]
   end
 
@@ -234,7 +234,7 @@ defmodule Tai.Markets.OrderBookTest do
 
     {:ok, bid} = book_pid |> OrderBook.bid()
 
-    assert bid == [price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil]
+    assert bid == %PriceLevel{price: 147.51, size: 10.2, processed_at: nil, server_changed_at: nil}
   end
 
   test "asks returns a full price ordered list", %{book_pid: book_pid} do
@@ -257,9 +257,9 @@ defmodule Tai.Markets.OrderBookTest do
     {:ok, asks} = book_pid |> OrderBook.asks
 
     assert asks == [
-      [price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil],
-      [price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil],
-      [price: 151, size: 1.1, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 151, size: 1.1, processed_at: nil, server_changed_at: nil}
     ]
   end
 
@@ -283,8 +283,8 @@ defmodule Tai.Markets.OrderBookTest do
     {:ok, asks} = book_pid |> OrderBook.asks(2)
 
     assert asks == [
-      [price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil],
-      [price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil]
+      %PriceLevel{price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 150.02, size: 1.2, processed_at: nil, server_changed_at: nil}
     ]
   end
 
@@ -307,6 +307,6 @@ defmodule Tai.Markets.OrderBookTest do
 
     {:ok, ask} = book_pid |> OrderBook.ask()
 
-    assert ask == [price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil]
+    assert ask == %PriceLevel{price: 150.00, size: 1.3, processed_at: nil, server_changed_at: nil}
   end
 end

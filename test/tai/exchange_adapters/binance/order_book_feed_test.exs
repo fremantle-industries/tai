@@ -4,7 +4,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
   doctest Tai.ExchangeAdapters.Binance.OrderBookFeed
 
   alias Tai.ExchangeAdapters.Binance.OrderBookFeed
-  alias Tai.Markets.{OrderBook}
+  alias Tai.Markets.{OrderBook, PriceLevel}
 
   defmodule Subscriber do
     use GenServer
@@ -96,18 +96,18 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
   ) do
     assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btcusdt_pid)
     assert [
-      [price: 8541.0, size: 1.174739, processed_at: _, server_changed_at: nil],
-      [price: 8536.17, size: 0.036, processed_at: _, server_changed_at: nil],
-      [price: 8536.16, size: 0.158082, processed_at: _, server_changed_at: nil],
-      [price: 8536.14, size: 0.003345, processed_at: _, server_changed_at: nil],
-      [price: 8535.97, size: 0.024218, processed_at: _, server_changed_at: nil]
+      %PriceLevel{price: 8541.0, size: 1.174739, server_changed_at: nil},
+      %PriceLevel{price: 8536.17, size: 0.036, server_changed_at: nil},
+      %PriceLevel{price: 8536.16, size: 0.158082, server_changed_at: nil},
+      %PriceLevel{price: 8536.14, size: 0.003345, server_changed_at: nil},
+      %PriceLevel{price: 8535.97, size: 0.024218, server_changed_at: nil}
     ] = bids
     assert [
-      [price: 8555.57, size: 0.039, processed_at: _, server_changed_at: nil],
-      [price: 8555.58, size: 0.089469, processed_at: _, server_changed_at: nil],
-      [price: 8559.99, size: 0.375128, processed_at: _, server_changed_at: nil],
-      [price: 8560.0, size: 0.620366, processed_at: _, server_changed_at: nil],
-      [price: 8561.11, size: 12.0, processed_at: _, server_changed_at: nil]
+      %PriceLevel{price: 8555.57, size: 0.039, server_changed_at: nil},
+      %PriceLevel{price: 8555.58, size: 0.089469, server_changed_at: nil},
+      %PriceLevel{price: 8559.99, size: 0.375128, server_changed_at: nil},
+      %PriceLevel{price: 8560.0, size: 0.620366, server_changed_at: nil},
+      %PriceLevel{price: 8561.11, size: 12.0, server_changed_at: nil}
     ] = asks
 
     send_depth_update(
@@ -129,41 +129,41 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
 
     assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btcusdt_pid)
     assert [
-      [price: 8541.01, size: 0.12, processed_at: _, server_changed_at: bid_server_changed_at_a],
-      [price: 8541.0, size: 2.23, processed_at: _, server_changed_at: bid_server_changed_at_b],
-      [price: 8536.16, size: 0.158082, processed_at: _, server_changed_at: bid_server_changed_at_c],
-      [price: 8536.14, size: 0.003345, processed_at: _, server_changed_at: bid_server_changed_at_d],
-      [price: 8535.97, size: 0.024218, processed_at: _, server_changed_at: bid_server_changed_at_e]
+      %PriceLevel{price: 8541.01, size: 0.12} = bid_a,
+      %PriceLevel{price: 8541.0, size: 2.23} = bid_b,
+      %PriceLevel{price: 8536.16, size: 0.158082} = bid_c,
+      %PriceLevel{price: 8536.14, size: 0.003345} = bid_d,
+      %PriceLevel{price: 8535.97, size: 0.024218} = bid_e
     ] = bids
-    assert DateTime.compare(bid_server_changed_at_a, bid_server_changed_at_b)
-    assert bid_server_changed_at_c == nil
-    assert bid_server_changed_at_d == nil
-    assert bid_server_changed_at_e == nil
+    assert DateTime.compare(bid_a.server_changed_at, bid_b.server_changed_at)
+    assert bid_c.server_changed_at == nil
+    assert bid_d.server_changed_at == nil
+    assert bid_e.server_changed_at == nil
 
     assert [
-      [price: 8555.58, size: 0.089469, processed_at: _, server_changed_at: ask_server_changed_at_a],
-      [price: 8559.99, size: 0.22, processed_at: _, server_changed_at: ask_server_changed_at_b],
-      [price: 8560.0, size: 0.620366, processed_at: _, server_changed_at: ask_server_changed_at_c],
-      [price: 8560.05, size: 1.13, processed_at: _, server_changed_at: ask_server_changed_at_d],
-      [price: 8561.11, size: 12.0, processed_at: _, server_changed_at: ask_server_changed_at_e]
+      %PriceLevel{price: 8555.58, size: 0.089469} = ask_a,
+      %PriceLevel{price: 8559.99, size: 0.22} = ask_b,
+      %PriceLevel{price: 8560.0, size: 0.620366} = ask_c,
+      %PriceLevel{price: 8560.05, size: 1.13} = ask_d,
+      %PriceLevel{price: 8561.11, size: 12.0} = ask_e
     ] = asks
-    assert DateTime.compare(ask_server_changed_at_b, ask_server_changed_at_d)
-    assert ask_server_changed_at_a == nil
-    assert ask_server_changed_at_c == nil
-    assert ask_server_changed_at_e == nil
+    assert DateTime.compare(ask_b.server_changed_at, ask_d.server_changed_at)
+    assert ask_a.server_changed_at == nil
+    assert ask_c.server_changed_at == nil
+    assert ask_e.server_changed_at == nil
 
     assert OrderBook.quotes(my_binance_feed_ltcusdt_pid) == {
       :ok,
       %OrderBook{
-        bids: [[price: 100.0, size: 0.1, processed_at: nil, server_changed_at: nil]],
-        asks: [[price: 100.1, size: 0.1, processed_at: nil, server_changed_at: nil]]
+        bids: [%PriceLevel{price: 100.0, size: 0.1, processed_at: nil, server_changed_at: nil}],
+        asks: [%PriceLevel{price: 100.1, size: 0.1, processed_at: nil, server_changed_at: nil}]
       }
     }
     assert OrderBook.quotes(my_feed_b_btcusdt_pid) == {
       :ok,
       %OrderBook{
-        bids: [[price: 1.0, size: 1.1, processed_at: nil, server_changed_at: nil]],
-        asks: [[price: 1.2, size: 0.1, processed_at: nil, server_changed_at: nil]]
+        bids: [%PriceLevel{price: 1.0, size: 1.1, processed_at: nil, server_changed_at: nil}],
+        asks: [%PriceLevel{price: 1.2, size: 0.1, processed_at: nil, server_changed_at: nil}]
       }
     }
   end

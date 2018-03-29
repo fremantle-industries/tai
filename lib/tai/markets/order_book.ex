@@ -5,7 +5,7 @@ defmodule Tai.Markets.OrderBook do
 
   use GenServer
 
-  alias Tai.Markets.OrderBook
+  alias Tai.Markets.{OrderBook, PriceLevel}
 
   defstruct bids: %{}, asks: %{}
 
@@ -108,21 +108,26 @@ defmodule Tai.Markets.OrderBook do
     |> Map.keys
     |> Enum.sort
     |> Enum.reverse
-    |> to_keyword_list(state.bids)
+    |> with_price_levels(state.bids)
   end
 
   defp ordered_asks(state) do
     state.asks
     |> Map.keys
     |> Enum.sort
-    |> to_keyword_list(state.asks)
+    |> with_price_levels(state.asks)
   end
 
-  defp to_keyword_list(prices, price_levels) do
+  defp with_price_levels(prices, level_details) do
     prices
     |> Enum.map(fn price ->
-      {size, processed_at, server_changed_at} = price_levels[price]
-      [price: price, size: size, processed_at: processed_at, server_changed_at: server_changed_at]
+      {size, processed_at, server_changed_at} = level_details[price]
+      %PriceLevel{
+        price: price,
+        size: size,
+        processed_at: processed_at,
+        server_changed_at: server_changed_at
+      }
     end)
   end
 

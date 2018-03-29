@@ -2,7 +2,8 @@ defmodule Tai.AdvisorTest do
   use ExUnit.Case
   doctest Tai.Advisor
 
-  alias Tai.{Advisor, Markets.OrderBook, PubSub}
+  alias Tai.{Advisor, PubSub}
+  alias Tai.Markets.{OrderBook, PriceLevel}
   alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderTypes}
 
   defmodule MyOrderBookFeed do
@@ -82,8 +83,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
+      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
       ^snapshot,
       %Advisor{}
     }
@@ -110,8 +111,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
+      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
       ^snapshot,
       %Advisor{}
     }
@@ -134,8 +135,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
+      %PriceLevel{price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
       ^changes,
       %Advisor{}
     }
@@ -162,8 +163,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
+      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
       ^snapshot,
       %Advisor{}
     }
@@ -186,8 +187,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
-      [price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil],
+      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil},
       ^changes,
       %Advisor{}
     }
@@ -211,8 +212,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
-      [price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil],
+      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
       ^snapshot,
       %Advisor{}
     }
@@ -224,8 +225,8 @@ defmodule Tai.AdvisorTest do
     assert_receive {
       :my_order_book_feed,
       :btcusd,
-      [price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil],
-      [price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil],
+      %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+      %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil},
       ^changes,
       %Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
     }

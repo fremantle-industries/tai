@@ -1,5 +1,6 @@
 defmodule Tai.Commands.Markets do
-  alias Tai.{Exchanges, Markets.OrderBook}
+  alias Tai.Exchanges
+  alias Tai.Markets.{OrderBook, PriceLevel}
 
   def markets do
     Exchanges.Config.order_book_feed_ids
@@ -18,19 +19,19 @@ defmodule Tai.Commands.Markets do
 
   defp format_inside_quote([bid: nil, ask: nil]) do
     format_inside_quote([
-      bid: [price: 0, size: 0, processed_at: nil, server_changed_at: nil],
-      ask: [price: 0, size: 0, processed_at: nil, server_changed_at: nil]
+      bid: %PriceLevel{price: 0, size: 0},
+      ask: %PriceLevel{price: 0, size: 0}
     ])
   end
   defp format_inside_quote([bid: bid, ask: nil]) do
     format_inside_quote([
       bid: bid,
-      ask: [price: 0, size: 0, processed_at: nil, server_changed_at: nil]
+      ask: %PriceLevel{price: 0, size: 0}
     ])
   end
   defp format_inside_quote([bid: nil, ask: ask]) do
     format_inside_quote([
-      bid: [price: 0, size: 0, processed_at: nil, server_changed_at: nil],
+      bid: %PriceLevel{price: 0, size: 0},
       ask: ask
     ])
   end
@@ -59,21 +60,21 @@ defmodule Tai.Commands.Markets do
     symbol,
     feed_id,
     [
-      bid: [price: bid_price, size: bid_size, processed_at: bid_processed_at, server_changed_at: bid_server_changed_at],
-      ask: [price: ask_price, size: ask_size, processed_at: ask_processed_at, server_changed_at: ask_server_changed_at]
+      bid: %PriceLevel{} = bid,
+      ask: %PriceLevel{} = ask
     ]
   }) do
     [
       feed_id,
       symbol,
-      bid_price |> Decimal.new,
-      ask_price |> Decimal.new,
-      bid_size |> Decimal.new,
-      ask_size |> Decimal.new,
-      bid_processed_at && Timex.from_now(bid_processed_at),
-      bid_server_changed_at && Timex.from_now(bid_server_changed_at),
-      ask_processed_at && Timex.from_now(ask_processed_at),
-      ask_server_changed_at && Timex.from_now(ask_server_changed_at)
+      bid.price |> Decimal.new,
+      ask.price |> Decimal.new,
+      bid.size |> Decimal.new,
+      ask.size |> Decimal.new,
+      bid.processed_at && Timex.from_now(bid.processed_at),
+      bid.server_changed_at && Timex.from_now(bid.server_changed_at),
+      ask.processed_at && Timex.from_now(ask.processed_at),
+      ask.server_changed_at && Timex.from_now(ask.server_changed_at)
     ]
   end
 

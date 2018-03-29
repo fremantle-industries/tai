@@ -5,7 +5,8 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  alias Tai.{Advisor, PubSub, Markets.OrderBook, Trading.Order}
+  alias Tai.{Advisor, PubSub, Trading.Order}
+  alias Tai.Markets.{OrderBook, PriceLevel}
 
   @typedoc """
   The state of the running advisor
@@ -169,8 +170,8 @@ defmodule Tai.Advisor do
 
         iex> Tai.Advisor.cached_inside_quote(state, :test_feed_a, :btcusd)
         [
-          bid: [price: 101.1, size: 1.1, processed_at: nil, server_changed_at: nil],
-          [ask: [price: 101.2, size: 0.1, processed_at: nil, server_changed_at: nil]
+          bid: %Tai.Markets.PriceLevel{price: 101.1, size: 1.1, processed_at: nil, server_changed_at: nil},
+          ask: %Tai.Markets.PriceLevel{price: 101.2, size: 0.1, processed_at: nil, server_changed_at: nil}
         ]
       """
       def cached_inside_quote(%{inside_quotes: inside_quotes}, order_book_feed_id, symbol) do
@@ -227,19 +228,19 @@ defmodule Tai.Advisor do
         (bids |> Enum.any? && bids |> inside_bid_is_stale?(previous_inside_quote)) || (asks |> Enum.any? && asks |> inside_ask_is_stale?(previous_inside_quote))
       end
 
-      defp inside_bid_is_stale?(bids, nil), do: false
-      defp inside_bid_is_stale?(bids, [bid: [price: prev_bid_price, size: prev_bid_size, processed_at: _pa, server_changed_at: _sca], ask: ask]) do
+      defp inside_bid_is_stale?(_bids, nil), do: false
+      defp inside_bid_is_stale?(bids, [bid: %PriceLevel{} = prev_bid, ask: _]) do
         bids
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
-          price >= prev_bid_price || (price == prev_bid_price && size != prev_bid_size)
+          price >= prev_bid.price || (price == prev_bid.price && size != prev_bid.size)
         end)
       end
 
       defp inside_ask_is_stale?(asks, nil), do: false
-      defp inside_ask_is_stale?(asks, [bid: bid, ask: [price: prev_ask_price, size: prev_ask_size, processed_at: _pa, server_changed_at: _sca]]) do
+      defp inside_ask_is_stale?(asks, [bid: bid, ask: %PriceLevel{} = prev_ask]) do
         asks
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
-          price <= prev_ask_price || (price == prev_ask_price && size != prev_ask_size)
+          price <= prev_ask.price || (price == prev_ask.price && size != prev_ask.size)
         end)
       end
 
