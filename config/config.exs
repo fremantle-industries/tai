@@ -19,7 +19,9 @@ use Mix.Config
 #
 #     config :logger, level: :info
 #
-config :logger, backends: [{LoggerFileBackend, :tai}]
+config :logger,
+  backends: [{LoggerFileBackend, :tai}],
+  utc_log: true
 config :logger, :tai, path: "./log/#{Mix.env}.log"
 case System.get_env("DEBUG") do
   "true" -> config :logger, :tai, level: :debug
