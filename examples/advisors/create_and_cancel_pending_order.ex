@@ -1,4 +1,4 @@
-defmodule Support.Advisors.CreateAndCancelPendingOrder do
+defmodule Examples.Advisors.CreateAndCancelPendingOrder do
   use Tai.Advisor
 
   alias Tai.Advisor

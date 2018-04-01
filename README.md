@@ -107,7 +107,7 @@ iex(3)> orders
 Run in their own process and receive asynchronous events when the order books change.
 They are intended to be run without supervison to analyze data or execute trading strategies.
 
-[Examples](test/support/advisors)
+[Examples](examples/advisors)
 
 ## Debugging
 
