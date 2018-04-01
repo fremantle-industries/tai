@@ -23,7 +23,9 @@ config :logger,
   backends: [{LoggerFileBackend, :tai}],
   utc_log: true
 
-config :logger, :tai, path: "./log/#{Mix.env}.log"
+config :logger, :tai,
+  path: "./log/#{Mix.env}.log",
+  format: "$dateT$time $level $message\n"
 
 if System.get_env("DEBUG") == "true" do
   config :logger, :tai, level: :debug
