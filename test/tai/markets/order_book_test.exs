@@ -4,6 +4,21 @@ defmodule Tai.Markets.OrderBookTest do
 
   alias Tai.Markets.{OrderBook, PriceLevel}
 
+  defmodule Subscriber do
+    use GenServer
+
+    def start_link(_), do: GenServer.start_link(__MODULE__, :ok)
+    def init(state), do: {:ok, state}
+    def subscribe_to_order_book_snapshot do
+      Tai.PubSub.subscribe({:order_book_snapshot, :my_test_feed, :btcusd})
+    end
+
+    def handle_info({:order_book_snapshot, _feed_id, _symbol, _snapshot} = msg, state) do
+      send :test, msg
+      {:noreply, state}
+    end
+  end
+
   setup do
     book_pid = start_supervised!({OrderBook, feed_id: :my_test_feed, symbol: :btcusd})
 
@@ -34,6 +49,37 @@ defmodule Tai.Markets.OrderBookTest do
       %PriceLevel{price: 1000.0, size: 0.1, processed_at: nil, server_changed_at: nil},
       %PriceLevel{price: 1000.1, size: 0.11, processed_at: nil, server_changed_at: nil}
     ]
+  end
+
+  test "replace broadcasts a pubsub event", %{book_pid: book_pid} do
+    start_supervised!(Subscriber)
+    Subscriber.subscribe_to_order_book_snapshot()
+
+    bid_processed_at = Timex.now
+    bid_server_changed_at = Timex.now
+    ask_processed_at = Timex.now
+    ask_server_changed_at = Timex.now
+    :ok = OrderBook.replace(
+      book_pid,
+      %OrderBook{
+        bids: %{999.9 => {1.1, bid_processed_at, bid_server_changed_at}},
+        asks: %{1000.0 => {0.1, ask_processed_at, ask_server_changed_at}}
+      }
+    )
+
+    assert_receive {
+      :order_book_snapshot,
+      :my_test_feed,
+      :btcusd,
+      %OrderBook{
+        bids: %{999.9 => {1.1, bp, bs}},
+        asks: %{1000.0 => {0.1, ap, as}}
+      }
+    }
+    assert DateTime.compare(bp, bid_processed_at)
+    assert DateTime.compare(bs, bid_server_changed_at)
+    assert DateTime.compare(ap, ask_processed_at)
+    assert DateTime.compare(as, ask_server_changed_at)
   end
 
   test "update replaces the given bids and asks", %{book_pid: book_pid} do

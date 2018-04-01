@@ -51,7 +51,6 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name
     |> OrderBook.replace(snapshot)
-    |> broadcast_order_book_snapshot(feed_id, symbol, snapshot)
   end
   @doc """
   Update the bids/asks in the order books that have changed

@@ -5,6 +5,7 @@ defmodule Tai.Markets.OrderBook do
 
   use GenServer
 
+  alias Tai.PubSub
   alias Tai.Markets.{OrderBook, PriceLevel}
 
   defstruct bids: %{}, asks: %{}
@@ -12,7 +13,11 @@ defmodule Tai.Markets.OrderBook do
   def start_link(feed_id: feed_id, symbol: symbol) do
     GenServer.start_link(
       __MODULE__,
-      %OrderBook{},
+      %{
+        feed_id: feed_id,
+        symbol: symbol,
+        order_book: %OrderBook{}
+      },
       name: to_name(feed_id: feed_id, symbol: symbol)
     )
   end
@@ -22,43 +27,62 @@ defmodule Tai.Markets.OrderBook do
   end
 
   def handle_call({:quotes, depth: depth}, _from, state) do
-    {
-      :reply,
-      {
-        :ok,
-        %OrderBook{
-          bids: state |> ordered_bids |> take(depth),
-          asks: state |> ordered_asks |> take(depth)
-        }
-      },
-      state
+    order_book = %OrderBook{
+      bids: state |> Map.get(:order_book) |> ordered_bids |> take(depth),
+      asks: state |> Map.get(:order_book) |> ordered_asks |> take(depth)
     }
+
+    {:reply, {:ok, order_book}, state}
   end
 
   def handle_call(:bid, _from, state) do
-    {:reply, {:ok, state |> ordered_bids |> List.first}, state}
+    bid = state.order_book
+          |> ordered_bids
+          |> List.first
+
+    {:reply, {:ok, bid}, state}
   end
 
   def handle_call({:bids, depth}, _from, state) do
-    {:reply, {:ok, state |> ordered_bids |> take(depth)}, state}
+    bids = state.order_book
+          |> ordered_bids
+          |> take(depth)
+
+    {:reply, {:ok, bids}, state}
   end
 
   def handle_call(:ask, _from, state) do
-    {:reply, {:ok, state |> ordered_asks |> List.first}, state}
+    ask = state.order_book
+          |> ordered_asks
+          |> List.first
+
+    {:reply, {:ok, ask}, state}
   end
 
   def handle_call({:asks, depth}, _from, state) do
-    {:reply, {:ok, state |> ordered_asks |> take(depth)}, state}
+    asks = state.order_book
+           |> ordered_asks
+           |> take(depth)
+
+    {:reply, {:ok, asks}, state}
   end
 
-  def handle_call({:replace, replacement}, _from, _state) do
-    {:reply, :ok, replacement}
+  def handle_call({:replace, snapshot}, _from, state) do
+    PubSub.broadcast(
+      {:order_book_snapshot, state.feed_id, state.symbol},
+      {:order_book_snapshot, state.feed_id, state.symbol, snapshot}
+    )
+    new_state = state |> Map.put(:order_book, snapshot)
+
+    {:reply, :ok, new_state}
   end
 
   def handle_call({:update, %OrderBook{bids: bids, asks: asks}}, _from, state) do
+    new_order_book = state.order_book
+                     |> update_side(:bids, bids)
+                     |> update_side(:asks, asks)
     new_state = state
-                |> update_side(:bids, bids)
-                |> update_side(:asks, asks)
+                |> Map.put(:order_book, new_order_book)
 
     {:reply, :ok, new_state}
   end

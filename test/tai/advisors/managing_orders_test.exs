@@ -147,7 +147,6 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {enqueued_order_1, %Advisor{}}
     assert_receive {enqueued_order_2, %Advisor{}}
@@ -226,7 +225,6 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {enqueued_order_1, %Advisor{}}
     assert_receive {enqueued_order_2, %Advisor{}}
@@ -305,7 +303,6 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       asks: %{101.3 => {0.1, nil, nil}}
     }
     book_pid |> OrderBook.replace(snapshot)
-    MyOrderBookFeed.broadcast_order_book_snapshot(:ok, :my_order_book_feed, :btcusd, snapshot)
 
     assert_receive {
       %Order{

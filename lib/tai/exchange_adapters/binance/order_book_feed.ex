@@ -39,7 +39,6 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
         [feed_id: feed_id, symbol: symbol]
         |> OrderBook.to_name
         |> OrderBook.replace(snapshot)
-        |> broadcast_order_book_snapshot(feed_id, symbol, snapshot)
     end
 
     subscribe_to_order_books(pid, feed_id, tail)

@@ -214,40 +214,6 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   end
 
   test(
-    "broadcasts the order book snapshot to the pubsub subscribers",
-    %{my_feed_a_pid: my_feed_a_pid}
-  ) do
-    start_supervised!(Subscriber)
-    Subscriber.subscribe_to_order_book_snapshot()
-
-    send_feed_snapshot(
-      my_feed_a_pid,
-      "BTC-USD",
-      [["110.0", "100.0"], ["100.0", "110.0"]],
-      [["120.0", "10.0"], ["130.0", "11.0"]]
-    )
-
-    assert_receive {
-      :order_book_snapshot,
-      :my_feed_a,
-      :btcusd,
-      %OrderBook{
-        bids: %{
-          100.0 => {110.0, bid_a_processed_at, nil},
-          110.0 => {100.0, bid_b_processed_at, nil}
-        },
-        asks: %{
-          130.0 => {11.0, ask_a_processed_at, nil},
-          120.0 => {10.0, ask_b_processed_at, nil}
-        }
-      }
-    }
-    assert DateTime.compare(bid_a_processed_at, bid_b_processed_at)
-    assert DateTime.compare(bid_a_processed_at, ask_a_processed_at)
-    assert DateTime.compare(bid_a_processed_at, ask_b_processed_at)
-  end
-
-  test(
     "broadcasts the order book changes to the pubsub subscribers",
     %{my_feed_a_pid: my_feed_a_pid}
   ) do
@@ -270,6 +236,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       }
     }
   end
+
 
   test "logs a warning for unhandled messages", %{my_feed_a_pid: my_feed_a_pid} do
     assert capture_log(fn ->
