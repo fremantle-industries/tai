@@ -1,25 +1,10 @@
 defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Binance.OrderBookFeed
 
   alias Tai.ExchangeAdapters.Binance.OrderBookFeed
   alias Tai.Markets.{OrderBook, PriceLevel}
-
-  defmodule Subscriber do
-    use GenServer
-
-    def start_link(_), do: GenServer.start_link(__MODULE__, :ok)
-    def init(state), do: {:ok, state}
-    def subscribe_to_order_book_changes do
-      Tai.PubSub.subscribe({:order_book_changes, :my_binance_feed, :btcusdt})
-    end
-
-    def handle_info({:order_book_changes, _feed_id, _symbol, _changes} = msg, state) do
-      send :test, msg
-      {:noreply, state}
-    end
-  end
 
   def send_feed_msg(pid, msg) do
     WebSockex.send_frame(pid, {:text, msg |> JSON.encode!})
@@ -47,6 +32,8 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
     HTTPoison.start
     ExVCR.Config.cassette_library_dir("test/fixture/vcr_cassettes/exchange_adapters/binance")
 
+    Process.register self(), :test
+
     my_binance_feed_btcusdt_pid = start_supervised!({OrderBook, [feed_id: :my_binance_feed, symbol: :btcusdt]}, id: :my_binance_feed_btcusdt)
     my_binance_feed_ltcusdt_pid = start_supervised!({OrderBook, [feed_id: :my_binance_feed, symbol: :ltcusdt]}, id: :my_binance_feed_ltcusdt)
     my_feed_b_btcusdt_pid = start_supervised!({OrderBook, [feed_id: :my_feed_b, symbol: :btcusdt]}, id: :my_feed_b_btcusdt)
@@ -73,6 +60,11 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
         asks: %{1.2 => {0.1, nil, nil}}
       }
     )
+
+    start_supervised!({
+      Support.ForwardOrderBookEvents,
+      [feed_id: :my_binance_feed, symbol: :btcusdt]
+    })
 
     {
       :ok,
@@ -125,8 +117,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
       ]
     )
 
-    :timer.sleep 100
-
+    assert_receive {:order_book_changes, :my_binance_feed, :btcusdt, %OrderBook{}}
     assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btcusdt_pid)
     assert [
       %PriceLevel{price: 8541.01, size: 0.12} = bid_a,
