@@ -13,8 +13,8 @@ defmodule Tai.Advisor do
   """
   @type t :: Advisor
 
-  @enforce_keys [:advisor_id, :order_books, :inside_quotes, :store]
-  defstruct advisor_id: nil, order_books: %{}, inside_quotes: %{}, store: %{}
+  @enforce_keys [:advisor_id, :exchanges, :order_books, :inside_quotes, :store]
+  defstruct advisor_id: nil, exchanges: [], order_books: %{}, inside_quotes: %{}, store: %{}
 
   @doc """
   Callback when order book has bid or ask changes
@@ -73,12 +73,13 @@ defmodule Tai.Advisor do
 
       @behaviour Advisor
 
-      def start_link(advisor_id: advisor_id, order_books: order_books) do
+      def start_link(advisor_id: advisor_id, order_books: order_books, exchanges: exchanges) do
         GenServer.start_link(
           __MODULE__,
           %Advisor{
             advisor_id: advisor_id,
             order_books: order_books,
+            exchanges: exchanges,
             inside_quotes: %{},
             store: %{}
           },
@@ -87,8 +88,9 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def init(%Advisor{order_books: order_books} = state) do
-        subscribe_to_order_book_and_order_channels(order_books)
+      def init(%Advisor{order_books: order_books, exchanges: exchanges} = state) do
+        subscribe_to_order_book_channels(order_books)
+        subscribe_to_exchange_channels(exchanges)
 
         {:ok, state}
       end
@@ -187,7 +189,7 @@ defmodule Tai.Advisor do
       def handle_order_cancelling(order, state), do: :ok
       def handle_order_cancelled(order, state), do: :ok
 
-      defp subscribe_to_order_book_and_order_channels(order_books) do
+      defp subscribe_to_order_book_channels(order_books) do
         order_books
         |> Enum.each(fn {order_book_feed_id, symbols} ->
           symbols
@@ -198,14 +200,10 @@ defmodule Tai.Advisor do
             ])
           end)
         end)
+      end
 
-        PubSub.subscribe([
-          :order_enqueued,
-          :order_create_ok,
-          :order_create_error,
-          :order_cancelling,
-          :order_cancelled
-        ])
+      defp subscribe_to_exchange_channels(exchanges) do
+        PubSub.subscribe(exchanges)
       end
 
       defp fetch_inside_quote(order_book_feed_id, symbol) do

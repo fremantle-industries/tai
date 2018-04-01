@@ -31,7 +31,10 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(fn -> Helper.balance end) == "0.22 USD\n"
   end
 
-  test "markets displays all inside quotes and the time they were last processed and changed", %{test_feed_a_btcusd: test_feed_a_btcusd} do
+  test(
+    "markets displays all inside quotes and the time they were last processed and changed",
+    %{test_feed_a_btcusd: test_feed_a_btcusd}
+  ) do
     :ok = OrderBook.replace(
       test_feed_a_btcusd,
       %OrderBook{

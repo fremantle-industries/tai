@@ -135,7 +135,11 @@ defmodule Tai.Advisors.ManagingOrdersTest do
   test "handle_inside_quote can create multiple buy_limit orders", %{book_pid: book_pid} do
     start_supervised!({
       MyBuyLimitAdvisor,
-      [advisor_id: :my_buy_limit_advisor, order_books: %{my_order_book_feed: [:btcusd]}]
+      [
+        advisor_id: :my_buy_limit_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange]
+      ]
     })
 
     snapshot = %OrderBook{
@@ -210,7 +214,11 @@ defmodule Tai.Advisors.ManagingOrdersTest do
   test "handle_inside_quote can create multiple sell_limit orders", %{book_pid: book_pid} do
     start_supervised!({
       MySellLimitAdvisor,
-      [advisor_id: :my_sell_limit_advisor, order_books: %{my_order_book_feed: [:btcusd]}]
+      [
+        advisor_id: :my_sell_limit_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange]
+      ]
     })
 
     snapshot = %OrderBook{
@@ -285,7 +293,11 @@ defmodule Tai.Advisors.ManagingOrdersTest do
   test "handle_inside_quote can cancel orders", %{book_pid: book_pid} do
     start_supervised!({
       MyCancelOrdersAdvisor,
-      [advisor_id: :my_cancel_orders_advisor, order_books: %{my_order_book_feed: [:btcusd]}]
+      [
+        advisor_id: :my_cancel_orders_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange]
+      ]
     })
 
     snapshot = %OrderBook{

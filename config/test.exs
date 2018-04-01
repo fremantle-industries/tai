@@ -32,7 +32,8 @@ config :tai,          advisors: %{
                           order_books: %{
                             test_feed_a: [:btcusd, :ltcusd],
                             test_feed_b: [:ethusd, :ltcusd]
-                          }
+                          },
+                          exchanges: [:test_exchange_a, :test_exchange_b]
                         ],
                         test_advisor_b: [
                           server: Support.Advisors.SpreadCapture,

@@ -15,4 +15,10 @@ defmodule Tai.Advisors.Config do
     |> Map.get(advisor_id, [])
     |> Keyword.get(:order_books)
   end
+
+  def exchanges(advisor_id) do
+    all()
+    |> Map.get(advisor_id, [])
+    |> Keyword.get(:exchanges, [])
+  end
 end

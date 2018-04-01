@@ -11,7 +11,8 @@ defmodule Tai.Advisors.ConfigTest do
         order_books: %{
           test_feed_a: [:btcusd, :ltcusd],
           test_feed_b: [:ethusd, :ltcusd]
-        }
+        },
+        exchanges: [:test_exchange_a, :test_exchange_b]
       ],
       test_advisor_b: [
         server: Support.Advisors.SpreadCapture,
@@ -43,5 +44,13 @@ defmodule Tai.Advisors.ConfigTest do
 
   test "order_books returns nil when the advisor doesn't exist" do
     assert Config.order_books(:test_advisor_doesnt_exist) == nil
+  end
+
+  test "exchanges returns a list of exchanges" do
+    assert Config.exchanges(:test_advisor_a) == [:test_exchange_a, :test_exchange_b]
+  end
+
+  test "exchanges returns an empty list when it's not supplied" do
+    assert Config.exchanges(:test_advisor_b) == []
   end
 end

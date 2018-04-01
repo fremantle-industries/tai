@@ -46,7 +46,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]}
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange]
       ]
     })
     changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
@@ -69,7 +70,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]}
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange]
       ]
     })
     snapshot = %OrderBook{
@@ -99,7 +101,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]}
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange]
       ]
     })
     snapshot = %OrderBook{
@@ -155,7 +158,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]}
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange]
       ]
     })
     snapshot = %OrderBook{
@@ -208,7 +212,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]}
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange]
       ]
     })
     snapshot = %OrderBook{

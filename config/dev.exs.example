@@ -29,6 +29,7 @@ config :tai,          advisors: %{
                           order_books: %{
                             gdax: [:btcusd, :ltcusd, :ethusd],
                             binance: [:btcusdt, :ltcusdt, :ethusdt]
-                          }
+                          },
+                          exchanges: [:gdax]
                         ]
                       }

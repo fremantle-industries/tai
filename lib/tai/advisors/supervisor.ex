@@ -17,7 +17,11 @@ defmodule Tai.Advisors.Supervisor do
     Supervisor.child_spec(
       {
         server,
-        [advisor_id: advisor_id, order_books: Config.order_books(advisor_id)]
+        [
+          advisor_id: advisor_id,
+          order_books: Config.order_books(advisor_id),
+          exchanges: Config.exchanges(advisor_id)
+        ]
       },
       id: advisor_id |> Advisor.to_name
     )

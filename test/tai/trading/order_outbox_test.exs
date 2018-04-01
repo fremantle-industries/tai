@@ -12,13 +12,7 @@ defmodule Tai.Trading.OrderOutboxTest do
     end
 
     def init(state) do
-      Tai.PubSub.subscribe([
-        :order_enqueued,
-        :order_create_ok,
-        :order_create_error,
-        :order_cancelling,
-        :order_cancelled
-      ])
+      Tai.PubSub.subscribe(:my_test_exchange)
 
       {:ok, state}
     end

@@ -6,8 +6,20 @@ defmodule Support.Advisors.SpreadCapture do
 
   require Logger
 
-  def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state) do
-    Logger.debug "[#{state.advisor_id |> Advisor.to_name}] handle_inside_quote - order_book_feed_id: #{order_book_feed_id}, symbol: #{symbol}, quote: #{inspect inside_quote}, changes: #{inspect changes}, state: #{inspect state}"
+  def handle_inside_quote(:gdax, symbol, inside_quote, changes, state) do
+    Logger.debug fn ->
+      :io_lib.format(
+        "[~s] handle_inside_quote - order_book_feed_id: ~s, symbol: ~s, quote: ~s, changes: ~s, state: ~s",
+        [
+          state.advisor_id |> Advisor.to_name,
+          :gdax,
+          symbol,
+          inspect(inside_quote),
+          inspect(changes),
+          inspect(state)
+        ]
+      )
+    end
 
     cond do
       Orders.count() == 0 ->
@@ -19,6 +31,21 @@ defmodule Support.Advisors.SpreadCapture do
         {:ok, %{cancel_orders: cancel_orders}}
       true ->
         :ok
+    end
+  end
+  def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state) do
+    Logger.debug fn ->
+      :io_lib.format(
+        "[~s] handle_inside_quote - order_book_feed_id: ~s, symbol: ~s, quote: ~s, changes: ~s, state: ~s",
+        [
+          state.advisor_id |> Advisor.to_name,
+          order_book_feed_id,
+          symbol,
+          inspect(inside_quote),
+          inspect(changes),
+          inspect(state)
+        ]
+      )
     end
   end
 
