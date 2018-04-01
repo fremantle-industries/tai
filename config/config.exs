@@ -22,10 +22,13 @@ use Mix.Config
 config :logger,
   backends: [{LoggerFileBackend, :tai}],
   utc_log: true
+
 config :logger, :tai, path: "./log/#{Mix.env}.log"
-case System.get_env("DEBUG") do
-  "true" -> config :logger, :tai, level: :debug
-  _ -> config :logger, :tai, level: :info
+
+if System.get_env("DEBUG") == "true" do
+  config :logger, :tai, level: :debug
+else
+  config :logger, :tai, level: :info
 end
 
 # It is also possible to import configuration files, relative to this
