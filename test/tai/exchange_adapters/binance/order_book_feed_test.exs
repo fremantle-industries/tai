@@ -167,29 +167,4 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
       }
     }
   end
-
-  test(
-    "broadcasts the order book changes to the pubsub subscribers",
-    %{my_binance_feed_pid: my_binance_feed_pid}
-  ) do
-    start_supervised!(Subscriber)
-    Subscriber.subscribe_to_order_book_changes()
-
-    send_depth_update(
-      my_binance_feed_pid,
-      "BTCUSDT",
-      [["8541.01", "0.12", []]],
-      []
-    )
-
-    assert_receive {
-      :order_book_changes,
-      :my_binance_feed,
-      :btcusdt,
-      %{
-        bids: %{8541.01 => {0.12, _, _}},
-        asks: %{}
-      }
-    }
-  end
 end

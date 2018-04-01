@@ -7,7 +7,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
 
   require Logger
 
-  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook, PubSub}
+  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook}
   alias Tai.ExchangeAdapters.Gdax.{Product, Serializers.Snapshot, Serializers.L2Update}
 
   @doc """
@@ -72,7 +72,6 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name
     |> OrderBook.update(normalized_changes)
-    |> broadcast_order_book_changes(feed_id, symbol, normalized_changes)
   end
   @doc """
   Log a warning message when the WebSocket receives a message that is not explicitly handled

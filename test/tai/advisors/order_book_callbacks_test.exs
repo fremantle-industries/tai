@@ -1,16 +1,9 @@
 defmodule Tai.Advisors.OrderBookCallbacksTest do
   use ExUnit.Case
 
-  alias Tai.{Advisor, PubSub}
+  alias Tai.Advisor
   alias Tai.Markets.{OrderBook, PriceLevel, Quote}
   alias Tai.Trading.Orders
-
-  defmodule MyOrderBookFeed do
-    use Tai.Exchanges.OrderBookFeed
-
-    def subscribe_to_order_books(_pid, _feed_id, _symbols), do: :ok
-    def handle_msg(_msg, _feed_id), do: :ok
-  end
 
   defmodule MyAdvisor do
     use Advisor
@@ -52,7 +45,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     })
     changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
     book_pid |> OrderBook.update(changes)
-    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
@@ -122,7 +114,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     }
 
     changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
-    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     refute_receive {
       _feed_id,
@@ -134,7 +125,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     }
 
     book_pid |> OrderBook.update(changes)
-    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
@@ -178,7 +168,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     }
 
     changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
-    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     refute_receive {
       _feed_id,
@@ -190,7 +179,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     }
 
     book_pid |> OrderBook.update(changes)
-    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,
@@ -232,7 +220,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
     book_pid |> OrderBook.update(changes)
-    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       :my_order_book_feed,

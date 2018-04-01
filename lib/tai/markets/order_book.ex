@@ -77,7 +77,11 @@ defmodule Tai.Markets.OrderBook do
     {:reply, :ok, new_state}
   end
 
-  def handle_call({:update, %OrderBook{bids: bids, asks: asks}}, _from, state) do
+  def handle_call({:update, %OrderBook{bids: bids, asks: asks} = changes}, _from, state) do
+    PubSub.broadcast(
+      {:order_book_changes, state.feed_id, state.symbol},
+      {:order_book_changes, state.feed_id, state.symbol, changes}
+    )
     new_order_book = state.order_book
                      |> update_side(:bids, bids)
                      |> update_side(:asks, asks)

@@ -5,13 +5,6 @@ defmodule Tai.Advisors.ManagingOrdersTest do
   alias Tai.Markets.{OrderBook}
   alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderTypes}
 
-  defmodule MyOrderBookFeed do
-    use Tai.Exchanges.OrderBookFeed
-
-    def subscribe_to_order_books(_pid, _feed_id, _symbols), do: :ok
-    def handle_msg(_msg, _feed_id), do: :ok
-  end
-
   defmodule MyOrderAdvisor do
     def handle_order_enqueued(order, state) do
       send :test, {order, state}
@@ -359,7 +352,6 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       asks: %{}
     }
     book_pid |> OrderBook.update(changes)
-    MyOrderBookFeed.broadcast_order_book_changes(:ok, :my_order_book_feed, :btcusd, changes)
 
     assert_receive {
       %Order{

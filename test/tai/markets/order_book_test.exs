@@ -12,8 +12,15 @@ defmodule Tai.Markets.OrderBookTest do
     def subscribe_to_order_book_snapshot do
       Tai.PubSub.subscribe({:order_book_snapshot, :my_test_feed, :btcusd})
     end
+    def subscribe_to_order_book_changes do
+      Tai.PubSub.subscribe({:order_book_changes, :my_test_feed, :btcusd})
+    end
 
     def handle_info({:order_book_snapshot, _feed_id, _symbol, _snapshot} = msg, state) do
+      send :test, msg
+      {:noreply, state}
+    end
+    def handle_info({:order_book_changes, _feed_id, _symbol, _changes} = msg, state) do
       send :test, msg
       {:noreply, state}
     end
@@ -148,6 +155,37 @@ defmodule Tai.Markets.OrderBookTest do
     {:ok, %{bids: bids, asks: asks}} = book_pid |> OrderBook.quotes
     assert bids == [%PriceLevel{price: 101.0, size: 1.0, processed_at: nil, server_changed_at: nil}]
     assert asks == [%PriceLevel{price: 103.0, size: 1.0, processed_at: nil, server_changed_at: nil}]
+  end
+
+  test "update broadcasts a pubsub event", %{book_pid: book_pid} do
+    start_supervised!(Subscriber)
+    Subscriber.subscribe_to_order_book_changes()
+
+    bid_processed_at = Timex.now
+    bid_server_changed_at = Timex.now
+    ask_processed_at = Timex.now
+    ask_server_changed_at = Timex.now
+    :ok = OrderBook.update(
+      book_pid,
+      %OrderBook{
+        bids: %{100.0 => {0.1, bid_processed_at, bid_server_changed_at}},
+        asks: %{102.0 => {0.2, ask_processed_at, ask_server_changed_at}}
+      }
+    )
+
+    assert_receive {
+      :order_book_changes,
+      :my_test_feed,
+      :btcusd,
+      %OrderBook{
+        bids: %{100.0 => {0.1, bp, bs}},
+        asks: %{102.0 => {0.2, ap, as}}
+      }
+    }
+    assert DateTime.compare(bp, bid_processed_at)
+    assert DateTime.compare(bs, bid_server_changed_at)
+    assert DateTime.compare(ap, ask_processed_at)
+    assert DateTime.compare(as, ask_server_changed_at)
   end
 
   test "quotes returns a price ordered list of all bids and asks", %{book_pid: book_pid} do

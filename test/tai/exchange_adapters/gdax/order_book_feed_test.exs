@@ -213,31 +213,6 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     }
   end
 
-  test(
-    "broadcasts the order book changes to the pubsub subscribers",
-    %{my_feed_a_pid: my_feed_a_pid}
-  ) do
-    start_supervised!(Subscriber)
-    Subscriber.subscribe_to_order_book_changes()
-
-    send_feed_l2update(
-      my_feed_a_pid,
-      "BTC-USD",
-      [["buy", "0.9", "0.1"]]
-    )
-
-    assert_receive {
-      :order_book_changes,
-      :my_feed_a,
-      :btcusd,
-      %OrderBook{
-        bids: %{0.9 => {0.1, _processed_at, _server_changed_at}},
-        asks: %{}
-      }
-    }
-  end
-
-
   test "logs a warning for unhandled messages", %{my_feed_a_pid: my_feed_a_pid} do
     assert capture_log(fn ->
       WebSockex.send_frame(my_feed_a_pid, {:text, %{type: "unknown_type"} |> JSON.encode!})

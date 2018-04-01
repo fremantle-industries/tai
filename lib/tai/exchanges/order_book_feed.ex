@@ -56,16 +56,6 @@ defmodule Tai.Exchanges.OrderBookFeed do
       """
       def build_connection_url(url, symbols), do: url
 
-      @doc """
-      Broadcast the normalized order book changes via the PubSub mechanism
-      """
-      def broadcast_order_book_changes(:ok, feed_id, symbol, changes) do
-        PubSub.broadcast(
-          {:order_book_changes, feed_id, symbol},
-          {:order_book_changes, feed_id, symbol, changes}
-        )
-      end
-
       @doc false
       defp init_subscriptions({:ok, pid}, feed_id, symbols) do
         pid
