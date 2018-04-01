@@ -28,7 +28,7 @@ config :tai,          exchanges: %{
 
 config :tai,          advisors: %{
                         test_advisor_a: [
-                          server: Support.Advisors.SpreadCapture,
+                          server: Support.Advisors.CreateAndCancelPendingOrder,
                           order_books: %{
                             test_feed_a: [:btcusd, :ltcusd],
                             test_feed_b: [:ethusd, :ltcusd]
@@ -36,7 +36,7 @@ config :tai,          advisors: %{
                           exchanges: [:test_exchange_a, :test_exchange_b]
                         ],
                         test_advisor_b: [
-                          server: Support.Advisors.SpreadCapture,
+                          server: Support.Advisors.CreateAndCancelPendingOrder,
                           order_books: %{
                             test_feed_a: [:btcusd],
                             test_feed_b: [:ethusd]

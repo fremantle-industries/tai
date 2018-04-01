@@ -24,8 +24,8 @@ config :tai,          exchanges: %{
                       }
 
 config :tai,          advisors: %{
-                        spread_capture: [
-                          server: Support.Advisors.SpreadCapture,
+                        create_and_cancel_pending_order: [
+                          server: Support.Advisors.CreateAndCancelPendingOrder,
                           order_books: %{
                             gdax: [:btcusd, :ltcusd, :ethusd],
                             binance: [:btcusdt, :ltcusdt, :ethusdt]

@@ -124,7 +124,7 @@ If you would like to filter the log messages to target certain patterns or
 processes you can combine it with the `grep` command.
 
 ```bash
-tail -f logs/dev.log | grep advisor_spread_capture
+tail -f logs/dev.log | grep advisor_create_and_cancel_pending_order
 ```
 
 ## Configuration

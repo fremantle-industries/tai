@@ -1,4 +1,4 @@
-defmodule Support.Advisors.SpreadCapture do
+defmodule Support.Advisors.CreateAndCancelPendingOrder do
   use Tai.Advisor
 
   alias Tai.Advisor
