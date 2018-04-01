@@ -38,7 +38,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
     symbol
     |> OrderBookSnapshot.fetch(5)
     |> case do
-      {:ok, snapshot} ->
+      {:ok, %OrderBook{} = snapshot} ->
         [feed_id: feed_id, symbol: symbol]
         |> OrderBook.to_name()
         |> OrderBook.replace(snapshot)

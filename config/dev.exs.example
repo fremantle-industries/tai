@@ -14,6 +14,10 @@ config :tai,          order_book_feeds: %{
                         binance: [
                           adapter: Tai.ExchangeAdapters.Binance.OrderBookFeed,
                           order_books: [:btcusdt, :ltcusdt, :ethusdt]
+                        ],
+                        poloniex: [
+                          adapter: Tai.ExchangeAdapters.Poloniex.OrderBookFeed,
+                          order_books: [:btcusdt, :ltcusdt, :ethusdt]
                         ]
                       }
 
