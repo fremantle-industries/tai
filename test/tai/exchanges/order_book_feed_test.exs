@@ -11,10 +11,19 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
 
     def default_url, do: "ws://localhost:#{EchoBoy.Config.port()}/ws/"
     def subscribe_to_order_books(_pid, _feed_id, _symbols), do: :ok
-    def handle_msg(msg, feed_id), do: send(:test, {msg, feed_id})
 
-    def handle_disconnect(conn_status, feed_id) do
-      val = super(conn_status, feed_id)
+    def handle_msg(msg, %OrderBookFeed{} = state) do
+      counter = state.store |> Map.get(:counter, 0)
+      new_store = state.store |> Map.put(:counter, counter + 1)
+      new_state = state |> Map.put(:store, new_store)
+
+      send(:test, {msg, state})
+
+      {:ok, new_state}
+    end
+
+    def handle_disconnect(conn_status, state) do
+      val = super(conn_status, state)
       send(:test, :disconnected)
 
       val
@@ -41,7 +50,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
 
       def default_url, do: ""
       def subscribe_to_order_books(_pid, _feed_id, _symbols), do: :ok
-      def handle_msg(_msg, _feed_id), do: nil
+      def handle_msg(_msg, _state), do: nil
     end
 
     assert InvalidUrlOrderBookFeed.start_link(
@@ -59,7 +68,32 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
 
     WebSocket.send_json_msg(pid, %{hello: "world!"})
 
-    assert_receive {%{"hello" => "world!"}, :example_feed}
+    assert_receive {
+      %{"hello" => "world!"},
+      %OrderBookFeed{feed_id: :example_feed}
+    }
+  end
+
+  test "handle_msg updates the state when it returns an ok, state tuple" do
+    {:ok, pid} =
+      ExampleOrderBookFeed.start_link(
+        feed_id: :example_feed,
+        symbols: [:btcusd, :ltcusd]
+      )
+
+    WebSocket.send_json_msg(pid, %{hello: "world!"})
+
+    assert_receive {
+      %{"hello" => "world!"},
+      %OrderBookFeed{feed_id: :example_feed}
+    }
+
+    WebSocket.send_json_msg(pid, %{hello: "world!"})
+
+    assert_receive {
+      %{"hello" => "world!"},
+      %OrderBookFeed{feed_id: :example_feed, store: %{counter: 1}}
+    }
   end
 
   test "raises an error when the message is not valid JSON" do
@@ -87,7 +121,10 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
       capture_log(fn ->
         WebSocket.send_json_msg(pid, %{type: "test_message"})
 
-        assert_receive {%{"type" => "test_message"}, :example_feed}
+        assert_receive {
+          %{"type" => "test_message"},
+          %OrderBookFeed{feed_id: :example_feed}
+        }
       end)
 
     assert log_msg =~

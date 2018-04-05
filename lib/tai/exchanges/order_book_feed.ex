@@ -3,15 +3,25 @@ defmodule Tai.Exchanges.OrderBookFeed do
   Behaviour to connect to a WebSocket that streams quotes from order books
   """
 
+  @typedoc """
+  The state of the running order book feed
+  """
+  @type t :: Tai.Exchanges.OrderBookFeed
+
+  @enforce_keys [:feed_id, :symbols, :store]
+  defstruct [:feed_id, :symbols, :store]
+
   @doc """
   Invoked after the process is started and should be used to setup subscriptions
   """
-  @callback subscribe_to_order_books(pid :: Pid.t, feed_id :: Atom.t, symbols :: List.t) :: :ok | :error
+  @callback subscribe_to_order_books(pid :: Pid.t(), feed_id :: Atom.t(), symbols :: List.t()) ::
+              :ok | :error
 
   @doc """
   Invoked after a message is received on the socket and should be used to process the message
   """
-  @callback handle_msg(msg :: Map.t, feed_id :: Atom.t) :: nil
+  @callback handle_msg(msg :: Map.t(), feed_id :: Atom.t()) ::
+              {:ok, state :: Tai.Exchanges.OrderBookFeed.t()}
 
   @doc """
   Returns an atom that will identify the process
@@ -29,21 +39,23 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       require Logger
 
-      alias Tai.PubSub
+      alias Tai.{Exchanges.OrderBookFeed, PubSub}
 
       @behaviour Tai.Exchanges.OrderBookFeed
 
-      def default_url, do: raise "No default_url/0 in #{__MODULE__}"
+      def default_url, do: raise("No default_url/0 in #{__MODULE__}")
 
       def start_link(url, feed_id: feed_id, symbols: symbols) do
+        state = %OrderBookFeed{feed_id: feed_id, symbols: symbols, store: %{}}
+
         url
         |> build_connection_url(symbols)
         |> WebSockex.start_link(
           __MODULE__,
-          feed_id,
-          name: feed_id |> Tai.Exchanges.OrderBookFeed.to_name
+          state,
+          name: feed_id |> Tai.Exchanges.OrderBookFeed.to_name()
         )
-        |> init_subscriptions(feed_id, symbols)
+        |> init_subscriptions(state)
       end
 
       def start_link([feed_id: feed_id, symbols: symbols] = args) do
@@ -57,7 +69,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
       def build_connection_url(url, symbols), do: url
 
       @doc false
-      defp init_subscriptions({:ok, pid}, feed_id, symbols) do
+      defp init_subscriptions({:ok, pid}, %OrderBookFeed{feed_id: feed_id, symbols: symbols}) do
         pid
         |> subscribe_to_order_books(feed_id, symbols)
         |> case do
@@ -65,36 +77,46 @@ defmodule Tai.Exchanges.OrderBookFeed do
           :error -> {:error, "could not subscribe to order books"}
         end
       end
+
       @doc false
-      defp init_subscriptions({:error, reason}, feed_id, symbols) do
+      defp init_subscriptions({:error, reason}, %OrderBookFeed{}) do
         {:error, reason}
       end
 
       @doc false
-      def handle_frame({:text, msg}, feed_id) do
-        Logger.debug "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] received msg: #{msg}"
+      def handle_frame({:text, msg}, %OrderBookFeed{feed_id: feed_id} = state) do
+        Logger.debug("[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name()}] received msg: #{msg}")
 
         msg
-        |> parse_msg(feed_id)
+        |> parse_msg(state)
+        |> case do
+          {:ok, new_state} ->
+            {:ok, new_state}
 
-        {:ok, feed_id}
+          _ ->
+            {:ok, state}
+        end
       end
 
       @doc false
-      defp parse_msg(msg, feed_id) do
+      defp parse_msg(msg, %OrderBookFeed{} = state) do
         msg
-        |> JSON.decode!
-        |> handle_msg(feed_id)
+        |> JSON.decode!()
+        |> handle_msg(state)
       end
 
       @doc false
-      def handle_disconnect(conn_status, feed_id) do
-        Logger.error "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name}] disconnected - reason: #{inspect conn_status.reason}"
+      def handle_disconnect(conn_status, %OrderBookFeed{feed_id: feed_id} = state) do
+        Logger.error(
+          "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name()}] disconnected - reason: #{
+            inspect(conn_status.reason)
+          }"
+        )
 
-        {:ok, feed_id}
+        {:ok, state}
       end
 
-      defoverridable [build_connection_url: 2, default_url: 0, handle_disconnect: 2]
+      defoverridable build_connection_url: 2, default_url: 0, handle_disconnect: 2
     end
   end
 end

@@ -21,9 +21,11 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   Subscribe to streams for all symbols
   """
   def build_connection_url(url, symbols) do
-    streams = symbols
-              |> Enum.map(&"#{&1}@depth")
-              |> Enum.join("/")
+    streams =
+      symbols
+      |> Enum.map(&"#{&1}@depth")
+      |> Enum.join("/")
+
     "#{url}?streams=#{streams}"
   end
 
@@ -31,13 +33,14 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   Snapshot the order book
   """
   def subscribe_to_order_books(_pid, _feed_id, []), do: :ok
+
   def subscribe_to_order_books(pid, feed_id, [symbol | tail]) do
     symbol
     |> OrderBookSnapshot.fetch(5)
     |> case do
       {:ok, snapshot} ->
         [feed_id: feed_id, symbol: symbol]
-        |> OrderBook.to_name
+        |> OrderBook.to_name()
         |> OrderBook.replace(snapshot)
     end
 
@@ -48,36 +51,45 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   Update the order book as changes are received
   """
   def handle_msg(
-    %{
-      "data" => %{
-        "e" => "depthUpdate",
-        "E" => event_time,
-        "s" => binance_symbol,
-        "U" => _first_update_id_in_event,
-        "u" => _final_update_id_in_event,
-        "b" => changed_bids,
-        "a" => changed_asks
-      },
-      "stream" => _stream_name
-    },
-    feed_id
-  ) do
-    processed_at = Timex.now
+        %{
+          "data" => %{
+            "e" => "depthUpdate",
+            "E" => event_time,
+            "s" => binance_symbol,
+            "U" => _first_update_id_in_event,
+            "u" => _final_update_id_in_event,
+            "b" => changed_bids,
+            "a" => changed_asks
+          },
+          "stream" => _stream_name
+        },
+        %OrderBookFeed{feed_id: feed_id} = state
+      ) do
+    processed_at = Timex.now()
     {:ok, server_changed_at} = DateTime.from_unix(event_time, :millisecond)
+
     normalized_changes = %OrderBook{
       bids: changed_bids |> DepthUpdate.normalize(processed_at, server_changed_at),
       asks: changed_asks |> DepthUpdate.normalize(processed_at, server_changed_at)
     }
-    symbol = binance_symbol |> String.downcase |> String.to_atom
+
+    symbol = binance_symbol |> String.downcase() |> String.to_atom()
 
     [feed_id: feed_id, symbol: symbol]
-    |> OrderBook.to_name
+    |> OrderBook.to_name()
     |> OrderBook.update(normalized_changes)
+
+    {:ok, state}
   end
+
   @doc """
   Log a warning message when the WebSocket receives a message that is not explicitly handled
   """
-  def handle_msg(unhandled_msg, feed_id) do
-    Logger.warn "[#{feed_id |> OrderBookFeed.to_name}] unhandled message: #{inspect unhandled_msg}"
+  def handle_msg(unhandled_msg, %OrderBookFeed{feed_id: feed_id} = state) do
+    Logger.warn(
+      "[#{feed_id |> OrderBookFeed.to_name()}] unhandled message: #{inspect(unhandled_msg)}"
+    )
+
+    {:ok, state}
   end
 end

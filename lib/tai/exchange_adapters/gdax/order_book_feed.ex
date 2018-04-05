@@ -36,7 +36,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
           "bids" => bids,
           "asks" => asks
         },
-        feed_id
+        %OrderBookFeed{feed_id: feed_id} = state
       ) do
     processed_at = Timex.now()
 
@@ -50,6 +50,8 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name()
     |> OrderBook.replace(snapshot)
+
+    {:ok, state}
   end
 
   @doc """
@@ -62,7 +64,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
           "product_id" => product_id,
           "changes" => changes
         },
-        feed_id
+        %OrderBookFeed{feed_id: feed_id} = state
       ) do
     processed_at = Timex.now()
     server_changed_at = Timex.parse!(time, "{ISO:Extended}")
@@ -72,14 +74,18 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
     [feed_id: feed_id, symbol: symbol]
     |> OrderBook.to_name()
     |> OrderBook.update(normalized_changes)
+
+    {:ok, state}
   end
 
   @doc """
   Log a warning message when the WebSocket receives a message that is not explicitly handled
   """
-  def handle_msg(unhandled_msg, feed_id) do
+  def handle_msg(unhandled_msg, %OrderBookFeed{feed_id: feed_id} = state) do
     Logger.warn(
       "[#{feed_id |> OrderBookFeed.to_name()}] unhandled message: #{inspect(unhandled_msg)}"
     )
+
+    {:ok, state}
   end
 end
