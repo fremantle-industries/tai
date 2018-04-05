@@ -19,7 +19,10 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
 
       send(:test, {msg, state})
 
-      {:ok, new_state}
+      case msg do
+        %{"return" => "error"} -> {:error, msg}
+        _ -> {:ok, new_state}
+      end
     end
 
     def handle_disconnect(conn_status, state) do
@@ -94,6 +97,31 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
       %{"hello" => "world!"},
       %OrderBookFeed{feed_id: :example_feed, store: %{counter: 1}}
     }
+  end
+
+  test "handle_msg logs an error when it doesn't return an ok, state tuple" do
+    {:ok, pid} =
+      ExampleOrderBookFeed.start_link(
+        feed_id: :example_feed,
+        symbols: [:btcusd, :ltcusd]
+      )
+
+    log_msg =
+      capture_log(fn ->
+        WebSocket.send_json_msg(pid, %{return: "error"})
+
+        assert_receive {
+          %{"return" => "error"},
+          %OrderBookFeed{feed_id: :example_feed}
+        }
+
+        :timer.sleep(100)
+      end)
+
+    assert log_msg =~
+             "[warn]  [order_book_feed_example_feed] Expected 'handle_msg' to return an {:ok, state} tuple."
+
+    assert log_msg =~ "But it returned: {:error, %{\"return\" => \"error\"}}"
   end
 
   test "raises an error when the message is not valid JSON" do

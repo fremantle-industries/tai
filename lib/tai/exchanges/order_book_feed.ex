@@ -53,7 +53,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
         |> WebSockex.start_link(
           __MODULE__,
           state,
-          name: feed_id |> Tai.Exchanges.OrderBookFeed.to_name()
+          name: feed_id |> OrderBookFeed.to_name()
         )
         |> init_subscriptions(state)
       end
@@ -85,24 +85,26 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       @doc false
       def handle_frame({:text, msg}, %OrderBookFeed{feed_id: feed_id} = state) do
-        Logger.debug("[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name()}] received msg: #{msg}")
+        Logger.debug(fn ->
+          "[#{feed_id |> OrderBookFeed.to_name()}] received msg: #{msg}"
+        end)
 
         msg
-        |> parse_msg(state)
+        |> JSON.decode!()
+        |> handle_msg(state)
         |> case do
           {:ok, new_state} ->
             {:ok, new_state}
 
-          _ ->
+          other ->
+            Logger.warn(
+              "[#{feed_id |> OrderBookFeed.to_name()}] Expected 'handle_msg' to return an {:ok, state} tuple. But it returned: #{
+                inspect(other)
+              }"
+            )
+
             {:ok, state}
         end
-      end
-
-      @doc false
-      defp parse_msg(msg, %OrderBookFeed{} = state) do
-        msg
-        |> JSON.decode!()
-        |> handle_msg(state)
       end
 
       @doc false
