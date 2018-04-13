@@ -151,17 +151,21 @@ They are intended to be run without supervison to analyze data or execute tradin
 
 ## Debugging
 
-Error, warning and information messages are written to a separate log file for 
-each environment in the `logs` directory.
+`tai` keeps detailed logs of it's operations while running. They are written to a file with the name of the environment e.g. `logs/dev.log`. By default only `info`, `warn` & `error` messages are logged. If you would like to enable verbose logging that is useful for development and debugging you can set the `DEBUG` environment variable before you run tai.
 
-To monitor a stream of logs you can use the `tail` command
+```bash
+DEBUG=true iex -S mix
+```
+
+To monitor a running instance of `tai` you can `tail` it's log
 
 ```bash
 tail -f logs/dev.log
 ```
 
-If you would like to filter the log messages to target certain patterns or 
-processes you can combine it with the `grep` command.
+You can combine `tail` with `grep` to filter the logs for specific components or patterns. 
+
+e.g. Filter log messages created by the `CreateAndCancelPendingOrder` advisor
 
 ```bash
 tail -f logs/dev.log | grep advisor_create_and_cancel_pending_order
