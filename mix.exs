@@ -7,7 +7,7 @@ defmodule Tai.Mixfile do
       version: "0.0.1",
       elixir: "~> 1.6",
       package: package(),
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()
@@ -28,7 +28,7 @@ defmodule Tai.Mixfile do
       {:binance, "~> 0.3"},
       {:httpoison, "~> 0.13", override: true},
       {:json, "~> 1.0"},
-      {:table_rex, "~> 0.10"},
+      {:table_rex, "~> 1.0"},
       {:timex, "~> 3.1"},
       {:websockex, "~> 0.4"},
       {:logger_file_backend, "~> 0.0.10"},
@@ -63,6 +63,7 @@ defmodule Tai.Mixfile do
       ["lib"]
     end
   end
+
   defp elixirc_paths(:test), do: ["lib", "test/support", "examples"]
   defp elixirc_paths(_), do: ["lib"]
 end
