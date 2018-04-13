@@ -62,6 +62,16 @@ iex(1)> help
 * cancel_order exchange(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
 ```
 
+#### balance
+
+Return the USD value across all configured exchanges
+
+
+```
+iex(2)> balance
+$100.12
+```
+
 #### markets
 
 Displays the live top of the order book for the configured feeds. It also 
@@ -70,7 +80,7 @@ allows you to monitor if the feed is starting to fall behind while updating
 the order books.
 
 ```
-iex(2)> markets
+iex(3)> markets
 +---------+---------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
 |    Feed |  Symbol | Bid Price | Ask Price |   Bid Size |     Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
 +---------+---------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
@@ -94,7 +104,7 @@ update in the background so that the information is available when you re-run
 the `orders` command.
 
 ```
-iex(3)> orders
+iex(4)> orders
 +----------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
 | Exchange | Symbol |      Type | Price | Size | Status |                            Client ID | Server ID |    Enqueued At | Created At |
 +----------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
