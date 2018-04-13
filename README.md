@@ -63,19 +63,19 @@ end
 
 ## Usage
 
-`tai` currently runs as an interactive mix console application. Once started 
-it subscribes to the configured order book feeds, processes their change events 
-and execute orders using a uniform API across exchanges.
+`tai` currently runs as an interactive mix console application.
 
+Once started it subscribes to the configured order book feeds and starts 
+[advisors](#advisors) to process the changes in the order book where you can 
+execute orders using a uniform API across exchanges.
 
 ```bash
 iex -S mix
 ```
 
-When the interactive console is running it will start the [configured](#configuration) 
-order books, [advisors](#advisors) and allow you to manually execute [commands](#commands).
-
 ### Commands
+
+You can inspect the state of your orders and feeds or execute manual orders using the following commands
 
 #### help
 
@@ -104,10 +104,10 @@ $100.13
 
 #### markets
 
-Displays the live top of the order book for the configured feeds. It also 
-includes the time they were last processed and sent from the server which 
-allows you to monitor if the feed is starting to fall behind while updating 
-the order books.
+Displays the live top of the order book for the configured feeds. It includes 
+the time they were processed locally and if supported, the time they were sent 
+from the exchange. This allows you to monitor if a feed is under backpressure and
+starting to fall behind as it updates it's order books.
 
 ```
 iex(3)> markets
