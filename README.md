@@ -9,7 +9,7 @@ A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the
 likely to change and no effort will be made to maintain backwards compatibility at this time.
 We are working to make `tai` production quality software.
 
-[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Debugging](#debugging) | [Configuration](#configuration) | [Examples](./examples)
+[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](./advisors) | [Configuration](#configuration) | [Debugging](#debugging)
 
 
 ## Supported Exchanges
@@ -144,10 +144,17 @@ iex(4)> orders
 
 ## Advisors
 
-Run in their own process and receive asynchronous events when the order books change.
-They are intended to be run without supervison to analyze data or execute trading strategies.
+Advisors are the brains of any `tai` application, they receive events such 
+as order book changes or trades and can create, edit or cancel orders. They 
+are intended to run without supervision to analyze and record data or execute 
+trading strategies.
 
-[Examples](examples/advisors)
+Take a look at some of the [examples](./examples/advisors) to understand how to create advisors.
+
+## Configuration
+
+Each environment can have their own configuration. Take a look at the [example 
+dev configuration](config/dev.exs.example) for available options.
 
 ## Debugging
 
@@ -170,11 +177,6 @@ e.g. Filter log messages created by the `CreateAndCancelPendingOrder` advisor
 ```bash
 tail -f logs/dev.log | grep advisor_create_and_cancel_pending_order
 ```
-
-## Configuration
-
-Each environment can have their own configuration. Take a look at the [example 
-dev configuration](config/dev.exs.example) for available options.
 
 ## Authors
 
