@@ -1,15 +1,45 @@
 # Tai
 [![Build Status](https://circleci.com/gh/fremantle-capital/tai.png)](https://circleci.com/gh/fremantle-capital/tai)
 
-A trading toolkit built with [Elixir](https://elixir-lang.org/) and running on the [Erlang virtual machine](http://erlang.org/faq/implementations.html)
+A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the [Erlang virtual machine](http://erlang.org/faq/implementations.html)
 
 ## WARNING
 
 `tai` is alpha quality software. It passes our test suite but the API is highly 
-likely to change and no effort will be made to maintain backwards compatibility.
+likely to change and no effort will be made to maintain backwards compatibility at this time.
 We are working to make `tai` production quality software.
 
-## Installation
+[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Debugging](#debugging) | [Configuration](#configuration) | [Examples](./examples)
+
+
+## Supported Exchanges
+
+| Exchange       | Live Order Book  | Orders |
+|----------------|:----:|:--------------:|
+| GDAX           | [x] | [x] |
+| Binance        | [x] | [ ] |
+| Poloniex       | [x] | [ ] |
+
+## Planned Exchanges
+
+| Exchange       | Live Order Book  | Orders |
+|----------------|:----:|:--------------:|
+| Bitfinex           | [ ] | [ ] |
+| Bitflyer           | [ ] | [ ] |
+| Bithumb            | [ ] | [ ] |
+| Bitmex             | [ ] | [ ] |
+| Bitstamp           | [ ] | [ ] |
+| Bittrex            | [ ] | [ ] |
+| Gemini             | [ ] | [ ] |
+| HitBtc             | [ ] | [ ] |
+| Huobi              | [ ] | [ ] |
+| Kraken             | [ ] | [ ] |
+| OkCoin             | [ ] | [ ] |
+| ...                | [ ] | [ ] |
+
+[Full List...](./PLANNED_EXCHANGES.md)
+
+## Install
 
 Tai requires Elixir 1.6. Add `tai` to your list of dependencies in `mix.exs`
 
@@ -21,7 +51,7 @@ def deps do
 end
 ```
 
-Or use the bleeding edge from `master`
+Or use the lastest from `master`
 
 ```elixir
 def deps do
@@ -69,7 +99,7 @@ Return the USD value across all configured exchanges
 
 ```
 iex(2)> balance
-$100.12
+$100.13
 ```
 
 #### markets
