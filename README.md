@@ -75,7 +75,8 @@ iex -S mix
 
 ### Commands
 
-You can inspect the state of your orders and feeds or execute manual orders using the following commands
+You can view your total balance, inspect the state of orders, display live markets 
+or execute manual orders using the following commands.
 
 #### help
 
@@ -153,8 +154,8 @@ Take a look at some of the [examples](./examples/advisors) to understand how to 
 
 ## Configuration
 
-Each environment can have their own configuration. Take a look at the [example 
-dev configuration](config/dev.exs.example) for available options.
+Each environment can have its own configuration. Take a look at the [example dev configuration](config/dev.exs.example) 
+for available options.
 
 ## Debugging
 
