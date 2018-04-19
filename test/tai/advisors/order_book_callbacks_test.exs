@@ -1,6 +1,8 @@
 defmodule Tai.Advisors.OrderBookCallbacksTest do
   use ExUnit.Case
 
+  import ExUnit.CaptureLog
+
   alias Tai.Advisor
   alias Tai.Markets.{OrderBook, PriceLevel, Quote}
   alias Tai.Trading.Orders
@@ -15,7 +17,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
       send(:test, {feed_id, symbol, inside_quote, changes, state})
 
-      {:ok, %{store: %{hello: "world"}}}
+      state.store[:return_val] || :ok
     end
   end
 
@@ -83,6 +85,35 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       ^snapshot,
       %Advisor{}
     }
+  end
+
+  test("handle_inside_quote logs a warning message when it returns an unknown type", %{
+    book_pid: book_pid
+  }) do
+    start_supervised!({
+      MyAdvisor,
+      [
+        advisor_id: :my_advisor,
+        order_books: %{my_order_book_feed: [:btcusd]},
+        exchanges: [:my_test_exchange],
+        store: %{return_val: {:unknown, :return_val}}
+      ]
+    })
+
+    snapshot = %OrderBook{
+      bids: %{101.2 => {1.0, nil, nil}},
+      asks: %{101.3 => {0.1, nil, nil}}
+    }
+
+    log_msg =
+      capture_log(fn ->
+        book_pid |> OrderBook.replace(snapshot)
+
+        :timer.sleep(100)
+      end)
+
+    assert log_msg =~
+             "[warn]  handle_inside_quote returned an invalid value: '{:unknown, :return_val}'"
   end
 
   test(
@@ -206,7 +237,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
         exchanges: [:my_test_exchange],
-        store: %{}
+        store: %{return_val: {:ok, %{store: %{hello: "world"}}}}
       ]
     })
 

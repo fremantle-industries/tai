@@ -296,39 +296,51 @@ defmodule Tai.Advisor do
           state
         else
           handle_inside_quote(order_book_feed_id, symbol, current_inside_quote, changes, state)
-          |> normalize_handler_response
-          |> cancel_orders
-          |> submit_orders
-          |> update_store(state)
+          |> normalize_handle_inside_quote_response
+          |> case do
+            {:ok, actions} ->
+              actions
+              |> cancel_orders
+              |> submit_orders
+              |> update_state(state)
+
+            :error ->
+              state
+          end
         end
       end
 
-      defp normalize_handler_response(:ok) do
+      defp normalize_handle_inside_quote_response(:ok) do
         {:ok, %{}}
-        |> normalize_handler_response
+        |> normalize_handle_inside_quote_response
       end
 
-      defp normalize_handler_response({:ok, actions}) do
+      defp normalize_handle_inside_quote_response({:ok, actions}) do
         default_actions = %{cancel_orders: [], limit_orders: []}
         {:ok, default_actions |> Map.merge(actions)}
       end
 
-      defp cancel_orders({:ok, %{cancel_orders: cancel_orders}} = handler_response) do
+      defp normalize_handle_inside_quote_response(unhandled) do
+        Logger.warn("handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'")
+        :error
+      end
+
+      defp cancel_orders(%{cancel_orders: cancel_orders} = actions) do
         cancel_orders
         |> OrderOutbox.cancel()
 
-        handler_response
+        actions
       end
 
-      defp submit_orders({:ok, %{limit_orders: limit_orders}} = handler_response) do
+      defp submit_orders(%{limit_orders: limit_orders} = actions) do
         limit_orders
         |> OrderOutbox.add()
 
-        handler_response
+        actions
       end
 
-      defp update_store({:ok, %{store: store}}, state), do: state |> Map.put(:store, store)
-      defp update_store({:ok, %{}}, state), do: state
+      defp update_state(%{store: store}, state), do: state |> Map.put(:store, store)
+      defp update_state(%{}, state), do: state
 
       defoverridable handle_order_book_changes: 4,
                      handle_inside_quote: 5,
