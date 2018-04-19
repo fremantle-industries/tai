@@ -21,44 +21,50 @@ defmodule Tai.Trading.OrderOutbox do
   end
 
   def handle_call({:add, submissions}, _from, state) do
-    new_orders = submissions
-                 |> Orders.add
-                 |> Enum.map(&broadcast_enqueued_order/1)
+    new_orders =
+      submissions
+      |> Orders.add()
+      |> Enum.map(&broadcast_enqueued_order/1)
 
     {:reply, new_orders, state}
   end
 
   def handle_call({:cancel, client_ids}, _from, state) do
-    orders_to_cancel = [client_id: client_ids, status: OrderStatus.pending]
-                        |> Orders.where
-                        |> Enum.map(&Orders.update(&1.client_id, status: OrderStatus.cancelling))
-                        |> Enum.map(&broadcast_cancelling_order/1)
+    orders_to_cancel =
+      [client_id: client_ids, status: OrderStatus.pending()]
+      |> Orders.where()
+      |> Enum.map(&Orders.update(&1.client_id, status: OrderStatus.cancelling()))
+      |> Enum.map(&broadcast_cancelling_order/1)
 
     {:reply, orders_to_cancel, state}
   end
 
   def handle_info({:order_enqueued, order}, state) do
     cond do
-      order.type == OrderTypes.buy_limit ->
-        {:ok, _pid} = Task.start_link(fn ->
-          Tai.Exchanges.Account.buy_limit(order)
-          |> handle_limit_response(order)
-        end)
-      order.type == OrderTypes.sell_limit ->
-        {:ok, _pid} = Task.start_link(fn ->
-          Tai.Exchanges.Account.sell_limit(order)
-          |> handle_limit_response(order)
-        end)
+      order.type == OrderTypes.buy_limit() ->
+        {:ok, _pid} =
+          Task.start_link(fn ->
+            Tai.Exchanges.Account.buy_limit(order)
+            |> handle_limit_response(order)
+          end)
+
+      order.type == OrderTypes.sell_limit() ->
+        {:ok, _pid} =
+          Task.start_link(fn ->
+            Tai.Exchanges.Account.sell_limit(order)
+            |> handle_limit_response(order)
+          end)
     end
 
     {:noreply, state}
   end
 
   def handle_info({:order_cancelling, order}, state) do
-    {:ok, _pid} = Task.start_link(fn ->
-      Tai.Exchanges.Account.cancel_order(order.exchange, order.server_id)
-      |> handle_cancel_order_response(order)
-    end)
+    {:ok, _pid} =
+      Task.start_link(fn ->
+        Tai.Exchanges.Account.cancel_order(order.exchange, order.server_id)
+        |> handle_cancel_order_response(order)
+      end)
 
     {:noreply, state}
   end
@@ -91,24 +97,27 @@ defmodule Tai.Trading.OrderOutbox do
   end
 
   defp handle_limit_response(
-    {:ok, %OrderResponses.Created{id: server_id, created_at: created_at}},
-    order
-  ) do
-    pending_order = Orders.update(
-      order.client_id,
-      server_id: server_id,
-      created_at: created_at,
-      status: OrderStatus.pending
-    )
+         {:ok, %OrderResponses.Created{id: server_id, created_at: created_at}},
+         order
+       ) do
+    pending_order =
+      Orders.update(
+        order.client_id,
+        server_id: server_id,
+        created_at: created_at,
+        status: OrderStatus.pending()
+      )
+
     PubSub.broadcast(pending_order.exchange, {:order_create_ok, pending_order})
   end
+
   defp handle_limit_response({:error, reason}, order) do
-    error_order = Orders.update(order.client_id, status: OrderStatus.error)
+    error_order = Orders.update(order.client_id, status: OrderStatus.error())
     PubSub.broadcast(error_order.exchange, {:order_create_error, reason, error_order})
   end
 
   defp handle_cancel_order_response({:ok, _order_id}, order) do
-    cancelled_order = Orders.update(order.client_id, status: OrderStatus.cancelled)
+    cancelled_order = Orders.update(order.client_id, status: OrderStatus.cancelled())
     PubSub.broadcast(cancelled_order.exchange, {:order_cancelled, cancelled_order})
   end
 end

@@ -5,23 +5,23 @@ defmodule Tai.Advisors.ConfigTest do
   alias Tai.Advisors.Config
 
   test "all returns the application config" do
-    assert Config.all == %{
-      test_advisor_a: [
-        server: Examples.Advisors.CreateAndCancelPendingOrder,
-        order_books: %{
-          test_feed_a: [:btcusd, :ltcusd],
-          test_feed_b: [:ethusd, :ltcusd]
-        },
-        exchanges: [:test_exchange_a, :test_exchange_b]
-      ],
-      test_advisor_b: [
-        server: Examples.Advisors.CreateAndCancelPendingOrder,
-        order_books: %{
-          test_feed_a: [:btcusd],
-          test_feed_b: [:ethusd]
-        }
-      ]
-    }
+    assert Config.all() == %{
+             test_advisor_a: [
+               server: Examples.Advisors.CreateAndCancelPendingOrder,
+               order_books: %{
+                 test_feed_a: [:btcusd, :ltcusd],
+                 test_feed_b: [:ethusd, :ltcusd]
+               },
+               exchanges: [:test_exchange_a, :test_exchange_b]
+             ],
+             test_advisor_b: [
+               server: Examples.Advisors.CreateAndCancelPendingOrder,
+               order_books: %{
+                 test_feed_a: [:btcusd],
+                 test_feed_b: [:ethusd]
+               }
+             ]
+           }
   end
 
   test "all returns an empty map when no advisors have been configured" do
@@ -29,17 +29,17 @@ defmodule Tai.Advisors.ConfigTest do
   end
 
   test "servers returns a keyword list of id and server" do
-    assert Config.servers == [
-      test_advisor_a: Examples.Advisors.CreateAndCancelPendingOrder,
-      test_advisor_b: Examples.Advisors.CreateAndCancelPendingOrder
-    ]
+    assert Config.servers() == [
+             test_advisor_a: Examples.Advisors.CreateAndCancelPendingOrder,
+             test_advisor_b: Examples.Advisors.CreateAndCancelPendingOrder
+           ]
   end
 
   test "order_books returns a map of feed ids with a list of symbols for the advisor id" do
     assert Config.order_books(:test_advisor_a) == %{
-      test_feed_a: [:btcusd, :ltcusd],
-      test_feed_b: [:ethusd, :ltcusd],
-    }
+             test_feed_a: [:btcusd, :ltcusd],
+             test_feed_b: [:ethusd, :ltcusd]
+           }
   end
 
   test "order_books returns nil when the advisor doesn't exist" do

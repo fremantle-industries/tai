@@ -52,7 +52,6 @@ defmodule Tai.Exchanges.Config do
     for {id, _} <- exchanges(), do: id
   end
 
-
   @doc """
   Return a map of order book feed adapters and the books to subscribe to
 
@@ -84,12 +83,9 @@ defmodule Tai.Exchanges.Config do
   """
   def order_book_feed_ids do
     order_book_feeds()
-    |> Enum.reduce(
-      [],
-      fn {feed_id, _config}, acc ->
-        Enum.concat(acc, [feed_id])
-      end
-    )
+    |> Enum.reduce([], fn {feed_id, _config}, acc ->
+      Enum.concat(acc, [feed_id])
+    end)
   end
 
   @doc """
@@ -105,12 +101,9 @@ defmodule Tai.Exchanges.Config do
   """
   def order_book_feed_adapters do
     order_book_feeds()
-    |> Enum.reduce(
-      %{},
-      fn {feed_id, [adapter: adapter, order_books: _]}, acc ->
-        Map.put(acc, feed_id, adapter)
-      end
-    )
+    |> Enum.reduce(%{}, fn {feed_id, [adapter: adapter, order_books: _]}, acc ->
+      Map.put(acc, feed_id, adapter)
+    end)
   end
 
   @doc """
@@ -136,12 +129,9 @@ defmodule Tai.Exchanges.Config do
   """
   def order_book_feed_symbols(feed_id) do
     order_book_feeds()
-    |> Enum.reduce(
-      %{},
-      fn {feed_id, [adapter: _, order_books: order_books]}, acc ->
-        Map.put(acc, feed_id, order_books)
-      end
-    )
+    |> Enum.reduce(%{}, fn {feed_id, [adapter: _, order_books: order_books]}, acc ->
+      Map.put(acc, feed_id, order_books)
+    end)
     |> Map.fetch!(feed_id)
   end
 end

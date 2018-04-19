@@ -30,7 +30,7 @@ defmodule Tai.PubSubTest do
     end
 
     def handle_info(args, [id: _id, test: test] = state) do
-      send :"test_#{test}", {args, state}
+      send(:"test_#{test}", {args, state})
 
       {:noreply, state}
     end
@@ -48,7 +48,7 @@ defmodule Tai.PubSubTest do
   end
 
   test "subscribe can take multiple topics and broadcast a message to all of them" do
-    Process.register self(), :test_subscribe
+    Process.register(self(), :test_subscribe)
     start_supervised!({MultiSubscriber, id: :a, test: :subscribe}, id: :subscribe_a)
     start_supervised!({MultiSubscriber, id: :b, test: :subscribe}, id: :subscribe_b)
 
@@ -76,7 +76,7 @@ defmodule Tai.PubSubTest do
   end
 
   test "unsubscribe can take multiple topics" do
-    Process.register self(), :test_unsubscribe
+    Process.register(self(), :test_unsubscribe)
     start_supervised!({MultiSubscriber, id: :a, test: :unsubscribe}, id: :subscribe_a)
     start_supervised!({MultiSubscriber, id: :b, test: :unsubscribe}, id: :subscribe_b)
 

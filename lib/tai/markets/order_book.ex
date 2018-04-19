@@ -36,33 +36,37 @@ defmodule Tai.Markets.OrderBook do
   end
 
   def handle_call(:bid, _from, state) do
-    bid = state.order_book
-          |> ordered_bids
-          |> List.first
+    bid =
+      state.order_book
+      |> ordered_bids
+      |> List.first()
 
     {:reply, {:ok, bid}, state}
   end
 
   def handle_call({:bids, depth}, _from, state) do
-    bids = state.order_book
-          |> ordered_bids
-          |> take(depth)
+    bids =
+      state.order_book
+      |> ordered_bids
+      |> take(depth)
 
     {:reply, {:ok, bids}, state}
   end
 
   def handle_call(:ask, _from, state) do
-    ask = state.order_book
-          |> ordered_asks
-          |> List.first
+    ask =
+      state.order_book
+      |> ordered_asks
+      |> List.first()
 
     {:reply, {:ok, ask}, state}
   end
 
   def handle_call({:asks, depth}, _from, state) do
-    asks = state.order_book
-           |> ordered_asks
-           |> take(depth)
+    asks =
+      state.order_book
+      |> ordered_asks
+      |> take(depth)
 
     {:reply, {:ok, asks}, state}
   end
@@ -72,6 +76,7 @@ defmodule Tai.Markets.OrderBook do
       {:order_book_snapshot, state.feed_id, state.symbol},
       {:order_book_snapshot, state.feed_id, state.symbol, snapshot}
     )
+
     new_state = state |> Map.put(:order_book, snapshot)
 
     {:reply, :ok, new_state}
@@ -82,11 +87,15 @@ defmodule Tai.Markets.OrderBook do
       {:order_book_changes, state.feed_id, state.symbol},
       {:order_book_changes, state.feed_id, state.symbol, changes}
     )
-    new_order_book = state.order_book
-                     |> update_side(:bids, bids)
-                     |> update_side(:asks, asks)
-    new_state = state
-                |> Map.put(:order_book, new_order_book)
+
+    new_order_book =
+      state.order_book
+      |> update_side(:bids, bids)
+      |> update_side(:asks, asks)
+
+    new_state =
+      state
+      |> Map.put(:order_book, new_order_book)
 
     {:reply, :ok, new_state}
   end
@@ -133,16 +142,16 @@ defmodule Tai.Markets.OrderBook do
 
   defp ordered_bids(state) do
     state.bids
-    |> Map.keys
-    |> Enum.sort
-    |> Enum.reverse
+    |> Map.keys()
+    |> Enum.sort()
+    |> Enum.reverse()
     |> with_price_levels(state.bids)
   end
 
   defp ordered_asks(state) do
     state.asks
-    |> Map.keys
-    |> Enum.sort
+    |> Map.keys()
+    |> Enum.sort()
     |> with_price_levels(state.asks)
   end
 
@@ -150,6 +159,7 @@ defmodule Tai.Markets.OrderBook do
     prices
     |> Enum.map(fn price ->
       {size, processed_at, server_changed_at} = level_details[price]
+
       %PriceLevel{
         price: price,
         size: size,
@@ -160,16 +170,18 @@ defmodule Tai.Markets.OrderBook do
   end
 
   defp take(list, :all), do: list
+
   defp take(list, depth) do
     list
     |> Enum.take(depth)
   end
 
   defp update_side(state, side, price_levels) do
-    new_side = state
-               |> Map.get(side)
-               |> Map.merge(price_levels)
-               |> Map.drop(price_levels |> drop_prices)
+    new_side =
+      state
+      |> Map.get(side)
+      |> Map.merge(price_levels)
+      |> Map.drop(price_levels |> drop_prices)
 
     state
     |> Map.put(side, new_side)

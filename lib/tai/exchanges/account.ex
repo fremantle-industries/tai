@@ -25,6 +25,7 @@ defmodule Tai.Exchanges.Account do
     |> to_name
     |> GenServer.call({:buy_limit, symbol, price, size})
   end
+
   @doc """
   Create a buy limit order from the given order struct. It returns an error tuple
   when the type is not accepted.
@@ -32,7 +33,7 @@ defmodule Tai.Exchanges.Account do
   {:error, %OrderResponses.InvalidOrderType{}}
   """
   def buy_limit(%Order{} = order) do
-    if order.type == OrderTypes.buy_limit do
+    if order.type == OrderTypes.buy_limit() do
       buy_limit(order.exchange, order.symbol, order.price, order.size)
     else
       {:error, %OrderResponses.InvalidOrderType{}}
@@ -51,6 +52,7 @@ defmodule Tai.Exchanges.Account do
     |> to_name
     |> GenServer.call({:sell_limit, symbol, price, size})
   end
+
   @doc """
   Create a sell limit order from the given order struct. It returns an error tuple
   when the type is not accepted.
@@ -58,7 +60,7 @@ defmodule Tai.Exchanges.Account do
   {:error, %OrderResponses.InvalidOrderType{}}
   """
   def sell_limit(%Order{} = order) do
-    if order.type == OrderTypes.sell_limit do
+    if order.type == OrderTypes.sell_limit() do
       sell_limit(order.exchange, order.symbol, order.price, order.size)
     else
       {:error, %OrderResponses.InvalidOrderType{}}

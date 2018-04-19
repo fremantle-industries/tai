@@ -3,18 +3,18 @@ defmodule Tai.Commands.Markets do
   alias Tai.Markets.{OrderBook, PriceLevel, Quote}
 
   def markets do
-    Exchanges.Config.order_book_feed_ids
+    Exchanges.Config.order_book_feed_ids()
     |> fetch_order_book_status
     |> print_order_book_status
   end
 
   defp inside_quote([feed_id: _feed_id, symbol: _symbol] = feed_id_and_symbol) do
     feed_id_and_symbol
-    |> OrderBook.to_name
-    |> OrderBook.quotes
+    |> OrderBook.to_name()
+    |> OrderBook.quotes()
     |> case do
       {:ok, %{bids: bids, asks: asks}} ->
-        %Quote{bid: bids |> List.first, ask: asks |> List.first}
+        %Quote{bid: bids |> List.first(), ask: asks |> List.first()}
     end
   end
 
@@ -24,30 +24,36 @@ defmodule Tai.Commands.Markets do
       ask: %PriceLevel{price: 0, size: 0}
     })
   end
+
   defp format_inside_quote(%Quote{bid: bid, ask: nil}) do
     format_inside_quote(%Quote{
       bid: bid,
       ask: %PriceLevel{price: 0, size: 0}
     })
   end
+
   defp format_inside_quote(%Quote{bid: nil, ask: ask}) do
     format_inside_quote(%Quote{
       bid: %PriceLevel{price: 0, size: 0},
       ask: ask
     })
   end
+
   defp format_inside_quote(%Quote{} = inside_quote), do: inside_quote
 
   defp fetch_order_book_status([_head | _tail] = feed_ids) do
     feed_ids
     |> fetch_order_book_status([])
   end
+
   defp fetch_order_book_status([], acc), do: acc
+
   defp fetch_order_book_status([feed_id | tail], acc) do
-    rows = feed_id
-           |> Exchanges.Config.order_book_feed_symbols
-           |> Enum.map(&to_feed_and_symbol_inside_quote(&1, feed_id))
-           |> Enum.map(&to_order_book_status_row/1)
+    rows =
+      feed_id
+      |> Exchanges.Config.order_book_feed_symbols()
+      |> Enum.map(&to_feed_and_symbol_inside_quote(&1, feed_id))
+      |> Enum.map(&to_order_book_status_row/1)
 
     tail
     |> fetch_order_book_status(acc |> Enum.concat(rows))
@@ -67,10 +73,10 @@ defmodule Tai.Commands.Markets do
     [
       feed_id,
       symbol,
-      bid.price |> Decimal.new,
-      ask.price |> Decimal.new,
-      bid.size |> Decimal.new,
-      ask.size |> Decimal.new,
+      bid.price |> Decimal.new(),
+      ask.price |> Decimal.new(),
+      bid.size |> Decimal.new(),
+      ask.size |> Decimal.new(),
       bid.processed_at && Timex.from_now(bid.processed_at),
       bid.server_changed_at && Timex.from_now(bid.server_changed_at),
       ask.processed_at && Timex.from_now(ask.processed_at),
@@ -94,7 +100,7 @@ defmodule Tai.Commands.Markets do
 
     TableRex.Table.new(rows, header)
     |> TableRex.Table.put_column_meta(:all, align: :right)
-    |> TableRex.Table.render!
-    |> IO.puts
+    |> TableRex.Table.render!()
+    |> IO.puts()
   end
 end

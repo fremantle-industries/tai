@@ -102,15 +102,15 @@ defmodule Tai.ExchangeAdapters.Poloniex.SymbolMapping do
   def to_poloniex(:xrpusdt), do: "USDT_XRP"
   def to_poloniex(:zecusdt), do: "USDT_ZEC"
 
-  def to_poloniex(symbol) when is_atom(symbol), do: symbol |> Atom.to_string |> String.upcase
-  def to_poloniex(symbol), do: symbol |> String.upcase
+  def to_poloniex(symbol) when is_atom(symbol), do: symbol |> Atom.to_string() |> String.upcase()
+  def to_poloniex(symbol), do: symbol |> String.upcase()
 
   def to_tai(currency_pair) do
     currency_pair
     |> String.split("_")
-    |> Enum.reverse
+    |> Enum.reverse()
     |> Enum.join("")
-    |> String.downcase
-    |> String.to_atom
+    |> String.downcase()
+    |> String.to_atom()
   end
 end

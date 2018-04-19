@@ -8,14 +8,11 @@ defmodule Tai.ExchangeAdapters.Binance.DepthUpdate do
   """
   def normalize(raw_price_levels, processed_at, server_changed_at) do
     raw_price_levels
-    |> Enum.reduce(
-      %{},
-      fn ([price_str, size_str, _], acc) ->
-        {price, _} = Float.parse(price_str)
-        {size, _} = Float.parse(size_str)
+    |> Enum.reduce(%{}, fn [price_str, size_str, _], acc ->
+      {price, _} = Float.parse(price_str)
+      {size, _} = Float.parse(size_str)
 
-        Map.put(acc, price, {size, processed_at, server_changed_at})
-      end
-    )
+      Map.put(acc, price, {size, processed_at, server_changed_at})
+    end)
   end
 end

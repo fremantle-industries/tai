@@ -8,7 +8,7 @@ defmodule Tai.Exchanges.OrderBookFeedsSupervisor do
   end
 
   def init(_) do
-    Config.order_book_feed_ids
+    Config.order_book_feed_ids()
     |> to_children
     |> Supervisor.init(strategy: :one_for_one)
   end

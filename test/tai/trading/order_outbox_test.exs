@@ -18,39 +18,39 @@ defmodule Tai.Trading.OrderOutboxTest do
     end
 
     def handle_info({:order_enqueued, _order} = msg, state) do
-      send :test, msg
+      send(:test, msg)
       {:noreply, state}
     end
 
     def handle_info({:order_create_ok, _order} = msg, state) do
-      send :test, msg
+      send(:test, msg)
       {:noreply, state}
     end
 
     def handle_info({:order_create_error, _reason, _order} = msg, state) do
-      send :test, msg
+      send(:test, msg)
       {:noreply, state}
     end
 
     def handle_info({:order_cancelling, _order} = msg, state) do
-      send :test, msg
+      send(:test, msg)
       {:noreply, state}
     end
 
     def handle_info({:order_cancelled, _order} = msg, state) do
-      send :test, msg
+      send(:test, msg)
       {:noreply, state}
     end
   end
 
   setup do
-    Process.register self(), :test
+    Process.register(self(), :test)
     start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_exchange})
     start_supervised!(OrderLifecycleSubscriber)
 
-    on_exit fn ->
+    on_exit(fn ->
       Orders.clear()
-    end
+    end)
 
     :ok
   end
@@ -58,26 +58,28 @@ defmodule Tai.Trading.OrderOutboxTest do
   test "add enqueues the submissions as orders and then executes it on the exchange" do
     assert Orders.count() == 0
 
-    [new_buy_limit_order, new_sell_limit_order] = new_orders = OrderOutbox.add([
-      {:my_test_exchange, :btcusd_success, 100.0, 0.1},
-      {:my_test_exchange, :btcusd_success, 100.0, -0.1}
-    ])
+    [new_buy_limit_order, new_sell_limit_order] =
+      new_orders =
+      OrderOutbox.add([
+        {:my_test_exchange, :btcusd_success, 100.0, 0.1},
+        {:my_test_exchange, :btcusd_success, 100.0, -0.1}
+      ])
 
     assert Enum.count(new_orders) == 2
     assert Orders.count() == 2
 
     assert_receive {:order_enqueued, enqueued_order_1}
     assert enqueued_order_1.client_id == new_buy_limit_order.client_id
-    assert enqueued_order_1.status == OrderStatus.enqueued
-    assert enqueued_order_1.type == OrderTypes.buy_limit
+    assert enqueued_order_1.status == OrderStatus.enqueued()
+    assert enqueued_order_1.type == OrderTypes.buy_limit()
     assert enqueued_order_1.enqueued_at == new_buy_limit_order.enqueued_at
     assert enqueued_order_1.server_id == nil
     assert enqueued_order_1.created_at == nil
 
     assert_receive {:order_enqueued, enqueued_order_2}
     assert enqueued_order_2.client_id == new_sell_limit_order.client_id
-    assert enqueued_order_2.status == OrderStatus.enqueued
-    assert enqueued_order_2.type == OrderTypes.sell_limit
+    assert enqueued_order_2.status == OrderStatus.enqueued()
+    assert enqueued_order_2.type == OrderTypes.sell_limit()
     assert enqueued_order_2.enqueued_at == new_sell_limit_order.enqueued_at
     assert enqueued_order_2.server_id == nil
     assert enqueued_order_2.created_at == nil
@@ -85,21 +87,20 @@ defmodule Tai.Trading.OrderOutboxTest do
     assert_receive {:order_create_ok, created_order_a}
     assert_receive {:order_create_ok, created_order_b}
 
-    [created_order_1, created_order_2] = [created_order_a, created_order_b]
-                                         |> Enum.sort(
-                                           &(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt)
-                                         )
+    [created_order_1, created_order_2] =
+      [created_order_a, created_order_b]
+      |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
 
     assert created_order_1.client_id == new_buy_limit_order.client_id
-    assert created_order_1.status == OrderStatus.pending
-    assert created_order_1.type == OrderTypes.buy_limit
+    assert created_order_1.status == OrderStatus.pending()
+    assert created_order_1.type == OrderTypes.buy_limit()
     assert created_order_1.enqueued_at == new_buy_limit_order.enqueued_at
     assert created_order_1.server_id != nil
     assert %DateTime{} = created_order_1.created_at
 
     assert created_order_2.client_id == new_sell_limit_order.client_id
-    assert created_order_2.status == OrderStatus.pending
-    assert created_order_2.type == OrderTypes.sell_limit
+    assert created_order_2.status == OrderStatus.pending()
+    assert created_order_2.type == OrderTypes.sell_limit()
     assert created_order_2.enqueued_at == new_sell_limit_order.enqueued_at
     assert created_order_2.server_id != nil
     assert %DateTime{} = created_order_2.created_at
@@ -108,15 +109,16 @@ defmodule Tai.Trading.OrderOutboxTest do
   test "add broadcasts failed orders and updates the status" do
     assert Orders.count() == 0
 
-    [new_order_1, new_order_2] = OrderOutbox.add([
-      {:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1},
-      {:my_test_exchange, :btcusd_insufficient_funds, 100.0, -0.1}
-    ])
+    [new_order_1, new_order_2] =
+      OrderOutbox.add([
+        {:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1},
+        {:my_test_exchange, :btcusd_insufficient_funds, 100.0, -0.1}
+      ])
 
     assert Orders.count() == 2
     assert_receive {:order_enqueued, enqueued_order_1}
     assert enqueued_order_1.client_id == new_order_1.client_id
-    assert enqueued_order_1.status == OrderStatus.enqueued
+    assert enqueued_order_1.status == OrderStatus.enqueued()
 
     assert_receive {:order_create_error, error_reason_a, error_order_a}
     assert_receive {:order_create_error, error_reason_b, error_order_b}
@@ -126,28 +128,30 @@ defmodule Tai.Trading.OrderOutboxTest do
     [
       {error_reason_1, error_order_1},
       {error_reason_2, error_order_2}
-    ] = unsorted_errors
-        |> Enum.sort(fn {_ra, oa}, {_rb, ob} ->
-          DateTime.compare(oa.enqueued_at, ob.enqueued_at) == :lt
-        end)
+    ] =
+      unsorted_errors
+      |> Enum.sort(fn {_ra, oa}, {_rb, ob} ->
+        DateTime.compare(oa.enqueued_at, ob.enqueued_at) == :lt
+      end)
 
     assert %OrderResponses.InsufficientFunds{} = error_reason_1
     assert error_order_1.client_id == new_order_1.client_id
-    assert error_order_1.type == OrderTypes.buy_limit
-    assert error_order_1.status == OrderStatus.error
+    assert error_order_1.type == OrderTypes.buy_limit()
+    assert error_order_1.status == OrderStatus.error()
 
     assert %OrderResponses.InsufficientFunds{} = error_reason_2
     assert error_order_2.client_id == new_order_2.client_id
-    assert error_order_2.type == OrderTypes.sell_limit
-    assert error_order_2.status == OrderStatus.error
+    assert error_order_2.type == OrderTypes.sell_limit()
+    assert error_order_2.status == OrderStatus.error()
   end
 
   test "cancel changes the given pending orders to cancelling and sends the request to the exchange in the background" do
-    [order_1, order_2, order_3] = OrderOutbox.add([
-      {:my_test_exchange, :btcusd_success, 100.0, 0.1},
-      {:my_test_exchange, :btcusd_success, 100.0, 1.1},
-      {:my_test_exchange, :btcusd_insufficient_funds, 100.0, 2.1}
-    ])
+    [order_1, order_2, order_3] =
+      OrderOutbox.add([
+        {:my_test_exchange, :btcusd_success, 100.0, 0.1},
+        {:my_test_exchange, :btcusd_success, 100.0, 1.1},
+        {:my_test_exchange, :btcusd_insufficient_funds, 100.0, 2.1}
+      ])
 
     assert_receive {:order_enqueued, ^order_1}
     assert_receive {:order_enqueued, ^order_2}
@@ -156,18 +160,19 @@ defmodule Tai.Trading.OrderOutboxTest do
     assert_receive {:order_create_ok, _}
     assert_receive {:order_create_error, _, _}
 
-    [cancelling_order_1, cancelling_order_2] = OrderOutbox.cancel([
-      order_1.client_id,
-      order_2.client_id,
-      order_3.client_id,
-      "client_id_doesnt_exist"
-    ])
-    |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
+    [cancelling_order_1, cancelling_order_2] =
+      OrderOutbox.cancel([
+        order_1.client_id,
+        order_2.client_id,
+        order_3.client_id,
+        "client_id_doesnt_exist"
+      ])
+      |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
 
     assert cancelling_order_1.client_id == order_1.client_id
-    assert cancelling_order_1.status == OrderStatus.cancelling
+    assert cancelling_order_1.status == OrderStatus.cancelling()
     assert cancelling_order_2.client_id == order_2.client_id
-    assert cancelling_order_2.status == OrderStatus.cancelling
+    assert cancelling_order_2.status == OrderStatus.cancelling()
 
     assert_receive {:order_cancelling, ^cancelling_order_1}
     assert_receive {:order_cancelling, ^cancelling_order_2}
@@ -177,8 +182,8 @@ defmodule Tai.Trading.OrderOutboxTest do
 
     cancelled_order_client_ids = [cancelled_order_1.client_id, cancelled_order_2.client_id]
     assert cancelled_order_client_ids |> Enum.member?(cancelling_order_1.client_id)
-    assert cancelled_order_1.status == OrderStatus.cancelled
+    assert cancelled_order_1.status == OrderStatus.cancelled()
     assert cancelled_order_client_ids |> Enum.member?(cancelling_order_2.client_id)
-    assert cancelled_order_2.status == OrderStatus.cancelled
+    assert cancelled_order_2.status == OrderStatus.cancelled()
   end
 end

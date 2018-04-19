@@ -24,9 +24,9 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
 
   test "buy_limit returns an :error, insufficient_funds tuple when the symbol is :btcusd_insufficient_funds" do
     assert Account.buy_limit(:my_test_exchange, :btcusd_insufficient_funds, 101.1, 0.1) == {
-      :error,
-      %OrderResponses.InsufficientFunds{}
-    }
+             :error,
+             %OrderResponses.InsufficientFunds{}
+           }
   end
 
   test "buy_limit returns an :error, unknown_error tuple otherwise" do
@@ -43,9 +43,9 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
 
   test "sell_limit returns an :error, insufficient_funds tuple when the symbol is :btcusd_insufficient_funds" do
     assert Account.sell_limit(:my_test_exchange, :btcusd_insufficient_funds, 101.1, 0.1) == {
-      :error,
-      %OrderResponses.InsufficientFunds{}
-    }
+             :error,
+             %OrderResponses.InsufficientFunds{}
+           }
   end
 
   test "sell_limit returns an :error, unknown_error tuple otherwise" do
@@ -54,9 +54,9 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
 
   test "order_status can return an invalid order id" do
     assert Account.order_status(:my_test_exchange, "invalid-order-id") == {
-      :error,
-      "Invalid order id"
-    }
+             :error,
+             "Invalid order id"
+           }
   end
 
   test "order_status returns an ok tuple for all other order ids" do
@@ -65,15 +65,15 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
 
   test "cancel_order can return an invalid order id" do
     assert Account.cancel_order(:my_test_exchange, "invalid-order-id") == {
-      :error,
-      "Invalid order id"
-    }
+             :error,
+             "Invalid order id"
+           }
   end
 
   test "cancel_order returns an ok tuple for all other order ids" do
     assert Account.cancel_order(:my_test_exchange, "some-other-order-id") == {
-      :ok,
-      "some-other-order-id"
-    }
+             :ok,
+             "some-other-order-id"
+           }
   end
 end

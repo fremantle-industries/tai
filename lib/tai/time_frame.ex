@@ -6,7 +6,7 @@ defmodule Tai.TimeFrame do
       start = :os.system_time(unquote(units))
       result = unquote(yield)
       time_passed = :os.system_time(unquote(units)) - start
-      Logger.debug "#{unquote(name)} #{time_passed} #{unquote(units)}"
+      Logger.debug("#{unquote(name)} #{time_passed} #{unquote(units)}")
 
       result
     end
@@ -17,7 +17,7 @@ defmodule Tai.TimeFrame do
       start = :os.system_time(unquote(units))
       result = unquote(yield)
       time_passed = :os.system_time(unquote(units)) - start
-      Logger.warn "#{unquote(name)} #{time_passed} #{unquote(units)}"
+      Logger.warn("#{unquote(name)} #{time_passed} #{unquote(units)}")
 
       result
     end
@@ -28,7 +28,7 @@ defmodule Tai.TimeFrame do
       start = :os.system_time(unquote(units))
       result = unquote(yield)
       time_passed = :os.system_time(unquote(units)) - start
-      Logger.info "#{unquote(name)} #{time_passed} #{unquote(units)}"
+      Logger.info("#{unquote(name)} #{time_passed} #{unquote(units)}")
 
       result
     end

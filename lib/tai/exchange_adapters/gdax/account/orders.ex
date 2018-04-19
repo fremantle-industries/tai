@@ -15,7 +15,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
   defp create_limit_order(order) do
     order
     |> build_limit_order
-    |> ExGdax.create_order
+    |> ExGdax.create_order()
     |> handle_create_order
   end
 
@@ -30,10 +30,11 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
   end
 
   defp handle_create_order({
-    :ok,
-    %{"id" => id, "status" => status, "created_at" => created_at_str}
-  }) do
+         :ok,
+         %{"id" => id, "status" => status, "created_at" => created_at_str}
+       }) do
     created_at = Timex.parse!(created_at_str, "{ISO:Extended}")
+
     order_response = %OrderResponses.Created{
       id: id,
       status: OrderStatus.to_atom(status),
@@ -42,9 +43,11 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
 
     {:ok, order_response}
   end
+
   defp handle_create_order({:error, "Insufficient funds", _status_code}) do
     {:error, %OrderResponses.InsufficientFunds{}}
   end
+
   defp handle_create_order({:error, message, _status_code}) do
     {:error, message}
   end

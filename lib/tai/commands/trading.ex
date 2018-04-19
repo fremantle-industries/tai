@@ -6,9 +6,12 @@ defmodule Tai.Commands.Trading do
     |> Account.buy_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
-        IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
+        IO.puts(
+          "create order success - id: #{order_response.id}, status: #{order_response.status}"
+        )
+
       {:error, %OrderResponses.InsufficientFunds{}} ->
-        IO.puts "create order failure - insufficient funds"
+        IO.puts("create order failure - insufficient funds")
     end
   end
 
@@ -17,9 +20,12 @@ defmodule Tai.Commands.Trading do
     |> Account.sell_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
-        IO.puts "create order success - id: #{order_response.id}, status: #{order_response.status}"
+        IO.puts(
+          "create order success - id: #{order_response.id}, status: #{order_response.status}"
+        )
+
       {:error, %OrderResponses.InsufficientFunds{}} ->
-        IO.puts "create order failure - insufficient funds"
+        IO.puts("create order failure - insufficient funds")
     end
   end
 
@@ -28,9 +34,10 @@ defmodule Tai.Commands.Trading do
     |> Account.order_status(order_id)
     |> case do
       {:ok, status} ->
-        IO.puts "status: #{status}"
+        IO.puts("status: #{status}")
+
       {:error, message} ->
-        IO.puts "error: #{message}"
+        IO.puts("error: #{message}")
     end
   end
 
@@ -39,9 +46,10 @@ defmodule Tai.Commands.Trading do
     |> Account.cancel_order(order_id)
     |> case do
       {:ok, _canceled_order_id} ->
-        IO.puts "cancel order success"
+        IO.puts("cancel order success")
+
       {:error, message} ->
-        IO.puts "error: #{message}"
+        IO.puts("error: #{message}")
     end
   end
 end

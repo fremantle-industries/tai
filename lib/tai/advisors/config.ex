@@ -5,7 +5,7 @@ defmodule Tai.Advisors.Config do
 
   def servers do
     all()
-    |> Enum.map(fn ({advisor_id, config}) ->
+    |> Enum.map(fn {advisor_id, config} ->
       {advisor_id, Keyword.get(config, :server)}
     end)
   end

@@ -2,8 +2,8 @@ defmodule Tai.Commands.Orders do
   alias Tai.Trading.Orders
 
   def orders do
-    Orders.all
-    |> Enum.sort(&DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt)
+    Orders.all()
+    |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
     |> Enum.map(fn order ->
       [
         order.exchange,
@@ -24,15 +24,16 @@ defmodule Tai.Commands.Orders do
   defp print_table([]) do
     [
       "-"
-      |> List.duplicate(header() |> Enum.count)
+      |> List.duplicate(header() |> Enum.count())
     ]
     |> print_table
   end
+
   defp print_table(rows) do
     TableRex.Table.new(rows, header())
     |> TableRex.Table.put_column_meta(:all, align: :right)
-    |> TableRex.Table.render!
-    |> IO.puts
+    |> TableRex.Table.render!()
+    |> IO.puts()
   end
 
   defp header do

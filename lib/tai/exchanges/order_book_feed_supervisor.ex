@@ -15,19 +15,17 @@ defmodule Tai.Exchanges.OrderBookFeedSupervisor do
 
   def to_name(feed_id) do
     "#{__MODULE__}_#{feed_id}"
-    |> String.to_atom
+    |> String.to_atom()
   end
 
   defp to_children(feed_id) do
     order_book_child_specs(feed_id)
-    |> Enum.concat(
-      [feed_id |> feed_child_spec]
-    )
+    |> Enum.concat([feed_id |> feed_child_spec])
   end
 
   defp order_book_child_specs(feed_id) do
     feed_id
-    |> Config.order_book_feed_symbols
+    |> Config.order_book_feed_symbols()
     |> Enum.map(
       &Supervisor.child_spec(
         {Tai.Markets.OrderBook, feed_id: feed_id, symbol: &1},
@@ -38,11 +36,11 @@ defmodule Tai.Exchanges.OrderBookFeedSupervisor do
 
   defp feed_child_spec(feed_id) do
     %{
-      id: feed_id |> Tai.Exchanges.OrderBookFeed.to_name,
+      id: feed_id |> Tai.Exchanges.OrderBookFeed.to_name(),
       start: {
-        feed_id |> Config.order_book_feed_adapter,
+        feed_id |> Config.order_book_feed_adapter(),
         :start_link,
-        [[feed_id: feed_id, symbols: feed_id |> Config.order_book_feed_symbols]]
+        [[feed_id: feed_id, symbols: feed_id |> Config.order_book_feed_symbols()]]
       },
       type: :worker,
       restart: :permanent,

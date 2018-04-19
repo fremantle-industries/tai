@@ -28,17 +28,15 @@ defmodule Tai.Trading.Orders do
   end
 
   def handle_call({:update, client_id, attrs}, _from, state) do
-    {_previous_order, new_state} = Map.get_and_update(
-      state,
-      client_id,
-      fn current_order ->
+    {_previous_order, new_state} =
+      Map.get_and_update(state, client_id, fn current_order ->
         attr_whitelist = [:server_id, :created_at, :status]
-        accepted_attrs = attrs |> Keyword.take(attr_whitelist) |> Map.new
+        accepted_attrs = attrs |> Keyword.take(attr_whitelist) |> Map.new()
         updated_order = current_order |> Map.merge(accepted_attrs)
 
         {current_order, updated_order}
-      end
-    )
+      end)
+
     updated_order = new_state[client_id]
 
     {:reply, updated_order, new_state}
@@ -49,18 +47,19 @@ defmodule Tai.Trading.Orders do
   end
 
   def handle_call(:all, _from, state) do
-    {:reply, state |> Map.values, state}
+    {:reply, state |> Map.values(), state}
   end
 
   def handle_call({:where, [_head | _tail] = filters}, _from, state) do
-    {:reply, state |> filter(filters) |> Map.values, state}
+    {:reply, state |> filter(filters) |> Map.values(), state}
   end
 
   def handle_call(:count, _from, state) do
-    {:reply, state |> Enum.count, state}
+    {:reply, state |> Enum.count(), state}
   end
+
   def handle_call({:count, status: status}, _from, state) do
-    {:reply, state |> filter(status: status) |> Enum.count, state}
+    {:reply, state |> filter(status: status) |> Enum.count(), state}
   end
 
   @doc """
@@ -118,6 +117,7 @@ defmodule Tai.Trading.Orders do
   def count do
     GenServer.call(__MODULE__, :count)
   end
+
   @doc """
   Return the total number of orders with the given status
   """
@@ -129,12 +129,16 @@ defmodule Tai.Trading.Orders do
     [submission]
     |> add_orders(state)
   end
+
   defp add_orders([], state), do: {[], state}
+
   defp add_orders([_head | _tail] = submissions, state) do
     submissions
     |> add_orders(state, [])
   end
-  defp add_orders([], state, new_orders), do: {new_orders |> Enum.reverse, state}
+
+  defp add_orders([], state, new_orders), do: {new_orders |> Enum.reverse(), state}
+
   defp add_orders([{exchange_id, symbol, price, size} | tail], state, new_orders) do
     order = %Order{
       client_id: UUID.uuid4(),
@@ -143,30 +147,33 @@ defmodule Tai.Trading.Orders do
       type: to_order_type(size),
       price: price,
       size: abs(size),
-      status: OrderStatus.enqueued,
-      enqueued_at: Timex.now
+      status: OrderStatus.enqueued(),
+      enqueued_at: Timex.now()
     }
+
     new_state = state |> Map.put(order.client_id, order)
 
     add_orders(tail, new_state, [order | new_orders])
   end
 
-  defp to_order_type(size) when size > 0, do: OrderTypes.buy_limit
-  defp to_order_type(size) when size < 0, do: OrderTypes.sell_limit
+  defp to_order_type(size) when size > 0, do: OrderTypes.buy_limit()
+  defp to_order_type(size) when size < 0, do: OrderTypes.sell_limit()
 
   defp filter(state, [{attr, [_head | _tail] = vals}]) do
     state
     |> Enum.filter(fn {_, order} ->
       vals
-      |> Enum.any?(& &1 == Map.get(order, attr))
+      |> Enum.any?(&(&1 == Map.get(order, attr)))
     end)
-    |> Map.new
+    |> Map.new()
   end
+
   defp filter(state, [{attr, val}]) do
     state
     |> Enum.filter(fn {_, order} -> Map.get(order, attr) == val end)
-    |> Map.new
+    |> Map.new()
   end
+
   defp filter(state, [{_attr, _val} = head | tail]) do
     state
     |> filter([head])

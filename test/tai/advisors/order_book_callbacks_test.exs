@@ -9,32 +9,31 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     use Advisor
 
     def handle_order_book_changes(feed_id, symbol, changes, state) do
-      send :test, {feed_id, symbol, changes, state}
+      send(:test, {feed_id, symbol, changes, state})
     end
 
     def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
-      send :test, {feed_id, symbol, inside_quote, changes, state}
+      send(:test, {feed_id, symbol, inside_quote, changes, state})
 
       {:ok, %{store: %{hello: "world"}}}
     end
   end
 
   setup do
-    Process.register self(), :test
+    Process.register(self(), :test)
     book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btcusd})
     start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_exchange})
 
-    on_exit fn ->
+    on_exit(fn ->
       Orders.clear()
-    end
+    end)
 
     {:ok, %{book_pid: book_pid}}
   end
 
-  test(
-    "handle_order_book_changes is called when it receives a broadcast message",
-    %{book_pid: book_pid}
-  ) do
+  test("handle_order_book_changes is called when it receives a broadcast message", %{
+    book_pid: book_pid
+  }) do
     start_supervised!({
       MyAdvisor,
       [
@@ -43,6 +42,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         exchanges: [:my_test_exchange]
       ]
     })
+
     changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
     book_pid |> OrderBook.update(changes)
 
@@ -54,10 +54,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     }
   end
 
-  test(
-    "handle_inside_quote is called after the snapshot broadcast message",
-    %{book_pid: book_pid}
-  ) do
+  test("handle_inside_quote is called after the snapshot broadcast message", %{book_pid: book_pid}) do
     start_supervised!({
       MyAdvisor,
       [
@@ -66,10 +63,12 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         exchanges: [:my_test_exchange]
       ]
     })
+
     snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
+
     book_pid |> OrderBook.replace(snapshot)
 
     assert_receive {
@@ -96,10 +95,12 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         exchanges: [:my_test_exchange]
       ]
     })
+
     snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
+
     book_pid |> OrderBook.replace(snapshot)
 
     assert_receive {
@@ -107,7 +108,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       :btcusd,
       %Quote{
         bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil},
+        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
       },
       ^snapshot,
       %Advisor{}
@@ -150,10 +151,12 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         exchanges: [:my_test_exchange]
       ]
     })
+
     snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
+
     book_pid |> OrderBook.replace(snapshot)
 
     assert_receive {
@@ -201,10 +204,12 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         exchanges: [:my_test_exchange]
       ]
     })
+
     snapshot = %OrderBook{
       bids: %{101.2 => {1.0, nil, nil}},
       asks: %{101.3 => {0.1, nil, nil}}
     }
+
     book_pid |> OrderBook.replace(snapshot)
 
     assert_receive {

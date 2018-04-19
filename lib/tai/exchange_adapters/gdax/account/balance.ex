@@ -2,9 +2,9 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Balance do
   alias Tai.{ExchangeAdapters.Gdax.Price, Markets.Currency, Markets.Symbol}
 
   def fetch do
-    ExGdax.list_accounts
+    ExGdax.list_accounts()
     |> convert_to_usd
-    |> Currency.sum
+    |> Currency.sum()
   end
 
   defp convert_to_usd({:ok, accounts}) do
@@ -14,18 +14,19 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Balance do
 
   defp convert_account_to_usd(%{"currency" => "USD", "balance" => balance}) do
     balance
-    |> Decimal.new
+    |> Decimal.new()
   end
+
   defp convert_account_to_usd(%{"currency" => currency, "balance" => balance}) do
     balance
-    |> Decimal.new
+    |> Decimal.new()
     |> Decimal.mult(usd_price(currency))
   end
 
   defp usd_price(currency) do
     "#{currency}usd"
-    |> Symbol.downcase
-    |> Price.fetch
+    |> Symbol.downcase()
+    |> Price.fetch()
     |> case do
       {:ok, price} -> price
     end

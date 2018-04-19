@@ -8,7 +8,7 @@ defmodule Tai.Advisors.Supervisor do
   end
 
   def init(:ok) do
-    Config.servers
+    Config.servers()
     |> Enum.map(&config_to_child_spec/1)
     |> Supervisor.init(strategy: :one_for_one)
   end
@@ -23,7 +23,7 @@ defmodule Tai.Advisors.Supervisor do
           exchanges: Config.exchanges(advisor_id)
         ]
       },
-      id: advisor_id |> Advisor.to_name
+      id: advisor_id |> Advisor.to_name()
     )
   end
 end

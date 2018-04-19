@@ -8,15 +8,12 @@ defmodule Tai.Exchanges.Supervisor do
   end
 
   def init(:ok) do
-    Enum.concat(
-      exchange_supervisors(),
-      [Tai.Exchanges.OrderBookFeedsSupervisor]
-    )
+    Enum.concat(exchange_supervisors(), [Tai.Exchanges.OrderBookFeedsSupervisor])
     |> Supervisor.init(strategy: :one_for_one)
   end
 
   defp exchange_supervisors do
-    Config.exchange_supervisors
+    Config.exchange_supervisors()
     |> Enum.map(fn {exchange_id, supervisor} ->
       Supervisor.child_spec(
         {supervisor, exchange_id},
