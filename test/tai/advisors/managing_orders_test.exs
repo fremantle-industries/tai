@@ -5,20 +5,6 @@ defmodule Tai.Advisors.ManagingOrdersTest do
   alias Tai.Markets.{OrderBook}
   alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderTypes}
 
-  defmodule MyOrderAdvisor do
-    def handle_order_enqueued(order, state) do
-      send(:test, {order, state})
-    end
-
-    def handle_order_create_ok(order, state) do
-      send(:test, {order, state})
-    end
-
-    def handle_order_create_error(reason, order, state) do
-      send(:test, {reason, order, state})
-    end
-  end
-
   defmodule MyBuyLimitAdvisor do
     use Advisor
 
