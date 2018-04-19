@@ -20,7 +20,8 @@ defmodule Tai.Advisors.Supervisor do
         [
           advisor_id: advisor_id,
           order_books: Config.order_books(advisor_id),
-          exchanges: Config.exchanges(advisor_id)
+          exchanges: Config.exchanges(advisor_id),
+          store: %{}
         ]
       },
       id: advisor_id |> Advisor.to_name()

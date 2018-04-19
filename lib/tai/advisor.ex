@@ -85,7 +85,12 @@ defmodule Tai.Advisor do
 
       @behaviour Advisor
 
-      def start_link(advisor_id: advisor_id, order_books: order_books, exchanges: exchanges) do
+      def start_link(
+            advisor_id: advisor_id,
+            order_books: order_books,
+            exchanges: exchanges,
+            store: %{} = store
+          ) do
         GenServer.start_link(
           __MODULE__,
           %Advisor{
@@ -93,7 +98,7 @@ defmodule Tai.Advisor do
             order_books: order_books,
             exchanges: exchanges,
             inside_quotes: %{},
-            store: %{}
+            store: Map.merge(%{}, store)
           },
           name: advisor_id |> Advisor.to_name()
         )

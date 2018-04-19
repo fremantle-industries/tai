@@ -39,7 +39,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange]
+        exchanges: [:my_test_exchange],
+        store: %{}
       ]
     })
 
@@ -60,7 +61,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange]
+        exchanges: [:my_test_exchange],
+        store: %{}
       ]
     })
 
@@ -92,7 +94,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange]
+        exchanges: [:my_test_exchange],
+        store: %{}
       ]
     })
 
@@ -148,7 +151,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange]
+        exchanges: [:my_test_exchange],
+        store: %{}
       ]
     })
 
@@ -201,7 +205,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange]
+        exchanges: [:my_test_exchange],
+        store: %{}
       ]
     })
 

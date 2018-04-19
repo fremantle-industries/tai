@@ -5,43 +5,11 @@ defmodule Tai.Advisors.ManagingOrdersTest do
   alias Tai.Markets.{OrderBook}
   alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderTypes}
 
-  defmodule MyBuyLimitAdvisor do
+  defmodule MyOrderAdvisor do
     use Advisor
 
-    def handle_inside_quote(_feed_id, _symbol, _inside_quote, _changes, _state) do
-      limit_orders = [
-        {:my_test_exchange, :btcusd_success, 101.1, 0.1},
-        {:my_test_exchange, :btcusd_success, 10.1, 0.11},
-        {:my_test_exchange, :btcusd_insufficient_funds, 1.1, 0.1}
-      ]
-
-      {:ok, %{limit_orders: limit_orders}}
-    end
-
-    def handle_order_enqueued(order, state) do
-      send(:test, {order, state})
-    end
-
-    def handle_order_create_ok(order, state) do
-      send(:test, {order, state})
-    end
-
-    def handle_order_create_error(reason, order, state) do
-      send(:test, {reason, order, state})
-    end
-  end
-
-  defmodule MySellLimitAdvisor do
-    use Advisor
-
-    def handle_inside_quote(_feed_id, _symbol, _inside_quote, _changes, _state) do
-      limit_orders = [
-        {:my_test_exchange, :btcusd_success, 101.1, -0.1},
-        {:my_test_exchange, :btcusd_success, 10.1, -0.11},
-        {:my_test_exchange, :btcusd_insufficient_funds, 1.1, -0.1}
-      ]
-
-      {:ok, %{limit_orders: limit_orders}}
+    def handle_inside_quote(_feed_id, _symbol, _inside_quote, _changes, state) do
+      {:ok, %{limit_orders: state.store.limit_orders}}
     end
 
     def handle_order_enqueued(order, state) do
@@ -116,11 +84,18 @@ defmodule Tai.Advisors.ManagingOrdersTest do
 
   test "handle_inside_quote can create multiple buy_limit orders", %{book_pid: book_pid} do
     start_supervised!({
-      MyBuyLimitAdvisor,
+      MyOrderAdvisor,
       [
         advisor_id: :my_buy_limit_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange]
+        exchanges: [:my_test_exchange],
+        store: %{
+          limit_orders: [
+            {:my_test_exchange, :btcusd_success, 101.1, 0.1},
+            {:my_test_exchange, :btcusd_success, 10.1, 0.11},
+            {:my_test_exchange, :btcusd_insufficient_funds, 1.1, 0.1}
+          ]
+        }
       ]
     })
 
@@ -194,11 +169,18 @@ defmodule Tai.Advisors.ManagingOrdersTest do
 
   test "handle_inside_quote can create multiple sell_limit orders", %{book_pid: book_pid} do
     start_supervised!({
-      MySellLimitAdvisor,
+      MyOrderAdvisor,
       [
         advisor_id: :my_sell_limit_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange]
+        exchanges: [:my_test_exchange],
+        store: %{
+          limit_orders: [
+            {:my_test_exchange, :btcusd_success, 101.1, -0.1},
+            {:my_test_exchange, :btcusd_success, 10.1, -0.11},
+            {:my_test_exchange, :btcusd_insufficient_funds, 1.1, -0.1}
+          ]
+        }
       ]
     })
 
@@ -276,7 +258,8 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       [
         advisor_id: :my_cancel_orders_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange]
+        exchanges: [:my_test_exchange],
+        store: %{}
       ]
     })
 
