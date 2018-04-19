@@ -4,11 +4,12 @@ config :logger,
   backends: [{LoggerFileBackend, :file_log}],
   utc_log: true
 
-log_format = "$dateT$time [$level]$levelpad $message\n"
+log_format = "$dateT$time [$level]$levelpad $metadata$message\n"
 
 config :logger, :file_log,
   path: "./log/#{Mix.env()}.log",
-  format: log_format
+  format: log_format,
+  metadata: [:pname]
 
 config :logger, :console, format: log_format
 

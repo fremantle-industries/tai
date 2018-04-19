@@ -118,9 +118,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
         :timer.sleep(100)
       end)
 
-    assert log_msg =~
-             "[warn]  [order_book_feed_example_feed] Expected 'handle_msg' to return an {:ok, state} tuple."
-
+    assert log_msg =~ "[warn]  expected 'handle_msg' to return an {:ok, state} tuple."
     assert log_msg =~ "But it returned: {:error, %{\"return\" => \"error\"}}"
   end
 
@@ -155,8 +153,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
         }
       end)
 
-    assert log_msg =~
-             "[debug] [order_book_feed_example_feed] received msg: {\"type\":\"test_message\"}"
+    assert log_msg =~ "[debug] received msg: {\"type\":\"test_message\"}"
   end
 
   test "logs an error message when disconnected" do
@@ -173,7 +170,6 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
         assert_receive :disconnected
       end)
 
-    assert log_msg =~
-             "[error] [order_book_feed_example_feed] disconnected - reason: {:remote, 1000, \"\"}"
+    assert log_msg =~ "[error] disconnected - reason: {:remote, 1000, \"\"}"
   end
 end

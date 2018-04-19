@@ -5,7 +5,7 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  alias Tai.{Advisor, PubSub, Trading.Order}
+  alias Tai.{Advisor, PubSub, Trading.Order, MetaLogger}
   alias Tai.Markets.{OrderBook, Quote}
 
   @typedoc """
@@ -19,38 +19,50 @@ defmodule Tai.Advisor do
   @doc """
   Callback when order book has bid or ask changes
   """
-  @callback handle_order_book_changes(order_book_feed_id :: Atom.t, symbol :: Atom.t, changes :: term, state :: Advisor.t) :: :ok
+  @callback handle_order_book_changes(
+              order_book_feed_id :: Atom.t(),
+              symbol :: Atom.t(),
+              changes :: term,
+              state :: Advisor.t()
+            ) :: :ok
 
   @doc """
   Callback when the highest bid or lowest ask changes price or size
   """
-  @callback handle_inside_quote(order_book_feed_id :: Atom.t, symbol :: Atom.t, inside_quote :: Quote.t, changes :: Map.t | List.t, state :: Advisor.t) :: :ok | {:ok, actions :: Map.t}
+  @callback handle_inside_quote(
+              order_book_feed_id :: Atom.t(),
+              symbol :: Atom.t(),
+              inside_quote :: Quote.t(),
+              changes :: Map.t() | List.t(),
+              state :: Advisor.t()
+            ) :: :ok | {:ok, actions :: Map.t()}
 
   @doc """
   Callback when an order is enqueued
   """
-  @callback handle_order_enqueued(order :: Order.t, state :: Advisor.t) :: :ok
+  @callback handle_order_enqueued(order :: Order.t(), state :: Advisor.t()) :: :ok
 
   @doc """
   Callback when an order is created on the server
   """
-  @callback handle_order_create_ok(order :: Order.t, state :: Advisor.t) :: :ok
+  @callback handle_order_create_ok(order :: Order.t(), state :: Advisor.t()) :: :ok
 
   @doc """
   Callback when an order creation fails
   """
-  @callback handle_order_create_error(reason :: term, order :: Order.t, state :: Advisor.t) :: :ok
+  @callback handle_order_create_error(reason :: term, order :: Order.t(), state :: Advisor.t()) ::
+              :ok
 
   @doc """
   Callback when an order has been cancelled in the outbox but before the 
   request has been sent to the exchange.
   """
-  @callback handle_order_cancelling(order :: Order.t, state :: Advisor.t) :: :ok
+  @callback handle_order_cancelling(order :: Order.t(), state :: Advisor.t()) :: :ok
 
   @doc """
   Callback when an order has been cancelled on the exchange
   """
-  @callback handle_order_cancelled(order :: Order.t, state :: Advisor.t) :: :ok
+  @callback handle_order_cancelled(order :: Order.t(), state :: Advisor.t()) :: :ok
 
   @doc """
   Returns an atom that will identify the process
@@ -83,12 +95,13 @@ defmodule Tai.Advisor do
             inside_quotes: %{},
             store: %{}
           },
-          name: advisor_id |> Advisor.to_name
+          name: advisor_id |> Advisor.to_name()
         )
       end
 
       @doc false
       def init(%Advisor{order_books: order_books, exchanges: exchanges} = state) do
+        MetaLogger.init_pname()
         subscribe_to_order_book_channels(order_books)
         subscribe_to_exchange_channels(exchanges)
 
@@ -97,53 +110,67 @@ defmodule Tai.Advisor do
 
       @doc false
       def handle_info({:order_book_snapshot, order_book_feed_id, symbol, snapshot}, state) do
-        new_state = state
-                    |> cache_inside_quote(order_book_feed_id, symbol)
-                    |> execute_handle_inside_quote(order_book_feed_id, symbol, snapshot)
+        new_state =
+          state
+          |> cache_inside_quote(order_book_feed_id, symbol)
+          |> execute_handle_inside_quote(order_book_feed_id, symbol, snapshot)
 
         {:noreply, new_state}
       end
+
       @doc false
       def handle_info({:order_book_changes, order_book_feed_id, symbol, changes}, state) do
-        new_state = Tai.TimeFrame.debug "[#{state.advisor_id |> Advisor.to_name}] handle_info({:order_book_changes...})" do
-          handle_order_book_changes(order_book_feed_id, symbol, changes, state)
+        new_state =
+          Tai.TimeFrame.debug "handle_info({:order_book_changes...})" do
+            handle_order_book_changes(order_book_feed_id, symbol, changes, state)
 
-          previous_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
-          if inside_quote_is_stale?(previous_inside_quote, changes) do
-            state
-            |> cache_inside_quote(order_book_feed_id, symbol)
-            |> execute_handle_inside_quote(order_book_feed_id, symbol, changes, previous_inside_quote)
-          else
-            state
+            previous_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
+
+            if inside_quote_is_stale?(previous_inside_quote, changes) do
+              state
+              |> cache_inside_quote(order_book_feed_id, symbol)
+              |> execute_handle_inside_quote(
+                order_book_feed_id,
+                symbol,
+                changes,
+                previous_inside_quote
+              )
+            else
+              state
+            end
           end
-        end
 
         {:noreply, new_state}
       end
+
       @doc false
       def handle_info({:order_enqueued, order}, state) do
         handle_order_enqueued(order, state)
 
         {:noreply, state}
       end
+
       @doc false
       def handle_info({:order_create_ok, order}, state) do
         handle_order_create_ok(order, state)
 
         {:noreply, state}
       end
+
       @doc false
       def handle_info({:order_create_error, reason, order}, state) do
         handle_order_create_error(reason, order, state)
 
         {:noreply, state}
       end
+
       @doc false
       def handle_info({:order_cancelling, order}, state) do
         handle_order_cancelling(order, state)
 
         {:noreply, state}
       end
+
       @doc false
       def handle_info({:order_cancelled, order}, state) do
         handle_order_cancelled(order, state)
@@ -161,7 +188,7 @@ defmodule Tai.Advisor do
       """
       def quotes(feed_id: order_book_feed_id, symbol: symbol, depth: depth) do
         [feed_id: order_book_feed_id, symbol: symbol]
-        |> OrderBook.to_name
+        |> OrderBook.to_name()
         |> OrderBook.quotes(depth)
       end
 
@@ -178,7 +205,7 @@ defmodule Tai.Advisor do
       """
       def cached_inside_quote(%{inside_quotes: inside_quotes}, order_book_feed_id, symbol) do
         inside_quotes
-        |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name)
+        |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name())
       end
 
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
@@ -211,39 +238,53 @@ defmodule Tai.Advisor do
         |> quotes
         |> case do
           {:ok, %OrderBook{bids: bids, asks: asks}} ->
-            %Quote{bid: bids |> List.first, ask: asks |> List.first}
+            %Quote{bid: bids |> List.first(), ask: asks |> List.first()}
         end
       end
 
       defp cache_inside_quote(state, order_book_feed_id, symbol) do
         current_inside_quote = fetch_inside_quote(order_book_feed_id, symbol)
-        order_book_key = [feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name
+        order_book_key = [feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name()
         new_inside_quotes = state.inside_quotes |> Map.put(order_book_key, current_inside_quote)
 
         state |> Map.put(:inside_quotes, new_inside_quotes)
       end
 
-      defp inside_quote_is_stale?(previous_inside_quote, %OrderBook{bids: bids, asks: asks} = changes) do
-        (bids |> Enum.any? && bids |> inside_bid_is_stale?(previous_inside_quote)) || (asks |> Enum.any? && asks |> inside_ask_is_stale?(previous_inside_quote))
+      defp inside_quote_is_stale?(
+             previous_inside_quote,
+             %OrderBook{bids: bids, asks: asks} = changes
+           ) do
+        (bids |> Enum.any?() && bids |> inside_bid_is_stale?(previous_inside_quote)) ||
+          (asks |> Enum.any?() && asks |> inside_ask_is_stale?(previous_inside_quote))
       end
 
       defp inside_bid_is_stale?(_bids, nil), do: false
+
       defp inside_bid_is_stale?(bids, %Quote{} = prev_quote) do
         bids
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
-          price >= prev_quote.bid.price || (price == prev_quote.bid.price && size != prev_quote.bid.size)
+          price >= prev_quote.bid.price ||
+            (price == prev_quote.bid.price && size != prev_quote.bid.size)
         end)
       end
 
       defp inside_ask_is_stale?(asks, nil), do: false
+
       defp inside_ask_is_stale?(asks, %Quote{} = prev_quote) do
         asks
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
-          price <= prev_quote.ask.price || (price == prev_quote.ask.price && size != prev_quote.ask.size)
+          price <= prev_quote.ask.price ||
+            (price == prev_quote.ask.price && size != prev_quote.ask.size)
         end)
       end
 
-      defp execute_handle_inside_quote(state, order_book_feed_id, symbol, changes, previous_inside_quote \\ nil) do
+      defp execute_handle_inside_quote(
+             state,
+             order_book_feed_id,
+             symbol,
+             changes,
+             previous_inside_quote \\ nil
+           ) do
         current_inside_quote = cached_inside_quote(state, order_book_feed_id, symbol)
 
         if current_inside_quote == previous_inside_quote do
@@ -261,6 +302,7 @@ defmodule Tai.Advisor do
         {:ok, %{}}
         |> normalize_handler_response
       end
+
       defp normalize_handler_response({:ok, actions}) do
         default_actions = %{cancel_orders: [], limit_orders: []}
         {:ok, default_actions |> Map.merge(actions)}
@@ -268,14 +310,14 @@ defmodule Tai.Advisor do
 
       defp cancel_orders({:ok, %{cancel_orders: cancel_orders}} = handler_response) do
         cancel_orders
-        |> OrderOutbox.cancel
+        |> OrderOutbox.cancel()
 
         handler_response
       end
 
       defp submit_orders({:ok, %{limit_orders: limit_orders}} = handler_response) do
         limit_orders
-        |> OrderOutbox.add
+        |> OrderOutbox.add()
 
         handler_response
       end
@@ -283,15 +325,13 @@ defmodule Tai.Advisor do
       defp update_store({:ok, %{store: store}}, state), do: state |> Map.put(:store, store)
       defp update_store({:ok, %{}}, state), do: state
 
-      defoverridable [
-        handle_order_book_changes: 4,
-        handle_inside_quote: 5,
-        handle_order_enqueued: 2,
-        handle_order_create_ok: 2,
-        handle_order_create_error: 3,
-        handle_order_cancelling: 2,
-        handle_order_cancelled: 2
-      ]
+      defoverridable handle_order_book_changes: 4,
+                     handle_inside_quote: 5,
+                     handle_order_enqueued: 2,
+                     handle_order_create_ok: 2,
+                     handle_order_create_error: 3,
+                     handle_order_cancelling: 2,
+                     handle_order_cancelled: 2
     end
   end
 end

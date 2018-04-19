@@ -85,10 +85,8 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   @doc """
   Log a warning message when the WebSocket receives a message that is not explicitly handled
   """
-  def handle_msg(unhandled_msg, %OrderBookFeed{feed_id: feed_id} = state) do
-    Logger.warn(
-      "[#{feed_id |> OrderBookFeed.to_name()}] unhandled message: #{inspect(unhandled_msg)}"
-    )
+  def handle_msg(unhandled_msg, state) do
+    Logger.warn("unhandled message: #{inspect(unhandled_msg)}")
 
     {:ok, state}
   end

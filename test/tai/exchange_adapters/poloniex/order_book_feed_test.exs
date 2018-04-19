@@ -188,7 +188,6 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeedTest do
         :timer.sleep(100)
       end)
 
-    assert log_msg =~
-             "[order_book_feed_my_poloniex_feed] unhandled message: %{\"type\" => \"unknown_type\"}"
+    assert log_msg =~ "unhandled message: %{\"type\" => \"unknown_type\"}"
   end
 end

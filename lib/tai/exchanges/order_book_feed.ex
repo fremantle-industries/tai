@@ -3,10 +3,12 @@ defmodule Tai.Exchanges.OrderBookFeed do
   Behaviour to connect to a WebSocket that streams quotes from order books
   """
 
+  alias Tai.{PubSub, MetaLogger, Exchanges.OrderBookFeed}
+
   @typedoc """
   The state of the running order book feed
   """
-  @type t :: Tai.Exchanges.OrderBookFeed
+  @type t :: OrderBookFeed
 
   @enforce_keys [:feed_id, :symbols, :store]
   defstruct [:feed_id, :symbols, :store]
@@ -20,8 +22,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
   @doc """
   Invoked after a message is received on the socket and should be used to process the message
   """
-  @callback handle_msg(msg :: Map.t(), feed_id :: Atom.t()) ::
-              {:ok, state :: Tai.Exchanges.OrderBookFeed.t()}
+  @callback handle_msg(msg :: Map.t(), feed_id :: Atom.t()) :: {:ok, state :: OrderBookFeed.t()}
 
   @doc """
   Returns an atom that will identify the process
@@ -64,6 +65,15 @@ defmodule Tai.Exchanges.OrderBookFeed do
       end
 
       @doc """
+      Add the registered process name as logger metadata after the websocket has connected
+      """
+      def handle_connect(_conn, state) do
+        MetaLogger.init_pname()
+
+        {:ok, state}
+      end
+
+      @doc """
       Hook to create a connection URL with symbols
       """
       def build_connection_url(url, symbols), do: url
@@ -85,9 +95,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       @doc false
       def handle_frame({:text, msg}, %OrderBookFeed{feed_id: feed_id} = state) do
-        Logger.debug(fn ->
-          "[#{feed_id |> OrderBookFeed.to_name()}] received msg: #{msg}"
-        end)
+        Logger.debug(fn -> "received msg: #{msg}" end)
 
         msg
         |> JSON.decode!()
@@ -98,7 +106,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
           other ->
             Logger.warn(
-              "[#{feed_id |> OrderBookFeed.to_name()}] Expected 'handle_msg' to return an {:ok, state} tuple. But it returned: #{
+              "expected 'handle_msg' to return an {:ok, state} tuple. But it returned: #{
                 inspect(other)
               }"
             )
@@ -108,12 +116,8 @@ defmodule Tai.Exchanges.OrderBookFeed do
       end
 
       @doc false
-      def handle_disconnect(conn_status, %OrderBookFeed{feed_id: feed_id} = state) do
-        Logger.error(
-          "[#{feed_id |> Tai.Exchanges.OrderBookFeed.to_name()}] disconnected - reason: #{
-            inspect(conn_status.reason)
-          }"
-        )
+      def handle_disconnect(conn_status, state) do
+        Logger.error("disconnected - reason: #{inspect(conn_status.reason)}")
 
         {:ok, state}
       end

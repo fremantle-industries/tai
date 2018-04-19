@@ -33,8 +33,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
   for more than 60 seconds, the heartbeat interval will be reduced to 8 seconds 
   until the next update.
   """
-  def handle_msg([1010], %OrderBookFeed{feed_id: feed_id} = state) do
-    Logger.debug(fn -> "[#{feed_id |> OrderBookFeed.to_name()}] heartbeat" end)
+  def handle_msg([1010], state) do
+    Logger.debug(fn -> "heartbeat" end)
     {:ok, state}
   end
 
@@ -63,10 +63,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
   @doc """
   Log a warning message when the WebSocket receives a message that is not explicitly handled
   """
-  def handle_msg(unhandled_msg, %OrderBookFeed{feed_id: feed_id} = state) do
-    Logger.warn(
-      "[#{feed_id |> OrderBookFeed.to_name()}] unhandled message: #{inspect(unhandled_msg)}"
-    )
+  def handle_msg(unhandled_msg, state) do
+    Logger.warn("unhandled message: #{inspect(unhandled_msg)}")
 
     {:ok, state}
   end
