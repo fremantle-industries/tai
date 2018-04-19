@@ -62,6 +62,20 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
            ) == {:error, %WebSockex.URLError{url: ""}}
   end
 
+  test "logs a connection message" do
+    log_msg =
+      capture_log(fn ->
+        ExampleOrderBookFeed.start_link(
+          feed_id: :example_feed,
+          symbols: [:btcusd, :ltcusd]
+        )
+
+        :timer.sleep(100)
+      end)
+
+    assert log_msg =~ "connected"
+  end
+
   test "calls the handle_msg callback when it receives a WebSocket message" do
     {:ok, pid} =
       ExampleOrderBookFeed.start_link(

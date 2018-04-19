@@ -69,6 +69,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
       """
       def handle_connect(_conn, state) do
         MetaLogger.init_pname()
+        Logger.info("connected")
 
         {:ok, state}
       end
