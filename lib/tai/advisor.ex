@@ -310,14 +310,14 @@ defmodule Tai.Advisor do
         end
       end
 
+      @empty_response {:ok, %{}}
       defp normalize_handle_inside_quote_response(:ok) do
-        {:ok, %{}}
-        |> normalize_handle_inside_quote_response
+        normalize_handle_inside_quote_response(@empty_response)
       end
 
+      @default_actions %{cancel_orders: [], orders: []}
       defp normalize_handle_inside_quote_response({:ok, actions}) do
-        default_actions = %{cancel_orders: [], orders: []}
-        {:ok, default_actions |> Map.merge(actions)}
+        {:ok, Map.merge(@default_actions, actions)}
       end
 
       defp normalize_handle_inside_quote_response(unhandled) do
