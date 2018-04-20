@@ -213,12 +213,19 @@ defmodule Tai.Advisor do
         |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name())
       end
 
+      @doc false
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
+      @doc false
       def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state), do: :ok
+      @doc false
       def handle_order_enqueued(order, state), do: :ok
+      @doc false
       def handle_order_create_ok(order, state), do: :ok
+      @doc false
       def handle_order_create_error(reason, order, state), do: :ok
+      @doc false
       def handle_order_cancelling(order, state), do: :ok
+      @doc false
       def handle_order_cancelled(order, state), do: :ok
 
       defp subscribe_to_order_book_channels(order_books) do
