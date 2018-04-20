@@ -3,7 +3,7 @@ defmodule Tai.Exchanges.AccountTest do
   doctest Tai.Exchanges.Account
 
   alias Tai.Exchanges.Account
-  alias Tai.Trading.{OrderResponses, Order, OrderStatus, OrderTypes}
+  alias Tai.Trading.{OrderResponses, Order, OrderStatus}
 
   test "balance returns the USD value of all assets on the given exchange" do
     assert Account.balance(:test_exchange_a) == Decimal.new(0.11)
@@ -21,7 +21,8 @@ defmodule Tai.Exchanges.AccountTest do
       client_id: UUID.uuid4(),
       exchange: :test_exchange_a,
       symbol: :btcusd_success,
-      type: OrderTypes.buy_limit(),
+      side: Order.buy(),
+      type: Order.limit(),
       price: 10.1,
       size: 2.2,
       status: OrderStatus.enqueued(),
@@ -34,19 +35,33 @@ defmodule Tai.Exchanges.AccountTest do
     assert %DateTime{} = order_response.created_at
   end
 
-  test "buy_limit returns an error tuple when the type is not buy_limit" do
-    order = %Order{
+  test "buy_limit returns an error tuple when it is not the correct side or type" do
+    buy_market_order = %Order{
       client_id: UUID.uuid4(),
       exchange: :test_exchange_a,
       symbol: :btcusd_success,
-      type: OrderTypes.sell_limit(),
+      side: Order.buy(),
+      type: :market,
       price: 10.1,
       size: 2.2,
       status: OrderStatus.enqueued(),
       enqueued_at: Timex.now()
     }
 
-    assert {:error, %OrderResponses.InvalidOrderType{}} = Account.buy_limit(order)
+    sell_limit_order = %Order{
+      client_id: UUID.uuid4(),
+      exchange: :test_exchange_a,
+      symbol: :btcusd_success,
+      side: Order.sell(),
+      type: Order.limit(),
+      price: 10.1,
+      size: 2.2,
+      status: OrderStatus.enqueued(),
+      enqueued_at: Timex.now()
+    }
+
+    assert {:error, %OrderResponses.InvalidOrderType{}} = Account.buy_limit(buy_market_order)
+    assert {:error, %OrderResponses.InvalidOrderType{}} = Account.buy_limit(sell_limit_order)
   end
 
   test "buy_limit returns an error tuple when an order fails" do
@@ -70,7 +85,8 @@ defmodule Tai.Exchanges.AccountTest do
       client_id: UUID.uuid4(),
       exchange: :test_exchange_a,
       symbol: :btcusd_success,
-      type: OrderTypes.sell_limit(),
+      side: Order.sell(),
+      type: Order.limit(),
       price: 10.1,
       size: 2.2,
       status: OrderStatus.enqueued(),
@@ -83,19 +99,33 @@ defmodule Tai.Exchanges.AccountTest do
     assert %DateTime{} = order_response.created_at
   end
 
-  test "sell_limit returns an error tuple when the type is not sell_limit" do
-    order = %Order{
+  test "sell_limit returns an error tuple when it is not the correct side or type" do
+    sell_market_order = %Order{
       client_id: UUID.uuid4(),
       exchange: :test_exchange_a,
       symbol: :btcusd_success,
-      type: OrderTypes.buy_limit(),
+      side: Order.sell(),
+      type: :market,
       price: 10.1,
       size: 2.2,
       status: OrderStatus.enqueued(),
       enqueued_at: Timex.now()
     }
 
-    assert {:error, %OrderResponses.InvalidOrderType{}} = Account.sell_limit(order)
+    buy_limit_order = %Order{
+      client_id: UUID.uuid4(),
+      exchange: :test_exchange_a,
+      symbol: :btcusd_success,
+      side: Order.buy(),
+      type: Order.limit(),
+      price: 10.1,
+      size: 2.2,
+      status: OrderStatus.enqueued(),
+      enqueued_at: Timex.now()
+    }
+
+    assert {:error, %OrderResponses.InvalidOrderType{}} = Account.sell_limit(sell_market_order)
+    assert {:error, %OrderResponses.InvalidOrderType{}} = Account.sell_limit(buy_limit_order)
   end
 
   test "sell_limit returns an {:error, reason} tuple when an order fails" do

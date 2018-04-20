@@ -6,7 +6,8 @@ defmodule Tai.Commands.HelperTest do
 
   import ExUnit.CaptureIO
 
-  alias Tai.{Commands.Helper, Markets.OrderBook, Trading.Orders}
+  alias Tai.{Commands.Helper, Markets.OrderBook}
+  alias Tai.Trading.{Orders, OrderSubmission}
 
   setup do
     test_feed_a_btcusd = [feed_id: :test_feed_a, symbol: :btcusd] |> OrderBook.to_name()
@@ -67,20 +68,16 @@ defmodule Tai.Commands.HelperTest do
            +----------+--------+------+-------+------+--------+-----------+-----------+-------------+------------+\n
            """
 
-    [btcusd_order] = Orders.add({:test_feed_a, :btcusd, 12999.99, 1.1})
-    [ltcusd_order] = Orders.add({:test_feed_b, :ltcusd, 75.23, 1.0})
+    [btcusd_order] = Orders.add(OrderSubmission.buy_limit(:test_feed_a, :btcusd, 12999.99, 1.1))
+    [ltcusd_order] = Orders.add(OrderSubmission.sell_limit(:test_feed_b, :ltcusd, 75.23, 1.0))
 
     assert capture_io(fn -> Helper.orders() end) == """
-           +-------------+--------+-----------+----------+------+----------+--------------------------------------+-----------+-------------+------------+
-           |    Exchange | Symbol |      Type |    Price | Size |   Status |                            Client ID | Server ID | Enqueued At | Created At |
-           +-------------+--------+-----------+----------+------+----------+--------------------------------------+-----------+-------------+------------+
-           | test_feed_a | btcusd | buy_limit | 12999.99 |  1.1 | enqueued | #{
-             btcusd_order.client_id
-           } |           |         now |            |
-           | test_feed_b | ltcusd | buy_limit |    75.23 |  1.0 | enqueued | #{
-             ltcusd_order.client_id
-           } |           |         now |            |
-           +-------------+--------+-----------+----------+------+----------+--------------------------------------+-----------+-------------+------------+\n
+           +-------------+--------+-------+----------+------+----------+--------------------------------------+-----------+-------------+------------+
+           |    Exchange | Symbol |  Type |    Price | Size |   Status |                            Client ID | Server ID | Enqueued At | Created At |
+           +-------------+--------+-------+----------+------+----------+--------------------------------------+-----------+-------------+------------+
+           | test_feed_a | btcusd | limit | 12999.99 |  1.1 | enqueued | #{btcusd_order.client_id} |           |         now |            |
+           | test_feed_b | ltcusd | limit |    75.23 |  1.0 | enqueued | #{ltcusd_order.client_id} |           |         now |            |
+           +-------------+--------+-------+----------+------+----------+--------------------------------------+-----------+-------------+------------+\n
            """
 
     Orders.clear()

@@ -3,7 +3,7 @@ defmodule Tai.Exchanges.Account do
   Uniform interface for private exchange actions
   """
 
-  alias Tai.Trading.{Order, OrderResponses, OrderTypes}
+  alias Tai.Trading.{Order, OrderResponses}
 
   @doc """
   """
@@ -33,7 +33,7 @@ defmodule Tai.Exchanges.Account do
   {:error, %OrderResponses.InvalidOrderType{}}
   """
   def buy_limit(%Order{} = order) do
-    if order.type == OrderTypes.buy_limit() do
+    if order.type == Order.limit() && order.side == Order.buy() do
       buy_limit(order.exchange, order.symbol, order.price, order.size)
     else
       {:error, %OrderResponses.InvalidOrderType{}}
@@ -60,7 +60,7 @@ defmodule Tai.Exchanges.Account do
   {:error, %OrderResponses.InvalidOrderType{}}
   """
   def sell_limit(%Order{} = order) do
-    if order.type == OrderTypes.sell_limit() do
+    if order.type == Order.limit() && order.side == Order.sell() do
       sell_limit(order.exchange, order.symbol, order.price, order.size)
     else
       {:error, %OrderResponses.InvalidOrderType{}}

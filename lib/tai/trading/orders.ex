@@ -5,7 +5,7 @@ defmodule Tai.Trading.Orders do
 
   use GenServer
 
-  alias Tai.Trading.{Order, OrderStatus, OrderTypes}
+  alias Tai.Trading.{Order, OrderStatus, OrderSubmission}
 
   require Logger
 
@@ -130,6 +130,11 @@ defmodule Tai.Trading.Orders do
     |> add_orders(state)
   end
 
+  defp add_orders(%OrderSubmission{} = submission, state) do
+    [submission]
+    |> add_orders(state)
+  end
+
   defp add_orders([], state), do: {[], state}
 
   defp add_orders([_head | _tail] = submissions, state) do
@@ -139,14 +144,15 @@ defmodule Tai.Trading.Orders do
 
   defp add_orders([], state, new_orders), do: {new_orders |> Enum.reverse(), state}
 
-  defp add_orders([{exchange_id, symbol, price, size} | tail], state, new_orders) do
+  defp add_orders([%OrderSubmission{} = submission | tail], state, new_orders) do
     order = %Order{
       client_id: UUID.uuid4(),
-      exchange: exchange_id,
-      symbol: symbol,
-      type: to_order_type(size),
-      price: price,
-      size: abs(size),
+      exchange: submission.exchange_id,
+      symbol: submission.symbol,
+      side: submission.side,
+      type: submission.type,
+      price: abs(submission.price),
+      size: abs(submission.size),
       status: OrderStatus.enqueued(),
       enqueued_at: Timex.now()
     }
@@ -155,9 +161,6 @@ defmodule Tai.Trading.Orders do
 
     add_orders(tail, new_state, [order | new_orders])
   end
-
-  defp to_order_type(size) when size > 0, do: OrderTypes.buy_limit()
-  defp to_order_type(size) when size < 0, do: OrderTypes.sell_limit()
 
   defp filter(state, [{attr, [_head | _tail] = vals}]) do
     state

@@ -316,7 +316,7 @@ defmodule Tai.Advisor do
       end
 
       defp normalize_handle_inside_quote_response({:ok, actions}) do
-        default_actions = %{cancel_orders: [], limit_orders: []}
+        default_actions = %{cancel_orders: [], orders: []}
         {:ok, default_actions |> Map.merge(actions)}
       end
 
@@ -326,15 +326,13 @@ defmodule Tai.Advisor do
       end
 
       defp cancel_orders(%{cancel_orders: cancel_orders} = actions) do
-        cancel_orders
-        |> OrderOutbox.cancel()
+        OrderOutbox.cancel(cancel_orders)
 
         actions
       end
 
-      defp submit_orders(%{limit_orders: limit_orders} = actions) do
-        limit_orders
-        |> OrderOutbox.add()
+      defp submit_orders(%{orders: orders} = actions) do
+        OrderOutbox.add(orders)
 
         actions
       end

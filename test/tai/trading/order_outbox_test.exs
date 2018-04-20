@@ -2,7 +2,14 @@ defmodule Tai.Trading.OrderOutboxTest do
   use ExUnit.Case
   doctest Tai.Trading.OrderOutbox
 
-  alias Tai.Trading.{OrderOutbox, Orders, OrderResponses, OrderStatus, OrderTypes}
+  alias Tai.Trading.{
+    Order,
+    Orders,
+    OrderOutbox,
+    OrderResponses,
+    OrderStatus,
+    OrderSubmission
+  }
 
   defmodule OrderLifecycleSubscriber do
     use GenServer
@@ -61,8 +68,8 @@ defmodule Tai.Trading.OrderOutboxTest do
     [new_buy_limit_order, new_sell_limit_order] =
       new_orders =
       OrderOutbox.add([
-        {:my_test_exchange, :btcusd_success, 100.0, 0.1},
-        {:my_test_exchange, :btcusd_success, 100.0, -0.1}
+        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 100.0, 0.1),
+        OrderSubmission.sell_limit(:my_test_exchange, :btcusd_success, 100.0, 0.1)
       ])
 
     assert Enum.count(new_orders) == 2
@@ -71,7 +78,8 @@ defmodule Tai.Trading.OrderOutboxTest do
     assert_receive {:order_enqueued, enqueued_order_1}
     assert enqueued_order_1.client_id == new_buy_limit_order.client_id
     assert enqueued_order_1.status == OrderStatus.enqueued()
-    assert enqueued_order_1.type == OrderTypes.buy_limit()
+    assert enqueued_order_1.side == Order.buy()
+    assert enqueued_order_1.type == Order.limit()
     assert enqueued_order_1.enqueued_at == new_buy_limit_order.enqueued_at
     assert enqueued_order_1.server_id == nil
     assert enqueued_order_1.created_at == nil
@@ -79,7 +87,8 @@ defmodule Tai.Trading.OrderOutboxTest do
     assert_receive {:order_enqueued, enqueued_order_2}
     assert enqueued_order_2.client_id == new_sell_limit_order.client_id
     assert enqueued_order_2.status == OrderStatus.enqueued()
-    assert enqueued_order_2.type == OrderTypes.sell_limit()
+    assert enqueued_order_2.side == Order.sell()
+    assert enqueued_order_2.type == Order.limit()
     assert enqueued_order_2.enqueued_at == new_sell_limit_order.enqueued_at
     assert enqueued_order_2.server_id == nil
     assert enqueued_order_2.created_at == nil
@@ -93,14 +102,16 @@ defmodule Tai.Trading.OrderOutboxTest do
 
     assert created_order_1.client_id == new_buy_limit_order.client_id
     assert created_order_1.status == OrderStatus.pending()
-    assert created_order_1.type == OrderTypes.buy_limit()
+    assert created_order_1.side == Order.buy()
+    assert created_order_1.type == Order.limit()
     assert created_order_1.enqueued_at == new_buy_limit_order.enqueued_at
     assert created_order_1.server_id != nil
     assert %DateTime{} = created_order_1.created_at
 
     assert created_order_2.client_id == new_sell_limit_order.client_id
     assert created_order_2.status == OrderStatus.pending()
-    assert created_order_2.type == OrderTypes.sell_limit()
+    assert created_order_2.side == Order.sell()
+    assert created_order_2.type == Order.limit()
     assert created_order_2.enqueued_at == new_sell_limit_order.enqueued_at
     assert created_order_2.server_id != nil
     assert %DateTime{} = created_order_2.created_at
@@ -111,8 +122,8 @@ defmodule Tai.Trading.OrderOutboxTest do
 
     [new_order_1, new_order_2] =
       OrderOutbox.add([
-        {:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1},
-        {:my_test_exchange, :btcusd_insufficient_funds, 100.0, -0.1}
+        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1),
+        OrderSubmission.sell_limit(:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1)
       ])
 
     assert Orders.count() == 2
@@ -136,21 +147,23 @@ defmodule Tai.Trading.OrderOutboxTest do
 
     assert %OrderResponses.InsufficientFunds{} = error_reason_1
     assert error_order_1.client_id == new_order_1.client_id
-    assert error_order_1.type == OrderTypes.buy_limit()
+    assert error_order_1.side == Order.buy()
+    assert error_order_1.type == Order.limit()
     assert error_order_1.status == OrderStatus.error()
 
     assert %OrderResponses.InsufficientFunds{} = error_reason_2
     assert error_order_2.client_id == new_order_2.client_id
-    assert error_order_2.type == OrderTypes.sell_limit()
+    assert error_order_2.side == Order.sell()
+    assert error_order_2.type == Order.limit()
     assert error_order_2.status == OrderStatus.error()
   end
 
   test "cancel changes the given pending orders to cancelling and sends the request to the exchange in the background" do
     [order_1, order_2, order_3] =
       OrderOutbox.add([
-        {:my_test_exchange, :btcusd_success, 100.0, 0.1},
-        {:my_test_exchange, :btcusd_success, 100.0, 1.1},
-        {:my_test_exchange, :btcusd_insufficient_funds, 100.0, 2.1}
+        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 100.0, 0.1),
+        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 100.0, 1.1),
+        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_insufficient_funds, 100.0, 2.1)
       ])
 
     assert_receive {:order_enqueued, ^order_1}

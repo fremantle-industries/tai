@@ -8,7 +8,7 @@ defmodule Tai.Trading.OrderOutbox do
   require Logger
 
   alias Tai.PubSub
-  alias Tai.Trading.{Orders, OrderResponses, OrderStatus, OrderTypes}
+  alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus}
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -41,14 +41,14 @@ defmodule Tai.Trading.OrderOutbox do
 
   def handle_info({:order_enqueued, order}, state) do
     cond do
-      order.type == OrderTypes.buy_limit() ->
+      order.type == Order.limit() && order.side == Order.buy() ->
         {:ok, _pid} =
           Task.start_link(fn ->
             Tai.Exchanges.Account.buy_limit(order)
             |> handle_limit_response(order)
           end)
 
-      order.type == OrderTypes.sell_limit() ->
+      order.type == Order.limit() && order.side == Order.sell() ->
         {:ok, _pid} =
           Task.start_link(fn ->
             Tai.Exchanges.Account.sell_limit(order)
