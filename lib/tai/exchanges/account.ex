@@ -33,7 +33,7 @@ defmodule Tai.Exchanges.Account do
   {:error, %OrderResponses.InvalidOrderType{}}
   """
   def buy_limit(%Order{} = order) do
-    if order.type == Order.limit() && order.side == Order.buy() do
+    if Order.buy_limit?(order) do
       buy_limit(order.exchange, order.symbol, order.price, order.size)
     else
       {:error, %OrderResponses.InvalidOrderType{}}
@@ -60,7 +60,7 @@ defmodule Tai.Exchanges.Account do
   {:error, %OrderResponses.InvalidOrderType{}}
   """
   def sell_limit(%Order{} = order) do
-    if order.type == Order.limit() && order.side == Order.sell() do
+    if Order.sell_limit?(order) do
       sell_limit(order.exchange, order.symbol, order.price, order.size)
     else
       {:error, %OrderResponses.InvalidOrderType{}}
