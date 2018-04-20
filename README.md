@@ -9,7 +9,7 @@ A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the
 likely to change and no effort will be made to maintain backwards compatibility at this time.
 We are working to make `tai` production quality software.
 
-[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](./advisors) | [Configuration](#configuration) | [Debugging](#debugging)
+[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](#advisors) | [Configuration](#configuration) | [Debugging](#debugging)
 
 
 ## Supported Exchanges
