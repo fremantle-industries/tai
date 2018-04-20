@@ -26,6 +26,18 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     })
   end
 
+  def send_subscriptions(pid, product_ids) do
+    WebSocket.send_json_msg(pid, %{
+      type: "subscriptions",
+      channels: [
+        %{
+          product_ids: product_ids,
+          name: "level2"
+        }
+      ]
+    })
+  end
+
   setup do
     HTTPoison.start()
     Process.register(self(), :test)
@@ -203,6 +215,18 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
            }
   end
 
+  test "logs an info message for successful product subscriptions", %{
+    my_gdax_feed_pid: my_gdax_feed_pid
+  } do
+    log_msg =
+      capture_log(fn ->
+        send_subscriptions(my_gdax_feed_pid, ["BTC-USD", "LTC-USD"])
+        :timer.sleep(100)
+      end)
+
+    assert log_msg =~ "[info]  successfully subscribed to [\"BTC-USD\", \"LTC-USD\"]"
+  end
+
   test "logs a warning for unhandled messages", %{my_gdax_feed_pid: my_gdax_feed_pid} do
     log_msg =
       capture_log(fn ->
@@ -210,6 +234,6 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
         :timer.sleep(100)
       end)
 
-    assert log_msg =~ "unhandled message: %{\"type\" => \"unknown_type\"}"
+    assert log_msg =~ "[warn]  unhandled message: %{\"type\" => \"unknown_type\"}"
   end
 end

@@ -79,6 +79,26 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
   end
 
   @doc """
+  Log an info message with the products that were successfully subscribed to
+  """
+  def handle_msg(
+        %{
+          "channels" => [
+            %{
+              "name" => "level2",
+              "product_ids" => product_ids
+            }
+          ],
+          "type" => "subscriptions"
+        },
+        state
+      ) do
+    Logger.info("successfully subscribed to #{inspect(product_ids)}")
+
+    {:ok, state}
+  end
+
+  @doc """
   Log a warning message when the WebSocket receives a message that is not explicitly handled
   """
   def handle_msg(unhandled_msg, state) do
