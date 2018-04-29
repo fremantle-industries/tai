@@ -8,15 +8,15 @@ defmodule Tai.Advisors.Supervisor do
   end
 
   def init(:ok) do
-    Config.servers()
+    Config.modules()
     |> Enum.map(&config_to_child_spec/1)
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp config_to_child_spec({advisor_id, server}) do
+  defp config_to_child_spec({advisor_id, module}) do
     Supervisor.child_spec(
       {
-        server,
+        module,
         [
           advisor_id: advisor_id,
           order_books: Config.order_books(advisor_id),

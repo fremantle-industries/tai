@@ -33,7 +33,7 @@ config :tai,
 config :tai,
   advisors: %{
     create_and_cancel_pending_order: [
-      server: Examples.Advisors.CreateAndCancelPendingOrder,
+      module: Examples.Advisors.CreateAndCancelPendingOrder,
       order_books: %{
         gdax: [:btcusd, :ltcusd, :ethusd],
         binance: [:btcusdt, :ltcusdt, :ethusdt]

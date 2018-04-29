@@ -7,7 +7,7 @@ defmodule Tai.Advisors.ConfigTest do
   test "all returns the application config" do
     assert Config.all() == %{
              test_advisor_a: [
-               server: Examples.Advisors.CreateAndCancelPendingOrder,
+               module: Examples.Advisors.CreateAndCancelPendingOrder,
                order_books: %{
                  test_feed_a: [:btcusd, :ltcusd],
                  test_feed_b: [:ethusd, :ltcusd]
@@ -15,7 +15,7 @@ defmodule Tai.Advisors.ConfigTest do
                exchanges: [:test_exchange_a, :test_exchange_b]
              ],
              test_advisor_b: [
-               server: Examples.Advisors.CreateAndCancelPendingOrder,
+               module: Examples.Advisors.CreateAndCancelPendingOrder,
                order_books: %{
                  test_feed_a: [:btcusd],
                  test_feed_b: [:ethusd]
@@ -28,8 +28,8 @@ defmodule Tai.Advisors.ConfigTest do
     assert Config.all(nil) == %{}
   end
 
-  test "servers returns a keyword list of id and server" do
-    assert Config.servers() == [
+  test "modules returns a keyword list of id and module" do
+    assert Config.modules() == [
              test_advisor_a: Examples.Advisors.CreateAndCancelPendingOrder,
              test_advisor_b: Examples.Advisors.CreateAndCancelPendingOrder
            ]

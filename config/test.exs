@@ -32,7 +32,7 @@ config :tai,
 config :tai,
   advisors: %{
     test_advisor_a: [
-      server: Examples.Advisors.CreateAndCancelPendingOrder,
+      module: Examples.Advisors.CreateAndCancelPendingOrder,
       order_books: %{
         test_feed_a: [:btcusd, :ltcusd],
         test_feed_b: [:ethusd, :ltcusd]
@@ -40,7 +40,7 @@ config :tai,
       exchanges: [:test_exchange_a, :test_exchange_b]
     ],
     test_advisor_b: [
-      server: Examples.Advisors.CreateAndCancelPendingOrder,
+      module: Examples.Advisors.CreateAndCancelPendingOrder,
       order_books: %{
         test_feed_a: [:btcusd],
         test_feed_b: [:ethusd]

@@ -3,10 +3,10 @@ defmodule Tai.Advisors.Config do
     advisors || %{}
   end
 
-  def servers do
+  def modules do
     all()
     |> Enum.map(fn {advisor_id, config} ->
-      {advisor_id, Keyword.get(config, :server)}
+      {advisor_id, Keyword.get(config, :module)}
     end)
   end
 
