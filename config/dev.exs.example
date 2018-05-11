@@ -31,13 +31,15 @@ config :tai,
   }
 
 config :tai,
-  advisors: %{
-    create_and_cancel_pending_order: [
-      module: Examples.Advisors.CreateAndCancelPendingOrder,
-      order_books: %{
-        gdax: [:btcusd, :ltcusd, :ethusd],
-        binance: [:btcusdt, :ltcusdt, :ethusdt]
-      },
-      exchanges: [:gdax]
-    ]
-  }
+  advisors: [
+    %{
+      id: :create_and_cancel_pending_order,
+      supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
+      order_books: "gdax.btcusd"
+    },
+    %{
+      id: :log_spread_advisor,
+      supervisor: Examples.Advisors.LogSpread.Supervisor,
+      order_books: "*"
+    }
+  ]

@@ -30,20 +30,15 @@ config :tai,
   }
 
 config :tai,
-  advisors: %{
-    test_advisor_a: [
-      module: Examples.Advisors.CreateAndCancelPendingOrder,
-      order_books: %{
-        test_feed_a: [:btcusd, :ltcusd],
-        test_feed_b: [:ethusd, :ltcusd]
-      },
-      exchanges: [:test_exchange_a, :test_exchange_b]
-    ],
-    test_advisor_b: [
-      module: Examples.Advisors.CreateAndCancelPendingOrder,
-      order_books: %{
-        test_feed_a: [:btcusd],
-        test_feed_b: [:ethusd]
-      }
-    ]
-  }
+  advisors: [
+    %{
+      id: :create_and_cancel_pending_order,
+      supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
+      order_books: "test_feed_a test_feed_b.ethusd"
+    },
+    %{
+      id: :log_spread_advisor,
+      supervisor: Examples.Advisors.LogSpread.Supervisor,
+      order_books: "*"
+    }
+  ]

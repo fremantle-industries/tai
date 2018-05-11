@@ -23,16 +23,17 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
+      {:binance, "~> 0.4"},
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.3"},
-      {:binance, "~> 0.4"},
       {:httpoison, "~> 1.0"},
       {:json, "~> 1.0"},
+      {:juice, "~> 0.0.2"},
+      {:logger_file_backend, "~> 0.0.10"},
       {:table_rex, "~> 1.0"},
       {:timex, "~> 3.1"},
-      {:websockex, "~> 0.4"},
-      {:logger_file_backend, "~> 0.0.10"},
       {:uuid, "~> 1.1"},
+      {:websockex, "~> 0.4"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
       {:echo_boy, "~> 0.1.0", github: "rupurt/echo_boy", only: [:dev, :test]},

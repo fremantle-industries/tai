@@ -1,24 +1,32 @@
 defmodule Tai.Advisors.Config do
-  def all(advisors \\ Application.get_env(:tai, :advisors)) do
-    advisors || %{}
+  alias Tai.Exchanges
+
+  def all(config \\ Application.get_env(:tai, :advisors)) do
+    config || []
   end
 
-  def modules do
+  def find(advisor_id) do
     all()
-    |> Enum.map(fn {advisor_id, config} ->
-      {advisor_id, Keyword.get(config, :module)}
-    end)
+    |> Enum.find(fn %{id: config_id} -> advisor_id == config_id end)
   end
 
   def order_books(advisor_id) do
-    all()
-    |> Map.get(advisor_id, [])
-    |> Keyword.get(:order_books)
+    query =
+      advisor_id
+      |> find
+      |> Map.get(:order_books)
+
+    order_books_by_exchange()
+    |> Juice.squeeze(query)
   end
 
-  def exchanges(advisor_id) do
-    all()
-    |> Map.get(advisor_id, [])
-    |> Keyword.get(:exchanges, [])
+  defp order_books_by_exchange do
+    Exchanges.Config.order_book_feeds()
+    |> Enum.reduce(
+      %{},
+      fn {adapter_id, [adapter: _, order_books: order_books]}, acc ->
+        Map.put(acc, adapter_id, order_books)
+      end
+    )
   end
 end

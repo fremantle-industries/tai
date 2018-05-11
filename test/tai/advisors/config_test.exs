@@ -5,52 +5,39 @@ defmodule Tai.Advisors.ConfigTest do
   alias Tai.Advisors.Config
 
   test "all returns the application config" do
-    assert Config.all() == %{
-             test_advisor_a: [
-               module: Examples.Advisors.CreateAndCancelPendingOrder,
-               order_books: %{
-                 test_feed_a: [:btcusd, :ltcusd],
-                 test_feed_b: [:ethusd, :ltcusd]
-               },
-               exchanges: [:test_exchange_a, :test_exchange_b]
-             ],
-             test_advisor_b: [
-               module: Examples.Advisors.CreateAndCancelPendingOrder,
-               order_books: %{
-                 test_feed_a: [:btcusd],
-                 test_feed_b: [:ethusd]
-               }
-             ]
-           }
-  end
-
-  test "all returns an empty map when no advisors have been configured" do
-    assert Config.all(nil) == %{}
-  end
-
-  test "modules returns a keyword list of id and module" do
-    assert Config.modules() == [
-             test_advisor_a: Examples.Advisors.CreateAndCancelPendingOrder,
-             test_advisor_b: Examples.Advisors.CreateAndCancelPendingOrder
+    assert Config.all() == [
+             %{
+               id: :create_and_cancel_pending_order,
+               supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
+               order_books: "test_feed_a test_feed_b.ethusd"
+             },
+             %{
+               id: :log_spread_advisor,
+               supervisor: Examples.Advisors.LogSpread.Supervisor,
+               order_books: "*"
+             }
            ]
   end
 
-  test "order_books returns a map of feed ids with a list of symbols for the advisor id" do
-    assert Config.order_books(:test_advisor_a) == %{
+  test "find returns the config for the matching advisor or nil if it doesn't exist" do
+    assert Config.find(:log_spread_advisor) == %{
+             id: :log_spread_advisor,
+             supervisor: Examples.Advisors.LogSpread.Supervisor,
+             order_books: "*"
+           }
+
+    assert Config.find(:i_dont_exist) == nil
+  end
+
+  test "order_books returns a map of feeds with books for the given advisor id" do
+    assert Config.order_books(:log_spread_advisor) == %{
              test_feed_a: [:btcusd, :ltcusd],
              test_feed_b: [:ethusd, :ltcusd]
            }
-  end
 
-  test "order_books returns nil when the advisor doesn't exist" do
-    assert Config.order_books(:test_advisor_doesnt_exist) == nil
-  end
-
-  test "exchanges returns a list of exchanges" do
-    assert Config.exchanges(:test_advisor_a) == [:test_exchange_a, :test_exchange_b]
-  end
-
-  test "exchanges returns an empty list when it's not supplied" do
-    assert Config.exchanges(:test_advisor_b) == []
+    assert Config.order_books(:create_and_cancel_pending_order) == %{
+             test_feed_a: [:btcusd, :ltcusd],
+             test_feed_b: [:ethusd]
+           }
   end
 end
