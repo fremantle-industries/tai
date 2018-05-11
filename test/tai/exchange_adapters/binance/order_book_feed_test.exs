@@ -3,6 +3,8 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Binance.OrderBookFeed
 
+  import ExUnit.CaptureLog
+
   alias Tai.{ExchangeAdapters.Binance.OrderBookFeed, WebSocket}
   alias Tai.Markets.{OrderBook, PriceLevel}
 
@@ -170,5 +172,23 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
                ]
              }
            }
+  end
+
+  test "logs a warning for invalid symbols" do
+    use_cassette "exchange_adapters/binance/order_book_feed_invalid_symbol_error" do
+      log_msg =
+        capture_log(fn ->
+          {:ok, _pid} =
+            OrderBookFeed.start_link(
+              "ws://localhost:#{EchoBoy.Config.port()}/ws",
+              feed_id: :my_binance_feed_invalid_symbol,
+              symbols: [:idontexist]
+            )
+
+          :timer.sleep(100)
+        end)
+
+      assert log_msg =~ "[warn]  invalid symbol: idontexist"
+    end
   end
 end

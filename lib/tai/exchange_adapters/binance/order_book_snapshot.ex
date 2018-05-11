@@ -16,6 +16,9 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshot do
             asks: asks |> to_price_levels(processed_at)
           }
         }
+
+      {:error, %{"code" => -1121, "msg" => "Invalid symbol."}} ->
+        {:error, :invalid_symbol}
     end
   end
 

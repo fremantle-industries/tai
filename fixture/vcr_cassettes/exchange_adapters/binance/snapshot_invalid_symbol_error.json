@@ -1,0 +1,38 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v1/depth?symbol=IDONTEXIST&limit=5"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"code\":-1121,\"msg\":\"Invalid symbol.\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Fri, 11 May 2018 22:43:29 GMT",
+        "Server": "nginx",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Error from cloudfront",
+        "Via": "1.1 400e19a7f70282e0817451f6606ca8f9.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "v3Ap9CNBNuYqW4ZShQ_MSrkL-_DgJ7mhwCdWg4LYt1XzBuw6tcN3Zg=="
+      },
+      "status_code": 400,
+      "type": "ok"
+    }
+  }
+]

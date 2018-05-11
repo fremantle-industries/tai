@@ -44,4 +44,10 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshotTest do
       assert DateTime.compare(ask_processed_at_a, ask_processed_at_e)
     end
   end
+
+  test "fetch returns an error tuple when the symbol is invalid" do
+    use_cassette "exchange_adapters/binance/snapshot_invalid_symbol_error" do
+      assert {:error, :invalid_symbol} = OrderBookSnapshot.fetch(:idontexist, 5)
+    end
+  end
 end

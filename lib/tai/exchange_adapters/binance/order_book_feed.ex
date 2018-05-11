@@ -42,6 +42,9 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
         [feed_id: feed_id, symbol: symbol]
         |> OrderBook.to_name()
         |> OrderBook.replace(snapshot)
+
+      {:error, :invalid_symbol} ->
+        Logger.warn("invalid symbol: #{symbol}")
     end
 
     subscribe_to_order_books(pid, feed_id, tail)
