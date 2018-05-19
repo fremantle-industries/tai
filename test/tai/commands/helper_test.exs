@@ -52,9 +52,9 @@ defmodule Tai.Commands.HelperTest do
            |        Feed | Symbol | Bid Price | Ask Price | Bid Size | Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
            +-------------+--------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
            | test_feed_a | btcusd |  12999.99 |  13000.01 | 0.000021 |     1.11 |              now |                   now |              now |                   now |
-           | test_feed_a | ltcusd |         0 |         0 |        0 |        0 |                  |                       |                  |                       |
-           | test_feed_b | ethusd |         0 |         0 |        0 |        0 |                  |                       |                  |                       |
-           | test_feed_b | ltcusd |         0 |         0 |        0 |        0 |                  |                       |                  |                       |
+           | test_feed_a | ltcusd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
+           | test_feed_b | ethusd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
+           | test_feed_b | ltcusd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
            +-------------+--------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+\n
            """
   end

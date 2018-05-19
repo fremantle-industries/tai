@@ -4,31 +4,58 @@ defmodule Tai.Commands.Markets do
   """
 
   alias Tai.Exchanges
-  alias Tai.Markets.{OrderBook, PriceLevel, Quote}
+  alias Tai.Markets.{OrderBook, Quote}
   alias TableRex.Table
 
   def markets do
     Exchanges.Config.order_book_feed_ids()
-    |> fetch_order_book_status
+    |> group_rows
+    |> fetch_rows
+    |> format_rows
     |> render!
   end
 
-  defp fetch_order_book_status([_head | _tail] = feed_ids) do
+  defp group_rows(feed_ids) do
     feed_ids
-    |> fetch_order_book_status([])
+    |> Enum.reduce(
+      [],
+      fn feed_id, acc ->
+        feed_id
+        |> Exchanges.Config.order_book_feed_symbols()
+        |> Enum.reduce(
+          acc,
+          fn symbol, acc -> [{feed_id, symbol} | acc] end
+        )
+      end
+    )
+    |> Enum.reverse()
   end
 
-  defp fetch_order_book_status([], acc), do: acc
+  defp fetch_rows(groups) when is_list(groups) do
+    groups
+    |> Enum.map(fn {feed_id, symbol} ->
+      {:ok, inside_quote} = OrderBook.inside_quote(feed_id, symbol)
+      {feed_id, symbol, inside_quote}
+    end)
+  end
 
-  defp fetch_order_book_status([feed_id | tail], acc) do
-    rows =
-      feed_id
-      |> Exchanges.Config.order_book_feed_symbols()
-      |> Enum.map(&to_feed_and_symbol_inside_quote(&1, feed_id))
-      |> Enum.map(&to_order_book_status_row/1)
-
-    tail
-    |> fetch_order_book_status(acc |> Enum.concat(rows))
+  defp format_rows(groups_with_quotes) when is_list(groups_with_quotes) do
+    groups_with_quotes
+    |> Enum.map(fn {feed_id, symbol, %Quote{bid: bid, ask: ask}} ->
+      [
+        feed_id,
+        symbol,
+        {bid, :price},
+        {ask, :price},
+        {bid, :size},
+        {ask, :size},
+        {bid, :processed_at},
+        {bid, :server_changed_at},
+        {ask, :processed_at},
+        {ask, :server_changed_at}
+      ]
+      |> format_row
+    end)
   end
 
   defp render!(rows) do
@@ -52,55 +79,11 @@ defmodule Tai.Commands.Markets do
     |> IO.puts()
   end
 
-  def to_feed_and_symbol_inside_quote(symbol, feed_id) do
-    with {:ok, raw_inside_quote} <- OrderBook.inside_quote(feed_id, symbol),
-         inside_quote <- format_inside_quote(raw_inside_quote) do
-      {symbol, feed_id, inside_quote}
-    end
-  end
-
-  defp to_order_book_status_row({symbol, feed_id, %Quote{bid: bid, ask: ask}}) do
-    [
-      feed_id,
-      symbol,
-      bid.price,
-      ask.price,
-      bid.size,
-      ask.size,
-      bid.processed_at,
-      bid.server_changed_at,
-      ask.processed_at,
-      ask.server_changed_at
-    ]
-    |> format_row
-  end
-
   defp format_row(row) when is_list(row), do: row |> Enum.map(&format_col/1)
+  defp format_col({nil, _}), do: format_col(nil)
+  defp format_col({receiver, message}), do: receiver |> get_in([message]) |> format_col
   defp format_col(num) when is_number(num), do: Decimal.new(num)
   defp format_col(%DateTime{} = date), do: Timex.from_now(date)
-  defp format_col(nil), do: nil
+  defp format_col(nil), do: "~"
   defp format_col(pass_through), do: pass_through
-
-  defp format_inside_quote(%Quote{bid: nil, ask: nil}) do
-    format_inside_quote(%Quote{
-      bid: %PriceLevel{price: 0, size: 0},
-      ask: %PriceLevel{price: 0, size: 0}
-    })
-  end
-
-  defp format_inside_quote(%Quote{bid: bid, ask: nil}) do
-    format_inside_quote(%Quote{
-      bid: bid,
-      ask: %PriceLevel{price: 0, size: 0}
-    })
-  end
-
-  defp format_inside_quote(%Quote{bid: nil, ask: ask}) do
-    format_inside_quote(%Quote{
-      bid: %PriceLevel{price: 0, size: 0},
-      ask: ask
-    })
-  end
-
-  defp format_inside_quote(%Quote{} = inside_quote), do: inside_quote
 end
