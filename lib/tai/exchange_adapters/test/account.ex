@@ -7,12 +7,12 @@ defmodule Tai.ExchangeAdapters.Test.Account do
 
   alias Tai.{Exchanges.Account, Trading.OrderResponses}
 
-  def start_link(exchange_id) do
-    GenServer.start_link(__MODULE__, exchange_id, name: exchange_id |> Account.to_name())
+  def start_link(account_id) do
+    GenServer.start_link(__MODULE__, account_id, name: account_id |> Account.to_name())
   end
 
-  def init(exchange_id) do
-    {:ok, exchange_id}
+  def init(account_id) do
+    {:ok, account_id}
   end
 
   def handle_call(:balance, _from, state) do

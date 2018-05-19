@@ -1,8 +1,8 @@
 defmodule Tai.Commands.Trading do
   alias Tai.{Exchanges.Account, Trading.OrderResponses}
 
-  def buy_limit(exchange, symbol, price, size) do
-    exchange
+  def buy_limit(account_id, symbol, price, size) do
+    account_id
     |> Account.buy_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
@@ -15,8 +15,8 @@ defmodule Tai.Commands.Trading do
     end
   end
 
-  def sell_limit(exchange, symbol, price, size) do
-    exchange
+  def sell_limit(account_id, symbol, price, size) do
+    account_id
     |> Account.sell_limit(symbol, price, size)
     |> case do
       {:ok, order_response} ->
@@ -29,8 +29,8 @@ defmodule Tai.Commands.Trading do
     end
   end
 
-  def order_status(exchange, order_id) do
-    exchange
+  def order_status(account_id, order_id) do
+    account_id
     |> Account.order_status(order_id)
     |> case do
       {:ok, status} ->
@@ -41,8 +41,8 @@ defmodule Tai.Commands.Trading do
     end
   end
 
-  def cancel_order(exchange, order_id) do
-    exchange
+  def cancel_order(account_id, order_id) do
+    account_id
     |> Account.cancel_order(order_id)
     |> case do
       {:ok, _canceled_order_id} ->

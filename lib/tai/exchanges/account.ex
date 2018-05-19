@@ -7,8 +7,8 @@ defmodule Tai.Exchanges.Account do
 
   @doc """
   """
-  def balance(exchange_id) do
-    exchange_id
+  def balance(account_id) do
+    account_id
     |> to_name
     |> GenServer.call(:balance)
   end
@@ -20,8 +20,8 @@ defmodule Tai.Exchanges.Account do
   - price
   - size
   """
-  def buy_limit(exchange_id, symbol, price, size) do
-    exchange_id
+  def buy_limit(account_id, symbol, price, size) do
+    account_id
     |> to_name
     |> GenServer.call({:buy_limit, symbol, price, size})
   end
@@ -34,7 +34,7 @@ defmodule Tai.Exchanges.Account do
   """
   def buy_limit(%Order{} = order) do
     if Order.buy_limit?(order) do
-      buy_limit(order.exchange, order.symbol, order.price, order.size)
+      buy_limit(order.account_id, order.symbol, order.price, order.size)
     else
       {:error, %OrderResponses.InvalidOrderType{}}
     end
@@ -47,8 +47,8 @@ defmodule Tai.Exchanges.Account do
   - price
   - size
   """
-  def sell_limit(exchange_id, symbol, price, size) do
-    exchange_id
+  def sell_limit(account_id, symbol, price, size) do
+    account_id
     |> to_name
     |> GenServer.call({:sell_limit, symbol, price, size})
   end
@@ -61,7 +61,7 @@ defmodule Tai.Exchanges.Account do
   """
   def sell_limit(%Order{} = order) do
     if Order.sell_limit?(order) do
-      sell_limit(order.exchange, order.symbol, order.price, order.size)
+      sell_limit(order.account_id, order.symbol, order.price, order.size)
     else
       {:error, %OrderResponses.InvalidOrderType{}}
     end
@@ -70,8 +70,8 @@ defmodule Tai.Exchanges.Account do
   @doc """
   Fetches the status of the order from the exchange
   """
-  def order_status(exchange_id, order_id) do
-    exchange_id
+  def order_status(account_id, order_id) do
+    account_id
     |> to_name
     |> GenServer.call({:order_status, order_id})
   end
@@ -79,19 +79,19 @@ defmodule Tai.Exchanges.Account do
   @doc """
   Cancels the order on the exchange and returns the order_id
   """
-  def cancel_order(exchange_id, order_id) do
-    exchange_id
+  def cancel_order(account_id, order_id) do
+    account_id
     |> to_name
     |> GenServer.call({:cancel_order, order_id})
   end
 
   @doc """
-  Returns an atom which identifies the process for the given exchange_id
+  Returns an atom which identifies the process for the given account_id
 
   ## Examples
 
-    iex> Tai.Exchanges.Account.to_name(:my_test_exchange)
-    :exchanges_account_my_test_exchange
+    iex> Tai.Exchanges.Account.to_name(:my_test_small_account)
+    :account_my_test_small_account
   """
-  def to_name(exchange_id), do: :"exchanges_account_#{exchange_id}"
+  def to_name(account_id), do: :"account_#{account_id}"
 end

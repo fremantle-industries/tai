@@ -21,10 +21,10 @@ defmodule Tai.Commands.HelperTest do
            * balance
            * markets
            * orders
-           * buy_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
-           * sell_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
-           * order_status exchange(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
-           * cancel_order exchange(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")\n
+           * buy_limit account_id(:gdax), symbol(:btcusd), price(101.12), size(1.2)
+           * sell_limit account_id(:gdax), symbol(:btcusd), price(101.12), size(1.2)
+           * order_status account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
+           * cancel_order account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")\n
            """
   end
 
@@ -61,11 +61,11 @@ defmodule Tai.Commands.HelperTest do
 
   test "orders displays items in ascending order from when they were enqueued" do
     assert capture_io(fn -> Helper.orders() end) == """
-           +----------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+
-           | Exchange | Symbol | Side | Type | Price | Size | Status | Client ID | Server ID | Enqueued At | Created At |
-           +----------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+
-           |        - |      - |    - |    - |     - |    - |      - |         - |         - |           - |          - |
-           +----------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+\n
+           +---------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+
+           | Account | Symbol | Side | Type | Price | Size | Status | Client ID | Server ID | Enqueued At | Created At |
+           +---------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+
+           |       - |      - |    - |    - |     - |    - |      - |         - |         - |           - |          - |
+           +---------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+\n
            """
 
     [btcusd_order] = Orders.add(OrderSubmission.buy_limit(:test_feed_a, :btcusd, 12_999.99, 1.1))
@@ -73,7 +73,7 @@ defmodule Tai.Commands.HelperTest do
 
     assert capture_io(fn -> Helper.orders() end) == """
            +-------------+--------+------+-------+----------+------+----------+--------------------------------------+-----------+-------------+------------+
-           |    Exchange | Symbol | Side |  Type |    Price | Size |   Status |                            Client ID | Server ID | Enqueued At | Created At |
+           |     Account | Symbol | Side |  Type |    Price | Size |   Status |                            Client ID | Server ID | Enqueued At | Created At |
            +-------------+--------+------+-------+----------+------+----------+--------------------------------------+-----------+-------------+------------+
            | test_feed_a | btcusd |  buy | limit | 12999.99 |  1.1 | enqueued | #{
              btcusd_order.client_id
@@ -89,51 +89,51 @@ defmodule Tai.Commands.HelperTest do
 
   test "buy_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
-             Helper.buy_limit(:test_exchange_a, :btcusd_success, 10.1, 2.2)
+             Helper.buy_limit(:test_account_a, :btcusd_success, 10.1, 2.2)
            end) ==
              "create order success - id: f9df7435-34d5-4861-8ddc-80f0fd2c83d7, status: pending\n"
   end
 
   test "buy_limit displays an error message when the order can't be created" do
     assert capture_io(fn ->
-             Helper.buy_limit(:test_exchange_a, :btcusd_insufficient_funds, 10.1, 3.3)
+             Helper.buy_limit(:test_account_a, :btcusd_insufficient_funds, 10.1, 3.3)
            end) == "create order failure - insufficient funds\n"
   end
 
   test "sell_limit creates an order on the exchange then displays it's 'id' and 'status'" do
     assert capture_io(fn ->
-             Helper.sell_limit(:test_exchange_a, :btcusd_success, 10.1, 2.2)
+             Helper.sell_limit(:test_account_a, :btcusd_success, 10.1, 2.2)
            end) ==
              "create order success - id: 41541912-ebc1-4173-afa5-4334ccf7a1a8, status: pending\n"
   end
 
   test "sell_limit displays an error message when the order can't be created" do
     assert capture_io(fn ->
-             Helper.sell_limit(:test_exchange_a, :btcusd_insufficient_funds, 10.1, 3.3)
+             Helper.sell_limit(:test_account_a, :btcusd_insufficient_funds, 10.1, 3.3)
            end) == "create order failure - insufficient funds\n"
   end
 
   test "order_status displays the order info" do
     assert capture_io(fn ->
-             Helper.order_status(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
+             Helper.order_status(:test_account_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
            end) == "status: open\n"
   end
 
   test "order_status displays error messages" do
     assert capture_io(fn ->
-             Helper.order_status(:test_exchange_a, "invalid-order-id")
+             Helper.order_status(:test_account_a, "invalid-order-id")
            end) == "error: Invalid order id\n"
   end
 
   test "cancel_order cancels a previous order" do
     assert capture_io(fn ->
-             Helper.cancel_order(:test_exchange_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
+             Helper.cancel_order(:test_account_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
            end) == "cancel order success\n"
   end
 
   test "cancel_order displays error messages" do
     assert capture_io(fn ->
-             Helper.cancel_order(:test_exchange_a, "invalid-order-id")
+             Helper.cancel_order(:test_account_a, "invalid-order-id")
            end) == "error: Invalid order id\n"
   end
 end

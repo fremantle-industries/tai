@@ -19,7 +19,7 @@ defmodule Tai.Trading.OrderOutboxTest do
     end
 
     def init(state) do
-      Tai.PubSub.subscribe(:my_test_exchange)
+      Tai.PubSub.subscribe(:my_test_account)
 
       {:ok, state}
     end
@@ -52,7 +52,7 @@ defmodule Tai.Trading.OrderOutboxTest do
 
   setup do
     Process.register(self(), :test)
-    start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_exchange})
+    start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
     start_supervised!(OrderLifecycleSubscriber)
 
     on_exit(fn ->
@@ -68,8 +68,8 @@ defmodule Tai.Trading.OrderOutboxTest do
     [new_buy_limit_order, new_sell_limit_order] =
       new_orders =
       OrderOutbox.add([
-        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 100.0, 0.1),
-        OrderSubmission.sell_limit(:my_test_exchange, :btcusd_success, 100.0, 0.1)
+        OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 100.0, 0.1),
+        OrderSubmission.sell_limit(:my_test_account, :btcusd_success, 100.0, 0.1)
       ])
 
     assert Enum.count(new_orders) == 2
@@ -122,8 +122,8 @@ defmodule Tai.Trading.OrderOutboxTest do
 
     [new_order_1, new_order_2] =
       OrderOutbox.add([
-        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1),
-        OrderSubmission.sell_limit(:my_test_exchange, :btcusd_insufficient_funds, 100.0, 0.1)
+        OrderSubmission.buy_limit(:my_test_account, :btcusd_insufficient_funds, 100.0, 0.1),
+        OrderSubmission.sell_limit(:my_test_account, :btcusd_insufficient_funds, 100.0, 0.1)
       ])
 
     assert Orders.count() == 2
@@ -161,9 +161,9 @@ defmodule Tai.Trading.OrderOutboxTest do
   test "cancel changes the given pending orders to cancelling and sends the request to the exchange in the background" do
     [order_1, order_2, order_3] =
       OrderOutbox.add([
-        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 100.0, 0.1),
-        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 100.0, 1.1),
-        OrderSubmission.buy_limit(:my_test_exchange, :btcusd_insufficient_funds, 100.0, 2.1)
+        OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 100.0, 0.1),
+        OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 100.0, 1.1),
+        OrderSubmission.buy_limit(:my_test_account, :btcusd_insufficient_funds, 100.0, 2.1)
       ])
 
     assert_receive {:order_enqueued, ^order_1}

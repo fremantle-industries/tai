@@ -2,7 +2,7 @@ defmodule Tai.Trading.Order do
   @enforce_keys [
     :client_id,
     :enqueued_at,
-    :exchange,
+    :account_id,
     :price,
     :side,
     :size,
@@ -14,7 +14,7 @@ defmodule Tai.Trading.Order do
     :client_id,
     :created_at,
     :enqueued_at,
-    :exchange,
+    :account_id,
     :price,
     :server_id,
     :side,

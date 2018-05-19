@@ -9,7 +9,7 @@ defmodule Examples.Advisors.LogSpread.SupervisorTest do
 
     assert %Tai.Advisor{
              advisor_id: :log_spread_advisor,
-             exchanges: [],
+             accounts: [],
              order_books: %{
                test_feed_a: [:btcusd, :ltcusd],
                test_feed_b: [:ethusd, :ltcusd]

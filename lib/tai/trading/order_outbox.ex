@@ -62,7 +62,7 @@ defmodule Tai.Trading.OrderOutbox do
   def handle_info({:order_cancelling, order}, state) do
     {:ok, _pid} =
       Task.start_link(fn ->
-        Tai.Exchanges.Account.cancel_order(order.exchange, order.server_id)
+        Tai.Exchanges.Account.cancel_order(order.account_id, order.server_id)
         |> handle_cancel_order_response(order)
       end)
 
@@ -85,14 +85,14 @@ defmodule Tai.Trading.OrderOutbox do
 
   defp broadcast_enqueued_order(order) do
     PubSub.broadcast(__MODULE__, {:order_enqueued, order})
-    PubSub.broadcast(order.exchange, {:order_enqueued, order})
+    PubSub.broadcast(order.account_id, {:order_enqueued, order})
 
     order
   end
 
   defp broadcast_cancelling_order(order) do
     PubSub.broadcast(__MODULE__, {:order_cancelling, order})
-    PubSub.broadcast(order.exchange, {:order_cancelling, order})
+    PubSub.broadcast(order.account_id, {:order_cancelling, order})
     order
   end
 
@@ -108,16 +108,16 @@ defmodule Tai.Trading.OrderOutbox do
         status: OrderStatus.pending()
       )
 
-    PubSub.broadcast(pending_order.exchange, {:order_create_ok, pending_order})
+    PubSub.broadcast(pending_order.account_id, {:order_create_ok, pending_order})
   end
 
   defp handle_limit_response({:error, reason}, order) do
     error_order = Orders.update(order.client_id, status: OrderStatus.error())
-    PubSub.broadcast(error_order.exchange, {:order_create_error, reason, error_order})
+    PubSub.broadcast(error_order.account_id, {:order_create_error, reason, error_order})
   end
 
   defp handle_cancel_order_response({:ok, _order_id}, order) do
     cancelled_order = Orders.update(order.client_id, status: OrderStatus.cancelled())
-    PubSub.broadcast(cancelled_order.exchange, {:order_cancelled, cancelled_order})
+    PubSub.broadcast(cancelled_order.account_id, {:order_cancelled, cancelled_order})
   end
 end

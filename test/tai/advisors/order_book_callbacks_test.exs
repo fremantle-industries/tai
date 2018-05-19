@@ -24,7 +24,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
   setup do
     Process.register(self(), :test)
     book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btcusd})
-    start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_exchange})
+    start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
 
     on_exit(fn ->
       Orders.clear()
@@ -41,7 +41,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{}
       ]
     })
@@ -63,7 +63,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{}
       ]
     })
@@ -95,7 +95,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{return_val: {:unknown, :return_val}}
       ]
     })
@@ -125,7 +125,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{}
       ]
     })
@@ -182,7 +182,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{}
       ]
     })
@@ -236,7 +236,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       [
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{return_val: {:ok, %{store: %{hello: "world"}}}}
       ]
     })

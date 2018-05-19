@@ -16,11 +16,11 @@ defmodule Tai.Advisors.Config do
       |> find
       |> Map.get(:order_books)
 
-    order_books_by_exchange()
+    order_books_by_adapter_id()
     |> Juice.squeeze(query)
   end
 
-  defp order_books_by_exchange do
+  defp order_books_by_adapter_id do
     Exchanges.Config.order_book_feeds()
     |> Enum.reduce(
       %{},

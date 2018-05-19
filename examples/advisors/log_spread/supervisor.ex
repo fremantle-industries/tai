@@ -22,7 +22,7 @@ defmodule Examples.Advisors.LogSpread.Supervisor do
     [
       advisor_id: id,
       order_books: Config.order_books(id),
-      exchanges: [],
+      accounts: [],
       store: %{}
     ]
   end

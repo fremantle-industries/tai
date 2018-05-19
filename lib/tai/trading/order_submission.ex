@@ -5,15 +5,15 @@ defmodule Tai.Trading.OrderSubmission do
 
   alias Tai.Trading.{Order, OrderSubmission}
 
-  @enforce_keys [:exchange_id, :symbol, :side, :price, :size, :type]
-  defstruct [:exchange_id, :symbol, :side, :price, :size, :type]
+  @enforce_keys [:account_id, :symbol, :side, :price, :size, :type]
+  defstruct [:account_id, :symbol, :side, :price, :size, :type]
 
   @doc """
   Return an OrderSubmission for buy limit orders
   """
-  def buy_limit(exchange_id, symbol, price, size) do
+  def buy_limit(account_id, symbol, price, size) do
     %OrderSubmission{
-      exchange_id: exchange_id,
+      account_id: account_id,
       symbol: symbol,
       side: Order.buy(),
       type: Order.limit(),
@@ -25,9 +25,9 @@ defmodule Tai.Trading.OrderSubmission do
   @doc """
   Return an OrderSubmission for sell limit orders
   """
-  def sell_limit(exchange_id, symbol, price, size) do
+  def sell_limit(account_id, symbol, price, size) do
     %OrderSubmission{
-      exchange_id: exchange_id,
+      account_id: account_id,
       symbol: symbol,
       side: Order.sell(),
       type: Order.limit(),

@@ -10,7 +10,8 @@ defmodule Tai.Supervisor do
       Tai.PubSub,
       Tai.Trading.Supervisor,
       Tai.Advisors.Supervisor,
-      Tai.Exchanges.Supervisor
+      Tai.Exchanges.AccountsSupervisor,
+      Tai.Exchanges.OrderBookFeedsSupervisor
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

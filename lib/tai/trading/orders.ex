@@ -125,7 +125,7 @@ defmodule Tai.Trading.Orders do
     GenServer.call(__MODULE__, {:count, status: status})
   end
 
-  defp add_orders({_exchange, _symbol, _price, _size} = submission, state) do
+  defp add_orders({_account_id, _symbol, _price, _size} = submission, state) do
     [submission]
     |> add_orders(state)
   end
@@ -147,7 +147,7 @@ defmodule Tai.Trading.Orders do
   defp add_orders([%OrderSubmission{} = submission | tail], state, new_orders) do
     order = %Order{
       client_id: UUID.uuid4(),
-      exchange: submission.exchange_id,
+      account_id: submission.account_id,
       symbol: submission.symbol,
       side: submission.side,
       type: submission.type,

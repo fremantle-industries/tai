@@ -13,8 +13,8 @@ defmodule Tai.Advisor do
   """
   @type t :: Advisor
 
-  @enforce_keys [:advisor_id, :exchanges, :order_books, :inside_quotes, :store]
-  defstruct advisor_id: nil, exchanges: [], order_books: %{}, inside_quotes: %{}, store: %{}
+  @enforce_keys [:advisor_id, :accounts, :order_books, :inside_quotes, :store]
+  defstruct advisor_id: nil, accounts: [], order_books: %{}, inside_quotes: %{}, store: %{}
 
   @doc """
   Callback when order book has bid or ask changes
@@ -88,7 +88,7 @@ defmodule Tai.Advisor do
       def start_link(
             advisor_id: advisor_id,
             order_books: order_books,
-            exchanges: exchanges,
+            accounts: accounts,
             store: %{} = store
           ) do
         GenServer.start_link(
@@ -96,7 +96,7 @@ defmodule Tai.Advisor do
           %Advisor{
             advisor_id: advisor_id,
             order_books: order_books,
-            exchanges: exchanges,
+            accounts: accounts,
             inside_quotes: %{},
             store: Map.merge(%{}, store)
           },
@@ -105,10 +105,10 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def init(%Advisor{order_books: order_books, exchanges: exchanges} = state) do
+      def init(%Advisor{order_books: order_books, accounts: accounts} = state) do
         MetaLogger.init_pname()
         subscribe_to_order_book_channels(order_books)
-        subscribe_to_exchange_channels(exchanges)
+        subscribe_to_account_channels(accounts)
 
         {:ok, state}
       end
@@ -241,8 +241,8 @@ defmodule Tai.Advisor do
         end)
       end
 
-      defp subscribe_to_exchange_channels(exchanges) do
-        PubSub.subscribe(exchanges)
+      defp subscribe_to_account_channels(accounts) do
+        PubSub.subscribe(accounts)
       end
 
       defp cache_inside_quote(state, feed_id, symbol) do

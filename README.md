@@ -87,15 +87,15 @@ iex(1)> help
 * balance
 * markets
 * orders
-* buy_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
-* sell_limit exchange(:gdax), symbol(:btcusd), price(101.12), size(1.2)
-* order_status exchange(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
-* cancel_order exchange(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
+* buy_limit account_id(:gdax), symbol(:btcusd), price(101.12), size(1.2)
+* sell_limit account_id(:gdax), symbol(:btcusd), price(101.12), size(1.2)
+* order_status account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
+* cancel_order account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
 ```
 
 #### balance
 
-Return the USD value across all configured exchanges
+Return the USD value across all configured accounts
 
 
 ```
@@ -136,11 +136,11 @@ the `orders` command.
 
 ```
 iex(4)> orders
-+----------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
-| Exchange | Symbol |      Type | Price | Size | Status |                            Client ID | Server ID |    Enqueued At | Created At |
-+----------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
-|     gdax | btcusd | buy_limit | 100.1 |  0.1 |  error | a6aa15bc-b271-486f-ab40-f9b35b2cd223 |           | 20 minutes ago |            |
-+----------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
++---------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
+| Account | Symbol |      Type | Price | Size | Status |                            Client ID | Server ID |    Enqueued At | Created At |
++---------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
+|    gdax | btcusd | buy_limit | 100.1 |  0.1 |  error | a6aa15bc-b271-486f-ab40-f9b35b2cd223 |           | 20 minutes ago |            |
++---------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
 ```
 
 ## Advisors

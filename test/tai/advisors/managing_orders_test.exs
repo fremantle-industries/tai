@@ -34,8 +34,8 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       cond do
         Orders.count() == 0 ->
           orders = [
-            OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 101.1, 0.1),
-            OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 10.1, 0.11)
+            OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 101.1, 0.1),
+            OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 10.1, 0.11)
           ]
 
           {:ok, %{orders: orders}}
@@ -73,7 +73,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
   setup do
     Process.register(self(), :test)
     book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btcusd})
-    start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_exchange})
+    start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
 
     on_exit(fn ->
       Orders.clear()
@@ -88,12 +88,12 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       [
         advisor_id: :my_buy_limit_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{
           orders: [
-            OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 101.1, 0.1),
-            OrderSubmission.buy_limit(:my_test_exchange, :btcusd_success, 10.1, 0.11),
-            OrderSubmission.buy_limit(:my_test_exchange, :btcusd_insufficient_funds, 1.1, 0.1)
+            OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 101.1, 0.1),
+            OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 10.1, 0.11),
+            OrderSubmission.buy_limit(:my_test_account, :btcusd_insufficient_funds, 1.1, 0.1)
           ]
         }
       ]
@@ -111,7 +111,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert_receive {enqueued_order_3, %Advisor{}}
 
     assert enqueued_order_1.server_id == nil
-    assert enqueued_order_1.exchange == :my_test_exchange
+    assert enqueued_order_1.account_id == :my_test_account
     assert enqueued_order_1.symbol == :btcusd_success
     assert enqueued_order_1.side == Order.buy()
     assert enqueued_order_1.type == Order.limit()
@@ -120,7 +120,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert enqueued_order_1.status == OrderStatus.enqueued()
 
     assert enqueued_order_2.server_id == nil
-    assert enqueued_order_2.exchange == :my_test_exchange
+    assert enqueued_order_2.account_id == :my_test_account
     assert enqueued_order_2.symbol == :btcusd_success
     assert enqueued_order_2.side == Order.buy()
     assert enqueued_order_2.type == Order.limit()
@@ -129,7 +129,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert enqueued_order_2.status == OrderStatus.enqueued()
 
     assert enqueued_order_3.server_id == nil
-    assert enqueued_order_3.exchange == :my_test_exchange
+    assert enqueued_order_3.account_id == :my_test_account
     assert enqueued_order_3.symbol == :btcusd_insufficient_funds
     assert enqueued_order_3.side == Order.buy()
     assert enqueued_order_3.type == Order.limit()
@@ -146,7 +146,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
 
     assert created_order_1.server_id != nil
-    assert created_order_1.exchange == :my_test_exchange
+    assert created_order_1.account_id == :my_test_account
     assert created_order_1.symbol == :btcusd_success
     assert created_order_1.side == Order.buy()
     assert created_order_1.type == Order.limit()
@@ -155,7 +155,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert created_order_1.status == OrderStatus.pending()
 
     assert created_order_2.server_id != nil
-    assert created_order_2.exchange == :my_test_exchange
+    assert created_order_2.account_id == :my_test_account
     assert created_order_2.symbol == :btcusd_success
     assert created_order_2.side == Order.buy()
     assert created_order_2.type == Order.limit()
@@ -164,7 +164,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert created_order_2.status == OrderStatus.pending()
 
     assert error_order.server_id == nil
-    assert error_order.exchange == :my_test_exchange
+    assert error_order.account_id == :my_test_account
     assert error_order.symbol == :btcusd_insufficient_funds
     assert error_order.side == Order.buy()
     assert error_order.type == Order.limit()
@@ -179,12 +179,12 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       [
         advisor_id: :my_sell_limit_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{
           orders: [
-            OrderSubmission.sell_limit(:my_test_exchange, :btcusd_success, 101.1, 0.1),
-            OrderSubmission.sell_limit(:my_test_exchange, :btcusd_success, 10.1, 0.11),
-            OrderSubmission.sell_limit(:my_test_exchange, :btcusd_insufficient_funds, 1.1, 0.1)
+            OrderSubmission.sell_limit(:my_test_account, :btcusd_success, 101.1, 0.1),
+            OrderSubmission.sell_limit(:my_test_account, :btcusd_success, 10.1, 0.11),
+            OrderSubmission.sell_limit(:my_test_account, :btcusd_insufficient_funds, 1.1, 0.1)
           ]
         }
       ]
@@ -202,7 +202,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert_receive {enqueued_order_3, %Advisor{}}
 
     assert enqueued_order_1.server_id == nil
-    assert enqueued_order_1.exchange == :my_test_exchange
+    assert enqueued_order_1.account_id == :my_test_account
     assert enqueued_order_1.symbol == :btcusd_success
     assert enqueued_order_1.side == Order.sell()
     assert enqueued_order_1.type == Order.limit()
@@ -211,7 +211,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert enqueued_order_1.status == OrderStatus.enqueued()
 
     assert enqueued_order_2.server_id == nil
-    assert enqueued_order_2.exchange == :my_test_exchange
+    assert enqueued_order_2.account_id == :my_test_account
     assert enqueued_order_2.symbol == :btcusd_success
     assert enqueued_order_2.side == Order.sell()
     assert enqueued_order_2.type == Order.limit()
@@ -220,7 +220,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert enqueued_order_2.status == OrderStatus.enqueued()
 
     assert enqueued_order_3.server_id == nil
-    assert enqueued_order_3.exchange == :my_test_exchange
+    assert enqueued_order_3.account_id == :my_test_account
     assert enqueued_order_3.symbol == :btcusd_insufficient_funds
     assert enqueued_order_3.side == Order.sell()
     assert enqueued_order_3.type == Order.limit()
@@ -237,7 +237,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
 
     assert created_order_1.server_id != nil
-    assert created_order_1.exchange == :my_test_exchange
+    assert created_order_1.account_id == :my_test_account
     assert created_order_1.symbol == :btcusd_success
     assert created_order_1.side == Order.sell()
     assert created_order_1.type == Order.limit()
@@ -246,7 +246,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert created_order_1.status == OrderStatus.pending()
 
     assert created_order_2.server_id != nil
-    assert created_order_2.exchange == :my_test_exchange
+    assert created_order_2.account_id == :my_test_account
     assert created_order_2.symbol == :btcusd_success
     assert created_order_1.side == Order.sell()
     assert created_order_1.type == Order.limit()
@@ -255,7 +255,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert created_order_2.status == OrderStatus.pending()
 
     assert error_order.server_id == nil
-    assert error_order.exchange == :my_test_exchange
+    assert error_order.account_id == :my_test_account
     assert error_order.symbol == :btcusd_insufficient_funds
     assert error_order.side == Order.sell()
     assert error_order.type == Order.limit()
@@ -270,7 +270,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       [
         advisor_id: :my_cancel_orders_advisor,
         order_books: %{my_order_book_feed: [:btcusd]},
-        exchanges: [:my_test_exchange],
+        accounts: [:my_test_account],
         store: %{}
       ]
     })
@@ -286,7 +286,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       %Order{
         client_id: _,
         server_id: nil,
-        exchange: :my_test_exchange,
+        account_id: :my_test_account,
         symbol: :btcusd_success,
         price: 101.1,
         size: 0.1,
@@ -299,7 +299,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       %Order{
         client_id: _,
         server_id: nil,
-        exchange: :my_test_exchange,
+        account_id: :my_test_account,
         symbol: :btcusd_success,
         price: 10.1,
         size: 0.11,
@@ -312,7 +312,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       %Order{
         client_id: _,
         server_id: _,
-        exchange: :my_test_exchange,
+        account_id: :my_test_account,
         symbol: :btcusd_success,
         price: 101.1,
         size: 0.1,
@@ -325,7 +325,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       %Order{
         client_id: _,
         server_id: _,
-        exchange: :my_test_exchange,
+        account_id: :my_test_account,
         symbol: :btcusd_success,
         price: 10.1,
         size: 0.11,
@@ -345,7 +345,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       %Order{
         client_id: _,
         server_id: _,
-        exchange: :my_test_exchange,
+        account_id: :my_test_account,
         symbol: :btcusd_success,
         price: 101.1,
         size: 0.1,
@@ -358,7 +358,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       %Order{
         client_id: _,
         server_id: _,
-        exchange: :my_test_exchange,
+        account_id: :my_test_account,
         symbol: :btcusd_success,
         price: 10.1,
         size: 0.11,
@@ -371,7 +371,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       %Order{
         client_id: _,
         server_id: _,
-        exchange: :my_test_exchange,
+        account_id: :my_test_account,
         symbol: :btcusd_success,
         price: 101.1,
         size: 0.1,
@@ -384,7 +384,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       %Order{
         client_id: _,
         server_id: _,
-        exchange: :my_test_exchange,
+        account_id: :my_test_account,
         symbol: :btcusd_success,
         price: 10.1,
         size: 0.11,

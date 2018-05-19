@@ -6,7 +6,7 @@ defmodule Tai.Commands.Orders do
     |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
     |> Enum.map(fn order ->
       [
-        order.exchange,
+        order.account_id,
         order.symbol,
         order.side,
         order.type,
@@ -39,7 +39,7 @@ defmodule Tai.Commands.Orders do
 
   defp header do
     [
-      "Exchange",
+      "Account",
       "Symbol",
       "Side",
       "Type",

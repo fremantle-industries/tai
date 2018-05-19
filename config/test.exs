@@ -20,12 +20,12 @@ config :tai,
   }
 
 config :tai,
-  exchanges: %{
-    test_exchange_a: [
-      supervisor: Tai.ExchangeAdapters.Test.Supervisor
+  accounts: %{
+    test_account_a: [
+      supervisor: Tai.ExchangeAdapters.Test.AccountSupervisor
     ],
-    test_exchange_b: [
-      supervisor: Tai.ExchangeAdapters.Test.Supervisor
+    test_account_b: [
+      supervisor: Tai.ExchangeAdapters.Test.AccountSupervisor
     ]
   }
 

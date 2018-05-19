@@ -4,52 +4,53 @@ defmodule Tai.Exchanges.Config do
   """
 
   @doc """
-  Return a map of exchange configuration
+  Return a map of account configuration
 
   ## Examples
 
-    iex> Tai.Exchanges.Config.exchanges
+    iex> Tai.Exchanges.Config.accounts
     %{
-      test_exchange_a: [
-        supervisor: Tai.ExchangeAdapters.Test.Supervisor
+      test_account_a: [
+        supervisor: Tai.ExchangeAdapters.Test.AccountSupervisor
       ],
-      test_exchange_b: [
-        supervisor: Tai.ExchangeAdapters.Test.Supervisor
+      test_account_b: [
+        supervisor: Tai.ExchangeAdapters.Test.AccountSupervisor
       ]
     }
   """
-  def exchanges do
-    Application.get_env(:tai, :exchanges)
+  def accounts do
+    Application.get_env(:tai, :accounts)
   end
 
   @doc """
-  Return a keyword list of the configured exchange id & supervisor
+  Return a keyword list of the configured account id & supervisor
 
   ## Examples
 
-    iex> Tai.Exchanges.Config.exchange_supervisors
+    iex> Tai.Exchanges.Config.account_supervisors
     [
-      test_exchange_a: Tai.ExchangeAdapters.Test.Supervisor,
-      test_exchange_b: Tai.ExchangeAdapters.Test.Supervisor
+      test_account_a: Tai.ExchangeAdapters.Test.AccountSupervisor,
+      test_account_b: Tai.ExchangeAdapters.Test.AccountSupervisor
     ]
   """
-  def exchange_supervisors do
-    exchanges()
-    |> Enum.map(fn {exchange_id, config} ->
-      {exchange_id, Keyword.get(config, :supervisor)}
+  def account_supervisors do
+    accounts()
+    |> Enum.map(fn {account_id, config} ->
+      supervisor = Keyword.get(config, :supervisor)
+      {account_id, supervisor}
     end)
   end
 
   @doc """
-  Return the keys for the exchange adapters
+  Return the keys for the account adapters
 
   ## Examples
 
-    iex> Tai.Exchanges.Config.exchange_ids()
-    [:test_exchange_a, :test_exchange_b]
+    iex> Tai.Exchanges.Config.account_ids()
+    [:test_account_a, :test_account_b]
   """
-  def exchange_ids do
-    for {id, _} <- exchanges(), do: id
+  def account_ids do
+    for {id, _} <- accounts(), do: id
   end
 
   @doc """
