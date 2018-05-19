@@ -114,28 +114,28 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def handle_info({:order_book_snapshot, order_book_feed_id, symbol, snapshot}, state) do
+      def handle_info({:order_book_snapshot, feed_id, symbol, snapshot}, state) do
         new_state =
           state
-          |> cache_inside_quote(order_book_feed_id, symbol)
-          |> execute_handle_inside_quote(order_book_feed_id, symbol, snapshot)
+          |> cache_inside_quote(feed_id, symbol)
+          |> execute_handle_inside_quote(feed_id, symbol, snapshot)
 
         {:noreply, new_state}
       end
 
       @doc false
-      def handle_info({:order_book_changes, order_book_feed_id, symbol, changes}, state) do
+      def handle_info({:order_book_changes, feed_id, symbol, changes}, state) do
         new_state =
           Tai.TimeFrame.debug "handle_info({:order_book_changes...})" do
-            handle_order_book_changes(order_book_feed_id, symbol, changes, state)
+            handle_order_book_changes(feed_id, symbol, changes, state)
 
-            previous_inside_quote = state |> cached_inside_quote(order_book_feed_id, symbol)
+            previous_inside_quote = state |> cached_inside_quote(feed_id, symbol)
 
             if inside_quote_is_stale?(previous_inside_quote, changes) do
               state
-              |> cache_inside_quote(order_book_feed_id, symbol)
+              |> cache_inside_quote(feed_id, symbol)
               |> execute_handle_inside_quote(
-                order_book_feed_id,
+                feed_id,
                 symbol,
                 changes,
                 previous_inside_quote
@@ -191,8 +191,8 @@ defmodule Tai.Advisor do
         iex> Tai.Advisor.quotes(feed_id: :test_feed_a, symbol: :btcusd, depth: 1)
         {:ok, %Tai.Markets.OrderBook{bids: [], asks: []}
       """
-      def quotes(feed_id: order_book_feed_id, symbol: symbol, depth: depth) do
-        [feed_id: order_book_feed_id, symbol: symbol]
+      def quotes(feed_id: feed_id, symbol: symbol, depth: depth) do
+        [feed_id: feed_id, symbol: symbol]
         |> OrderBook.to_name()
         |> OrderBook.quotes(depth)
       end
@@ -245,14 +245,13 @@ defmodule Tai.Advisor do
         PubSub.subscribe(exchanges)
       end
 
-      defp cache_inside_quote(state, order_book_feed_id, symbol) do
-        with {:ok, current_inside_quote} <- OrderBook.inside_quote(order_book_feed_id, symbol),
-             order_book_key =
-               [feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name(),
-             new_inside_quotes =
-               state.inside_quotes |> Map.put(order_book_key, current_inside_quote) do
-          state
-          |> Map.put(:inside_quotes, new_inside_quotes)
+      defp cache_inside_quote(state, feed_id, symbol) do
+        with {:ok, current_inside_quote} <- OrderBook.inside_quote(feed_id, symbol),
+             feed_and_symbol <- [feed_id: feed_id, symbol: symbol],
+             key <- OrderBook.to_name(feed_and_symbol),
+             old <- state.inside_quotes,
+             updated <- Map.put(old, key, current_inside_quote) do
+          Map.put(state, :inside_quotes, updated)
         end
       end
 
