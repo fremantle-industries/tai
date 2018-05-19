@@ -1,6 +1,11 @@
 defmodule Tai.Commands.Markets do
+  @moduledoc """
+  Display the bid/ask for each symbol on all order book feeds
+  """
+
   alias Tai.Exchanges
   alias Tai.Markets.{OrderBook, PriceLevel, Quote}
+  alias TableRex.Table
 
   def markets do
     Exchanges.Config.order_book_feed_ids()
@@ -98,9 +103,10 @@ defmodule Tai.Commands.Markets do
       "Ask Server Changed At"
     ]
 
-    TableRex.Table.new(rows, header)
-    |> TableRex.Table.put_column_meta(:all, align: :right)
-    |> TableRex.Table.render!()
+    rows
+    |> Table.new(header)
+    |> Table.put_column_meta(:all, align: :right)
+    |> Table.render!()
     |> IO.puts()
   end
 end

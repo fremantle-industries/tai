@@ -1,4 +1,8 @@
 defmodule Tai.Commands.Helper do
+  @moduledoc """
+  Commands for using `tai` in IEx
+  """
+
   alias Tai.Commands
 
   defdelegate help, to: Commands.Info

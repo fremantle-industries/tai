@@ -38,12 +38,12 @@ defmodule Tai.Commands.HelperTest do
     :ok =
       OrderBook.replace(test_feed_a_btcusd, %OrderBook{
         bids: %{
-          12999.99 => {0.000021, Timex.now(), Timex.now()},
-          12999.98 => {1.0, nil, nil}
+          12_999.99 => {0.000021, Timex.now(), Timex.now()},
+          12_999.98 => {1.0, nil, nil}
         },
         asks: %{
-          13000.01 => {1.11, Timex.now(), Timex.now()},
-          13000.02 => {1.25, nil, nil}
+          13_000.01 => {1.11, Timex.now(), Timex.now()},
+          13_000.02 => {1.25, nil, nil}
         }
       })
 
@@ -68,7 +68,7 @@ defmodule Tai.Commands.HelperTest do
            +----------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+\n
            """
 
-    [btcusd_order] = Orders.add(OrderSubmission.buy_limit(:test_feed_a, :btcusd, 12999.99, 1.1))
+    [btcusd_order] = Orders.add(OrderSubmission.buy_limit(:test_feed_a, :btcusd, 12_999.99, 1.1))
     [ltcusd_order] = Orders.add(OrderSubmission.sell_limit(:test_feed_b, :ltcusd, 75.23, 1.0))
 
     assert capture_io(fn -> Helper.orders() end) == """
