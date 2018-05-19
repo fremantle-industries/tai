@@ -6,7 +6,7 @@ defmodule Tai.Markets.OrderBook do
   use GenServer
 
   alias Tai.PubSub
-  alias Tai.Markets.{OrderBook, PriceLevel}
+  alias Tai.Markets.{OrderBook, PriceLevel, Quote}
 
   defstruct bids: %{}, asks: %{}
 
@@ -100,8 +100,28 @@ defmodule Tai.Markets.OrderBook do
     {:reply, :ok, new_state}
   end
 
+  @doc """
+  Return bid/asks up to the given depth. If depth is not provided it returns
+  the full order book.
+  """
   def quotes(name, depth \\ :all) do
     GenServer.call(name, {:quotes, depth: depth})
+  end
+
+  @doc """
+  Return the bid/ask at the top of the book
+  """
+  def inside_quote(feed_id, symbol) do
+    [feed_id: feed_id, symbol: symbol]
+    |> to_name()
+    |> quotes(1)
+    |> case do
+      {:ok, %{bids: bids, asks: asks}} ->
+        with top_bid <- List.first(bids),
+             top_ask <- List.first(asks) do
+          {:ok, %Quote{bid: top_bid, ask: top_ask}}
+        end
+    end
   end
 
   def bid(name) do

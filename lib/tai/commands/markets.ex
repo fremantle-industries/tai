@@ -53,13 +53,10 @@ defmodule Tai.Commands.Markets do
   end
 
   def to_feed_and_symbol_inside_quote(symbol, feed_id) do
-    {
-      symbol,
-      feed_id,
-      [feed_id: feed_id, symbol: symbol]
-      |> inside_quote
-      |> format_inside_quote
-    }
+    with {:ok, raw_inside_quote} <- OrderBook.inside_quote(feed_id, symbol),
+         inside_quote <- format_inside_quote(raw_inside_quote) do
+      {symbol, feed_id, inside_quote}
+    end
   end
 
   defp to_order_book_status_row({symbol, feed_id, %Quote{bid: bid, ask: ask}}) do
@@ -83,16 +80,6 @@ defmodule Tai.Commands.Markets do
   defp format_col(%DateTime{} = date), do: Timex.from_now(date)
   defp format_col(nil), do: nil
   defp format_col(pass_through), do: pass_through
-
-  defp inside_quote([feed_id: _feed_id, symbol: _symbol] = feed_id_and_symbol) do
-    feed_id_and_symbol
-    |> OrderBook.to_name()
-    |> OrderBook.quotes()
-    |> case do
-      {:ok, %{bids: bids, asks: asks}} ->
-        %Quote{bid: bids |> List.first(), ask: asks |> List.first()}
-    end
-  end
 
   defp format_inside_quote(%Quote{bid: nil, ask: nil}) do
     format_inside_quote(%Quote{

@@ -245,21 +245,15 @@ defmodule Tai.Advisor do
         PubSub.subscribe(exchanges)
       end
 
-      defp fetch_inside_quote(order_book_feed_id, symbol) do
-        [feed_id: order_book_feed_id, symbol: symbol, depth: 1]
-        |> quotes
-        |> case do
-          {:ok, %OrderBook{bids: bids, asks: asks}} ->
-            %Quote{bid: bids |> List.first(), ask: asks |> List.first()}
-        end
-      end
-
       defp cache_inside_quote(state, order_book_feed_id, symbol) do
-        current_inside_quote = fetch_inside_quote(order_book_feed_id, symbol)
-        order_book_key = [feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name()
-        new_inside_quotes = state.inside_quotes |> Map.put(order_book_key, current_inside_quote)
-
-        state |> Map.put(:inside_quotes, new_inside_quotes)
+        with {:ok, current_inside_quote} <- OrderBook.inside_quote(order_book_feed_id, symbol),
+             order_book_key =
+               [feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name(),
+             new_inside_quotes =
+               state.inside_quotes |> Map.put(order_book_key, current_inside_quote) do
+          state
+          |> Map.put(:inside_quotes, new_inside_quotes)
+        end
       end
 
       defp inside_quote_is_stale?(
