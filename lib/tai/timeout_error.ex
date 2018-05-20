@@ -3,6 +3,6 @@ defmodule Tai.TimeoutError do
   Module which represents a timeout error
   """
 
-  @enforce_keys [:message]
-  defstruct [:message]
+  @enforce_keys [:reason]
+  defstruct [:reason]
 end

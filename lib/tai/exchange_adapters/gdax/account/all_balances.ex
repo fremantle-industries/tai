@@ -19,15 +19,15 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.AllBalances do
   end
 
   defp normalize_accounts({:error, "Invalid Passphrase" = reason, _status}) do
-    {:error, %CredentialError{message: reason}}
+    {:error, %CredentialError{reason: reason}}
   end
 
   defp normalize_accounts({:error, "Invalid API Key" = reason, _status}) do
-    {:error, %CredentialError{message: reason}}
+    {:error, %CredentialError{reason: reason}}
   end
 
   defp normalize_accounts({:error, "timeout" = reason}) do
-    {:error, %TimeoutError{message: reason}}
+    {:error, %TimeoutError{reason: reason}}
   end
 
   defp normalize_account(%{"currency" => raw_currency, "balance" => raw_balance}, acc) do

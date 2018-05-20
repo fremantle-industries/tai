@@ -26,6 +26,7 @@ defmodule Tai.Mixfile do
       {:binance, "~> 0.4"},
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.3"},
+      {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
       {:json, "~> 1.0"},
       {:juice, "~> 0.0.3"},

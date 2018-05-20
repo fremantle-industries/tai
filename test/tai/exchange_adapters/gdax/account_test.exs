@@ -31,7 +31,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_passphrase" do
       assert Account.all_balances(:my_gdax_exchange) == {
                :error,
-               %CredentialError{message: "Invalid Passphrase"}
+               %CredentialError{reason: "Invalid Passphrase"}
              }
     end
   end
@@ -40,7 +40,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_api_key" do
       assert Account.all_balances(:my_gdax_exchange) == {
                :error,
-               %CredentialError{message: "Invalid API Key"}
+               %CredentialError{reason: "Invalid API Key"}
              }
     end
   end
@@ -49,7 +49,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     use_cassette "exchange_adapters/gdax/account/all_balances_error_timeout" do
       assert Account.all_balances(:my_gdax_exchange) == {
                :error,
-               %TimeoutError{message: "timeout"}
+               %TimeoutError{reason: "timeout"}
              }
     end
   end
