@@ -24,4 +24,4 @@ Coming soon...
 
 ## Cancel pending orders
 
-[Example](./create_and_cancel_pending_order.ex)
+[Example](./create_and_cancel_pending_order/advisor.ex)
