@@ -9,11 +9,16 @@ config :exvcr,
     "CB-ACCESS-PASSPHRASE",
     # Poloniex
     "Key",
-    "Sign"
+    "Sign",
+    # Binance
+    "X-MBX-APIKEY"
   ],
   filter_sensitive_data: [
+    # GDAX
     [pattern: "\"id\":\"[a-z0-9-]{36,36}\"", placeholder: "\"id\":\"***\""],
-    [pattern: "\"profile_id\":\"[a-z0-9-]{36,36}\"", placeholder: "\"profile_id\":\"***\""]
+    [pattern: "\"profile_id\":\"[a-z0-9-]{36,36}\"", placeholder: "\"profile_id\":\"***\""],
+    # Binance
+    [pattern: "signature=[A-Z0-9]+", placeholder: "signature=***"]
   ]
 
 config(:echo_boy, port: 4100)
@@ -26,6 +31,10 @@ config :ex_gdax,
 config :ex_poloniex,
   api_key: System.get_env("POLONIEX_API_KEY"),
   api_secret: System.get_env("POLONIEX_API_SECRET")
+
+config :binance,
+  api_key: System.get_env("BINANCE_API_KEY"),
+  secret_key: System.get_env("BINANCE_API_SECRET")
 
 config :tai,
   order_book_feeds: %{

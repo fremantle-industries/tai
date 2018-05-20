@@ -1,0 +1,40 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v3/account?recvWindow=5000&timestamp=1526859362501&signature=***"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"code\":-2014,\"msg\":\"API-key format invalid.\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Sun, 20 May 2018 23:36:02 GMT",
+        "Server": "nginx",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Error from cloudfront",
+        "Via": "1.1 8f6be4b7e4756846b1fd5d03929beeb6.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "27WMzLdU8_hRXklUUGLMf3yTQ-gRiC2V-RrhfVdhNXlJFbetf-B8Mg=="
+      },
+      "status_code": 401,
+      "type": "ok"
+    }
+  }
+]

@@ -11,6 +11,10 @@ config :ex_poloniex,
   api_key: System.get_env("POLONIEX_API_KEY"),
   api_secret: System.get_env("POLONIEX_API_SECRET")
 
+config :binance,
+  api_key: System.get_env("BINANCE_API_KEY"),
+  secret_key: System.get_env("BINANCE_API_SECRET")
+
 config :tai,
   order_book_feeds: %{
     gdax: [
@@ -34,6 +38,9 @@ config :tai,
     ],
     poloniex: [
       adapter: Tai.ExchangeAdapters.Poloniex.Account
+    ],
+    binance: [
+      adapter: Tai.ExchangeAdapters.Binance.Account
     ]
   }
 
