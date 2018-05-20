@@ -5,8 +5,16 @@ defmodule Tai.Exchanges.AccountTest do
   alias Tai.Exchanges.Account
   alias Tai.Trading.{OrderResponses, Order, OrderStatus}
 
-  test "balance returns the USD value of all assets on the given account" do
-    assert Account.balance(:test_account_a) == Decimal.new(0.11)
+  test "all_balances returns an ok tuple with a map of symbols and their balances for the account" do
+    assert Account.all_balances(:test_account_a) == {
+             :ok,
+             %{
+               bch: Decimal.new(0),
+               btc: Decimal.new("1.1"),
+               eth: Decimal.new("0.000000000000200000000"),
+               ltc: Decimal.new("0.03")
+             }
+           }
   end
 
   test "buy_limit returns an ok tuple when an order is successfully created" do

@@ -1,5 +1,17 @@
 use Mix.Config
 
+config :exvcr,
+  filter_request_headers: [
+    "CB-ACCESS-KEY",
+    "CB-ACCESS-SIGN",
+    "CB-ACCESS-TIMESTAMP",
+    "CB-ACCESS-PASSPHRASE"
+  ],
+  filter_sensitive_data: [
+    [pattern: "\"id\":\"[a-z0-9-]{36,36}\"", placeholder: "\"id\":\"***\""],
+    [pattern: "\"profile_id\":\"[a-z0-9-]{36,36}\"", placeholder: "\"profile_id\":\"***\""]
+  ]
+
 config :echo_boy, port: 4100
 
 config :ex_gdax,

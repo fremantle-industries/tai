@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Gdax.Account
 
-  alias Tai.{Exchanges.Account, Trading.OrderResponses}
+  alias Tai.{Exchanges.Account, CredentialError, TimeoutError, Trading.OrderResponses}
 
   setup_all do
     HTTPoison.start()
@@ -12,13 +12,45 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     :ok
   end
 
-  test "balance returns the USD sum of all accounts" do
-    use_cassette "exchange_adapters/gdax/account/balance" do
-      # 1337.247745066 USD
-      # 1.1 BTC
-      # 2.2 LTC
-      # 3.3 ETH
-      assert Account.balance(:my_gdax_exchange) == Decimal.new("11503.40374506600000000000000")
+  test "all_balances returns an ok tuple with a map of balances by symbol" do
+    use_cassette "exchange_adapters/gdax/account/all_balances_success" do
+      assert Account.all_balances(:my_gdax_exchange) == {
+               :ok,
+               %{
+                 btc: Decimal.new("1.8822774027894548"),
+                 eth: Decimal.new("0.0000000000000000"),
+                 ltc: Decimal.new("2.1418000000000000"),
+                 bch: Decimal.new("0.0000000000000000"),
+                 usd: Decimal.new("0.0000499244138000")
+               }
+             }
+    end
+  end
+
+  test "all_balances returns an error tuple when the passphrase is invalid" do
+    use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_passphrase" do
+      assert Account.all_balances(:my_gdax_exchange) == {
+               :error,
+               %CredentialError{message: "Invalid Passphrase"}
+             }
+    end
+  end
+
+  test "all_balances returns an error tuple when the api key is invalid" do
+    use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_api_key" do
+      assert Account.all_balances(:my_gdax_exchange) == {
+               :error,
+               %CredentialError{message: "Invalid API Key"}
+             }
+    end
+  end
+
+  test "all_balances returns an error tuple when the request times out" do
+    use_cassette "exchange_adapters/gdax/account/all_balances_error_timeout" do
+      assert Account.all_balances(:my_gdax_exchange) == {
+               :error,
+               %TimeoutError{message: "timeout"}
+             }
     end
   end
 

@@ -1,0 +1,42 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.gdax.com/accounts"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"message\":\"Invalid Passphrase\"}",
+      "headers": {
+        "Date": "Sun, 20 May 2018 03:08:30 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "32",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=df45236b19ff056d0280c1669d0f7070f1526785710; expires=Mon, 20-May-19 03:08:30 GMT; path=/; domain=.gdax.com; HttpOnly",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, cb-session, cb-fp",
+        "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "cb-before, cb-after",
+        "Access-Control-Max-Age": "7200",
+        "ETag": "W/\"20-iCJG0ECQwdSnCoKtEzRh/6Ut5CE\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "41db9960ca012a55-SEA"
+      },
+      "status_code": 400,
+      "type": "ok"
+    }
+  }
+]

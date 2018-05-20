@@ -15,8 +15,15 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, account_id}
   end
 
-  def handle_call(:balance, _from, state) do
-    {:reply, Decimal.new(0.11), state}
+  @all_balances %{
+    bch: Decimal.new(0),
+    btc: Decimal.new("1.1"),
+    eth: Decimal.new("0.000000000000200000000"),
+    ltc: Decimal.new("0.03")
+  }
+
+  def handle_call(:all_balances, _from, state) do
+    {:reply, {:ok, @all_balances}, state}
   end
 
   def handle_call({:buy_limit, :btcusd_success, _price, _size}, _from, state) do

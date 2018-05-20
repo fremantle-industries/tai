@@ -95,12 +95,18 @@ iex(1)> help
 
 #### balance
 
-Return the USD value across all configured accounts
+Display all non-zero balances across configured accounts
 
 
 ```
 iex(2)> balance
-$100.13
++---------+--------+-------------+
+| Account | Symbol |     Balance |
++---------+--------+-------------+
+|    gdax |    btc |  1.00000720 |
+|    gdax |    ltc | 18.00200141 |
+|    gdax |    usd |        0.01 |
++---------+--------+-------------+
 ```
 
 #### markets

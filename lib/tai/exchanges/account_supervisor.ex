@@ -8,12 +8,17 @@ defmodule Tai.Exchanges.AccountSupervisor do
   alias Tai.Exchanges
 
   def start_link(account_id) do
-    Supervisor.start_link(__MODULE__, account_id, name: :"#{__MODULE__}_#{account_id}")
+    Supervisor.start_link(
+      __MODULE__,
+      account_id,
+      name: :"#{__MODULE__}_#{account_id}"
+    )
   end
 
   def init(account_id) do
     [
-      {Exchanges.Config.account_adapter(account_id), account_id}
+      {Exchanges.Config.account_adapter(account_id), account_id},
+      {Exchanges.BalanceSupervisor, account_id}
     ]
     |> Supervisor.init(strategy: :one_for_one)
   end

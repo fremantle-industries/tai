@@ -6,7 +6,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Account do
   use GenServer
 
   alias Tai.Exchanges.Account
-  alias Tai.ExchangeAdapters.Gdax.Account.{Balance, CancelOrder, Orders, OrderStatus}
+  alias Tai.ExchangeAdapters.Gdax.Account.{AllBalances, CancelOrder, Orders, OrderStatus}
 
   def start_link(account_id) do
     GenServer.start_link(__MODULE__, account_id, name: account_id |> Account.to_name())
@@ -16,8 +16,8 @@ defmodule Tai.ExchangeAdapters.Gdax.Account do
     {:ok, account_id}
   end
 
-  def handle_call(:balance, _from, state) do
-    {:reply, Balance.fetch(), state}
+  def handle_call(:all_balances, _from, state) do
+    {:reply, AllBalances.fetch(), state}
   end
 
   def handle_call({:buy_limit, symbol, price, size}, _from, state) do

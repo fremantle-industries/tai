@@ -28,8 +28,19 @@ defmodule Tai.Commands.HelperTest do
            """
   end
 
-  test "balance is the sum of USD balances across accounts" do
-    assert capture_io(fn -> Helper.balance() end) == "0.22 USD\n"
+  test "balance shows the symbols on each exchange with a non-zero balance" do
+    assert capture_io(fn -> Helper.balance() end) == """
+           +----------------+--------+----------------------+
+           |        Account | Symbol |              Balance |
+           +----------------+--------+----------------------+
+           | test_account_a |    btc |           1.10000000 |
+           | test_account_a |    eth | 0.000000000000200000 |
+           | test_account_a |    ltc |           0.03000000 |
+           | test_account_b |    btc |           1.10000000 |
+           | test_account_b |    eth | 0.000000000000200000 |
+           | test_account_b |    ltc |           0.03000000 |
+           +----------------+--------+----------------------+\n
+           """
   end
 
   test("markets displays all inside quotes and the time they were last processed and changed", %{

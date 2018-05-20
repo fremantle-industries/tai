@@ -1,0 +1,42 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.gdax.com/accounts"
+    },
+    "response": {
+      "binary": false,
+      "body": "[{\"id\":\"***\",\"currency\":\"USD\",\"balance\":\"0.0000499244138000\",\"available\":\"0.0000499244138\",\"hold\":\"0.0000000000000000\",\"profile_id\":\"***\"},{\"id\":\"***\",\"currency\":\"LTC\",\"balance\":\"2.1418000000000000\",\"available\":\"0\",\"hold\":\"2.1418000000000000\",\"profile_id\":\"***\"},{\"id\":\"***\",\"currency\":\"ETH\",\"balance\":\"0.0000000000000000\",\"available\":\"0\",\"hold\":\"0.0000000000000000\",\"profile_id\":\"***\"},{\"id\":\"***\",\"currency\":\"BTC\",\"balance\":\"1.8822774027894548\",\"available\":\"0.0000000000266548\",\"hold\":\"1.8822774027628000\",\"profile_id\":\"***\"},{\"id\":\"***\",\"currency\":\"BCH\",\"balance\":\"0.0000000000000000\",\"available\":\"0\",\"hold\":\"0.0000000000000000\",\"profile_id\":\"***\"}]",
+      "headers": {
+        "Date": "Sun, 20 May 2018 19:31:08 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "984",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d83efe1829e8eddf76b6bcf380471210c1526844668; expires=Mon, 20-May-19 19:31:08 GMT; path=/; domain=.gdax.com; HttpOnly",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, cb-session, cb-fp",
+        "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "cb-before, cb-after",
+        "Access-Control-Max-Age": "7200",
+        "ETag": "W/\"3d8-mabARCh5SuwVSBW6Rcu8esva834\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "41e138ca2b0d2a3d-SEA"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

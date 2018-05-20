@@ -14,6 +14,15 @@ defmodule Tai.Exchanges.Account do
   end
 
   @doc """
+  Fetches all balances for the given account
+  """
+  def all_balances(account_id) do
+    account_id
+    |> to_name
+    |> GenServer.call(:all_balances)
+  end
+
+  @doc """
   Create a buy limit order on the exchange with the given
 
   - symbol
