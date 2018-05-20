@@ -1,4 +1,8 @@
 defmodule Tai.Exchanges.AccountsSupervisor do
+  @moduledoc """
+  Start an account supervisor for every configured account
+  """
+
   use Supervisor
 
   alias Tai.Exchanges
@@ -8,15 +12,15 @@ defmodule Tai.Exchanges.AccountsSupervisor do
   end
 
   def init(:ok) do
-    Exchanges.Config.account_supervisors()
-    |> Enum.map(&account_child/1)
+    Exchanges.Config.account_ids()
+    |> Enum.map(&account_supervisor_spec/1)
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp account_child({account_id, supervisor}) do
+  defp account_supervisor_spec(account_id) do
     Supervisor.child_spec(
-      {supervisor, account_id},
-      id: "#{supervisor}_#{account_id}"
+      {Exchanges.AccountSupervisor, account_id},
+      id: "#{Exchanges.AccountSupervisor}_#{account_id}"
     )
   end
 end

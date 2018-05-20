@@ -26,7 +26,7 @@ config :tai,
 config :tai,
   accounts: %{
     gdax: [
-      supervisor: Tai.ExchangeAdapters.Gdax.AccountSupervisor
+      adapter: Tai.ExchangeAdapters.Gdax.Account
     ]
   }
 

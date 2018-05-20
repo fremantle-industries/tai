@@ -11,34 +11,15 @@ defmodule Tai.Exchanges.Config do
     iex> Tai.Exchanges.Config.accounts
     %{
       test_account_a: [
-        supervisor: Tai.ExchangeAdapters.Test.AccountSupervisor
+        adapter: Tai.ExchangeAdapters.Test.Account
       ],
       test_account_b: [
-        supervisor: Tai.ExchangeAdapters.Test.AccountSupervisor
+        adapter: Tai.ExchangeAdapters.Test.Account
       ]
     }
   """
   def accounts do
     Application.get_env(:tai, :accounts)
-  end
-
-  @doc """
-  Return a keyword list of the configured account id & supervisor
-
-  ## Examples
-
-    iex> Tai.Exchanges.Config.account_supervisors
-    [
-      test_account_a: Tai.ExchangeAdapters.Test.AccountSupervisor,
-      test_account_b: Tai.ExchangeAdapters.Test.AccountSupervisor
-    ]
-  """
-  def account_supervisors do
-    accounts()
-    |> Enum.map(fn {account_id, config} ->
-      supervisor = Keyword.get(config, :supervisor)
-      {account_id, supervisor}
-    end)
   end
 
   @doc """
@@ -51,6 +32,19 @@ defmodule Tai.Exchanges.Config do
   """
   def account_ids do
     for {id, _} <- accounts(), do: id
+  end
+
+  @doc """
+
+  ## Examples
+
+    iex> Tai.Exchanges.Config.account_adapter(:test_account_a)
+    Tai.ExchangeAdapters.Test.Account
+  """
+  def account_adapter(account_id) do
+    accounts()
+    |> Map.get(account_id)
+    |> Keyword.get(:adapter)
   end
 
   @doc """

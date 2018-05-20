@@ -22,10 +22,10 @@ config :tai,
 config :tai,
   accounts: %{
     test_account_a: [
-      supervisor: Tai.ExchangeAdapters.Test.AccountSupervisor
+      adapter: Tai.ExchangeAdapters.Test.Account
     ],
     test_account_b: [
-      supervisor: Tai.ExchangeAdapters.Test.AccountSupervisor
+      adapter: Tai.ExchangeAdapters.Test.Account
     ]
   }
 
