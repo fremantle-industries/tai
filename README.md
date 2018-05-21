@@ -14,11 +14,11 @@ We are working to make `tai` production quality software.
 
 ## Supported Exchanges
 
-| Exchange       | Live Order Book  | Orders |
-|----------------|:----:|:--------------:|
-| GDAX           | [x] | [x] |
-| Binance        | [x] | [ ] |
-| Poloniex       | [x] | [ ] |
+| Exchange       | Live Order Book  | Account Balance | Orders |
+|----------------|:---:|:---:|:---:|
+| GDAX           | [x] | [x] | [x] |
+| Binance        | [x] | [x] | [ ] |
+| Poloniex       | [x] | [x] | [ ] |
 
 ## Planned Exchanges
 
