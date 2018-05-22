@@ -5,7 +5,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
   alias Tai.{Exchanges.Account, CredentialError, TimeoutError}
   alias Tai.Trading.OrderDurations.{FillOrKill, ImmediateOrCancel}
-  alias Tai.Trading.{FillOrKillError, OrderResponse}
+  alias Tai.Trading.{FillOrKillError, NotEnoughError, OrderResponse}
 
   setup_all do
     HTTPoison.start()
@@ -108,6 +108,15 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
                %Tai.CredentialError{
                  reason: %ExPoloniex.AuthenticationError{message: "Invalid API key/secret pair."}
                }
+             }
+    end
+  end
+
+  test "buy_limit returns an error tuple when it doesn't have enough of a balance" do
+    use_cassette "exchange_adapters/poloniex/account/buy_limit_error_not_enough" do
+      assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.02, 1000, %FillOrKill{}) == {
+               :error,
+               %NotEnoughError{reason: %ExPoloniex.NotEnoughError{message: "Not enough BTC."}}
              }
     end
   end

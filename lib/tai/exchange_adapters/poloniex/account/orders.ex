@@ -30,6 +30,10 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
     {:error, %Tai.CredentialError{reason: error}}
   end
 
+  defp handle_create_order({:error, %ExPoloniex.NotEnoughError{} = error}) do
+    {:error, %Tai.Trading.NotEnoughError{reason: error}}
+  end
+
   defp normalize_duration(%Tai.Trading.OrderDurations.FillOrKill{}),
     do: %ExPoloniex.OrderDurations.FillOrKill{}
 
