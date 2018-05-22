@@ -4,7 +4,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
   doctest Tai.ExchangeAdapters.Poloniex.Account
 
   alias Tai.{Exchanges.Account, CredentialError, TimeoutError}
-  alias Tai.Trading.OrderDurations.{FillOrKill}
+  alias Tai.Trading.OrderDurations.{FillOrKill, ImmediateOrCancel}
   alias Tai.Trading.{FillOrKillError, OrderResponse}
 
   setup_all do
@@ -77,8 +77,23 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
     end
   end
 
-  test "buy_limit with fill or kill returns an error tuple when the request times out" do
-    use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_timeout" do
+  test "buy_limit can create an immediate or cancel order" do
+    use_cassette "exchange_adapters/poloniex/account/buy_limit_immediate_or_cancel_success" do
+      assert {:ok, %OrderResponse{} = response} =
+               Account.buy_limit(
+                 :my_poloniex_exchange,
+                 :ltcbtc,
+                 0.017,
+                 0.01,
+                 %ImmediateOrCancel{}
+               )
+
+      assert response.id == "173577768530"
+    end
+  end
+
+  test "buy_limit returns an error tuple when the request times out" do
+    use_cassette "exchange_adapters/poloniex/account/buy_limit_error_timeout" do
       assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
                :error,
                %TimeoutError{reason: %HTTPoison.Error{reason: "timeout"}}
@@ -86,8 +101,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
     end
   end
 
-  test "buy_limit with fill or kill returns an error tuple when the api key is invalid" do
-    use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_invalid_api_key" do
+  test "buy_limit returns an error tuple when the api key is invalid" do
+    use_cassette "exchange_adapters/poloniex/account/buy_limit_error_invalid_api_key" do
       assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
                :error,
                %Tai.CredentialError{
