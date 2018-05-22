@@ -1,0 +1,23 @@
+[
+  {
+    "request": {
+      "body": "nonce=1526964459849594000&command=buy&fillOrKill=1&currencyPair=BTC_LTC&rate=0.0001&amount=1",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Key": "***",
+        "Sign": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://poloniex.com/tradingApi"
+    },
+    "response": {
+      "binary": false,
+      "body": "timeout",
+      "headers": [],
+      "status_code": null,
+      "type": "error"
+    }
+  }
+]

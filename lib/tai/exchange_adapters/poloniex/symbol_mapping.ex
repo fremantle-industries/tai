@@ -1,4 +1,8 @@
 defmodule Tai.ExchangeAdapters.Poloniex.SymbolMapping do
+  @moduledoc """
+  Mappings between tai symbol format and Poloniex currency pair format
+  """
+
   def to_poloniex(:ampbtc), do: "BTC_AMP"
   def to_poloniex(:ardrbtc), do: "BTC_ARDR"
   def to_poloniex(:bchbtc), do: "BTC_BCH"

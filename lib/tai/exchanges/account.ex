@@ -28,11 +28,12 @@ defmodule Tai.Exchanges.Account do
   - symbol
   - price
   - size
+  - duration
   """
-  def buy_limit(account_id, symbol, price, size) do
+  def buy_limit(account_id, symbol, price, size, duration \\ :immediate_or_cancel) do
     account_id
     |> to_name
-    |> GenServer.call({:buy_limit, symbol, price, size})
+    |> GenServer.call({:buy_limit, symbol, price, size, duration})
   end
 
   @doc """

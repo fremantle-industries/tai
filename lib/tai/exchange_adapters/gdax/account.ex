@@ -20,8 +20,8 @@ defmodule Tai.ExchangeAdapters.Gdax.Account do
     {:reply, AllBalances.fetch(), state}
   end
 
-  def handle_call({:buy_limit, symbol, price, size}, _from, state) do
-    response = Orders.buy_limit(symbol, price, size)
+  def handle_call({:buy_limit, symbol, price, size, duration}, _from, state) do
+    response = Orders.buy_limit(symbol, price, size, duration)
     {:reply, response, state}
   end
 

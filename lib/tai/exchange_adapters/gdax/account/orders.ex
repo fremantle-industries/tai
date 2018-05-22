@@ -1,8 +1,12 @@
 defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
+  @moduledoc """
+  Create buy and sell orders for the GDAX adapter
+  """
+
   alias Tai.Trading.OrderResponses
   alias Tai.ExchangeAdapters.Gdax.{Account.OrderStatus, Product}
 
-  def buy_limit(symbol, price, size) do
+  def buy_limit(symbol, price, size, _duration) do
     {"buy", symbol, price, size}
     |> create_limit_order
   end
