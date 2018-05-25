@@ -12,25 +12,27 @@ defmodule Tai.ExchangeAdapters.Binance.AccountTest do
     :ok
   end
 
-  test "all_balances returns an error tuple when the secret is invalid" do
-    use_cassette "exchange_adapters/binance/account/all_balances_error_invalid_secret" do
-      assert Account.all_balances(:my_binance_exchange) == {
-               :error,
-               %CredentialError{
-                 reason: "API-key format invalid."
+  describe "#all_balances" do
+    test "returns an error tuple when the secret is invalid" do
+      use_cassette "exchange_adapters/binance/account/all_balances_error_invalid_secret" do
+        assert Account.all_balances(:my_binance_exchange) == {
+                 :error,
+                 %CredentialError{
+                   reason: "API-key format invalid."
+                 }
                }
-             }
+      end
     end
-  end
 
-  test "all_balances returns an error tuple when the api key is invalid" do
-    use_cassette "exchange_adapters/binance/account/all_balances_error_invalid_api_key" do
-      assert Account.all_balances(:my_binance_exchange) == {
-               :error,
-               %CredentialError{
-                 reason: "API-key format invalid."
+    test "returns an error tuple when the api key is invalid" do
+      use_cassette "exchange_adapters/binance/account/all_balances_error_invalid_api_key" do
+        assert Account.all_balances(:my_binance_exchange) == {
+                 :error,
+                 %CredentialError{
+                   reason: "API-key format invalid."
+                 }
                }
-             }
+      end
     end
   end
 end

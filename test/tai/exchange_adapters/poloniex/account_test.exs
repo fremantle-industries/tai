@@ -14,89 +14,101 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
     :ok
   end
 
-  test "all_balances returns an error tuple when the secret is invalid" do
-    use_cassette "exchange_adapters/poloniex/account/all_balances_error_invalid_secret" do
-      assert Account.all_balances(:my_poloniex_exchange) == {
-               :error,
-               %CredentialError{
-                 reason: %ExPoloniex.AuthenticationError{message: "Invalid API key/secret pair."}
+  describe "#all_balances" do
+    test "returns an error tuple when the secret is invalid" do
+      use_cassette "exchange_adapters/poloniex/account/all_balances_error_invalid_secret" do
+        assert Account.all_balances(:my_poloniex_exchange) == {
+                 :error,
+                 %CredentialError{
+                   reason: %ExPoloniex.AuthenticationError{
+                     message: "Invalid API key/secret pair."
+                   }
+                 }
                }
-             }
+      end
     end
-  end
 
-  test "all_balances returns an error tuple when the api key is invalid" do
-    use_cassette "exchange_adapters/poloniex/account/all_balances_error_invalid_api_key" do
-      assert Account.all_balances(:my_poloniex_exchange) == {
-               :error,
-               %CredentialError{
-                 reason: %ExPoloniex.AuthenticationError{message: "Invalid API key/secret pair."}
+    test "returns an error tuple when the api key is invalid" do
+      use_cassette "exchange_adapters/poloniex/account/all_balances_error_invalid_api_key" do
+        assert Account.all_balances(:my_poloniex_exchange) == {
+                 :error,
+                 %CredentialError{
+                   reason: %ExPoloniex.AuthenticationError{
+                     message: "Invalid API key/secret pair."
+                   }
+                 }
                }
-             }
+      end
     end
   end
 
-  test "buy_limit can create a fill or kill order" do
-    use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_success" do
-      assert {:ok, %OrderResponse{} = response} =
-               Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0165, 0.01, %FillOrKill{})
+  describe "#buy_limit" do
+    test "can create a fill or kill order" do
+      use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_success" do
+        assert {:ok, %OrderResponse{} = response} =
+                 Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0165, 0.01, %FillOrKill{})
 
-      assert response.id == "174286166423"
+        assert response.id == "174286166423"
+      end
     end
-  end
 
-  test "buy_limit with fill or kill returns an error tuple when it can't completely execute a fill or kill order" do
-    use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_unable_to_fill_completely" do
-      assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
-               :error,
-               %FillOrKillError{
-                 reason: %ExPoloniex.FillOrKillError{message: "Unable to fill order completely."}
+    test "fill or kill returns an error tuple when it can't completely execute a fill or kill order" do
+      use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_unable_to_fill_completely" do
+        assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
+                 :error,
+                 %FillOrKillError{
+                   reason: %ExPoloniex.FillOrKillError{
+                     message: "Unable to fill order completely."
+                   }
+                 }
                }
-             }
+      end
     end
-  end
 
-  test "buy_limit can create an immediate or cancel order" do
-    use_cassette "exchange_adapters/poloniex/account/buy_limit_immediate_or_cancel_success" do
-      assert {:ok, %OrderResponse{} = response} =
-               Account.buy_limit(
-                 :my_poloniex_exchange,
-                 :ltcbtc,
-                 0.017,
-                 0.01,
-                 %ImmediateOrCancel{}
-               )
+    test "can create an immediate or cancel order" do
+      use_cassette "exchange_adapters/poloniex/account/buy_limit_immediate_or_cancel_success" do
+        assert {:ok, %OrderResponse{} = response} =
+                 Account.buy_limit(
+                   :my_poloniex_exchange,
+                   :ltcbtc,
+                   0.017,
+                   0.01,
+                   %ImmediateOrCancel{}
+                 )
 
-      assert response.id == "173577768530"
+        assert response.id == "173577768530"
+      end
     end
-  end
 
-  test "buy_limit returns an error tuple when the request times out" do
-    use_cassette "exchange_adapters/poloniex/account/buy_limit_error_timeout" do
-      assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
-               :error,
-               %TimeoutError{reason: %HTTPoison.Error{reason: "timeout"}}
-             }
-    end
-  end
-
-  test "buy_limit returns an error tuple when the api key is invalid" do
-    use_cassette "exchange_adapters/poloniex/account/buy_limit_error_invalid_api_key" do
-      assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
-               :error,
-               %Tai.CredentialError{
-                 reason: %ExPoloniex.AuthenticationError{message: "Invalid API key/secret pair."}
+    test "returns an error tuple when the request times out" do
+      use_cassette "exchange_adapters/poloniex/account/buy_limit_error_timeout" do
+        assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
+                 :error,
+                 %TimeoutError{reason: %HTTPoison.Error{reason: "timeout"}}
                }
-             }
+      end
     end
-  end
 
-  test "buy_limit returns an error tuple when it doesn't have enough of a balance" do
-    use_cassette "exchange_adapters/poloniex/account/buy_limit_error_not_enough" do
-      assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.02, 1000, %FillOrKill{}) == {
-               :error,
-               %NotEnoughError{reason: %ExPoloniex.NotEnoughError{message: "Not enough BTC."}}
-             }
+    test "returns an error tuple when the api key is invalid" do
+      use_cassette "exchange_adapters/poloniex/account/buy_limit_error_invalid_api_key" do
+        assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
+                 :error,
+                 %Tai.CredentialError{
+                   reason: %ExPoloniex.AuthenticationError{
+                     message: "Invalid API key/secret pair."
+                   }
+                 }
+               }
+      end
+    end
+
+    test "returns an error tuple when it doesn't have enough of a balance" do
+      use_cassette "exchange_adapters/poloniex/account/buy_limit_error_not_enough" do
+        assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.02, 1000, %FillOrKill{}) == {
+                 :error,
+                 %NotEnoughError{reason: %ExPoloniex.NotEnoughError{message: "Not enough BTC."}}
+               }
+      end
     end
   end
 end
