@@ -33,10 +33,10 @@ defmodule Tai.Commands.HelperTest do
            +----------------+--------+----------------------+
            |        Account | Symbol |              Balance |
            +----------------+--------+----------------------+
-           | test_account_a |    btc |           1.10000000 |
+           | test_account_a |    btc |           1.81227740 |
            | test_account_a |    eth | 0.000000000000200000 |
            | test_account_a |    ltc |           0.03000000 |
-           | test_account_b |    btc |           1.10000000 |
+           | test_account_b |    btc |           1.81227740 |
            | test_account_b |    eth | 0.000000000000200000 |
            | test_account_b |    ltc |           0.03000000 |
            +----------------+--------+----------------------+\n

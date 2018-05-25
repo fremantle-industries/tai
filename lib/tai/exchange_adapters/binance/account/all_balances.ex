@@ -22,8 +22,8 @@ defmodule Tai.ExchangeAdapters.Binance.Account.AllBalances do
     {:error, %CredentialError{reason: reason}}
   end
 
-  defp normalize_assets({:error, {:http_error, %HTTPoison.Error{reason: "timeout"} = reason}}) do
-    {:error, %TimeoutError{reason: reason}}
+  defp normalize_assets({:error, {:http_error, %HTTPoison.Error{reason: "timeout"}}}) do
+    {:error, %TimeoutError{reason: "network request timed out"}}
   end
 
   defp normalize_asset(%{"asset" => raw_asset, "free" => raw_free, "locked" => raw_locked}, acc) do

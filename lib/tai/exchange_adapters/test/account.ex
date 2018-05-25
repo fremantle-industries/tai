@@ -17,7 +17,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
 
   @all_balances %{
     bch: Decimal.new(0),
-    btc: Decimal.new("1.1"),
+    btc: Decimal.new("1.8122774027894548"),
     eth: Decimal.new("0.000000000000200000000"),
     ltc: Decimal.new("0.03")
   }

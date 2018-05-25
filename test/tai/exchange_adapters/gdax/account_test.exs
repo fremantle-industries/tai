@@ -3,28 +3,13 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Gdax.Account
 
-  alias Tai.{Exchanges.Account, CredentialError, TimeoutError, Trading.OrderResponses}
+  alias Tai.{Exchanges.Account, CredentialError, Trading.OrderResponses}
 
   setup_all do
     HTTPoison.start()
     start_supervised!({Tai.ExchangeAdapters.Gdax.Account, :my_gdax_exchange})
 
     :ok
-  end
-
-  test "all_balances returns an ok tuple with a map of balances by symbol" do
-    use_cassette "exchange_adapters/gdax/account/all_balances_success" do
-      assert Account.all_balances(:my_gdax_exchange) == {
-               :ok,
-               %{
-                 btc: Decimal.new("1.8822774027894548"),
-                 eth: Decimal.new("0.0000000000000000"),
-                 ltc: Decimal.new("2.1418000000000000"),
-                 bch: Decimal.new("0.0000000000000000"),
-                 usd: Decimal.new("0.0000499244138000")
-               }
-             }
-    end
   end
 
   test "all_balances returns an error tuple when the passphrase is invalid" do
@@ -41,15 +26,6 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
       assert Account.all_balances(:my_gdax_exchange) == {
                :error,
                %CredentialError{reason: "Invalid API Key"}
-             }
-    end
-  end
-
-  test "all_balances returns an error tuple when the request times out" do
-    use_cassette "exchange_adapters/gdax/account/all_balances_error_timeout" do
-      assert Account.all_balances(:my_gdax_exchange) == {
-               :error,
-               %TimeoutError{reason: "timeout"}
              }
     end
   end
