@@ -26,7 +26,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, @all_balances}, state}
   end
 
-  def handle_call({:buy_limit, :btcusd_success, _price, _size, _duration}, _from, state) do
+  def handle_call({:buy_limit, :btcusd_success, _price, _size, _time_in_force}, _from, state) do
     order_response = %OrderResponses.Created{
       id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7",
       status: :pending,
@@ -37,18 +37,18 @@ defmodule Tai.ExchangeAdapters.Test.Account do
   end
 
   def handle_call(
-        {:buy_limit, :btcusd_insufficient_funds, _price, _size, _duration},
+        {:buy_limit, :btcusd_insufficient_funds, _price, _size, _time_in_force},
         _from,
         state
       ) do
     {:reply, {:error, %OrderResponses.InsufficientFunds{}}, state}
   end
 
-  def handle_call({:buy_limit, _symbol, _price, _size, _duration}, _from, state) do
+  def handle_call({:buy_limit, _symbol, _price, _size, _time_in_force}, _from, state) do
     {:reply, {:error, :unknown_error}, state}
   end
 
-  def handle_call({:sell_limit, :btcusd_success, _price, _size}, _from, state) do
+  def handle_call({:sell_limit, :btcusd_success, _price, _size, _time_in_force}, _from, state) do
     order_response = %OrderResponses.Created{
       id: "41541912-ebc1-4173-afa5-4334ccf7a1a8",
       status: :pending,
@@ -58,11 +58,15 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, order_response}, state}
   end
 
-  def handle_call({:sell_limit, :btcusd_insufficient_funds, _price, _size}, _from, state) do
+  def handle_call(
+        {:sell_limit, :btcusd_insufficient_funds, _price, _size, _time_in_force},
+        _from,
+        state
+      ) do
     {:reply, {:error, %OrderResponses.InsufficientFunds{}}, state}
   end
 
-  def handle_call({:sell_limit, _symbol, _price, _size}, _from, state) do
+  def handle_call({:sell_limit, _symbol, _price, _size, _time_in_force}, _from, state) do
     {:reply, {:error, :unknown_error}, state}
   end
 

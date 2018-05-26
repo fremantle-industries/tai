@@ -14,6 +14,15 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
     end
   end
 
+  def sell_limit(symbol, price, size, time_in_force) do
+    with normalized_tif <- normalize_duration(time_in_force) do
+      symbol
+      |> SymbolMapping.to_poloniex()
+      |> ExPoloniex.Trading.sell(price, size, normalized_tif)
+      |> parse_create_order(size, time_in_force)
+    end
+  end
+
   defp parse_create_order(
          {:ok, %ExPoloniex.OrderResponse{} = poloniex_response},
          original_size,

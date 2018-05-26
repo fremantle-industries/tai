@@ -12,6 +12,15 @@ defmodule Tai.ExchangeAdapters.Binance.Account.Orders do
     end
   end
 
+  def sell_limit(symbol, price, size, time_in_force) do
+    with normalized_tif <- normalize_duration(time_in_force) do
+      symbol
+      |> Tai.Markets.Symbol.upcase()
+      |> Binance.order_limit_sell(size, price, normalized_tif)
+      |> parse_create_order(time_in_force)
+    end
+  end
+
   defp parse_create_order({:ok, %Binance.OrderResponse{} = binance_response}, time_in_force) do
     response = %Tai.Trading.OrderResponse{
       id: binance_response.order_id,

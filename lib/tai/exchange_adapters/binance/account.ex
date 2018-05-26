@@ -24,8 +24,13 @@ defmodule Tai.ExchangeAdapters.Binance.Account do
     {:reply, AllBalances.fetch(), state}
   end
 
-  def handle_call({:buy_limit, symbol, price, size, duration}, _from, state) do
-    response = Orders.buy_limit(symbol, price, size, duration)
+  def handle_call({:buy_limit, symbol, price, size, time_in_force}, _from, state) do
+    response = Orders.buy_limit(symbol, price, size, time_in_force)
+    {:reply, response, state}
+  end
+
+  def handle_call({:sell_limit, symbol, price, size, time_in_force}, _from, state) do
+    response = Orders.sell_limit(symbol, price, size, time_in_force)
     {:reply, response, state}
   end
 end

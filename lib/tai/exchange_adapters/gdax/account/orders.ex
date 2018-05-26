@@ -6,12 +6,12 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
   alias Tai.Trading.OrderResponses
   alias Tai.ExchangeAdapters.Gdax.{Account.OrderStatus, Product}
 
-  def buy_limit(symbol, price, size, _duration) do
+  def buy_limit(symbol, price, size, _time_in_force) do
     {"buy", symbol, price, size}
     |> create_limit_order
   end
 
-  def sell_limit(symbol, price, size) do
+  def sell_limit(symbol, price, size, _time_in_force) do
     {"sell", symbol, price, size}
     |> create_limit_order
   end
