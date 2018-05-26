@@ -9,7 +9,11 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account do
   alias Tai.ExchangeAdapters.Poloniex.Account.{AllBalances, Orders}
 
   def start_link(account_id) do
-    GenServer.start_link(__MODULE__, account_id, name: account_id |> Account.to_name())
+    GenServer.start_link(
+      __MODULE__,
+      account_id,
+      name: account_id |> Account.to_name()
+    )
   end
 
   def init(account_id) do

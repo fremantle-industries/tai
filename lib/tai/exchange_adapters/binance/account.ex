@@ -6,10 +6,14 @@ defmodule Tai.ExchangeAdapters.Binance.Account do
   use GenServer
 
   alias Tai.Exchanges.Account
-  alias Tai.ExchangeAdapters.Binance.Account.{AllBalances}
+  alias Tai.ExchangeAdapters.Binance.Account.{AllBalances, Orders}
 
   def start_link(account_id) do
-    GenServer.start_link(__MODULE__, account_id, name: account_id |> Account.to_name())
+    GenServer.start_link(
+      __MODULE__,
+      account_id,
+      name: account_id |> Account.to_name()
+    )
   end
 
   def init(account_id) do
@@ -18,5 +22,10 @@ defmodule Tai.ExchangeAdapters.Binance.Account do
 
   def handle_call(:all_balances, _from, state) do
     {:reply, AllBalances.fetch(), state}
+  end
+
+  def handle_call({:buy_limit, symbol, price, size, duration}, _from, state) do
+    response = Orders.buy_limit(symbol, price, size, duration)
+    {:reply, response, state}
   end
 end

@@ -5,6 +5,8 @@ defmodule Tai.Exchanges.AccountTest do
 
   alias Tai.TimeoutError
   alias Tai.Exchanges.Account
+  alias Tai.Trading.{OrderResponse, OrderStatus}
+  alias Tai.Trading.OrderDurations.FillOrKill
 
   defp my_adapter(adapter_id), do: :"my_#{adapter_id}_account"
 
@@ -47,6 +49,28 @@ defmodule Tai.Exchanges.AccountTest do
     end)
   end
 
+  @adapters [
+    {Tai.ExchangeAdapters.Binance.Account, :binance},
+    {Tai.ExchangeAdapters.Poloniex.Account, :poloniex}
+  ]
   describe "#buy_limit" do
+    @adapters
+    |> Enum.map(fn {_, adapter_id} ->
+      @adapter_id adapter_id
+      test "#{adapter_id} can create a fill or kill duration order" do
+        use_cassette "exchange_adapters/shared/account/#{@adapter_id}/buy_limit_fill_or_kill_success" do
+          assert {:ok, %OrderResponse{} = response} =
+                   @adapter_id
+                   |> my_adapter
+                   |> Account.buy_limit(:ltcbtc, 0.0165, 0.01, %FillOrKill{})
+
+          assert response.id != nil
+          assert response.status == OrderStatus.expired()
+          assert response.time_in_force == %FillOrKill{}
+          assert Decimal.cmp(response.original_size, Decimal.new(0.01)) == :eq
+          assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
+        end
+      end
+    end)
   end
 end

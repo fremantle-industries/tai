@@ -43,15 +43,6 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
   end
 
   describe "#buy_limit" do
-    test "can create a fill or kill order" do
-      use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_success" do
-        assert {:ok, %OrderResponse{} = response} =
-                 Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0165, 0.01, %FillOrKill{})
-
-        assert response.id == "174286166423"
-      end
-    end
-
     test "fill or kill returns an error tuple when it can't completely execute a fill or kill order" do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_unable_to_fill_completely" do
         assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {

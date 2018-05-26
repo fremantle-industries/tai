@@ -23,7 +23,9 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
-      {:binance, "~> 0.4"},
+      {:binance,
+       github: "fremantle-capital/binance.ex",
+       branch: "fill-or-kill-and-immediate-or-cancel-orders"},
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.3"},
       {:ex_poloniex, "~> 0.0.2"},
