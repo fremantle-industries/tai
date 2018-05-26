@@ -1,7 +1,7 @@
 [
   {
     "request": {
-      "body": "nonce=1526670978458067000&command=buy&immediateOrCancel=1&currencyPair=BTC_LTC&rate=0.017&amount=0.02",
+      "body": "nonce=1527308447161026000&command=sell&immediateOrCancel=1&currencyPair=BTC_LTC&rate=0.16&amount=0.02",
       "headers": {
         "Content-Type": "application/x-www-form-urlencoded",
         "Key": "***",
@@ -14,7 +14,7 @@
     },
     "response": {
       "binary": false,
-      "body": "{\"orderNumber\":\"173577768530\",\"resultingTrades\":[{\"amount\":\"0.01000000\",\"date\":\"2018-05-18 19:16:19\",\"rate\":\"0.01662373\",\"total\":\"0.00016623\",\"tradeID\":\"15983832\",\"type\":\"buy\"}],\"amountUnfilled\":\"0.01000000\"}",
+      "body": "{\"orderNumber\":\"173577768530\",\"resultingTrades\":[{\"amount\":\"0.01000000\",\"date\":\"2018-05-18 19:16:19\",\"rate\":\"0.16623730\",\"total\":\"0.00166230\",\"tradeID\":\"15983832\",\"type\":\"sell\"}],\"amountUnfilled\":\"0.01000000\"}",
       "headers": {
         "Date": "Fri, 18 May 2018 19:16:19 GMT",
         "Content-Type": "application/json",

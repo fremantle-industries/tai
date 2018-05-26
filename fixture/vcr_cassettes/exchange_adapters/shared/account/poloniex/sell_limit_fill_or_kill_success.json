@@ -14,7 +14,7 @@
     },
     "response": {
       "binary": false,
-      "body": "{\"orderNumber\":\"174286166423\",\"resultingTrades\":[{\"amount\":\"0.01000000\",\"date\":\"2018-05-22 04:29:01\",\"rate\":\"0.1607000\",\"total\":\"0.0016070\",\"tradeID\":\"16001202\",\"type\":\"sell\"}]}",
+      "body": "{\"orderNumber\":\"174286166423\",\"resultingTrades\":[{\"amount\":\"0.01000000\",\"date\":\"2018-05-22 04:29:01\",\"rate\":\"0.16070000\",\"total\":\"0.00160700\",\"tradeID\":\"16001202\",\"type\":\"sell\"}]}",
       "headers": {
         "Date": "Tue, 22 May 2018 04:29:00 GMT",
         "Content-Type": "application/json",
