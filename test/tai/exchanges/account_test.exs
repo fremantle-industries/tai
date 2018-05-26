@@ -59,7 +59,7 @@ defmodule Tai.Exchanges.AccountTest do
     |> Enum.map(fn {_, adapter_id} ->
       @adapter_id adapter_id
 
-      test "#{adapter_id} can create a fill or kill duration order" do
+      test "#{adapter_id} adapter can create a fill or kill duration order" do
         use_cassette "exchange_adapters/shared/account/#{@adapter_id}/buy_limit_fill_or_kill_success" do
           assert {:ok, %OrderResponse{} = response} =
                    @adapter_id
@@ -74,7 +74,7 @@ defmodule Tai.Exchanges.AccountTest do
         end
       end
 
-      test "#{adapter_id} can create an immediate or cancel duration order" do
+      test "#{adapter_id} adapter can create an immediate or cancel duration order" do
         use_cassette "exchange_adapters/shared/account/#{@adapter_id}/buy_limit_immediate_or_cancel_success" do
           assert {:ok, %OrderResponse{} = response} =
                    @adapter_id
@@ -100,7 +100,7 @@ defmodule Tai.Exchanges.AccountTest do
     |> Enum.map(fn {_, adapter_id} ->
       @adapter_id adapter_id
 
-      test "#{adapter_id} can create a fill or kill duration order" do
+      test "#{adapter_id} adapter can create a fill or kill duration order" do
         use_cassette "exchange_adapters/shared/account/#{@adapter_id}/sell_limit_fill_or_kill_success" do
           assert {:ok, %OrderResponse{} = response} =
                    @adapter_id
@@ -115,7 +115,7 @@ defmodule Tai.Exchanges.AccountTest do
         end
       end
 
-      test "#{adapter_id} can create an immediate or cancel duration order" do
+      test "#{adapter_id} adapter can create an immediate or cancel duration order" do
         use_cassette "exchange_adapters/shared/account/#{@adapter_id}/sell_limit_immediate_or_cancel_success" do
           assert {:ok, %OrderResponse{} = response} =
                    @adapter_id
