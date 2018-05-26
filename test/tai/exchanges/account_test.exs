@@ -6,7 +6,7 @@ defmodule Tai.Exchanges.AccountTest do
   alias Tai.TimeoutError
   alias Tai.Exchanges.Account
   alias Tai.Trading.{OrderResponse, OrderStatus}
-  alias Tai.Trading.OrderDurations.FillOrKill
+  alias Tai.Trading.OrderDurations.{FillOrKill, ImmediateOrCancel}
 
   defp my_adapter(adapter_id), do: :"my_#{adapter_id}_account"
 
@@ -32,6 +32,7 @@ defmodule Tai.Exchanges.AccountTest do
     @adapters
     |> Enum.map(fn {_, adapter_id} ->
       @adapter_id adapter_id
+
       test "#{adapter_id} adapter returns a map of assets" do
         use_cassette "exchange_adapters/shared/account/#{@adapter_id}/all_balances_success" do
           assert {:ok, balances} = @adapter_id |> my_adapter |> Account.all_balances()
@@ -57,6 +58,7 @@ defmodule Tai.Exchanges.AccountTest do
     @adapters
     |> Enum.map(fn {_, adapter_id} ->
       @adapter_id adapter_id
+
       test "#{adapter_id} can create a fill or kill duration order" do
         use_cassette "exchange_adapters/shared/account/#{@adapter_id}/buy_limit_fill_or_kill_success" do
           assert {:ok, %OrderResponse{} = response} =
@@ -68,6 +70,21 @@ defmodule Tai.Exchanges.AccountTest do
           assert response.status == OrderStatus.expired()
           assert response.time_in_force == %FillOrKill{}
           assert Decimal.cmp(response.original_size, Decimal.new(0.01)) == :eq
+          assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
+        end
+      end
+
+      test "#{adapter_id} can create an immediate or cancel duration order" do
+        use_cassette "exchange_adapters/shared/account/#{@adapter_id}/buy_limit_immediate_or_cancel_success" do
+          assert {:ok, %OrderResponse{} = response} =
+                   @adapter_id
+                   |> my_adapter
+                   |> Account.buy_limit(:ltcbtc, 0.017, 0.02, %ImmediateOrCancel{})
+
+          assert response.id != nil
+          assert response.status == OrderStatus.expired()
+          assert response.time_in_force == %ImmediateOrCancel{}
+          assert Decimal.cmp(response.original_size, Decimal.new(0.02)) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
         end
       end

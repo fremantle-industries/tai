@@ -4,8 +4,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
   doctest Tai.ExchangeAdapters.Poloniex.Account
 
   alias Tai.{Exchanges.Account, CredentialError, TimeoutError}
-  alias Tai.Trading.OrderDurations.{FillOrKill, ImmediateOrCancel}
-  alias Tai.Trading.{FillOrKillError, NotEnoughError, OrderResponse}
+  alias Tai.Trading.OrderDurations.{FillOrKill}
+  alias Tai.Trading.{FillOrKillError, NotEnoughError}
 
   setup_all do
     HTTPoison.start()
@@ -53,21 +53,6 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
                    }
                  }
                }
-      end
-    end
-
-    test "can create an immediate or cancel order" do
-      use_cassette "exchange_adapters/poloniex/account/buy_limit_immediate_or_cancel_success" do
-        assert {:ok, %OrderResponse{} = response} =
-                 Account.buy_limit(
-                   :my_poloniex_exchange,
-                   :ltcbtc,
-                   0.017,
-                   0.01,
-                   %ImmediateOrCancel{}
-                 )
-
-        assert response.id == "173577768530"
       end
     end
 
