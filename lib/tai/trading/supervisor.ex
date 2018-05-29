@@ -12,6 +12,10 @@ defmodule Tai.Trading.Supervisor do
   def init(:ok) do
     children = [
       Tai.Trading.OrderStore
+      # {
+      #   Tai.Trading.OrderPipeline,
+      #   [send_orders_enabled: Tai.Settings.send_orders_enabled()]
+      # }
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

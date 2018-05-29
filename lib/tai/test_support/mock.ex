@@ -25,10 +25,4 @@ defmodule Tai.TestSupport.Mock do
         asks: asks
       })
   end
-
-  @spec restart_application :: no_return
-  def restart_application do
-    Application.stop(:tai)
-    :ok = Application.start(:tai)
-  end
 end

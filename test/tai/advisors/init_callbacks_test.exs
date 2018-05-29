@@ -2,6 +2,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
   use ExUnit.Case, async: true
 
   import ExUnit.CaptureLog
+  import Tai.TestSupport.Helpers
   import Tai.TestSupport.Mock
 
   defmodule InitSuccessAdvisor do

@@ -10,4 +10,5 @@ defmodule Tai.Trading.OrderStatus do
   def canceling, do: :canceling
   def canceled, do: :canceled
   def error, do: :error
+  def skip, do: :skip
 end

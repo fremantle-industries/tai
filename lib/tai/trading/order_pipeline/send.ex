@@ -4,12 +4,18 @@ defmodule Tai.Trading.OrderPipeline.Send do
   alias Tai.Trading.{OrderResponse, Order}
 
   def execute_step(%Order{status: :enqueued} = o) do
-    Task.start_link(fn ->
+    if Tai.Settings.send_orders?() do
+      Task.start_link(fn ->
+        o
+        |> send_request
+        |> parse_response(o)
+        |> execute_callback
+      end)
+    else
       o
-      |> send_request
-      |> parse_response(o)
+      |> skip_order!
       |> execute_callback
-    end)
+    end
   end
 
   defp send_request(%Order{side: :buy, type: :limit} = o) do
@@ -74,6 +80,12 @@ defmodule Tai.Trading.OrderPipeline.Send do
       status: Tai.Trading.OrderStatus.error(),
       error_reason: reason
     )
+    |> to_next_step
+  end
+
+  defp skip_order!(o) do
+    o.client_id
+    |> find_by_and_update(status: Tai.Trading.OrderStatus.skip())
     |> to_next_step
   end
 

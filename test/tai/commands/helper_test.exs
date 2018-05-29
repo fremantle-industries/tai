@@ -5,6 +5,7 @@ defmodule Tai.Commands.HelperTest do
   doctest Tai.Commands.Helper
 
   import ExUnit.CaptureIO
+  import Tai.TestSupport.Helpers
   import Tai.TestSupport.Mock
 
   alias Tai.{Commands.Helper, Markets.OrderBook}
