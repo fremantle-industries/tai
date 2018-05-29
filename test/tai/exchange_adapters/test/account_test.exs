@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
   doctest Tai.ExchangeAdapters.Test.Account
 
   alias Tai.Exchanges.Account
-  alias Tai.Trading.{Order, OrderResponses, OrderStatus}
+  alias Tai.Trading.{Order, OrderResponses, OrderStatus, TimeInForce}
 
   setup_all do
     start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
@@ -45,7 +45,8 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         price: 10.1,
         size: 2.2,
         status: OrderStatus.enqueued(),
-        enqueued_at: Timex.now()
+        enqueued_at: Timex.now(),
+        time_in_force: TimeInForce.good_til_canceled()
       }
 
       assert {:ok, order_response} = Account.buy_limit(order)
@@ -64,7 +65,8 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         price: 10.1,
         size: 2.2,
         status: OrderStatus.enqueued(),
-        enqueued_at: Timex.now()
+        enqueued_at: Timex.now(),
+        time_in_force: TimeInForce.good_til_canceled()
       }
 
       sell_limit_order = %Order{
@@ -76,7 +78,8 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         price: 10.1,
         size: 2.2,
         status: OrderStatus.enqueued(),
-        enqueued_at: Timex.now()
+        enqueued_at: Timex.now(),
+        time_in_force: TimeInForce.good_til_canceled()
       }
 
       assert {:error, %OrderResponses.InvalidOrderType{}} = Account.buy_limit(buy_market_order)
@@ -115,7 +118,8 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         price: 10.1,
         size: 2.2,
         status: OrderStatus.enqueued(),
-        enqueued_at: Timex.now()
+        enqueued_at: Timex.now(),
+        time_in_force: TimeInForce.good_til_canceled()
       }
 
       assert {:ok, order_response} = Account.sell_limit(order)
@@ -134,7 +138,8 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         price: 10.1,
         size: 2.2,
         status: OrderStatus.enqueued(),
-        enqueued_at: Timex.now()
+        enqueued_at: Timex.now(),
+        time_in_force: TimeInForce.good_til_canceled()
       }
 
       buy_limit_order = %Order{
@@ -146,7 +151,8 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         price: 10.1,
         size: 2.2,
         status: OrderStatus.enqueued(),
-        enqueued_at: Timex.now()
+        enqueued_at: Timex.now(),
+        time_in_force: TimeInForce.good_til_canceled()
       }
 
       assert {:error, %OrderResponses.InvalidOrderType{}} = Account.sell_limit(sell_market_order)

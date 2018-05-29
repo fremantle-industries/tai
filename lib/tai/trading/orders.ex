@@ -153,6 +153,7 @@ defmodule Tai.Trading.Orders do
       type: submission.type,
       price: abs(submission.price),
       size: abs(submission.size),
+      time_in_force: submission.time_in_force,
       status: OrderStatus.enqueued(),
       enqueued_at: Timex.now()
     }

@@ -2,7 +2,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
   use Tai.Advisor
 
   alias Tai.Advisor
-  alias Tai.Trading.{Orders, OrderStatus, OrderSubmission}
+  alias Tai.Trading.{Orders, OrderStatus, OrderSubmission, TimeInForce}
 
   require Logger
 
@@ -26,7 +26,9 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
           Logger.info("create buy limit order on #{order_book_feed_id}")
 
           actions = %{
-            orders: [OrderSubmission.buy_limit(:gdax, symbol, 100.1, 0.1)]
+            orders: [
+              OrderSubmission.buy_limit(:gdax, symbol, 100.1, 0.1, TimeInForce.fill_or_kill())
+            ]
           }
 
           {:ok, actions}

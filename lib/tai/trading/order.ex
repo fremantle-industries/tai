@@ -8,6 +8,7 @@ defmodule Tai.Trading.Order do
     :size,
     :status,
     :symbol,
+    :time_in_force,
     :type
   ]
   defstruct [
@@ -21,6 +22,7 @@ defmodule Tai.Trading.Order do
     :size,
     :status,
     :symbol,
+    :time_in_force,
     :type
   ]
 

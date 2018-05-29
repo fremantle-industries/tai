@@ -7,7 +7,7 @@ defmodule Tai.Commands.HelperTest do
   import ExUnit.CaptureIO
 
   alias Tai.{Commands.Helper, Markets.OrderBook}
-  alias Tai.Trading.{Orders, OrderSubmission}
+  alias Tai.Trading.{Orders, OrderSubmission, TimeInForce}
 
   setup do
     test_feed_a_btcusd = [feed_id: :test_feed_a, symbol: :btcusd] |> OrderBook.to_name()
@@ -72,27 +72,40 @@ defmodule Tai.Commands.HelperTest do
 
   test "orders displays items in ascending order from when they were enqueued" do
     assert capture_io(fn -> Helper.orders() end) == """
-           +---------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+
-           | Account | Symbol | Side | Type | Price | Size | Status | Client ID | Server ID | Enqueued At | Created At |
-           +---------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+
-           |       - |      - |    - |    - |     - |    - |      - |         - |         - |           - |          - |
-           +---------+--------+------+------+-------+------+--------+-----------+-----------+-------------+------------+\n
+           +---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+
+           | Account | Symbol | Side | Type | Price | Size | Time in Force | Status | Client ID | Server ID | Enqueued At | Created At |
+           +---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+
+           |       - |      - |    - |    - |     - |    - |             - |      - |         - |         - |           - |          - |
+           +---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+\n
            """
 
-    [btcusd_order] = Orders.add(OrderSubmission.buy_limit(:test_feed_a, :btcusd, 12_999.99, 1.1))
-    [ltcusd_order] = Orders.add(OrderSubmission.sell_limit(:test_feed_b, :ltcusd, 75.23, 1.0))
+    [btcusd_order] =
+      Orders.add(
+        OrderSubmission.buy_limit(
+          :test_feed_a,
+          :btcusd,
+          12_999.99,
+          1.1,
+          TimeInForce.fill_or_kill()
+        )
+      )
+
+    [ltcusd_order] =
+      Orders.add(
+        OrderSubmission.sell_limit(:test_feed_b, :ltcusd, 75.23, 1.0, TimeInForce.fill_or_kill())
+      )
 
     assert capture_io(fn -> Helper.orders() end) == """
-           +-------------+--------+------+-------+----------+------+----------+--------------------------------------+-----------+-------------+------------+
-           |     Account | Symbol | Side |  Type |    Price | Size |   Status |                            Client ID | Server ID | Enqueued At | Created At |
-           +-------------+--------+------+-------+----------+------+----------+--------------------------------------+-----------+-------------+------------+
-           | test_feed_a | btcusd |  buy | limit | 12999.99 |  1.1 | enqueued | #{
+           +-------------+--------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
+           |     Account | Symbol | Side |  Type |    Price | Size | Time in Force |   Status |                            Client ID | Server ID | Enqueued At | Created At |
+           +-------------+--------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
+           | test_feed_a | btcusd |  buy | limit | 12999.99 |  1.1 |           fok | enqueued | #{
              btcusd_order.client_id
            } |           |         now |            |
-           | test_feed_b | ltcusd | sell | limit |    75.23 |  1.0 | enqueued | #{
+           | test_feed_b | ltcusd | sell | limit |    75.23 |  1.0 |           fok | enqueued | #{
              ltcusd_order.client_id
            } |           |         now |            |
-           +-------------+--------+------+-------+----------+------+----------+--------------------------------------+-----------+-------------+------------+\n
+           +-------------+--------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+\n
            """
 
     Orders.clear()

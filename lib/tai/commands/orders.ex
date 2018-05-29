@@ -1,5 +1,6 @@
 defmodule Tai.Commands.Orders do
   alias Tai.Trading.Orders
+  alias TableRex.Table
 
   def orders do
     Orders.all()
@@ -12,6 +13,7 @@ defmodule Tai.Commands.Orders do
         order.type,
         order.price,
         order.size,
+        order.time_in_force,
         order.status,
         order.client_id,
         order.server_id,
@@ -31,9 +33,10 @@ defmodule Tai.Commands.Orders do
   end
 
   defp print_table(rows) do
-    TableRex.Table.new(rows, header())
-    |> TableRex.Table.put_column_meta(:all, align: :right)
-    |> TableRex.Table.render!()
+    rows
+    |> Table.new(header())
+    |> Table.put_column_meta(:all, align: :right)
+    |> Table.render!()
     |> IO.puts()
   end
 
@@ -45,6 +48,7 @@ defmodule Tai.Commands.Orders do
       "Type",
       "Price",
       "Size",
+      "Time in Force",
       "Status",
       "Client ID",
       "Server ID",

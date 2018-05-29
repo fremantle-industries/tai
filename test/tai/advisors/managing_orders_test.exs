@@ -3,7 +3,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
 
   alias Tai.{Advisor}
   alias Tai.Markets.{OrderBook}
-  alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderSubmission}
+  alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderSubmission, TimeInForce}
 
   defmodule MyOrderAdvisor do
     use Advisor
@@ -34,8 +34,20 @@ defmodule Tai.Advisors.ManagingOrdersTest do
       cond do
         Orders.count() == 0 ->
           orders = [
-            OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 101.1, 0.1),
-            OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 10.1, 0.11)
+            OrderSubmission.buy_limit(
+              :my_test_account,
+              :btcusd_success,
+              101.1,
+              0.1,
+              TimeInForce.fill_or_kill()
+            ),
+            OrderSubmission.buy_limit(
+              :my_test_account,
+              :btcusd_success,
+              10.1,
+              0.11,
+              TimeInForce.fill_or_kill()
+            )
           ]
 
           {:ok, %{orders: orders}}
@@ -91,9 +103,27 @@ defmodule Tai.Advisors.ManagingOrdersTest do
         accounts: [:my_test_account],
         store: %{
           orders: [
-            OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 101.1, 0.1),
-            OrderSubmission.buy_limit(:my_test_account, :btcusd_success, 10.1, 0.11),
-            OrderSubmission.buy_limit(:my_test_account, :btcusd_insufficient_funds, 1.1, 0.1)
+            OrderSubmission.buy_limit(
+              :my_test_account,
+              :btcusd_success,
+              101.1,
+              0.1,
+              TimeInForce.fill_or_kill()
+            ),
+            OrderSubmission.buy_limit(
+              :my_test_account,
+              :btcusd_success,
+              10.1,
+              0.11,
+              TimeInForce.fill_or_kill()
+            ),
+            OrderSubmission.buy_limit(
+              :my_test_account,
+              :btcusd_insufficient_funds,
+              1.1,
+              0.1,
+              TimeInForce.fill_or_kill()
+            )
           ]
         }
       ]
@@ -182,9 +212,27 @@ defmodule Tai.Advisors.ManagingOrdersTest do
         accounts: [:my_test_account],
         store: %{
           orders: [
-            OrderSubmission.sell_limit(:my_test_account, :btcusd_success, 101.1, 0.1),
-            OrderSubmission.sell_limit(:my_test_account, :btcusd_success, 10.1, 0.11),
-            OrderSubmission.sell_limit(:my_test_account, :btcusd_insufficient_funds, 1.1, 0.1)
+            OrderSubmission.sell_limit(
+              :my_test_account,
+              :btcusd_success,
+              101.1,
+              0.1,
+              TimeInForce.fill_or_kill()
+            ),
+            OrderSubmission.sell_limit(
+              :my_test_account,
+              :btcusd_success,
+              10.1,
+              0.11,
+              TimeInForce.fill_or_kill()
+            ),
+            OrderSubmission.sell_limit(
+              :my_test_account,
+              :btcusd_insufficient_funds,
+              1.1,
+              0.1,
+              TimeInForce.fill_or_kill()
+            )
           ]
         }
       ]
@@ -206,6 +254,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert enqueued_order_1.symbol == :btcusd_success
     assert enqueued_order_1.side == Order.sell()
     assert enqueued_order_1.type == Order.limit()
+    assert enqueued_order_1.time_in_force == TimeInForce.fill_or_kill()
     assert enqueued_order_1.price == 101.1
     assert enqueued_order_1.size == 0.1
     assert enqueued_order_1.status == OrderStatus.enqueued()
@@ -215,6 +264,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert enqueued_order_2.symbol == :btcusd_success
     assert enqueued_order_2.side == Order.sell()
     assert enqueued_order_2.type == Order.limit()
+    assert enqueued_order_2.time_in_force == TimeInForce.fill_or_kill()
     assert enqueued_order_2.price == 10.1
     assert enqueued_order_2.size == 0.11
     assert enqueued_order_2.status == OrderStatus.enqueued()
@@ -224,6 +274,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert enqueued_order_3.symbol == :btcusd_insufficient_funds
     assert enqueued_order_3.side == Order.sell()
     assert enqueued_order_3.type == Order.limit()
+    assert enqueued_order_3.time_in_force == TimeInForce.fill_or_kill()
     assert enqueued_order_3.price == 1.1
     assert enqueued_order_3.size == 0.1
     assert enqueued_order_3.status == OrderStatus.enqueued()
@@ -241,6 +292,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert created_order_1.symbol == :btcusd_success
     assert created_order_1.side == Order.sell()
     assert created_order_1.type == Order.limit()
+    assert created_order_1.time_in_force == TimeInForce.fill_or_kill()
     assert created_order_1.price == 101.1
     assert created_order_1.size == 0.1
     assert created_order_1.status == OrderStatus.pending()
@@ -248,8 +300,9 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert created_order_2.server_id != nil
     assert created_order_2.account_id == :my_test_account
     assert created_order_2.symbol == :btcusd_success
-    assert created_order_1.side == Order.sell()
-    assert created_order_1.type == Order.limit()
+    assert created_order_2.side == Order.sell()
+    assert created_order_2.type == Order.limit()
+    assert created_order_2.time_in_force == TimeInForce.fill_or_kill()
     assert created_order_2.price == 10.1
     assert created_order_2.size == 0.11
     assert created_order_2.status == OrderStatus.pending()
@@ -259,6 +312,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     assert error_order.symbol == :btcusd_insufficient_funds
     assert error_order.side == Order.sell()
     assert error_order.type == Order.limit()
+    assert error_order.time_in_force == TimeInForce.fill_or_kill()
     assert error_order.price == 1.1
     assert error_order.size == 0.1
     assert error_order.status == OrderStatus.error()

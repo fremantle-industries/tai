@@ -14,7 +14,8 @@ defmodule Tai.Trading.OrderTest do
       price: :ignore,
       size: :ignore,
       status: :ignore,
-      symbol: :ignore
+      symbol: :ignore,
+      time_in_force: :ignore
     }
 
     buy_market_order = %Order{
@@ -26,7 +27,8 @@ defmodule Tai.Trading.OrderTest do
       price: :ignore,
       size: :ignore,
       status: :ignore,
-      symbol: :ignore
+      symbol: :ignore,
+      time_in_force: :ignore
     }
 
     sell_limit_order = %Order{
@@ -38,7 +40,8 @@ defmodule Tai.Trading.OrderTest do
       price: :ignore,
       size: :ignore,
       status: :ignore,
-      symbol: :ignore
+      symbol: :ignore,
+      time_in_force: :ignore
     }
 
     assert Order.buy_limit?(buy_limit_order) == true
@@ -56,7 +59,8 @@ defmodule Tai.Trading.OrderTest do
       price: :ignore,
       size: :ignore,
       status: :ignore,
-      symbol: :ignore
+      symbol: :ignore,
+      time_in_force: :ignore
     }
 
     sell_market_order = %Order{
@@ -68,7 +72,8 @@ defmodule Tai.Trading.OrderTest do
       price: :ignore,
       size: :ignore,
       status: :ignore,
-      symbol: :ignore
+      symbol: :ignore,
+      time_in_force: :ignore
     }
 
     buy_limit_order = %Order{
@@ -80,7 +85,8 @@ defmodule Tai.Trading.OrderTest do
       price: :ignore,
       size: :ignore,
       status: :ignore,
-      symbol: :ignore
+      symbol: :ignore,
+      time_in_force: :ignore
     }
 
     assert Order.sell_limit?(sell_limit_order) == true
