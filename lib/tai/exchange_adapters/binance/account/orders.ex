@@ -33,8 +33,8 @@ defmodule Tai.ExchangeAdapters.Binance.Account.Orders do
     {:ok, response}
   end
 
-  defp normalize_duration(%Tai.Trading.OrderDurations.FillOrKill{}), do: "FOK"
-  defp normalize_duration(%Tai.Trading.OrderDurations.ImmediateOrCancel{}), do: "IOC"
+  defp normalize_duration(:fok), do: "FOK"
+  defp normalize_duration(:ioc), do: "IOC"
 
   defp status("EXPIRED"), do: Tai.Trading.OrderStatus.expired()
 end

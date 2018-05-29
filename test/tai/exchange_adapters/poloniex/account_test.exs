@@ -4,8 +4,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
   doctest Tai.ExchangeAdapters.Poloniex.Account
 
   alias Tai.{Exchanges.Account, CredentialError, TimeoutError}
-  alias Tai.Trading.OrderDurations.{FillOrKill}
-  alias Tai.Trading.{FillOrKillError, NotEnoughError}
+  alias Tai.Trading.{FillOrKillError, NotEnoughError, TimeInForce}
 
   setup_all do
     HTTPoison.start()
@@ -45,7 +44,13 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
   describe "#buy_limit" do
     test "fill or kill returns an error tuple when it can't completely execute a fill or kill order" do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_unable_to_fill_completely" do
-        assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
+        assert Account.buy_limit(
+                 :my_poloniex_exchange,
+                 :ltcbtc,
+                 0.0001,
+                 1,
+                 TimeInForce.fill_or_kill()
+               ) == {
                  :error,
                  %FillOrKillError{
                    reason: %ExPoloniex.FillOrKillError{
@@ -58,7 +63,13 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     test "returns an error tuple when the request times out" do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_timeout" do
-        assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
+        assert Account.buy_limit(
+                 :my_poloniex_exchange,
+                 :ltcbtc,
+                 0.0001,
+                 1,
+                 TimeInForce.fill_or_kill()
+               ) == {
                  :error,
                  %TimeoutError{reason: %HTTPoison.Error{reason: "timeout"}}
                }
@@ -67,7 +78,13 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     test "returns an error tuple when the api key is invalid" do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_invalid_api_key" do
-        assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.0001, 1, %FillOrKill{}) == {
+        assert Account.buy_limit(
+                 :my_poloniex_exchange,
+                 :ltcbtc,
+                 0.0001,
+                 1,
+                 TimeInForce.fill_or_kill()
+               ) == {
                  :error,
                  %Tai.CredentialError{
                    reason: %ExPoloniex.AuthenticationError{
@@ -80,7 +97,13 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     test "returns an error tuple when it doesn't have enough of a balance" do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_not_enough" do
-        assert Account.buy_limit(:my_poloniex_exchange, :ltcbtc, 0.02, 1000, %FillOrKill{}) == {
+        assert Account.buy_limit(
+                 :my_poloniex_exchange,
+                 :ltcbtc,
+                 0.02,
+                 1000,
+                 TimeInForce.fill_or_kill()
+               ) == {
                  :error,
                  %NotEnoughError{reason: %ExPoloniex.NotEnoughError{message: "Not enough BTC."}}
                }

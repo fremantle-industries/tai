@@ -44,16 +44,21 @@ defmodule Tai.Trading.OrderOutbox do
       order.type == Order.limit() && order.side == Order.buy() ->
         {:ok, _pid} =
           Task.start_link(fn ->
-            Tai.Exchanges.Account.buy_limit(order)
+            order
+            |> Tai.Exchanges.Account.buy_limit()
             |> handle_limit_response(order)
           end)
 
       order.type == Order.limit() && order.side == Order.sell() ->
         {:ok, _pid} =
           Task.start_link(fn ->
-            Tai.Exchanges.Account.sell_limit(order)
+            order
+            |> Tai.Exchanges.Account.sell_limit()
             |> handle_limit_response(order)
           end)
+
+      true ->
+        nil
     end
 
     {:noreply, state}
@@ -62,7 +67,8 @@ defmodule Tai.Trading.OrderOutbox do
   def handle_info({:order_cancelling, order}, state) do
     {:ok, _pid} =
       Task.start_link(fn ->
-        Tai.Exchanges.Account.cancel_order(order.account_id, order.server_id)
+        order.account_id
+        |> Tai.Exchanges.Account.cancel_order(order.server_id)
         |> handle_cancel_order_response(order)
       end)
 

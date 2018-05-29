@@ -5,8 +5,7 @@ defmodule Tai.Exchanges.AccountTest do
 
   alias Tai.TimeoutError
   alias Tai.Exchanges.Account
-  alias Tai.Trading.{OrderResponse, OrderStatus}
-  alias Tai.Trading.OrderDurations.{FillOrKill, ImmediateOrCancel}
+  alias Tai.Trading.{OrderResponse, OrderStatus, TimeInForce}
 
   defp my_adapter(adapter_id), do: :"my_#{adapter_id}_account"
 
@@ -64,11 +63,11 @@ defmodule Tai.Exchanges.AccountTest do
           assert {:ok, %OrderResponse{} = response} =
                    @adapter_id
                    |> my_adapter
-                   |> Account.buy_limit(:ltcbtc, 0.0165, 0.01, %FillOrKill{})
+                   |> Account.buy_limit(:ltcbtc, 0.0165, 0.01, TimeInForce.fill_or_kill())
 
           assert response.id != nil
           assert response.status == OrderStatus.expired()
-          assert response.time_in_force == %FillOrKill{}
+          assert response.time_in_force == TimeInForce.fill_or_kill()
           assert Decimal.cmp(response.original_size, Decimal.new(0.01)) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
         end
@@ -79,11 +78,11 @@ defmodule Tai.Exchanges.AccountTest do
           assert {:ok, %OrderResponse{} = response} =
                    @adapter_id
                    |> my_adapter
-                   |> Account.buy_limit(:ltcbtc, 0.016, 0.02, %ImmediateOrCancel{})
+                   |> Account.buy_limit(:ltcbtc, 0.016, 0.02, TimeInForce.immediate_or_cancel())
 
           assert response.id != nil
           assert response.status == OrderStatus.expired()
-          assert response.time_in_force == %ImmediateOrCancel{}
+          assert response.time_in_force == TimeInForce.immediate_or_cancel()
           assert Decimal.cmp(response.original_size, Decimal.new(0.02)) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
         end
@@ -105,11 +104,11 @@ defmodule Tai.Exchanges.AccountTest do
           assert {:ok, %OrderResponse{} = response} =
                    @adapter_id
                    |> my_adapter
-                   |> Account.sell_limit(:ltcbtc, 0.16, 0.01, %FillOrKill{})
+                   |> Account.sell_limit(:ltcbtc, 0.16, 0.01, TimeInForce.fill_or_kill())
 
           assert response.id != nil
           assert response.status == OrderStatus.expired()
-          assert response.time_in_force == %FillOrKill{}
+          assert response.time_in_force == TimeInForce.fill_or_kill()
           assert Decimal.cmp(response.original_size, Decimal.new(0.01)) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
         end
@@ -120,11 +119,11 @@ defmodule Tai.Exchanges.AccountTest do
           assert {:ok, %OrderResponse{} = response} =
                    @adapter_id
                    |> my_adapter
-                   |> Account.sell_limit(:ltcbtc, 0.16, 0.02, %ImmediateOrCancel{})
+                   |> Account.sell_limit(:ltcbtc, 0.16, 0.02, TimeInForce.immediate_or_cancel())
 
           assert response.id != nil
           assert response.status == OrderStatus.expired()
-          assert response.time_in_force == %ImmediateOrCancel{}
+          assert response.time_in_force == TimeInForce.immediate_or_cancel()
           assert Decimal.cmp(response.original_size, Decimal.new(0.02)) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
         end

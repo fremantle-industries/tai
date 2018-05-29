@@ -331,8 +331,8 @@ defmodule Tai.Advisor do
         actions
       end
 
-      defp submit_orders(%{orders: orders} = actions) do
-        OrderOutbox.add(orders)
+      defp submit_orders(%{orders: order_submissions} = actions) do
+        OrderOutbox.add(order_submissions)
 
         actions
       end

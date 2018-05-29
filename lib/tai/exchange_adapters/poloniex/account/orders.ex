@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
   Create buy and sell orders for the Poloniex adapter
   """
 
-  alias Tai.ExchangeAdapters.Poloniex.{SymbolMapping}
+  alias Tai.ExchangeAdapters.Poloniex.SymbolMapping
 
   def buy_limit(symbol, price, size, time_in_force) do
     with normalized_tif <- normalize_duration(time_in_force) do
@@ -55,16 +55,11 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
     {:error, %Tai.Trading.NotEnoughError{reason: error}}
   end
 
-  defp normalize_duration(%Tai.Trading.OrderDurations.FillOrKill{}),
-    do: %ExPoloniex.OrderDurations.FillOrKill{}
+  defp normalize_duration(:fok), do: %ExPoloniex.OrderDurations.FillOrKill{}
+  defp normalize_duration(:ioc), do: %ExPoloniex.OrderDurations.ImmediateOrCancel{}
 
-  defp normalize_duration(%Tai.Trading.OrderDurations.ImmediateOrCancel{}),
-    do: %ExPoloniex.OrderDurations.ImmediateOrCancel{}
-
-  defp status(%Tai.Trading.OrderDurations.FillOrKill{}), do: Tai.Trading.OrderStatus.expired()
-
-  defp status(%Tai.Trading.OrderDurations.ImmediateOrCancel{}),
-    do: Tai.Trading.OrderStatus.expired()
+  defp status(:fok), do: Tai.Trading.OrderStatus.expired()
+  defp status(:ioc), do: Tai.Trading.OrderStatus.expired()
 
   defp executed_size(resulting_trades) do
     resulting_trades
