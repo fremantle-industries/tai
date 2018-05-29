@@ -22,7 +22,17 @@ defmodule Tai.Trading.Orders do
   end
 
   def handle_call({:add, submissions}, _from, state) do
-    {new_orders, new_state} = add_orders(submissions, state)
+    new_orders =
+      submissions
+      |> List.wrap()
+      |> build_orders
+
+    new_state =
+      new_orders
+      |> Enum.reduce(
+        state,
+        fn order, acc -> Map.put(acc, order.client_id, order) end
+      )
 
     {:reply, new_orders, new_state}
   end
@@ -125,42 +135,28 @@ defmodule Tai.Trading.Orders do
     GenServer.call(__MODULE__, {:count, status: status})
   end
 
-  defp add_orders({_account_id, _symbol, _price, _size} = submission, state) do
-    [submission]
-    |> add_orders(state)
-  end
-
-  defp add_orders(%OrderSubmission{} = submission, state) do
-    [submission]
-    |> add_orders(state)
-  end
-
-  defp add_orders([], state), do: {[], state}
-
-  defp add_orders([_head | _tail] = submissions, state) do
+  defp build_orders(submissions) do
     submissions
-    |> add_orders(state, [])
-  end
+    |> Enum.reduce(
+      [],
+      fn %OrderSubmission{} = submission, acc ->
+        order = %Order{
+          client_id: UUID.uuid4(),
+          account_id: submission.account_id,
+          symbol: submission.symbol,
+          side: submission.side,
+          type: submission.type,
+          price: abs(submission.price),
+          size: abs(submission.size),
+          time_in_force: submission.time_in_force,
+          status: OrderStatus.enqueued(),
+          enqueued_at: Timex.now()
+        }
 
-  defp add_orders([], state, new_orders), do: {new_orders |> Enum.reverse(), state}
-
-  defp add_orders([%OrderSubmission{} = submission | tail], state, new_orders) do
-    order = %Order{
-      client_id: UUID.uuid4(),
-      account_id: submission.account_id,
-      symbol: submission.symbol,
-      side: submission.side,
-      type: submission.type,
-      price: abs(submission.price),
-      size: abs(submission.size),
-      time_in_force: submission.time_in_force,
-      status: OrderStatus.enqueued(),
-      enqueued_at: Timex.now()
-    }
-
-    new_state = state |> Map.put(order.client_id, order)
-
-    add_orders(tail, new_state, [order | new_orders])
+        [order | acc]
+      end
+    )
+    |> Enum.reverse()
   end
 
   defp filter(state, [{attr, [_head | _tail] = vals}]) do
