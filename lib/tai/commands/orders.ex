@@ -1,9 +1,12 @@
 defmodule Tai.Commands.Orders do
-  alias Tai.Trading.Orders
+  @moduledoc """
+  Display the list of orders and their details
+  """
+
   alias TableRex.Table
 
   def orders do
-    Orders.all()
+    Tai.Trading.Orders.all()
     |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
     |> Enum.map(fn order ->
       [
@@ -25,10 +28,9 @@ defmodule Tai.Commands.Orders do
   end
 
   defp print_table([]) do
-    [
-      "-"
-      |> List.duplicate(header() |> Enum.count())
-    ]
+    col_count = header() |> Enum.count()
+
+    [List.duplicate("-", col_count)]
     |> print_table
   end
 
