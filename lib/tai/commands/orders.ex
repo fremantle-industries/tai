@@ -6,7 +6,7 @@ defmodule Tai.Commands.Orders do
   alias TableRex.Table
 
   def orders do
-    Tai.Trading.Orders.all()
+    Tai.Trading.OrderStore.all()
     |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
     |> Enum.map(fn order ->
       [

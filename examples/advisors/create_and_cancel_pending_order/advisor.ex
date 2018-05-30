@@ -2,7 +2,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
   use Tai.Advisor
 
   alias Tai.Advisor
-  alias Tai.Trading.{Orders, OrderStatus, OrderSubmission, TimeInForce}
+  alias Tai.Trading.{OrderStatus, OrderSubmission, TimeInForce}
 
   require Logger
 
@@ -22,7 +22,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
 
     if order_book_feed_id == :gdax do
       cond do
-        Orders.count() == 0 ->
+        Tai.Trading.OrderStore.count() == 0 ->
           Logger.info("create buy limit order on #{order_book_feed_id}")
 
           actions = %{
@@ -33,7 +33,8 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
 
           {:ok, actions}
 
-        (pending_orders = Orders.where(status: OrderStatus.pending())) |> Enum.count() > 0 ->
+        (pending_orders = Tai.Trading.OrderStore.where(status: OrderStatus.pending()))
+        |> Enum.count() > 0 ->
           Logger.info(
             "[#{state.advisor_id |> Advisor.to_name()}] handle_inside_quote - cancel pending orders: #{
               inspect(pending_orders)

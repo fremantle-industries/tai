@@ -5,7 +5,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
   alias Tai.Advisor
   alias Tai.Markets.{OrderBook, PriceLevel, Quote}
-  alias Tai.Trading.Orders
 
   defmodule MyAdvisor do
     use Advisor
@@ -27,7 +26,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
 
     on_exit(fn ->
-      Orders.clear()
+      Tai.Trading.OrderStore.clear()
     end)
 
     {:ok, %{book_pid: book_pid}}

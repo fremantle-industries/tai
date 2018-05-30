@@ -3,7 +3,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
 
   alias Tai.{Advisor}
   alias Tai.Markets.{OrderBook}
-  alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus, OrderSubmission, TimeInForce}
+  alias Tai.Trading.{Order, OrderResponses, OrderStatus, OrderSubmission, TimeInForce}
 
   defmodule MyOrderAdvisor do
     use Advisor
@@ -32,7 +32,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
 
     def handle_inside_quote(_feed_id, _symbol, _inside_quote, _changes, _state) do
       cond do
-        Orders.count() == 0 ->
+        Tai.Trading.OrderStore.count() == 0 ->
           orders = [
             OrderSubmission.buy_limit(
               :my_test_account,
@@ -52,7 +52,8 @@ defmodule Tai.Advisors.ManagingOrdersTest do
 
           {:ok, %{orders: orders}}
 
-        (pending_orders = Orders.where(status: OrderStatus.pending())) |> Enum.count() == 2 ->
+        (pending_orders = Tai.Trading.OrderStore.where(status: OrderStatus.pending()))
+        |> Enum.count() == 2 ->
           cancel_orders = pending_orders |> Enum.map(& &1.client_id)
           {:ok, %{cancel_orders: cancel_orders}}
 
@@ -88,7 +89,7 @@ defmodule Tai.Advisors.ManagingOrdersTest do
     start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
 
     on_exit(fn ->
-      Orders.clear()
+      Tai.Trading.OrderStore.clear()
     end)
 
     {:ok, %{book_pid: book_pid}}

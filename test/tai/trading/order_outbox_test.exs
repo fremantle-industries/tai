@@ -4,7 +4,6 @@ defmodule Tai.Trading.OrderOutboxTest do
 
   alias Tai.Trading.{
     Order,
-    Orders,
     OrderOutbox,
     OrderResponses,
     OrderStatus,
@@ -57,14 +56,14 @@ defmodule Tai.Trading.OrderOutboxTest do
     start_supervised!(OrderLifecycleSubscriber)
 
     on_exit(fn ->
-      Orders.clear()
+      Tai.Trading.OrderStore.clear()
     end)
 
     :ok
   end
 
   test "add enqueues the submissions as orders and then executes it on the exchange" do
-    assert Orders.count() == 0
+    assert Tai.Trading.OrderStore.count() == 0
 
     [new_buy_limit_order, new_sell_limit_order] =
       new_orders =
@@ -86,7 +85,7 @@ defmodule Tai.Trading.OrderOutboxTest do
       ])
 
     assert Enum.count(new_orders) == 2
-    assert Orders.count() == 2
+    assert Tai.Trading.OrderStore.count() == 2
 
     assert_receive {:order_enqueued, enqueued_order_1}
     assert enqueued_order_1.client_id == new_buy_limit_order.client_id
@@ -135,7 +134,7 @@ defmodule Tai.Trading.OrderOutboxTest do
   end
 
   test "add broadcasts failed orders and updates the status" do
-    assert Orders.count() == 0
+    assert Tai.Trading.OrderStore.count() == 0
 
     [new_order_1, new_order_2] =
       OrderOutbox.add([
@@ -155,7 +154,7 @@ defmodule Tai.Trading.OrderOutboxTest do
         )
       ])
 
-    assert Orders.count() == 2
+    assert Tai.Trading.OrderStore.count() == 2
     assert_receive {:order_enqueued, enqueued_order_1}
     assert enqueued_order_1.client_id == new_order_1.client_id
     assert enqueued_order_1.status == OrderStatus.enqueued()

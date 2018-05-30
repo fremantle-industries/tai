@@ -7,14 +7,14 @@ defmodule Tai.Commands.HelperTest do
   import ExUnit.CaptureIO
 
   alias Tai.{Commands.Helper, Markets.OrderBook}
-  alias Tai.Trading.{Orders, OrderSubmission, TimeInForce}
+  alias Tai.Trading.{OrderSubmission, TimeInForce}
 
   setup do
     test_feed_a_btcusd = [feed_id: :test_feed_a, symbol: :btcusd] |> OrderBook.to_name()
     stop_supervised(test_feed_a_btcusd)
 
     on_exit(fn ->
-      Orders.clear()
+      Tai.Trading.OrderStore.clear()
     end)
 
     {:ok, %{test_feed_a_btcusd: test_feed_a_btcusd}}
@@ -84,7 +84,7 @@ defmodule Tai.Commands.HelperTest do
            """
 
     [btcusd_order] =
-      Orders.add(
+      Tai.Trading.OrderStore.add(
         OrderSubmission.buy_limit(
           :test_feed_a,
           :btcusd,
@@ -95,7 +95,7 @@ defmodule Tai.Commands.HelperTest do
       )
 
     [ltcusd_order] =
-      Orders.add(
+      Tai.Trading.OrderStore.add(
         OrderSubmission.sell_limit(:test_feed_b, :ltcusd, 75.23, 1.0, TimeInForce.fill_or_kill())
       )
 
@@ -111,8 +111,6 @@ defmodule Tai.Commands.HelperTest do
            } |           |         now |            |
            +-------------+--------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+\n
            """
-
-    Orders.clear()
   end
 
   test "buy_limit enqueues an order and displays it's client id" do

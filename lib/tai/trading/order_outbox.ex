@@ -8,7 +8,7 @@ defmodule Tai.Trading.OrderOutbox do
   require Logger
 
   alias Tai.PubSub
-  alias Tai.Trading.{Order, Orders, OrderResponses, OrderStatus}
+  alias Tai.Trading.{Order, OrderResponses, OrderStatus}
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -23,7 +23,7 @@ defmodule Tai.Trading.OrderOutbox do
   def handle_call({:add, submissions}, _from, state) do
     new_orders =
       submissions
-      |> Orders.add()
+      |> Tai.Trading.OrderStore.add()
       |> Enum.map(&broadcast_enqueued_order/1)
 
     {:reply, new_orders, state}
@@ -32,8 +32,8 @@ defmodule Tai.Trading.OrderOutbox do
   def handle_call({:cancel, client_ids}, _from, state) do
     orders_to_cancel =
       [client_id: client_ids, status: OrderStatus.pending()]
-      |> Orders.where()
-      |> Enum.map(&Orders.update(&1.client_id, status: OrderStatus.cancelling()))
+      |> Tai.Trading.OrderStore.where()
+      |> Enum.map(&Tai.Trading.OrderStore.update(&1.client_id, status: OrderStatus.cancelling()))
       |> Enum.map(&broadcast_cancelling_order/1)
 
     {:reply, orders_to_cancel, state}
@@ -107,7 +107,7 @@ defmodule Tai.Trading.OrderOutbox do
          order
        ) do
     pending_order =
-      Orders.update(
+      Tai.Trading.OrderStore.update(
         order.client_id,
         server_id: server_id,
         created_at: created_at,
@@ -118,12 +118,14 @@ defmodule Tai.Trading.OrderOutbox do
   end
 
   defp handle_limit_response({:error, reason}, order) do
-    error_order = Orders.update(order.client_id, status: OrderStatus.error())
+    error_order = Tai.Trading.OrderStore.update(order.client_id, status: OrderStatus.error())
     PubSub.broadcast(error_order.account_id, {:order_create_error, reason, error_order})
   end
 
   defp handle_cancel_order_response({:ok, _order_id}, order) do
-    cancelled_order = Orders.update(order.client_id, status: OrderStatus.cancelled())
+    cancelled_order =
+      Tai.Trading.OrderStore.update(order.client_id, status: OrderStatus.cancelled())
+
     PubSub.broadcast(cancelled_order.account_id, {:order_cancelled, cancelled_order})
   end
 end

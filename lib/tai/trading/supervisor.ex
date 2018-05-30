@@ -1,4 +1,8 @@
 defmodule Tai.Trading.Supervisor do
+  @moduledoc """
+  Supervisor that manages the processes for trade execution and tracking
+  """
+
   use Supervisor
 
   def start_link(_) do
@@ -8,7 +12,7 @@ defmodule Tai.Trading.Supervisor do
   def init(:ok) do
     children = [
       Tai.Trading.OrderOutbox,
-      Tai.Trading.Orders
+      Tai.Trading.OrderStore
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

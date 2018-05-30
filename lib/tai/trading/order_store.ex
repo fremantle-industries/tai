@@ -1,4 +1,4 @@
-defmodule Tai.Trading.Orders do
+defmodule Tai.Trading.OrderStore do
   @moduledoc """
   Converts submissions into orders and keeps track of them for updates
   """
