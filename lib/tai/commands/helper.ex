@@ -9,8 +9,8 @@ defmodule Tai.Commands.Helper do
   defdelegate balance, to: Commands.Balance
   defdelegate markets, to: Commands.Markets
   defdelegate orders, to: Commands.Orders
-  defdelegate buy_limit(account_id, symbol, price, size), to: Commands.Trading
-  defdelegate sell_limit(account_id, symbol, price, size), to: Commands.Trading
+  defdelegate buy_limit(account_id, symbol, price, size, time_in_force), to: Commands.Trading
+  defdelegate sell_limit(account_id, symbol, price, size, time_in_force), to: Commands.Trading
   defdelegate order_status(account_id, order_id), to: Commands.Trading
   defdelegate cancel_order(account_id, order_id), to: Commands.Trading
 end

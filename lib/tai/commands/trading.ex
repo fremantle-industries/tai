@@ -1,37 +1,29 @@
 defmodule Tai.Commands.Trading do
-  alias Tai.{Exchanges.Account, Trading.OrderResponses}
+  @moduledoc """
+  Commands to submit and manage orders for an account
+  """
 
-  def buy_limit(account_id, symbol, price, size) do
+  def buy_limit(account_id, symbol, price, size, time_in_force) do
     account_id
-    |> Account.buy_limit(symbol, price, size)
-    |> case do
-      {:ok, order_response} ->
-        IO.puts(
-          "create order success - id: #{order_response.id}, status: #{order_response.status}"
-        )
-
-      {:error, %OrderResponses.InsufficientFunds{}} ->
-        IO.puts("create order failure - insufficient funds")
-    end
+    |> Tai.Trading.OrderSubmission.buy_limit(symbol, price, size, time_in_force)
+    |> Tai.Trading.OrderOutbox.add()
+    |> render_order
   end
 
-  def sell_limit(account_id, symbol, price, size) do
+  def sell_limit(account_id, symbol, price, size, time_in_force) do
     account_id
-    |> Account.sell_limit(symbol, price, size)
-    |> case do
-      {:ok, order_response} ->
-        IO.puts(
-          "create order success - id: #{order_response.id}, status: #{order_response.status}"
-        )
+    |> Tai.Trading.OrderSubmission.sell_limit(symbol, price, size, time_in_force)
+    |> Tai.Trading.OrderOutbox.add()
+    |> render_order
+  end
 
-      {:error, %OrderResponses.InsufficientFunds{}} ->
-        IO.puts("create order failure - insufficient funds")
-    end
+  defp render_order([order]) do
+    IO.puts("order enqueued. client_id: #{order.client_id}")
   end
 
   def order_status(account_id, order_id) do
     account_id
-    |> Account.order_status(order_id)
+    |> Tai.Exchanges.Account.order_status(order_id)
     |> case do
       {:ok, status} ->
         IO.puts("status: #{status}")
@@ -43,7 +35,7 @@ defmodule Tai.Commands.Trading do
 
   def cancel_order(account_id, order_id) do
     account_id
-    |> Account.cancel_order(order_id)
+    |> Tai.Exchanges.Account.cancel_order(order_id)
     |> case do
       {:ok, _canceled_order_id} ->
         IO.puts("cancel order success")
