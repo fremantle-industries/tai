@@ -3,8 +3,6 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.AllBalances do
   Fetch and normalize all balances on the GDAX account
   """
 
-  alias Tai.{CredentialError, TimeoutError}
-
   def fetch do
     ExGdax.list_accounts()
     |> normalize_accounts
@@ -19,15 +17,19 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.AllBalances do
   end
 
   defp normalize_accounts({:error, "Invalid Passphrase" = reason, _status}) do
-    {:error, %CredentialError{reason: reason}}
+    {:error, %Tai.CredentialError{reason: reason}}
   end
 
   defp normalize_accounts({:error, "Invalid API Key" = reason, _status}) do
-    {:error, %CredentialError{reason: reason}}
+    {:error, %Tai.CredentialError{reason: reason}}
+  end
+
+  defp normalize_accounts({:error, reason, 503}) do
+    {:error, %Tai.ServiceUnavailableError{reason: reason}}
   end
 
   defp normalize_accounts({:error, "timeout"}) do
-    {:error, %TimeoutError{reason: "network request timed out"}}
+    {:error, %Tai.TimeoutError{reason: "network request timed out"}}
   end
 
   defp normalize_account(%{"currency" => raw_currency, "balance" => raw_balance}, acc) do

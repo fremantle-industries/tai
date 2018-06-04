@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Gdax.Account
 
-  alias Tai.{Exchanges.Account, CredentialError, Trading.OrderResponses}
+  alias Tai.{Exchanges.Account, Trading.OrderResponses}
 
   setup_all do
     HTTPoison.start()
@@ -17,7 +17,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
       use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_passphrase" do
         assert Account.all_balances(:my_gdax_exchange) == {
                  :error,
-                 %CredentialError{reason: "Invalid Passphrase"}
+                 %Tai.CredentialError{reason: "Invalid Passphrase"}
                }
       end
     end
@@ -26,7 +26,19 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
       use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_api_key" do
         assert Account.all_balances(:my_gdax_exchange) == {
                  :error,
-                 %CredentialError{reason: "Invalid API Key"}
+                 %Tai.CredentialError{reason: "Invalid API Key"}
+               }
+      end
+    end
+
+    test "returns an error tuple when down for maintenance" do
+      use_cassette "exchange_adapters/gdax/account/all_balances_error_maintenance" do
+        assert Account.all_balances(:my_gdax_exchange) == {
+                 :error,
+                 %Tai.ServiceUnavailableError{
+                   reason:
+                     "GDAX is currently under maintenance. For updates please see https://status.gdax.com/"
+                 }
                }
       end
     end

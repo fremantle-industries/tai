@@ -1,0 +1,42 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.gdax.com/accounts"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"message\":\"GDAX is currently under maintenance. For updates please see https://status.gdax.com/\"}",
+      "headers": {
+        "Date": "Mon, 04 Jun 2018 03:47:05 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "98",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d21c372f55ba6cc3a6fd253e0a40ebf6c1528084024; expires=Tue, 04-Jun-19 03:47:04 GMT; path=/; domain=.gdax.com; HttpOnly",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, cb-session, cb-fp",
+        "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "cb-before, cb-after, cb-gdpr",
+        "Access-Control-Max-Age": "7200",
+        "ETag": "W/\"62-wnkpfSeZX66O5oMehQM3VwJBhvA\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "42576a834d1d2a61-SEA"
+      },
+      "status_code": 503,
+      "type": "ok"
+    }
+  }
+]
