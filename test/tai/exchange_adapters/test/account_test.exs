@@ -26,13 +26,12 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
   end
 
   describe "#buy_limit" do
-    test "returns an ok tuple when an order is successfully created" do
+    test "returns an ok tuple with a pending order response successfully created" do
       assert {:ok, order_response} =
                Account.buy_limit(:my_test_account, :btcusd_success, 10.1, 2.2)
 
       assert order_response.id == "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"
       assert order_response.status == :pending
-      assert %DateTime{} = order_response.created_at
     end
 
     test "can take an order struct" do
@@ -52,7 +51,6 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       assert {:ok, order_response} = Account.buy_limit(order)
       assert order_response.id == "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"
       assert order_response.status == :pending
-      assert %DateTime{} = order_response.created_at
     end
 
     test "returns an error tuple when it is not the correct side or type" do
@@ -87,10 +85,10 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
     end
 
     test "returns an error tuple when an order fails" do
-      assert Account.buy_limit(:my_test_account, :btcusd_insufficient_funds, 10.1, 2.1) == {
+      assert {
                :error,
-               %OrderResponses.InsufficientFunds{}
-             }
+               %Tai.Trading.InsufficientBalanceError{}
+             } = Account.buy_limit(:my_test_account, :btcusd_insufficient_funds, 10.1, 2.1)
     end
 
     test "returns an unknown error tuple when it can't find a match" do
@@ -105,7 +103,6 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
 
       assert order_response.id == "41541912-ebc1-4173-afa5-4334ccf7a1a8"
       assert order_response.status == :pending
-      assert %DateTime{} = order_response.created_at
     end
 
     test "can take an order struct" do
@@ -125,7 +122,6 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       assert {:ok, order_response} = Account.sell_limit(order)
       assert order_response.id == "41541912-ebc1-4173-afa5-4334ccf7a1a8"
       assert order_response.status == :pending
-      assert %DateTime{} = order_response.created_at
     end
 
     test "returns an error tuple when it is not the correct side or type" do
@@ -160,10 +156,10 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
     end
 
     test "returns an {:error, reason} tuple when an order fails" do
-      assert Account.sell_limit(:my_test_account, :btcusd_insufficient_funds, 10.1, 2.1) == {
+      assert {
                :error,
-               %OrderResponses.InsufficientFunds{}
-             }
+               %Tai.Trading.InsufficientBalanceError{}
+             } = Account.sell_limit(:my_test_account, :btcusd_insufficient_funds, 10.1, 2.1)
     end
 
     test "sell_limit returns an unknown error tuple when it can't find a matching symbol" do

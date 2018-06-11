@@ -3,24 +3,23 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
   Create buy and sell orders for the GDAX adapter
   """
 
-  alias Tai.Trading.OrderResponses
-  alias Tai.ExchangeAdapters.Gdax.{Account.OrderStatus, Product}
+  alias Tai.ExchangeAdapters.Gdax.Product
 
-  def buy_limit(symbol, price, size, _time_in_force) do
+  def buy_limit(symbol, price, size, time_in_force) do
     {"buy", symbol, price, size}
-    |> create_limit_order
+    |> create_limit_order(time_in_force)
   end
 
-  def sell_limit(symbol, price, size, _time_in_force) do
+  def sell_limit(symbol, price, size, time_in_force) do
     {"sell", symbol, price, size}
-    |> create_limit_order
+    |> create_limit_order(time_in_force)
   end
 
-  defp create_limit_order(order) do
+  defp create_limit_order(order, time_in_force) do
     order
     |> build_limit_order
     |> ExGdax.create_order()
-    |> handle_create_order
+    |> handle_create_order(time_in_force)
   end
 
   defp build_limit_order({side, symbol, price, size}) do
@@ -33,26 +32,36 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
     }
   end
 
-  defp handle_create_order({
-         :ok,
-         %{"id" => id, "status" => status, "created_at" => created_at_str}
-       }) do
-    created_at = Timex.parse!(created_at_str, "{ISO:Extended}")
-
-    order_response = %OrderResponses.Created{
+  defp handle_create_order(
+         {
+           :ok,
+           %{
+             "id" => id,
+             "status" => status,
+             "size" => size,
+             "filled_size" => filled_size
+           }
+         },
+         time_in_force
+       ) do
+    response = %Tai.Trading.OrderResponse{
       id: id,
-      status: OrderStatus.to_atom(status),
-      created_at: created_at
+      status: tai_status(status),
+      time_in_force: time_in_force,
+      original_size: Decimal.new(size),
+      executed_size: Decimal.new(filled_size)
     }
 
-    {:ok, order_response}
+    {:ok, response}
   end
 
-  defp handle_create_order({:error, "Insufficient funds", _status_code}) do
-    {:error, %OrderResponses.InsufficientFunds{}}
+  defp handle_create_order({:error, "Insufficient funds" = reason, _status_code}, _time_in_force) do
+    {:error, %Tai.Trading.InsufficientBalanceError{reason: reason}}
   end
 
-  defp handle_create_order({:error, message, _status_code}) do
-    {:error, message}
+  defp handle_create_order({:error, reason, _status_code}, _time_in_force) do
+    {:error, reason}
   end
+
+  defp tai_status("pending"), do: Tai.Trading.OrderStatus.pending()
 end

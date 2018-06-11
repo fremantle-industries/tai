@@ -24,12 +24,12 @@ defmodule Tai.Mixfile do
   defp deps do
     [
       {:binance,
-       github: "fremantle-capital/binance.ex",
-       branch: "fill-or-kill-and-immediate-or-cancel-orders"},
+       github: "fremantle-capital/binance.ex", branch: "struct-insufficient-balance-error"},
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.3"},
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
+      {:honeydew, "~> 1.1.2"},
       {:json, "~> 1.0"},
       {:juice, "~> 0.0.3"},
       {:logger_file_backend, "~> 0.0.10"},

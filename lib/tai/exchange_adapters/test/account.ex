@@ -5,7 +5,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
 
   use GenServer
 
-  alias Tai.{Exchanges.Account, Trading.OrderResponses}
+  alias Tai.Exchanges.Account
 
   def start_link(account_id) do
     GenServer.start_link(__MODULE__, account_id, name: account_id |> Account.to_name())
@@ -26,11 +26,49 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, @all_balances}, state}
   end
 
-  def handle_call({:buy_limit, :btcusd_success, _price, _size, _time_in_force}, _from, state) do
-    order_response = %OrderResponses.Created{
+  def handle_call({:buy_limit, :btcusd_success, _price, size, :fok}, _from, state) do
+    order_response = %Tai.Trading.OrderResponse{
+      id: UUID.uuid4(),
+      status: Tai.Trading.OrderStatus.filled(),
+      time_in_force: Tai.Trading.TimeInForce.fill_or_kill(),
+      original_size: size,
+      executed_size: size
+    }
+
+    {:reply, {:ok, order_response}, state}
+  end
+
+  def handle_call({:buy_limit, :btcusd_expired, _price, size, :fok}, _from, state) do
+    order_response = %Tai.Trading.OrderResponse{
+      id: UUID.uuid4(),
+      status: Tai.Trading.OrderStatus.expired(),
+      time_in_force: Tai.Trading.TimeInForce.fill_or_kill(),
+      original_size: size,
+      executed_size: 0
+    }
+
+    {:reply, {:ok, order_response}, state}
+  end
+
+  def handle_call({:buy_limit, :btcusd_pending, _price, size, :gtc}, _from, state) do
+    order_response = %Tai.Trading.OrderResponse{
       id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7",
-      status: :pending,
-      created_at: Timex.now()
+      status: Tai.Trading.OrderStatus.pending(),
+      time_in_force: Tai.Trading.TimeInForce.good_til_canceled(),
+      original_size: size,
+      executed_size: 0.0
+    }
+
+    {:reply, {:ok, order_response}, state}
+  end
+
+  def handle_call({:buy_limit, :btcusd_success, _price, size, time_in_force}, _from, state) do
+    order_response = %Tai.Trading.OrderResponse{
+      id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7",
+      status: Tai.Trading.OrderStatus.pending(),
+      time_in_force: time_in_force,
+      original_size: size,
+      executed_size: size
     }
 
     {:reply, {:ok, order_response}, state}
@@ -41,18 +79,60 @@ defmodule Tai.ExchangeAdapters.Test.Account do
         _from,
         state
       ) do
-    {:reply, {:error, %OrderResponses.InsufficientFunds{}}, state}
+    {
+      :reply,
+      {:error, %Tai.Trading.InsufficientBalanceError{reason: "Insufficient Balance"}},
+      state
+    }
   end
 
   def handle_call({:buy_limit, _symbol, _price, _size, _time_in_force}, _from, state) do
     {:reply, {:error, :unknown_error}, state}
   end
 
-  def handle_call({:sell_limit, :btcusd_success, _price, _size, _time_in_force}, _from, state) do
-    order_response = %OrderResponses.Created{
+  def handle_call({:sell_limit, :btcusd_success, _price, size, :fok}, _from, state) do
+    order_response = %Tai.Trading.OrderResponse{
+      id: UUID.uuid4(),
+      status: Tai.Trading.OrderStatus.filled(),
+      time_in_force: Tai.Trading.TimeInForce.fill_or_kill(),
+      original_size: size,
+      executed_size: size
+    }
+
+    {:reply, {:ok, order_response}, state}
+  end
+
+  def handle_call({:sell_limit, :btcusd_expired, _price, size, :fok}, _from, state) do
+    order_response = %Tai.Trading.OrderResponse{
+      id: UUID.uuid4(),
+      status: Tai.Trading.OrderStatus.expired(),
+      time_in_force: Tai.Trading.TimeInForce.fill_or_kill(),
+      original_size: size,
+      executed_size: 0
+    }
+
+    {:reply, {:ok, order_response}, state}
+  end
+
+  def handle_call({:sell_limit, :btcusd_pending, _price, size, :gtc}, _from, state) do
+    order_response = %Tai.Trading.OrderResponse{
       id: "41541912-ebc1-4173-afa5-4334ccf7a1a8",
-      status: :pending,
-      created_at: Timex.now()
+      status: Tai.Trading.OrderStatus.pending(),
+      time_in_force: Tai.Trading.TimeInForce.good_til_canceled(),
+      original_size: size,
+      executed_size: 0.0
+    }
+
+    {:reply, {:ok, order_response}, state}
+  end
+
+  def handle_call({:sell_limit, :btcusd_success, _price, size, time_in_force}, _from, state) do
+    order_response = %Tai.Trading.OrderResponse{
+      id: "41541912-ebc1-4173-afa5-4334ccf7a1a8",
+      status: Tai.Trading.OrderStatus.pending(),
+      time_in_force: time_in_force,
+      original_size: size,
+      executed_size: size
     }
 
     {:reply, {:ok, order_response}, state}
@@ -63,7 +143,11 @@ defmodule Tai.ExchangeAdapters.Test.Account do
         _from,
         state
       ) do
-    {:reply, {:error, %OrderResponses.InsufficientFunds{}}, state}
+    {
+      :reply,
+      {:error, %Tai.Trading.InsufficientBalanceError{reason: "Insufficient Balance"}},
+      state
+    }
   end
 
   def handle_call({:sell_limit, _symbol, _price, _size, _time_in_force}, _from, state) do

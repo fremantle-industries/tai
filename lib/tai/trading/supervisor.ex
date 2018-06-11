@@ -11,7 +11,6 @@ defmodule Tai.Trading.Supervisor do
 
   def init(:ok) do
     children = [
-      Tai.Trading.OrderOutbox,
       Tai.Trading.OrderStore
     ]
 

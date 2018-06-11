@@ -52,7 +52,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
   end
 
   defp parse_create_order({:error, %ExPoloniex.NotEnoughError{} = error}, _, _) do
-    {:error, %Tai.Trading.NotEnoughError{reason: error}}
+    {:error, %Tai.Trading.InsufficientBalanceError{reason: error}}
   end
 
   defp normalize_duration(:fok), do: %ExPoloniex.OrderDurations.FillOrKill{}

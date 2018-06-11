@@ -1,0 +1,40 @@
+[
+  {
+    "request": {
+      "body": "price=0.001&quantity=10000.01&recvWindow=1000&side=BUY&symbol=LTCBTC&timeInForce=FOK&timestamp=1528087825080&type=LIMIT&signature=***",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v3/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"code\":-2010,\"msg\":\"Account has insufficient balance for requested action.\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Mon, 04 Jun 2018 04:50:25 GMT",
+        "Server": "nginx",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Error from cloudfront",
+        "Via": "1.1 5afc8eca980390e71a86518c6f90001a.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "SZ66Bl_D-o8T-ZOvP_Sc88AFgbFvD1bndY33Nn5IBbTgsRwuvmbrpw=="
+      },
+      "status_code": 400,
+      "type": "ok"
+    }
+  }
+]

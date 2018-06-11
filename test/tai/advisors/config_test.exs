@@ -12,6 +12,11 @@ defmodule Tai.Advisors.ConfigTest do
                order_books: "test_feed_a test_feed_b.ethusd"
              },
              %{
+               id: :fill_or_kill_orders,
+               supervisor: Examples.Advisors.FillOrKillOrders.Supervisor,
+               order_books: "test_feed_a test_feed_b.ethusd"
+             },
+             %{
                id: :log_spread_advisor,
                supervisor: Examples.Advisors.LogSpread.Supervisor,
                order_books: "*"

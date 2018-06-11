@@ -5,19 +5,17 @@ defmodule Tai.Commands.Trading do
 
   def buy_limit(account_id, symbol, price, size, time_in_force) do
     account_id
-    |> Tai.Trading.OrderSubmission.buy_limit(symbol, price, size, time_in_force)
-    |> Tai.Trading.OrderOutbox.add()
+    |> Tai.Trading.OrderPipeline.buy_limit(symbol, price, size, time_in_force)
     |> render_order
   end
 
   def sell_limit(account_id, symbol, price, size, time_in_force) do
     account_id
-    |> Tai.Trading.OrderSubmission.sell_limit(symbol, price, size, time_in_force)
-    |> Tai.Trading.OrderOutbox.add()
+    |> Tai.Trading.OrderPipeline.sell_limit(symbol, price, size, time_in_force)
     |> render_order
   end
 
-  defp render_order([order]) do
+  defp render_order(order) do
     IO.puts("order enqueued. client_id: #{order.client_id}")
   end
 

@@ -33,6 +33,12 @@ defmodule Tai.ExchangeAdapters.Binance.Account.Orders do
     {:ok, response}
   end
 
+  defp parse_create_order({:error, %Binance.InsufficientBalanceError{} = reason}, _time_in_force) do
+    {:error, %Tai.Trading.InsufficientBalanceError{reason: reason}}
+  end
+
+  defp parse_create_order({:error, _reason} = response, _time_in_force), do: response
+
   defp normalize_duration(:fok), do: "FOK"
   defp normalize_duration(:ioc), do: "IOC"
 

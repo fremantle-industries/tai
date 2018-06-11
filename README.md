@@ -17,8 +17,8 @@ We are working to make `tai` production quality software.
 | Exchange       | Live Order Book  | Account Balance | Orders |
 |----------------|:---:|:---:|:---:|
 | GDAX           | [x] | [x] | [x] |
-| Binance        | [x] | [x] | [ ] |
-| Poloniex       | [x] | [x] | [ ] |
+| Binance        | [x] | [x] | [x] |
+| Poloniex       | [x] | [x] | [x] |
 
 ## Planned Exchanges
 

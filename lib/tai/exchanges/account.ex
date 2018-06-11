@@ -44,7 +44,7 @@ defmodule Tai.Exchanges.Account do
   """
   def buy_limit(%Order{} = order) do
     if Order.buy_limit?(order) do
-      buy_limit(order.account_id, order.symbol, order.price, order.size)
+      buy_limit(order.account_id, order.symbol, order.price, order.size, order.time_in_force)
     else
       {:error, %OrderResponses.InvalidOrderType{}}
     end
@@ -72,7 +72,7 @@ defmodule Tai.Exchanges.Account do
   """
   def sell_limit(%Order{} = order) do
     if Order.sell_limit?(order) do
-      sell_limit(order.account_id, order.symbol, order.price, order.size)
+      sell_limit(order.account_id, order.symbol, order.price, order.size, order.time_in_force)
     else
       {:error, %OrderResponses.InvalidOrderType{}}
     end

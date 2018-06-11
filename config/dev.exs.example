@@ -52,6 +52,11 @@ config :tai,
       order_books: "gdax.btcusd"
     },
     %{
+      id: :fill_or_kill_orders,
+      supervisor: Examples.Advisors.FillOrKillOrders.Supervisor,
+      order_books: "binance.btcusdt"
+    },
+    %{
       id: :log_spread_advisor,
       supervisor: Examples.Advisors.LogSpread.Supervisor,
       order_books: "*"

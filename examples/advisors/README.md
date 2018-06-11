@@ -6,6 +6,10 @@ A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the
 
 [Example](./log_spread/advisor.ex)
 
+## Create fill or kill orders
+
+[Example](./fill_or_kill_orders/advisor.ex)
+
 ## Cancel pending orders
 
 [Example](./create_and_cancel_pending_order/advisor.ex)
@@ -14,18 +18,6 @@ A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the
 
 Coming soon...
 
-## Top of the order book changes
-
-Coming soon...
-
 ## Store data for later
-
-Coming soon...
-
-## Create buy limit orders
-
-Coming soon...
-
-## Create sell limit orders
 
 Coming soon...

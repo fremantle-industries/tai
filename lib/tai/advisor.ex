@@ -5,7 +5,7 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  alias Tai.{Advisor, PubSub, Trading.Order, MetaLogger}
+  alias Tai.{Advisor, PubSub, MetaLogger}
   alias Tai.Markets.{OrderBook, Quote}
 
   @typedoc """
@@ -38,33 +38,6 @@ defmodule Tai.Advisor do
             ) :: :ok | {:ok, actions :: Map.t()}
 
   @doc """
-  Callback when an order is enqueued
-  """
-  @callback handle_order_enqueued(order :: Order.t(), state :: Advisor.t()) :: :ok
-
-  @doc """
-  Callback when an order is created on the server
-  """
-  @callback handle_order_create_ok(order :: Order.t(), state :: Advisor.t()) :: :ok
-
-  @doc """
-  Callback when an order creation fails
-  """
-  @callback handle_order_create_error(reason :: term, order :: Order.t(), state :: Advisor.t()) ::
-              :ok
-
-  @doc """
-  Callback when an order has been cancelled in the outbox but before the 
-  request has been sent to the exchange.
-  """
-  @callback handle_order_cancelling(order :: Order.t(), state :: Advisor.t()) :: :ok
-
-  @doc """
-  Callback when an order has been cancelled on the exchange
-  """
-  @callback handle_order_cancelled(order :: Order.t(), state :: Advisor.t()) :: :ok
-
-  @doc """
   Returns an atom that will identify the process
 
   ## Examples
@@ -81,7 +54,7 @@ defmodule Tai.Advisor do
       require Logger
       require Tai.TimeFrame
 
-      alias Tai.{Advisor, Markets.OrderBook, Trading.OrderOutbox}
+      alias Tai.{Advisor, Markets.OrderBook}
 
       @behaviour Advisor
 
@@ -148,41 +121,6 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
 
-      @doc false
-      def handle_info({:order_enqueued, order}, state) do
-        handle_order_enqueued(order, state)
-
-        {:noreply, state}
-      end
-
-      @doc false
-      def handle_info({:order_create_ok, order}, state) do
-        handle_order_create_ok(order, state)
-
-        {:noreply, state}
-      end
-
-      @doc false
-      def handle_info({:order_create_error, reason, order}, state) do
-        handle_order_create_error(reason, order, state)
-
-        {:noreply, state}
-      end
-
-      @doc false
-      def handle_info({:order_cancelling, order}, state) do
-        handle_order_cancelling(order, state)
-
-        {:noreply, state}
-      end
-
-      @doc false
-      def handle_info({:order_cancelled, order}, state) do
-        handle_order_cancelled(order, state)
-
-        {:noreply, state}
-      end
-
       @doc """
       Returns the current state of the order book up to the given depth
 
@@ -217,16 +155,6 @@ defmodule Tai.Advisor do
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
       @doc false
       def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state), do: :ok
-      @doc false
-      def handle_order_enqueued(order, state), do: :ok
-      @doc false
-      def handle_order_create_ok(order, state), do: :ok
-      @doc false
-      def handle_order_create_error(reason, order, state), do: :ok
-      @doc false
-      def handle_order_cancelling(order, state), do: :ok
-      @doc false
-      def handle_order_cancelled(order, state), do: :ok
 
       defp subscribe_to_order_book_channels(order_books) do
         order_books
@@ -295,17 +223,12 @@ defmodule Tai.Advisor do
         if current_inside_quote == previous_inside_quote do
           state
         else
-          handle_inside_quote(order_book_feed_id, symbol, current_inside_quote, changes, state)
+          order_book_feed_id
+          |> handle_inside_quote(symbol, current_inside_quote, changes, state)
           |> normalize_handle_inside_quote_response
           |> case do
-            {:ok, actions} ->
-              actions
-              |> cancel_orders
-              |> submit_orders
-              |> update_state(state)
-
-            :error ->
-              state
+            {:ok, actions} -> update_state(actions, state)
+            :error -> state
           end
         end
       end
@@ -315,38 +238,18 @@ defmodule Tai.Advisor do
         normalize_handle_inside_quote_response(@empty_response)
       end
 
-      @default_actions %{cancel_orders: [], orders: []}
-      defp normalize_handle_inside_quote_response({:ok, actions}) do
-        {:ok, Map.merge(@default_actions, actions)}
-      end
+      defp normalize_handle_inside_quote_response({:ok, _actions} = response), do: response
 
       defp normalize_handle_inside_quote_response(unhandled) do
         Logger.warn("handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'")
         :error
       end
 
-      defp cancel_orders(%{cancel_orders: cancel_orders} = actions) do
-        OrderOutbox.cancel(cancel_orders)
-
-        actions
-      end
-
-      defp submit_orders(%{orders: order_submissions} = actions) do
-        OrderOutbox.add(order_submissions)
-
-        actions
-      end
-
       defp update_state(%{store: store}, state), do: state |> Map.put(:store, store)
       defp update_state(%{}, state), do: state
 
       defoverridable handle_order_book_changes: 4,
-                     handle_inside_quote: 5,
-                     handle_order_enqueued: 2,
-                     handle_order_create_ok: 2,
-                     handle_order_create_error: 3,
-                     handle_order_cancelling: 2,
-                     handle_order_cancelled: 2
+                     handle_inside_quote: 5
     end
   end
 end

@@ -4,9 +4,6 @@ defmodule Tai.Trading.OrderStore do
   """
 
   use GenServer
-
-  alias Tai.Trading.{Order, OrderStatus, OrderSubmission}
-
   require Logger
 
   def start_link(_) do
@@ -37,23 +34,23 @@ defmodule Tai.Trading.OrderStore do
     {:reply, new_orders, new_state}
   end
 
-  def handle_call({:update, client_id, attrs}, _from, state) do
-    {_previous_order, new_state} =
-      Map.get_and_update(state, client_id, fn current_order ->
-        attr_whitelist = [:server_id, :created_at, :status]
-        accepted_attrs = attrs |> Keyword.take(attr_whitelist) |> Map.new()
-        updated_order = current_order |> Map.merge(accepted_attrs)
-
-        {current_order, updated_order}
-      end)
-
-    updated_order = new_state[client_id]
-
-    {:reply, updated_order, new_state}
-  end
-
   def handle_call({:find, client_id}, _from, state) do
     {:reply, Map.get(state, client_id), state}
+  end
+
+  def handle_call({:find_by_and_update, filters, update_attrs}, _from, state) do
+    with [current_order] <- state |> filter(filters) |> Map.values(),
+         updated_order <-
+           Tai.Trading.OrderStore.AttributeWhitelist.apply(
+             current_order,
+             update_attrs
+           ) do
+      new_state = Map.put(state, current_order.client_id, updated_order)
+      {:reply, {:ok, [current_order, updated_order]}, new_state}
+    else
+      [] -> {:reply, {:error, :not_found}, state}
+      [_head | _tail] -> {:reply, {:error, :multiple_orders_found}, state}
+    end
   end
 
   def handle_call(:all, _from, state) do
@@ -69,7 +66,12 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:count, status: status}, _from, state) do
-    {:reply, state |> filter(status: status) |> Enum.count(), state}
+    count =
+      state
+      |> filter(status: status)
+      |> Enum.count()
+
+    {:reply, count, state}
   end
 
   @doc """
@@ -90,21 +92,18 @@ defmodule Tai.Trading.OrderStore do
   end
 
   @doc """
-  Update the whitelisted attributes for the given order
-
-  - server_id
-  - created_at
-  - status
-  """
-  def update(client_id, attributes \\ %{}) do
-    GenServer.call(__MODULE__, {:update, client_id, attributes})
-  end
-
-  @doc """
   Return the order matching the client_id or nil otherwise
   """
   def find(client_id) do
     GenServer.call(__MODULE__, {:find, client_id})
+  end
+
+  @doc """
+  Find an order by a list of query parameters and update whitelisted 
+  attributes in an atomic operation
+  """
+  def find_by_and_update(query, update_attrs) do
+    GenServer.call(__MODULE__, {:find_by_and_update, query, update_attrs})
   end
 
   @doc """
@@ -139,8 +138,8 @@ defmodule Tai.Trading.OrderStore do
     submissions
     |> Enum.reduce(
       [],
-      fn %OrderSubmission{} = submission, acc ->
-        order = %Order{
+      fn %Tai.Trading.OrderSubmission{} = submission, acc ->
+        order = %Tai.Trading.Order{
           client_id: UUID.uuid4(),
           account_id: submission.account_id,
           symbol: submission.symbol,
@@ -149,8 +148,9 @@ defmodule Tai.Trading.OrderStore do
           price: abs(submission.price),
           size: abs(submission.size),
           time_in_force: submission.time_in_force,
-          status: OrderStatus.enqueued(),
-          enqueued_at: Timex.now()
+          status: Tai.Trading.OrderStatus.enqueued(),
+          enqueued_at: Timex.now(),
+          order_updated_callback: submission.order_updated_callback
         }
 
         [order | acc]
@@ -178,5 +178,24 @@ defmodule Tai.Trading.OrderStore do
     state
     |> filter([head])
     |> filter(tail)
+  end
+
+  defmodule AttributeWhitelist do
+    @whitelist_attrs [
+      :created_at,
+      :error_reason,
+      :executed_size,
+      :server_id,
+      :status
+    ]
+
+    def apply(order, update_attrs) do
+      accepted_attrs =
+        update_attrs
+        |> Keyword.take(@whitelist_attrs)
+        |> Map.new()
+
+      Map.merge(order, accepted_attrs)
+    end
   end
 end
