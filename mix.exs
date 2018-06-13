@@ -30,7 +30,6 @@ defmodule Tai.Mixfile do
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
       {:honeydew, "~> 1.1.2"},
-      {:json, "~> 1.0"},
       {:juice, "~> 0.0.3"},
       {:logger_file_backend, "~> 0.0.10"},
       {:table_rex, "~> 1.0"},

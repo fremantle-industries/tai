@@ -4,6 +4,6 @@ defmodule Tai.WebSocket do
   end
 
   def send_json_msg(pid, msg) do
-    send_msg(pid, msg |> JSON.encode!())
+    send_msg(pid, msg |> Poison.encode!())
   end
 end

@@ -99,7 +99,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
         Logger.debug(fn -> "received msg: #{msg}" end)
 
         msg
-        |> JSON.decode!()
+        |> Poison.decode!()
         |> handle_msg(state)
         |> case do
           {:ok, new_state} ->
