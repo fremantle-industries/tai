@@ -5,13 +5,13 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  alias Tai.{Advisor, PubSub, MetaLogger}
+  alias Tai.{PubSub, MetaLogger}
   alias Tai.Markets.{OrderBook, Quote}
 
   @typedoc """
   The state of the running advisor
   """
-  @type t :: Advisor
+  @type t :: Tai.Advisor
 
   @enforce_keys [:advisor_id, :accounts, :order_books, :inside_quotes, :store]
   defstruct advisor_id: nil, accounts: [], order_books: %{}, inside_quotes: %{}, store: %{}
@@ -54,9 +54,9 @@ defmodule Tai.Advisor do
       require Logger
       require Tai.TimeFrame
 
-      alias Tai.{Advisor, Markets.OrderBook}
+      alias Tai.Markets.OrderBook
 
-      @behaviour Advisor
+      @behaviour Tai.Advisor
 
       def start_link(
             advisor_id: advisor_id,
@@ -66,19 +66,19 @@ defmodule Tai.Advisor do
           ) do
         GenServer.start_link(
           __MODULE__,
-          %Advisor{
+          %Tai.Advisor{
             advisor_id: advisor_id,
             order_books: order_books,
             accounts: accounts,
             inside_quotes: %{},
             store: Map.merge(%{}, store)
           },
-          name: advisor_id |> Advisor.to_name()
+          name: advisor_id |> Tai.Advisor.to_name()
         )
       end
 
       @doc false
-      def init(%Advisor{order_books: order_books, accounts: accounts} = state) do
+      def init(%Tai.Advisor{order_books: order_books, accounts: accounts} = state) do
         MetaLogger.init_pname()
         subscribe_to_order_book_channels(order_books)
         subscribe_to_account_channels(accounts)
