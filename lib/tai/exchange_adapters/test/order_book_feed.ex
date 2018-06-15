@@ -7,7 +7,11 @@ defmodule Tai.ExchangeAdapters.Test.OrderBookFeed do
 
   def default_url, do: "ws://localhost:#{EchoBoy.Config.port()}/ws"
 
+  def subscribe_to_order_books(_pid, :subscribe_error, symbols) do
+    {:error, "could not subscribe to #{symbols.join(",")}"}
+  end
+
   def subscribe_to_order_books(_pid, _feed_id, _symbols), do: :ok
 
-  def handle_msg(_msg, _state), do: nil
+  def handle_msg(_msg, state), do: {:ok, state}
 end

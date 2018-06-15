@@ -6,6 +6,7 @@ defmodule Tai.Commands.Balance do
   alias Tai.{Exchanges, Markets.Asset}
   alias TableRex.Table
 
+  @spec balance :: no_return
   def balance do
     Exchanges.Config.account_ids()
     |> fetch_balances
@@ -47,15 +48,11 @@ defmodule Tai.Commands.Balance do
     end)
   end
 
+  @header ["Account", "Symbol", "Balance"]
+  @spec render!(list) :: no_return
   defp render!(rows) do
-    header = [
-      "Account",
-      "Symbol",
-      "Balance"
-    ]
-
     rows
-    |> Table.new(header)
+    |> Table.new(@header)
     |> Table.put_column_meta(:all, align: :right)
     |> Table.render!()
     |> IO.puts()

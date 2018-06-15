@@ -7,7 +7,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
 
   require Logger
 
-  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook, WebSocket}
+  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook}
   alias Tai.ExchangeAdapters.Gdax.{Product, Serializers.Snapshot, Serializers.L2Update}
 
   @doc """
@@ -19,11 +19,23 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
   Subscribe to the level2 channel for the configured symbols
   """
   def subscribe_to_order_books(pid, _feed_id, symbols) do
-    WebSocket.send_json_msg(pid, %{
+    gdax_product_ids = Product.to_product_ids(symbols)
+
+    msg = %{
       "type" => "subscribe",
-      "product_ids" => Product.to_product_ids(symbols),
+      "product_ids" => gdax_product_ids,
       "channels" => ["level2"]
-    })
+    }
+
+    pid
+    |> Tai.WebSocket.send_json_msg(msg)
+    |> case do
+      :ok ->
+        :ok
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   @doc """

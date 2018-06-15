@@ -178,17 +178,18 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
     use_cassette "exchange_adapters/binance/order_book_feed_invalid_symbol_error" do
       log_msg =
         capture_log(fn ->
-          {:ok, _pid} =
+          {:error, _reason} =
             OrderBookFeed.start_link(
               "ws://localhost:#{EchoBoy.Config.port()}/ws",
               feed_id: :my_binance_feed_invalid_symbol,
-              symbols: [:idontexist]
+              symbols: [:idontexist, :wedontexist]
             )
 
           :timer.sleep(100)
         end)
 
-      assert log_msg =~ "[warn]  invalid symbol: idontexist"
+      assert log_msg =~
+               "[warn]  could not subscribe to order books with invalid symbols: idontexist, wedontexist"
     end
   end
 end

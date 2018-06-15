@@ -5,6 +5,7 @@ defmodule Tai.Commands.Orders do
 
   alias TableRex.Table
 
+  @spec orders :: no_return
   def orders do
     Tai.Trading.OrderStore.all()
     |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
@@ -27,8 +28,25 @@ defmodule Tai.Commands.Orders do
     |> print_table
   end
 
+  @header [
+    "Account",
+    "Symbol",
+    "Side",
+    "Type",
+    "Price",
+    "Size",
+    "Time in Force",
+    "Status",
+    "Client ID",
+    "Server ID",
+    "Enqueued At",
+    "Created At"
+  ]
+  @spec print_table(list) :: no_return
+  defp print_table(rows)
+
   defp print_table([]) do
-    col_count = header() |> Enum.count()
+    col_count = @header |> Enum.count()
 
     [List.duplicate("-", col_count)]
     |> print_table
@@ -36,26 +54,9 @@ defmodule Tai.Commands.Orders do
 
   defp print_table(rows) do
     rows
-    |> Table.new(header())
+    |> Table.new(@header)
     |> Table.put_column_meta(:all, align: :right)
     |> Table.render!()
     |> IO.puts()
-  end
-
-  defp header do
-    [
-      "Account",
-      "Symbol",
-      "Side",
-      "Type",
-      "Price",
-      "Size",
-      "Time in Force",
-      "Status",
-      "Client ID",
-      "Server ID",
-      "Enqueued At",
-      "Created At"
-    ]
   end
 end

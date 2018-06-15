@@ -15,13 +15,39 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
   """
   def default_url, do: "wss://api2.poloniex.com/"
 
-  def subscribe_to_order_books(_pid, _feed_id, []), do: :ok
+  def subscribe_to_order_books(pid, _feed_id, symbols) do
+    results =
+      symbols
+      |> Enum.map(fn symbol ->
+        with poloniex_symbol <- SymbolMapping.to_poloniex(symbol),
+             :ok <-
+               WebSocket.send_json_msg(pid, %{command: "subscribe", channel: poloniex_symbol}) do
+          :ok
+        else
+          {:error, _} = error ->
+            error
+        end
+      end)
 
-  def subscribe_to_order_books(pid, feed_id, [symbol | tail]) do
-    poloniex_symbol = symbol |> SymbolMapping.to_poloniex()
-    WebSocket.send_json_msg(pid, %{command: "subscribe", channel: poloniex_symbol})
+    errors = Enum.reject(results, &(&1 == :ok))
 
-    subscribe_to_order_books(pid, feed_id, tail)
+    if Enum.any?(errors) do
+      message = subscribe_error_message(errors)
+      Logger.warn(message)
+      {:error, message}
+    else
+      :ok
+    end
+  end
+
+  defp subscribe_error_message(errors) do
+    errors
+    |> Enum.map(fn {:error, reason} ->
+      reason
+      |> List.wrap()
+      |> Enum.join(" ")
+    end)
+    |> Enum.join(", ")
   end
 
   @doc """

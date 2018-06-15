@@ -61,10 +61,11 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
   defp status(:fok), do: Tai.Trading.OrderStatus.expired()
   defp status(:ioc), do: Tai.Trading.OrderStatus.expired()
 
+  @spec executed_size(list) :: Decimal.t()
   defp executed_size(resulting_trades) do
     resulting_trades
     |> Enum.reduce(
-      Decimal.new(0.0),
+      Decimal.new(0),
       fn %ExPoloniex.Trade{amount: amount}, acc ->
         amount
         |> Decimal.new()

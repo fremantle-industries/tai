@@ -30,24 +30,48 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   end
 
   @doc """
-  Snapshot the order book
+  Snapshot the order book 5 levels deep
   """
-  def subscribe_to_order_books(_pid, _feed_id, []), do: :ok
+  @price_levels 5
+  @spec subscribe_to_order_books(pid, atom, list) :: :ok | {:error, bitstring}
+  def subscribe_to_order_books(_pid, feed_id, symbols) do
+    subscriptions =
+      symbols
+      |> Enum.map(fn symbol ->
+        with {:ok, %OrderBook{} = snapshot} <- OrderBookSnapshot.fetch(symbol, @price_levels) do
+          [feed_id: feed_id, symbol: symbol]
+          |> OrderBook.to_name()
+          |> OrderBook.replace(snapshot)
 
-  def subscribe_to_order_books(pid, feed_id, [symbol | tail]) do
-    symbol
-    |> OrderBookSnapshot.fetch(5)
-    |> case do
-      {:ok, %OrderBook{} = snapshot} ->
-        [feed_id: feed_id, symbol: symbol]
-        |> OrderBook.to_name()
-        |> OrderBook.replace(snapshot)
+          :ok
+        else
+          {:error, :invalid_symbol} ->
+            {:error, symbol}
+        end
+      end)
 
-      {:error, :invalid_symbol} ->
-        Logger.warn("invalid symbol: #{symbol}")
+    errors = Enum.reject(subscriptions, &(&1 == :ok))
+
+    if Enum.any?(errors) do
+      message = subscribe_error_message(errors)
+      Logger.warn(message)
+      {:error, message}
+    else
+      :ok
     end
+  end
 
-    subscribe_to_order_books(pid, feed_id, tail)
+  defp subscribe_error_message(errors) do
+    symbols =
+      errors
+      |> Enum.map(fn {:error, symbol} ->
+        symbol
+        |> List.wrap()
+        |> Enum.join(" ")
+      end)
+      |> Enum.join(", ")
+
+    "could not subscribe to order books with invalid symbols: #{symbols}"
   end
 
   @doc """

@@ -113,29 +113,6 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     }
   end
 
-  test "handle_msg logs an error when it doesn't return an ok, state tuple" do
-    {:ok, pid} =
-      ExampleOrderBookFeed.start_link(
-        feed_id: :example_feed,
-        symbols: [:btcusd, :ltcusd]
-      )
-
-    log_msg =
-      capture_log(fn ->
-        WebSocket.send_json_msg(pid, %{return: "error"})
-
-        assert_receive {
-          %{"return" => "error"},
-          %OrderBookFeed{feed_id: :example_feed}
-        }
-
-        :timer.sleep(100)
-      end)
-
-    assert log_msg =~ "[warn]  expected 'handle_msg' to return an {:ok, state} tuple."
-    assert log_msg =~ "But it returned: {:error, %{\"return\" => \"error\"}}"
-  end
-
   test "raises an error when the message is not valid JSON" do
     Process.flag(:trap_exit, true)
 

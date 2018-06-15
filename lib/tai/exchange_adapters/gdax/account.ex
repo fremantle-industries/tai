@@ -2,47 +2,18 @@ defmodule Tai.ExchangeAdapters.Gdax.Account do
   @moduledoc """
   Execute private exchange actions for the GDAX account
   """
+  use Tai.Exchanges.Account
 
-  use GenServer
-
-  def start_link(account_id) do
-    GenServer.start_link(
-      __MODULE__,
-      account_id,
-      name: account_id |> Tai.Exchanges.Account.to_name()
-    )
+  def all_balances() do
+    Tai.ExchangeAdapters.Gdax.Account.AllBalances.fetch()
   end
 
-  def init(account_id) do
-    {:ok, account_id}
+  def buy_limit(symbol, price, size, time_in_force) do
+    Tai.ExchangeAdapters.Gdax.Account.Orders.buy_limit(symbol, price, size, time_in_force)
   end
 
-  def handle_call(:all_balances, _from, state) do
-    {:reply, Tai.ExchangeAdapters.Gdax.Account.AllBalances.fetch(), state}
-  end
-
-  def handle_call({:buy_limit, symbol, price, size, time_in_force}, _from, state) do
-    response =
-      Tai.ExchangeAdapters.Gdax.Account.Orders.buy_limit(
-        symbol,
-        price,
-        size,
-        time_in_force
-      )
-
-    {:reply, response, state}
-  end
-
-  def handle_call({:sell_limit, symbol, price, size, time_in_force}, _from, state) do
-    response =
-      Tai.ExchangeAdapters.Gdax.Account.Orders.sell_limit(
-        symbol,
-        price,
-        size,
-        time_in_force
-      )
-
-    {:reply, response, state}
+  def sell_limit(symbol, price, size, time_in_force) do
+    Tai.ExchangeAdapters.Gdax.Account.Orders.sell_limit(symbol, price, size, time_in_force)
   end
 
   def handle_call({:order_status, order_id}, _from, state) do

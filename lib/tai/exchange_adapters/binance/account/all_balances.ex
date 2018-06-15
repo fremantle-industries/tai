@@ -3,8 +3,6 @@ defmodule Tai.ExchangeAdapters.Binance.Account.AllBalances do
   Fetch and normalize all balances on the Binance account
   """
 
-  alias Tai.{CredentialError, TimeoutError}
-
   def fetch do
     Binance.get_account()
     |> normalize_assets
@@ -19,11 +17,11 @@ defmodule Tai.ExchangeAdapters.Binance.Account.AllBalances do
   end
 
   defp normalize_assets({:error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}}) do
-    {:error, %CredentialError{reason: reason}}
+    {:error, %Tai.CredentialError{reason: reason}}
   end
 
   defp normalize_assets({:error, {:http_error, %HTTPoison.Error{reason: "timeout"}}}) do
-    {:error, %TimeoutError{reason: "network request timed out"}}
+    {:error, %Tai.TimeoutError{reason: "network request timed out"}}
   end
 
   defp normalize_asset(%{"asset" => raw_asset, "free" => raw_free, "locked" => raw_locked}, acc) do

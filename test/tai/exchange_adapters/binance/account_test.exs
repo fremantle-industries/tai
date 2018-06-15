@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Binance.AccountTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.ExchangeAdapters.Binance.Account
 
-  alias Tai.{Exchanges.Account, CredentialError}
+  require Logger
 
   setup_all do
     HTTPoison.start()
@@ -15,9 +15,9 @@ defmodule Tai.ExchangeAdapters.Binance.AccountTest do
   describe "#all_balances" do
     test "returns an error tuple when the secret is invalid" do
       use_cassette "exchange_adapters/binance/account/all_balances_error_invalid_secret" do
-        assert Account.all_balances(:my_binance_exchange) == {
+        assert Tai.Exchanges.Account.all_balances(:my_binance_exchange) == {
                  :error,
-                 %CredentialError{
+                 %Tai.CredentialError{
                    reason: "API-key format invalid."
                  }
                }
@@ -26,9 +26,9 @@ defmodule Tai.ExchangeAdapters.Binance.AccountTest do
 
     test "returns an error tuple when the api key is invalid" do
       use_cassette "exchange_adapters/binance/account/all_balances_error_invalid_api_key" do
-        assert Account.all_balances(:my_binance_exchange) == {
+        assert Tai.Exchanges.Account.all_balances(:my_binance_exchange) == {
                  :error,
-                 %CredentialError{
+                 %Tai.CredentialError{
                    reason: "API-key format invalid."
                  }
                }

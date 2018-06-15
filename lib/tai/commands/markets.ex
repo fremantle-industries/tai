@@ -7,6 +7,7 @@ defmodule Tai.Commands.Markets do
   alias Tai.Markets.{OrderBook, Quote}
   alias TableRex.Table
 
+  @spec markets :: no_return
   def markets do
     Exchanges.Config.order_book_feed_ids()
     |> group_rows
@@ -58,6 +59,7 @@ defmodule Tai.Commands.Markets do
     end)
   end
 
+  @spec render!(list) :: no_return
   defp render!(rows) do
     header = [
       "Feed",

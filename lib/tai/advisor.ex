@@ -20,22 +20,22 @@ defmodule Tai.Advisor do
   Callback when order book has bid or ask changes
   """
   @callback handle_order_book_changes(
-              order_book_feed_id :: Atom.t(),
-              symbol :: Atom.t(),
+              order_book_feed_id :: atom,
+              symbol :: atom,
               changes :: term,
-              state :: Advisor.t()
+              state :: Tai.Advisor.t()
             ) :: :ok
 
   @doc """
   Callback when the highest bid or lowest ask changes price or size
   """
   @callback handle_inside_quote(
-              order_book_feed_id :: Atom.t(),
-              symbol :: Atom.t(),
-              inside_quote :: Quote.t(),
-              changes :: Map.t() | List.t(),
-              state :: Advisor.t()
-            ) :: :ok | {:ok, actions :: Map.t()}
+              order_book_feed_id :: atom,
+              symbol :: atom,
+              inside_quote :: Tai.Markets.Quote.t(),
+              changes :: map | list,
+              state :: Tai.Advisor.t()
+            ) :: :ok | {:ok, actions :: map}
 
   @doc """
   Returns an atom that will identify the process

@@ -3,9 +3,59 @@ defmodule Tai.Exchanges.Account do
   Uniform interface for private exchange actions
   """
 
-  alias Tai.Trading.{Order, OrderResponses}
+  @callback all_balances() :: {:ok, balances :: map} | {:error, reason :: term}
+
+  @callback buy_limit(
+              symbol :: atom,
+              price :: float,
+              size :: float,
+              time_in_force :: atom()
+            ) :: {:ok, order_response :: Tai.Trading.OrderResponse.t()} | {:error, reason :: term}
+
+  @callback sell_limit(
+              symbol :: atom,
+              price :: float,
+              size :: float,
+              time_in_force :: atom
+            ) :: {:ok, order_response :: Tai.Trading.OrderResponse.t()} | {:error, reason :: term}
+
+  defmacro __using__(_) do
+    quote location: :keep do
+      use GenServer
+
+      @behaviour Tai.Exchanges.Account
+
+      def start_link(account_id) do
+        GenServer.start_link(
+          __MODULE__,
+          account_id,
+          name: account_id |> Tai.Exchanges.Account.to_name()
+        )
+      end
+
+      def init(account_id) do
+        {:ok, account_id}
+      end
+
+      def handle_call(:all_balances, _from, state) do
+        response = all_balances()
+        {:reply, response, state}
+      end
+
+      def handle_call({:buy_limit, symbol, price, size, time_in_force}, _from, state) do
+        response = buy_limit(symbol, price, size, time_in_force)
+        {:reply, response, state}
+      end
+
+      def handle_call({:sell_limit, symbol, price, size, time_in_force}, _from, state) do
+        response = sell_limit(symbol, price, size, time_in_force)
+        {:reply, response, state}
+      end
+    end
+  end
 
   @doc """
+  TODO
   """
   def balance(account_id) do
     account_id
@@ -40,13 +90,13 @@ defmodule Tai.Exchanges.Account do
   Create a buy limit order from the given order struct. It returns an error tuple
   when the type is not accepted.
 
-  {:error, %OrderResponses.InvalidOrderType{}}
+  {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
   """
-  def buy_limit(%Order{} = order) do
-    if Order.buy_limit?(order) do
+  def buy_limit(%Tai.Trading.Order{} = order) do
+    if Tai.Trading.Order.buy_limit?(order) do
       buy_limit(order.account_id, order.symbol, order.price, order.size, order.time_in_force)
     else
-      {:error, %OrderResponses.InvalidOrderType{}}
+      {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
     end
   end
 
@@ -68,13 +118,13 @@ defmodule Tai.Exchanges.Account do
   Create a sell limit order from the given order struct. It returns an error tuple
   when the type is not accepted.
 
-  {:error, %OrderResponses.InvalidOrderType{}}
+  {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
   """
-  def sell_limit(%Order{} = order) do
-    if Order.sell_limit?(order) do
+  def sell_limit(%Tai.Trading.Order{} = order) do
+    if Tai.Trading.Order.sell_limit?(order) do
       sell_limit(order.account_id, order.symbol, order.price, order.size, order.time_in_force)
     else
-      {:error, %OrderResponses.InvalidOrderType{}}
+      {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
     end
   end
 
