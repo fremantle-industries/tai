@@ -1,4 +1,6 @@
 defmodule Tai.Trading.Order do
+  @type t :: Tai.Trading.Order
+
   @enforce_keys [
     :account_id,
     :client_id,

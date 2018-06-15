@@ -3,6 +3,12 @@ defmodule Tai.Exchanges.Account do
   Uniform interface for private exchange actions
   """
 
+  @type order_response :: Tai.Trading.OrderResponse.t()
+  @type credential_error :: Tai.CredentialError.t()
+  @type timeout_error :: Tai.TimeoutError.t()
+  @type insufficient_balance_error :: Tai.Trading.InsufficientBalanceError.t()
+  @type invalid_order_type_error :: Tai.Trading.OrderResponses.InvalidOrderType.t()
+
   @callback all_balances() :: {:ok, balances :: map} | {:error, reason :: term}
 
   @callback buy_limit(
@@ -57,6 +63,7 @@ defmodule Tai.Exchanges.Account do
   @doc """
   Fetches all balances for the given account
   """
+  @spec all_balances(atom) :: {:ok, map} | {:error, credential_error | timeout_error}
   def all_balances(account_id) do
     account_id
     |> to_name
@@ -71,6 +78,8 @@ defmodule Tai.Exchanges.Account do
   - size
   - time_in_force
   """
+  @spec buy_limit(atom, atom, float, float, atom) ::
+          {:ok, order_response} | {:error, insufficient_balance_error}
   def buy_limit(account_id, symbol, price, size, time_in_force \\ :ioc) do
     account_id
     |> to_name
@@ -83,6 +92,8 @@ defmodule Tai.Exchanges.Account do
 
   {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
   """
+  @spec buy_limit(term) ::
+          {:ok, order_response} | {:error, invalid_order_type_error | insufficient_balance_error}
   def buy_limit(%Tai.Trading.Order{} = order) do
     if Tai.Trading.Order.buy_limit?(order) do
       buy_limit(order.account_id, order.symbol, order.price, order.size, order.time_in_force)
