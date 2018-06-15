@@ -10,7 +10,14 @@ defmodule Tai.Mixfile do
       start_permanent: Mix.env() == :prod,
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -44,10 +51,11 @@ defmodule Tai.Mixfile do
       {:echo_boy, "~> 0.1.0", github: "rupurt/echo_boy", only: [:dev, :test]},
       {:exvcr, "~> 0.10.2", only: [:dev, :test]},
       {:plug, "~> 1.0", only: [:dev, :test]},
-      {:dialyxir, "~> 1.0.0-rc.1", only: [:dev], runtime: false},
+      {:excoveralls, "~> 0.8", only: :test},
+      {:ex_unit_notifier, "~> 0.1", only: :test},
+      {:dialyxir, "~> 1.0.0-rc.1", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
-      {:ex_unit_notifier, "~> 0.1", only: :test}
+      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false}
     ]
   end
 

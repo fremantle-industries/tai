@@ -12,3 +12,4 @@ jobs:
       - run: mix local.rebar --force
       - run: mix deps.get
       - run: mix test
+      - run: mix coveralls.circle
