@@ -55,15 +55,6 @@ defmodule Tai.Exchanges.Account do
   end
 
   @doc """
-  TODO
-  """
-  def balance(account_id) do
-    account_id
-    |> to_name
-    |> GenServer.call(:balance)
-  end
-
-  @doc """
   Fetches all balances for the given account
   """
   def all_balances(account_id) do
