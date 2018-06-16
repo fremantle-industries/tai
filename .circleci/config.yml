@@ -12,4 +12,14 @@ jobs:
       - run: mix local.rebar --force
       - run: mix deps.get
       - run: mix test
+
+      - restore_cache:
+          keys:
+            - dialyzer-plt-{{ arch }}-{{ .Branch }}
+      - run: mix dialyzer
+      - save_cache:
+          key: dialyzer-plt-{{ arch }}-{{ .Branch }}
+          paths:
+            - _build/dev
+
       - run: MIX_ENV=test mix coveralls.circle
