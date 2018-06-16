@@ -8,9 +8,17 @@ jobs:
     steps:
       - checkout
 
+      - restore_cache:
+          keys:
+            - hex-packages-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
+      - save_cache:
+          key: hex-packages-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - deps
+
       - run: mix test
 
       - restore_cache:
