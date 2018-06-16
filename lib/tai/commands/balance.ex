@@ -27,8 +27,9 @@ defmodule Tai.Commands.Balance do
         |> Enum.reverse()
         |> Enum.reduce(
           acc,
-          fn {symbol, balance}, acc ->
-            [{account_id, symbol, balance} | acc]
+          fn {symbol, detail}, acc ->
+            total = Tai.Exchanges.BalanceDetail.total(detail)
+            [{account_id, symbol, detail.free, detail.locked, total} | acc]
           end
         )
       end
@@ -37,18 +38,20 @@ defmodule Tai.Commands.Balance do
 
   defp exclude_empty_balances(balances) do
     balances
-    |> Enum.reject(fn [_, _, ab] -> Asset.zero?(ab) end)
+    |> Enum.reject(fn [_, _, _, _, total] -> Asset.zero?(total) end)
   end
 
   defp format_rows(balances) do
     balances
-    |> Enum.map(fn {exchange_id, symbol, balance} ->
-      asset_balance = Asset.new(balance, symbol)
-      [exchange_id, symbol, asset_balance]
+    |> Enum.map(fn {exchange_id, symbol, free, locked, total} ->
+      formatted_free = Asset.new(free, symbol)
+      formatted_locked = Asset.new(locked, symbol)
+      formatted_total = Asset.new(total, symbol)
+      [exchange_id, symbol, formatted_free, formatted_locked, formatted_total]
     end)
   end
 
-  @header ["Account", "Symbol", "Balance"]
+  @header ["Account", "Symbol", "Free", "Locked", "Balance"]
   @spec render!(list) :: no_return
   defp render!(rows) do
     rows

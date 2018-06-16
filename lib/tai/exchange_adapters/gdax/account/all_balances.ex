@@ -32,10 +32,13 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.AllBalances do
     {:error, %Tai.TimeoutError{reason: "network request timed out"}}
   end
 
-  defp normalize_account(%{"currency" => raw_currency, "balance" => raw_balance}, acc) do
+  defp normalize_account(
+         %{"currency" => raw_currency, "available" => available, "hold" => hold},
+         acc
+       ) do
     with symbol <- raw_currency |> String.downcase() |> String.to_atom(),
-         {:ok, balance} <- Decimal.parse(raw_balance) do
-      Map.put(acc, symbol, balance)
+         detail = Tai.Exchanges.BalanceDetail.new(available, hold) do
+      Map.put(acc, symbol, detail)
     end
   end
 end

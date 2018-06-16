@@ -24,12 +24,10 @@ defmodule Tai.ExchangeAdapters.Binance.Account.AllBalances do
     {:error, %Tai.TimeoutError{reason: "network request timed out"}}
   end
 
-  defp normalize_asset(%{"asset" => raw_asset, "free" => raw_free, "locked" => raw_locked}, acc) do
+  defp normalize_asset(%{"asset" => raw_asset, "free" => free, "locked" => locked}, acc) do
     with asset <- raw_asset |> String.downcase() |> String.to_atom(),
-         free <- Decimal.new(raw_free),
-         locked <- Decimal.new(raw_locked),
-         balance <- Decimal.add(free, locked) do
-      Map.put(acc, asset, balance)
+         detail <- Tai.Exchanges.BalanceDetail.new(free, locked) do
+      Map.put(acc, asset, detail)
     end
   end
 end

@@ -33,8 +33,11 @@ defmodule Tai.Exchanges.AccountTest do
           assert {:ok, balances} =
                    @adapter_id |> my_adapter |> Tai.Exchanges.Account.all_balances()
 
-          assert balances[:btc] == Decimal.new("1.8122774027894548")
-          assert balances[:eth] == Decimal.new("0.000000000000200000000")
+          assert Decimal.cmp(balances[:btc].free, Decimal.new("0.00020000")) == :eq
+          assert Decimal.cmp(balances[:btc].locked, Decimal.new("1.80000000")) == :eq
+
+          assert Decimal.cmp(balances[:eth].free, Decimal.new("0.20000000")) == :eq
+          assert Decimal.cmp(balances[:eth].locked, Decimal.new("1.10000000")) == :eq
         end
       end
 

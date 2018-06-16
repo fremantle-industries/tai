@@ -34,10 +34,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.AllBalances do
          acc
        ) do
     with symbol <- raw_currency |> String.downcase() |> String.to_atom(),
-         available <- Decimal.new(raw_available),
-         on_orders <- Decimal.new(raw_on_orders),
-         balance <- Decimal.add(available, on_orders) do
-      Map.put(acc, symbol, balance)
+         detail <- Tai.Exchanges.BalanceDetail.new(raw_available, raw_on_orders) do
+      Map.put(acc, symbol, detail)
     end
   end
 end
