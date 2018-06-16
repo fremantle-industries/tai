@@ -19,7 +19,14 @@ jobs:
           paths:
             - deps
 
+      - restore_cache:
+          keys:
+            - test-build-{{ arch }}-{{ .Branch }}
       - run: mix test
+      - save_cache:
+          key: test-build-{{ arch }}-{{ .Branch }}
+          paths:
+            - _build/test
 
       - restore_cache:
           keys:
