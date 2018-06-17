@@ -79,7 +79,7 @@ defmodule Tai.Advisor do
 
       @doc false
       def init(%Tai.Advisor{order_books: order_books, accounts: accounts} = state) do
-        MetaLogger.init_pname()
+        MetaLogger.init_tid()
         subscribe_to_order_book_channels(order_books)
         subscribe_to_account_channels(accounts)
 

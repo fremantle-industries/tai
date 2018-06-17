@@ -1,10 +1,10 @@
 defmodule Tai.MetaLogger do
-  def init_pname() do
-    pname =
+  def init_tid() do
+    tid =
       self()
       |> Process.info()
       |> Keyword.get(:registered_name)
 
-    Logger.metadata(pname: pname)
+    Logger.metadata(tid: tid)
   end
 end

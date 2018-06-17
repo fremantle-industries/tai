@@ -9,7 +9,7 @@ log_format = "$dateT$time [$level]$levelpad $metadata$message\n"
 config :logger, :file_log,
   path: "./log/#{Mix.env()}.log",
   format: log_format,
-  metadata: [:pname]
+  metadata: [:tid]
 
 config :logger, :console, format: log_format
 

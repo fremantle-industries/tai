@@ -65,7 +65,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
       Add the registered process name as logger metadata after the websocket has connected
       """
       def handle_connect(_conn, state) do
-        Tai.MetaLogger.init_pname()
+        Tai.MetaLogger.init_tid()
         Logger.info("connected")
 
         {:ok, state}
