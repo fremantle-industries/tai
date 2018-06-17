@@ -1,13 +1,12 @@
 defmodule Tai.Exchanges.HoldRequest do
-  @type t :: %Tai.Exchanges.HoldRequest{account_id: atom, asset: atom, amount: Decimal.t()}
+  @type t :: %Tai.Exchanges.HoldRequest{asset: atom, amount: Decimal.t()}
 
-  @enforce_keys [:account_id, :asset, :amount]
-  defstruct [:account_id, :asset, :amount]
+  @enforce_keys [:asset, :amount]
+  defstruct [:asset, :amount]
 
-  @spec new(atom, atom, Decimal.t()) :: t
-  def new(account_id, asset, amount) do
+  @spec new(atom, Decimal.t()) :: t
+  def new(asset, amount) do
     %Tai.Exchanges.HoldRequest{
-      account_id: account_id,
       asset: asset,
       amount: Decimal.new(amount)
     }
