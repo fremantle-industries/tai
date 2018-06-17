@@ -1,11 +1,11 @@
-defmodule Tai.Exchanges.HoldRequestTest do
+defmodule Tai.Exchanges.LockRequestTest do
   use ExUnit.Case, async: true
-  doctest Tai.Exchanges.HoldRequest
+  doctest Tai.Exchanges.LockRequest
 
   describe "#new" do
     test "returns the struct with decimal values" do
-      assert Tai.Exchanges.HoldRequest.new(:btc, 0.1) ==
-               %Tai.Exchanges.HoldRequest{
+      assert Tai.Exchanges.LockRequest.new(:btc, 0.1) ==
+               %Tai.Exchanges.LockRequest{
                  asset: :btc,
                  amount: Decimal.new(0.1)
                }

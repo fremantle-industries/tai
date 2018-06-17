@@ -1,12 +1,12 @@
-defmodule Tai.Exchanges.HoldRequest do
-  @type t :: %Tai.Exchanges.HoldRequest{asset: atom, amount: Decimal.t()}
+defmodule Tai.Exchanges.LockRequest do
+  @type t :: %Tai.Exchanges.LockRequest{asset: atom, amount: Decimal.t()}
 
   @enforce_keys [:asset, :amount]
   defstruct [:asset, :amount]
 
   @spec new(atom, Decimal.t()) :: t
   def new(asset, amount) do
-    %Tai.Exchanges.HoldRequest{
+    %Tai.Exchanges.LockRequest{
       asset: asset,
       amount: Decimal.new(amount)
     }

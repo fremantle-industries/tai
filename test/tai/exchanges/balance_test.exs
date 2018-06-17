@@ -27,12 +27,12 @@ defmodule Tai.Exchanges.BalanceTest do
 
   describe "#lock_all" do
     test "reserves balances for all of the requests" do
-      hold_requests = [
-        Tai.Exchanges.HoldRequest.new(:btc, 1.0),
-        Tai.Exchanges.HoldRequest.new(:ltc, 0.1)
+      lock_requests = [
+        Tai.Exchanges.LockRequest.new(:btc, 1.0),
+        Tai.Exchanges.LockRequest.new(:ltc, 0.1)
       ]
 
-      assert Tai.Exchanges.Balance.lock_all(:my_test_account, hold_requests) == :ok
+      assert Tai.Exchanges.Balance.lock_all(:my_test_account, lock_requests) == :ok
 
       assert Tai.Exchanges.Balance.all(:my_test_account) == %{
                btc: Tai.Exchanges.BalanceDetail.new(0.1, 1.0),
@@ -42,17 +42,17 @@ defmodule Tai.Exchanges.BalanceTest do
     end
 
     test "doesn't reserve any balances if one of the requests fails" do
-      hold_requests = [
-        Tai.Exchanges.HoldRequest.new(:btc, 1.0),
-        Tai.Exchanges.HoldRequest.new(:ltc, 0.11),
-        Tai.Exchanges.HoldRequest.new(:ltc, 0.01)
+      lock_requests = [
+        Tai.Exchanges.LockRequest.new(:btc, 1.0),
+        Tai.Exchanges.LockRequest.new(:ltc, 0.11),
+        Tai.Exchanges.LockRequest.new(:ltc, 0.01)
       ]
 
-      assert Tai.Exchanges.Balance.lock_all(:my_test_account, hold_requests) == {
+      assert Tai.Exchanges.Balance.lock_all(:my_test_account, lock_requests) == {
                :error,
                [
-                 Tai.Exchanges.HoldRequest.new(:ltc, 0.11),
-                 Tai.Exchanges.HoldRequest.new(:ltc, 0.01)
+                 Tai.Exchanges.LockRequest.new(:ltc, 0.11),
+                 Tai.Exchanges.LockRequest.new(:ltc, 0.01)
                ]
              }
 
@@ -64,15 +64,15 @@ defmodule Tai.Exchanges.BalanceTest do
     end
 
     test "doesn't reserve any balances if one of the assets doesn't exist" do
-      hold_requests = [
-        Tai.Exchanges.HoldRequest.new(:btc, 1.0),
-        Tai.Exchanges.HoldRequest.new(:xbt, 1.0),
-        Tai.Exchanges.HoldRequest.new(:ltc, 0.1)
+      lock_requests = [
+        Tai.Exchanges.LockRequest.new(:btc, 1.0),
+        Tai.Exchanges.LockRequest.new(:xbt, 1.0),
+        Tai.Exchanges.LockRequest.new(:ltc, 0.1)
       ]
 
-      assert Tai.Exchanges.Balance.lock_all(:my_test_account, hold_requests) == {
+      assert Tai.Exchanges.Balance.lock_all(:my_test_account, lock_requests) == {
                :error,
-               [Tai.Exchanges.HoldRequest.new(:xbt, 1.0)]
+               [Tai.Exchanges.LockRequest.new(:xbt, 1.0)]
              }
 
       assert Tai.Exchanges.Balance.all(:my_test_account) == %{
