@@ -20,6 +20,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   @doc """
   Subscribe to streams for all symbols
   """
+  @spec build_connection_url(String.t(), [atom, ...]) :: String.t()
   def build_connection_url(url, symbols) do
     streams =
       symbols
