@@ -13,7 +13,7 @@ defmodule Tai.Trading.OrderStoreTest do
   defp add_order do
     Tai.Trading.OrderSubmission.buy_limit(
       :my_test_account,
-      :btcusd,
+      :btc_usd,
       100.0,
       1.0,
       Tai.Trading.TimeInForce.fill_or_kill()
@@ -48,7 +48,7 @@ defmodule Tai.Trading.OrderStoreTest do
       assert Tai.Trading.OrderStore.count() == 1
       assert {:ok, _} = UUID.info(order.client_id)
       assert order.account_id == :my_test_account
-      assert order.symbol == :btcusd
+      assert order.symbol == :btc_usd
       assert order.price == 100.0
       assert order.size == 1.0
       assert order.status == Tai.Trading.OrderStatus.enqueued()
@@ -63,7 +63,7 @@ defmodule Tai.Trading.OrderStoreTest do
       submission_1 =
         Tai.Trading.OrderSubmission.buy_limit(
           :my_test_account,
-          :btcusd,
+          :btc_usd,
           100.0,
           1.0,
           Tai.Trading.TimeInForce.fill_or_kill()
@@ -72,7 +72,7 @@ defmodule Tai.Trading.OrderStoreTest do
       submission_2 =
         Tai.Trading.OrderSubmission.sell_limit(
           :my_test_account,
-          :ltcusd,
+          :ltc_usd,
           10.0,
           1.1,
           Tai.Trading.TimeInForce.fill_or_kill()
@@ -86,7 +86,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
       assert {:ok, _} = UUID.info(order_1.client_id)
       assert order_1.account_id == :my_test_account
-      assert order_1.symbol == :btcusd
+      assert order_1.symbol == :btc_usd
       assert order_1.side == Tai.Trading.Order.buy()
       assert order_1.type == Tai.Trading.Order.limit()
       assert order_1.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
@@ -97,7 +97,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
       assert {:ok, _} = UUID.info(order_2.client_id)
       assert order_2.account_id == :my_test_account
-      assert order_2.symbol == :ltcusd
+      assert order_2.symbol == :ltc_usd
       assert order_2.side == Tai.Trading.Order.sell()
       assert order_2.type == Tai.Trading.Order.limit()
       assert order_2.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()

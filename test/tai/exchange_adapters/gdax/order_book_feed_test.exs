@@ -42,22 +42,22 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     HTTPoison.start()
     Process.register(self(), :test)
 
-    my_gdax_feed_btcusd_pid =
+    my_gdax_feed_btc_usd_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_gdax_feed, symbol: :btcusd]},
-        id: :my_gdax_feed_btcusd
+        {OrderBook, [feed_id: :my_gdax_feed, symbol: :btc_usd]},
+        id: :my_gdax_feed_btc_usd
       )
 
-    my_gdax_feed_ltcusd_pid =
+    my_gdax_feed_ltc_usd_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_gdax_feed, symbol: :ltcusd]},
-        id: :my_gdax_feed_ltcusd
+        {OrderBook, [feed_id: :my_gdax_feed, symbol: :ltc_usd]},
+        id: :my_gdax_feed_ltc_usd
       )
 
-    my_feed_b_btcusd_pid =
+    my_feed_b_btc_usd_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_feed_b, symbol: :btcusd]},
-        id: :my_feed_b_btcusd
+        {OrderBook, [feed_id: :my_feed_b, symbol: :btc_usd]},
+        id: :my_feed_b_btc_usd
       )
 
     {:ok, my_gdax_feed_pid} =
@@ -65,11 +65,11 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
         OrderBookFeed.start_link(
           "ws://localhost:#{EchoBoy.Config.port()}/ws",
           feed_id: :my_gdax_feed,
-          symbols: [:btcusd, :ltcusd]
+          symbols: [:btc_usd, :ltc_usd]
         )
       end
 
-    OrderBook.replace(my_gdax_feed_btcusd_pid, %OrderBook{
+    OrderBook.replace(my_gdax_feed_btc_usd_pid, %OrderBook{
       bids: %{
         1.0 => {1.1, nil, nil},
         1.1 => {1.0, nil, nil}
@@ -80,45 +80,45 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       }
     })
 
-    OrderBook.replace(my_gdax_feed_ltcusd_pid, %OrderBook{
+    OrderBook.replace(my_gdax_feed_ltc_usd_pid, %OrderBook{
       bids: %{100.0 => {0.1, nil, nil}},
       asks: %{100.1 => {0.1, nil, nil}}
     })
 
-    OrderBook.replace(my_feed_b_btcusd_pid, %OrderBook{
+    OrderBook.replace(my_feed_b_btc_usd_pid, %OrderBook{
       bids: %{1.0 => {1.1, nil, nil}},
       asks: %{1.2 => {0.1, nil, nil}}
     })
 
     start_supervised!({
       Support.ForwardOrderBookEvents,
-      [feed_id: :my_gdax_feed, symbol: :btcusd]
+      [feed_id: :my_gdax_feed, symbol: :btc_usd]
     })
 
     {
       :ok,
       %{
         my_gdax_feed_pid: my_gdax_feed_pid,
-        my_gdax_feed_btcusd_pid: my_gdax_feed_btcusd_pid,
-        my_gdax_feed_ltcusd_pid: my_gdax_feed_ltcusd_pid,
-        my_feed_b_btcusd_pid: my_feed_b_btcusd_pid
+        my_gdax_feed_btc_usd_pid: my_gdax_feed_btc_usd_pid,
+        my_gdax_feed_ltc_usd_pid: my_gdax_feed_ltc_usd_pid,
+        my_feed_b_btc_usd_pid: my_feed_b_btc_usd_pid
       }
     }
   end
 
   test("snapshot replaces the bids/asks in the order book for the symbol", %{
     my_gdax_feed_pid: my_gdax_feed_pid,
-    my_gdax_feed_btcusd_pid: my_gdax_feed_btcusd_pid,
-    my_gdax_feed_ltcusd_pid: my_gdax_feed_ltcusd_pid,
-    my_feed_b_btcusd_pid: my_feed_b_btcusd_pid
+    my_gdax_feed_btc_usd_pid: my_gdax_feed_btc_usd_pid,
+    my_gdax_feed_ltc_usd_pid: my_gdax_feed_ltc_usd_pid,
+    my_feed_b_btc_usd_pid: my_feed_b_btc_usd_pid
   }) do
     send_feed_snapshot(my_gdax_feed_pid, "BTC-USD", [["110.0", "100.0"], ["100.0", "110.0"]], [
       ["120.0", "10.0"],
       ["130.0", "11.0"]
     ])
 
-    assert_receive {:order_book_snapshot, :my_gdax_feed, :btcusd, %OrderBook{}}
-    {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(my_gdax_feed_btcusd_pid)
+    assert_receive {:order_book_snapshot, :my_gdax_feed, :btc_usd, %OrderBook{}}
+    {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(my_gdax_feed_btc_usd_pid)
 
     [
       %PriceLevel{price: 110.0, size: 100.0, server_changed_at: nil} = bid_a,
@@ -134,7 +134,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     assert DateTime.compare(bid_a.processed_at, ask_a.processed_at)
     assert DateTime.compare(bid_a.processed_at, ask_b.processed_at)
 
-    assert OrderBook.quotes(my_gdax_feed_ltcusd_pid) == {
+    assert OrderBook.quotes(my_gdax_feed_ltc_usd_pid) == {
              :ok,
              %OrderBook{
                bids: [
@@ -146,7 +146,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
              }
            }
 
-    assert OrderBook.quotes(my_feed_b_btcusd_pid) == {
+    assert OrderBook.quotes(my_feed_b_btc_usd_pid) == {
              :ok,
              %OrderBook{
                bids: [
@@ -161,9 +161,9 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
 
   test("l2update adds/updates/deletes the bids/asks in the order book for the symbol", %{
     my_gdax_feed_pid: my_gdax_feed_pid,
-    my_gdax_feed_btcusd_pid: my_gdax_feed_btcusd_pid,
-    my_gdax_feed_ltcusd_pid: my_gdax_feed_ltcusd_pid,
-    my_feed_b_btcusd_pid: my_feed_b_btcusd_pid
+    my_gdax_feed_btc_usd_pid: my_gdax_feed_btc_usd_pid,
+    my_gdax_feed_ltc_usd_pid: my_gdax_feed_ltc_usd_pid,
+    my_feed_b_btc_usd_pid: my_feed_b_btc_usd_pid
   }) do
     send_feed_l2update(my_gdax_feed_pid, "BTC-USD", [
       ["buy", "0.9", "0.1"],
@@ -174,8 +174,8 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
       ["sell", "1.3", "0.0"]
     ])
 
-    assert_receive {:order_book_changes, :my_gdax_feed, :btcusd, %OrderBook{}}
-    {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(my_gdax_feed_btcusd_pid)
+    assert_receive {:order_book_changes, :my_gdax_feed, :btc_usd, %OrderBook{}}
+    {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(my_gdax_feed_btc_usd_pid)
 
     [%PriceLevel{price: 1.0, size: 1.2} = bid_a, %PriceLevel{price: 0.9, size: 0.1} = bid_b] =
       bids
@@ -190,7 +190,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
     assert DateTime.compare(bid_a.server_changed_at, ask_a.server_changed_at)
     assert DateTime.compare(bid_a.server_changed_at, ask_b.server_changed_at)
 
-    assert OrderBook.quotes(my_gdax_feed_ltcusd_pid) == {
+    assert OrderBook.quotes(my_gdax_feed_ltc_usd_pid) == {
              :ok,
              %OrderBook{
                bids: [
@@ -202,7 +202,7 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
              }
            }
 
-    assert OrderBook.quotes(my_feed_b_btcusd_pid) == {
+    assert OrderBook.quotes(my_feed_b_btc_usd_pid) == {
              :ok,
              %OrderBook{
                bids: [

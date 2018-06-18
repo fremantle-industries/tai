@@ -22,7 +22,7 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
       order =
         Tai.Trading.OrderPipeline.buy_limit(
           :test_account_a,
-          :btcusd_expired,
+          :btc_usd_expired,
           100.1,
           0.1,
           :fok,
@@ -45,7 +45,7 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
       order =
         Tai.Trading.OrderPipeline.sell_limit(
           :test_account_a,
-          :btcusd_expired,
+          :btc_usd_expired,
           10_000.1,
           0.1,
           :fok,
@@ -70,7 +70,7 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
           order =
             Tai.Trading.OrderPipeline.buy_limit(
               :test_account_a,
-              :btcusd_success,
+              :btc_usd_success,
               100.1,
               0.1,
               :fok,
@@ -96,7 +96,7 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
       order =
         Tai.Trading.OrderPipeline.sell_limit(
           :test_account_a,
-          :btcusd_success,
+          :btc_usd_success,
           10_000.1,
           0.1,
           :fok,
@@ -123,7 +123,7 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
           order =
             Tai.Trading.OrderPipeline.buy_limit(
               :test_account_a,
-              :btcusd_pending,
+              :btc_usd_pending,
               100.1,
               0.1,
               :gtc,
@@ -151,7 +151,7 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
           order =
             Tai.Trading.OrderPipeline.sell_limit(
               :test_account_a,
-              :btcusd_pending,
+              :btc_usd_pending,
               100_000.1,
               0.01,
               :gtc,
@@ -182,7 +182,7 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
         order =
           Tai.Trading.OrderPipeline.buy_limit(
             :test_account_a,
-            :btcusd_unknown_error,
+            :btc_usd_unknown_error,
             100.1,
             0.1,
             :fok,

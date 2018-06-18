@@ -56,11 +56,11 @@ defmodule Tai.Exchanges.Config do
     %{
       test_feed_a: [
         adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
-        order_books: [:btcusd, :ltcusd]
+        order_books: [:btc_usd, :ltc_usd]
       ],
       test_feed_b: [
         adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
-        order_books: [:ethusd, :ltcusd]
+        order_books: [:eth_usd, :ltc_usd]
       ]
     }
   """
@@ -120,7 +120,7 @@ defmodule Tai.Exchanges.Config do
   ## Examples
 
     iex> Tai.Exchanges.Config.order_book_feed_symbols(:test_feed_a)
-    [:btcusd, :ltcusd]
+    [:btc_usd, :ltc_usd]
   """
   def order_book_feed_symbols(feed_id) do
     order_book_feeds()

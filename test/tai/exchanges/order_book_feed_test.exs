@@ -43,7 +43,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     assert {:ok, _pid} =
              ExampleOrderBookFeed.start_link(
                feed_id: :example_feed,
-               symbols: [:btcusd, :ltcusd]
+               symbols: [:btc_usd, :ltc_usd]
              )
   end
 
@@ -58,7 +58,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
 
     assert InvalidUrlOrderBookFeed.start_link(
              feed_id: :example_feed,
-             symbols: [:btcusd, :ltcusd]
+             symbols: [:btc_usd, :ltc_usd]
            ) == {:error, %WebSockex.URLError{url: ""}}
   end
 
@@ -67,7 +67,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
       capture_log(fn ->
         ExampleOrderBookFeed.start_link(
           feed_id: :example_feed,
-          symbols: [:btcusd, :ltcusd]
+          symbols: [:btc_usd, :ltc_usd]
         )
 
         :timer.sleep(100)
@@ -80,7 +80,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     {:ok, pid} =
       ExampleOrderBookFeed.start_link(
         feed_id: :example_feed,
-        symbols: [:btcusd, :ltcusd]
+        symbols: [:btc_usd, :ltc_usd]
       )
 
     WebSocket.send_json_msg(pid, %{hello: "world!"})
@@ -95,7 +95,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     {:ok, pid} =
       ExampleOrderBookFeed.start_link(
         feed_id: :example_feed,
-        symbols: [:btcusd, :ltcusd]
+        symbols: [:btc_usd, :ltc_usd]
       )
 
     WebSocket.send_json_msg(pid, %{hello: "world!"})
@@ -119,7 +119,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     {:ok, pid} =
       ExampleOrderBookFeed.start_link(
         feed_id: :example_feed,
-        symbols: [:btcusd, :ltcusd]
+        symbols: [:btc_usd, :ltc_usd]
       )
 
     WebSocket.send_msg(pid, "not-json")
@@ -131,7 +131,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     {:ok, pid} =
       ExampleOrderBookFeed.start_link(
         feed_id: :example_feed,
-        symbols: [:btcusd, :ltcusd]
+        symbols: [:btc_usd, :ltc_usd]
       )
 
     log_msg =
@@ -151,7 +151,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
     {:ok, pid} =
       ExampleOrderBookFeed.start_link(
         feed_id: :example_feed,
-        symbols: [:btcusd, :ltcusd]
+        symbols: [:btc_usd, :ltc_usd]
       )
 
     log_msg =

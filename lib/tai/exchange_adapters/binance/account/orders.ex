@@ -6,7 +6,7 @@ defmodule Tai.ExchangeAdapters.Binance.Account.Orders do
   def buy_limit(symbol, price, size, time_in_force) do
     with normalized_tif <- normalize_duration(time_in_force) do
       symbol
-      |> Tai.Markets.Symbol.upcase()
+      |> Tai.ExchangeAdapters.Binance.SymbolMapping.to_binance()
       |> Binance.order_limit_buy(size, price, normalized_tif)
       |> parse_create_order(time_in_force)
     end
@@ -15,7 +15,7 @@ defmodule Tai.ExchangeAdapters.Binance.Account.Orders do
   def sell_limit(symbol, price, size, time_in_force) do
     with normalized_tif <- normalize_duration(time_in_force) do
       symbol
-      |> Tai.Markets.Symbol.upcase()
+      |> Tai.ExchangeAdapters.Binance.SymbolMapping.to_binance()
       |> Binance.order_limit_sell(size, price, normalized_tif)
       |> parse_create_order(time_in_force)
     end

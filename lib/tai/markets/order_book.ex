@@ -153,8 +153,8 @@ defmodule Tai.Markets.OrderBook do
 
   ## Examples
 
-    iex> Tai.Markets.OrderBook.to_name(feed_id: :my_test_feed, symbol: :btcusd)
-    Tai.Markets.OrderBook_my_test_feed_btcusd
+    iex> Tai.Markets.OrderBook.to_name(feed_id: :my_test_feed, symbol: :btc_usd)
+    Tai.Markets.OrderBook_my_test_feed_btc_usd
   """
   def to_name(feed_id: feed_id, symbol: symbol) do
     :"#{__MODULE__}_#{feed_id}_#{symbol}"

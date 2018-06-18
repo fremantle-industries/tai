@@ -23,6 +23,8 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   def build_connection_url(url, symbols) do
     streams =
       symbols
+      |> Enum.map(&Tai.ExchangeAdapters.Binance.SymbolMapping.to_binance/1)
+      |> Enum.map(&String.downcase/1)
       |> Enum.map(&"#{&1}@depth")
       |> Enum.join("/")
 
@@ -92,21 +94,19 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
         },
         %OrderBookFeed{feed_id: feed_id} = state
       ) do
-    processed_at = Timex.now()
-    {:ok, server_changed_at} = DateTime.from_unix(event_time, :millisecond)
+    with processed_at <- Timex.now(),
+         {:ok, server_changed_at} <- DateTime.from_unix(event_time, :millisecond),
+         normalized_changes <- %OrderBook{
+           bids: changed_bids |> DepthUpdate.normalize(processed_at, server_changed_at),
+           asks: changed_asks |> DepthUpdate.normalize(processed_at, server_changed_at)
+         },
+         symbol = Tai.ExchangeAdapters.Binance.SymbolMapping.to_tai(binance_symbol) do
+      [feed_id: feed_id, symbol: symbol]
+      |> OrderBook.to_name()
+      |> OrderBook.update(normalized_changes)
 
-    normalized_changes = %OrderBook{
-      bids: changed_bids |> DepthUpdate.normalize(processed_at, server_changed_at),
-      asks: changed_asks |> DepthUpdate.normalize(processed_at, server_changed_at)
-    }
-
-    symbol = binance_symbol |> String.downcase() |> String.to_atom()
-
-    [feed_id: feed_id, symbol: symbol]
-    |> OrderBook.to_name()
-    |> OrderBook.update(normalized_changes)
-
-    {:ok, state}
+      {:ok, state}
+    end
   end
 
   @doc """

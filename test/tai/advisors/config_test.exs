@@ -9,12 +9,12 @@ defmodule Tai.Advisors.ConfigTest do
              %{
                id: :create_and_cancel_pending_order,
                supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
-               order_books: "test_feed_a test_feed_b.ethusd"
+               order_books: "test_feed_a test_feed_b.eth_usd"
              },
              %{
                id: :fill_or_kill_orders,
                supervisor: Examples.Advisors.FillOrKillOrders.Supervisor,
-               order_books: "test_feed_a test_feed_b.ethusd"
+               order_books: "test_feed_a test_feed_b.eth_usd"
              },
              %{
                id: :log_spread_advisor,
@@ -36,13 +36,13 @@ defmodule Tai.Advisors.ConfigTest do
 
   test "order_books returns a map of feeds with books for the given advisor id" do
     assert Config.order_books(:log_spread_advisor) == %{
-             test_feed_a: [:btcusd, :ltcusd],
-             test_feed_b: [:ethusd, :ltcusd]
+             test_feed_a: [:btc_usd, :ltc_usd],
+             test_feed_b: [:eth_usd, :ltc_usd]
            }
 
     assert Config.order_books(:create_and_cancel_pending_order) == %{
-             test_feed_a: [:btcusd, :ltcusd],
-             test_feed_b: [:ethusd]
+             test_feed_a: [:btc_usd, :ltc_usd],
+             test_feed_b: [:eth_usd]
            }
   end
 end

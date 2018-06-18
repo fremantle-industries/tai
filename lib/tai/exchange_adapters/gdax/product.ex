@@ -41,7 +41,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Product do
 
   defp strip_and_downcase(product_id) do
     product_id
-    |> String.replace("-", "")
+    |> String.replace("-", "_")
     |> String.downcase()
   end
 end

@@ -10,14 +10,14 @@ defmodule Tai.Commands.HelperTest do
   alias Tai.Trading.{OrderSubmission, TimeInForce}
 
   setup do
-    test_feed_a_btcusd = [feed_id: :test_feed_a, symbol: :btcusd] |> OrderBook.to_name()
-    stop_supervised(test_feed_a_btcusd)
+    test_feed_a_btc_usd = [feed_id: :test_feed_a, symbol: :btc_usd] |> OrderBook.to_name()
+    stop_supervised(test_feed_a_btc_usd)
 
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
     end)
 
-    {:ok, %{test_feed_a_btcusd: test_feed_a_btcusd}}
+    {:ok, %{test_feed_a_btc_usd: test_feed_a_btc_usd}}
   end
 
   test "help returns the usage for the supported commands" do
@@ -25,8 +25,8 @@ defmodule Tai.Commands.HelperTest do
            * balance
            * markets
            * orders
-           * buy_limit account_id(:gdax), symbol(:btcusd), price(101.12), size(1.2)
-           * sell_limit account_id(:gdax), symbol(:btcusd), price(101.12), size(1.2)
+           * buy_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
+           * sell_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
            * order_status account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
            * cancel_order account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")\n
            """
@@ -48,10 +48,10 @@ defmodule Tai.Commands.HelperTest do
   end
 
   test("markets displays all inside quotes and the time they were last processed and changed", %{
-    test_feed_a_btcusd: test_feed_a_btcusd
+    test_feed_a_btc_usd: test_feed_a_btc_usd
   }) do
     :ok =
-      OrderBook.replace(test_feed_a_btcusd, %OrderBook{
+      OrderBook.replace(test_feed_a_btc_usd, %OrderBook{
         bids: %{
           12_999.99 => {0.000021, Timex.now(), Timex.now()},
           12_999.98 => {1.0, nil, nil}
@@ -63,14 +63,14 @@ defmodule Tai.Commands.HelperTest do
       })
 
     assert capture_io(fn -> Helper.markets() end) == """
-           +-------------+--------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
-           |        Feed | Symbol | Bid Price | Ask Price | Bid Size | Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
-           +-------------+--------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
-           | test_feed_a | btcusd |  12999.99 |  13000.01 | 0.000021 |     1.11 |              now |                   now |              now |                   now |
-           | test_feed_a | ltcusd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
-           | test_feed_b | ethusd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
-           | test_feed_b | ltcusd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
-           +-------------+--------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+\n
+           +-------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
+           |        Feed |  Symbol | Bid Price | Ask Price | Bid Size | Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
+           +-------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
+           | test_feed_a | btc_usd |  12999.99 |  13000.01 | 0.000021 |     1.11 |              now |                   now |              now |                   now |
+           | test_feed_a | ltc_usd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
+           | test_feed_b | eth_usd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
+           | test_feed_b | ltc_usd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
+           +-------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+\n
            """
   end
 
@@ -83,33 +83,33 @@ defmodule Tai.Commands.HelperTest do
            +---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+\n
            """
 
-    [btcusd_order] =
+    [btc_usd_order] =
       Tai.Trading.OrderStore.add(
         OrderSubmission.buy_limit(
           :test_feed_a,
-          :btcusd,
+          :btc_usd,
           12_999.99,
           1.1,
           TimeInForce.fill_or_kill()
         )
       )
 
-    [ltcusd_order] =
+    [ltc_usd_order] =
       Tai.Trading.OrderStore.add(
-        OrderSubmission.sell_limit(:test_feed_b, :ltcusd, 75.23, 1.0, TimeInForce.fill_or_kill())
+        OrderSubmission.sell_limit(:test_feed_b, :ltc_usd, 75.23, 1.0, TimeInForce.fill_or_kill())
       )
 
     assert capture_io(fn -> Helper.orders() end) == """
-           +-------------+--------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
-           |     Account | Symbol | Side |  Type |    Price | Size | Time in Force |   Status |                            Client ID | Server ID | Enqueued At | Created At |
-           +-------------+--------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
-           | test_feed_a | btcusd |  buy | limit | 12999.99 |  1.1 |           fok | enqueued | #{
-             btcusd_order.client_id
+           +-------------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
+           |     Account |  Symbol | Side |  Type |    Price | Size | Time in Force |   Status |                            Client ID | Server ID | Enqueued At | Created At |
+           +-------------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
+           | test_feed_a | btc_usd |  buy | limit | 12999.99 |  1.1 |           fok | enqueued | #{
+             btc_usd_order.client_id
            } |           |         now |            |
-           | test_feed_b | ltcusd | sell | limit |    75.23 |  1.0 |           fok | enqueued | #{
-             ltcusd_order.client_id
+           | test_feed_b | ltc_usd | sell | limit |    75.23 |  1.0 |           fok | enqueued | #{
+             ltc_usd_order.client_id
            } |           |         now |            |
-           +-------------+--------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+\n
+           +-------------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+\n
            """
   end
 
@@ -117,7 +117,7 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(fn ->
              Helper.buy_limit(
                :test_account_a,
-               :btcusd_success,
+               :btc_usd_success,
                10.1,
                2.2,
                Tai.Trading.TimeInForce.fill_or_kill()
@@ -129,7 +129,7 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(fn ->
              Helper.sell_limit(
                :test_account_a,
-               :btcusd_success,
+               :btc_usd_success,
                10.1,
                2.2,
                Tai.Trading.TimeInForce.fill_or_kill()

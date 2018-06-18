@@ -25,7 +25,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
         order =
           Tai.Trading.OrderPipeline.buy_limit(
             :test_account_a,
-            :btcusdt,
+            :btc_usdt,
             100.1,
             0.1,
             :fok,
@@ -53,7 +53,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
         order =
           Tai.Trading.OrderPipeline.sell_limit(
             :test_account_a,
-            :btcusdt,
+            :btc_usdt,
             100_000.1,
             0.01,
             :fok,

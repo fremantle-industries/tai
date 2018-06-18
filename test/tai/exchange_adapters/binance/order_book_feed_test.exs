@@ -28,22 +28,22 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
 
     Process.register(self(), :test)
 
-    my_binance_feed_btcusdt_pid =
+    my_binance_feed_btc_usdt_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_binance_feed, symbol: :btcusdt]},
-        id: :my_binance_feed_btcusdt
+        {OrderBook, [feed_id: :my_binance_feed, symbol: :btc_usdt]},
+        id: :my_binance_feed_btc_usdt
       )
 
-    my_binance_feed_ltcusdt_pid =
+    my_binance_feed_ltc_usdt_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_binance_feed, symbol: :ltcusdt]},
-        id: :my_binance_feed_ltcusdt
+        {OrderBook, [feed_id: :my_binance_feed, symbol: :ltc_usdt]},
+        id: :my_binance_feed_ltc_usdt
       )
 
-    my_feed_b_btcusdt_pid =
+    my_feed_b_btc_usdt_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_feed_b, symbol: :btcusdt]},
-        id: :my_feed_b_btcusdt
+        {OrderBook, [feed_id: :my_feed_b, symbol: :btc_usdt]},
+        id: :my_feed_b_btc_usdt
       )
 
     {:ok, my_binance_feed_pid} =
@@ -51,43 +51,43 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
         OrderBookFeed.start_link(
           "ws://localhost:#{EchoBoy.Config.port()}/ws",
           feed_id: :my_binance_feed,
-          symbols: [:btcusdt, :ltcusdt]
+          symbols: [:btc_usdt, :ltc_usdt]
         )
       end
 
-    OrderBook.replace(my_binance_feed_ltcusdt_pid, %OrderBook{
+    OrderBook.replace(my_binance_feed_ltc_usdt_pid, %OrderBook{
       bids: %{100.0 => {0.1, nil, nil}},
       asks: %{100.1 => {0.1, nil, nil}}
     })
 
-    OrderBook.replace(my_feed_b_btcusdt_pid, %OrderBook{
+    OrderBook.replace(my_feed_b_btc_usdt_pid, %OrderBook{
       bids: %{1.0 => {1.1, nil, nil}},
       asks: %{1.2 => {0.1, nil, nil}}
     })
 
     start_supervised!({
       Support.ForwardOrderBookEvents,
-      [feed_id: :my_binance_feed, symbol: :btcusdt]
+      [feed_id: :my_binance_feed, symbol: :btc_usdt]
     })
 
     {
       :ok,
       %{
         my_binance_feed_pid: my_binance_feed_pid,
-        my_binance_feed_btcusdt_pid: my_binance_feed_btcusdt_pid,
-        my_binance_feed_ltcusdt_pid: my_binance_feed_ltcusdt_pid,
-        my_feed_b_btcusdt_pid: my_feed_b_btcusdt_pid
+        my_binance_feed_btc_usdt_pid: my_binance_feed_btc_usdt_pid,
+        my_binance_feed_ltc_usdt_pid: my_binance_feed_ltc_usdt_pid,
+        my_feed_b_btc_usdt_pid: my_feed_b_btc_usdt_pid
       }
     }
   end
 
   test("depthUpdate adds/updates/deletes the bids/asks in the order book for the symbol", %{
     my_binance_feed_pid: my_binance_feed_pid,
-    my_binance_feed_btcusdt_pid: my_binance_feed_btcusdt_pid,
-    my_binance_feed_ltcusdt_pid: my_binance_feed_ltcusdt_pid,
-    my_feed_b_btcusdt_pid: my_feed_b_btcusdt_pid
+    my_binance_feed_btc_usdt_pid: my_binance_feed_btc_usdt_pid,
+    my_binance_feed_ltc_usdt_pid: my_binance_feed_ltc_usdt_pid,
+    my_feed_b_btc_usdt_pid: my_feed_b_btc_usdt_pid
   }) do
-    assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btcusdt_pid)
+    assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btc_usdt_pid)
 
     assert [
              %PriceLevel{price: 8541.0, size: 1.174739, server_changed_at: nil},
@@ -120,8 +120,8 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
       ]
     )
 
-    assert_receive {:order_book_changes, :my_binance_feed, :btcusdt, %OrderBook{}}
-    assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btcusdt_pid)
+    assert_receive {:order_book_changes, :my_binance_feed, :btc_usdt, %OrderBook{}}
+    assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btc_usdt_pid)
 
     assert [
              %PriceLevel{price: 8541.01, size: 0.12} = bid_a,
@@ -149,7 +149,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
     assert ask_c.server_changed_at == nil
     assert ask_e.server_changed_at == nil
 
-    assert OrderBook.quotes(my_binance_feed_ltcusdt_pid) == {
+    assert OrderBook.quotes(my_binance_feed_ltc_usdt_pid) == {
              :ok,
              %OrderBook{
                bids: [
@@ -161,7 +161,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
              }
            }
 
-    assert OrderBook.quotes(my_feed_b_btcusdt_pid) == {
+    assert OrderBook.quotes(my_feed_b_btc_usdt_pid) == {
              :ok,
              %OrderBook{
                bids: [

@@ -126,7 +126,7 @@ defmodule Tai.Advisor do
 
       ## Examples
 
-        iex> Tai.Advisor.quotes(feed_id: :test_feed_a, symbol: :btcusd, depth: 1)
+        iex> Tai.Advisor.quotes(feed_id: :test_feed_a, symbol: :btc_usd, depth: 1)
         {:ok, %Tai.Markets.OrderBook{bids: [], asks: []}
       """
       def quotes(feed_id: feed_id, symbol: symbol, depth: depth) do
@@ -140,7 +140,7 @@ defmodule Tai.Advisor do
 
       ## Examples
 
-        iex> Tai.Advisor.cached_inside_quote(state, :test_feed_a, :btcusd)
+        iex> Tai.Advisor.cached_inside_quote(state, :test_feed_a, :btc_usd)
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{price: 101.1, size: 1.1, processed_at: nil, server_changed_at: nil},
           ask: %Tai.Markets.PriceLevel{price: 101.2, size: 0.1, processed_at: nil, server_changed_at: nil}

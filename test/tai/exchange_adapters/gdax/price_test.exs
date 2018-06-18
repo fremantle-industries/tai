@@ -11,13 +11,13 @@ defmodule Tai.ExchangeAdapters.Gdax.PriceTest do
 
   test "fetch returns value of the last trade for the symbol" do
     use_cassette "exchange_adapters/gdax/price_success" do
-      assert Price.fetch(:btcusd) == {:ok, Decimal.new("152.18000000")}
+      assert Price.fetch(:btc_usd) == {:ok, Decimal.new("152.18000000")}
     end
   end
 
   test "fetch supports upper and lower case symbols" do
     use_cassette "exchange_adapters/gdax/price_success" do
-      assert Price.fetch(:BtcusD) == {:ok, Decimal.new("152.18000000")}
+      assert Price.fetch(:Btc_usD) == {:ok, Decimal.new("152.18000000")}
     end
   end
 

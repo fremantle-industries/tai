@@ -7,11 +7,11 @@ defmodule Examples.Advisors.FillOrKillOrders.Advisor do
 
   require Logger
 
-  def handle_inside_quote(:binance, :btcusdt, _inside_quote, _changes, _state) do
+  def handle_inside_quote(:binance, :btc_usdt, _inside_quote, _changes, _state) do
     if Tai.Trading.OrderStore.count() == 0 do
       Tai.Trading.OrderPipeline.buy_limit(
         :binance,
-        :btcusdt,
+        :btc_usdt,
         100.1,
         0.1,
         :fok,

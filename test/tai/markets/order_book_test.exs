@@ -11,11 +11,11 @@ defmodule Tai.Markets.OrderBookTest do
     def init(state), do: {:ok, state}
 
     def subscribe_to_order_book_snapshot do
-      Tai.PubSub.subscribe({:order_book_snapshot, :my_test_feed, :btcusd})
+      Tai.PubSub.subscribe({:order_book_snapshot, :my_test_feed, :btc_usd})
     end
 
     def subscribe_to_order_book_changes do
-      Tai.PubSub.subscribe({:order_book_changes, :my_test_feed, :btcusd})
+      Tai.PubSub.subscribe({:order_book_changes, :my_test_feed, :btc_usd})
     end
 
     def handle_info({:order_book_snapshot, _feed_id, _symbol, _snapshot} = msg, state) do
@@ -30,7 +30,7 @@ defmodule Tai.Markets.OrderBookTest do
   end
 
   setup do
-    book_pid = start_supervised!({OrderBook, feed_id: :my_test_feed, symbol: :btcusd})
+    book_pid = start_supervised!({OrderBook, feed_id: :my_test_feed, symbol: :btc_usd})
 
     %{book_pid: book_pid}
   end
@@ -79,7 +79,7 @@ defmodule Tai.Markets.OrderBookTest do
     assert_receive {
       :order_book_snapshot,
       :my_test_feed,
-      :btcusd,
+      :btc_usd,
       %OrderBook{
         bids: %{999.9 => {1.1, bp, bs}},
         asks: %{1000.0 => {0.1, ap, as}}
@@ -182,7 +182,7 @@ defmodule Tai.Markets.OrderBookTest do
     assert_receive {
       :order_book_changes,
       :my_test_feed,
-      :btcusd,
+      :btc_usd,
       %OrderBook{
         bids: %{100.0 => {0.1, bp, bs}},
         asks: %{102.0 => {0.2, ap, as}}

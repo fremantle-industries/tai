@@ -28,7 +28,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
   describe "#buy_limit" do
     test "returns an ok tuple with a pending order response successfully created" do
       assert {:ok, order_response} =
-               Account.buy_limit(:my_test_account, :btcusd_success, 10.1, 2.2)
+               Account.buy_limit(:my_test_account, :btc_usd_success, 10.1, 2.2)
 
       assert order_response.id == "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"
       assert order_response.status == :pending
@@ -38,7 +38,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       order = %Order{
         client_id: UUID.uuid4(),
         account_id: :my_test_account,
-        symbol: :btcusd_success,
+        symbol: :btc_usd_success,
         side: Order.buy(),
         type: Order.limit(),
         price: 10.1,
@@ -57,7 +57,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       buy_market_order = %Order{
         client_id: UUID.uuid4(),
         account_id: :my_test_account,
-        symbol: :btcusd_success,
+        symbol: :btc_usd_success,
         side: Order.buy(),
         type: :market,
         price: 10.1,
@@ -70,7 +70,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       sell_limit_order = %Order{
         client_id: UUID.uuid4(),
         account_id: :my_test_account,
-        symbol: :btcusd_success,
+        symbol: :btc_usd_success,
         side: Order.sell(),
         type: Order.limit(),
         price: 10.1,
@@ -88,18 +88,18 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       assert {
                :error,
                %Tai.Trading.InsufficientBalanceError{}
-             } = Account.buy_limit(:my_test_account, :btcusd_insufficient_funds, 10.1, 2.1)
+             } = Account.buy_limit(:my_test_account, :btc_usd_insufficient_funds, 10.1, 2.1)
     end
 
     test "returns an unknown error tuple when it can't find a match" do
-      assert Account.buy_limit(:my_test_account, :btcusd, 101.1, 0.1) == {:error, :unknown_error}
+      assert Account.buy_limit(:my_test_account, :btc_usd, 101.1, 0.1) == {:error, :unknown_error}
     end
   end
 
   describe "#sell_limit" do
     test "returns an ok tuple when an order is successfully created" do
       assert {:ok, order_response} =
-               Account.sell_limit(:my_test_account, :btcusd_success, 10.1, 2.2)
+               Account.sell_limit(:my_test_account, :btc_usd_success, 10.1, 2.2)
 
       assert order_response.id == "41541912-ebc1-4173-afa5-4334ccf7a1a8"
       assert order_response.status == :pending
@@ -109,7 +109,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       order = %Order{
         client_id: UUID.uuid4(),
         account_id: :my_test_account,
-        symbol: :btcusd_success,
+        symbol: :btc_usd_success,
         side: Order.sell(),
         type: Order.limit(),
         price: 10.1,
@@ -128,7 +128,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       sell_market_order = %Order{
         client_id: UUID.uuid4(),
         account_id: :my_test_account,
-        symbol: :btcusd_success,
+        symbol: :btc_usd_success,
         side: Order.sell(),
         type: :market,
         price: 10.1,
@@ -141,7 +141,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       buy_limit_order = %Order{
         client_id: UUID.uuid4(),
         account_id: :my_test_account,
-        symbol: :btcusd_success,
+        symbol: :btc_usd_success,
         side: Order.buy(),
         type: Order.limit(),
         price: 10.1,
@@ -159,11 +159,12 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
       assert {
                :error,
                %Tai.Trading.InsufficientBalanceError{}
-             } = Account.sell_limit(:my_test_account, :btcusd_insufficient_funds, 10.1, 2.1)
+             } = Account.sell_limit(:my_test_account, :btc_usd_insufficient_funds, 10.1, 2.1)
     end
 
     test "sell_limit returns an unknown error tuple when it can't find a matching symbol" do
-      assert Account.sell_limit(:my_test_account, :btcusd, 101.1, 0.1) == {:error, :unknown_error}
+      assert Account.sell_limit(:my_test_account, :btc_usd, 101.1, 0.1) ==
+               {:error, :unknown_error}
     end
   end
 

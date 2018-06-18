@@ -22,7 +22,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
     order =
       Tai.Trading.OrderPipeline.buy_limit(
         :test_account_a,
-        :btcusd_pending,
+        :btc_usd_pending,
         100.1,
         0.1,
         :gtc,
@@ -61,7 +61,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
     order =
       Tai.Trading.OrderPipeline.buy_limit(
         :test_account_a,
-        :btcusd_expired,
+        :btc_usd_expired,
         100.1,
         0.1,
         :gtc,

@@ -22,7 +22,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
   setup do
     Process.register(self(), :test)
-    book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btcusd})
+    book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btc_usd})
     start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
 
     on_exit(fn ->
@@ -39,7 +39,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]},
+        order_books: %{my_order_book_feed: [:btc_usd]},
         accounts: [:my_test_account],
         store: %{}
       ]
@@ -50,7 +50,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     assert_receive {
       :my_order_book_feed,
-      :btcusd,
+      :btc_usd,
       ^changes,
       %Advisor{}
     }
@@ -61,7 +61,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]},
+        order_books: %{my_order_book_feed: [:btc_usd]},
         accounts: [:my_test_account],
         store: %{}
       ]
@@ -76,7 +76,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     assert_receive {
       :my_order_book_feed,
-      :btcusd,
+      :btc_usd,
       %Quote{
         bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
         ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
@@ -93,7 +93,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]},
+        order_books: %{my_order_book_feed: [:btc_usd]},
         accounts: [:my_test_account],
         store: %{return_val: {:unknown, :return_val}}
       ]
@@ -123,7 +123,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]},
+        order_books: %{my_order_book_feed: [:btc_usd]},
         accounts: [:my_test_account],
         store: %{}
       ]
@@ -138,7 +138,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     assert_receive {
       :my_order_book_feed,
-      :btcusd,
+      :btc_usd,
       %Quote{
         bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
         ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
@@ -162,7 +162,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     assert_receive {
       :my_order_book_feed,
-      :btcusd,
+      :btc_usd,
       %Quote{
         bid: %PriceLevel{price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil},
         ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
@@ -180,7 +180,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]},
+        order_books: %{my_order_book_feed: [:btc_usd]},
         accounts: [:my_test_account],
         store: %{}
       ]
@@ -195,7 +195,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     assert_receive {
       :my_order_book_feed,
-      :btcusd,
+      :btc_usd,
       %Quote{
         bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
         ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
@@ -219,7 +219,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     assert_receive {
       :my_order_book_feed,
-      :btcusd,
+      :btc_usd,
       %Quote{
         bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
         ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
@@ -234,7 +234,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       MyAdvisor,
       [
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btcusd]},
+        order_books: %{my_order_book_feed: [:btc_usd]},
         accounts: [:my_test_account],
         store: %{return_val: {:ok, %{store: %{hello: "world"}}}}
       ]
@@ -249,7 +249,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     assert_receive {
       :my_order_book_feed,
-      :btcusd,
+      :btc_usd,
       %Quote{
         bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
         ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
@@ -263,7 +263,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     assert_receive {
       :my_order_book_feed,
-      :btcusd,
+      :btc_usd,
       %Quote{
         bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
         ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}

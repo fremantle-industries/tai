@@ -40,11 +40,11 @@ config :tai,
   order_book_feeds: %{
     test_feed_a: [
       adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
-      order_books: [:btcusd, :ltcusd]
+      order_books: [:btc_usd, :ltc_usd]
     ],
     test_feed_b: [
       adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
-      order_books: [:ethusd, :ltcusd]
+      order_books: [:eth_usd, :ltc_usd]
     ]
   }
 
@@ -63,12 +63,12 @@ config :tai,
     %{
       id: :create_and_cancel_pending_order,
       supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
-      order_books: "test_feed_a test_feed_b.ethusd"
+      order_books: "test_feed_a test_feed_b.eth_usd"
     },
     %{
       id: :fill_or_kill_orders,
       supervisor: Examples.Advisors.FillOrKillOrders.Supervisor,
-      order_books: "test_feed_a test_feed_b.ethusd"
+      order_books: "test_feed_a test_feed_b.eth_usd"
     },
     %{
       id: :log_spread_advisor,

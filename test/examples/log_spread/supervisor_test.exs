@@ -11,8 +11,8 @@ defmodule Examples.Advisors.LogSpread.SupervisorTest do
              advisor_id: :log_spread_advisor,
              accounts: [],
              order_books: %{
-               test_feed_a: [:btcusd, :ltcusd],
-               test_feed_b: [:ethusd, :ltcusd]
+               test_feed_a: [:btc_usd, :ltc_usd],
+               test_feed_b: [:eth_usd, :ltc_usd]
              },
              store: %{}
            } = :sys.get_state(pid)

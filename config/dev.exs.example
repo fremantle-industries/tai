@@ -19,15 +19,15 @@ config :tai,
   order_book_feeds: %{
     gdax: [
       adapter: Tai.ExchangeAdapters.Gdax.OrderBookFeed,
-      order_books: [:btcusd, :ltcusd, :ethusd]
+      order_books: [:btc_usd, :ltc_usd, :eth_usd]
     ],
     binance: [
       adapter: Tai.ExchangeAdapters.Binance.OrderBookFeed,
-      order_books: [:btcusdt, :ltcusdt, :ethusdt]
+      order_books: [:btc_usdt, :ltc_usdt, :eth_usdt]
     ],
     poloniex: [
       adapter: Tai.ExchangeAdapters.Poloniex.OrderBookFeed,
-      order_books: [:btcusdt, :ltcusdt, :ethusdt]
+      order_books: [:btc_usdt, :ltc_usdt, :eth_usdt]
     ]
   }
 
@@ -49,12 +49,12 @@ config :tai,
     %{
       id: :create_and_cancel_pending_order,
       supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
-      order_books: "gdax.btcusd"
+      order_books: "gdax.btc_usd"
     },
     %{
       id: :fill_or_kill_orders,
       supervisor: Examples.Advisors.FillOrKillOrders.Supervisor,
-      order_books: "binance.btcusdt"
+      order_books: "binance.btc_usdt"
     },
     %{
       id: :log_spread_advisor,

@@ -26,7 +26,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, @all_balances}, state}
   end
 
-  def handle_call({:buy_limit, :btcusd_success, _price, size, :fok}, _from, state) do
+  def handle_call({:buy_limit, :btc_usd_success, _price, size, :fok}, _from, state) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       status: Tai.Trading.OrderStatus.filled(),
@@ -38,7 +38,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, order_response}, state}
   end
 
-  def handle_call({:buy_limit, :btcusd_expired, _price, size, :fok}, _from, state) do
+  def handle_call({:buy_limit, :btc_usd_expired, _price, size, :fok}, _from, state) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       status: Tai.Trading.OrderStatus.expired(),
@@ -50,7 +50,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, order_response}, state}
   end
 
-  def handle_call({:buy_limit, :btcusd_pending, _price, size, :gtc}, _from, state) do
+  def handle_call({:buy_limit, :btc_usd_pending, _price, size, :gtc}, _from, state) do
     order_response = %Tai.Trading.OrderResponse{
       id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7",
       status: Tai.Trading.OrderStatus.pending(),
@@ -62,7 +62,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, order_response}, state}
   end
 
-  def handle_call({:buy_limit, :btcusd_success, _price, size, time_in_force}, _from, state) do
+  def handle_call({:buy_limit, :btc_usd_success, _price, size, time_in_force}, _from, state) do
     order_response = %Tai.Trading.OrderResponse{
       id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7",
       status: Tai.Trading.OrderStatus.pending(),
@@ -75,7 +75,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
   end
 
   def handle_call(
-        {:buy_limit, :btcusd_insufficient_funds, _price, _size, _time_in_force},
+        {:buy_limit, :btc_usd_insufficient_funds, _price, _size, _time_in_force},
         _from,
         state
       ) do
@@ -90,7 +90,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:error, :unknown_error}, state}
   end
 
-  def handle_call({:sell_limit, :btcusd_success, _price, size, :fok}, _from, state) do
+  def handle_call({:sell_limit, :btc_usd_success, _price, size, :fok}, _from, state) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       status: Tai.Trading.OrderStatus.filled(),
@@ -102,7 +102,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, order_response}, state}
   end
 
-  def handle_call({:sell_limit, :btcusd_expired, _price, size, :fok}, _from, state) do
+  def handle_call({:sell_limit, :btc_usd_expired, _price, size, :fok}, _from, state) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       status: Tai.Trading.OrderStatus.expired(),
@@ -114,7 +114,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, order_response}, state}
   end
 
-  def handle_call({:sell_limit, :btcusd_pending, _price, size, :gtc}, _from, state) do
+  def handle_call({:sell_limit, :btc_usd_pending, _price, size, :gtc}, _from, state) do
     order_response = %Tai.Trading.OrderResponse{
       id: "41541912-ebc1-4173-afa5-4334ccf7a1a8",
       status: Tai.Trading.OrderStatus.pending(),
@@ -126,7 +126,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:reply, {:ok, order_response}, state}
   end
 
-  def handle_call({:sell_limit, :btcusd_success, _price, size, time_in_force}, _from, state) do
+  def handle_call({:sell_limit, :btc_usd_success, _price, size, time_in_force}, _from, state) do
     order_response = %Tai.Trading.OrderResponse{
       id: "41541912-ebc1-4173-afa5-4334ccf7a1a8",
       status: Tai.Trading.OrderStatus.pending(),
@@ -139,7 +139,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
   end
 
   def handle_call(
-        {:sell_limit, :btcusd_insufficient_funds, _price, _size, _time_in_force},
+        {:sell_limit, :btc_usd_insufficient_funds, _price, _size, _time_in_force},
         _from,
         state
       ) do

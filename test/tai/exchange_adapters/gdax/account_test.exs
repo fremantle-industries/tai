@@ -48,7 +48,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
                  :my_gdax_account
                  |> Tai.Exchanges.Account.buy_limit(
-                   :btcusd,
+                   :btc_usd,
                    101.1,
                    0.2,
                    Tai.Trading.TimeInForce.good_til_canceled()
@@ -67,7 +67,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
         assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
                  :my_gdax_account
                  |> Tai.Exchanges.Account.buy_limit(
-                   :btcusd,
+                   :btc_usd,
                    101.1,
                    0.3,
                    Tai.Trading.TimeInForce.fill_or_kill()
@@ -82,7 +82,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
                  :my_gdax_account
                  |> Tai.Exchanges.Account.sell_limit(
-                   :btcusd,
+                   :btc_usd,
                    99_999_999.1,
                    0.2,
                    Tai.Trading.TimeInForce.good_til_canceled()
@@ -101,7 +101,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
         assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
                  :my_gdax_account
                  |> Tai.Exchanges.Account.sell_limit(
-                   :btcusd,
+                   :btc_usd,
                    99_999_999.1,
                    0.3,
                    Tai.Trading.TimeInForce.good_til_canceled()
@@ -114,7 +114,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns the status" do
       use_cassette "exchange_adapters/gdax/account/order_status_success" do
         {:ok, order_response} =
-          Tai.Exchanges.Account.buy_limit(:my_gdax_account, :btcusd, 101.1, 0.2)
+          Tai.Exchanges.Account.buy_limit(:my_gdax_account, :btc_usd, 101.1, 0.2)
 
         assert Tai.Exchanges.Account.order_status(:my_gdax_account, order_response.id) ==
                  {:ok, :open}
@@ -133,7 +133,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns an ok tuple with the order id when it's successfully canceled" do
       use_cassette "exchange_adapters/gdax/account/cancel_order_success" do
         {:ok, order_response} =
-          Tai.Exchanges.Account.buy_limit(:my_gdax_account, :btcusd, 101.1, 0.2)
+          Tai.Exchanges.Account.buy_limit(:my_gdax_account, :btc_usd, 101.1, 0.2)
 
         {:ok, canceled_order_id} =
           Tai.Exchanges.Account.cancel_order(:my_gdax_account, order_response.id)

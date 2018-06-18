@@ -88,8 +88,8 @@ iex(1)> help
 * balance
 * markets
 * orders
-* buy_limit account_id(:gdax), symbol(:btcusd), price(101.12), size(1.2)
-* sell_limit account_id(:gdax), symbol(:btcusd), price(101.12), size(1.2)
+* buy_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
+* sell_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
 * order_status account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
 * cancel_order account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
 ```
@@ -119,16 +119,16 @@ starting to fall behind as it updates it's order books.
 
 ```
 iex(3)> markets
-+---------+---------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
-|    Feed |  Symbol | Bid Price | Ask Price |   Bid Size |     Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
-+---------+---------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
-| binance | btcusdt |    8430.0 |   8439.91 |   0.349355 |     1.021896 |     1 second ago |          1 second ago |              now |                   now |
-| binance | ltcusdt |    159.53 |    159.58 |   10.54534 |      1.02855 |    9 seconds ago |         9 seconds ago |    4 seconds ago |         4 seconds ago |
-| binance | ethusdt |    519.67 |     520.0 |    0.08984 |      2.33198 |    7 seconds ago |         7 seconds ago |              now |                   now |
-|    gdax |  btcusd |   8430.86 |   8430.87 | 0.01448655 |  24.32791169 |    3 seconds ago |         3 seconds ago |     1 second ago |          1 second ago |
-|    gdax |  ltcusd |    159.97 |    159.98 |    0.00002 | 478.22565196 |   28 seconds ago |        28 seconds ago |              now |                   now |
-|    gdax |  ethusd |    520.93 |    520.94 | 9.48431449 |  79.37008001 |              now |                   now |     1 second ago |         2 seconds ago |
-+---------+---------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
++---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
+|    Feed |   Symbol | Bid Price | Ask Price |   Bid Size |     Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
++---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
+| binance | btc_usdt |    8430.0 |   8439.91 |   0.349355 |     1.021896 |     1 second ago |          1 second ago |              now |                   now |
+| binance | ltc_usdt |    159.53 |    159.58 |   10.54534 |      1.02855 |    9 seconds ago |         9 seconds ago |    4 seconds ago |         4 seconds ago |
+| binance | eth_usdt |    519.67 |     520.0 |    0.08984 |      2.33198 |    7 seconds ago |         7 seconds ago |              now |                   now |
+|    gdax |  btc_usd |   8430.86 |   8430.87 | 0.01448655 |  24.32791169 |    3 seconds ago |         3 seconds ago |     1 second ago |          1 second ago |
+|    gdax |  ltc_usd |    159.97 |    159.98 |    0.00002 | 478.22565196 |   28 seconds ago |        28 seconds ago |              now |                   now |
+|    gdax |  eth_usd |    520.93 |    520.94 | 9.48431449 |  79.37008001 |              now |                   now |     1 second ago |         2 seconds ago |
++---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
 ```
 
 #### orders
@@ -143,11 +143,11 @@ the `orders` command.
 
 ```
 iex(4)> orders
-+---------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
-| Account | Symbol |      Type | Price | Size | Status |                            Client ID | Server ID |    Enqueued At | Created At |
-+---------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
-|    gdax | btcusd | buy_limit | 100.1 |  0.1 |  error | a6aa15bc-b271-486f-ab40-f9b35b2cd223 |           | 20 minutes ago |            |
-+---------+--------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
++---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
+| Account |  Symbol |      Type | Price | Size | Status |                            Client ID | Server ID |    Enqueued At | Created At |
++---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
+|    gdax | btc_usd | buy_limit | 100.1 |  0.1 |  error | a6aa15bc-b271-486f-ab40-f9b35b2cd223 |           | 20 minutes ago |            |
++---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
 ```
 
 ## Advisors

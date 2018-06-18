@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshot do
 
   def fetch(symbol, depth) do
     symbol
-    |> Tai.Markets.Symbol.upcase()
+    |> Tai.ExchangeAdapters.Binance.SymbolMapping.to_binance()
     |> Binance.get_depth(depth)
     |> case do
       {:ok, %Binance.OrderBook{bids: bids, asks: asks}} ->
