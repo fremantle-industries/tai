@@ -40,7 +40,7 @@ defmodule Tai.Mixfile do
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},
       {:logger_file_backend, "~> 0.0.10"},
-      {:table_rex, "~> 1.0"},
+      {:table_rex, "~> 2.0"},
       {:timex, "~> 3.1"},
       {:uuid, "~> 1.1"},
       # Needs a new release for mismatch of frame type
