@@ -1,5 +1,5 @@
 defmodule Tai.Exchanges.BalanceTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   doctest Tai.Exchanges.Balance
 
   setup do
@@ -41,7 +41,7 @@ defmodule Tai.Exchanges.BalanceTest do
              }
     end
 
-    test "doesn't reserve any balances if one of the requests fails" do
+    test "doesn't reserve any balances if there are insufficient funds for any of the requests" do
       lock_requests = [
         Tai.Exchanges.LockRequest.new(:btc, 1.0),
         Tai.Exchanges.LockRequest.new(:ltc, 0.11),
@@ -51,8 +51,8 @@ defmodule Tai.Exchanges.BalanceTest do
       assert Tai.Exchanges.Balance.lock_all(:my_test_account, lock_requests) == {
                :error,
                [
-                 Tai.Exchanges.LockRequest.new(:ltc, 0.11),
-                 Tai.Exchanges.LockRequest.new(:ltc, 0.01)
+                 {:insufficient_balance, Tai.Exchanges.LockRequest.new(:ltc, 0.11)},
+                 {:insufficient_balance, Tai.Exchanges.LockRequest.new(:ltc, 0.01)}
                ]
              }
 
@@ -72,7 +72,7 @@ defmodule Tai.Exchanges.BalanceTest do
 
       assert Tai.Exchanges.Balance.lock_all(:my_test_account, lock_requests) == {
                :error,
-               [Tai.Exchanges.LockRequest.new(:xbt, 1.0)]
+               [{:not_found, Tai.Exchanges.LockRequest.new(:xbt, 1.0)}]
              }
 
       assert Tai.Exchanges.Balance.all(:my_test_account) == %{

@@ -42,7 +42,7 @@ defmodule Tai.Exchanges.Balance do
 
             new_errors =
               if Decimal.cmp(new_free, Decimal.new(0)) == :lt do
-                [lock_request | acc.errors]
+                [{:insufficient_balance, lock_request} | acc.errors]
               else
                 acc.errors
               end
@@ -51,7 +51,7 @@ defmodule Tai.Exchanges.Balance do
             |> Map.put(:state, new_state)
             |> Map.put(:errors, new_errors)
           else
-            new_errors = [lock_request | acc.errors]
+            new_errors = [{:not_found, lock_request} | acc.errors]
 
             acc
             |> Map.put(:errors, new_errors)
@@ -74,7 +74,8 @@ defmodule Tai.Exchanges.Balance do
     |> GenServer.call(:all)
   end
 
-  @spec lock_all(atom, [lock_request, ...]) :: :ok | {:error, [lock_request, ...]}
+  @spec lock_all(atom, [lock_request, ...]) ::
+          :ok | {:error, [{:not_found | :insufficient_balance, lock_request}, ...]}
   def lock_all(account_id, lock_requests) do
     account_id
     |> to_name
