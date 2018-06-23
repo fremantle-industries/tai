@@ -25,7 +25,7 @@ defmodule Tai.Exchanges.OrderBookFeedSupervisor do
 
   defp order_book_child_specs(feed_id) do
     feed_id
-    |> Config.order_book_feed_symbols()
+    |> Tai.Exchanges.Config.order_book_feed_symbols()
     |> Enum.map(
       &Supervisor.child_spec(
         {Tai.Markets.OrderBook, feed_id: feed_id, symbol: &1},
@@ -38,9 +38,9 @@ defmodule Tai.Exchanges.OrderBookFeedSupervisor do
     %{
       id: feed_id |> Tai.Exchanges.OrderBookFeed.to_name(),
       start: {
-        feed_id |> Config.order_book_feed_adapter(),
+        feed_id |> Tai.Exchanges.Config.order_book_feed_adapter(),
         :start_link,
-        [[feed_id: feed_id, symbols: feed_id |> Config.order_book_feed_symbols()]]
+        [[feed_id: feed_id, symbols: feed_id |> Tai.Exchanges.Config.order_book_feed_symbols()]]
       },
       type: :worker,
       restart: :permanent,
