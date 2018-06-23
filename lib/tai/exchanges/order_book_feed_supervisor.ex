@@ -1,8 +1,6 @@
 defmodule Tai.Exchanges.OrderBookFeedSupervisor do
   use Supervisor
 
-  alias Tai.Exchanges.Config
-
   def start_link(feed_id) do
     Supervisor.start_link(__MODULE__, feed_id, name: feed_id |> to_name)
   end
