@@ -25,36 +25,24 @@ defmodule Tai.Exchanges.BalanceTest do
            }
   end
 
-  describe "#lock_all" do
-    test "reserves balances for all of the requests" do
-      balance_change_requests = [
-        Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.0),
-        Tai.Exchanges.BalanceChangeRequest.new(:ltc, 0.1)
-      ]
+  describe "#lock" do
+    test "locks the balance for the asset" do
+      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.0)
 
-      assert Tai.Exchanges.Balance.lock_all(:my_test_account, balance_change_requests) == :ok
+      assert Tai.Exchanges.Balance.lock(:my_test_account, balance_change_request) == :ok
 
       assert Tai.Exchanges.Balance.all(:my_test_account) == %{
                btc: Tai.Exchanges.BalanceDetail.new(0.1, 2.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.0, 0.2),
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
                eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
              }
     end
 
-    test "doesn't reserve any balances if there are insufficient funds for any of the requests" do
-      balance_change_requests = [
-        Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.0),
-        Tai.Exchanges.BalanceChangeRequest.new(:ltc, 0.11),
-        Tai.Exchanges.BalanceChangeRequest.new(:ltc, 0.01)
-      ]
+    test "doesn't lock the balance if the asset doesn't exist" do
+      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:xbt, 1.0)
 
-      assert Tai.Exchanges.Balance.lock_all(:my_test_account, balance_change_requests) == {
-               :error,
-               [
-                 {:insufficient_balance, Tai.Exchanges.BalanceChangeRequest.new(:ltc, 0.11)},
-                 {:insufficient_balance, Tai.Exchanges.BalanceChangeRequest.new(:ltc, 0.01)}
-               ]
-             }
+      assert Tai.Exchanges.Balance.lock(:my_test_account, balance_change_request) ==
+               {:error, :not_found}
 
       assert Tai.Exchanges.Balance.all(:my_test_account) == %{
                btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
@@ -63,17 +51,11 @@ defmodule Tai.Exchanges.BalanceTest do
              }
     end
 
-    test "doesn't reserve any balances if one of the assets doesn't exist" do
-      balance_change_requests = [
-        Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.0),
-        Tai.Exchanges.BalanceChangeRequest.new(:xbt, 1.0),
-        Tai.Exchanges.BalanceChangeRequest.new(:ltc, 0.1)
-      ]
+    test "doesn't lock the balance if there is insufficient funds" do
+      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.11)
 
-      assert Tai.Exchanges.Balance.lock_all(:my_test_account, balance_change_requests) == {
-               :error,
-               [{:not_found, Tai.Exchanges.BalanceChangeRequest.new(:xbt, 1.0)}]
-             }
+      assert Tai.Exchanges.Balance.lock(:my_test_account, balance_change_request) ==
+               {:error, :insufficient_balance}
 
       assert Tai.Exchanges.Balance.all(:my_test_account) == %{
                btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
