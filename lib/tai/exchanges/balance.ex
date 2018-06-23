@@ -3,7 +3,7 @@ defmodule Tai.Exchanges.Balance do
   Manages the balances of an account
   """
 
-  @type lock_request :: Tai.Exchanges.LockRequest.t()
+  @type balance_change_request :: Tai.Exchanges.BalanceChangeRequest.t()
 
   use GenServer
 
@@ -23,26 +23,26 @@ defmodule Tai.Exchanges.Balance do
     {:reply, state, state}
   end
 
-  def handle_call({:lock_all, lock_requests}, _from, state) do
+  def handle_call({:lock_all, balance_change_requests}, _from, state) do
     result =
-      lock_requests
+      balance_change_requests
       |> Enum.reduce(
         %{state: state, errors: []},
-        fn lock_request, acc ->
-          if detail = Map.get(acc.state, lock_request.asset) do
-            new_free = Decimal.sub(detail.free, lock_request.amount)
-            new_locked = Decimal.add(detail.locked, lock_request.amount)
+        fn balance_change_request, acc ->
+          if detail = Map.get(acc.state, balance_change_request.asset) do
+            new_free = Decimal.sub(detail.free, balance_change_request.amount)
+            new_locked = Decimal.add(detail.locked, balance_change_request.amount)
 
             new_detail =
               detail
               |> Map.put(:free, new_free)
               |> Map.put(:locked, new_locked)
 
-            new_state = Map.put(acc.state, lock_request.asset, new_detail)
+            new_state = Map.put(acc.state, balance_change_request.asset, new_detail)
 
             new_errors =
               if Decimal.cmp(new_free, Decimal.new(0)) == :lt do
-                [{:insufficient_balance, lock_request} | acc.errors]
+                [{:insufficient_balance, balance_change_request} | acc.errors]
               else
                 acc.errors
               end
@@ -51,7 +51,7 @@ defmodule Tai.Exchanges.Balance do
             |> Map.put(:state, new_state)
             |> Map.put(:errors, new_errors)
           else
-            new_errors = [{:not_found, lock_request} | acc.errors]
+            new_errors = [{:not_found, balance_change_request} | acc.errors]
 
             acc
             |> Map.put(:errors, new_errors)
@@ -67,6 +67,31 @@ defmodule Tai.Exchanges.Balance do
     end
   end
 
+  def handle_call(
+        {:unlock, %Tai.Exchanges.BalanceChangeRequest{asset: asset, amount: amount}},
+        _from,
+        state
+      ) do
+    if detail = Map.get(state, asset) do
+      new_free = Decimal.add(detail.free, amount)
+      new_locked = Decimal.sub(detail.locked, amount)
+
+      new_detail =
+        detail
+        |> Map.put(:free, new_free)
+        |> Map.put(:locked, new_locked)
+
+      if Decimal.cmp(new_locked, Decimal.new(0)) == :lt do
+        {:reply, {:error, :insufficient_balance}, state}
+      else
+        new_state = Map.put(state, asset, new_detail)
+        {:reply, :ok, new_state}
+      end
+    else
+      {:reply, {:error, :not_found}, state}
+    end
+  end
+
   @spec all(atom) :: map
   def all(account_id) do
     account_id
@@ -74,12 +99,19 @@ defmodule Tai.Exchanges.Balance do
     |> GenServer.call(:all)
   end
 
-  @spec lock_all(atom, [lock_request, ...]) ::
-          :ok | {:error, [{:not_found | :insufficient_balance, lock_request}, ...]}
-  def lock_all(account_id, lock_requests) do
+  @spec lock_all(atom, [balance_change_request, ...]) ::
+          :ok | {:error, [{:not_found | :insufficient_balance, balance_change_request}, ...]}
+  def lock_all(account_id, balance_change_requests) do
     account_id
     |> to_name
-    |> GenServer.call({:lock_all, lock_requests})
+    |> GenServer.call({:lock_all, balance_change_requests})
+  end
+
+  @spec unlock(atom, balance_change_request) :: :ok | {:error, :not_found | :insufficient_balance}
+  def unlock(account_id, balance_change_request) do
+    account_id
+    |> to_name
+    |> GenServer.call({:unlock, balance_change_request})
   end
 
   @doc """
