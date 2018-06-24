@@ -236,7 +236,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btc_usd]},
         accounts: [:my_test_account],
-        store: %{return_val: {:ok, %{store: %{hello: "world"}}}}
+        store: %{return_val: {:ok, %{hello: "world"}}}
       ]
     })
 

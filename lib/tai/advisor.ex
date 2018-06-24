@@ -41,7 +41,7 @@ defmodule Tai.Advisor do
               inside_quote :: Tai.Markets.Quote.t(),
               changes :: map | list,
               state :: Tai.Advisor.t()
-            ) :: :ok | {:ok, actions :: map}
+            ) :: :ok | {:ok, store :: map}
 
   @doc """
   Returns an atom that will identify the process
@@ -253,7 +253,7 @@ defmodule Tai.Advisor do
           |> handle_inside_quote(symbol, current_inside_quote, changes, state)
           |> normalize_handle_inside_quote_response
           |> case do
-            {:ok, actions} -> update_state(actions, state)
+            {:ok, new_store} -> Map.put(state, :store, new_store)
             :error -> state
           end
         end
@@ -264,15 +264,12 @@ defmodule Tai.Advisor do
         normalize_handle_inside_quote_response(@empty_response)
       end
 
-      defp normalize_handle_inside_quote_response({:ok, _actions} = response), do: response
+      defp normalize_handle_inside_quote_response({:ok, _store} = response), do: response
 
       defp normalize_handle_inside_quote_response(unhandled) do
         Logger.warn("handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'")
         :error
       end
-
-      defp update_state(%{store: store}, state), do: state |> Map.put(:store, store)
-      defp update_state(%{}, state), do: state
 
       defoverridable init_store: 1,
                      handle_order_book_changes: 4,
