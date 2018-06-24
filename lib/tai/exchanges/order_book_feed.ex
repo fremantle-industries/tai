@@ -6,7 +6,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
   @typedoc """
   The state of the running order book feed
   """
-  @type t :: Tai.Exchanges.OrderBookFeed
+  @type t :: %Tai.Exchanges.OrderBookFeed{}
 
   @enforce_keys [:feed_id, :symbols, :store]
   defstruct [:feed_id, :symbols, :store]
@@ -20,8 +20,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
   @doc """
   Invoked after a message is received on the socket and should be used to process the message
   """
-  @callback handle_msg(msg :: map, feed_id :: atom) ::
-              {:ok, state :: Tai.Exchanges.OrderBookFeed.t()}
+  @callback handle_msg(msg :: map, feed :: t) :: {:ok, state :: t}
 
   @doc """
   Returns an atom that will identify the process
