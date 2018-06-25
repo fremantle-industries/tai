@@ -13,7 +13,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
     end
 
     def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
-      send(:test, {feed_id, symbol, inside_quote, changes, state})
+      send(:init_success, {feed_id, symbol, inside_quote, changes, state})
       :ok
     end
   end
@@ -24,19 +24,15 @@ defmodule Tai.Advisors.InitCallbacksTest do
     def init_store(_), do: :error
 
     def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
-      send(:test, {feed_id, symbol, inside_quote, changes, state})
+      send(:init_failure, {feed_id, symbol, inside_quote, changes, state})
       :ok
     end
   end
 
-  setup do
-    Process.register(self(), :test)
-
-    :ok
-  end
-
   describe "#init_store" do
     test "allows the store to be updated with an ok tuple" do
+      Process.register(self(), :init_success)
+
       start_supervised!({
         Tai.Markets.OrderBook,
         [
@@ -80,6 +76,8 @@ defmodule Tai.Advisors.InitCallbacksTest do
     end
 
     test "logs an error and uses the original store when not an ok tuple" do
+      Process.register(self(), :init_failure)
+
       log_msg =
         capture_log(fn ->
           start_supervised!({
