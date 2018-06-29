@@ -1,5 +1,5 @@
 %{
-  "binance": {:git, "https://github.com/fremantle-capital/binance.ex.git", "1c7e5640b468f4752944639fa4777f607ab05595", [branch: "struct-insufficient-balance-error"]},
+  "binance": {:git, "https://github.com/fremantle-capital/binance.ex.git", "eff77030b5fafeab694fce47557ade9cce0cfca1", [branch: "struct-insufficient-balance-error"]},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
   "certifi": {:hex, :certifi, "2.3.1", "d0f424232390bf47d82da8478022301c561cf6445b5b5fb6a84d49a9e76d2639", [:rebar3], [{:parse_trans, "3.2.0", [hex: :parse_trans, repo: "hexpm", optional: false]}], "hexpm"},
   "combine": {:hex, :combine, "0.10.0", "eff8224eeb56498a2af13011d142c5e7997a80c8f5b97c499f84c841032e429f", [:mix], [], "hexpm"},
