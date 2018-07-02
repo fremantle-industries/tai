@@ -139,21 +139,25 @@ defmodule Tai.Trading.OrderStore do
     |> Enum.reduce(
       [],
       fn %Tai.Trading.OrderSubmission{} = submission, acc ->
-        order = %Tai.Trading.Order{
-          client_id: UUID.uuid4(),
-          account_id: submission.account_id,
-          symbol: submission.symbol,
-          side: submission.side,
-          type: submission.type,
-          price: abs(submission.price),
-          size: abs(submission.size),
-          time_in_force: submission.time_in_force,
-          status: Tai.Trading.OrderStatus.enqueued(),
-          enqueued_at: Timex.now(),
-          order_updated_callback: submission.order_updated_callback
-        }
+        with price <- submission.price |> Decimal.new() |> Decimal.abs(),
+             size <- submission.size |> Decimal.new() |> Decimal.abs(),
+             enqueued_at <- Timex.now() do
+          order = %Tai.Trading.Order{
+            client_id: UUID.uuid4(),
+            account_id: submission.account_id,
+            symbol: submission.symbol,
+            side: submission.side,
+            type: submission.type,
+            price: price,
+            size: size,
+            time_in_force: submission.time_in_force,
+            status: Tai.Trading.OrderStatus.enqueued(),
+            enqueued_at: enqueued_at,
+            order_updated_callback: submission.order_updated_callback
+          }
 
-        [order | acc]
+          [order | acc]
+        end
       end
     )
     |> Enum.reverse()

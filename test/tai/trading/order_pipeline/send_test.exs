@@ -36,9 +36,9 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
       }
 
       assert previous_order.client_id == order.client_id
-      assert previous_order.executed_size == 0
+      assert previous_order.executed_size == Decimal.new(0)
       assert updated_order.client_id == order.client_id
-      assert updated_order.executed_size == 0
+      assert updated_order.executed_size == Decimal.new(0)
     end
 
     test "expires unfilled sell orders", %{callback: callback} do
@@ -59,9 +59,9 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
       }
 
       assert previous_order.client_id == order.client_id
-      assert previous_order.executed_size == 0
+      assert previous_order.executed_size == Decimal.new(0)
       assert updated_order.client_id == order.client_id
-      assert updated_order.executed_size == 0
+      assert updated_order.executed_size == Decimal.new(0)
     end
 
     test "updates the executed size of filled buy orders", %{callback: callback} do
@@ -84,9 +84,9 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
           }
 
           assert previous_order.client_id == order.client_id
-          assert previous_order.executed_size == 0
+          assert previous_order.executed_size == Decimal.new(0)
           assert updated_order.client_id == order.client_id
-          assert updated_order.executed_size == 0.1
+          assert updated_order.executed_size == Decimal.new(0.1)
         end)
 
       assert log_msg =~ "order filled - client_id:"
@@ -110,9 +110,9 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
       }
 
       assert previous_order.client_id == order.client_id
-      assert previous_order.executed_size == 0
+      assert previous_order.executed_size == Decimal.new(0)
       assert updated_order.client_id == order.client_id
-      assert updated_order.executed_size == 0.1
+      assert updated_order.executed_size == Decimal.new(0.1)
     end
   end
 
@@ -137,9 +137,9 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
           }
 
           assert previous_order.client_id == order.client_id
-          assert previous_order.executed_size == 0
+          assert previous_order.executed_size == Decimal.new(0)
           assert updated_order.client_id == order.client_id
-          assert updated_order.executed_size == 0
+          assert updated_order.executed_size == Decimal.new(0)
         end)
 
       assert log_msg =~ "order pending - client_id:"
@@ -166,10 +166,10 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
 
           assert previous_order.client_id == order.client_id
           assert previous_order.server_id == nil
-          assert previous_order.executed_size == 0
+          assert previous_order.executed_size == Decimal.new(0)
           assert updated_order.client_id == order.client_id
           assert updated_order.server_id != nil
-          assert updated_order.executed_size == 0
+          assert updated_order.executed_size == Decimal.new(0)
         end)
 
       assert log_msg =~ "order pending - client_id:"

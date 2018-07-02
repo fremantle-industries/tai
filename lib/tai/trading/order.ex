@@ -13,7 +13,7 @@ defmodule Tai.Trading.Order do
     :time_in_force,
     :type
   ]
-  defstruct executed_size: 0,
+  defstruct executed_size: Decimal.new(0),
             client_id: nil,
             created_at: nil,
             enqueued_at: nil,

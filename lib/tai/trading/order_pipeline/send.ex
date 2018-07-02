@@ -48,7 +48,7 @@ defmodule Tai.Trading.OrderPipeline.Send do
       Tai.Trading.OrderStore.find_by_and_update(
         [client_id: client_id],
         status: Tai.Trading.OrderStatus.filled(),
-        executed_size: executed_size
+        executed_size: Decimal.new(executed_size)
       )
 
     Tai.Trading.Order.updated_callback(old_order, updated_order)

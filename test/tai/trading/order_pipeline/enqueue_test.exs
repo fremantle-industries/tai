@@ -34,8 +34,8 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
 
         assert Tai.Trading.OrderStore.count() == 1
         assert order.status == Tai.Trading.OrderStatus.enqueued()
-        assert order.price == 100.1
-        assert order.size == 0.1
+        assert order.price == Decimal.new(100.1)
+        assert order.size == Decimal.new(0.1)
         assert order.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
         assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
 
@@ -62,8 +62,8 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
 
         assert Tai.Trading.OrderStore.count() == 1
         assert order.status == Tai.Trading.OrderStatus.enqueued()
-        assert order.price == 100_000.1
-        assert order.size == 0.01
+        assert order.price == Decimal.new(100_000.1)
+        assert order.size == Decimal.new(0.01)
         assert order.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
         assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
         :timer.sleep(100)
