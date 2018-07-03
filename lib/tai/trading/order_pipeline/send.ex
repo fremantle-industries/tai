@@ -42,7 +42,7 @@ defmodule Tai.Trading.OrderPipeline.Send do
          {:ok, %Tai.Trading.OrderResponse{status: :filled, executed_size: executed_size}},
          %Tai.Trading.Order{client_id: client_id}
        ) do
-    Logger.warn(fn -> "order filled - client_id: #{client_id}" end)
+    Logger.info(fn -> "order filled - client_id: #{client_id}" end)
 
     {:ok, [old_order, updated_order]} =
       Tai.Trading.OrderStore.find_by_and_update(
