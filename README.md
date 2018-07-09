@@ -64,20 +64,27 @@ end
 
 ## Usage
 
-`tai` currently runs as an interactive mix console application.
+`tai` runs as an OTP application.
 
-Once started it subscribes to the configured order book feeds and starts 
-[advisors](#advisors) to process the changes in the order book where you can 
-execute orders using a uniform API across exchanges.
+During development we can leverage `mix` to compile and run our application:
 
 ```bash
-iex -S mix
+elixir --sname tai -S mix run --no-halt
 ```
+
+This will run your `tai` configuration as a process in the foreground. We assign
+a shortname so that we can connect and observe the node at any time via iex:
+
+```bash
+iex --sname client --remsh tai@localhost
+```
+
+This gives you an interactive elixir shell with a set of tai helper commands:
 
 ### Commands
 
-You can view your total balance, inspect the state of orders, display live markets 
-or execute manual orders using the following commands.
+You can view your [total balance](#balance), inspect the [state of orders](#orders), 
+display [live markets](#markets) or execute manual orders using the following commands.
 
 #### help
 
