@@ -46,5 +46,5 @@
   "tzdata": {:hex, :tzdata, "0.5.16", "13424d3afc76c68ff607f2df966c0ab4f3258859bbe3c979c9ed1606135e7352", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, repo: "hexpm", optional: false]}], "hexpm"},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.3.1", "a1f612a7b512638634a603c8f401892afbf99b8ce93a45041f8aaca99cadb85e", [:rebar3], [], "hexpm"},
   "uuid": {:hex, :uuid, "1.1.8", "e22fc04499de0de3ed1116b770c7737779f226ceefa0badb3592e64d5cfb4eb9", [:mix], [], "hexpm"},
-  "websockex": {:git, "https://github.com/Azolo/websockex.git", "a076c20d07abd029116d02f290720a9bba955357", []},
+  "websockex": {:hex, :websockex, "0.4.1", "d7b7191ec3d5dd136683b60114405a5a130a175faade773a07cb52dbd98f9442", [:mix], [], "hexpm"},
 }

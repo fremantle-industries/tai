@@ -40,9 +40,9 @@ defmodule Tai.Mixfile do
       {:table_rex, "~> 2.0"},
       {:timex, "~> 3.1"},
       {:uuid, "~> 1.1"},
-      # Needs a new release for mismatch of frame type
-      # {:websockex, "~> 0.4"},
-      {:websockex, github: "Azolo/websockex"},
+      # Fixes dialyzer warning, but can't release new hex package
+      # {:websockex, github: "Azolo/websockex"},
+      {:websockex, "~> 0.4"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
       {:echo_boy, "~> 0.1.0", github: "rupurt/echo_boy", only: [:dev, :test]},
