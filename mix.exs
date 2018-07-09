@@ -30,10 +30,7 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
-      # Open PR's for balance errors & new order types
-      # {:binance, "~> 0.4.0"},
-      {:binance,
-       github: "fremantle-capital/binance.ex", branch: "struct-insufficient-balance-error"},
+      {:binance, "~> 0.5.0"},
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.3"},
       {:ex_poloniex, "~> 0.0.2"},
