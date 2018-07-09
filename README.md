@@ -47,7 +47,7 @@ Tai requires Elixir 1.6. Add `tai` to your list of dependencies in `mix.exs`
 ```elixir
 def deps do
   [
-    {:tai, "~> 0.0.2"}
+    {:tai, "~> 0.0.3"}
   ]
 end
 ```
