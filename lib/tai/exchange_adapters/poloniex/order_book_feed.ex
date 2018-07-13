@@ -1,10 +1,11 @@
 defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
   @moduledoc """
+  Hydrate order books for the Poloniex exchange
   """
 
   use Tai.Exchanges.OrderBookFeed
 
-  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook, WebSocket}
+  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook}
   alias Tai.ExchangeAdapters.Poloniex.{Snapshot, SymbolMapping}
 
   @doc """
@@ -21,7 +22,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
       |> Enum.map(fn symbol ->
         with poloniex_symbol <- SymbolMapping.to_poloniex(symbol),
              :ok <-
-               WebSocket.send_json_msg(pid, %{command: "subscribe", channel: poloniex_symbol}) do
+               Tai.WebSocket.send_json_msg(pid, %{command: "subscribe", channel: poloniex_symbol}) do
           :ok
         else
           {:error, _} = error ->
