@@ -1,4 +1,8 @@
 defmodule Tai.Supervisor do
+  @moduledoc """
+  Root supervisor for tai components
+  """
+
   use Supervisor
 
   def start_link do
@@ -10,8 +14,7 @@ defmodule Tai.Supervisor do
       Tai.PubSub,
       Tai.Trading.Supervisor,
       Tai.Advisors.Supervisor,
-      Tai.Exchanges.AccountsSupervisor,
-      Tai.Exchanges.OrderBookFeedsSupervisor
+      Tai.Exchanges.Supervisor
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
