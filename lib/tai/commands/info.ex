@@ -1,7 +1,12 @@
 defmodule Tai.Commands.Info do
+  @moduledoc """
+  Display the available commands and their usage
+  """
+
   def help do
     IO.puts("""
     * balance
+    * products
     * markets
     * orders
     * buy_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)

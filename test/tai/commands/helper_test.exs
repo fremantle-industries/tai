@@ -24,12 +24,50 @@ defmodule Tai.Commands.HelperTest do
   test "help returns the usage for the supported commands" do
     assert capture_io(&Helper.help/0) == """
            * balance
+           * products
            * markets
            * orders
            * buy_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
            * sell_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
            * order_status account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
            * cancel_order account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")\n
+           """
+  end
+
+  test "products shows the list of products and their trade restrictions for the configured exchanges" do
+    mock_product(%Tai.Exchanges.Product{
+      exchange_id: :test_exchange_a,
+      symbol: :btc_usd,
+      exchange_symbol: "BTC_USD",
+      status: :trading,
+      min_price: Decimal.new("0.00001000"),
+      max_price: Decimal.new("100000.00000000"),
+      tick_size: Decimal.new("0.00000100"),
+      min_size: Decimal.new("0.00100000"),
+      max_size: Decimal.new("100000.00000000"),
+      step_size: Decimal.new("0.00100000")
+    })
+
+    mock_product(%Tai.Exchanges.Product{
+      exchange_id: :test_exchange_b,
+      symbol: :eth_usd,
+      exchange_symbol: "ETH_USD",
+      status: :trading,
+      min_price: Decimal.new("0.00001000"),
+      max_price: Decimal.new("100000.00000000"),
+      tick_size: Decimal.new("0.00000100"),
+      min_size: Decimal.new("0.00100000"),
+      max_size: Decimal.new("100000.00000000"),
+      step_size: Decimal.new("0.00100000")
+    })
+
+    assert capture_io(&Helper.products/0) == """
+           +-----------------+---------+-----------------+---------+------------+-----------------+------------+------------+-----------------+------------+
+           |     Exchange ID |  Symbol | Exchange Symbol |  Status |  Min Price |       Max Price |  Tick Size |   Min Size |        Max Size |  Step Size |
+           +-----------------+---------+-----------------+---------+------------+-----------------+------------+------------+-----------------+------------+
+           | test_exchange_a | btc_usd |         BTC_USD | trading | 0.00001000 | 100000.00000000 | 0.00000100 | 0.00100000 | 100000.00000000 | 0.00100000 |
+           | test_exchange_b | eth_usd |         ETH_USD | trading | 0.00001000 | 100000.00000000 | 0.00000100 | 0.00100000 | 100000.00000000 | 0.00100000 |
+           +-----------------+---------+-----------------+---------+------------+-----------------+------------+------------+-----------------+------------+\n
            """
   end
 

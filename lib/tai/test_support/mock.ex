@@ -1,4 +1,9 @@
 defmodule Tai.TestSupport.Mock do
+  @spec mock_product(Tai.Exchanges.Product.t()) :: :ok
+  def mock_product(product) do
+    Tai.Exchanges.Products.upsert(product)
+  end
+
   @spec mock_snapshot(atom, atom, map, map) ::
           :ok
           | {:error,

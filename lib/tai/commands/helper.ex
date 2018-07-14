@@ -9,6 +9,9 @@ defmodule Tai.Commands.Helper do
   @spec balance :: no_return
   defdelegate balance, to: Tai.Commands.Balance
 
+  @spec products :: no_return
+  defdelegate products, to: Tai.Commands.Products
+
   @spec markets :: no_return
   defdelegate markets, to: Tai.Commands.Markets
 
