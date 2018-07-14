@@ -3,6 +3,40 @@ defmodule Tai.Exchanges.Config do
   Configuration helper for exchanges
   """
 
+  @type t :: %Tai.Exchanges.Config{}
+
+  @enforce_keys [:id, :supervisor]
+  defstruct [:id, :supervisor]
+
+  @doc """
+  Return a struct for all configured exchanges 
+
+  ## Examples
+
+    iex> Tai.Exchanges.Config.all
+    [
+      %Tai.Exchanges.Config{
+        id: :test_exchange_a,
+        supervisor: Tai.ExchangeAdapters.Test.Supervisor
+      },
+      %Tai.Exchanges.Config{
+        id: :test_exchange_b,
+        supervisor: Tai.ExchangeAdapters.Test.Supervisor
+      }
+    ]
+  """
+  @spec all :: list(t)
+  def all do
+    :tai
+    |> Application.get_env(:exchanges)
+    |> Enum.map(fn {id, params} ->
+      %Tai.Exchanges.Config{
+        id: id,
+        supervisor: Keyword.get(params, :supervisor)
+      }
+    end)
+  end
+
   @doc """
   Return a map of account configuration
 

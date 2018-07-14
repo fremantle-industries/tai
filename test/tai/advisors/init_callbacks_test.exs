@@ -29,6 +29,12 @@ defmodule Tai.Advisors.InitCallbacksTest do
     end
   end
 
+  setup do
+    on_exit(fn ->
+      restart_application()
+    end)
+  end
+
   describe "#init_store" do
     test "allows the store to be updated with an ok tuple" do
       Process.register(self(), :init_success)

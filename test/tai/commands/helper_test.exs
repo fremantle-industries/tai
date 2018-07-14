@@ -5,6 +5,7 @@ defmodule Tai.Commands.HelperTest do
   doctest Tai.Commands.Helper
 
   import ExUnit.CaptureIO
+  import Tai.TestSupport.Mock
 
   alias Tai.{Commands.Helper, Markets.OrderBook}
   alias Tai.Trading.{OrderSubmission, TimeInForce}
@@ -14,7 +15,7 @@ defmodule Tai.Commands.HelperTest do
     stop_supervised(test_feed_a_btc_usd)
 
     on_exit(fn ->
-      Tai.Trading.OrderStore.clear()
+      restart_application()
     end)
 
     {:ok, %{test_feed_a_btc_usd: test_feed_a_btc_usd}}

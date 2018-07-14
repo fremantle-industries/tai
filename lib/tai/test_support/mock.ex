@@ -21,8 +21,8 @@ defmodule Tai.TestSupport.Mock do
       })
   end
 
-  @spec reset_mocks :: no_return
-  def reset_mocks do
+  @spec restart_application :: no_return
+  def restart_application do
     Application.stop(:tai)
     :ok = Application.start(:tai)
   end

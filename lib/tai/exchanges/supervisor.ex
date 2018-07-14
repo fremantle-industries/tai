@@ -12,6 +12,7 @@ defmodule Tai.Exchanges.Supervisor do
   def init(:ok) do
     [
       Tai.Exchanges.Products,
+      Tai.Exchanges.AdaptersSupervisor,
       # TODO
       # AccountsSupervisor & OrderBookFeedsSupervisor will become the 
       # responsibility of each individual adapter supervisor. Once complete

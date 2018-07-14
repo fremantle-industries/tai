@@ -37,6 +37,16 @@ config :binance,
   secret_key: System.get_env("BINANCE_API_SECRET")
 
 config :tai,
+  exchanges: %{
+    test_exchange_a: [
+      supervisor: Tai.ExchangeAdapters.Test.Supervisor
+    ],
+    test_exchange_b: [
+      supervisor: Tai.ExchangeAdapters.Test.Supervisor
+    ]
+  }
+
+config :tai,
   order_book_feeds: %{
     test_feed_a: [
       adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,

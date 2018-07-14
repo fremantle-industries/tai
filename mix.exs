@@ -30,7 +30,8 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
-      {:binance, "~> 0.5.0"},
+      # {:binance, "~> 0.5.0"},
+      {:binance, github: "fremantle-capital/binance.ex", branch: "add-exchange-info"},
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.3"},
       {:ex_poloniex, "~> 0.0.2"},
@@ -45,7 +46,7 @@ defmodule Tai.Mixfile do
       # {:websockex, "~> 0.4"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
-      {:echo_boy, "~> 0.1.0", github: "rupurt/echo_boy", only: [:dev, :test]},
+      {:echo_boy, github: "rupurt/echo_boy", only: [:dev, :test]},
       {:exvcr, "~> 0.10.2", only: [:dev, :test]},
       {:plug, "~> 1.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.8", only: :test},

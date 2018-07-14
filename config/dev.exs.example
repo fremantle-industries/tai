@@ -16,6 +16,13 @@ config :binance,
   secret_key: System.get_env("BINANCE_API_SECRET")
 
 config :tai,
+  exchanges: %{
+    binance: [
+      supervisor: Tai.ExchangeAdapters.Binance.Supervisor
+    ]
+  }
+
+config :tai,
   order_book_feeds: %{
     gdax: [
       adapter: Tai.ExchangeAdapters.Gdax.OrderBookFeed,
