@@ -1,4 +1,4 @@
-defmodule Tai.Markets.Symbol do
+defmodule Tai.Symbol do
   @moduledoc """
   Transform symbols between tai and exchange formats
   """

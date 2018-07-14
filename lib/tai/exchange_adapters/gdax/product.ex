@@ -1,6 +1,4 @@
 defmodule Tai.ExchangeAdapters.Gdax.Product do
-  alias Tai.Markets.Symbol
-
   def to_symbol(product_id) do
     product_id
     |> strip_and_downcase
@@ -9,13 +7,13 @@ defmodule Tai.ExchangeAdapters.Gdax.Product do
 
   def to_product_id(symbol) do
     symbol
-    |> Symbol.downcase()
+    |> Tai.Symbol.downcase()
     |> to_normalized_product_id
   end
 
   def to_product_ids(symbols) do
     symbols
-    |> Symbol.downcase_all()
+    |> Tai.Symbol.downcase_all()
     |> to_normalized_product_ids
   end
 
