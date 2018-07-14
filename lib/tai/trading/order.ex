@@ -1,5 +1,16 @@
 defmodule Tai.Trading.Order do
-  @type t :: Tai.Trading.Order
+  @type t :: %Tai.Trading.Order{
+          account_id: atom,
+          client_id: String.t(),
+          enqueued_at: DateTime.t(),
+          side: atom,
+          status: atom,
+          symbol: atom,
+          time_in_force: atom,
+          type: atom,
+          price: Decimal.t(),
+          size: Decimal.t()
+        }
 
   @enforce_keys [
     :account_id,

@@ -3,6 +3,7 @@ defmodule Tai.Exchanges.Account do
   Uniform interface for private exchange actions
   """
 
+  @type order :: Tai.Trading.Order.t()
   @type order_response :: Tai.Trading.OrderResponse.t()
   @type credential_error :: Tai.CredentialError.t()
   @type timeout_error :: Tai.TimeoutError.t()
@@ -92,7 +93,7 @@ defmodule Tai.Exchanges.Account do
 
   {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
   """
-  @spec buy_limit(term) ::
+  @spec buy_limit(order) ::
           {:ok, order_response} | {:error, invalid_order_type_error | insufficient_balance_error}
   def buy_limit(%Tai.Trading.Order{} = order) do
     if Tai.Trading.Order.buy_limit?(order) do
