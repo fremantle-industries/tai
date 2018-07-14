@@ -2,29 +2,43 @@ defmodule Tai.Markets.SymbolTest do
   use ExUnit.Case, async: true
   doctest Tai.Markets.Symbol
 
-  alias Tai.Markets.Symbol
+  describe "#downcase" do
+    test "converts an atom to a downcase string" do
+      assert Tai.Markets.Symbol.downcase(:FOO) == "foo"
+    end
 
-  test "downcase converts an atom to a downcased string" do
-    assert Symbol.downcase(:FOO) == "foo"
+    test "converts an uppercase string to a downcase string" do
+      assert Tai.Markets.Symbol.downcase("FOO") == "foo"
+    end
   end
 
-  test "downcase converts an uppercase string to downcase" do
-    assert Symbol.downcase("FOO") == "foo"
+  describe "#downcase_all" do
+    test "converts atoms to downcase strings" do
+      assert Tai.Markets.Symbol.downcase_all([:FOO, :Bar]) == ["foo", "bar"]
+    end
+
+    test "converts uppercase strings to downcase strings" do
+      assert Tai.Markets.Symbol.downcase_all(["FOO", "Bar"]) == ["foo", "bar"]
+    end
   end
 
-  test "downcase_all converts atoms to downcased strings" do
-    assert Symbol.downcase_all([:FOO, :Bar]) == ["foo", "bar"]
+  describe "#upcase" do
+    test "converts an atom to an uppercase string" do
+      assert Tai.Markets.Symbol.upcase(:foo) == "FOO"
+    end
+
+    test "converts a downcase string to an uppercase string" do
+      assert Tai.Markets.Symbol.upcase("foo") == "FOO"
+    end
   end
 
-  test "downcase_all converts uppercase strings to downcase" do
-    assert Symbol.downcase_all(["FOO", "Bar"]) == ["foo", "bar"]
-  end
+  describe "#build" do
+    test "returns a symbol for the base and quote asset separated by an underscore" do
+      assert Tai.Markets.Symbol.build("btc", "usdt") == :btc_usdt
+    end
 
-  test "upcase converts an atom to an upcased string" do
-    assert Symbol.upcase(:foo) == "FOO"
-  end
-
-  test "upcase converts a downcase string to uppercase" do
-    assert Symbol.upcase("foo") == "FOO"
+    test "downcases the base and quote assets" do
+      assert Tai.Markets.Symbol.build("BTC", "USDT") == :btc_usdt
+    end
   end
 end
