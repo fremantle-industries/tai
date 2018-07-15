@@ -6,12 +6,7 @@ defmodule Tai.Exchanges.Product do
     :symbol,
     :exchange_symbol,
     :status,
-    :min_price,
-    :max_price,
-    :tick_size,
-    :min_size,
-    :max_size,
-    :step_size
+    :min_notional
   ]
   defstruct [
     :exchange_id,
@@ -23,6 +18,7 @@ defmodule Tai.Exchanges.Product do
     :tick_size,
     :min_size,
     :max_size,
-    :step_size
+    :step_size,
+    :min_notional
   ]
 end

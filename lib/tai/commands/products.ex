@@ -26,7 +26,8 @@ defmodule Tai.Commands.Products do
         product.tick_size,
         product.min_size,
         product.max_size,
-        product.step_size
+        product.step_size,
+        product.min_notional
       ]
     end)
   end
@@ -43,7 +44,8 @@ defmodule Tai.Commands.Products do
       "Tick Size",
       "Min Size",
       "Max Size",
-      "Step Size"
+      "Step Size",
+      "Min Notional"
     ]
 
     rows

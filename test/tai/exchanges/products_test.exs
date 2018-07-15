@@ -17,7 +17,8 @@ defmodule Tai.Exchanges.ProductsTest do
       tick_size: Decimal.new("0.00100000"),
       min_size: Decimal.new("0.00100000"),
       max_size: Decimal.new("10000.00000000"),
-      step_size: Decimal.new("0.00100000")
+      step_size: Decimal.new("0.00100000"),
+      min_notional: Decimal.new("0.01000000")
     }
 
     {:ok, %{product: product}}

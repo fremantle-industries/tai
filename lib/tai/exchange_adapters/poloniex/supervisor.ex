@@ -1,6 +1,6 @@
-defmodule Tai.ExchangeAdapters.Binance.Supervisor do
+defmodule Tai.ExchangeAdapters.Poloniex.Supervisor do
   @moduledoc """
-  Supervisor for the Binance exchange adapter
+  Supervisor for the Poloniex exchange adapter
   """
 
   use Supervisor
@@ -15,7 +15,7 @@ defmodule Tai.ExchangeAdapters.Binance.Supervisor do
 
   def init(exchange_id) do
     [
-      {Tai.ExchangeAdapters.Binance.Products, exchange_id}
+      {Tai.ExchangeAdapters.Poloniex.Products, exchange_id}
     ]
     |> Supervisor.init(strategy: :one_for_one)
   end

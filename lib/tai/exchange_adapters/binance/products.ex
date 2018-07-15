@@ -38,7 +38,8 @@ defmodule Tai.ExchangeAdapters.Binance.Products do
     with symbol <- Tai.Symbol.build(base_asset, quote_asset),
          status <- tai_status(exchange_status),
          {min_price, max_price, tick_size} <- filters |> price_filter,
-         {min_size, max_size, step_size} <- filters |> size_filter do
+         {min_size, max_size, step_size} <- filters |> size_filter,
+         %Decimal{} = min_notional <- filters |> notional_filter do
       %Tai.Exchanges.Product{
         exchange_id: exchange_id,
         symbol: symbol,
@@ -49,7 +50,8 @@ defmodule Tai.ExchangeAdapters.Binance.Products do
         tick_size: tick_size,
         min_size: min_size,
         max_size: max_size,
-        step_size: step_size
+        step_size: step_size,
+        min_notional: min_notional
       }
       |> Tai.Exchanges.Products.upsert()
     end
@@ -70,6 +72,13 @@ defmodule Tai.ExchangeAdapters.Binance.Products do
     with %{"minQty" => min, "maxQty" => max, "stepSize" => step} <-
            find_filter(filters, @size_filter) do
       {Decimal.new(min), Decimal.new(max), Decimal.new(step)}
+    end
+  end
+
+  @notional_filter "MIN_NOTIONAL"
+  defp notional_filter(filters) do
+    with %{"minNotional" => notional} <- find_filter(filters, @notional_filter) do
+      Decimal.new(notional)
     end
   end
 
