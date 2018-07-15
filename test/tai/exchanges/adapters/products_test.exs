@@ -10,6 +10,10 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
   ]
 
   setup_all do
+    on_exit(fn ->
+      Tai.Exchanges.Products.clear()
+    end)
+
     HTTPoison.start()
     Process.register(self(), :test)
     :ok
