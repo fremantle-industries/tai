@@ -19,6 +19,9 @@ config :tai,
   exchanges: %{
     binance: [
       supervisor: Tai.ExchangeAdapters.Binance.Supervisor
+    ],
+    poloniex: [
+      supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor
     ]
   }
 
