@@ -31,7 +31,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Products do
   end
 
   defp fetch!(exchange_id) do
-    with {:ok, tickers} <- ExPoloniex.Public.return_ticker() do
+    with {:ok, %{} = tickers} <- ExPoloniex.Public.return_ticker() do
       Enum.each(tickers, &upsert_product(&1, exchange_id))
       Tai.Boot.fetched_products(exchange_id)
     end
@@ -50,12 +50,6 @@ defmodule Tai.ExchangeAdapters.Poloniex.Products do
         symbol: symbol,
         exchange_symbol: exchange_symbol,
         status: status,
-        min_price: nil,
-        max_price: nil,
-        tick_size: nil,
-        min_size: nil,
-        max_size: nil,
-        step_size: nil,
         min_notional: @min_notional
       }
       |> Tai.Exchanges.Products.upsert()

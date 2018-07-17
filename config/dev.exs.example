@@ -22,6 +22,9 @@ config :tai,
     ],
     poloniex: [
       supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor
+    ],
+    gdax: [
+      supervisor: Tai.ExchangeAdapters.Gdax.Supervisor
     ]
   }
 

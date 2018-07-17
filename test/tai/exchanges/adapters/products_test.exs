@@ -10,6 +10,10 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
     %Tai.Exchanges.Config{
       id: :poloniex,
       supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor
+    },
+    %Tai.Exchanges.Config{
+      id: :gdax,
+      supervisor: Tai.ExchangeAdapters.Gdax.Supervisor
     }
   ]
 
@@ -38,7 +42,7 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
       use_cassette "exchange_adapters/shared/products/#{exchange_id}/init_success" do
         start_supervised!({@config.supervisor, @config})
 
-        assert_receive {:fetched_products, :ok, ^exchange_id}
+        assert_receive {:fetched_products, :ok, ^exchange_id}, 1_000
       end
 
       assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.Products.find(key)

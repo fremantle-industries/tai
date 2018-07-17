@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Binance.ProductsTest do
+defmodule Tai.ExchangeAdapters.Gdax.ProductsTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
@@ -14,8 +14,8 @@ defmodule Tai.ExchangeAdapters.Binance.ProductsTest do
 
   test "retrieves the trade rules for each product" do
     config = %Tai.Exchanges.Config{
-      id: :binance,
-      supervisor: Tai.ExchangeAdapters.Binance.Supervisor
+      id: :gdax,
+      supervisor: Tai.ExchangeAdapters.Gdax.Supervisor
     }
 
     exchange_id = config.id
@@ -26,17 +26,17 @@ defmodule Tai.ExchangeAdapters.Binance.ProductsTest do
     use_cassette "exchange_adapters/shared/products/#{exchange_id}/init_success" do
       start_supervised!({config.supervisor, config})
 
-      assert_receive {:fetched_products, :ok, ^exchange_id}
+      assert_receive {:fetched_products, :ok, ^exchange_id}, 1_000
     end
 
     assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.Products.find(key)
-    assert Decimal.cmp(product.min_notional, Decimal.new(0.001)) == :eq
-    assert Decimal.cmp(product.min_price, Decimal.new(0.000001)) == :eq
-    assert Decimal.cmp(product.min_size, Decimal.new(0.01)) == :eq
-    assert Decimal.cmp(product.price_increment, Decimal.new(0.000001)) == :eq
-    assert Decimal.cmp(product.max_price, Decimal.new(100_000.0)) == :eq
-    assert Decimal.cmp(product.max_size, Decimal.new(100_000.0)) == :eq
-    assert Decimal.cmp(product.size_increment, Decimal.new(0.01)) == :eq
+    assert Decimal.cmp(product.min_notional, Decimal.new(0.000001)) == :eq
+    assert Decimal.cmp(product.min_price, Decimal.new(0.00001)) == :eq
+    assert Decimal.cmp(product.min_size, Decimal.new(0.1)) == :eq
+    assert Decimal.cmp(product.price_increment, Decimal.new(0.00001)) == :eq
+    assert product.max_price == nil
+    assert Decimal.cmp(product.max_size, Decimal.new(2000)) == :eq
+    assert product.size_increment == nil
 
     Tai.Boot.unsubscribe_products(exchange_id)
   end

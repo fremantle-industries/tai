@@ -33,10 +33,10 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
     assert Decimal.cmp(product.min_notional, Decimal.new(0.0001)) == :eq
     assert product.min_price == nil
     assert product.min_size == nil
-    assert product.tick_size == nil
+    assert product.price_increment == nil
     assert product.max_price == nil
     assert product.max_size == nil
-    assert product.step_size == nil
+    assert product.size_increment == nil
 
     Tai.Boot.unsubscribe_products(exchange_id)
   end

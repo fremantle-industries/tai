@@ -14,10 +14,10 @@ defmodule Tai.Exchanges.ProductsTest do
       status: :trading,
       min_price: Decimal.new("0.00100000"),
       max_price: Decimal.new("100000.00000000"),
-      tick_size: Decimal.new("0.00100000"),
+      price_increment: Decimal.new("0.00100000"),
       min_size: Decimal.new("0.00100000"),
       max_size: Decimal.new("10000.00000000"),
-      step_size: Decimal.new("0.00100000"),
+      size_increment: Decimal.new("0.00100000"),
       min_notional: Decimal.new("0.01000000")
     }
 

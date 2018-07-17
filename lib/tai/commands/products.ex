@@ -23,10 +23,10 @@ defmodule Tai.Commands.Products do
         product.status,
         product.min_price,
         product.max_price,
-        product.tick_size,
+        product.price_increment,
         product.min_size,
         product.max_size,
-        product.step_size,
+        product.size_increment,
         product.min_notional
       ]
     end)
@@ -41,10 +41,10 @@ defmodule Tai.Commands.Products do
       "Status",
       "Min Price",
       "Max Price",
-      "Tick Size",
+      "Price Increment",
       "Min Size",
       "Max Size",
-      "Step Size",
+      "Size Increment",
       "Min Notional"
     ]
 

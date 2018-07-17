@@ -13,12 +13,12 @@ defmodule Tai.Exchanges.Product do
     :symbol,
     :exchange_symbol,
     :status,
+    :min_notional,
     :min_price,
-    :max_price,
-    :tick_size,
     :min_size,
     :max_size,
-    :step_size,
-    :min_notional
+    :max_price,
+    :price_increment,
+    :size_increment
   ]
 end

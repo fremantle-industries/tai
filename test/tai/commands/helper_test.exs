@@ -42,10 +42,10 @@ defmodule Tai.Commands.HelperTest do
       status: :trading,
       min_price: Decimal.new("0.00001000"),
       max_price: Decimal.new("100000.00000000"),
-      tick_size: Decimal.new("0.00000100"),
+      price_increment: Decimal.new("0.00000100"),
       min_size: Decimal.new("0.00100000"),
       max_size: Decimal.new("100000.00000000"),
-      step_size: Decimal.new("0.00100000"),
+      size_increment: Decimal.new("0.00100000"),
       min_notional: Decimal.new("0.01000000")
     })
 
@@ -56,20 +56,20 @@ defmodule Tai.Commands.HelperTest do
       status: :trading,
       min_price: Decimal.new("0.00001000"),
       max_price: Decimal.new("100000.00000000"),
-      tick_size: Decimal.new("0.00000100"),
+      price_increment: Decimal.new("0.00000100"),
       min_size: Decimal.new("0.00100000"),
       max_size: Decimal.new("100000.00000000"),
-      step_size: Decimal.new("0.00100000"),
+      size_increment: Decimal.new("0.00100000"),
       min_notional: Decimal.new("0.01000000")
     })
 
     assert capture_io(&Helper.products/0) == """
-           +-----------------+---------+-----------------+---------+------------+-----------------+------------+------------+-----------------+------------+--------------+
-           |     Exchange ID |  Symbol | Exchange Symbol |  Status |  Min Price |       Max Price |  Tick Size |   Min Size |        Max Size |  Step Size | Min Notional |
-           +-----------------+---------+-----------------+---------+------------+-----------------+------------+------------+-----------------+------------+--------------+
-           | test_exchange_a | btc_usd |         BTC_USD | trading | 0.00001000 | 100000.00000000 | 0.00000100 | 0.00100000 | 100000.00000000 | 0.00100000 |   0.01000000 |
-           | test_exchange_b | eth_usd |         ETH_USD | trading | 0.00001000 | 100000.00000000 | 0.00000100 | 0.00100000 | 100000.00000000 | 0.00100000 |   0.01000000 |
-           +-----------------+---------+-----------------+---------+------------+-----------------+------------+------------+-----------------+------------+--------------+\n
+           +-----------------+---------+-----------------+---------+------------+-----------------+-----------------+------------+-----------------+----------------+--------------+
+           |     Exchange ID |  Symbol | Exchange Symbol |  Status |  Min Price |       Max Price | Price Increment |   Min Size |        Max Size | Size Increment | Min Notional |
+           +-----------------+---------+-----------------+---------+------------+-----------------+-----------------+------------+-----------------+----------------+--------------+
+           | test_exchange_a | btc_usd |         BTC_USD | trading | 0.00001000 | 100000.00000000 |      0.00000100 | 0.00100000 | 100000.00000000 |     0.00100000 |   0.01000000 |
+           | test_exchange_b | eth_usd |         ETH_USD | trading | 0.00001000 | 100000.00000000 |      0.00000100 | 0.00100000 | 100000.00000000 |     0.00100000 |   0.01000000 |
+           +-----------------+---------+-----------------+---------+------------+-----------------+-----------------+------------+-----------------+----------------+--------------+\n
            """
   end
 

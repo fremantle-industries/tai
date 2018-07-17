@@ -45,13 +45,13 @@ defmodule Tai.ExchangeAdapters.Binance.Products do
         symbol: symbol,
         exchange_symbol: exchange_symbol,
         status: status,
+        min_notional: min_notional,
         min_price: min_price,
-        max_price: max_price,
-        tick_size: tick_size,
         min_size: min_size,
+        price_increment: tick_size,
+        max_price: max_price,
         max_size: max_size,
-        step_size: step_size,
-        min_notional: min_notional
+        size_increment: step_size
       }
       |> Tai.Exchanges.Products.upsert()
     end

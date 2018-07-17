@@ -1,0 +1,43 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.gdax.com/products"
+    },
+    "response": {
+      "binary": false,
+      "body": "[{\"id\":\"BCH-BTC\",\"base_currency\":\"BCH\",\"quote_currency\":\"BTC\",\"base_min_size\":\"0.01\",\"base_max_size\":\"200\",\"quote_increment\":\"0.00001\",\"display_name\":\"BCH/BTC\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"0.001\",\"max_market_funds\":\"30\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"BCH-USD\",\"base_currency\":\"BCH\",\"quote_currency\":\"USD\",\"base_min_size\":\"0.01\",\"base_max_size\":\"350\",\"quote_increment\":\"0.01\",\"display_name\":\"BCH/USD\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"1000000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"BTC-EUR\",\"base_currency\":\"BTC\",\"quote_currency\":\"EUR\",\"base_min_size\":\"0.001\",\"base_max_size\":\"50\",\"quote_increment\":\"0.01\",\"display_name\":\"BTC/EUR\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"600000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"BTC-GBP\",\"base_currency\":\"BTC\",\"quote_currency\":\"GBP\",\"base_min_size\":\"0.001\",\"base_max_size\":\"20\",\"quote_increment\":\"0.01\",\"display_name\":\"BTC/GBP\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"200000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"BTC-USD\",\"base_currency\":\"BTC\",\"quote_currency\":\"USD\",\"base_min_size\":\"0.001\",\"base_max_size\":\"70\",\"quote_increment\":\"0.01\",\"display_name\":\"BTC/USD\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"1000000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"ETH-BTC\",\"base_currency\":\"ETH\",\"quote_currency\":\"BTC\",\"base_min_size\":\"0.01\",\"base_max_size\":\"600\",\"quote_increment\":\"0.00001\",\"display_name\":\"ETH/BTC\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"0.001\",\"max_market_funds\":\"50\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"ETH-EUR\",\"base_currency\":\"ETH\",\"quote_currency\":\"EUR\",\"base_min_size\":\"0.01\",\"base_max_size\":\"400\",\"quote_increment\":\"0.01\",\"display_name\":\"ETH/EUR\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"400000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"ETH-USD\",\"base_currency\":\"ETH\",\"quote_currency\":\"USD\",\"base_min_size\":\"0.01\",\"base_max_size\":\"700\",\"quote_increment\":\"0.01\",\"display_name\":\"ETH/USD\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"1000000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"LTC-BTC\",\"base_currency\":\"LTC\",\"quote_currency\":\"BTC\",\"base_min_size\":\"0.1\",\"base_max_size\":\"2000\",\"quote_increment\":\"0.00001\",\"display_name\":\"LTC/BTC\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"0.001\",\"max_market_funds\":\"30\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"LTC-EUR\",\"base_currency\":\"LTC\",\"quote_currency\":\"EUR\",\"base_min_size\":\"0.1\",\"base_max_size\":\"1000\",\"quote_increment\":\"0.01\",\"display_name\":\"LTC/EUR\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"200000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"LTC-USD\",\"base_currency\":\"LTC\",\"quote_currency\":\"USD\",\"base_min_size\":\"0.1\",\"base_max_size\":\"4000\",\"quote_increment\":\"0.01\",\"display_name\":\"LTC/USD\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"1000000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false},{\"id\":\"BCH-EUR\",\"base_currency\":\"BCH\",\"quote_currency\":\"EUR\",\"base_min_size\":\"0.01\",\"base_max_size\":\"120\",\"quote_increment\":\"0.01\",\"display_name\":\"BCH/EUR\",\"status\":\"online\",\"margin_enabled\":false,\"status_message\":null,\"min_market_funds\":\"10\",\"max_market_funds\":\"200000\",\"post_only\":false,\"limit_only\":false,\"cancel_only\":false}]",
+      "headers": {
+        "Date": "Tue, 17 Jul 2018 06:12:07 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "3959",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d17549d8257fa05dd7ceded483a6e7ee01531807927; expires=Wed, 17-Jul-19 06:12:07 GMT; path=/; domain=.gdax.com; HttpOnly",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, cb-session, cb-fp",
+        "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "cb-before, cb-after, cb-gdpr",
+        "Access-Control-Max-Age": "7200",
+        "Cache-Control": "public, max-age=5",
+        "ETag": "W/\"f77-FfTp1i6LIput0yoC9l4wFl3SJJ0\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "43ba8e1a59b329f5-SEA"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]
