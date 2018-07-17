@@ -30,8 +30,9 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
+      # Requires new hex package release
       # {:binance, "~> 0.5.0"},
-      {:binance, github: "fremantle-capital/binance.ex", branch: "add-exchange-info"},
+      {:binance, github: "dvcrn/binance.ex"},
       {:decimal, "~> 1.0"},
       {:ex_gdax, "~> 0.1.3"},
       {:ex_poloniex, "~> 0.0.2"},
