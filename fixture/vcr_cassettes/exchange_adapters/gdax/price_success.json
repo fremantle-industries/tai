@@ -4,10 +4,10 @@
       "body": "",
       "headers": {
         "Content-Type": "application/json",
-        "CB-ACCESS-KEY": "api_key",
-        "CB-ACCESS-SIGN": "8SoX/mF/f380PLEQSIKkn+htyyMkZwEQsYTJImhkUVc=",
-        "CB-ACCESS-TIMESTAMP": "1511124504",
-        "CB-ACCESS-PASSPHRASE": "passphrase"
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
       },
       "method": "get",
       "options": [],
@@ -43,10 +43,10 @@
       "body": "",
       "headers": {
         "Content-Type": "application/json",
-        "CB-ACCESS-KEY": "api_key",
-        "CB-ACCESS-SIGN": "afJUgZDw4CBh2h6ukYkYjUZaUNH9v71ac8EQXL9DNDM=",
-        "CB-ACCESS-TIMESTAMP": "1511124504",
-        "CB-ACCESS-PASSPHRASE": "passphrase"
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
       },
       "method": "get",
       "options": [],

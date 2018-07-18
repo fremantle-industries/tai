@@ -4,10 +4,10 @@
       "body": "",
       "headers": {
         "Content-Type": "application/json",
-        "CB-ACCESS-KEY": "api_key",
-        "CB-ACCESS-SIGN": "8SoX/mF/f380PLEQSIKkn+htyyMkZwEQsYTJImhkUVc=",
-        "CB-ACCESS-TIMESTAMP": "1511315386",
-        "CB-ACCESS-PASSPHRASE": "passphrase"
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
       },
       "method": "get",
       "options": [],
@@ -43,10 +43,10 @@
       "body": "{\"type\":\"limit\",\"size\":0.2,\"side\":\"buy\",\"product_id\":\"BTC-USD\",\"price\":101.1}",
       "headers": {
         "Content-Type": "application/json",
-        "CB-ACCESS-KEY": "api_key",
-        "CB-ACCESS-SIGN": "8SoX/mF/f380PLEQSIKkn+htyyMkZwEQsYTJImhkUVc=",
-        "CB-ACCESS-TIMESTAMP": "1511315386",
-        "CB-ACCESS-PASSPHRASE": "passphrase"
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
       },
       "method": "post",
       "options": [],
@@ -81,10 +81,10 @@
       "body": "",
       "headers": {
         "Content-Type": "application/json",
-        "CB-ACCESS-KEY": "api_key",
-        "CB-ACCESS-SIGN": "8SoX/mF/f380PLEQSIKkn+htyyMkZwEQsYTJImhkUVc=",
-        "CB-ACCESS-TIMESTAMP": "1511315386",
-        "CB-ACCESS-PASSPHRASE": "passphrase"
+        "CB-ACCESS-KEY": "***",
+        "CB-ACCESS-SIGN": "***",
+        "CB-ACCESS-TIMESTAMP": "***",
+        "CB-ACCESS-PASSPHRASE": "***"
       },
       "method": "delete",
       "options": [],
