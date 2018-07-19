@@ -15,28 +15,28 @@ We are working to make `tai` production quality software.
 
 ## Supported Exchanges
 
-| Exchange       | Live Order Book  | Account Balance | Orders |
-|----------------|:---:|:---:|:---:|
-| GDAX           | [x] | [x] | [x] |
-| Binance        | [x] | [x] | [x] |
-| Poloniex       | [x] | [x] | [x] |
+| Exchange       | Live Order Book  | Account Balance | Orders | Products |
+|----------------|:---:|:---:|:---:|:---:|
+| GDAX           | [x] | [x] | [x] | [x] |
+| Binance        | [x] | [x] | [x] | [x] |
+| Poloniex       | [x] | [x] | [x] | [x] |
 
 ## Planned Exchanges
 
-| Exchange       | Live Order Book  | Orders |
-|----------------|:----:|:--------------:|
-| Bitfinex           | [ ] | [ ] |
-| Bitflyer           | [ ] | [ ] |
-| Bithumb            | [ ] | [ ] |
-| Bitmex             | [ ] | [ ] |
-| Bitstamp           | [ ] | [ ] |
-| Bittrex            | [ ] | [ ] |
-| Gemini             | [ ] | [ ] |
-| HitBtc             | [ ] | [ ] |
-| Huobi              | [ ] | [ ] |
-| Kraken             | [ ] | [ ] |
-| OkCoin             | [ ] | [ ] |
-| ...                | [ ] | [ ] |
+| Exchange       |
+|----------------|
+| Bitfinex       |
+| Bitflyer       |
+| Bithumb        |
+| Bitmex         |
+| Bitstamp       |
+| Bittrex        |
+| Gemini         |
+| HitBtc         |
+| Huobi          |
+| Kraken         |
+| OkCoin         |
+| ...            |
 
 [Full List...](./PLANNED_EXCHANGES.md)
 
@@ -93,6 +93,7 @@ Display the available commands and usage examples
 ```bash
 iex(1)> help
 * balance
+* products
 * markets
 * orders
 * buy_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
@@ -117,6 +118,27 @@ iex(2)> balance
 +---------+--------+-------------+
 ```
 
+#### products
+
+Display the products on the the exchange
+
+```
+iex(3)> products
++-------------+-----------+-----------------+---------+--------------+----------------+-----------------+------------+-------------------+----------------+--------------+
+| Exchange ID |    Symbol | Exchange Symbol |  Status |    Min Price |      Max Price | Price Increment |   Min Size |          Max Size | Size Increment | Min Notional |
++-------------+-----------+-----------------+---------+--------------+----------------+-----------------+------------+-------------------+----------------+--------------+
+|     binance |   ada_bnb |          ADABNB | trading |   0.00141000 |     0.14090000 |      0.00001000 | 0.01000000 | 90000000.00000000 |     0.01000000 |   1.00000000 |
+|     binance |   ada_btc |          ADABTC | trading |   0.00000248 |     0.00024710 |      0.00000001 | 1.00000000 | 90000000.00000000 |     1.00000000 |   0.00100000 |
+|     binance |   ada_eth |          ADAETH | trading |   0.00003799 |     0.00379850 |      0.00000001 | 1.00000000 | 90000000.00000000 |     1.00000000 |   0.01000000 |
+|     binance |  ada_usdt |         ADAUSDT | trading |   0.01814000 |     1.81375000 |      0.00001000 | 0.10000000 | 90000000.00000000 |     0.10000000 |  10.00000000 |
+|     binance |   adx_bnb |          ADXBNB | trading |   0.00326000 |     0.32570000 |      0.00001000 | 0.01000000 | 90000000.00000000 |     0.01000000 |   1.00000000 |
+|     binance |   adx_btc |          ADXBTC | trading |   0.00000572 |     0.00057130 |       0.0000001 | 1.00000000 | 90000000.00000000 |     1.00000000 |   0.00100000 |
+|     binance |   adx_eth |          ADXETH | trading |   0.00008840 |     0.00883600 |       0.0000001 | 1.00000000 | 90000000.00000000 |     1.00000000 |   0.01000000 |
+|     binance |    ae_bnb |           AEBNB | trading |   0.01500000 |     1.50000000 |      0.00001000 | 0.01000000 | 90000000.00000000 |     0.01000000 |   1.00000000 |
+|     binance |    ae_btc |           AEBTC | trading |   0.00002640 |     0.00263400 |       0.0000001 | 0.01000000 | 90000000.00000000 |     0.01000000 |   0.00100000 |
++-------------+-----------+-----------------+---------+--------------+----------------+-----------------+------------+-------------------+----------------+--------------+
+```
+
 #### markets
 
 Displays the live top of the order book for the configured feeds. It includes 
@@ -125,7 +147,7 @@ from the exchange. This allows you to monitor if a feed is under backpressure an
 starting to fall behind as it updates it's order books.
 
 ```
-iex(3)> markets
+iex(4)> markets
 +---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
 |    Feed |   Symbol | Bid Price | Ask Price |   Bid Size |     Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
 +---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
@@ -149,7 +171,7 @@ update in the background so that the information is available when you re-run
 the `orders` command.
 
 ```
-iex(4)> orders
+iex(5)> orders
 +---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
 | Account |  Symbol |      Type | Price | Size | Status |                            Client ID | Server ID |    Enqueued At | Created At |
 +---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
