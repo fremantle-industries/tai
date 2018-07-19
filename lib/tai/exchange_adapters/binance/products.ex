@@ -57,7 +57,7 @@ defmodule Tai.ExchangeAdapters.Binance.Products do
     end
   end
 
-  defp tai_status("TRADING"), do: :trading
+  defp tai_status("TRADING"), do: Tai.Exchanges.ProductStatus.trading()
 
   @price_filter "PRICE_FILTER"
   defp price_filter(filters) do

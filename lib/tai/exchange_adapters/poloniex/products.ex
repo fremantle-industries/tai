@@ -62,5 +62,6 @@ defmodule Tai.ExchangeAdapters.Poloniex.Products do
     end
   end
 
-  defp tai_status("0"), do: :trading
+  defp tai_status("0"), do: Tai.Exchanges.ProductStatus.trading()
+  defp tai_status("1"), do: Tai.Exchanges.ProductStatus.halt()
 end
