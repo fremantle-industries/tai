@@ -73,18 +73,19 @@ elixir --sname tai -S mix run --no-halt
 ```
 
 This will run your `tai` configuration as a process in the foreground. We assign
-a shortname so that we can connect and observe the node at any time via iex:
+a shortname so that we can connect and observe the node at any time via `iex`:
 
 ```bash
 iex --sname client --remsh tai@localhost
 ```
 
-This gives you an interactive elixir shell with a set of tai helper commands:
+This gives you an interactive elixir shell with a set of `tai` helper commands:
 
 ### Commands
 
 You can view your [total balance](#balance), inspect the [state of orders](#orders), 
-display [live markets](#markets) or execute manual orders using the following commands.
+list the tradeable [products](#products) on an exchange, display 
+[live markets](#markets) or execute manual orders using the following commands.
 
 #### help
 
