@@ -36,7 +36,7 @@ defmodule Tai.ExchangeAdapters.Binance.Products do
          exchange_id
        ) do
     with symbol <- Tai.Symbol.build(base_asset, quote_asset),
-         status <- tai_status(exchange_status),
+         {:ok, status} <- Tai.ExchangeAdapters.Binance.ProductStatus.tai_status(exchange_status),
          {min_price, max_price, tick_size} <- filters |> price_filter,
          {min_size, max_size, step_size} <- filters |> size_filter,
          %Decimal{} = min_notional <- filters |> notional_filter do
@@ -56,8 +56,6 @@ defmodule Tai.ExchangeAdapters.Binance.Products do
       |> Tai.Exchanges.Products.upsert()
     end
   end
-
-  defp tai_status("TRADING"), do: Tai.Exchanges.ProductStatus.trading()
 
   @price_filter "PRICE_FILTER"
   defp price_filter(filters) do
