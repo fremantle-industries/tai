@@ -26,7 +26,7 @@ defmodule Tai.ExchangeAdapters.Binance.ProductsTest do
     use_cassette "exchange_adapters/shared/products/#{exchange_id}/init_success" do
       start_supervised!({config.supervisor, config})
 
-      assert_receive {:fetched_products, :ok, ^exchange_id}
+      assert_receive {:fetched_products, :ok, ^exchange_id}, 1_000
     end
 
     assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.Products.find(key)

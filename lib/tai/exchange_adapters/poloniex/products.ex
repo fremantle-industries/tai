@@ -13,11 +13,11 @@ defmodule Tai.ExchangeAdapters.Poloniex.Products do
 
   use GenServer
 
-  def start_link(exchange_id) do
+  def start_link([exchange_id: _, whitelist_query: _] = state) do
     GenServer.start_link(
       __MODULE__,
-      exchange_id,
-      name: :"#{__MODULE__}_#{exchange_id}"
+      state,
+      name: state |> to_name
     )
   end
 
@@ -30,21 +30,44 @@ defmodule Tai.ExchangeAdapters.Poloniex.Products do
     {:noreply, exchange_id}
   end
 
-  defp fetch!(exchange_id) do
-    with {:ok, %{} = tickers} <- ExPoloniex.Public.return_ticker() do
-      Enum.each(tickers, &upsert_product(&1, exchange_id))
+  defp to_name(exchange_id: exchange_id, whitelist_query: _) do
+    :"#{__MODULE__}_#{exchange_id}"
+  end
+
+  defp fetch!(exchange_id: exchange_id, whitelist_query: query) do
+    with {:ok, %{} = exchange_tickers} <- ExPoloniex.Public.return_ticker() do
+      exchange_tickers
+      |> index_by_symbol(exchange_id)
+      |> Juice.squeeze(query)
+      |> Enum.each(&upsert_product/1)
+
       Tai.Boot.fetched_products(exchange_id)
     end
   end
 
+  defp index_by_symbol(exchange_tickers, exchange_id) do
+    exchange_tickers
+    |> Enum.reduce(
+      %{},
+      fn {exchange_symbol, info}, acc ->
+        [quote_asset, base_asset] = String.split(exchange_symbol, "_")
+        symbol = Tai.Symbol.build(base_asset, quote_asset)
+
+        Map.put(acc, symbol, {exchange_id, exchange_symbol, info})
+      end
+    )
+  end
+
   @min_notional Decimal.new(0.0001)
-  defp upsert_product(
-         {exchange_symbol, %{"isFrozen" => is_frozen}},
-         exchange_id
-       ) do
-    with [quote_asset, base_asset] <- String.split(exchange_symbol, "_"),
-         symbol <- Tai.Symbol.build(base_asset, quote_asset),
-         status <- tai_status(is_frozen) do
+  defp upsert_product({
+         symbol,
+         {
+           exchange_id,
+           exchange_symbol,
+           %{"isFrozen" => is_frozen}
+         }
+       }) do
+    with status <- tai_status(is_frozen) do
       %Tai.Exchanges.Product{
         exchange_id: exchange_id,
         symbol: symbol,

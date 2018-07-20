@@ -1,42 +1,57 @@
 defmodule Tai.ExchangeAdapters.Binance.Products do
   use GenServer
 
-  def start_link(exchange_id) do
+  def start_link([exchange_id: _, whitelist_query: _] = state) do
     GenServer.start_link(
       __MODULE__,
-      exchange_id,
-      name: :"#{__MODULE__}_#{exchange_id}"
+      state,
+      name: state |> to_name
     )
   end
 
-  def init(exchange_id) do
-    {:ok, exchange_id, 0}
+  def init(state) do
+    {:ok, state, 0}
   end
 
-  def handle_info(:timeout, exchange_id) do
-    fetch!(exchange_id)
-    {:noreply, exchange_id}
+  def handle_info(:timeout, state) do
+    fetch!(state)
+    {:noreply, state}
   end
 
-  defp fetch!(exchange_id) do
-    with {:ok, %Binance.ExchangeInfo{symbols: symbols}} <- Binance.get_exchange_info() do
-      Enum.each(symbols, &upsert_product(&1, exchange_id))
+  defp to_name(exchange_id: exchange_id, whitelist_query: _) do
+    :"#{__MODULE__}_#{exchange_id}"
+  end
+
+  defp fetch!(exchange_id: exchange_id, whitelist_query: query) do
+    with {:ok, %Binance.ExchangeInfo{symbols: exchange_products}} <- Binance.get_exchange_info() do
+      exchange_products
+      |> index_by_symbol(exchange_id)
+      |> Juice.squeeze(query)
+      |> Enum.each(&upsert_product/1)
+
       Tai.Boot.fetched_products(exchange_id)
     end
   end
 
-  defp upsert_product(
-         %{
-           "symbol" => exchange_symbol,
-           "status" => exchange_status,
-           "baseAsset" => base_asset,
-           "quoteAsset" => quote_asset,
-           "filters" => filters
-         },
-         exchange_id
-       ) do
-    with symbol <- Tai.Symbol.build(base_asset, quote_asset),
-         {:ok, status} <- Tai.ExchangeAdapters.Binance.ProductStatus.tai_status(exchange_status),
+  defp index_by_symbol(exchange_products, exchange_id) do
+    exchange_products
+    |> Enum.reduce(
+      %{},
+      fn %{"baseAsset" => base_asset, "quoteAsset" => quote_asset} = info, acc ->
+        symbol = Tai.Symbol.build(base_asset, quote_asset)
+        Map.put(acc, symbol, {exchange_id, info})
+      end
+    )
+  end
+
+  defp upsert_product({
+         symbol,
+         {
+           exchange_id,
+           %{"symbol" => exchange_symbol, "status" => exchange_status, "filters" => filters}
+         }
+       }) do
+    with {:ok, status} <- Tai.ExchangeAdapters.Binance.ProductStatus.tai_status(exchange_status),
          {min_price, max_price, tick_size} <- filters |> price_filter,
          {min_size, max_size, step_size} <- filters |> size_filter,
          %Decimal{} = min_notional <- filters |> notional_filter do

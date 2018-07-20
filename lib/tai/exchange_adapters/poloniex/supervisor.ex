@@ -15,7 +15,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Supervisor do
 
   def init(exchange_id) do
     [
-      {Tai.ExchangeAdapters.Poloniex.Products, exchange_id}
+      {Tai.ExchangeAdapters.Poloniex.Products, [exchange_id: exchange_id, whitelist_query: "*"]}
     ]
     |> Supervisor.init(strategy: :one_for_one)
   end
