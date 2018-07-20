@@ -5,8 +5,8 @@ defmodule Tai.Exchanges.Config do
 
   @type t :: %Tai.Exchanges.Config{}
 
-  @enforce_keys [:id, :supervisor]
-  defstruct [:id, :supervisor]
+  @enforce_keys [:id, :supervisor, :products]
+  defstruct [:id, :supervisor, :products]
 
   @doc """
   Return a struct for all configured exchanges 
@@ -17,22 +17,24 @@ defmodule Tai.Exchanges.Config do
     [
       %Tai.Exchanges.Config{
         id: :test_exchange_a,
-        supervisor: Tai.ExchangeAdapters.Test.Supervisor
+        supervisor: Tai.ExchangeAdapters.Test.Supervisor,
+        products: "*"
       },
       %Tai.Exchanges.Config{
         id: :test_exchange_b,
-        supervisor: Tai.ExchangeAdapters.Test.Supervisor
+        supervisor: Tai.ExchangeAdapters.Test.Supervisor,
+        products: "*"
       }
     ]
   """
   @spec all :: list(t)
-  def all do
-    :tai
-    |> Application.get_env(:exchanges)
+  def all(exchanges \\ Application.get_env(:tai, :exchanges)) do
+    exchanges
     |> Enum.map(fn {id, params} ->
       %Tai.Exchanges.Config{
         id: id,
-        supervisor: Keyword.get(params, :supervisor)
+        supervisor: Keyword.get(params, :supervisor),
+        products: Keyword.get(params, :products, "*")
       }
     end)
   end

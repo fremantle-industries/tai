@@ -8,14 +8,15 @@ defmodule Tai.ExchangeAdapters.Poloniex.Supervisor do
   def start_link(%Tai.Exchanges.Config{} = config) do
     Supervisor.start_link(
       __MODULE__,
-      config.id,
+      config,
       name: :"#{__MODULE__}_#{config.id}"
     )
   end
 
-  def init(exchange_id) do
+  def init(%Tai.Exchanges.Config{id: exchange_id, products: products}) do
     [
-      {Tai.ExchangeAdapters.Poloniex.Products, [exchange_id: exchange_id, whitelist_query: "*"]}
+      {Tai.ExchangeAdapters.Poloniex.Products,
+       [exchange_id: exchange_id, whitelist_query: products]}
     ]
     |> Supervisor.init(strategy: :one_for_one)
   end

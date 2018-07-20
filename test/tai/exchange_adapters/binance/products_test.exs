@@ -15,7 +15,8 @@ defmodule Tai.ExchangeAdapters.Binance.ProductsTest do
   test "retrieves the trade rules for each product" do
     config = %Tai.Exchanges.Config{
       id: :binance,
-      supervisor: Tai.ExchangeAdapters.Binance.Supervisor
+      supervisor: Tai.ExchangeAdapters.Binance.Supervisor,
+      products: "*"
     }
 
     exchange_id = config.id

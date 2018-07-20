@@ -15,7 +15,8 @@ defmodule Tai.ExchangeAdapters.Gdax.ProductsTest do
   test "retrieves the trade rules for each product" do
     config = %Tai.Exchanges.Config{
       id: :gdax,
-      supervisor: Tai.ExchangeAdapters.Gdax.Supervisor
+      supervisor: Tai.ExchangeAdapters.Gdax.Supervisor,
+      products: "*"
     }
 
     exchange_id = config.id
