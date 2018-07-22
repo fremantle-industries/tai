@@ -2,6 +2,7 @@ defmodule Tai.ExchangeAdapters.Binance.Account do
   @moduledoc """
   Execute private exchange actions for the Binance account
   """
+
   use Tai.Exchanges.Account
 
   def all_balances() do

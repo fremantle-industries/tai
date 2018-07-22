@@ -5,10 +5,12 @@ defmodule Tai.ExchangeAdapters.Test.Account do
 
   use GenServer
 
-  alias Tai.Exchanges.Account
-
   def start_link(account_id) do
-    GenServer.start_link(__MODULE__, account_id, name: account_id |> Account.to_name())
+    GenServer.start_link(
+      __MODULE__,
+      account_id,
+      name: account_id |> Tai.Exchanges.Account.to_name()
+    )
   end
 
   def init(account_id) do
