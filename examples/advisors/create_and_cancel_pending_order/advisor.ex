@@ -7,6 +7,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
     if Tai.Trading.OrderStore.count() == 0 do
       Tai.Trading.OrderPipeline.buy_limit(
         :gdax,
+        :main,
         symbol,
         100.1,
         0.1,

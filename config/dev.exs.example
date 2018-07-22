@@ -18,13 +18,16 @@ config :binance,
 config :tai,
   exchanges: %{
     binance: [
-      supervisor: Tai.ExchangeAdapters.Binance.Supervisor
+      supervisor: Tai.ExchangeAdapters.Binance.Supervisor,
+      accounts: %{main: %{}}
     ],
     poloniex: [
-      supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor
+      supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor,
+      accounts: %{main: %{}}
     ],
     gdax: [
-      supervisor: Tai.ExchangeAdapters.Gdax.Supervisor
+      supervisor: Tai.ExchangeAdapters.Gdax.Supervisor,
+      accounts: %{main: %{}}
     ]
   }
 
@@ -41,19 +44,6 @@ config :tai,
     poloniex: [
       adapter: Tai.ExchangeAdapters.Poloniex.OrderBookFeed,
       order_books: [:btc_usdt, :ltc_usdt, :eth_usdt]
-    ]
-  }
-
-config :tai,
-  accounts: %{
-    gdax: [
-      adapter: Tai.ExchangeAdapters.Gdax.Account
-    ],
-    poloniex: [
-      adapter: Tai.ExchangeAdapters.Poloniex.Account
-    ],
-    binance: [
-      adapter: Tai.ExchangeAdapters.Binance.Account
     ]
   }
 

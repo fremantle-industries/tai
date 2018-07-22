@@ -5,7 +5,11 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
   setup_all do
     HTTPoison.start()
-    start_supervised!({Tai.ExchangeAdapters.Poloniex.Account, :my_poloniex_exchange})
+
+    start_supervised!(
+      {Tai.ExchangeAdapters.Poloniex.Account,
+       [exchange_id: :my_poloniex_exchange, account_id: :test]}
+    )
 
     :ok
   end
@@ -13,7 +17,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
   describe "#all_balances" do
     test "returns an error tuple when the secret is invalid" do
       use_cassette "exchange_adapters/poloniex/account/all_balances_error_invalid_secret" do
-        assert Tai.Exchanges.Account.all_balances(:my_poloniex_exchange) == {
+        assert Tai.Exchanges.Account.all_balances(:my_poloniex_exchange, :test) == {
                  :error,
                  %Tai.CredentialError{
                    reason: %ExPoloniex.AuthenticationError{
@@ -26,7 +30,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     test "returns an error tuple when the api key is invalid" do
       use_cassette "exchange_adapters/poloniex/account/all_balances_error_invalid_api_key" do
-        assert Tai.Exchanges.Account.all_balances(:my_poloniex_exchange) == {
+        assert Tai.Exchanges.Account.all_balances(:my_poloniex_exchange, :test) == {
                  :error,
                  %Tai.CredentialError{
                    reason: %ExPoloniex.AuthenticationError{
@@ -43,6 +47,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_unable_to_fill_completely" do
         assert Tai.Exchanges.Account.buy_limit(
                  :my_poloniex_exchange,
+                 :test,
                  :ltcbtc,
                  0.0001,
                  1,
@@ -62,6 +67,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_timeout" do
         assert Tai.Exchanges.Account.buy_limit(
                  :my_poloniex_exchange,
+                 :test,
                  :ltcbtc,
                  0.0001,
                  1,
@@ -77,6 +83,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_invalid_api_key" do
         assert Tai.Exchanges.Account.buy_limit(
                  :my_poloniex_exchange,
+                 :test,
                  :ltcbtc,
                  0.0001,
                  1,
@@ -96,6 +103,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_not_enough" do
         assert Tai.Exchanges.Account.buy_limit(
                  :my_poloniex_exchange,
+                 :test,
                  :ltcbtc,
                  0.02,
                  1000,

@@ -24,7 +24,8 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
       capture_log(fn ->
         order =
           Tai.Trading.OrderPipeline.buy_limit(
-            :test_account_a,
+            :test_exchange_a,
+            :main,
             :btc_usdt,
             100.1,
             0.1,
@@ -52,7 +53,8 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
       capture_log(fn ->
         order =
           Tai.Trading.OrderPipeline.sell_limit(
-            :test_account_a,
+            :test_exchange_a,
+            :main,
             :btc_usdt,
             100_000.1,
             0.01,

@@ -39,10 +39,12 @@ config :binance,
 config :tai,
   exchanges: %{
     test_exchange_a: [
-      supervisor: Tai.ExchangeAdapters.Test.Supervisor
+      supervisor: Tai.ExchangeAdapters.Test.Supervisor,
+      accounts: %{main: %{}}
     ],
     test_exchange_b: [
-      supervisor: Tai.ExchangeAdapters.Test.Supervisor
+      supervisor: Tai.ExchangeAdapters.Test.Supervisor,
+      accounts: %{main: %{}}
     ]
   }
 
@@ -55,16 +57,6 @@ config :tai,
     test_feed_b: [
       adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
       order_books: [:eth_usd, :ltc_usd]
-    ]
-  }
-
-config :tai,
-  accounts: %{
-    test_account_a: [
-      adapter: Tai.ExchangeAdapters.Test.Account
-    ],
-    test_account_b: [
-      adapter: Tai.ExchangeAdapters.Test.Account
     ]
   }
 

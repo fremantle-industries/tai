@@ -3,9 +3,8 @@ defmodule Tai.Trading.OrderSubmission do
   Order details that are turned into an order and assigned a tracking client id
   """
 
-  alias Tai.Trading.{Order, OrderSubmission}
-
   @enforce_keys [
+    :exchange_id,
     :account_id,
     :symbol,
     :side,
@@ -15,6 +14,7 @@ defmodule Tai.Trading.OrderSubmission do
     :type
   ]
   defstruct [
+    :exchange_id,
     :account_id,
     :symbol,
     :side,
@@ -28,12 +28,21 @@ defmodule Tai.Trading.OrderSubmission do
   @doc """
   Return an OrderSubmission for buy limit orders
   """
-  def buy_limit(account_id, symbol, price, size, time_in_force, order_updated_callback \\ nil) do
-    %OrderSubmission{
+  def buy_limit(
+        exchange_id,
+        account_id,
+        symbol,
+        price,
+        size,
+        time_in_force,
+        order_updated_callback \\ nil
+      ) do
+    %Tai.Trading.OrderSubmission{
+      exchange_id: exchange_id,
       account_id: account_id,
       symbol: symbol,
-      side: Order.buy(),
-      type: Order.limit(),
+      side: Tai.Trading.Order.buy(),
+      type: Tai.Trading.Order.limit(),
       price: price,
       size: size,
       time_in_force: time_in_force,
@@ -44,12 +53,21 @@ defmodule Tai.Trading.OrderSubmission do
   @doc """
   Return an OrderSubmission for sell limit orders
   """
-  def sell_limit(account_id, symbol, price, size, time_in_force, order_updated_callback \\ nil) do
-    %OrderSubmission{
+  def sell_limit(
+        exchange_id,
+        account_id,
+        symbol,
+        price,
+        size,
+        time_in_force,
+        order_updated_callback \\ nil
+      ) do
+    %Tai.Trading.OrderSubmission{
+      exchange_id: exchange_id,
       account_id: account_id,
       symbol: symbol,
-      side: Order.sell(),
-      type: Order.limit(),
+      side: Tai.Trading.Order.sell(),
+      type: Tai.Trading.Order.limit(),
       price: price,
       size: size,
       time_in_force: time_in_force,

@@ -16,7 +16,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
     config = %Tai.Exchanges.Config{
       id: :poloniex,
       supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor,
-      products: "*"
+      products: "*",
+      accounts: %{}
     }
 
     exchange_id = config.id
@@ -46,7 +47,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
     config = %Tai.Exchanges.Config{
       id: :poloniex,
       supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor,
-      products: "*"
+      products: "*",
+      accounts: %{}
     }
 
     exchange_id = config.id

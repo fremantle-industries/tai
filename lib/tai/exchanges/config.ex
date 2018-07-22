@@ -5,8 +5,8 @@ defmodule Tai.Exchanges.Config do
 
   @type t :: %Tai.Exchanges.Config{}
 
-  @enforce_keys [:id, :supervisor, :products]
-  defstruct [:id, :supervisor, :products]
+  @enforce_keys [:id, :supervisor, :products, :accounts]
+  defstruct [:id, :supervisor, :products, :accounts]
 
   @doc """
   Return a struct for all configured exchanges 
@@ -18,12 +18,14 @@ defmodule Tai.Exchanges.Config do
       %Tai.Exchanges.Config{
         id: :test_exchange_a,
         supervisor: Tai.ExchangeAdapters.Test.Supervisor,
-        products: "*"
+        products: "*",
+        accounts: %{main: %{}}
       },
       %Tai.Exchanges.Config{
         id: :test_exchange_b,
         supervisor: Tai.ExchangeAdapters.Test.Supervisor,
-        products: "*"
+        products: "*",
+        accounts: %{main: %{}}
       }
     ]
   """
@@ -34,53 +36,10 @@ defmodule Tai.Exchanges.Config do
       %Tai.Exchanges.Config{
         id: id,
         supervisor: Keyword.get(params, :supervisor),
-        products: Keyword.get(params, :products, "*")
+        products: Keyword.get(params, :products, "*"),
+        accounts: Keyword.get(params, :accounts, %{})
       }
     end)
-  end
-
-  @doc """
-  Return a map of account configuration
-
-  ## Examples
-
-    iex> Tai.Exchanges.Config.accounts
-    %{
-      test_account_a: [
-        adapter: Tai.ExchangeAdapters.Test.Account
-      ],
-      test_account_b: [
-        adapter: Tai.ExchangeAdapters.Test.Account
-      ]
-    }
-  """
-  def accounts do
-    Application.get_env(:tai, :accounts)
-  end
-
-  @doc """
-  Return the keys for the account adapters
-
-  ## Examples
-
-    iex> Tai.Exchanges.Config.account_ids()
-    [:test_account_a, :test_account_b]
-  """
-  def account_ids do
-    for {id, _} <- accounts(), do: id
-  end
-
-  @doc """
-
-  ## Examples
-
-    iex> Tai.Exchanges.Config.account_adapter(:test_account_a)
-    Tai.ExchangeAdapters.Test.Account
-  """
-  def account_adapter(account_id) do
-    accounts()
-    |> Map.get(account_id)
-    |> Keyword.get(:adapter)
   end
 
   @doc """

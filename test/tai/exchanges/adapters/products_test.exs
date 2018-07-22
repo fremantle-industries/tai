@@ -6,17 +6,20 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
     %Tai.Exchanges.Config{
       id: :binance,
       supervisor: Tai.ExchangeAdapters.Binance.Supervisor,
-      products: "*"
+      products: "*",
+      accounts: %{}
     },
     %Tai.Exchanges.Config{
       id: :poloniex,
       supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor,
-      products: "*"
+      products: "*",
+      accounts: %{}
     },
     %Tai.Exchanges.Config{
       id: :gdax,
       supervisor: Tai.ExchangeAdapters.Gdax.Supervisor,
-      products: "*"
+      products: "*",
+      accounts: %{}
     }
   ]
 

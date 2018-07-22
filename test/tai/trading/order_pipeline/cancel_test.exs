@@ -21,7 +21,8 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
        %{callback: callback} do
     order =
       Tai.Trading.OrderPipeline.buy_limit(
-        :test_account_a,
+        :test_exchange_a,
+        :main,
         :btc_usd_pending,
         100.1,
         0.1,
@@ -60,7 +61,8 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
   test "cancel returns an error tuple when the order is not pending", %{callback: callback} do
     order =
       Tai.Trading.OrderPipeline.buy_limit(
-        :test_account_a,
+        :test_exchange_a,
+        :main,
         :btc_usd_expired,
         100.1,
         0.1,

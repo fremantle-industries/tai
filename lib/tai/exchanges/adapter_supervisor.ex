@@ -1,5 +1,6 @@
 defmodule Tai.Exchanges.AdapterSupervisor do
   @callback products() :: atom
+  @callback account() :: atom
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -15,9 +16,12 @@ defmodule Tai.Exchanges.AdapterSupervisor do
         )
       end
 
-      def init(%Tai.Exchanges.Config{id: exchange_id, products: products}) do
+      def init(config) do
         [
-          {products(), [exchange_id: exchange_id, whitelist_query: products]}
+          {products(), [exchange_id: config.id, whitelist_query: config.products]},
+          {Tai.Exchanges.AccountsSupervisor,
+           [adapter: account(), exchange_id: config.id, accounts: config.accounts]},
+          {Tai.Exchanges.BalancesSupervisor, [exchange_id: config.id, accounts: config.accounts]}
         ]
         |> Supervisor.init(strategy: :one_for_one)
       end

@@ -32,16 +32,16 @@ defmodule Tai.Exchanges.Account do
 
       @behaviour Tai.Exchanges.Account
 
-      def start_link(account_id) do
+      def start_link([exchange_id: exchange_id, account_id: account_id] = state) do
         GenServer.start_link(
           __MODULE__,
-          account_id,
-          name: account_id |> Tai.Exchanges.Account.to_name()
+          state,
+          name: Tai.Exchanges.Account.to_name(exchange_id, account_id)
         )
       end
 
-      def init(account_id) do
-        {:ok, account_id}
+      def init(state) do
+        {:ok, state}
       end
 
       def handle_call(:all_balances, _from, state) do
@@ -64,10 +64,10 @@ defmodule Tai.Exchanges.Account do
   @doc """
   Fetches all balances for the given account
   """
-  @spec all_balances(atom) :: {:ok, map} | {:error, credential_error | timeout_error}
-  def all_balances(account_id) do
-    account_id
-    |> to_name
+  @spec all_balances(atom, atom) :: {:ok, map} | {:error, credential_error | timeout_error}
+  def all_balances(exchange_id, account_id) do
+    exchange_id
+    |> to_name(account_id)
     |> GenServer.call(:all_balances)
   end
 
@@ -79,11 +79,11 @@ defmodule Tai.Exchanges.Account do
   - size
   - time_in_force
   """
-  @spec buy_limit(atom, atom, float, float, atom) ::
+  @spec buy_limit(atom, atom, atom, float, float, atom) ::
           {:ok, order_response} | {:error, insufficient_balance_error}
-  def buy_limit(account_id, symbol, price, size, time_in_force \\ :ioc) do
-    account_id
-    |> to_name
+  def buy_limit(exchange_id, account_id, symbol, price, size, time_in_force \\ :ioc) do
+    exchange_id
+    |> to_name(account_id)
     |> GenServer.call({:buy_limit, symbol, price, size, time_in_force})
   end
 
@@ -97,7 +97,14 @@ defmodule Tai.Exchanges.Account do
           {:ok, order_response} | {:error, invalid_order_type_error | insufficient_balance_error}
   def buy_limit(%Tai.Trading.Order{} = order) do
     if Tai.Trading.Order.buy_limit?(order) do
-      buy_limit(order.account_id, order.symbol, order.price, order.size, order.time_in_force)
+      buy_limit(
+        order.exchange_id,
+        order.account_id,
+        order.symbol,
+        order.price,
+        order.size,
+        order.time_in_force
+      )
     else
       {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
     end
@@ -111,9 +118,9 @@ defmodule Tai.Exchanges.Account do
   - size
   - time_in_force
   """
-  def sell_limit(account_id, symbol, price, size, time_in_force \\ :ioc) do
-    account_id
-    |> to_name
+  def sell_limit(exchange_id, account_id, symbol, price, size, time_in_force \\ :ioc) do
+    exchange_id
+    |> to_name(account_id)
     |> GenServer.call({:sell_limit, symbol, price, size, time_in_force})
   end
 
@@ -125,7 +132,14 @@ defmodule Tai.Exchanges.Account do
   """
   def sell_limit(%Tai.Trading.Order{} = order) do
     if Tai.Trading.Order.sell_limit?(order) do
-      sell_limit(order.account_id, order.symbol, order.price, order.size, order.time_in_force)
+      sell_limit(
+        order.exchange_id,
+        order.account_id,
+        order.symbol,
+        order.price,
+        order.size,
+        order.time_in_force
+      )
     else
       {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
     end
@@ -134,18 +148,18 @@ defmodule Tai.Exchanges.Account do
   @doc """
   Fetches the status of the order from the exchange
   """
-  def order_status(account_id, order_id) do
-    account_id
-    |> to_name
+  def order_status(exchange_id, account_id, order_id) do
+    exchange_id
+    |> to_name(account_id)
     |> GenServer.call({:order_status, order_id})
   end
 
   @doc """
   Cancels the order on the exchange and returns the order_id
   """
-  def cancel_order(account_id, order_id) do
-    account_id
-    |> to_name
+  def cancel_order(exchange_id, account_id, order_id) do
+    exchange_id
+    |> to_name(account_id)
     |> GenServer.call({:cancel_order, order_id})
   end
 
@@ -154,8 +168,9 @@ defmodule Tai.Exchanges.Account do
 
   ## Examples
 
-    iex> Tai.Exchanges.Account.to_name(:my_test_small_account)
-    :account_my_test_small_account
+    iex> Tai.Exchanges.Account.to_name(:my_test_exchange, :my_test_account)
+    :account_my_test_exchange_my_test_account
   """
-  def to_name(account_id), do: :"account_#{account_id}"
+  def to_name(exchange_id, account_id),
+    do: :"account_#{exchange_id}_#{account_id}"
 end

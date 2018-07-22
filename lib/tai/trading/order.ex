@@ -1,5 +1,6 @@
 defmodule Tai.Trading.Order do
   @type t :: %Tai.Trading.Order{
+          exchange_id: atom,
           account_id: atom,
           client_id: String.t(),
           enqueued_at: DateTime.t(),
@@ -13,6 +14,7 @@ defmodule Tai.Trading.Order do
         }
 
   @enforce_keys [
+    :exchange_id,
     :account_id,
     :client_id,
     :enqueued_at,
@@ -29,6 +31,7 @@ defmodule Tai.Trading.Order do
             created_at: nil,
             enqueued_at: nil,
             error_reason: nil,
+            exchange_id: nil,
             account_id: nil,
             price: nil,
             server_id: nil,

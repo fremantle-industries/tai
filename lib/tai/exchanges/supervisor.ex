@@ -14,10 +14,8 @@ defmodule Tai.Exchanges.Supervisor do
       Tai.Exchanges.Products,
       Tai.Exchanges.AdaptersSupervisor,
       # TODO
-      # AccountsSupervisor & OrderBookFeedsSupervisor will become the 
-      # responsibility of each individual adapter supervisor. Once complete
-      # they can be removed.
-      Tai.Exchanges.AccountsSupervisor,
+      # OrderBookFeedsSupervisor will become the responsibility of each 
+      # individual adapter supervisor. Once complete it can be removed.
       Tai.Exchanges.OrderBookFeedsSupervisor
     ]
     |> Supervisor.init(strategy: :one_for_one)

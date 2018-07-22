@@ -6,14 +6,17 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
   alias Tai.Trading.{Order, OrderResponses, OrderStatus, TimeInForce}
 
   setup_all do
-    start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
+    start_supervised!(
+      {Tai.ExchangeAdapters.Test.Account,
+       [exchange_id: :my_test_exchange, account_id: :my_test_account]}
+    )
 
     :ok
   end
 
   describe "#all_balances" do
     test "returns an ok tuple with a map of symbols and their balances for the account" do
-      assert Account.all_balances(:my_test_account) == {
+      assert Account.all_balances(:my_test_exchange, :my_test_account) == {
                :ok,
                %{
                  bch: Tai.Exchanges.BalanceDetail.new(0, 0),
@@ -28,7 +31,13 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
   describe "#buy_limit" do
     test "returns an ok tuple with a pending order response successfully created" do
       assert {:ok, order_response} =
-               Account.buy_limit(:my_test_account, :btc_usd_success, 10.1, 2.2)
+               Tai.Exchanges.Account.buy_limit(
+                 :my_test_exchange,
+                 :my_test_account,
+                 :btc_usd_success,
+                 10.1,
+                 2.2
+               )
 
       assert order_response.id == "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"
       assert order_response.status == :pending
@@ -37,6 +46,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
     test "can take an order struct" do
       order = %Order{
         client_id: UUID.uuid4(),
+        exchange_id: :my_test_exchange,
         account_id: :my_test_account,
         symbol: :btc_usd_success,
         side: Order.buy(),
@@ -48,7 +58,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         time_in_force: TimeInForce.good_til_canceled()
       }
 
-      assert {:ok, order_response} = Account.buy_limit(order)
+      assert {:ok, order_response} = Tai.Exchanges.Account.buy_limit(order)
       assert order_response.id == "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"
       assert order_response.status == :pending
     end
@@ -56,6 +66,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
     test "returns an error tuple when it is not the correct side or type" do
       buy_market_order = %Order{
         client_id: UUID.uuid4(),
+        exchange_id: :my_test_exchange,
         account_id: :my_test_account,
         symbol: :btc_usd_success,
         side: Order.buy(),
@@ -69,6 +80,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
 
       sell_limit_order = %Order{
         client_id: UUID.uuid4(),
+        exchange_id: :my_test_exchange,
         account_id: :my_test_account,
         symbol: :btc_usd_success,
         side: Order.sell(),
@@ -80,26 +92,48 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         time_in_force: TimeInForce.good_til_canceled()
       }
 
-      assert {:error, %OrderResponses.InvalidOrderType{}} = Account.buy_limit(buy_market_order)
-      assert {:error, %OrderResponses.InvalidOrderType{}} = Account.buy_limit(sell_limit_order)
+      assert {:error, %OrderResponses.InvalidOrderType{}} =
+               Tai.Exchanges.Account.buy_limit(buy_market_order)
+
+      assert {:error, %OrderResponses.InvalidOrderType{}} =
+               Tai.Exchanges.Account.buy_limit(sell_limit_order)
     end
 
     test "returns an error tuple when an order fails" do
       assert {
                :error,
                %Tai.Trading.InsufficientBalanceError{}
-             } = Account.buy_limit(:my_test_account, :btc_usd_insufficient_funds, 10.1, 2.1)
+             } =
+               Tai.Exchanges.Account.buy_limit(
+                 :my_test_exchange,
+                 :my_test_account,
+                 :btc_usd_insufficient_funds,
+                 10.1,
+                 2.1
+               )
     end
 
     test "returns an unknown error tuple when it can't find a match" do
-      assert Account.buy_limit(:my_test_account, :btc_usd, 101.1, 0.1) == {:error, :unknown_error}
+      assert Tai.Exchanges.Account.buy_limit(
+               :my_test_exchange,
+               :my_test_account,
+               :btc_usd,
+               101.1,
+               0.1
+             ) == {:error, :unknown_error}
     end
   end
 
   describe "#sell_limit" do
     test "returns an ok tuple when an order is successfully created" do
       assert {:ok, order_response} =
-               Account.sell_limit(:my_test_account, :btc_usd_success, 10.1, 2.2)
+               Tai.Exchanges.Account.sell_limit(
+                 :my_test_exchange,
+                 :my_test_account,
+                 :btc_usd_success,
+                 10.1,
+                 2.2
+               )
 
       assert order_response.id == "41541912-ebc1-4173-afa5-4334ccf7a1a8"
       assert order_response.status == :pending
@@ -108,6 +142,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
     test "can take an order struct" do
       order = %Order{
         client_id: UUID.uuid4(),
+        exchange_id: :my_test_exchange,
         account_id: :my_test_account,
         symbol: :btc_usd_success,
         side: Order.sell(),
@@ -119,7 +154,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         time_in_force: TimeInForce.good_til_canceled()
       }
 
-      assert {:ok, order_response} = Account.sell_limit(order)
+      assert {:ok, order_response} = Tai.Exchanges.Account.sell_limit(order)
       assert order_response.id == "41541912-ebc1-4173-afa5-4334ccf7a1a8"
       assert order_response.status == :pending
     end
@@ -127,6 +162,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
     test "returns an error tuple when it is not the correct side or type" do
       sell_market_order = %Order{
         client_id: UUID.uuid4(),
+        exchange_id: :my_test_exchange,
         account_id: :my_test_account,
         symbol: :btc_usd_success,
         side: Order.sell(),
@@ -140,6 +176,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
 
       buy_limit_order = %Order{
         client_id: UUID.uuid4(),
+        exchange_id: :my_test_exchange,
         account_id: :my_test_account,
         symbol: :btc_usd_success,
         side: Order.buy(),
@@ -151,44 +188,71 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
         time_in_force: TimeInForce.good_til_canceled()
       }
 
-      assert {:error, %OrderResponses.InvalidOrderType{}} = Account.sell_limit(sell_market_order)
-      assert {:error, %OrderResponses.InvalidOrderType{}} = Account.sell_limit(buy_limit_order)
+      assert {:error, %OrderResponses.InvalidOrderType{}} =
+               Tai.Exchanges.Account.sell_limit(sell_market_order)
+
+      assert {:error, %OrderResponses.InvalidOrderType{}} =
+               Tai.Exchanges.Account.sell_limit(buy_limit_order)
     end
 
     test "returns an {:error, reason} tuple when an order fails" do
       assert {
                :error,
                %Tai.Trading.InsufficientBalanceError{}
-             } = Account.sell_limit(:my_test_account, :btc_usd_insufficient_funds, 10.1, 2.1)
+             } =
+               Account.sell_limit(
+                 :my_test_exchange,
+                 :my_test_account,
+                 :btc_usd_insufficient_funds,
+                 10.1,
+                 2.1
+               )
     end
 
     test "sell_limit returns an unknown error tuple when it can't find a matching symbol" do
-      assert Account.sell_limit(:my_test_account, :btc_usd, 101.1, 0.1) ==
-               {:error, :unknown_error}
+      assert Tai.Exchanges.Account.sell_limit(
+               :my_test_exchange,
+               :my_test_account,
+               :btc_usd,
+               101.1,
+               0.1
+             ) == {:error, :unknown_error}
     end
   end
 
   describe "#order_status" do
     test "returns an {:ok, status} tuple when it finds the order on the given account" do
-      assert Account.order_status(:my_test_account, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7") ==
-               {:ok, :open}
+      assert Tai.Exchanges.Account.order_status(
+               :my_test_exchange,
+               :my_test_account,
+               "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"
+             ) == {:ok, :open}
     end
 
     test "return an {:error, reason} tuple when the order doesn't exist" do
-      assert Account.order_status(:my_test_account, "invalid-order-id") ==
-               {:error, "Invalid order id"}
+      assert Tai.Exchanges.Account.order_status(
+               :my_test_exchange,
+               :my_test_account,
+               "invalid-order-id"
+             ) == {:error, "Invalid order id"}
     end
   end
 
   describe "#cancel_order" do
     test "cancels a previous order" do
-      assert Account.cancel_order(:my_test_account, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7") ==
-               {:ok, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"}
+      assert Tai.Exchanges.Account.cancel_order(
+               :my_test_exchange,
+               :my_test_account,
+               "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"
+             ) == {:ok, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7"}
     end
 
     test "displays error messages" do
-      assert Account.cancel_order(:my_test_account, "invalid-order-id") ==
-               {:error, "Invalid order id"}
+      assert Tai.Exchanges.Account.cancel_order(
+               :my_test_exchange,
+               :my_test_account,
+               "invalid-order-id"
+             ) == {:error, "Invalid order id"}
     end
   end
 end

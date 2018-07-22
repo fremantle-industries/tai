@@ -3,33 +3,50 @@ defmodule Tai.Commands.Balance do
   Display symbols on each exchange with a non-zero balance
   """
 
-  alias Tai.{Exchanges, Markets.Asset}
   alias TableRex.Table
 
   @spec balance :: no_return
   def balance do
-    Exchanges.Config.account_ids()
+    Tai.Exchanges.Config.all()
+    |> group_by_exchange_accounts
     |> fetch_balances
     |> format_rows
     |> exclude_empty_balances
     |> render!
   end
 
-  defp fetch_balances(account_ids) do
-    account_ids
-    |> Enum.sort()
-    |> Enum.reverse()
+  defp group_by_exchange_accounts(configs) do
+    configs
     |> Enum.reduce(
       [],
-      fn account_id, acc ->
-        account_id
-        |> Exchanges.Balance.all()
+      fn config, acc ->
+        config.accounts
+        |> Enum.reduce(
+          acc,
+          fn {account_id, _}, acc ->
+            [{config.id, account_id} | acc]
+          end
+        )
+      end
+    )
+    |> Enum.sort(fn {exchange_id_a, _}, {exchange_id_b, _} ->
+      exchange_id_a |> Atom.to_string() >= exchange_id_b |> Atom.to_string()
+    end)
+  end
+
+  defp fetch_balances(exchange_accounts) do
+    exchange_accounts
+    |> Enum.reduce(
+      [],
+      fn {exchange_id, account_id}, acc ->
+        exchange_id
+        |> Tai.Exchanges.Balance.all(account_id)
         |> Enum.reverse()
         |> Enum.reduce(
           acc,
           fn {symbol, detail}, acc ->
             total = Tai.Exchanges.BalanceDetail.total(detail)
-            [{account_id, symbol, detail.free, detail.locked, total} | acc]
+            [{exchange_id, account_id, symbol, detail.free, detail.locked, total} | acc]
           end
         )
       end
@@ -38,20 +55,20 @@ defmodule Tai.Commands.Balance do
 
   defp exclude_empty_balances(balances) do
     balances
-    |> Enum.reject(fn [_, _, _, _, total] -> Asset.zero?(total) end)
+    |> Enum.reject(fn [_, _, _, _, _, total] -> Tai.Markets.Asset.zero?(total) end)
   end
 
   defp format_rows(balances) do
     balances
-    |> Enum.map(fn {exchange_id, symbol, free, locked, total} ->
-      formatted_free = Asset.new(free, symbol)
-      formatted_locked = Asset.new(locked, symbol)
-      formatted_total = Asset.new(total, symbol)
-      [exchange_id, symbol, formatted_free, formatted_locked, formatted_total]
+    |> Enum.map(fn {exchange_id, account_id, symbol, free, locked, total} ->
+      formatted_free = Tai.Markets.Asset.new(free, symbol)
+      formatted_locked = Tai.Markets.Asset.new(locked, symbol)
+      formatted_total = Tai.Markets.Asset.new(total, symbol)
+      [exchange_id, account_id, symbol, formatted_free, formatted_locked, formatted_total]
     end)
   end
 
-  @header ["Account", "Symbol", "Free", "Locked", "Balance"]
+  @header ["Exchange", "Account", "Symbol", "Free", "Locked", "Balance"]
   @spec render!(list) :: no_return
   defp render!(rows) do
     rows

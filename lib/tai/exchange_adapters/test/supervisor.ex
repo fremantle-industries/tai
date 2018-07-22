@@ -8,4 +8,8 @@ defmodule Tai.ExchangeAdapters.Test.Supervisor do
   def products() do
     Tai.ExchangeAdapters.Test.Products
   end
+
+  def account() do
+    Tai.ExchangeAdapters.Test.Account
+  end
 end

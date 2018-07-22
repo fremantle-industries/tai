@@ -5,7 +5,10 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
   setup_all do
     HTTPoison.start()
-    start_supervised!({Tai.ExchangeAdapters.Gdax.Account, :my_gdax_account})
+
+    start_supervised!(
+      {Tai.ExchangeAdapters.Gdax.Account, [exchange_id: :my_gdax_exchange, account_id: :test]}
+    )
 
     :ok
   end
@@ -13,7 +16,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   describe "#all_balances" do
     test "returns an error tuple when the passphrase is invalid" do
       use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_passphrase" do
-        assert Tai.Exchanges.Account.all_balances(:my_gdax_account) == {
+        assert Tai.Exchanges.Account.all_balances(:my_gdax_exchange, :test) == {
                  :error,
                  %Tai.CredentialError{reason: "Invalid Passphrase"}
                }
@@ -22,7 +25,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
     test "returns an error tuple when the api key is invalid" do
       use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_api_key" do
-        assert Tai.Exchanges.Account.all_balances(:my_gdax_account) == {
+        assert Tai.Exchanges.Account.all_balances(:my_gdax_exchange, :test) == {
                  :error,
                  %Tai.CredentialError{reason: "Invalid API Key"}
                }
@@ -31,7 +34,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
     test "returns an error tuple when down for maintenance" do
       use_cassette "exchange_adapters/gdax/account/all_balances_error_maintenance" do
-        assert Tai.Exchanges.Account.all_balances(:my_gdax_account) == {
+        assert Tai.Exchanges.Account.all_balances(:my_gdax_exchange, :test) == {
                  :error,
                  %Tai.ServiceUnavailableError{
                    reason:
@@ -46,8 +49,9 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "can create a good til canceled duration order" do
       use_cassette "exchange_adapters/shared/account/gdax/buy_limit_good_til_canceled_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
-                 :my_gdax_account
-                 |> Tai.Exchanges.Account.buy_limit(
+                 Tai.Exchanges.Account.buy_limit(
+                   :my_gdax_exchange,
+                   :test,
                    :btc_usd,
                    101.1,
                    0.2,
@@ -65,8 +69,9 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns an insufficient funds error tuple" do
       use_cassette "exchange_adapters/shared/account/gdax/buy_limit_error_insufficient_funds" do
         assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
-                 :my_gdax_account
-                 |> Tai.Exchanges.Account.buy_limit(
+                 Tai.Exchanges.Account.buy_limit(
+                   :my_gdax_exchange,
+                   :test,
                    :btc_usd,
                    101.1,
                    0.3,
@@ -80,8 +85,9 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "can create a good til canceled duration order" do
       use_cassette "exchange_adapters/shared/account/gdax/sell_limit_good_til_canceled_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
-                 :my_gdax_account
-                 |> Tai.Exchanges.Account.sell_limit(
+                 Tai.Exchanges.Account.sell_limit(
+                   :my_gdax_exchange,
+                   :test,
                    :btc_usd,
                    99_999_999.1,
                    0.2,
@@ -99,8 +105,9 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns an insufficient funds error tuple" do
       use_cassette "exchange_adapters/shared/account/gdax/sell_limit_error_insufficient_funds" do
         assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
-                 :my_gdax_account
-                 |> Tai.Exchanges.Account.sell_limit(
+                 Tai.Exchanges.Account.sell_limit(
+                   :my_gdax_exchange,
+                   :test,
                    :btc_usd,
                    99_999_999.1,
                    0.3,
@@ -114,16 +121,16 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns the status" do
       use_cassette "exchange_adapters/gdax/account/order_status_success" do
         {:ok, order_response} =
-          Tai.Exchanges.Account.buy_limit(:my_gdax_account, :btc_usd, 101.1, 0.2)
+          Tai.Exchanges.Account.buy_limit(:my_gdax_exchange, :test, :btc_usd, 101.1, 0.2)
 
-        assert Tai.Exchanges.Account.order_status(:my_gdax_account, order_response.id) ==
+        assert Tai.Exchanges.Account.order_status(:my_gdax_exchange, :test, order_response.id) ==
                  {:ok, :open}
       end
     end
 
     test "returns an error/message tuple when it can't find the order" do
       use_cassette "exchange_adapters/gdax/account/order_status_error" do
-        assert Tai.Exchanges.Account.order_status(:my_gdax_account, "invalid-order-id") ==
+        assert Tai.Exchanges.Account.order_status(:my_gdax_exchange, :test, "invalid-order-id") ==
                  {:error, "Invalid order id"}
       end
     end
@@ -133,10 +140,10 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns an ok tuple with the order id when it's successfully canceled" do
       use_cassette "exchange_adapters/gdax/account/cancel_order_success" do
         {:ok, order_response} =
-          Tai.Exchanges.Account.buy_limit(:my_gdax_account, :btc_usd, 101.1, 0.2)
+          Tai.Exchanges.Account.buy_limit(:my_gdax_exchange, :test, :btc_usd, 101.1, 0.2)
 
         {:ok, canceled_order_id} =
-          Tai.Exchanges.Account.cancel_order(:my_gdax_account, order_response.id)
+          Tai.Exchanges.Account.cancel_order(:my_gdax_exchange, :test, order_response.id)
 
         assert canceled_order_id == order_response.id
       end
@@ -144,7 +151,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
     test "returns an error tuple when it can't cancel the order" do
       use_cassette "exchange_adapters/gdax/account/cancel_order_error" do
-        assert Tai.Exchanges.Account.cancel_order(:my_gdax_account, "invalid-order-id") ==
+        assert Tai.Exchanges.Account.cancel_order(:my_gdax_exchange, :test, "invalid-order-id") ==
                  {:error, "Invalid order id"}
       end
     end

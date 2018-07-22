@@ -12,6 +12,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
   defp add_order do
     Tai.Trading.OrderSubmission.buy_limit(
+      :my_test_exchange,
       :my_test_account,
       :btc_usd,
       100.0,
@@ -47,6 +48,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
       assert Tai.Trading.OrderStore.count() == 1
       assert {:ok, _} = UUID.info(order.client_id)
+      assert order.exchange_id == :my_test_exchange
       assert order.account_id == :my_test_account
       assert order.symbol == :btc_usd
       assert order.price == Decimal.new(100.0)
@@ -62,6 +64,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
       submission_1 =
         Tai.Trading.OrderSubmission.buy_limit(
+          :my_test_exchange,
           :my_test_account,
           :btc_usd,
           100.0,
@@ -71,6 +74,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
       submission_2 =
         Tai.Trading.OrderSubmission.sell_limit(
+          :my_test_exchange,
           :my_test_account,
           :ltc_usd,
           10.0,
@@ -85,6 +89,7 @@ defmodule Tai.Trading.OrderStoreTest do
       assert Tai.Trading.OrderStore.count() == 2
 
       assert {:ok, _} = UUID.info(order_1.client_id)
+      assert order_1.exchange_id == :my_test_exchange
       assert order_1.account_id == :my_test_account
       assert order_1.symbol == :btc_usd
       assert order_1.side == Tai.Trading.Order.buy()
@@ -96,6 +101,7 @@ defmodule Tai.Trading.OrderStoreTest do
       assert %DateTime{} = order_1.enqueued_at
 
       assert {:ok, _} = UUID.info(order_2.client_id)
+      assert order_2.exchange_id == :my_test_exchange
       assert order_2.account_id == :my_test_account
       assert order_2.symbol == :ltc_usd
       assert order_2.side == Tai.Trading.Order.sell()

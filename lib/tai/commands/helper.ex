@@ -18,15 +18,17 @@ defmodule Tai.Commands.Helper do
   @spec orders :: no_return
   defdelegate orders, to: Tai.Commands.Orders
 
-  @spec buy_limit(atom, atom, float, float, atom) :: no_return
-  defdelegate buy_limit(account_id, symbol, price, size, time_in_force), to: Tai.Commands.Trading
+  @spec buy_limit(atom, atom, atom, float, float, atom) :: no_return
+  defdelegate buy_limit(exchange_id, account_id, symbol, price, size, time_in_force),
+    to: Tai.Commands.Trading
 
-  @spec sell_limit(atom, atom, float, float, atom) :: no_return
-  defdelegate sell_limit(account_id, symbol, price, size, time_in_force), to: Tai.Commands.Trading
+  @spec sell_limit(atom, atom, atom, float, float, atom) :: no_return
+  defdelegate sell_limit(exchange_id, account_id, symbol, price, size, time_in_force),
+    to: Tai.Commands.Trading
 
-  @spec order_status(atom, String.t()) :: no_return
-  defdelegate order_status(account_id, order_id), to: Tai.Commands.Trading
+  @spec order_status(atom, atom, String.t()) :: no_return
+  defdelegate order_status(exchange_id, account_id, order_id), to: Tai.Commands.Trading
 
-  @spec cancel_order(atom, String.t()) :: no_return
-  defdelegate cancel_order(account_id, order_id), to: Tai.Commands.Trading
+  @spec cancel_order(atom, atom, String.t()) :: no_return
+  defdelegate cancel_order(exchange_id, account_id, order_id), to: Tai.Commands.Trading
 end

@@ -37,8 +37,8 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
   defp send_cancel_order!(order) do
     {:ok, _pid} =
       Task.start_link(fn ->
-        order.account_id
-        |> Tai.Exchanges.Account.cancel_order(order.server_id)
+        order.exchange_id
+        |> Tai.Exchanges.Account.cancel_order(order.account_id, order.server_id)
         |> parse_cancel_order_response(order)
       end)
   end

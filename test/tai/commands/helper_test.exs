@@ -27,10 +27,10 @@ defmodule Tai.Commands.HelperTest do
            * products
            * markets
            * orders
-           * buy_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
-           * sell_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
-           * order_status account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
-           * cancel_order account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")\n
+           * buy_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)
+           * sell_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)
+           * order_status exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
+           * cancel_order exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")\n
            """
   end
 
@@ -75,16 +75,16 @@ defmodule Tai.Commands.HelperTest do
 
   test "balance shows the symbols on each exchange with a non-zero balance" do
     assert capture_io(fn -> Helper.balance() end) == """
-           +----------------+--------+----------------------+----------------------+----------------------+
-           |        Account | Symbol |                 Free |               Locked |              Balance |
-           +----------------+--------+----------------------+----------------------+----------------------+
-           | test_account_a |    btc |           0.10000000 |           1.81227740 |           1.91227740 |
-           | test_account_a |    eth | 0.000000000000000000 | 0.000000000000200000 | 0.000000000000200000 |
-           | test_account_a |    ltc |           0.00000000 |           0.03000000 |           0.03000000 |
-           | test_account_b |    btc |           0.10000000 |           1.81227740 |           1.91227740 |
-           | test_account_b |    eth | 0.000000000000000000 | 0.000000000000200000 | 0.000000000000200000 |
-           | test_account_b |    ltc |           0.00000000 |           0.03000000 |           0.03000000 |
-           +----------------+--------+----------------------+----------------------+----------------------+\n
+           +-----------------+---------+--------+----------------------+----------------------+----------------------+
+           |        Exchange | Account | Symbol |                 Free |               Locked |              Balance |
+           +-----------------+---------+--------+----------------------+----------------------+----------------------+
+           | test_exchange_a |    main |    btc |           0.10000000 |           1.81227740 |           1.91227740 |
+           | test_exchange_a |    main |    eth | 0.000000000000000000 | 0.000000000000200000 | 0.000000000000200000 |
+           | test_exchange_a |    main |    ltc |           0.00000000 |           0.03000000 |           0.03000000 |
+           | test_exchange_b |    main |    btc |           0.10000000 |           1.81227740 |           1.91227740 |
+           | test_exchange_b |    main |    eth | 0.000000000000000000 | 0.000000000000200000 | 0.000000000000200000 |
+           | test_exchange_b |    main |    ltc |           0.00000000 |           0.03000000 |           0.03000000 |
+           +-----------------+---------+--------+----------------------+----------------------+----------------------+\n
            """
   end
 
@@ -117,17 +117,18 @@ defmodule Tai.Commands.HelperTest do
 
   test "orders displays items in ascending order from when they were enqueued" do
     assert capture_io(fn -> Helper.orders() end) == """
-           +---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+
-           | Account | Symbol | Side | Type | Price | Size | Time in Force | Status | Client ID | Server ID | Enqueued At | Created At |
-           +---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+
-           |       - |      - |    - |    - |     - |    - |             - |      - |         - |         - |           - |          - |
-           +---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+\n
+           +----------+---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+
+           | Exchange | Account | Symbol | Side | Type | Price | Size | Time in Force | Status | Client ID | Server ID | Enqueued At | Created At |
+           +----------+---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+
+           |        - |       - |      - |    - |    - |     - |    - |             - |      - |         - |         - |           - |          - |
+           +----------+---------+--------+------+------+-------+------+---------------+--------+-----------+-----------+-------------+------------+\n
            """
 
     [btc_usd_order] =
       Tai.Trading.OrderStore.add(
         OrderSubmission.buy_limit(
-          :test_feed_a,
+          :test_exchange_a,
+          :main,
           :btc_usd,
           12_999.99,
           1.1,
@@ -137,27 +138,35 @@ defmodule Tai.Commands.HelperTest do
 
     [ltc_usd_order] =
       Tai.Trading.OrderStore.add(
-        OrderSubmission.sell_limit(:test_feed_b, :ltc_usd, 75.23, 1.0, TimeInForce.fill_or_kill())
+        OrderSubmission.sell_limit(
+          :test_exchange_b,
+          :main,
+          :ltc_usd,
+          75.23,
+          1.0,
+          TimeInForce.fill_or_kill()
+        )
       )
 
     assert capture_io(fn -> Helper.orders() end) == """
-           +-------------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
-           |     Account |  Symbol | Side |  Type |    Price | Size | Time in Force |   Status |                            Client ID | Server ID | Enqueued At | Created At |
-           +-------------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
-           | test_feed_a | btc_usd |  buy | limit | 12999.99 |  1.1 |           fok | enqueued | #{
+           +-----------------+---------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
+           |        Exchange | Account |  Symbol | Side |  Type |    Price | Size | Time in Force |   Status |                            Client ID | Server ID | Enqueued At | Created At |
+           +-----------------+---------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+
+           | test_exchange_a |    main | btc_usd |  buy | limit | 12999.99 |  1.1 |           fok | enqueued | #{
              btc_usd_order.client_id
            } |           |         now |            |
-           | test_feed_b | ltc_usd | sell | limit |    75.23 |  1.0 |           fok | enqueued | #{
+           | test_exchange_b |    main | ltc_usd | sell | limit |    75.23 |  1.0 |           fok | enqueued | #{
              ltc_usd_order.client_id
            } |           |         now |            |
-           +-------------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+\n
+           +-----------------+---------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+\n
            """
   end
 
   test "buy_limit enqueues an order and displays it's client id" do
     assert capture_io(fn ->
              Helper.buy_limit(
-               :test_account_a,
+               :test_exchange_a,
+               :main,
                :btc_usd_success,
                10.1,
                2.2,
@@ -169,7 +178,8 @@ defmodule Tai.Commands.HelperTest do
   test "sell_limit enqueues an order and displays it's client id" do
     assert capture_io(fn ->
              Helper.sell_limit(
-               :test_account_a,
+               :test_exchange_a,
+               :main,
                :btc_usd_success,
                10.1,
                2.2,
@@ -180,25 +190,25 @@ defmodule Tai.Commands.HelperTest do
 
   test "order_status displays the order info" do
     assert capture_io(fn ->
-             Helper.order_status(:test_account_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
+             Helper.order_status(:test_exchange_a, :main, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
            end) == "status: open\n"
   end
 
   test "order_status displays error messages" do
     assert capture_io(fn ->
-             Helper.order_status(:test_account_a, "invalid-order-id")
+             Helper.order_status(:test_exchange_a, :main, "invalid-order-id")
            end) == "error: Invalid order id\n"
   end
 
   test "cancel_order cancels a previous order" do
     assert capture_io(fn ->
-             Helper.cancel_order(:test_account_a, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
+             Helper.cancel_order(:test_exchange_a, :main, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
            end) == "cancel order success\n"
   end
 
   test "cancel_order displays error messages" do
     assert capture_io(fn ->
-             Helper.cancel_order(:test_account_a, "invalid-order-id")
+             Helper.cancel_order(:test_exchange_a, :main, "invalid-order-id")
            end) == "error: Invalid order id\n"
   end
 end

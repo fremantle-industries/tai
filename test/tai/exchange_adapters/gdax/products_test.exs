@@ -16,7 +16,8 @@ defmodule Tai.ExchangeAdapters.Gdax.ProductsTest do
     config = %Tai.Exchanges.Config{
       id: :gdax,
       supervisor: Tai.ExchangeAdapters.Gdax.Supervisor,
-      products: "*"
+      products: "*",
+      accounts: %{}
     }
 
     exchange_id = config.id

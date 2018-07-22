@@ -144,6 +144,7 @@ defmodule Tai.Trading.OrderStore do
              enqueued_at <- Timex.now() do
           order = %Tai.Trading.Order{
             client_id: UUID.uuid4(),
+            exchange_id: submission.exchange_id,
             account_id: submission.account_id,
             symbol: submission.symbol,
             side: submission.side,

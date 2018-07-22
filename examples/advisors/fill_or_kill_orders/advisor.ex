@@ -11,6 +11,7 @@ defmodule Examples.Advisors.FillOrKillOrders.Advisor do
     if Tai.Trading.OrderStore.count() == 0 do
       Tai.Trading.OrderPipeline.buy_limit(
         :binance,
+        :main,
         :btc_usdt,
         100.1,
         0.1,

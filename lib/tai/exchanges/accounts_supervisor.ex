@@ -1,24 +1,19 @@
 defmodule Tai.Exchanges.AccountsSupervisor do
-  @moduledoc """
-  Start an account supervisor for every configured account
-  """
-
   use Supervisor
 
-  def start_link(_) do
-    Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
-  end
-
-  def init(:ok) do
-    Tai.Exchanges.Config.account_ids()
-    |> Enum.map(&account_supervisor_spec/1)
-    |> Supervisor.init(strategy: :one_for_one)
-  end
-
-  defp account_supervisor_spec(account_id) do
-    Supervisor.child_spec(
-      {Tai.Exchanges.AccountSupervisor, account_id},
-      id: "#{Tai.Exchanges.AccountSupervisor}_#{account_id}"
+  def start_link([adapter: _, exchange_id: exchange_id, accounts: _] = state) do
+    Supervisor.start_link(
+      __MODULE__,
+      state,
+      name: :"#{__MODULE__}_#{exchange_id}"
     )
+  end
+
+  def init(adapter: adapter, exchange_id: exchange_id, accounts: accounts) do
+    accounts
+    |> Enum.map(fn {account_id, _} ->
+      {adapter, [exchange_id: exchange_id, account_id: account_id]}
+    end)
+    |> Supervisor.init(strategy: :one_for_one)
   end
 end

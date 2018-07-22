@@ -6,12 +6,14 @@ defmodule Tai.Trading.OrderSubmissionTest do
 
   test "buy_limit returns a limit submission for the buy side" do
     assert OrderSubmission.buy_limit(
+             :my_test_exchange,
              :my_test_account,
              :my_symbol,
              10.1,
              0.1,
              TimeInForce.fill_or_kill()
            ) == %OrderSubmission{
+             exchange_id: :my_test_exchange,
              account_id: :my_test_account,
              symbol: :my_symbol,
              side: Order.buy(),
@@ -24,6 +26,7 @@ defmodule Tai.Trading.OrderSubmissionTest do
 
   test "sell_limit returns a limit submission for the buy side" do
     assert OrderSubmission.sell_limit(
+             :my_test_exchange,
              :my_test_account,
              :my_symbol,
              10.1,
@@ -31,6 +34,7 @@ defmodule Tai.Trading.OrderSubmissionTest do
              TimeInForce.fill_or_kill()
            ) ==
              %OrderSubmission{
+               exchange_id: :my_test_exchange,
                account_id: :my_test_account,
                symbol: :my_symbol,
                side: Order.sell(),

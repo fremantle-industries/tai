@@ -21,7 +21,8 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
     test "expires unfilled buy orders", %{callback: callback} do
       order =
         Tai.Trading.OrderPipeline.buy_limit(
-          :test_account_a,
+          :test_exchange_a,
+          :main,
           :btc_usd_expired,
           100.1,
           0.1,
@@ -44,7 +45,8 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
     test "expires unfilled sell orders", %{callback: callback} do
       order =
         Tai.Trading.OrderPipeline.sell_limit(
-          :test_account_a,
+          :test_exchange_a,
+          :main,
           :btc_usd_expired,
           10_000.1,
           0.1,
@@ -69,7 +71,8 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
         capture_log(fn ->
           order =
             Tai.Trading.OrderPipeline.buy_limit(
-              :test_account_a,
+              :test_exchange_a,
+              :main,
               :btc_usd_success,
               100.1,
               0.1,
@@ -95,7 +98,8 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
     test "updates the executed size of filled sell orders", %{callback: callback} do
       order =
         Tai.Trading.OrderPipeline.sell_limit(
-          :test_account_a,
+          :test_exchange_a,
+          :main,
           :btc_usd_success,
           10_000.1,
           0.1,
@@ -122,7 +126,8 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
         capture_log(fn ->
           order =
             Tai.Trading.OrderPipeline.buy_limit(
-              :test_account_a,
+              :test_exchange_a,
+              :main,
               :btc_usd_pending,
               100.1,
               0.1,
@@ -150,7 +155,8 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
         capture_log(fn ->
           order =
             Tai.Trading.OrderPipeline.sell_limit(
-              :test_account_a,
+              :test_exchange_a,
+              :main,
               :btc_usd_pending,
               100_000.1,
               0.01,
@@ -181,7 +187,8 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
       capture_log(fn ->
         order =
           Tai.Trading.OrderPipeline.buy_limit(
-            :test_account_a,
+            :test_exchange_a,
+            :main,
             :btc_usd_unknown_error,
             100.1,
             0.1,
@@ -214,6 +221,7 @@ defmodule Tai.Trading.OrderPipeline.SendTest do
           type: 'magic_type',
           client_id: :ignore,
           enqueued_at: :ignore,
+          exchange_id: :ignore,
           account_id: :ignore,
           price: :ignore,
           size: :ignore,

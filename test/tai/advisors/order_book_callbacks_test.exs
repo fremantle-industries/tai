@@ -21,13 +21,17 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
   end
 
   setup do
-    Process.register(self(), :test)
-    book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btc_usd})
-    start_supervised!({Tai.ExchangeAdapters.Test.Account, :my_test_account})
-
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
     end)
+
+    Process.register(self(), :test)
+    book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btc_usd})
+
+    start_supervised!(
+      {Tai.ExchangeAdapters.Test.Account,
+       [exchange_id: :my_test_exchange, account_id: :my_test_account]}
+    )
 
     {:ok, %{book_pid: book_pid}}
   end

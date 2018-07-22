@@ -3,15 +3,15 @@ defmodule Tai.Commands.Trading do
   Commands to submit and manage orders for an account
   """
 
-  def buy_limit(account_id, symbol, price, size, time_in_force) do
-    account_id
-    |> Tai.Trading.OrderPipeline.buy_limit(symbol, price, size, time_in_force)
+  def buy_limit(exchange_id, account_id, symbol, price, size, time_in_force) do
+    exchange_id
+    |> Tai.Trading.OrderPipeline.buy_limit(account_id, symbol, price, size, time_in_force)
     |> render_order
   end
 
-  def sell_limit(account_id, symbol, price, size, time_in_force) do
-    account_id
-    |> Tai.Trading.OrderPipeline.sell_limit(symbol, price, size, time_in_force)
+  def sell_limit(exchange_id, account_id, symbol, price, size, time_in_force) do
+    exchange_id
+    |> Tai.Trading.OrderPipeline.sell_limit(account_id, symbol, price, size, time_in_force)
     |> render_order
   end
 
@@ -19,9 +19,9 @@ defmodule Tai.Commands.Trading do
     IO.puts("order enqueued. client_id: #{order.client_id}")
   end
 
-  def order_status(account_id, order_id) do
-    account_id
-    |> Tai.Exchanges.Account.order_status(order_id)
+  def order_status(exchange_id, account_id, order_id) do
+    exchange_id
+    |> Tai.Exchanges.Account.order_status(account_id, order_id)
     |> case do
       {:ok, status} ->
         IO.puts("status: #{status}")
@@ -31,9 +31,9 @@ defmodule Tai.Commands.Trading do
     end
   end
 
-  def cancel_order(account_id, order_id) do
-    account_id
-    |> Tai.Exchanges.Account.cancel_order(order_id)
+  def cancel_order(exchange_id, account_id, order_id) do
+    exchange_id
+    |> Tai.Exchanges.Account.cancel_order(account_id, order_id)
     |> case do
       {:ok, _canceled_order_id} ->
         IO.puts("cancel order success")

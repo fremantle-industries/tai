@@ -7,11 +7,11 @@ defmodule Tai.Exchanges.Balance do
 
   use GenServer
 
-  def start_link(account_id: account_id, balances: %{} = balances) do
+  def start_link(exchange_id: exchange_id, account_id: account_id, balances: %{} = balances) do
     GenServer.start_link(
       __MODULE__,
       balances,
-      name: account_id |> to_name
+      name: to_name(exchange_id, account_id)
     )
   end
 
@@ -73,24 +73,26 @@ defmodule Tai.Exchanges.Balance do
     end
   end
 
-  @spec all(atom) :: map
-  def all(account_id) do
-    account_id
-    |> to_name
+  @spec all(atom, atom) :: map
+  def all(exchange_id, account_id) do
+    exchange_id
+    |> to_name(account_id)
     |> GenServer.call(:all)
   end
 
-  @spec lock(atom, balance_change_request) :: :ok | {:error, :not_found | :insufficient_balance}
-  def lock(account_id, balance_change_request) do
-    account_id
-    |> to_name
+  @spec lock(atom, atom, balance_change_request) ::
+          :ok | {:error, :not_found | :insufficient_balance}
+  def lock(exchange_id, account_id, balance_change_request) do
+    exchange_id
+    |> to_name(account_id)
     |> GenServer.call({:lock, balance_change_request})
   end
 
-  @spec unlock(atom, balance_change_request) :: :ok | {:error, :not_found | :insufficient_balance}
-  def unlock(account_id, balance_change_request) do
-    account_id
-    |> to_name
+  @spec unlock(atom, atom, balance_change_request) ::
+          :ok | {:error, :not_found | :insufficient_balance}
+  def unlock(exchange_id, account_id, balance_change_request) do
+    exchange_id
+    |> to_name(account_id)
     |> GenServer.call({:unlock, balance_change_request})
   end
 
@@ -99,11 +101,11 @@ defmodule Tai.Exchanges.Balance do
 
   ## Examples
 
-    iex> Tai.Exchanges.Balance.to_name(:my_test_account)
-    :"Elixir.Tai.Exchanges.Balance_my_test_account"
+    iex> Tai.Exchanges.Balance.to_name(:my_test_exchange, :my_test_account)
+    :"Elixir.Tai.Exchanges.Balance_my_test_exchange_my_test_account"
   """
-  @spec to_name(atom) :: atom
-  def to_name(account_id) do
-    :"#{__MODULE__}_#{account_id}"
+  @spec to_name(atom, atom) :: atom
+  def to_name(exchange_id, account_id) do
+    :"#{__MODULE__}_#{exchange_id}_#{account_id}"
   end
 end
