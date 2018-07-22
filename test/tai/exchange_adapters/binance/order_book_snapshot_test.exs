@@ -8,8 +8,6 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshotTest do
 
   setup_all do
     HTTPoison.start()
-    start_supervised!({Tai.ExchangeAdapters.Gdax.Account, :my_gdax_exchange})
-
     :ok
   end
 
