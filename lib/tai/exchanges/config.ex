@@ -5,8 +5,8 @@ defmodule Tai.Exchanges.Config do
 
   @type t :: %Tai.Exchanges.Config{}
 
-  @enforce_keys [:id, :supervisor, :products, :accounts]
-  defstruct [:id, :supervisor, :products, :accounts]
+  @enforce_keys [:id, :supervisor]
+  defstruct id: nil, supervisor: nil, products: "*", accounts: %{}
 
   @doc """
   Return a struct for all configured exchanges 

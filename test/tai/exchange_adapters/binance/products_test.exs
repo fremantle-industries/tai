@@ -16,7 +16,6 @@ defmodule Tai.ExchangeAdapters.Binance.ProductsTest do
     config = %Tai.Exchanges.Config{
       id: :binance,
       supervisor: Tai.ExchangeAdapters.Binance.Supervisor,
-      products: "*",
       accounts: %{}
     }
 

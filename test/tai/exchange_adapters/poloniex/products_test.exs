@@ -16,7 +16,6 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
     config = %Tai.Exchanges.Config{
       id: :poloniex,
       supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor,
-      products: "*",
       accounts: %{}
     }
 
@@ -47,7 +46,6 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
     config = %Tai.Exchanges.Config{
       id: :poloniex,
       supervisor: Tai.ExchangeAdapters.Poloniex.Supervisor,
-      products: "*",
       accounts: %{}
     }
 
