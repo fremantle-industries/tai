@@ -169,8 +169,8 @@ defmodule Tai.Exchanges.Account do
   ## Examples
 
     iex> Tai.Exchanges.Account.to_name(:my_test_exchange, :my_test_account)
-    :account_my_test_exchange_my_test_account
+    :"Elixir.Tai.Exchanges.Account_my_test_exchange_my_test_account"
   """
   def to_name(exchange_id, account_id),
-    do: :"account_#{exchange_id}_#{account_id}"
+    do: :"#{Tai.Exchanges.Account}_#{exchange_id}_#{account_id}"
 end
