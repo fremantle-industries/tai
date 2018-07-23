@@ -3,18 +3,9 @@ defmodule Tai.ExchangeAdapters.Test.Supervisor do
   Supervisor for the test exchange adapter
   """
 
-  use Supervisor
+  use Tai.Exchanges.AdapterSupervisor
 
-  def start_link(%Tai.Exchanges.Config{} = config) do
-    Supervisor.start_link(
-      __MODULE__,
-      config.id,
-      name: :"#{__MODULE__}_#{config.id}"
-    )
-  end
-
-  def init(_config) do
-    children = []
-    Supervisor.init(children, strategy: :one_for_one)
+  def products() do
+    Tai.ExchangeAdapters.Test.Products
   end
 end
