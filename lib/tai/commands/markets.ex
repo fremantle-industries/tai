@@ -3,13 +3,11 @@ defmodule Tai.Commands.Markets do
   Display the bid/ask for each symbol on all order book feeds
   """
 
-  alias Tai.Exchanges
-  alias Tai.Markets.{OrderBook, Quote}
   alias TableRex.Table
 
   @spec markets :: no_return
   def markets do
-    Exchanges.Config.order_book_feed_ids()
+    Tai.Exchanges.Config.order_book_feed_ids()
     |> group_rows
     |> fetch_rows
     |> format_rows
@@ -22,7 +20,7 @@ defmodule Tai.Commands.Markets do
       [],
       fn feed_id, acc ->
         feed_id
-        |> Exchanges.Config.order_book_feed_symbols()
+        |> Tai.Exchanges.Config.order_book_feed_symbols()
         |> Enum.reduce(
           acc,
           fn symbol, acc -> [{feed_id, symbol} | acc] end
@@ -35,14 +33,14 @@ defmodule Tai.Commands.Markets do
   defp fetch_rows(groups) when is_list(groups) do
     groups
     |> Enum.map(fn {feed_id, symbol} ->
-      {:ok, inside_quote} = OrderBook.inside_quote(feed_id, symbol)
+      {:ok, inside_quote} = Tai.Markets.OrderBook.inside_quote(feed_id, symbol)
       {feed_id, symbol, inside_quote}
     end)
   end
 
   defp format_rows(groups_with_quotes) when is_list(groups_with_quotes) do
     groups_with_quotes
-    |> Enum.map(fn {feed_id, symbol, %Quote{bid: bid, ask: ask}} ->
+    |> Enum.map(fn {feed_id, symbol, %Tai.Markets.Quote{bid: bid, ask: ask}} ->
       [
         feed_id,
         symbol,
