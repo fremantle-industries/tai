@@ -52,7 +52,7 @@ defmodule Tai.Mixfile do
       {:plug, "~> 1.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_unit_notifier, "~> 0.1", only: :test},
-      {:dialyxir, "~> 1.0.0-rc.1", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false}
     ]
