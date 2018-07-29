@@ -40,7 +40,7 @@ defmodule Tai.Commands.Balance do
       [],
       fn {exchange_id, account_id}, acc ->
         exchange_id
-        |> Tai.Exchanges.Balance.all(account_id)
+        |> Tai.Exchanges.AssetBalances.all(account_id)
         |> Enum.reverse()
         |> Enum.reduce(
           acc,

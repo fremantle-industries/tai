@@ -1,19 +1,24 @@
-defmodule Tai.Exchanges.BalanceTest do
+defmodule Tai.Exchanges.AssetBalancesTest do
   use ExUnit.Case
-  doctest Tai.Exchanges.Balance
+  doctest Tai.Exchanges.AssetBalances
 
   defp all do
-    Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account)
+    Tai.Exchanges.AssetBalances.all(:my_test_exchange, :my_test_account)
   end
 
   defp lock_range(asset, min, max) do
     range = Tai.Exchanges.BalanceRange.new(asset, min, max)
-    Tai.Exchanges.Balance.lock_range(:my_test_exchange, :my_test_account, range)
+    Tai.Exchanges.AssetBalances.lock_range(:my_test_exchange, :my_test_account, range)
   end
 
   defp unlock(asset, qty) do
     balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(asset, qty)
-    Tai.Exchanges.Balance.unlock(:my_test_exchange, :my_test_account, balance_change_request)
+
+    Tai.Exchanges.AssetBalances.unlock(
+      :my_test_exchange,
+      :my_test_account,
+      balance_change_request
+    )
   end
 
   setup do
@@ -23,7 +28,7 @@ defmodule Tai.Exchanges.BalanceTest do
     }
 
     start_supervised!({
-      Tai.Exchanges.Balance,
+      Tai.Exchanges.AssetBalances,
       [exchange_id: :my_test_exchange, account_id: :my_test_account, balances: balances]
     })
 

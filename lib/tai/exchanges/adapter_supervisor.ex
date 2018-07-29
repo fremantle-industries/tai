@@ -21,7 +21,8 @@ defmodule Tai.Exchanges.AdapterSupervisor do
           {products(), [exchange_id: config.id, whitelist_query: config.products]},
           {Tai.Exchanges.AccountsSupervisor,
            [adapter: account(), exchange_id: config.id, accounts: config.accounts]},
-          {Tai.Exchanges.BalancesSupervisor, [exchange_id: config.id, accounts: config.accounts]}
+          {Tai.Exchanges.AssetBalancesSupervisor,
+           [exchange_id: config.id, accounts: config.accounts]}
         ]
         |> Supervisor.init(strategy: :one_for_one)
       end

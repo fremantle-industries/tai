@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Balance do
+defmodule Tai.Exchanges.AssetBalances do
   @moduledoc """
   Manages the balances of an account
   """
@@ -116,8 +116,8 @@ defmodule Tai.Exchanges.Balance do
 
   ## Examples
 
-    iex> Tai.Exchanges.Balance.to_name(:my_test_exchange, :my_test_account)
-    :"Elixir.Tai.Exchanges.Balance_my_test_exchange_my_test_account"
+    iex> Tai.Exchanges.AssetBalances.to_name(:my_test_exchange, :my_test_account)
+    :"Elixir.Tai.Exchanges.AssetBalances_my_test_exchange_my_test_account"
   """
   @spec to_name(atom, atom) :: atom
   def to_name(exchange_id, account_id) do
