@@ -2,13 +2,18 @@ defmodule Tai.Exchanges.BalanceTest do
   use ExUnit.Case
   doctest Tai.Exchanges.Balance
 
+  defp all do
+    Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account)
+  end
+
   defp lock_range(asset, min, max) do
     range = Tai.Exchanges.BalanceRange.new(asset, min, max)
     Tai.Exchanges.Balance.lock_range(:my_test_exchange, :my_test_account, range)
   end
 
-  defp all do
-    Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account)
+  defp unlock(asset, qty) do
+    balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(asset, qty)
+    Tai.Exchanges.Balance.unlock(:my_test_exchange, :my_test_account, balance_change_request)
   end
 
   setup do
@@ -108,45 +113,27 @@ defmodule Tai.Exchanges.BalanceTest do
 
   describe "#unlock" do
     test "unlocks the balance for the asset" do
-      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.0)
+      assert unlock(:btc, 1.0) == :ok
 
-      assert Tai.Exchanges.Balance.unlock(
-               :my_test_exchange,
-               :my_test_account,
-               balance_change_request
-             ) == :ok
-
-      assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
+      assert all() == %{
                btc: Tai.Exchanges.BalanceDetail.new(2.1, 0.1),
                ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
     end
 
     test "doesn't unlock the balance if the asset doesn't exist" do
-      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:xbt, 1.0)
+      assert unlock(:xbt, 1.0) == {:error, :not_found}
 
-      assert Tai.Exchanges.Balance.unlock(
-               :my_test_exchange,
-               :my_test_account,
-               balance_change_request
-             ) == {:error, :not_found}
-
-      assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
+      assert all() == %{
                btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
                ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
     end
 
     test "doesn't unlock the balance if there is insufficient funds" do
-      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.11)
+      assert unlock(:btc, 1.11) == {:error, :insufficient_balance}
 
-      assert Tai.Exchanges.Balance.unlock(
-               :my_test_exchange,
-               :my_test_account,
-               balance_change_request
-             ) == {:error, :insufficient_balance}
-
-      assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
+      assert all() == %{
                btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
                ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
