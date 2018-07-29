@@ -45,7 +45,7 @@ defmodule Tai.Commands.Balance do
         |> Enum.reduce(
           acc,
           fn {symbol, detail}, acc ->
-            total = Tai.Exchanges.BalanceDetail.total(detail)
+            total = Tai.Exchanges.AssetBalance.total(detail)
             [{exchange_id, account_id, symbol, detail.free, detail.locked, total} | acc]
           end
         )

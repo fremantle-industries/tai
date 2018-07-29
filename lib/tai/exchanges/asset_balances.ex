@@ -29,7 +29,7 @@ defmodule Tai.Exchanges.AssetBalances do
         _from,
         state
       ) do
-    with %Tai.Exchanges.BalanceDetail{} = balance <- Map.get(state, balance_range.asset),
+    with %Tai.Exchanges.AssetBalance{} = balance <- Map.get(state, balance_range.asset),
          :ok <- Tai.Exchanges.BalanceRange.validate(balance_range) do
       lock_result =
         cond do

@@ -6,10 +6,10 @@ defmodule Tai.ExchangeAdapters.Test.Account do
   use Tai.Exchanges.Account
 
   @all_balances %{
-    bch: Tai.Exchanges.BalanceDetail.new(0, 0),
-    btc: Tai.Exchanges.BalanceDetail.new("0.10000000", "1.8122774027894548"),
-    eth: Tai.Exchanges.BalanceDetail.new(0, "0.000000000000200000000"),
-    ltc: Tai.Exchanges.BalanceDetail.new(0, "0.03")
+    bch: Tai.Exchanges.AssetBalance.new(0, 0),
+    btc: Tai.Exchanges.AssetBalance.new("0.10000000", "1.8122774027894548"),
+    eth: Tai.Exchanges.AssetBalance.new(0, "0.000000000000200000000"),
+    ltc: Tai.Exchanges.AssetBalance.new(0, "0.03")
   }
 
   def all_balances() do

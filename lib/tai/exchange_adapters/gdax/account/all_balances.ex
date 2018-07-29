@@ -37,7 +37,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.AllBalances do
          acc
        ) do
     with symbol <- raw_currency |> String.downcase() |> String.to_atom(),
-         detail = Tai.Exchanges.BalanceDetail.new(available, hold) do
+         detail = Tai.Exchanges.AssetBalance.new(available, hold) do
       Map.put(acc, symbol, detail)
     end
   end

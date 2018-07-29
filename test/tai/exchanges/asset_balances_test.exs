@@ -23,8 +23,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
 
   setup do
     balances = %{
-      btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-      ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+      btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+      ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
     }
 
     start_supervised!({
@@ -38,8 +38,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   describe "#all" do
     test "returns a map of details for all assets in the account" do
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
   end
@@ -49,8 +49,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert lock_range(:btc, 0, 1.1) == {:ok, Decimal.new(1.1)}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(0.0, 2.2),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(0.0, 2.2),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -58,8 +58,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert lock_range(:btc, 0, 1.0) == {:ok, Decimal.new(1.0)}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(0.1, 2.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(0.1, 2.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -67,8 +67,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert lock_range(:btc, 1.1, 1.2) == {:ok, Decimal.new(1.1)}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(0.0, 2.2),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(0.0, 2.2),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -76,8 +76,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert lock_range(:btc, 1.0, 1.2) == {:ok, Decimal.new(1.1)}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(0.0, 2.2),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(0.0, 2.2),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -85,8 +85,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert lock_range(:xbt, 0.1, 1.2) == {:error, :not_found}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -94,8 +94,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert lock_range(:btc, 1.11, 1.2) == {:error, :insufficient_balance}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -103,8 +103,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert lock_range(:btc, 0.11, 0.1) == {:error, :min_greater_than_max}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -112,8 +112,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert lock_range(:btc, -0.1, 0.1) == {:error, :min_less_than_zero}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
   end
@@ -123,8 +123,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert unlock(:btc, 1.0) == :ok
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(2.1, 0.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(2.1, 0.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -132,8 +132,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert unlock(:xbt, 1.0) == {:error, :not_found}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
 
@@ -141,8 +141,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert unlock(:btc, 1.11) == {:error, :insufficient_balance}
 
       assert all() == %{
-               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+               btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+               ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
     end
   end

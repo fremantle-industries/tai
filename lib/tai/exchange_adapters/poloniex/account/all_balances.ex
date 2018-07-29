@@ -34,7 +34,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.AllBalances do
          acc
        ) do
     with symbol <- raw_currency |> String.downcase() |> String.to_atom(),
-         detail <- Tai.Exchanges.BalanceDetail.new(raw_available, raw_on_orders) do
+         detail <- Tai.Exchanges.AssetBalance.new(raw_available, raw_on_orders) do
       Map.put(acc, symbol, detail)
     end
   end

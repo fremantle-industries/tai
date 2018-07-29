@@ -26,7 +26,7 @@ defmodule Tai.ExchangeAdapters.Binance.Account.AllBalances do
 
   defp normalize_asset(%{"asset" => raw_asset, "free" => free, "locked" => locked}, acc) do
     with asset <- raw_asset |> String.downcase() |> String.to_atom(),
-         detail <- Tai.Exchanges.BalanceDetail.new(free, locked) do
+         detail <- Tai.Exchanges.AssetBalance.new(free, locked) do
       Map.put(acc, asset, detail)
     end
   end
