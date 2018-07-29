@@ -30,11 +30,13 @@ defmodule Tai.Exchanges.BalanceTest do
     :ok
   end
 
-  test "all returns the details for all assets in the account" do
-    assert all() == %{
-             btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-             ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
-           }
+  describe "#all" do
+    test "returns a map of details for all assets in the account" do
+      assert all() == %{
+               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+             }
+    end
   end
 
   describe "#lock_range" do
