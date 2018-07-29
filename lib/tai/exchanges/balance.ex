@@ -3,6 +3,7 @@ defmodule Tai.Exchanges.Balance do
   Manages the balances of an account
   """
 
+  @type balance_range :: Tai.Exchanges.BalanceRange.t()
   @type balance_change_request :: Tai.Exchanges.BalanceChangeRequest.t()
 
   use GenServer
@@ -24,27 +25,39 @@ defmodule Tai.Exchanges.Balance do
   end
 
   def handle_call(
-        {:lock, %Tai.Exchanges.BalanceChangeRequest{asset: asset, amount: amount}},
+        {:lock_range, %Tai.Exchanges.BalanceRange{} = balance_range},
         _from,
         state
       ) do
-    if detail = Map.get(state, asset) do
-      new_free = Decimal.sub(detail.free, amount)
-      new_locked = Decimal.add(detail.locked, amount)
+    with %Tai.Exchanges.BalanceDetail{} = balance <- Map.get(state, balance_range.asset),
+         :ok <- Tai.Exchanges.BalanceRange.validate(balance_range) do
+      lock_result =
+        cond do
+          Decimal.cmp(balance_range.max, balance.free) != :gt -> balance_range.max
+          Decimal.cmp(balance_range.min, balance.free) != :gt -> balance.free
+          true -> nil
+        end
 
-      new_detail =
-        detail
-        |> Map.put(:free, new_free)
-        |> Map.put(:locked, new_locked)
-
-      if Decimal.cmp(new_free, Decimal.new(0)) == :lt do
+      if lock_result == nil do
         {:reply, {:error, :insufficient_balance}, state}
       else
-        new_state = Map.put(state, asset, new_detail)
-        {:reply, :ok, new_state}
+        new_free = Decimal.sub(balance.free, lock_result)
+        new_locked = Decimal.add(balance.locked, lock_result)
+
+        new_balance =
+          balance
+          |> Map.put(:free, new_free)
+          |> Map.put(:locked, new_locked)
+
+        new_state = Map.put(state, balance_range.asset, new_balance)
+        {:reply, {:ok, lock_result}, new_state}
       end
     else
-      {:reply, {:error, :not_found}, state}
+      {:error, _} = error ->
+        {:reply, error, state}
+
+      nil ->
+        {:reply, {:error, :not_found}, state}
     end
   end
 
@@ -80,12 +93,14 @@ defmodule Tai.Exchanges.Balance do
     |> GenServer.call(:all)
   end
 
-  @spec lock(atom, atom, balance_change_request) ::
-          :ok | {:error, :not_found | :insufficient_balance}
-  def lock(exchange_id, account_id, balance_change_request) do
+  @spec lock_range(atom, atom, balance_range) ::
+          {:ok, Decimal.t()}
+          | {:error, :not_found | :insufficient_balance | :min_greater_than_max,
+             :min_less_than_zero}
+  def lock_range(exchange_id, account_id, range) do
     exchange_id
     |> to_name(account_id)
-    |> GenServer.call({:lock, balance_change_request})
+    |> GenServer.call({:lock_range, range})
   end
 
   @spec unlock(atom, atom, balance_change_request) ::

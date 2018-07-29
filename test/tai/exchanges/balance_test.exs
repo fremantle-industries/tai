@@ -2,11 +2,19 @@ defmodule Tai.Exchanges.BalanceTest do
   use ExUnit.Case
   doctest Tai.Exchanges.Balance
 
+  defp lock_range(asset, min, max) do
+    range = Tai.Exchanges.BalanceRange.new(asset, min, max)
+    Tai.Exchanges.Balance.lock_range(:my_test_exchange, :my_test_account, range)
+  end
+
+  defp all do
+    Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account)
+  end
+
   setup do
     balances = %{
       btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-      ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
-      eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
+      ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
     }
 
     start_supervised!({
@@ -18,59 +26,82 @@ defmodule Tai.Exchanges.BalanceTest do
   end
 
   test "all returns the details for all assets in the account" do
-    assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
+    assert all() == %{
              btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-             ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
-             eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
+             ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
            }
   end
 
-  describe "#lock" do
-    test "locks the balance for the asset" do
-      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.0)
+  describe "#lock_range" do
+    test "returns max when = free balance" do
+      assert lock_range(:btc, 0, 1.1) == {:ok, Decimal.new(1.1)}
 
-      assert Tai.Exchanges.Balance.lock(
-               :my_test_exchange,
-               :my_test_account,
-               balance_change_request
-             ) == :ok
+      assert all() == %{
+               btc: Tai.Exchanges.BalanceDetail.new(0.0, 2.2),
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+             }
+    end
 
-      assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
+    test "returns max when < free balance" do
+      assert lock_range(:btc, 0, 1.0) == {:ok, Decimal.new(1.0)}
+
+      assert all() == %{
                btc: Tai.Exchanges.BalanceDetail.new(0.1, 2.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
-               eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
     end
 
-    test "doesn't lock the balance if the asset doesn't exist" do
-      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:xbt, 1.0)
+    test "returns free balance when max >= free balance and min = free balance" do
+      assert lock_range(:btc, 1.1, 1.2) == {:ok, Decimal.new(1.1)}
 
-      assert Tai.Exchanges.Balance.lock(
-               :my_test_exchange,
-               :my_test_account,
-               balance_change_request
-             ) == {:error, :not_found}
-
-      assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
-               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
-               eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
+      assert all() == %{
+               btc: Tai.Exchanges.BalanceDetail.new(0.0, 2.2),
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
     end
 
-    test "doesn't lock the balance if there is insufficient funds" do
-      balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.11)
+    test "returns free balance when max >= free balance and min < free balance" do
+      assert lock_range(:btc, 1.0, 1.2) == {:ok, Decimal.new(1.1)}
 
-      assert Tai.Exchanges.Balance.lock(
-               :my_test_exchange,
-               :my_test_account,
-               balance_change_request
-             ) == {:error, :insufficient_balance}
+      assert all() == %{
+               btc: Tai.Exchanges.BalanceDetail.new(0.0, 2.2),
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+             }
+    end
 
-      assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
+    test "returns an error tuple when the asset doesn't exist" do
+      assert lock_range(:xbt, 0.1, 1.2) == {:error, :not_found}
+
+      assert all() == %{
                btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
-               eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+             }
+    end
+
+    test "returns an error tuple when min > free balance" do
+      assert lock_range(:btc, 1.11, 1.2) == {:error, :insufficient_balance}
+
+      assert all() == %{
+               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+             }
+    end
+
+    test "returns an error tuple when min > max" do
+      assert lock_range(:btc, 0.11, 0.1) == {:error, :min_greater_than_max}
+
+      assert all() == %{
+               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
+             }
+    end
+
+    test "returns an error tuple when min < 0" do
+      assert lock_range(:btc, -0.1, 0.1) == {:error, :min_less_than_zero}
+
+      assert all() == %{
+               btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
     end
   end
@@ -87,12 +118,11 @@ defmodule Tai.Exchanges.BalanceTest do
 
       assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
                btc: Tai.Exchanges.BalanceDetail.new(2.1, 0.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
-               eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
     end
 
-    test "doesn't unlock the balance is the asset doesn't exist" do
+    test "doesn't unlock the balance if the asset doesn't exist" do
       balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:xbt, 1.0)
 
       assert Tai.Exchanges.Balance.unlock(
@@ -103,12 +133,11 @@ defmodule Tai.Exchanges.BalanceTest do
 
       assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
                btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
-               eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
     end
 
-    test "doesn't unlock the balance is there is insufficient funds" do
+    test "doesn't unlock the balance if there is insufficient funds" do
       balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(:btc, 1.11)
 
       assert Tai.Exchanges.Balance.unlock(
@@ -119,8 +148,7 @@ defmodule Tai.Exchanges.BalanceTest do
 
       assert Tai.Exchanges.Balance.all(:my_test_exchange, :my_test_account) == %{
                btc: Tai.Exchanges.BalanceDetail.new(1.1, 1.1),
-               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1),
-               eth: Tai.Exchanges.BalanceDetail.new(0.2, 0.2)
+               ltc: Tai.Exchanges.BalanceDetail.new(0.1, 0.1)
              }
     end
   end
