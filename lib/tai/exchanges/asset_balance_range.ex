@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.BalanceRange do
-  @type t :: %Tai.Exchanges.BalanceRange{
+defmodule Tai.Exchanges.AssetBalanceRange do
+  @type t :: %Tai.Exchanges.AssetBalanceRange{
           asset: atom,
           min: Decimal.t(),
           max: Decimal.t()
@@ -13,7 +13,7 @@ defmodule Tai.Exchanges.BalanceRange do
   def new(asset, min, max)
 
   def new(asset, %Decimal{} = min, %Decimal{} = max) do
-    %Tai.Exchanges.BalanceRange{
+    %Tai.Exchanges.AssetBalanceRange{
       asset: asset,
       min: min,
       max: max
@@ -25,7 +25,7 @@ defmodule Tai.Exchanges.BalanceRange do
   end
 
   @spec validate(t) :: :ok | {:error, :min_less_than_zero | :min_greater_than_max}
-  def validate(%Tai.Exchanges.BalanceRange{min: min, max: max}) do
+  def validate(%Tai.Exchanges.AssetBalanceRange{min: min, max: max}) do
     cond do
       Decimal.cmp(min, Decimal.new(0)) == :lt -> {:error, :min_less_than_zero}
       Decimal.cmp(min, max) == :gt -> {:error, :min_greater_than_max}

@@ -7,7 +7,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   end
 
   defp lock_range(asset, min, max) do
-    range = Tai.Exchanges.BalanceRange.new(asset, min, max)
+    range = Tai.Exchanges.AssetBalanceRange.new(asset, min, max)
     Tai.Exchanges.AssetBalances.lock_range(:my_test_exchange, :my_test_account, range)
   end
 

@@ -3,7 +3,7 @@ defmodule Tai.Exchanges.AssetBalances do
   Manages the balances of an account
   """
 
-  @type balance_range :: Tai.Exchanges.BalanceRange.t()
+  @type balance_range :: Tai.Exchanges.AssetBalanceRange.t()
   @type balance_change_request :: Tai.Exchanges.BalanceChangeRequest.t()
 
   use GenServer
@@ -25,12 +25,12 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def handle_call(
-        {:lock_range, %Tai.Exchanges.BalanceRange{} = balance_range},
+        {:lock_range, %Tai.Exchanges.AssetBalanceRange{} = balance_range},
         _from,
         state
       ) do
     with %Tai.Exchanges.AssetBalance{} = balance <- Map.get(state, balance_range.asset),
-         :ok <- Tai.Exchanges.BalanceRange.validate(balance_range) do
+         :ok <- Tai.Exchanges.AssetBalanceRange.validate(balance_range) do
       lock_result =
         cond do
           Decimal.cmp(balance_range.max, balance.free) != :gt -> balance_range.max
