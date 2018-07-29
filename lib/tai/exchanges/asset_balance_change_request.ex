@@ -1,12 +1,12 @@
-defmodule Tai.Exchanges.BalanceChangeRequest do
-  @type t :: %Tai.Exchanges.BalanceChangeRequest{asset: atom, amount: Decimal.t()}
+defmodule Tai.Exchanges.AssetBalanceChangeRequest do
+  @type t :: %Tai.Exchanges.AssetBalanceChangeRequest{asset: atom, amount: Decimal.t()}
 
   @enforce_keys [:asset, :amount]
   defstruct [:asset, :amount]
 
   @spec new(atom, Decimal.t()) :: t
   def new(asset, amount) do
-    %Tai.Exchanges.BalanceChangeRequest{
+    %Tai.Exchanges.AssetBalanceChangeRequest{
       asset: asset,
       amount: Decimal.new(amount)
     }

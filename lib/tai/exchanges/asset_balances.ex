@@ -4,7 +4,7 @@ defmodule Tai.Exchanges.AssetBalances do
   """
 
   @type balance_range :: Tai.Exchanges.AssetBalanceRange.t()
-  @type balance_change_request :: Tai.Exchanges.BalanceChangeRequest.t()
+  @type balance_change_request :: Tai.Exchanges.AssetBalanceChangeRequest.t()
 
   use GenServer
 
@@ -62,7 +62,7 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def handle_call(
-        {:unlock, %Tai.Exchanges.BalanceChangeRequest{asset: asset, amount: amount}},
+        {:unlock, %Tai.Exchanges.AssetBalanceChangeRequest{asset: asset, amount: amount}},
         _from,
         state
       ) do

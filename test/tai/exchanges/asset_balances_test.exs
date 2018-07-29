@@ -12,7 +12,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   end
 
   defp unlock(asset, qty) do
-    balance_change_request = Tai.Exchanges.BalanceChangeRequest.new(asset, qty)
+    balance_change_request = Tai.Exchanges.AssetBalanceChangeRequest.new(asset, qty)
 
     Tai.Exchanges.AssetBalances.unlock(
       :my_test_exchange,
