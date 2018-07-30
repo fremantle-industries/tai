@@ -8,6 +8,8 @@ defmodule Tai.Exchanges.AssetBalances do
 
   use GenServer
 
+  require Logger
+
   def start_link(exchange_id: exchange_id, account_id: account_id, balances: %{} = balances) do
     GenServer.start_link(
       __MODULE__,
@@ -17,6 +19,7 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def init(balances) do
+    Tai.MetaLogger.init_tid()
     {:ok, balances}
   end
 
@@ -39,7 +42,15 @@ defmodule Tai.Exchanges.AssetBalances do
         end
 
       if lock_result == nil do
-        {:reply, {:error, :insufficient_balance}, state}
+        continue = {
+          :lock_range_insufficient_balance,
+          balance_range.asset,
+          balance.free,
+          balance_range.min,
+          balance_range.max
+        }
+
+        {:reply, {:error, :insufficient_balance}, state, {:continue, continue}}
       else
         new_free = Decimal.sub(balance.free, lock_result)
         new_locked = Decimal.add(balance.locked, lock_result)
@@ -50,7 +61,16 @@ defmodule Tai.Exchanges.AssetBalances do
           |> Map.put(:locked, new_locked)
 
         new_state = Map.put(state, balance_range.asset, new_balance)
-        {:reply, {:ok, lock_result}, new_state}
+
+        continue = {
+          :lock_range_ok,
+          balance_range.asset,
+          lock_result,
+          balance_range.min,
+          balance_range.max
+        }
+
+        {:reply, {:ok, lock_result}, new_state, {:continue, continue}}
       end
     else
       {:error, _} = error ->
@@ -84,6 +104,16 @@ defmodule Tai.Exchanges.AssetBalances do
     else
       {:reply, {:error, :not_found}, state}
     end
+  end
+
+  def handle_continue({:lock_range_ok, asset, qty, min, max}, state) do
+    Logger.info("[lock_range_ok,#{asset},#{qty},#{min}..#{max}]")
+    {:noreply, state}
+  end
+
+  def handle_continue({:lock_range_insufficient_balance, asset, free, min, max}, state) do
+    Logger.info("[lock_range_insufficient_balance,#{asset},#{free},#{min}..#{max}]")
+    {:noreply, state}
   end
 
   @spec all(atom, atom) :: map

@@ -2,6 +2,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   use ExUnit.Case
   doctest Tai.Exchanges.AssetBalances
 
+  import ExUnit.CaptureLog
+
   defp all do
     Tai.Exchanges.AssetBalances.all(:my_test_exchange, :my_test_account)
   end
@@ -36,7 +38,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   end
 
   describe "#all" do
-    test "returns a map of details for all assets in the account" do
+    test "returns a map of balances for all assets in the account" do
       assert all() == %{
                btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
                ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
@@ -115,6 +117,26 @@ defmodule Tai.Exchanges.AssetBalancesTest do
                btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
                ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
+    end
+
+    test "logs the asset, locked quantity & range when successful" do
+      log_msg =
+        capture_log(fn ->
+          lock_range(:btc, 0.5, 0.6)
+          :timer.sleep(100)
+        end)
+
+      assert log_msg =~ ~r/\[lock_range_ok,btc,0.6,0.5..0.6\]/
+    end
+
+    test "logs the asset, free balance & range when unsuccessful" do
+      log_msg =
+        capture_log(fn ->
+          lock_range(:btc, 1.2, 1.3)
+          :timer.sleep(100)
+        end)
+
+      assert log_msg =~ ~r/\[lock_range_insufficient_balance,btc,1.1,1.2..1.3\]/
     end
   end
 
