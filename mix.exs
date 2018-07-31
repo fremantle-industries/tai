@@ -57,7 +57,7 @@ defmodule Tai.Mixfile do
       # https://bugs.erlang.org/browse/ERL-680
       # {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false}
+      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}
     ]
   end
 
