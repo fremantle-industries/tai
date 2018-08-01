@@ -20,7 +20,7 @@ defmodule Tai.Exchanges.AssetBalances do
 
   def init(balances) do
     Tai.MetaLogger.init_tid()
-    {:ok, balances}
+    {:ok, balances, {:continue, :init}}
   end
 
   def handle_call(:all, _from, state) do
@@ -106,6 +106,15 @@ defmodule Tai.Exchanges.AssetBalances do
     else
       {:reply, {:error, :not_found}, state}
     end
+  end
+
+  def handle_continue(:init, state) do
+    state
+    |> Enum.each(fn {asset, balance} ->
+      Logger.info("[init,#{asset},#{balance.free},#{balance.locked}]")
+    end)
+
+    {:noreply, state}
   end
 
   def handle_continue({:lock_range_ok, asset, qty, min, max}, state) do

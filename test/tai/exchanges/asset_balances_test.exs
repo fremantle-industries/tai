@@ -4,40 +4,20 @@ defmodule Tai.Exchanges.AssetBalancesTest do
 
   import ExUnit.CaptureLog
 
-  defp all do
-    Tai.Exchanges.AssetBalances.all(:my_test_exchange, :my_test_account)
-  end
+  test "logs the free & locked balances on init" do
+    log_msg =
+      capture_log(fn ->
+        start_asset_balances(:ok)
+        :timer.sleep(100)
+      end)
 
-  defp lock_range(asset, min, max) do
-    range = Tai.Exchanges.AssetBalanceRange.new(asset, min, max)
-    Tai.Exchanges.AssetBalances.lock_range(:my_test_exchange, :my_test_account, range)
-  end
-
-  defp unlock(asset, qty) do
-    balance_change_request = Tai.Exchanges.AssetBalanceChangeRequest.new(asset, qty)
-
-    Tai.Exchanges.AssetBalances.unlock(
-      :my_test_exchange,
-      :my_test_account,
-      balance_change_request
-    )
-  end
-
-  setup do
-    balances = %{
-      btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
-      ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
-    }
-
-    start_supervised!({
-      Tai.Exchanges.AssetBalances,
-      [exchange_id: :my_test_exchange, account_id: :my_test_account, balances: balances]
-    })
-
-    :ok
+    assert log_msg =~ ~r/\[init,btc,1.1,1.1\]/
+    assert log_msg =~ ~r/\[init,ltc,0.1,0.1\]/
   end
 
   describe "#all" do
+    setup [:start_asset_balances]
+
     test "returns a map of balances for all assets in the account" do
       assert all() == %{
                btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
@@ -47,6 +27,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   end
 
   describe "#lock_range" do
+    setup [:start_asset_balances]
+
     test "returns max when = free balance" do
       assert lock_range(:btc, 0, 1.1) == {:ok, Decimal.new(1.1)}
 
@@ -141,6 +123,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   end
 
   describe "#unlock" do
+    setup [:start_asset_balances]
+
     test "unlocks the balance for the asset" do
       assert unlock(:btc, 1.0) == :ok
 
@@ -187,5 +171,38 @@ defmodule Tai.Exchanges.AssetBalancesTest do
 
       assert log_msg =~ ~r/\[unlock_insufficient_balance,btc,1.1,1.11\]/
     end
+  end
+
+  defp all do
+    Tai.Exchanges.AssetBalances.all(:my_test_exchange, :my_test_account)
+  end
+
+  defp lock_range(asset, min, max) do
+    range = Tai.Exchanges.AssetBalanceRange.new(asset, min, max)
+    Tai.Exchanges.AssetBalances.lock_range(:my_test_exchange, :my_test_account, range)
+  end
+
+  defp unlock(asset, qty) do
+    balance_change_request = Tai.Exchanges.AssetBalanceChangeRequest.new(asset, qty)
+
+    Tai.Exchanges.AssetBalances.unlock(
+      :my_test_exchange,
+      :my_test_account,
+      balance_change_request
+    )
+  end
+
+  defp start_asset_balances(_context) do
+    balances = %{
+      btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
+      ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
+    }
+
+    start_supervised!({
+      Tai.Exchanges.AssetBalances,
+      [exchange_id: :my_test_exchange, account_id: :my_test_account, balances: balances]
+    })
+
+    :ok
   end
 end
