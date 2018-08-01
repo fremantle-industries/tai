@@ -159,13 +159,33 @@ defmodule Tai.Exchanges.AssetBalancesTest do
              }
     end
 
-    test "doesn't unlock the balance if there is insufficient funds" do
+    test "doesn't unlock the quantity when there is an insufficient locked balance" do
       assert unlock(:btc, 1.11) == {:error, :insufficient_balance}
 
       assert all() == %{
                btc: Tai.Exchanges.AssetBalance.new(1.1, 1.1),
                ltc: Tai.Exchanges.AssetBalance.new(0.1, 0.1)
              }
+    end
+
+    test "logs the asset & unlocked quantity" do
+      log_msg =
+        capture_log(fn ->
+          unlock(:btc, 1.0)
+          :timer.sleep(100)
+        end)
+
+      assert log_msg =~ ~r/\[unlock_ok,btc,1.0\]/
+    end
+
+    test "logs the asset, locked balance & attempted quantity when there is an insufficent locked balance" do
+      log_msg =
+        capture_log(fn ->
+          unlock(:btc, 1.11)
+          :timer.sleep(100)
+        end)
+
+      assert log_msg =~ ~r/\[unlock_insufficient_balance,btc,1.1,1.11\]/
     end
   end
 end

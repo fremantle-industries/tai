@@ -96,10 +96,12 @@ defmodule Tai.Exchanges.AssetBalances do
         |> Map.put(:locked, new_locked)
 
       if Decimal.cmp(new_locked, Decimal.new(0)) == :lt do
-        {:reply, {:error, :insufficient_balance}, state}
+        continue = {:unlock_insufficient_balance, asset, detail.locked, amount}
+        {:reply, {:error, :insufficient_balance}, state, {:continue, continue}}
       else
         new_state = Map.put(state, asset, new_detail)
-        {:reply, :ok, new_state}
+        continue = {:unlock_ok, asset, amount}
+        {:reply, :ok, new_state, {:continue, continue}}
       end
     else
       {:reply, {:error, :not_found}, state}
@@ -112,7 +114,17 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def handle_continue({:lock_range_insufficient_balance, asset, free, min, max}, state) do
-    Logger.info("[lock_range_insufficient_balance,#{asset},#{free},#{min}..#{max}]")
+    Logger.warn("[lock_range_insufficient_balance,#{asset},#{free},#{min}..#{max}]")
+    {:noreply, state}
+  end
+
+  def handle_continue({:unlock_ok, asset, amount}, state) do
+    Logger.info("[unlock_ok,#{asset},#{amount}]")
+    {:noreply, state}
+  end
+
+  def handle_continue({:unlock_insufficient_balance, asset, locked, amount}, state) do
+    Logger.warn("[unlock_insufficient_balance,#{asset},#{locked},#{amount}]")
     {:noreply, state}
   end
 
