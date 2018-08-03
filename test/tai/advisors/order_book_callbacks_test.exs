@@ -320,7 +320,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
           }
         },
         ^snapshot,
-        %Tai.Advisor{}
+        %Tai.Advisor{advisor_id: :my_advisor, store: %{return_val: {:ok, %{hello: "world"}}}}
       }
 
       changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
