@@ -36,244 +36,248 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     {:ok, %{book_pid: book_pid}}
   end
 
-  test("handle_order_book_changes is called when it receives a broadcast message", %{
-    book_pid: book_pid
-  }) do
-    start_supervised!({
-      MyAdvisor,
-      [
-        advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btc_usd]},
-        accounts: [:my_test_account],
-        store: %{}
-      ]
-    })
+  describe "#handle_order_book_changes" do
+    test("is called when it receives a broadcast message", %{
+      book_pid: book_pid
+    }) do
+      start_supervised!({
+        MyAdvisor,
+        [
+          advisor_id: :my_advisor,
+          order_books: %{my_order_book_feed: [:btc_usd]},
+          accounts: [:my_test_account],
+          store: %{}
+        ]
+      })
 
-    changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
-    book_pid |> OrderBook.update(changes)
+      changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+      book_pid |> OrderBook.update(changes)
 
-    assert_receive {
-      :my_order_book_feed,
-      :btc_usd,
-      ^changes,
-      %Advisor{}
-    }
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        ^changes,
+        %Advisor{}
+      }
+    end
   end
 
-  test("handle_inside_quote is called after the snapshot broadcast message", %{book_pid: book_pid}) do
-    start_supervised!({
-      MyAdvisor,
-      [
-        advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btc_usd]},
-        accounts: [:my_test_account],
-        store: %{}
-      ]
-    })
+  describe "#handle_inside_quote" do
+    test("is called after the snapshot broadcast message", %{book_pid: book_pid}) do
+      start_supervised!({
+        MyAdvisor,
+        [
+          advisor_id: :my_advisor,
+          order_books: %{my_order_book_feed: [:btc_usd]},
+          accounts: [:my_test_account],
+          store: %{}
+        ]
+      })
 
-    snapshot = %OrderBook{
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
-    }
+      snapshot = %OrderBook{
+        bids: %{101.2 => {1.0, nil, nil}},
+        asks: %{101.3 => {0.1, nil, nil}}
+      }
 
-    book_pid |> OrderBook.replace(snapshot)
+      book_pid |> OrderBook.replace(snapshot)
 
-    assert_receive {
-      :my_order_book_feed,
-      :btc_usd,
-      %Quote{
-        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
-      },
-      ^snapshot,
-      %Advisor{}
-    }
-  end
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Quote{
+          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        },
+        ^snapshot,
+        %Advisor{}
+      }
+    end
 
-  test("handle_inside_quote logs a warning message when it returns an unknown type", %{
-    book_pid: book_pid
-  }) do
-    start_supervised!({
-      MyAdvisor,
-      [
-        advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btc_usd]},
-        accounts: [:my_test_account],
-        store: %{return_val: {:unknown, :return_val}}
-      ]
-    })
+    test("logs a warning message when it returns an unknown type", %{
+      book_pid: book_pid
+    }) do
+      start_supervised!({
+        MyAdvisor,
+        [
+          advisor_id: :my_advisor,
+          order_books: %{my_order_book_feed: [:btc_usd]},
+          accounts: [:my_test_account],
+          store: %{return_val: {:unknown, :return_val}}
+        ]
+      })
 
-    snapshot = %OrderBook{
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
-    }
+      snapshot = %OrderBook{
+        bids: %{101.2 => {1.0, nil, nil}},
+        asks: %{101.3 => {0.1, nil, nil}}
+      }
 
-    log_msg =
-      capture_log(fn ->
-        book_pid |> OrderBook.replace(snapshot)
+      log_msg =
+        capture_log(fn ->
+          book_pid |> OrderBook.replace(snapshot)
 
-        :timer.sleep(100)
-      end)
+          :timer.sleep(100)
+        end)
 
-    assert log_msg =~
-             "[warn]  handle_inside_quote returned an invalid value: '{:unknown, :return_val}'"
-  end
+      assert log_msg =~
+               "[warn]  handle_inside_quote returned an invalid value: '{:unknown, :return_val}'"
+    end
 
-  test(
-    "handle_inside_quote is called on broadcast changes when the inside bid price is >= to the previous bid or != size ",
-    %{book_pid: book_pid}
-  ) do
-    start_supervised!({
-      MyAdvisor,
-      [
-        advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btc_usd]},
-        accounts: [:my_test_account],
-        store: %{}
-      ]
-    })
+    test(
+      "is called on broadcast changes when the inside bid price is >= to the previous bid or != size ",
+      %{book_pid: book_pid}
+    ) do
+      start_supervised!({
+        MyAdvisor,
+        [
+          advisor_id: :my_advisor,
+          order_books: %{my_order_book_feed: [:btc_usd]},
+          accounts: [:my_test_account],
+          store: %{}
+        ]
+      })
 
-    snapshot = %OrderBook{
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
-    }
+      snapshot = %OrderBook{
+        bids: %{101.2 => {1.0, nil, nil}},
+        asks: %{101.3 => {0.1, nil, nil}}
+      }
 
-    book_pid |> OrderBook.replace(snapshot)
+      book_pid |> OrderBook.replace(snapshot)
 
-    assert_receive {
-      :my_order_book_feed,
-      :btc_usd,
-      %Quote{
-        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
-      },
-      ^snapshot,
-      %Advisor{}
-    }
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Quote{
+          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        },
+        ^snapshot,
+        %Advisor{}
+      }
 
-    changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+      changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
 
-    refute_receive {
-      _feed_id,
-      _symbol,
-      _bid,
-      _ask,
-      _changes,
-      %Advisor{}
-    }
+      refute_receive {
+        _feed_id,
+        _symbol,
+        _bid,
+        _ask,
+        _changes,
+        %Advisor{}
+      }
 
-    book_pid |> OrderBook.update(changes)
+      book_pid |> OrderBook.update(changes)
 
-    assert_receive {
-      :my_order_book_feed,
-      :btc_usd,
-      %Quote{
-        bid: %PriceLevel{price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil},
-        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
-      },
-      ^changes,
-      %Advisor{}
-    }
-  end
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Quote{
+          bid: %PriceLevel{price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil},
+          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        },
+        ^changes,
+        %Advisor{}
+      }
+    end
 
-  test(
-    "handle_inside_quote is called on broadcast changes when the inside ask price is <= to the previous ask or != size ",
-    %{book_pid: book_pid}
-  ) do
-    start_supervised!({
-      MyAdvisor,
-      [
-        advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btc_usd]},
-        accounts: [:my_test_account],
-        store: %{}
-      ]
-    })
+    test(
+      "is called on broadcast changes when the inside ask price is <= to the previous ask or != size ",
+      %{book_pid: book_pid}
+    ) do
+      start_supervised!({
+        MyAdvisor,
+        [
+          advisor_id: :my_advisor,
+          order_books: %{my_order_book_feed: [:btc_usd]},
+          accounts: [:my_test_account],
+          store: %{}
+        ]
+      })
 
-    snapshot = %OrderBook{
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
-    }
+      snapshot = %OrderBook{
+        bids: %{101.2 => {1.0, nil, nil}},
+        asks: %{101.3 => {0.1, nil, nil}}
+      }
 
-    book_pid |> OrderBook.replace(snapshot)
+      book_pid |> OrderBook.replace(snapshot)
 
-    assert_receive {
-      :my_order_book_feed,
-      :btc_usd,
-      %Quote{
-        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
-      },
-      ^snapshot,
-      %Advisor{}
-    }
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Quote{
+          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        },
+        ^snapshot,
+        %Advisor{}
+      }
 
-    changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+      changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
 
-    refute_receive {
-      _feed_id,
-      _symbol,
-      _bid,
-      _ask,
-      _changes,
-      %Advisor{}
-    }
+      refute_receive {
+        _feed_id,
+        _symbol,
+        _bid,
+        _ask,
+        _changes,
+        %Advisor{}
+      }
 
-    book_pid |> OrderBook.update(changes)
+      book_pid |> OrderBook.update(changes)
 
-    assert_receive {
-      :my_order_book_feed,
-      :btc_usd,
-      %Quote{
-        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-        ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
-      },
-      ^changes,
-      %Advisor{}
-    }
-  end
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Quote{
+          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+          ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
+        },
+        ^changes,
+        %Advisor{}
+      }
+    end
 
-  test "handle_inside_quote can store data in the state", %{book_pid: book_pid} do
-    start_supervised!({
-      MyAdvisor,
-      [
-        advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btc_usd]},
-        accounts: [:my_test_account],
-        store: %{return_val: {:ok, %{hello: "world"}}}
-      ]
-    })
+    test "can store data in the state", %{book_pid: book_pid} do
+      start_supervised!({
+        MyAdvisor,
+        [
+          advisor_id: :my_advisor,
+          order_books: %{my_order_book_feed: [:btc_usd]},
+          accounts: [:my_test_account],
+          store: %{return_val: {:ok, %{hello: "world"}}}
+        ]
+      })
 
-    snapshot = %OrderBook{
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
-    }
+      snapshot = %OrderBook{
+        bids: %{101.2 => {1.0, nil, nil}},
+        asks: %{101.3 => {0.1, nil, nil}}
+      }
 
-    book_pid |> OrderBook.replace(snapshot)
+      book_pid |> OrderBook.replace(snapshot)
 
-    assert_receive {
-      :my_order_book_feed,
-      :btc_usd,
-      %Quote{
-        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-        ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
-      },
-      ^snapshot,
-      %Advisor{}
-    }
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Quote{
+          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        },
+        ^snapshot,
+        %Advisor{}
+      }
 
-    changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
-    book_pid |> OrderBook.update(changes)
+      changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+      book_pid |> OrderBook.update(changes)
 
-    assert_receive {
-      :my_order_book_feed,
-      :btc_usd,
-      %Quote{
-        bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-        ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
-      },
-      ^changes,
-      %Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
-    }
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Quote{
+          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
+          ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
+        },
+        ^changes,
+        %Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
+      }
+    end
   end
 end
