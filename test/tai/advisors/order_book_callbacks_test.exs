@@ -12,7 +12,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
     def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
       send(:test, {feed_id, symbol, inside_quote, changes, state})
-
       state.store[:return_val] || :ok
     end
   end
@@ -252,7 +251,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       }
     end
 
-    test "can store data in the state", %{book_pid: book_pid} do
+    test "can store data in state by returning an ok tuple", %{book_pid: book_pid} do
       start_advisor!(MyAdvisor, %{return_val: {:ok, %{hello: "world"}}})
 
       snapshot = %Tai.Markets.OrderBook{
@@ -268,6 +267,45 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         %Tai.Markets.Quote{},
         ^snapshot,
         %Tai.Advisor{advisor_id: :my_advisor, store: %{return_val: {:ok, %{hello: "world"}}}}
+      }
+
+      changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+      Tai.Markets.OrderBook.update(book_pid, changes)
+
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Tai.Markets.Quote{},
+        ^changes,
+        %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
+      }
+    end
+
+    test "doesn't change store data state with an ok atom", %{book_pid: book_pid} do
+      defmodule OkAdvisor do
+        use Tai.Advisor
+
+        def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
+          send(:test, {feed_id, symbol, inside_quote, changes, state})
+          :ok
+        end
+      end
+
+      start_advisor!(OkAdvisor, %{hello: "world"})
+
+      snapshot = %Tai.Markets.OrderBook{
+        bids: %{101.2 => {1.0, nil, nil}},
+        asks: %{101.3 => {0.1, nil, nil}}
+      }
+
+      Tai.Markets.OrderBook.replace(book_pid, snapshot)
+
+      assert_receive {
+        :my_order_book_feed,
+        :btc_usd,
+        %Tai.Markets.Quote{},
+        ^snapshot,
+        %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
       }
 
       changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}

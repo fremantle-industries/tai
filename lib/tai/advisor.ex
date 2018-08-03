@@ -249,24 +249,19 @@ defmodule Tai.Advisor do
         else
           order_book_feed_id
           |> handle_inside_quote(symbol, current_inside_quote, changes, state)
-          |> normalize_handle_inside_quote_response
           |> case do
-            {:ok, new_store} -> Map.put(state, :store, new_store)
-            :error -> state
+            {:ok, new_store} ->
+              Map.put(state, :store, new_store)
+
+            :ok ->
+              state
+
+            unhandled ->
+              Logger.warn(
+                "handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'"
+              )
           end
         end
-      end
-
-      @empty_response {:ok, %{}}
-      defp normalize_handle_inside_quote_response(:ok) do
-        normalize_handle_inside_quote_response(@empty_response)
-      end
-
-      defp normalize_handle_inside_quote_response({:ok, _store} = response), do: response
-
-      defp normalize_handle_inside_quote_response(unhandled) do
-        Logger.warn("handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'")
-        :error
       end
 
       defoverridable init_store: 1,
