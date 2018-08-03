@@ -103,13 +103,9 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     }) do
       start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
 
-      snapshot = %Tai.Markets.OrderBook{
-        bids: %{101.2 => {1.0, nil, nil}},
-        asks: %{101.3 => {0.1, nil, nil}}
-      }
-
       log_msg =
         capture_log(fn ->
+          snapshot = %Tai.Markets.OrderBook{bids: %{101.2 => {1.0, nil, nil}}, asks: %{}}
           Tai.Markets.OrderBook.replace(book_pid, snapshot)
           :timer.sleep(100)
         end)
@@ -269,20 +265,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Tai.Markets.Quote{
-          bid: %Tai.Markets.PriceLevel{
-            price: 101.2,
-            size: 1.0,
-            processed_at: nil,
-            server_changed_at: nil
-          },
-          ask: %Tai.Markets.PriceLevel{
-            price: 101.3,
-            size: 0.1,
-            processed_at: nil,
-            server_changed_at: nil
-          }
-        },
+        %Tai.Markets.Quote{},
         ^snapshot,
         %Tai.Advisor{advisor_id: :my_advisor, store: %{return_val: {:ok, %{hello: "world"}}}}
       }
@@ -293,20 +276,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Tai.Markets.Quote{
-          bid: %Tai.Markets.PriceLevel{
-            price: 101.2,
-            size: 1.0,
-            processed_at: nil,
-            server_changed_at: nil
-          },
-          ask: %Tai.Markets.PriceLevel{
-            price: 101.3,
-            size: 0.2,
-            processed_at: nil,
-            server_changed_at: nil
-          }
-        },
+        %Tai.Markets.Quote{},
         ^changes,
         %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
       }
