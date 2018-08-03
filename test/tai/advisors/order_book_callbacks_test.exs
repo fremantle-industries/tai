@@ -17,6 +17,18 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     end
   end
 
+  defp start_advisor!(advisor, store \\ %{}) do
+    start_supervised!({
+      advisor,
+      [
+        advisor_id: :my_advisor,
+        order_books: %{my_order_book_feed: [:btc_usd]},
+        accounts: [:my_test_account],
+        store: store
+      ]
+    })
+  end
+
   setup do
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
@@ -39,15 +51,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     test("is called when it receives a broadcast message", %{
       book_pid: book_pid
     }) do
-      start_supervised!({
-        MyAdvisor,
-        [
-          advisor_id: :my_advisor,
-          order_books: %{my_order_book_feed: [:btc_usd]},
-          accounts: [:my_test_account],
-          store: %{}
-        ]
-      })
+      start_advisor!(MyAdvisor)
 
       changes = %Tai.Markets.OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
       Tai.Markets.OrderBook.update(book_pid, changes)
@@ -63,15 +67,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
   describe "#handle_inside_quote" do
     test("is called after the snapshot broadcast message", %{book_pid: book_pid}) do
-      start_supervised!({
-        MyAdvisor,
-        [
-          advisor_id: :my_advisor,
-          order_books: %{my_order_book_feed: [:btc_usd]},
-          accounts: [:my_test_account],
-          store: %{}
-        ]
-      })
+      start_advisor!(MyAdvisor)
 
       snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
@@ -105,15 +101,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     test("logs a warning message when it returns an unknown type", %{
       book_pid: book_pid
     }) do
-      start_supervised!({
-        MyAdvisor,
-        [
-          advisor_id: :my_advisor,
-          order_books: %{my_order_book_feed: [:btc_usd]},
-          accounts: [:my_test_account],
-          store: %{return_val: {:unknown, :return_val}}
-        ]
-      })
+      start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
 
       snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
@@ -134,15 +122,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       "is called on broadcast changes when the inside bid price is >= to the previous bid or != size ",
       %{book_pid: book_pid}
     ) do
-      start_supervised!({
-        MyAdvisor,
-        [
-          advisor_id: :my_advisor,
-          order_books: %{my_order_book_feed: [:btc_usd]},
-          accounts: [:my_test_account],
-          store: %{}
-        ]
-      })
+      start_advisor!(MyAdvisor)
 
       snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
@@ -211,15 +191,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       "is called on broadcast changes when the inside ask price is <= to the previous ask or != size ",
       %{book_pid: book_pid}
     ) do
-      start_supervised!({
-        MyAdvisor,
-        [
-          advisor_id: :my_advisor,
-          order_books: %{my_order_book_feed: [:btc_usd]},
-          accounts: [:my_test_account],
-          store: %{}
-        ]
-      })
+      start_advisor!(MyAdvisor)
 
       snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
@@ -285,15 +257,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     end
 
     test "can store data in the state", %{book_pid: book_pid} do
-      start_supervised!({
-        MyAdvisor,
-        [
-          advisor_id: :my_advisor,
-          order_books: %{my_order_book_feed: [:btc_usd]},
-          accounts: [:my_test_account],
-          store: %{return_val: {:ok, %{hello: "world"}}}
-        ]
-      })
+      start_advisor!(MyAdvisor, %{return_val: {:ok, %{hello: "world"}}})
 
       snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
