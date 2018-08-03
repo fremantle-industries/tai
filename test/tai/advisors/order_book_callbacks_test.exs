@@ -3,11 +3,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
   import ExUnit.CaptureLog
 
-  alias Tai.Advisor
-  alias Tai.Markets.{OrderBook, PriceLevel, Quote}
-
   defmodule MyAdvisor do
-    use Advisor
+    use Tai.Advisor
 
     def handle_order_book_changes(feed_id, symbol, changes, state) do
       send(:test, {feed_id, symbol, changes, state})
@@ -26,7 +23,9 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     end)
 
     Process.register(self(), :test)
-    book_pid = start_supervised!({OrderBook, feed_id: :my_order_book_feed, symbol: :btc_usd})
+
+    book_pid =
+      start_supervised!({Tai.Markets.OrderBook, feed_id: :my_order_book_feed, symbol: :btc_usd})
 
     start_supervised!(
       {Tai.ExchangeAdapters.Test.Account,
@@ -50,14 +49,14 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         ]
       })
 
-      changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
-      book_pid |> OrderBook.update(changes)
+      changes = %Tai.Markets.OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+      Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
         ^changes,
-        %Advisor{}
+        %Tai.Advisor{}
       }
     end
   end
@@ -74,22 +73,32 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         ]
       })
 
-      snapshot = %OrderBook{
+      snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      book_pid |> OrderBook.replace(snapshot)
+      Tai.Markets.OrderBook.replace(book_pid, snapshot)
 
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Quote{
-          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.1,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
         ^snapshot,
-        %Advisor{}
+        %Tai.Advisor{}
       }
     end
 
@@ -106,15 +115,14 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         ]
       })
 
-      snapshot = %OrderBook{
+      snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
       log_msg =
         capture_log(fn ->
-          book_pid |> OrderBook.replace(snapshot)
-
+          Tai.Markets.OrderBook.replace(book_pid, snapshot)
           :timer.sleep(100)
         end)
 
@@ -136,25 +144,35 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         ]
       })
 
-      snapshot = %OrderBook{
+      snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      book_pid |> OrderBook.replace(snapshot)
+      Tai.Markets.OrderBook.replace(book_pid, snapshot)
 
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Quote{
-          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.1,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
         ^snapshot,
-        %Advisor{}
+        %Tai.Advisor{}
       }
 
-      changes = %OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+      changes = %Tai.Markets.OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
 
       refute_receive {
         _feed_id,
@@ -162,20 +180,30 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         _bid,
         _ask,
         _changes,
-        %Advisor{}
+        %Tai.Advisor{}
       }
 
-      book_pid |> OrderBook.update(changes)
+      Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Quote{
-          bid: %PriceLevel{price: 101.2, size: 1.1, processed_at: nil, server_changed_at: nil},
-          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.1,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.1,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
         ^changes,
-        %Advisor{}
+        %Tai.Advisor{}
       }
     end
 
@@ -193,25 +221,35 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         ]
       })
 
-      snapshot = %OrderBook{
+      snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      book_pid |> OrderBook.replace(snapshot)
+      Tai.Markets.OrderBook.replace(book_pid, snapshot)
 
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Quote{
-          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.1,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
         ^snapshot,
-        %Advisor{}
+        %Tai.Advisor{}
       }
 
-      changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+      changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
 
       refute_receive {
         _feed_id,
@@ -219,20 +257,30 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         _bid,
         _ask,
         _changes,
-        %Advisor{}
+        %Tai.Advisor{}
       }
 
-      book_pid |> OrderBook.update(changes)
+      Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Quote{
-          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-          ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
+        %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.2,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
         ^changes,
-        %Advisor{}
+        %Tai.Advisor{}
       }
     end
 
@@ -247,36 +295,56 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         ]
       })
 
-      snapshot = %OrderBook{
+      snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      book_pid |> OrderBook.replace(snapshot)
+      Tai.Markets.OrderBook.replace(book_pid, snapshot)
 
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Quote{
-          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-          ask: %PriceLevel{price: 101.3, size: 0.1, processed_at: nil, server_changed_at: nil}
+        %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.1,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
         ^snapshot,
-        %Advisor{}
+        %Tai.Advisor{}
       }
 
-      changes = %OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
-      book_pid |> OrderBook.update(changes)
+      changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+      Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
         :my_order_book_feed,
         :btc_usd,
-        %Quote{
-          bid: %PriceLevel{price: 101.2, size: 1.0, processed_at: nil, server_changed_at: nil},
-          ask: %PriceLevel{price: 101.3, size: 0.2, processed_at: nil, server_changed_at: nil}
+        %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.2,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
         ^changes,
-        %Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
+        %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
       }
     end
   end

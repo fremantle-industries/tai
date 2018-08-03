@@ -5,9 +5,6 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  alias Tai.{PubSub, MetaLogger}
-  alias Tai.Markets.{OrderBook, Quote}
-
   @typedoc """
   The state of the running advisor
   """
@@ -60,8 +57,6 @@ defmodule Tai.Advisor do
       require Logger
       require Tai.TimeFrame
 
-      alias Tai.Markets.OrderBook
-
       @behaviour Tai.Advisor
 
       def start_link(
@@ -85,7 +80,7 @@ defmodule Tai.Advisor do
 
       @doc false
       def init(%Tai.Advisor{order_books: order_books, accounts: accounts} = state) do
-        MetaLogger.init_tid()
+        Tai.MetaLogger.init_tid()
         subscribe_to_order_book_channels(order_books)
         subscribe_to_account_channels(accounts)
         new_store = init_store_callback(state.store)
@@ -155,8 +150,8 @@ defmodule Tai.Advisor do
       """
       def quotes(feed_id: feed_id, symbol: symbol, depth: depth) do
         [feed_id: feed_id, symbol: symbol]
-        |> OrderBook.to_name()
-        |> OrderBook.quotes(depth)
+        |> Tai.Markets.OrderBook.to_name()
+        |> Tai.Markets.OrderBook.quotes(depth)
       end
 
       @doc """
@@ -172,7 +167,10 @@ defmodule Tai.Advisor do
       """
       def cached_inside_quote(%{inside_quotes: inside_quotes}, order_book_feed_id, symbol) do
         inside_quotes
-        |> Map.get([feed_id: order_book_feed_id, symbol: symbol] |> OrderBook.to_name())
+        |> Map.get(
+          [feed_id: order_book_feed_id, symbol: symbol]
+          |> Tai.Markets.OrderBook.to_name()
+        )
       end
 
       @doc false
@@ -187,7 +185,7 @@ defmodule Tai.Advisor do
         |> Enum.each(fn {order_book_feed_id, symbols} ->
           symbols
           |> Enum.each(fn symbol ->
-            PubSub.subscribe([
+            Tai.PubSub.subscribe([
               {:order_book_snapshot, order_book_feed_id, symbol},
               {:order_book_changes, order_book_feed_id, symbol}
             ])
@@ -196,13 +194,13 @@ defmodule Tai.Advisor do
       end
 
       defp subscribe_to_account_channels(accounts) do
-        PubSub.subscribe(accounts)
+        Tai.PubSub.subscribe(accounts)
       end
 
       defp cache_inside_quote(state, feed_id, symbol) do
-        with {:ok, current_inside_quote} <- OrderBook.inside_quote(feed_id, symbol),
+        with {:ok, current_inside_quote} <- Tai.Markets.OrderBook.inside_quote(feed_id, symbol),
              feed_and_symbol <- [feed_id: feed_id, symbol: symbol],
-             key <- OrderBook.to_name(feed_and_symbol),
+             key <- Tai.Markets.OrderBook.to_name(feed_and_symbol),
              old <- state.inside_quotes,
              updated <- Map.put(old, key, current_inside_quote) do
           Map.put(state, :inside_quotes, updated)
@@ -211,7 +209,7 @@ defmodule Tai.Advisor do
 
       defp inside_quote_is_stale?(
              previous_inside_quote,
-             %OrderBook{bids: bids, asks: asks} = changes
+             %Tai.Markets.OrderBook{bids: bids, asks: asks} = changes
            ) do
         (bids |> Enum.any?() && bids |> inside_bid_is_stale?(previous_inside_quote)) ||
           (asks |> Enum.any?() && asks |> inside_ask_is_stale?(previous_inside_quote))
@@ -219,7 +217,7 @@ defmodule Tai.Advisor do
 
       defp inside_bid_is_stale?(_bids, nil), do: false
 
-      defp inside_bid_is_stale?(bids, %Quote{} = prev_quote) do
+      defp inside_bid_is_stale?(bids, %Tai.Markets.Quote{} = prev_quote) do
         bids
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
           price >= prev_quote.bid.price ||
@@ -229,7 +227,7 @@ defmodule Tai.Advisor do
 
       defp inside_ask_is_stale?(asks, nil), do: false
 
-      defp inside_ask_is_stale?(asks, %Quote{} = prev_quote) do
+      defp inside_ask_is_stale?(asks, %Tai.Markets.Quote{} = prev_quote) do
         asks
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
           price <= prev_quote.ask.price ||
