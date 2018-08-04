@@ -10,8 +10,8 @@ defmodule Tai.Advisor do
   """
   @type t :: Tai.Advisor
 
-  @enforce_keys [:advisor_id, :accounts, :order_books, :inside_quotes, :store]
-  defstruct advisor_id: nil, accounts: [], order_books: %{}, inside_quotes: %{}, store: %{}
+  @enforce_keys [:advisor_id, :order_books, :inside_quotes, :store]
+  defstruct advisor_id: nil, order_books: %{}, inside_quotes: %{}, store: %{}
 
   @doc """
   Callback during initilization. Allows the store to be updated before it 
@@ -62,7 +62,6 @@ defmodule Tai.Advisor do
       def start_link(
             advisor_id: advisor_id,
             order_books: order_books,
-            accounts: accounts,
             store: %{} = store
           ) do
         GenServer.start_link(
@@ -70,7 +69,6 @@ defmodule Tai.Advisor do
           %Tai.Advisor{
             advisor_id: advisor_id,
             order_books: order_books,
-            accounts: accounts,
             inside_quotes: %{},
             store: Map.merge(%{}, store)
           },
@@ -79,10 +77,9 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def init(%Tai.Advisor{order_books: order_books, accounts: accounts} = state) do
+      def init(%Tai.Advisor{order_books: order_books} = state) do
         Tai.MetaLogger.init_tid()
         subscribe_to_order_book_channels(order_books)
-        subscribe_to_account_channels(accounts)
         new_store = init_store_callback(state.store)
         new_state = Map.put(state, :store, new_store)
 
@@ -191,10 +188,6 @@ defmodule Tai.Advisor do
             ])
           end)
         end)
-      end
-
-      defp subscribe_to_account_channels(accounts) do
-        Tai.PubSub.subscribe(accounts)
       end
 
       defp cache_inside_quote(state, feed_id, symbol) do

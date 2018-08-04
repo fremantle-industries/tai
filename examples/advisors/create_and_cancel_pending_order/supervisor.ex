@@ -28,7 +28,6 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Supervisor do
     [
       advisor_id: advisor_id,
       order_books: Map.put(%{}, feed_id, [symbol]),
-      accounts: [],
       store: %{}
     ]
   end

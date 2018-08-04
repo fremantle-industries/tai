@@ -14,7 +14,6 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.SupervisorTest do
 
     assert %Tai.Advisor{
              advisor_id: :create_and_cancel_pending_order_test_feed_a_btc_usd,
-             accounts: [],
              order_books: %{
                test_feed_a: [:btc_usd]
              },
@@ -23,7 +22,6 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.SupervisorTest do
 
     assert %Tai.Advisor{
              advisor_id: :create_and_cancel_pending_order_test_feed_a_ltc_usd,
-             accounts: [],
              order_books: %{
                test_feed_a: [:ltc_usd]
              },
@@ -32,7 +30,6 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.SupervisorTest do
 
     assert %Tai.Advisor{
              advisor_id: :create_and_cancel_pending_order_test_feed_b_eth_usd,
-             accounts: [],
              order_books: %{
                test_feed_b: [:eth_usd]
              },
