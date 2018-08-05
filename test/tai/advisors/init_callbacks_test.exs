@@ -7,7 +7,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
   defmodule InitSuccessAdvisor do
     use Tai.Advisor
 
-    def init_store(store) do
+    def init_store(%Tai.Advisor{store: store}) do
       new_store = Map.put(store, :init_store_callback, true)
       {:ok, new_store}
     end
@@ -76,8 +76,10 @@ defmodule Tai.Advisors.InitCallbacksTest do
         :btc_usd,
         %Tai.Markets.Quote{},
         %Tai.Markets.OrderBook{},
-        %Tai.Advisor{store: %{init_store_callback: true}}
+        %Tai.Advisor{} = state
       }
+
+      assert state.store == %{init_store_callback: true}
     end
 
     test "logs an error and uses the original store when not an ok tuple" do
@@ -122,8 +124,10 @@ defmodule Tai.Advisors.InitCallbacksTest do
             :btc_usd,
             %Tai.Markets.Quote{},
             %Tai.Markets.OrderBook{},
-            %Tai.Advisor{store: %{}}
+            %Tai.Advisor{} = state
           }
+
+          assert state.store == %{}
         end)
 
       assert log_msg =~ "[error] init_store must return {:ok, store} but it returned ':error'"

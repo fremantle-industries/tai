@@ -5,19 +5,24 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  @typedoc """
-  The state of the running advisor
-  """
-  @type t :: Tai.Advisor
-
   @enforce_keys [:advisor_id, :order_books, :inside_quotes, :store]
   defstruct advisor_id: nil, order_books: %{}, inside_quotes: %{}, store: %{}
+
+  @typedoc """
+  State of the running advisor
+  """
+  @type t :: %Tai.Advisor{
+          advisor_id: atom,
+          order_books: map,
+          inside_quotes: map,
+          store: map
+        }
 
   @doc """
   Callback during initilization. Allows the store to be updated before it 
   starts responding to events
   """
-  @callback init_store(store :: map) :: {:ok, map}
+  @callback init_store(state :: t) :: {:ok, map}
 
   @doc """
   Callback when order book has bid or ask changes
@@ -80,14 +85,14 @@ defmodule Tai.Advisor do
       def init(%Tai.Advisor{order_books: order_books} = state) do
         Tai.MetaLogger.init_tid()
         subscribe_to_order_book_channels(order_books)
-        new_store = init_store_callback(state.store)
+        new_store = init_store_callback(state)
         new_state = Map.put(state, :store, new_store)
 
         {:ok, new_state}
       end
 
-      defp init_store_callback(store) do
-        store
+      defp init_store_callback(state) do
+        state
         |> init_store
         |> case do
           {:ok, new_store} ->
@@ -98,7 +103,7 @@ defmodule Tai.Advisor do
               "init_store must return {:ok, store} but it returned '#{inspect(return_error)}'"
             )
 
-            store
+            state.store
         end
       end
 
@@ -171,7 +176,7 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def init_store(store), do: {:ok, store}
+      def init_store(%Tai.Advisor{store: store}), do: {:ok, store}
       @doc false
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
       @doc false
