@@ -52,10 +52,7 @@ defmodule Tai.Mixfile do
       {:plug, "~> 1.0", only: [:dev, :test]},
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_unit_notifier, "~> 0.1", only: :test},
-      # Causes infinite loop in tests on Elixir 1.7.1. Could be related to:
-      # https://github.com/elixir-lang/elixir/issues/7989
-      # https://bugs.erlang.org/browse/ERL-680
-      # {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}
     ]
