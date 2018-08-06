@@ -108,7 +108,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
           :timer.sleep(100)
         end)
 
-      assert log_msg =~ ~r/\[lock_range_ok,btc,0.6,0.5..0.6\]/
+      assert log_msg =~ ~r/\[lock_range_ok:btc,0.6,0.5..0.6\]/
     end
 
     test "logs the asset, free balance & range when unsuccessful" do
@@ -118,7 +118,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
           :timer.sleep(100)
         end)
 
-      assert log_msg =~ ~r/\[lock_range_insufficient_balance,btc,1.1,1.2..1.3\]/
+      assert log_msg =~ ~r/\[lock_range_insufficient_balance:btc,1.1,1.2..1.3\]/
     end
   end
 
@@ -159,7 +159,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
           :timer.sleep(100)
         end)
 
-      assert log_msg =~ ~r/\[unlock_ok,btc,1.0\]/
+      assert log_msg =~ ~r/\[unlock_ok:btc,1.0\]/
     end
 
     test "logs the asset, locked balance & attempted quantity when there is an insufficent locked balance" do
@@ -169,7 +169,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
           :timer.sleep(100)
         end)
 
-      assert log_msg =~ ~r/\[unlock_insufficient_balance,btc,1.1,1.11\]/
+      assert log_msg =~ ~r/\[unlock_insufficient_balance:btc,1.1,1.11\]/
     end
   end
 

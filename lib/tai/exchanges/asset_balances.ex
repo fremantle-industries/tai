@@ -118,22 +118,22 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def handle_continue({:lock_range_ok, asset, qty, min, max}, state) do
-    Logger.info("[lock_range_ok,#{asset},#{qty},#{min}..#{max}]")
+    Logger.info("[lock_range_ok:#{asset},#{qty},#{min}..#{max}]")
     {:noreply, state}
   end
 
   def handle_continue({:lock_range_insufficient_balance, asset, free, min, max}, state) do
-    Logger.warn("[lock_range_insufficient_balance,#{asset},#{free},#{min}..#{max}]")
+    Logger.warn("[lock_range_insufficient_balance:#{asset},#{free},#{min}..#{max}]")
     {:noreply, state}
   end
 
   def handle_continue({:unlock_ok, asset, amount}, state) do
-    Logger.info("[unlock_ok,#{asset},#{amount}]")
+    Logger.info("[unlock_ok:#{asset},#{amount}]")
     {:noreply, state}
   end
 
   def handle_continue({:unlock_insufficient_balance, asset, locked, amount}, state) do
-    Logger.warn("[unlock_insufficient_balance,#{asset},#{locked},#{amount}]")
+    Logger.warn("[unlock_insufficient_balance:#{asset},#{locked},#{amount}]")
     {:noreply, state}
   end
 
