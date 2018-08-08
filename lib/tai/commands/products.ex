@@ -29,8 +29,17 @@ defmodule Tai.Commands.Products do
         product.size_increment,
         product.min_notional
       ]
+      |> Enum.map(&format_col/1)
     end)
   end
+
+  defp format_col(%Decimal{} = val) do
+    val
+    |> Decimal.reduce()
+    |> Decimal.to_string(:normal)
+  end
+
+  defp format_col(val), do: val
 
   @spec render!(list) :: no_return
   defp render!(rows) do
