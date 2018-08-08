@@ -1,5 +1,0 @@
-run.config:
-  engine: elixir
-  engine.config:
-    erlang_runtime: erlang-20.0
-    runtime: elixir-1.6
