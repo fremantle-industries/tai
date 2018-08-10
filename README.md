@@ -83,12 +83,15 @@ This gives you an interactive elixir shell with a set of `tai` helper [commands]
 
 ## Advisors
 
-Advisors are the brains of any `tai` application, they receive events such 
-as order book changes or trades and can create, edit or cancel orders. They 
-are intended to run without supervision to analyze and record data or execute 
-trading strategies.
+Advisors are the brains of any `tai` application, they subscribe to changes in
+order books and process these events to record and analyze data or execute
+automated trading strategies.
 
-Take a look at some of the [examples](./examples/advisors) to understand how to create advisors.
+Orders can be created and managed through a uniform API across exchanges, with 
+fast execution and reliability.
+
+Take a look at some of the [examples](./examples/advisors) to understand what 
+you can create with advisors in just a few lines of code.
 
 ## Configuration
 
