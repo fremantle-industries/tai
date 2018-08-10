@@ -2,22 +2,15 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
   use ExUnit.Case
 
   import ExUnit.CaptureLog
+  import Tai.TestSupport.Helpers
 
   setup do
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
     end)
-
-    test_pid = self()
-
-    callback = fn previous_order, updated_order ->
-      send(test_pid, {:callback_fired, previous_order, updated_order})
-    end
-
-    {:ok, callback: callback}
   end
 
-  test "buy_limit enqueues an order and logs a message", %{callback: callback} do
+  test "buy_limit enqueues an order and logs a message" do
     assert Tai.Trading.OrderStore.count() == 0
 
     log_msg =
@@ -30,7 +23,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
             100.1,
             0.1,
             :fok,
-            callback
+            fire_order_callback(self())
           )
 
         assert Tai.Trading.OrderStore.count() == 1
@@ -39,14 +32,12 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
         assert order.size == Decimal.new(0.1)
         assert order.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
         assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
-
-        :timer.sleep(100)
       end)
 
     assert log_msg =~ "order enqueued - client_id:"
   end
 
-  test "sell_limit enqueues an order and logs a message", %{callback: callback} do
+  test "sell_limit enqueues an order and logs a message" do
     assert Tai.Trading.OrderStore.count() == 0
 
     log_msg =
@@ -59,7 +50,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
             100_000.1,
             0.01,
             :fok,
-            callback
+            fire_order_callback(self())
           )
 
         assert Tai.Trading.OrderStore.count() == 1
@@ -68,7 +59,6 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
         assert order.size == Decimal.new(0.01)
         assert order.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
         assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
-        :timer.sleep(100)
       end)
 
     assert log_msg =~ "order enqueued - client_id:"

@@ -2,23 +2,15 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
   use ExUnit.Case
 
   import ExUnit.CaptureLog
+  import Tai.TestSupport.Helpers
 
   setup do
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
     end)
-
-    test_pid = self()
-
-    callback = fn previous_order, updated_order ->
-      send(test_pid, {:callback_fired, previous_order, updated_order})
-    end
-
-    {:ok, callback: callback}
   end
 
-  test "cancel updates the order status to :canceling and sends the request to the exchange in the background",
-       %{callback: callback} do
+  test "updates the status to canceling and sends the request to the exchange in the background" do
     order =
       Tai.Trading.OrderPipeline.buy_limit(
         :test_exchange_a,
@@ -27,7 +19,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
         100.1,
         0.1,
         :gtc,
-        callback
+        fire_order_callback(self())
       )
 
     assert_receive {
@@ -58,7 +50,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
     assert log_msg =~ "order canceled - client_id:"
   end
 
-  test "cancel returns an error tuple when the order is not pending", %{callback: callback} do
+  test "returns an error tuple when the status is not pending" do
     order =
       Tai.Trading.OrderPipeline.buy_limit(
         :test_exchange_a,
@@ -67,7 +59,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
         100.1,
         0.1,
         :gtc,
-        callback
+        fire_order_callback(self())
       )
 
     assert_receive {
@@ -81,7 +73,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
         assert {:error, :order_status_must_be_pending} = Tai.Trading.OrderPipeline.cancel(order)
       end)
 
-    assert log_msg =~ "could not cancel order client_id:"
-    assert log_msg =~ "status must be 'pending' but it was 'error'"
+    assert log_msg =~
+             ~r/could not cancel order client_id: .+ status must be 'pending' but it was 'error'/
   end
 end
