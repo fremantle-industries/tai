@@ -14,6 +14,8 @@ defmodule Tai.Commands.Info do
     * order_status exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
     * cancel_order exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
     * settings
+    * enable_send_orders
+    * disable_send_orders
     """)
   end
 end

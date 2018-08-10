@@ -21,8 +21,8 @@ defmodule Tai.Settings do
     {:reply, state, state}
   end
 
-  def handle_call(:disable_send_orders!, _from, state) do
-    new_state = Map.put(state, :send_orders, false)
+  def handle_call({:set_send_orders, val}, _from, state) do
+    new_state = Map.put(state, :send_orders, val)
     {:reply, :ok, new_state}
   end
 
@@ -36,7 +36,11 @@ defmodule Tai.Settings do
   end
 
   def disable_send_orders! do
-    GenServer.call(__MODULE__, :disable_send_orders!)
+    GenServer.call(__MODULE__, {:set_send_orders, false})
+  end
+
+  def enable_send_orders! do
+    GenServer.call(__MODULE__, {:set_send_orders, true})
   end
 
   def send_orders? do

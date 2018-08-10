@@ -34,4 +34,10 @@ defmodule Tai.Commands.Helper do
 
   @spec settings() :: no_return
   defdelegate settings(), to: Tai.Commands.Settings
+
+  @spec disable_send_orders() :: no_return
+  defdelegate disable_send_orders(), to: Tai.Commands.SendOrders, as: :disable
+
+  @spec enable_send_orders() :: no_return
+  defdelegate enable_send_orders(), to: Tai.Commands.SendOrders, as: :enable
 end

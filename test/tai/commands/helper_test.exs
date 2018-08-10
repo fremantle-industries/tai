@@ -32,7 +32,9 @@ defmodule Tai.Commands.HelperTest do
            * sell_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)
            * order_status exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
            * cancel_order exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
-           * settings\n
+           * settings
+           * enable_send_orders
+           * disable_send_orders\n
            """
   end
 
@@ -216,6 +218,28 @@ defmodule Tai.Commands.HelperTest do
 
   test "settings displays the current values" do
     assert capture_io(fn -> Helper.settings() end) == """
+           +-------------+-------+
+           |        Name | Value |
+           +-------------+-------+
+           | send_orders |  true |
+           +-------------+-------+\n
+           """
+  end
+
+  test "disable_send_orders sets the value to false" do
+    assert capture_io(fn -> Helper.disable_send_orders() end) == """
+           +-------------+-------+
+           |        Name | Value |
+           +-------------+-------+
+           | send_orders | false |
+           +-------------+-------+\n
+           """
+  end
+
+  test "enable_send_orders sets the value to false" do
+    Tai.Settings.disable_send_orders!()
+
+    assert capture_io(fn -> Helper.enable_send_orders() end) == """
            +-------------+-------+
            |        Name | Value |
            +-------------+-------+
