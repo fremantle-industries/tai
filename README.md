@@ -101,6 +101,9 @@ iex(1)> help
 * sell_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
 * order_status account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
 * cancel_order account_id(:gdax), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
+* settings
+* enable_send_orders
+* disable_send_orders
 ```
 
 #### balance
