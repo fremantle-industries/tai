@@ -10,7 +10,7 @@ A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the
 likely to change and no effort will be made to maintain backwards compatibility at this time.
 We are working to make `tai` production quality software.
 
-[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](#advisors) | [Configuration](#configuration) | [Debugging](#debugging)
+[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](#advisors) | [Configuration](#configuration) | [Commands](#commands) | [Debugging](#debugging)
 
 
 ## Supported Exchanges
@@ -42,7 +42,7 @@ We are working to make `tai` production quality software.
 
 ## Install
 
-Tai requires Elixir 1.7+ & Erlang/OTP 21+. Add `tai` to your list of dependencies in `mix.exs`
+`tai` requires Elixir 1.7+ & Erlang/OTP 21+. Add `tai` to your list of dependencies in `mix.exs`
 
 ```elixir
 def deps do
@@ -79,9 +79,23 @@ a shortname so that we can connect and observe the node at any time via `iex`:
 iex --sname client --remsh tai@localhost
 ```
 
-This gives you an interactive elixir shell with a set of `tai` helper commands:
+This gives you an interactive elixir shell with a set of `tai` helper [commands](#commands)
 
-### Commands
+## Advisors
+
+Advisors are the brains of any `tai` application, they receive events such 
+as order book changes or trades and can create, edit or cancel orders. They 
+are intended to run without supervision to analyze and record data or execute 
+trading strategies.
+
+Take a look at some of the [examples](./examples/advisors) to understand how to create advisors.
+
+## Configuration
+
+Each environment can have its own configuration. Take a look at the [example dev configuration](config/dev.exs.example) 
+for available options.
+
+## Commands
 
 You can view your [total balance](#balance), inspect the [state of orders](#orders), 
 list the tradeable [products](#products) on an exchange, display 
@@ -181,20 +195,6 @@ iex(5)> orders
 |    gdax | btc_usd | buy_limit | 100.1 |  0.1 |  error | a6aa15bc-b271-486f-ab40-f9b35b2cd223 |           | 20 minutes ago |            |
 +---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
 ```
-
-## Advisors
-
-Advisors are the brains of any `tai` application, they receive events such 
-as order book changes or trades and can create, edit or cancel orders. They 
-are intended to run without supervision to analyze and record data or execute 
-trading strategies.
-
-Take a look at some of the [examples](./examples/advisors) to understand how to create advisors.
-
-## Configuration
-
-Each environment can have its own configuration. Take a look at the [example dev configuration](config/dev.exs.example) 
-for available options.
 
 ## Debugging
 
