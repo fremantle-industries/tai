@@ -5,8 +5,12 @@ defmodule Tai.Settings do
 
   use GenServer
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, %{send_orders: true}, name: __MODULE__)
+  def start_link(settings) do
+    GenServer.start_link(
+      __MODULE__,
+      settings,
+      name: __MODULE__
+    )
   end
 
   def init(state) do

@@ -36,6 +36,8 @@ config :binance,
   api_key: System.get_env("BINANCE_API_KEY"),
   secret_key: System.get_env("BINANCE_API_SECRET")
 
+config :tai, send_orders: true
+
 config :tai,
   exchanges: %{
     test_exchange_a: [
