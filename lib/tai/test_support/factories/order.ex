@@ -1,5 +1,5 @@
 defmodule Tai.TestSupport.Factories.Order do
-  def build_invalid_order() do
+  def build_invalid_order(callback \\ nil) do
     %Tai.Trading.Order{
       side: :invalid_side,
       type: :invalid_type,
@@ -9,9 +9,10 @@ defmodule Tai.TestSupport.Factories.Order do
       account_id: :ignore,
       price: :ignore,
       size: :ignore,
-      status: :ignore,
+      status: Tai.Trading.OrderStatus.enqueued(),
       symbol: :ignore,
-      time_in_force: :ignore
+      time_in_force: :ignore,
+      order_updated_callback: callback
     }
   end
 end

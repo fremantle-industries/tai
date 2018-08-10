@@ -20,7 +20,7 @@ defmodule Tai.Trading.OrderPipeline do
       time_in_force,
       order_updated_callback
     )
-    |> Tai.Trading.OrderPipeline.Enqueue.call()
+    |> Tai.Trading.OrderPipeline.Enqueue.execute_step()
   end
 
   @doc """
@@ -44,11 +44,11 @@ defmodule Tai.Trading.OrderPipeline do
       time_in_force,
       order_updated_callback
     )
-    |> Tai.Trading.OrderPipeline.Enqueue.call()
+    |> Tai.Trading.OrderPipeline.Enqueue.execute_step()
   end
 
   @doc """
   Cancel a pending order
   """
-  defdelegate cancel(order), to: Tai.Trading.OrderPipeline.Cancel, as: :call
+  defdelegate cancel(order), to: Tai.Trading.OrderPipeline.Cancel, as: :execute_step
 end

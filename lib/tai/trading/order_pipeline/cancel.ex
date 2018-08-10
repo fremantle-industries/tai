@@ -1,10 +1,10 @@
 defmodule Tai.Trading.OrderPipeline.Cancel do
   require Logger
 
-  def call(%Tai.Trading.Order{client_id: client_id}) do
+  def execute_step(%Tai.Trading.Order{client_id: client_id}) do
     with {:ok, [old_order, updated_order]} <- find_pending_order_and_pre_cancel(client_id) do
       log_canceling(client_id)
-      Tai.Trading.Order.updated_callback(old_order, updated_order)
+      Tai.Trading.Order.execute_update_callback(old_order, updated_order)
       send_cancel_order!(updated_order)
 
       {:ok, updated_order}
@@ -46,7 +46,7 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
   defp parse_cancel_order_response({:ok, _order_id}, %Tai.Trading.Order{client_id: client_id}) do
     {:ok, [old_order, updated_order]} = find_canceling_order_and_cancel(client_id)
     log_canceled(updated_order.client_id)
-    Tai.Trading.Order.updated_callback(old_order, updated_order)
+    Tai.Trading.Order.execute_update_callback(old_order, updated_order)
   end
 
   defp log_canceling(client_id) do

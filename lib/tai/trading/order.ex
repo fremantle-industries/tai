@@ -71,14 +71,16 @@ defmodule Tai.Trading.Order do
   def sell_limit?(%Tai.Trading.Order{}), do: false
 
   @doc """
-  Execute the callback function in a new task
+  Execute the callback function if provided
   """
-  def updated_callback(previous_order, %Tai.Trading.Order{} = updated_order) do
-    if updated_order.order_updated_callback do
-      {:ok, _pid} =
-        Task.start_link(fn ->
-          updated_order.order_updated_callback.(previous_order, updated_order)
-        end)
-    end
+  def execute_update_callback(_prev, %Tai.Trading.Order{order_updated_callback: nil}), do: :ok
+
+  def execute_update_callback(previous, %Tai.Trading.Order{} = updated) do
+    updated.order_updated_callback.(previous, updated)
+  end
+
+  @deprecated "Use Tai.Trading.Order.execute_update_callback instead"
+  def updated_callback(previous_order, updated_order) do
+    execute_update_callback(previous_order, updated_order)
   end
 end
