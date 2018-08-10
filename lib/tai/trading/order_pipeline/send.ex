@@ -5,12 +5,10 @@ defmodule Tai.Trading.OrderPipeline.Send do
 
   def execute_step(%Order{status: :enqueued} = o) do
     if Tai.Settings.send_orders?() do
-      Task.start_link(fn ->
-        o
-        |> send_request
-        |> parse_response(o)
-        |> execute_callback
-      end)
+      o
+      |> send_request
+      |> parse_response(o)
+      |> execute_callback
     else
       o
       |> skip_order!
