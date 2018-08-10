@@ -199,7 +199,7 @@ for available options.
 `tai` keeps detailed logs of it's operations while running. They are written to a file with the name of the environment e.g. `logs/dev.log`. By default only `info`, `warn` & `error` messages are logged. If you would like to enable verbose logging that is useful for development and debugging you can set the `DEBUG` environment variable before you run tai.
 
 ```bash
-DEBUG=true iex -S mix
+DEBUG=true iex --sname client --remsh tai@localhost
 ```
 
 To monitor a running instance of `tai` you can `tail` it's log
