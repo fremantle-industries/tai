@@ -31,4 +31,7 @@ defmodule Tai.Commands.Helper do
 
   @spec cancel_order(atom, atom, String.t()) :: no_return
   defdelegate cancel_order(exchange_id, account_id, order_id), to: Tai.Commands.Trading
+
+  @spec settings() :: no_return
+  defdelegate settings(), to: Tai.Commands.Settings
 end

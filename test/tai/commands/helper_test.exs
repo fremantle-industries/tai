@@ -31,7 +31,8 @@ defmodule Tai.Commands.HelperTest do
            * buy_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)
            * sell_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)
            * order_status exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
-           * cancel_order exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")\n
+           * cancel_order exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
+           * settings\n
            """
   end
 
@@ -211,5 +212,15 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(fn ->
              Helper.cancel_order(:test_exchange_a, :main, "invalid-order-id")
            end) == "error: Invalid order id\n"
+  end
+
+  test "settings displays the current values" do
+    assert capture_io(fn -> Helper.settings() end) == """
+           +-------------+-------+
+           |        Name | Value |
+           +-------------+-------+
+           | send_orders |  true |
+           +-------------+-------+\n
+           """
   end
 end
