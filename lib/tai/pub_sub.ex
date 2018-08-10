@@ -10,7 +10,11 @@ defmodule Tai.PubSub do
   end
 
   def start_link(_) do
-    Registry.start_link(:duplicate, __MODULE__, partitions: System.schedulers_online())
+    Registry.start_link(
+      keys: :duplicate,
+      name: __MODULE__,
+      partitions: System.schedulers_online()
+    )
   end
 
   def subscribe([]), do: :ok
