@@ -33,7 +33,7 @@ defmodule Tai.Mixfile do
       # Requires new hex package release
       # {:binance, "~> 0.5.0"},
       {:binance, github: "dvcrn/binance.ex"},
-      {:decimal, "~> 1.0"},
+      {:decimal, "~> 1.3.0"},
       {:ex_gdax, "~> 0.1.3"},
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
