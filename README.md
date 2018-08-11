@@ -221,6 +221,12 @@ e.g. Filter log messages created by the `CreateAndCancelPendingOrder` advisor
 tail -f logs/dev.log | grep advisor_create_and_cancel_pending_order
 ```
 
+## Help Wanted :)
+
+If you think this `tai` thing might be worthwhile and you don't see a feature 
+or exchange listed we would love your contributions to add them! Feel free to 
+drop us an email or open a Github issue.
+
 ## Authors
 
 * Alex Kwiatkowski - alex+git@rival-studios.com
