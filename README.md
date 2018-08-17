@@ -47,7 +47,7 @@ We are working to make `tai` production quality software.
 ```elixir
 def deps do
   [
-    {:tai, "~> 0.0.3"}
+    {:tai, "~> 0.0.4"}
   ]
 end
 ```
