@@ -1,6 +1,7 @@
 defmodule Tai.Commands.Settings do
   alias TableRex.Table
 
+  @spec settings :: no_return
   def settings do
     Tai.Settings.all()
     |> Enum.map(&Tuple.to_list/1)
