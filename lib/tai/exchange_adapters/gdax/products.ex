@@ -70,8 +70,9 @@ defmodule Tai.ExchangeAdapters.Gdax.Products do
         min_notional: min_notional,
         min_price: quote_increment,
         min_size: base_min_size,
+        max_size: base_max_size,
         price_increment: quote_increment,
-        max_size: base_max_size
+        size_increment: base_min_size
       }
       |> Tai.Exchanges.Products.upsert()
     end

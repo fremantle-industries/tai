@@ -104,7 +104,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.Products do
         min_notional: min_notional,
         min_size: @min_size,
         min_price: @min_price,
-        max_price: @max_price
+        max_price: @max_price,
+        size_increment: @min_size
       }
       |> Tai.Exchanges.Products.upsert()
     end

@@ -7,10 +7,10 @@ defmodule Tai.Exchanges.Product do
           min_notional: Decimal.t(),
           min_price: Decimal.t(),
           min_size: Decimal.t(),
-          max_price: Decimal.t() | nil,
-          max_size: Decimal.t() | nil,
+          size_increment: Decimal.t(),
           price_increment: Decimal.t() | nil,
-          size_increment: Decimal.t() | nil
+          max_price: Decimal.t() | nil,
+          max_size: Decimal.t() | nil
         }
 
   @enforce_keys [
@@ -20,7 +20,8 @@ defmodule Tai.Exchanges.Product do
     :status,
     :min_notional,
     :min_price,
-    :min_size
+    :min_size,
+    :size_increment
   ]
   defstruct [
     :exchange_id,

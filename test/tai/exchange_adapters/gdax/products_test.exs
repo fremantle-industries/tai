@@ -33,10 +33,10 @@ defmodule Tai.ExchangeAdapters.Gdax.ProductsTest do
     assert Decimal.cmp(product.min_notional, Decimal.new(0.000001)) == :eq
     assert Decimal.cmp(product.min_price, Decimal.new(0.00001)) == :eq
     assert Decimal.cmp(product.min_size, Decimal.new(0.1)) == :eq
-    assert Decimal.cmp(product.price_increment, Decimal.new(0.00001)) == :eq
-    assert product.max_price == nil
     assert Decimal.cmp(product.max_size, Decimal.new(2000)) == :eq
-    assert product.size_increment == nil
+    assert Decimal.cmp(product.price_increment, Decimal.new(0.00001)) == :eq
+    assert Decimal.cmp(product.size_increment, Decimal.new(0.1)) == :eq
+    assert product.max_price == nil
 
     Tai.Boot.unsubscribe_products(exchange_id)
   end

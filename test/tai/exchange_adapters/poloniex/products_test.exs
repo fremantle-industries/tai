@@ -37,7 +37,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
     assert product.max_price == Decimal.new(100_000.0)
     assert product.max_size == nil
     assert product.price_increment == nil
-    assert product.size_increment == nil
+    assert product.size_increment == Decimal.new(0.000001)
 
     Tai.Boot.unsubscribe_products(exchange_id)
   end

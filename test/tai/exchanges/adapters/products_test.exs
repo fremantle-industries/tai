@@ -51,6 +51,9 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
       assert product.exchange_symbol =~ "LTC"
       assert product.exchange_symbol =~ "BTC"
       assert Decimal.cmp(product.min_notional, Decimal.new(0)) == :gt
+      assert Decimal.cmp(product.min_size, Decimal.new(0)) == :gt
+      assert Decimal.cmp(product.min_price, Decimal.new(0)) == :gt
+      assert Decimal.cmp(product.size_increment, Decimal.new(0)) == :gt
       assert product.status == :trading
 
       Tai.Boot.unsubscribe_products(exchange_id)
