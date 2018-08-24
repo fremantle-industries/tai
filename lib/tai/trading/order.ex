@@ -78,9 +78,4 @@ defmodule Tai.Trading.Order do
   def execute_update_callback(previous, %Tai.Trading.Order{} = updated) do
     updated.order_updated_callback.(previous, updated)
   end
-
-  @deprecated "Use Tai.Trading.Order.execute_update_callback instead"
-  def updated_callback(previous_order, updated_order) do
-    execute_update_callback(previous_order, updated_order)
-  end
 end
