@@ -1,7 +1,14 @@
 defmodule Tai.TestSupport.Mock do
-  @spec mock_product(Tai.Exchanges.Product.t()) :: :ok
-  def mock_product(product) do
-    Tai.Exchanges.Products.upsert(product)
+  @spec mock_product(Tai.Exchanges.Product.t() | map) :: :ok
+  def mock_product(%Tai.Exchanges.Product{} = product) do
+    product
+    |> Tai.Exchanges.Products.upsert()
+  end
+
+  def mock_product(%{} = attrs) do
+    Tai.Exchanges.Product
+    |> struct(attrs)
+    |> Tai.Exchanges.Products.upsert()
   end
 
   @spec mock_snapshot(atom, atom, map, map) ::
