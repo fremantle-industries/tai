@@ -36,6 +36,7 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
         assert updated_order.error_reason == :unknown_error
       end)
 
-    assert log_msg =~ ~r/order error - client_id: .+, ':unknown_error'/
+    assert log_msg =~
+             ~r/\[order:.{36,36},error,test_exchange_a,main,btc_usd_unknown_symbol_error,buy,limit,fok,100.1,0.1,unknown_error\]/
   end
 end

@@ -1,6 +1,4 @@
 defmodule Tai.Trading.OrderPipeline.Send do
-  require Logger
-
   alias Tai.Trading.{OrderResponse, Order}
 
   def execute_step(%Order{status: :enqueued} = o) do
@@ -10,8 +8,8 @@ defmodule Tai.Trading.OrderPipeline.Send do
       |> parse_response(o)
       |> execute_callback
     else
-      o
-      |> skip_order!
+      o.client_id
+      |> skip!
       |> execute_callback
     end
   end
@@ -24,77 +22,65 @@ defmodule Tai.Trading.OrderPipeline.Send do
     o |> Tai.Exchanges.Account.sell_limit()
   end
 
-  defp parse_response({:ok, %OrderResponse{status: :filled} = o}, %Order{client_id: cid}) do
-    fill_order!(cid, o.executed_size)
+  defp parse_response({:ok, %OrderResponse{status: :filled} = r}, %Order{} = o) do
+    fill!(o.client_id, r.executed_size)
   end
 
   defp parse_response({:ok, %OrderResponse{status: :expired}}, %Order{client_id: cid}) do
-    expire_order!(cid)
+    expire!(cid)
   end
 
   defp parse_response({:ok, %OrderResponse{status: :pending, id: sid}}, %Order{client_id: cid}) do
-    pend_order!(cid, sid)
+    pend!(cid, sid)
   end
 
   defp parse_response({:error, reason}, %Order{client_id: cid}) do
-    order_error!(cid, reason)
+    error!(cid, reason)
   end
 
-  defp fill_order!(client_id, executed_size) do
-    Logger.info(fn -> "order filled - client_id: #{client_id}" end)
-
-    client_id
+  defp fill!(cid, executed_size) do
+    cid
     |> find_by_and_update(
       status: Tai.Trading.OrderStatus.filled(),
       executed_size: Decimal.new(executed_size)
     )
-    |> to_next_step
   end
 
-  defp expire_order!(client_id) do
-    client_id
+  defp expire!(cid) do
+    cid
     |> find_by_and_update(status: Tai.Trading.OrderStatus.expired())
-    |> to_next_step
   end
 
-  defp pend_order!(client_id, server_id) do
-    Logger.info(fn -> "order pending - client_id: #{client_id}" end)
-
-    client_id
+  defp pend!(cid, server_id) do
+    cid
     |> find_by_and_update(
       status: Tai.Trading.OrderStatus.pending(),
       server_id: server_id
     )
-    |> to_next_step
   end
 
-  defp order_error!(client_id, reason) do
-    Logger.warn(fn ->
-      "order error - client_id: #{client_id}, '#{inspect(reason)}'"
-    end)
-
-    client_id
+  defp error!(cid, reason) do
+    cid
     |> find_by_and_update(
       status: Tai.Trading.OrderStatus.error(),
       error_reason: reason
     )
-    |> to_next_step
   end
 
-  defp skip_order!(o) do
-    o.client_id
+  defp skip!(cid) do
+    cid
     |> find_by_and_update(status: Tai.Trading.OrderStatus.skip())
-    |> to_next_step
   end
 
   defp find_by_and_update(client_id, attrs) do
-    Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id],
-      attrs
-    )
-  end
+    {:ok, [old_order, updated_order]} =
+      Tai.Trading.OrderStore.find_by_and_update(
+        [client_id: client_id],
+        attrs
+      )
 
-  defp to_next_step({:ok, [old_order, updated_order]}) do
+    Tai.Trading.OrderPipeline.Logger.info(updated_order)
+
     {old_order, updated_order}
   end
 

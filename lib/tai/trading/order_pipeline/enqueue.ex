@@ -1,6 +1,4 @@
 defmodule Tai.Trading.OrderPipeline.Enqueue do
-  require Logger
-
   def execute_step(%Tai.Trading.OrderSubmission{} = submission) do
     [order] = Tai.Trading.OrderStore.add(submission)
 
@@ -15,7 +13,7 @@ defmodule Tai.Trading.OrderPipeline.Enqueue do
   end
 
   defp log_enqueued(order) do
-    Logger.info(fn -> "order enqueued - client_id: #{order.client_id}" end)
+    Tai.Trading.OrderPipeline.Logger.info(order)
     order
   end
 

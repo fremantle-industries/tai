@@ -37,7 +37,8 @@ defmodule Tai.Trading.OrderPipeline.GoodTilCanceledTest do
           assert updated_order.executed_size == Decimal.new(0)
         end)
 
-      assert log_msg =~ "order pending - client_id:"
+      assert log_msg =~
+               ~r/\[order:.{36,36},pending,test_exchange_a,main,btc_usd_pending,buy,limit,gtc,100.1,0.1,\]/
     end
 
     test "updates status to pending for sell orders" do
@@ -68,7 +69,8 @@ defmodule Tai.Trading.OrderPipeline.GoodTilCanceledTest do
           assert updated_order.executed_size == Decimal.new(0)
         end)
 
-      assert log_msg =~ "order pending - client_id:"
+      assert log_msg =~
+               ~r/\[order:.{36,36},pending,test_exchange_a,main,btc_usd_pending,sell,limit,gtc,100000.1,0.01,\]/
     end
   end
 end

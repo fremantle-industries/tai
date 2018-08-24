@@ -46,8 +46,11 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
         }
       end)
 
-    assert log_msg =~ "order canceling - client_id:"
-    assert log_msg =~ "order canceled - client_id:"
+    assert log_msg =~
+             ~r/\[order:.{36,36},canceling,test_exchange_a,main,btc_usd_pending,buy,limit,gtc,100.1,0.1,\]/
+
+    assert log_msg =~
+             ~r/\[order:.{36,36},canceled,test_exchange_a,main,btc_usd_pending,buy,limit,gtc,100.1,0.1,\]/
   end
 
   test "returns an error tuple when the status is not pending" do

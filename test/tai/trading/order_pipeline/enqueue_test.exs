@@ -1,5 +1,5 @@
 defmodule Tai.Trading.OrderPipeline.EnqueueTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
 
   import ExUnit.CaptureLog
   import Tai.TestSupport.Helpers
@@ -19,7 +19,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
           Tai.Trading.OrderPipeline.buy_limit(
             :test_exchange_a,
             :main,
-            :btc_usdt,
+            :btc_usd_success,
             100.1,
             0.1,
             :fok,
@@ -34,7 +34,8 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
         assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
       end)
 
-    assert log_msg =~ "order enqueued - client_id:"
+    assert log_msg =~
+             ~r/\[order:.{36,36},enqueued,test_exchange_a,main,btc_usd_success,buy,limit,fok,100.1,0.1,\]/
   end
 
   test "sell_limit enqueues an order and logs a message" do
@@ -46,7 +47,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
           Tai.Trading.OrderPipeline.sell_limit(
             :test_exchange_a,
             :main,
-            :btc_usdt,
+            :btc_usd_success,
             100_000.1,
             0.01,
             :fok,
@@ -61,6 +62,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
         assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
       end)
 
-    assert log_msg =~ "order enqueued - client_id:"
+    assert log_msg =~
+             ~r/\[order:.{36,36},enqueued,test_exchange_a,main,btc_usd_success,sell,limit,fok,100000.1,0.01,\]/
   end
 end
