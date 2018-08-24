@@ -11,6 +11,10 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     end
 
     def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
+      if Map.has_key?(state.store, :error) do
+        raise state.store.error
+      end
+
       send(:test, {feed_id, symbol, inside_quote, changes, state})
       state.store[:return_val] || :ok
     end
@@ -94,22 +98,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         ^snapshot,
         %Tai.Advisor{}
       }
-    end
-
-    test("logs a warning message when it returns an unknown type", %{
-      book_pid: book_pid
-    }) do
-      start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
-
-      log_msg =
-        capture_log(fn ->
-          snapshot = %Tai.Markets.OrderBook{bids: %{101.2 => {1.0, nil, nil}}, asks: %{}}
-          Tai.Markets.OrderBook.replace(book_pid, snapshot)
-          :timer.sleep(100)
-        end)
-
-      assert log_msg =~
-               "[warn]  handle_inside_quote returned an invalid value: '{:unknown, :return_val}'"
     end
 
     test(
@@ -250,6 +238,22 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       }
     end
 
+    test("logs a warning message when it returns an unknown type", %{
+      book_pid: book_pid
+    }) do
+      start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
+
+      log_msg =
+        capture_log(fn ->
+          snapshot = %Tai.Markets.OrderBook{bids: %{101.2 => {1.0, nil, nil}}, asks: %{}}
+          Tai.Markets.OrderBook.replace(book_pid, snapshot)
+          :timer.sleep(100)
+        end)
+
+      assert log_msg =~
+               "[warn]  handle_inside_quote returned an invalid value: '{:unknown, :return_val}'"
+    end
+
     test "can store data in state by returning an ok tuple", %{book_pid: book_pid} do
       start_advisor!(MyAdvisor, %{return_val: {:ok, %{hello: "world"}}})
 
@@ -317,6 +321,22 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         ^changes,
         %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
       }
+    end
+
+    test("logs a warning message when an error is raised", %{
+      book_pid: book_pid
+    }) do
+      start_advisor!(MyAdvisor, %{error: "!!!This is an ERROR!!!"})
+
+      log_msg =
+        capture_log(fn ->
+          snapshot = %Tai.Markets.OrderBook{bids: %{101.2 => {1.0, nil, nil}}, asks: %{}}
+          Tai.Markets.OrderBook.replace(book_pid, snapshot)
+          :timer.sleep(100)
+        end)
+
+      assert log_msg =~
+               "[warn]  handle_inside_quote raised an error: '%RuntimeError{message: \"!!!This is an ERROR!!!\"}'"
     end
   end
 end

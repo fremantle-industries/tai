@@ -245,19 +245,23 @@ defmodule Tai.Advisor do
         if current_inside_quote == previous_inside_quote do
           state
         else
-          order_book_feed_id
-          |> handle_inside_quote(symbol, current_inside_quote, changes, state)
-          |> case do
-            {:ok, new_store} ->
-              Map.put(state, :store, new_store)
+          try do
+            order_book_feed_id
+            |> handle_inside_quote(symbol, current_inside_quote, changes, state)
+            |> case do
+              {:ok, new_store} ->
+                Map.put(state, :store, new_store)
 
-            :ok ->
-              state
+              :ok ->
+                state
 
-            unhandled ->
-              Logger.warn(
-                "handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'"
-              )
+              unhandled ->
+                Logger.warn(
+                  "handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'"
+                )
+            end
+          rescue
+            e -> Logger.warn("handle_inside_quote raised an error: '#{inspect(e)}'")
           end
         end
       end
