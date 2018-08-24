@@ -23,7 +23,8 @@ defmodule Tai.Commands.Orders do
         order.client_id,
         order.server_id,
         Timex.from_now(order.enqueued_at),
-        order.created_at && Timex.from_now(order.created_at)
+        order.created_at && Timex.from_now(order.created_at),
+        order.error_reason
       ]
     end)
     |> print_table
@@ -42,7 +43,8 @@ defmodule Tai.Commands.Orders do
     "Client ID",
     "Server ID",
     "Enqueued At",
-    "Created At"
+    "Created At",
+    "Error Reason"
   ]
   @spec print_table(list) :: no_return
   defp print_table(rows)
