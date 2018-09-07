@@ -182,12 +182,12 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def handle_continue({:add, asset, val, balance}, state) do
-    Logger.info("[add:#{asset},+#{val},#{balance.free},#{balance.locked}]")
+    Logger.info("[add:#{asset},#{val},#{balance.free},#{balance.locked}]")
     {:noreply, state}
   end
 
   def handle_continue({:sub, asset, val, balance}, state) do
-    Logger.info("[sub:#{asset},-#{val},#{balance.free},#{balance.locked}]")
+    Logger.info("[sub:#{asset},#{val},#{balance.free},#{balance.locked}]")
     {:noreply, state}
   end
 

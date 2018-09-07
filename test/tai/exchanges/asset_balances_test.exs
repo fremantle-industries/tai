@@ -208,7 +208,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
           :timer.sleep(100)
         end)
 
-      assert log_msg =~ ~r/\[add:btc,\+0.1,1.2,1.1\]/
+      assert log_msg =~ ~r/\[add:btc,0.1,1.2,1.1\]/
     end
 
     test "returns an error tuple when the asset doesn't exist" do
@@ -260,7 +260,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
           :timer.sleep(100)
         end)
 
-      assert log_msg =~ ~r/\[sub:btc,\-0.1,1.0,1.1\]/
+      assert log_msg =~ ~r/\[sub:btc,0.1,1.0,1.1\]/
     end
 
     test "returns an error tuple when the result is less than 0" do
