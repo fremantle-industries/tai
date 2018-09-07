@@ -3,6 +3,7 @@ defmodule Tai.Exchanges.AssetBalances do
   Manages the balances of an account
   """
 
+  @type balance :: Tai.Exchanges.AssetBalance.t()
   @type balance_range :: Tai.Exchanges.AssetBalanceRange.t()
   @type balance_change_request :: Tai.Exchanges.AssetBalanceChangeRequest.t()
 
@@ -108,6 +109,25 @@ defmodule Tai.Exchanges.AssetBalances do
     end
   end
 
+  def handle_call({:add, asset, val}, _from, state) do
+    if Decimal.cmp(val, Decimal.new(0)) == :gt do
+      case Map.fetch(state, asset) do
+        {:ok, balance} ->
+          new_free = Decimal.add(balance.free, val)
+          new_balance = Map.put(balance, :free, new_free)
+          new_state = Map.put(state, asset, new_balance)
+          continue = {:add, asset, val, new_balance}
+
+          {:reply, {:ok, new_balance}, new_state, {:continue, continue}}
+
+        :error ->
+          {:reply, {:error, :not_found}, state}
+      end
+    else
+      {:reply, {:error, :value_must_be_positive}, state}
+    end
+  end
+
   def handle_continue(:init, state) do
     state
     |> Enum.each(fn {asset, balance} ->
@@ -137,6 +157,11 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
+  def handle_continue({:add, asset, val, balance}, state) do
+    Logger.info("[add:#{asset},+#{val},#{balance.free},#{balance.locked}]")
+    {:noreply, state}
+  end
+
   @spec all(atom, atom) :: map
   def all(exchange_id, account_id) do
     exchange_id
@@ -160,6 +185,20 @@ defmodule Tai.Exchanges.AssetBalances do
     exchange_id
     |> to_name(account_id)
     |> GenServer.call({:unlock, balance_change_request})
+  end
+
+  @spec add(atom, atom, atom, Decimal.t() | number | binary) ::
+          {:ok, balance} | {:error, :not_found | :value_must_be_positive}
+  def add(exchange_id, account_id, asset, val)
+
+  def add(exchange_id, account_id, asset, %Decimal{} = val) do
+    exchange_id
+    |> to_name(account_id)
+    |> GenServer.call({:add, asset, val})
+  end
+
+  def add(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
+    add(exchange_id, account_id, asset, Decimal.new(val))
   end
 
   @doc """
