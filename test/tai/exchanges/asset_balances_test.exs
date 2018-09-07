@@ -225,6 +225,66 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
+  describe "#sub" do
+    setup [:start_asset_balances]
+
+    test "subtracts from free and returns an ok tuple with the new balance" do
+      assert {:ok, balance} =
+               Tai.Exchanges.AssetBalances.sub(
+                 :my_test_exchange,
+                 :my_test_account,
+                 :btc,
+                 Decimal.new(0.1)
+               )
+
+      assert balance.free == Decimal.new(1.0)
+      assert balance.locked == Decimal.new(1.1)
+
+      assert {:ok, balance} =
+               Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
+
+      assert balance.free == Decimal.new(0.9)
+      assert balance.locked == Decimal.new(1.1)
+
+      assert {:ok, balance} =
+               Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, "0.1")
+
+      assert balance.free == Decimal.new(0.8)
+      assert balance.locked == Decimal.new(1.1)
+    end
+
+    test "logs the updated free balance" do
+      log_msg =
+        capture_log(fn ->
+          Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
+          :timer.sleep(100)
+        end)
+
+      assert log_msg =~ ~r/\[sub:btc,\-0.1,1.0,1.1\]/
+    end
+
+    test "returns an error tuple when the result is less than 0" do
+      assert {:ok, _balance} =
+               Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 1.1)
+
+      assert Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 1.1) ==
+               {:error, :result_less_then_zero}
+    end
+
+    test "returns an error tuple when the asset doesn't exist" do
+      assert Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :eth, 0.1) ==
+               {:error, :not_found}
+    end
+
+    test "returns an error tuple when the value is not positive" do
+      assert Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0) ==
+               {:error, :value_must_be_positive}
+
+      assert Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, -0.1) ==
+               {:error, :value_must_be_positive}
+    end
+  end
+
   defp all do
     Tai.Exchanges.AssetBalances.all(:my_test_exchange, :my_test_account)
   end
