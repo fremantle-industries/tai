@@ -16,15 +16,15 @@ defmodule Tai.Exchanges.Account do
               symbol :: atom,
               price :: float,
               size :: float,
-              time_in_force :: atom()
-            ) :: {:ok, order_response :: Tai.Trading.OrderResponse.t()} | {:error, reason :: term}
+              time_in_force :: atom
+            ) :: {:ok, order_response :: order_response} | {:error, reason :: term}
 
   @callback sell_limit(
               symbol :: atom,
               price :: float,
               size :: float,
               time_in_force :: atom
-            ) :: {:ok, order_response :: Tai.Trading.OrderResponse.t()} | {:error, reason :: term}
+            ) :: {:ok, order_response :: order_response} | {:error, reason :: term}
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -62,7 +62,7 @@ defmodule Tai.Exchanges.Account do
   end
 
   @doc """
-  Fetches all balances for the given account
+  Fetches all balances on the exchange for the account
   """
   @spec all_balances(atom, atom) :: {:ok, map} | {:error, credential_error | timeout_error}
   def all_balances(exchange_id, account_id) do
@@ -79,7 +79,7 @@ defmodule Tai.Exchanges.Account do
   - size
   - time_in_force
   """
-  @spec buy_limit(atom, atom, atom, float, float, atom) ::
+  @spec buy_limit(atom, atom, atom, number, number, atom) ::
           {:ok, order_response} | {:error, insufficient_balance_error}
   def buy_limit(exchange_id, account_id, symbol, price, size, time_in_force \\ :ioc) do
     exchange_id
