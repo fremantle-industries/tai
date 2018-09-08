@@ -8,7 +8,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     start_supervised!(
       {Tai.ExchangeAdapters.Poloniex.Account,
-       [exchange_id: :my_poloniex_exchange, account_id: :test]}
+       [exchange_id: :my_poloniex_exchange, account_id: :test, credentials: %{}]}
     )
 
     :ok

@@ -6,17 +6,17 @@ defmodule Tai.Exchanges.AccountTest do
   # Test adapter would need to make HTTP requests for the shared test cases to 
   # work. This may be a good reason to use EchoBoy instead of matching on 
   # special symbols
-  @binance_adapter {Tai.ExchangeAdapters.Binance.Account, :binance, :main}
-  @gdax_adapter {Tai.ExchangeAdapters.Gdax.Account, :gdax, :main}
-  @poloniex_adapter {Tai.ExchangeAdapters.Poloniex.Account, :poloniex, :main}
+  @binance_adapter {Tai.ExchangeAdapters.Binance.Account, :binance, :main, %{}}
+  @gdax_adapter {Tai.ExchangeAdapters.Gdax.Account, :gdax, :main, %{}}
+  @poloniex_adapter {Tai.ExchangeAdapters.Poloniex.Account, :poloniex, :main, %{}}
   @adapters [@binance_adapter, @gdax_adapter, @poloniex_adapter]
 
   setup_all do
     HTTPoison.start()
 
     @adapters
-    |> Enum.map(fn {adapter, exchange_id, account_id} ->
-      {adapter, [exchange_id: exchange_id, account_id: account_id]}
+    |> Enum.map(fn {adapter, exchange_id, account_id, credentials} ->
+      {adapter, [exchange_id: exchange_id, account_id: account_id, credentials: credentials]}
     end)
     |> Enum.map(&start_supervised!/1)
 
@@ -25,7 +25,7 @@ defmodule Tai.Exchanges.AccountTest do
 
   describe "#all_balances" do
     @adapters
-    |> Enum.map(fn {_, exchange_id, account_id} ->
+    |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->
       @exchange_id exchange_id
       @account_id account_id
 
@@ -54,7 +54,7 @@ defmodule Tai.Exchanges.AccountTest do
   @adapters [@binance_adapter, @poloniex_adapter]
   describe "#buy_limit" do
     @adapters
-    |> Enum.map(fn {_, exchange_id, account_id} ->
+    |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->
       @exchange_id exchange_id
       @account_id account_id
 
@@ -117,7 +117,7 @@ defmodule Tai.Exchanges.AccountTest do
   @adapters [@binance_adapter, @poloniex_adapter]
   describe "#sell_limit" do
     @adapters
-    |> Enum.map(fn {_, exchange_id, account_id} ->
+    |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->
       @exchange_id exchange_id
       @account_id account_id
 

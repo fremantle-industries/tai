@@ -10,7 +10,7 @@ defmodule Tai.ExchangeAdapters.Binance.AccountTest do
 
     start_supervised!(
       {Tai.ExchangeAdapters.Binance.Account,
-       [exchange_id: :my_binance_exchange, account_id: :test]}
+       [exchange_id: :my_binance_exchange, account_id: :test, credentials: %{}]}
     )
 
     :ok

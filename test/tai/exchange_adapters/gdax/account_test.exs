@@ -7,7 +7,8 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     HTTPoison.start()
 
     start_supervised!(
-      {Tai.ExchangeAdapters.Gdax.Account, [exchange_id: :my_gdax_exchange, account_id: :test]}
+      {Tai.ExchangeAdapters.Gdax.Account,
+       [exchange_id: :my_gdax_exchange, account_id: :test, credentials: %{}]}
     )
 
     :ok

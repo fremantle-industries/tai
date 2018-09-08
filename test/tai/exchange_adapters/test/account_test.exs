@@ -8,7 +8,7 @@ defmodule Tai.ExchangeAdapters.Test.AccountTest do
   setup_all do
     start_supervised!(
       {Tai.ExchangeAdapters.Test.Account,
-       [exchange_id: :my_test_exchange, account_id: :my_test_account]}
+       [exchange_id: :my_test_exchange, account_id: :my_test_account, credentials: %{}]}
     )
 
     :ok
