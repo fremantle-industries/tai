@@ -2,11 +2,8 @@ defmodule Tai.Exchanges.AccountsSupervisor do
   use Supervisor
 
   def start_link([adapter: _, exchange_id: exchange_id, accounts: _] = state) do
-    Supervisor.start_link(
-      __MODULE__,
-      state,
-      name: :"#{__MODULE__}_#{exchange_id}"
-    )
+    name = :"#{__MODULE__}_#{exchange_id}"
+    Supervisor.start_link(__MODULE__, state, name: name)
   end
 
   def init(adapter: adapter, exchange_id: exchange_id, accounts: accounts) do

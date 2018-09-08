@@ -1,25 +1,18 @@
 defmodule Tai.ExchangeAdapters.Gdax.Products do
   use GenServer
 
-  def start_link([exchange_id: _, whitelist_query: _] = state) do
-    GenServer.start_link(
-      __MODULE__,
-      state,
-      name: state |> to_name
-    )
+  def start_link([exchange_id: exchange_id, whitelist_query: _] = state) do
+    name = :"#{__MODULE__}_#{exchange_id}"
+    GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  def init(exchange_id) do
-    {:ok, exchange_id, 0}
+  def init(state) do
+    {:ok, state, {:continue, :fetch}}
   end
 
-  def handle_info(:timeout, exchange_id) do
-    fetch!(exchange_id)
-    {:noreply, exchange_id}
-  end
-
-  defp to_name(exchange_id: exchange_id, whitelist_query: _) do
-    :"#{__MODULE__}_#{exchange_id}"
+  def handle_continue(:fetch, state) do
+    fetch!(state)
+    {:noreply, state}
   end
 
   defp fetch!(exchange_id: exchange_id, whitelist_query: query) do
