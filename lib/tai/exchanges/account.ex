@@ -10,20 +10,22 @@ defmodule Tai.Exchanges.Account do
   @type insufficient_balance_error :: Tai.Trading.InsufficientBalanceError.t()
   @type invalid_order_type_error :: Tai.Trading.OrderResponses.InvalidOrderType.t()
 
-  @callback all_balances() :: {:ok, balances :: map} | {:error, reason :: term}
+  @callback all_balances(credentials :: map) :: {:ok, balances :: map} | {:error, reason :: term}
 
   @callback buy_limit(
               symbol :: atom,
               price :: float,
               size :: float,
-              time_in_force :: atom
+              time_in_force :: atom,
+              credentials :: map
             ) :: {:ok, order_response :: order_response} | {:error, reason :: term}
 
   @callback sell_limit(
               symbol :: atom,
               price :: float,
               size :: float,
-              time_in_force :: atom
+              time_in_force :: atom,
+              credentials :: map
             ) :: {:ok, order_response :: order_response} | {:error, reason :: term}
 
   defmacro __using__(_) do
@@ -42,17 +44,17 @@ defmodule Tai.Exchanges.Account do
       end
 
       def handle_call(:all_balances, _from, state) do
-        response = all_balances()
+        response = all_balances(state)
         {:reply, response, state}
       end
 
       def handle_call({:buy_limit, symbol, price, size, time_in_force}, _from, state) do
-        response = buy_limit(symbol, price, size, time_in_force)
+        response = buy_limit(symbol, price, size, time_in_force, state)
         {:reply, response, state}
       end
 
       def handle_call({:sell_limit, symbol, price, size, time_in_force}, _from, state) do
-        response = sell_limit(symbol, price, size, time_in_force)
+        response = sell_limit(symbol, price, size, time_in_force, state)
         {:reply, response, state}
       end
     end
@@ -79,9 +81,8 @@ defmodule Tai.Exchanges.Account do
   @spec buy_limit(atom, atom, atom, number, number, atom) ::
           {:ok, order_response} | {:error, insufficient_balance_error}
   def buy_limit(exchange_id, account_id, symbol, price, size, time_in_force \\ :ioc) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call({:buy_limit, symbol, price, size, time_in_force})
+    server = to_name(exchange_id, account_id)
+    GenServer.call(server, {:buy_limit, symbol, price, size, time_in_force})
   end
 
   @doc """

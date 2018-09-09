@@ -3,12 +3,20 @@ defmodule Tai.Exchanges.AccountTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   doctest Tai.Exchanges.Account
 
+  @gdax_credentials %{
+    api_url: "https://api-public.sandbox.pro.coinbase.com",
+    api_key: System.get_env("GDAX_API_KEY"),
+    api_secret: System.get_env("GDAX_API_SECRET"),
+    api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
+  }
+  @gdax_adapter {Tai.ExchangeAdapters.Gdax.Account, :gdax, :main, @gdax_credentials}
+
+  @binance_adapter {Tai.ExchangeAdapters.Binance.Account, :binance, :main, %{}}
+  @poloniex_adapter {Tai.ExchangeAdapters.Poloniex.Account, :poloniex, :main, %{}}
+
   # Test adapter would need to make HTTP requests for the shared test cases to 
   # work. This may be a good reason to use EchoBoy instead of matching on 
   # special symbols
-  @binance_adapter {Tai.ExchangeAdapters.Binance.Account, :binance, :main, %{}}
-  @gdax_adapter {Tai.ExchangeAdapters.Gdax.Account, :gdax, :main, %{}}
-  @poloniex_adapter {Tai.ExchangeAdapters.Poloniex.Account, :poloniex, :main, %{}}
   @adapters [@binance_adapter, @gdax_adapter, @poloniex_adapter]
 
   setup_all do

@@ -51,7 +51,7 @@
       "method": "post",
       "options": [],
       "request_body": "",
-      "url": "https://api.gdax.com/orders"
+      "url": "https://api-public.sandbox.pro.coinbase.com/orders"
     },
     "response": {
       "body": "{\"id\":\"8aee81e5-a9bd-4deb-a6f0-58e49d8c8139\",\"price\":\"101.10000000\",\"size\":\"0.20000000\",\"product_id\":\"BTC-USD\",\"side\":\"buy\",\"stp\":\"dc\",\"type\":\"limit\",\"time_in_force\":\"GTC\",\"post_only\":false,\"created_at\":\"2017-11-21T08:30:14.022263Z\",\"fill_fees\":\"0.0000000000000000\",\"filled_size\":\"0.00000000\",\"executed_value\":\"0.0000000000000000\",\"status\":\"pending\",\"settled\":false}",
@@ -89,7 +89,7 @@
       "method": "get",
       "options": [],
       "request_body": "",
-      "url": "https://api.gdax.com/orders/8aee81e5-a9bd-4deb-a6f0-58e49d8c8139"
+      "url": "https://api-public.sandbox.pro.coinbase.com/orders/8aee81e5-a9bd-4deb-a6f0-58e49d8c8139"
     },
     "response": {
       "body": "{\"id\":\"8aee81e5-a9bd-4deb-a6f0-58e49d8c8139\",\"price\":\"101.10000000\",\"size\":\"0.20000000\",\"product_id\":\"BTC-USD\",\"side\":\"buy\",\"stp\":\"dc\",\"type\":\"limit\",\"time_in_force\":\"GTC\",\"post_only\":false,\"created_at\":\"2017-11-21T08:30:14.022263Z\",\"fill_fees\":\"0.0000000000000000\",\"filled_size\":\"0.00000000\",\"executed_value\":\"0.0000000000000000\",\"status\":\"open\",\"settled\":false}",

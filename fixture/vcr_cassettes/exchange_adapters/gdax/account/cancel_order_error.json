@@ -12,7 +12,7 @@
       "method": "delete",
       "options": [],
       "request_body": "",
-      "url": "https://api.gdax.com/orders/invalid-order-id"
+      "url": "https://api-public.sandbox.pro.coinbase.com/orders/invalid-order-id"
     },
     "response": {
       "body": "{\"message\":\"Invalid order id\"}",

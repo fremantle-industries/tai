@@ -6,9 +6,16 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   setup_all do
     HTTPoison.start()
 
+    credentials = %{
+      api_url: "https://api-public.sandbox.pro.coinbase.com",
+      api_key: System.get_env("GDAX_API_KEY"),
+      api_secret: System.get_env("GDAX_API_SECRET"),
+      api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
+    }
+
     start_supervised!(
       {Tai.ExchangeAdapters.Gdax.Account,
-       [exchange_id: :my_gdax_exchange, account_id: :test, credentials: %{}]}
+       [exchange_id: :my_gdax_exchange, account_id: :test, credentials: credentials]}
     )
 
     :ok

@@ -5,24 +5,25 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
 
   alias Tai.ExchangeAdapters.Gdax.Product
 
-  def buy_limit(symbol, price, size, time_in_force) do
+  def buy_limit(symbol, price, size, time_in_force, credentials) do
     {"buy", symbol, price, size}
-    |> create_limit_order(time_in_force)
+    |> create_limit_order(time_in_force, credentials)
   end
 
-  def sell_limit(symbol, price, size, time_in_force) do
+  def sell_limit(symbol, price, size, time_in_force, credentials) do
     {"sell", symbol, price, size}
-    |> create_limit_order(time_in_force)
+    |> create_limit_order(time_in_force, credentials)
   end
 
-  defp create_limit_order(order, time_in_force) do
+  defp create_limit_order(order, time_in_force, credentials) do
     order
-    |> build_limit_order
-    |> ExGdax.create_order()
+    |> to_params
+    |> ExGdax.create_order(credentials)
     |> handle_create_order(time_in_force)
   end
 
-  defp build_limit_order({side, symbol, price, size}) do
+  # TODO: this should include time in force
+  defp to_params({side, symbol, price, size}) do
     %{
       "type" => "limit",
       "side" => side,

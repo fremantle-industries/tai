@@ -3,8 +3,9 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.AllBalances do
   Fetch and normalize all balances on the GDAX account
   """
 
-  def fetch do
-    ExGdax.list_accounts()
+  def fetch(credentials) do
+    credentials
+    |> ExGdax.list_accounts()
     |> normalize_accounts
   end
 

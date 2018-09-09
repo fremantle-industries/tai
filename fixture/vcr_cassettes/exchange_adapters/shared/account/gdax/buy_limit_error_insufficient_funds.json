@@ -51,7 +51,7 @@
       "method": "post",
       "options": [],
       "request_body": "",
-      "url": "https://api.gdax.com/orders"
+      "url": "https://api-public.sandbox.pro.coinbase.com/orders"
     },
     "response": {
       "body": "{\"message\":\"Insufficient funds\"}",

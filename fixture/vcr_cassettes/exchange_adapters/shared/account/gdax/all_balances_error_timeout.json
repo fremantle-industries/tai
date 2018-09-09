@@ -12,7 +12,7 @@
       "method": "get",
       "options": [],
       "request_body": "",
-      "url": "https://api.gdax.com/accounts"
+      "url": "https://api-public.sandbox.pro.coinbase.com/accounts"
     },
     "response": {
       "binary": false,

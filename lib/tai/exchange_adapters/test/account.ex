@@ -12,11 +12,11 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     ltc: Tai.Exchanges.AssetBalance.new(0, "0.03")
   }
 
-  def all_balances() do
+  def all_balances(_credentials) do
     {:ok, @all_balances}
   end
 
-  def buy_limit(:btc_usd_success, _price, size, :fok) do
+  def buy_limit(:btc_usd_success, _price, size, :fok, _credentials) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       status: Tai.Trading.OrderStatus.filled(),
@@ -28,7 +28,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, order_response}
   end
 
-  def buy_limit(:btc_usd_expired, _price, size, :fok) do
+  def buy_limit(:btc_usd_expired, _price, size, :fok, _credentials) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       status: Tai.Trading.OrderStatus.expired(),
@@ -40,7 +40,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, order_response}
   end
 
-  def buy_limit(:btc_usd_pending, _price, size, :gtc) do
+  def buy_limit(:btc_usd_pending, _price, size, :gtc, _credentials) do
     order_response = %Tai.Trading.OrderResponse{
       id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7",
       status: Tai.Trading.OrderStatus.pending(),
@@ -52,7 +52,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, order_response}
   end
 
-  def buy_limit(:btc_usd_success, _price, size, time_in_force) do
+  def buy_limit(:btc_usd_success, _price, size, time_in_force, _credentials) do
     order_response = %Tai.Trading.OrderResponse{
       id: "f9df7435-34d5-4861-8ddc-80f0fd2c83d7",
       status: Tai.Trading.OrderStatus.pending(),
@@ -64,16 +64,16 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, order_response}
   end
 
-  def buy_limit(:btc_usd_insufficient_funds, _price, _size, _time_in_force) do
+  def buy_limit(:btc_usd_insufficient_funds, _price, _size, _time_in_force, _credentials) do
     error = %Tai.Trading.InsufficientBalanceError{reason: "Insufficient Balance"}
     {:error, error}
   end
 
-  def buy_limit(_symbol, _price, _size, _time_in_force) do
+  def buy_limit(_symbol, _price, _size, _time_in_force, _credentials) do
     {:error, :unknown_error}
   end
 
-  def sell_limit(:btc_usd_success, _price, size, :fok) do
+  def sell_limit(:btc_usd_success, _price, size, :fok, _credentials) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       status: Tai.Trading.OrderStatus.filled(),
@@ -85,7 +85,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, order_response}
   end
 
-  def sell_limit(:btc_usd_expired, _price, size, :fok) do
+  def sell_limit(:btc_usd_expired, _price, size, :fok, _credentials) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       status: Tai.Trading.OrderStatus.expired(),
@@ -97,7 +97,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, order_response}
   end
 
-  def sell_limit(:btc_usd_pending, _price, size, :gtc) do
+  def sell_limit(:btc_usd_pending, _price, size, :gtc, _credentials) do
     order_response = %Tai.Trading.OrderResponse{
       id: "41541912-ebc1-4173-afa5-4334ccf7a1a8",
       status: Tai.Trading.OrderStatus.pending(),
@@ -109,7 +109,7 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, order_response}
   end
 
-  def sell_limit(:btc_usd_success, _price, size, time_in_force) do
+  def sell_limit(:btc_usd_success, _price, size, time_in_force, _credentials) do
     order_response = %Tai.Trading.OrderResponse{
       id: "41541912-ebc1-4173-afa5-4334ccf7a1a8",
       status: Tai.Trading.OrderStatus.pending(),
@@ -121,12 +121,12 @@ defmodule Tai.ExchangeAdapters.Test.Account do
     {:ok, order_response}
   end
 
-  def sell_limit(:btc_usd_insufficient_funds, _price, _size, _time_in_force) do
+  def sell_limit(:btc_usd_insufficient_funds, _price, _size, _time_in_force, _credentials) do
     error = %Tai.Trading.InsufficientBalanceError{reason: "Insufficient Balance"}
     {:error, error}
   end
 
-  def sell_limit(_symbol, _price, _size, _time_in_force) do
+  def sell_limit(_symbol, _price, _size, _time_in_force, _credentials) do
     {:error, :unknown_error}
   end
 
