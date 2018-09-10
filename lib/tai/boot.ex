@@ -15,6 +15,27 @@ defmodule Tai.Boot do
 
   @spec fetched_products(atom) :: :ok
   def fetched_products(exchange_id) do
-    Tai.PubSub.broadcast({exchange_id, :products}, {:fetched_products, :ok, exchange_id})
+    Tai.PubSub.broadcast(
+      {exchange_id, :products},
+      {:fetched_products, :ok, exchange_id}
+    )
+  end
+
+  @spec subscribe_fees(atom, atom) :: :ok
+  def subscribe_fees(exchange_id, account_id) do
+    Tai.PubSub.subscribe({exchange_id, account_id, :fees})
+  end
+
+  @spec unsubscribe_fees(atom, atom) :: :ok
+  def unsubscribe_fees(exchange_id, account_id) do
+    Tai.PubSub.unsubscribe({exchange_id, account_id, :fees})
+  end
+
+  @spec hydrated_fees(atom, atom) :: :ok
+  def hydrated_fees(exchange_id, account_id) do
+    Tai.PubSub.broadcast(
+      {exchange_id, account_id, :fees},
+      {:hydrated_fees, :ok, exchange_id, account_id}
+    )
   end
 end

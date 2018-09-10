@@ -26,6 +26,7 @@ defmodule Tai.Commands.HelperTest do
     assert capture_io(&Helper.help/0) == """
            * balance
            * products
+           * fees
            * markets
            * orders
            * buy_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)
@@ -74,6 +75,37 @@ defmodule Tai.Commands.HelperTest do
            | test_exchange_a | btc_usd |         BTC_USD | trading |   0.00001 |    100000 |        0.000001 |    0.001 |   100000 |          0.001 |         0.01 |
            | test_exchange_b | eth_usd |         ETH_USD | trading |   0.00001 |    100000 |        0.000001 |    0.001 |          |          0.001 |         0.01 |
            +-----------------+---------+-----------------+---------+-----------+-----------+-----------------+----------+----------+----------------+--------------+\n
+           """
+  end
+
+  test "fees shows the accounts maker/taker fees for every product on each exchange" do
+    mock_fee_info(%{
+      exchange_id: :test_exchange_a,
+      account_id: :main,
+      symbol: :btc_usd,
+      maker: Decimal.new(-0.0005),
+      maker_type: Tai.Exchanges.FeeInfo.percent(),
+      taker: Decimal.new(0.002),
+      taker_type: Tai.Exchanges.FeeInfo.percent()
+    })
+
+    mock_fee_info(%{
+      exchange_id: :test_exchange_b,
+      account_id: :main,
+      symbol: :eth_usd,
+      maker: Decimal.new(0),
+      maker_type: Tai.Exchanges.FeeInfo.percent(),
+      taker: Decimal.new(0.001),
+      taker_type: Tai.Exchanges.FeeInfo.percent()
+    })
+
+    assert capture_io(&Helper.fees/0) == """
+           +-----------------+------------+---------+--------+-------+
+           |     Exchange ID | Account ID |  Symbol |  Maker | Taker |
+           +-----------------+------------+---------+--------+-------+
+           | test_exchange_a |       main | btc_usd | -0.05% |  0.2% |
+           | test_exchange_b |       main | eth_usd |     0% |  0.1% |
+           +-----------------+------------+---------+--------+-------+\n
            """
   end
 

@@ -9,6 +9,10 @@ defmodule Tai.ExchangeAdapters.Gdax.Supervisor do
     Tai.ExchangeAdapters.Gdax.Products
   end
 
+  def hydrate_fees() do
+    Tai.ExchangeAdapters.Gdax.HydrateFees
+  end
+
   def account() do
     Tai.ExchangeAdapters.Gdax.Account
   end

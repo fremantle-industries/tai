@@ -7,6 +7,7 @@ defmodule Tai.Commands.Info do
     IO.puts("""
     * balance
     * products
+    * fees
     * markets
     * orders
     * buy_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)

@@ -2,7 +2,7 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
-  @adapters [
+  @exchanges [
     %Tai.Exchanges.Config{
       id: :binance,
       supervisor: Tai.ExchangeAdapters.Binance.Supervisor
@@ -27,7 +27,7 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
     :ok
   end
 
-  @adapters
+  @exchanges
   |> Enum.map(fn config ->
     @config config
 

@@ -9,6 +9,10 @@ defmodule Tai.ExchangeAdapters.Test.Supervisor do
     Tai.ExchangeAdapters.Test.Products
   end
 
+  def hydrate_fees() do
+    Tai.ExchangeAdapters.Test.HydrateFees
+  end
+
   def account() do
     Tai.ExchangeAdapters.Test.Account
   end

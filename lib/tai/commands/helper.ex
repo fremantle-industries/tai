@@ -12,6 +12,9 @@ defmodule Tai.Commands.Helper do
   @spec products :: no_return
   defdelegate products, to: Tai.Commands.Products
 
+  @spec fees :: no_return
+  defdelegate fees, to: Tai.Commands.Fees
+
   @spec markets :: no_return
   defdelegate markets, to: Tai.Commands.Markets
 
