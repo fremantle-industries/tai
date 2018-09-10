@@ -2,16 +2,13 @@ defmodule Tai.Exchanges.Supervisor do
   use Supervisor
 
   def start_link(_) do
-    Supervisor.start_link(
-      __MODULE__,
-      :ok,
-      name: __MODULE__
-    )
+    Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
   def init(:ok) do
     [
       Tai.Exchanges.Products,
+      Tai.Exchanges.Fees,
       Tai.Exchanges.AdaptersSupervisor,
       # TODO
       # OrderBookFeedsSupervisor will become the responsibility of each 
