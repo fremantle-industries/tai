@@ -56,6 +56,22 @@ defmodule Tai.Exchanges.ProductsTest do
     end
   end
 
+  describe "#where" do
+    test "returns a list of products that matche all attributes", %{product: product} do
+      assert Tai.Exchanges.Products.upsert(product) == :ok
+
+      assert Tai.Exchanges.Products.where(exchange_id: :other_exchange, symbol: :btc_usdt) == []
+
+      assert [matched_product] =
+               Tai.Exchanges.Products.where(
+                 exchange_id: product.exchange_id,
+                 symbol: product.symbol
+               )
+
+      assert matched_product == product
+    end
+  end
+
   describe "#clear" do
     test "removes the existing items in the 'products' ETS table", %{product: product} do
       assert Tai.Exchanges.Products.upsert(product) == :ok

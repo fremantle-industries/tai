@@ -52,6 +52,16 @@ defmodule Tai.Exchanges.Products do
     end
   end
 
+  @spec where([]) :: []
+  def where(filters) do
+    all()
+    |> Enum.filter(fn product ->
+      filters
+      |> Keyword.keys()
+      |> Enum.all?(&(Map.get(product, &1) == Keyword.get(filters, &1)))
+    end)
+  end
+
   @spec clear :: :ok
   def clear() do
     GenServer.call(__MODULE__, :clear)
