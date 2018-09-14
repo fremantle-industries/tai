@@ -15,11 +15,11 @@ We are working to make `tai` production quality software.
 
 ## Supported Exchanges
 
-| Exchange       | Live Order Book  | Account Balance | Orders | Products |
-|----------------|:---:|:---:|:---:|:---:|
-| GDAX           | [x] | [x] | [x] | [x] |
-| Binance        | [x] | [x] | [x] | [x] |
-| Poloniex       | [x] | [x] | [x] | [x] |
+| Exchange       | Live Order Book  | Account Balance | Orders | Products | Fees |
+|----------------|:---:|:---:|:---:|:---:|:---:|
+| GDAX           | [x] | [x] | [x] | [x] | [x] |
+| Binance        | [x] | [x] | [x] | [x] | [x] |
+| Poloniex       | [x] | [x] | [x] | [x] | [x] |
 
 ## Planned Exchanges
 
@@ -112,6 +112,7 @@ Display the available commands and usage examples
 iex(1)> help
 * balance
 * products
+* fees
 * markets
 * orders
 * buy_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
@@ -159,6 +160,30 @@ iex(3)> products
 +-------------+-----------+-----------------+---------+--------------+----------------+-----------------+------------+-------------------+----------------+--------------+
 ```
 
+#### fees
+
+Display the maker/taker fees for the every product in the exchange accounts
+
+```
+iex(4)> fees
++-------------+------------+-----------+-------+-------+
+| Exchange ID | Account ID |    Symbol | Maker | Taker |
++-------------+------------+-----------+-------+-------+
+|     binance |       main |   lsk_bnb |  0.1% |  0.1% |
+|     binance |       main |   rlc_eth |  0.1% |  0.1% |
+|     binance |       main |  aion_eth |  0.1% |  0.1% |
+|     binance |       main |   mft_bnb |  0.1% |  0.1% |
+|     binance |       main |  ardr_bnb |  0.1% |  0.1% |
+|     binance |       main |  iost_btc |  0.1% |  0.1% |
+|     binance |       main |   xlm_eth |  0.1% |  0.1% |
+|     binance |       main |   xem_eth |  0.1% |  0.1% |
+|     binance |       main |   kmd_btc |  0.1% |  0.1% |
+|     binance |       main | ncash_btc |  0.1% |  0.1% |
+|     binance |       main |   xrp_eth |  0.1% |  0.1% |
+|     binance |       main |   vet_bnb |  0.1% |  0.1% |
++-------------+------------+-----------+-------+-------+
+```
+
 #### markets
 
 Displays the live top of the order book for the configured feeds. It includes 
@@ -167,7 +192,7 @@ from the exchange. This allows you to monitor if a feed is under backpressure an
 starting to fall behind as it updates it's order books.
 
 ```
-iex(4)> markets
+iex(5)> markets
 +---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
 |    Feed |   Symbol | Bid Price | Ask Price |   Bid Size |     Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
 +---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
@@ -191,7 +216,7 @@ update in the background so that the information is available when you re-run
 the `orders` command.
 
 ```
-iex(5)> orders
+iex(6)> orders
 +---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
 | Account |  Symbol |      Type | Price | Size | Status |                            Client ID | Server ID |    Enqueued At | Created At |
 +---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
