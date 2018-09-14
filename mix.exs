@@ -34,7 +34,7 @@ defmodule Tai.Mixfile do
       {:decimal, "~> 1.3.0"},
       # Add user fee rate
       # {:ex_gdax, "~> 0.1.3"},
-      {:ex_gdax, github: "fremantle-capital/ex_gdax", branch: "user-fee-rates"},
+      {:ex_gdax, github: "bnhansn/ex_gdax", sha: "462a34"},
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},

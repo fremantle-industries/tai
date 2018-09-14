@@ -12,7 +12,7 @@
       "method": "get",
       "options": [],
       "request_body": "",
-      "url": "https://api.gdax.com/products"
+      "url": "https://api.pro.coinbase.com/products"
     },
     "response": {
       "binary": false,
