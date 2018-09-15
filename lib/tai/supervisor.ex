@@ -13,7 +13,7 @@ defmodule Tai.Supervisor do
     children = [
       Tai.PubSub,
       {Tai.Settings, Tai.Config.all()},
-      Tai.Trading.Supervisor,
+      Tai.Trading.OrderStore,
       Tai.Advisors.Supervisor,
       Tai.Exchanges.Supervisor
     ]
