@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Poloniex.Products do
+defmodule Tai.ExchangeAdapters.Poloniex.HydrateProducts do
   @moduledoc """
   Retrieves the available products on the Poloniex exchange
 

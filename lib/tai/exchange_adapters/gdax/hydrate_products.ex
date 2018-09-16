@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Gdax.Products do
+defmodule Tai.ExchangeAdapters.Gdax.HydrateProducts do
   use GenServer
 
   def start_link([exchange_id: exchange_id, whitelist_query: _] = state) do

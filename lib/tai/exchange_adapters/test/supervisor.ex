@@ -5,15 +5,15 @@ defmodule Tai.ExchangeAdapters.Test.Supervisor do
 
   use Tai.Exchanges.AdapterSupervisor
 
-  def products() do
-    Tai.ExchangeAdapters.Test.Products
+  def hydrate_products do
+    Tai.ExchangeAdapters.Test.HydrateProducts
   end
 
-  def hydrate_fees() do
+  def hydrate_fees do
     Tai.ExchangeAdapters.Test.HydrateFees
   end
 
-  def account() do
+  def account do
     Tai.ExchangeAdapters.Test.Account
   end
 end

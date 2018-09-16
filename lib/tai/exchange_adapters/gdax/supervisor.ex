@@ -5,15 +5,15 @@ defmodule Tai.ExchangeAdapters.Gdax.Supervisor do
 
   use Tai.Exchanges.AdapterSupervisor
 
-  def products() do
-    Tai.ExchangeAdapters.Gdax.Products
+  def hydrate_products do
+    Tai.ExchangeAdapters.Gdax.HydrateProducts
   end
 
-  def hydrate_fees() do
+  def hydrate_fees do
     Tai.ExchangeAdapters.Gdax.HydrateFees
   end
 
-  def account() do
+  def account do
     Tai.ExchangeAdapters.Gdax.Account
   end
 end

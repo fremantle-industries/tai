@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Binance.Products do
+defmodule Tai.ExchangeAdapters.Binance.HydrateProducts do
   use GenServer
 
   def start_link([exchange_id: _, whitelist_query: _] = state) do

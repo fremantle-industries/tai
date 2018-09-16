@@ -5,15 +5,15 @@ defmodule Tai.ExchangeAdapters.Poloniex.Supervisor do
 
   use Tai.Exchanges.AdapterSupervisor
 
-  def products() do
-    Tai.ExchangeAdapters.Poloniex.Products
+  def hydrate_products do
+    Tai.ExchangeAdapters.Poloniex.HydrateProducts
   end
 
-  def hydrate_fees() do
+  def hydrate_fees do
     Tai.ExchangeAdapters.Poloniex.HydrateFees
   end
 
-  def account() do
+  def account do
     Tai.ExchangeAdapters.Poloniex.Account
   end
 end
