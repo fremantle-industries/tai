@@ -12,8 +12,8 @@ defmodule Tai.Exchanges.AssetBalance do
     }
   end
 
-  @spec total(t) :: Decimal.t()
-  def total(detail) do
-    Decimal.add(detail.free, detail.locked)
+  @spec total(balance :: t) :: Decimal.t()
+  def total(%Tai.Exchanges.AssetBalance{free: free, locked: locked}) do
+    Decimal.add(free, locked)
   end
 end

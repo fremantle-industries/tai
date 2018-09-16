@@ -1,11 +1,10 @@
 defmodule Tai.Exchanges.Fees do
-  alias __MODULE__
   use GenServer
 
   @type fee_info :: Tai.Exchanges.FeeInfo.t()
 
   def start_link(_) do
-    {:ok, pid} = GenServer.start_link(Fees, :ok, name: Fees)
+    {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
     GenServer.call(pid, :create_ets_table)
     {:ok, pid}
   end
@@ -22,31 +21,31 @@ defmodule Tai.Exchanges.Fees do
   def handle_call({:upsert, fee_info}, _from, state) do
     key = {fee_info.exchange_id, fee_info.account_id, fee_info.symbol}
     record = {key, fee_info}
-    :ets.insert(Fees, record)
+    :ets.insert(__MODULE__, record)
     {:reply, :ok, state}
   end
 
   def handle_call(:clear, _from, state) do
-    :ets.delete(Fees)
+    :ets.delete(__MODULE__)
     create_ets_table()
     {:reply, :ok, state}
   end
 
   @spec upsert(fee_info) :: :ok
   def upsert(%Tai.Exchanges.FeeInfo{} = fee_info) do
-    GenServer.call(Fees, {:upsert, fee_info})
+    GenServer.call(__MODULE__, {:upsert, fee_info})
   end
 
   @spec clear :: :ok
   def clear() do
-    GenServer.call(Fees, :clear)
+    GenServer.call(__MODULE__, :clear)
   end
 
   @spec find_by(exchange_id: atom, account_id: atom, symbol: atom) ::
           {:ok, fee_info} | {:error, :not_found}
   def find_by(exchange_id: exchange_id, account_id: account_id, symbol: symbol) do
     with key <- {exchange_id, account_id, symbol},
-         [[%Tai.Exchanges.FeeInfo{} = fee_info]] <- :ets.match(Fees, {key, :"$1"}) do
+         [[%Tai.Exchanges.FeeInfo{} = fee_info]] <- :ets.match(__MODULE__, {key, :"$1"}) do
       {:ok, fee_info}
     else
       [] -> {:error, :not_found}
@@ -55,7 +54,7 @@ defmodule Tai.Exchanges.Fees do
 
   @spec all :: []
   def all do
-    Fees
+    __MODULE__
     |> :ets.select([{{:_, :_}, [], [:"$_"]}])
     |> Enum.map(fn {{_, _, _}, fee_info} -> fee_info end)
   end
@@ -67,6 +66,6 @@ defmodule Tai.Exchanges.Fees do
   end
 
   defp create_ets_table do
-    :ets.new(Fees, [:set, :protected, :named_table])
+    :ets.new(__MODULE__, [:set, :protected, :named_table])
   end
 end

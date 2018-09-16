@@ -1,39 +1,52 @@
 defmodule Tai.Exchanges.AssetBalances do
-  @moduledoc """
-  Manages the balances of an account
-  """
-
-  @type balance :: Tai.Exchanges.AssetBalance.t()
+  @type asset_balance :: Tai.Exchanges.AssetBalance.t()
   @type balance_range :: Tai.Exchanges.AssetBalanceRange.t()
-  @type balance_change_request :: Tai.Exchanges.AssetBalanceChangeRequest.t()
 
   use GenServer
 
   require Logger
 
-  def start_link(exchange_id: exchange_id, account_id: account_id, balances: %{} = balances) do
-    GenServer.start_link(
-      __MODULE__,
-      balances,
-      name: to_name(exchange_id, account_id)
-    )
+  def start_link(_) do
+    {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+    GenServer.call(pid, :create_ets_table)
+    {:ok, pid}
   end
 
-  def init(balances) do
+  def init(state) do
     Tai.MetaLogger.init_tid()
-    {:ok, balances, {:continue, :init}}
+    {:ok, state}
   end
 
-  def handle_call(:all, _from, state) do
-    {:reply, state, state}
+  def handle_call(:create_ets_table, _from, state) do
+    create_ets_table()
+    {:reply, :ok, state}
+  end
+
+  def handle_call(:clear, _from, state) do
+    :ets.delete(__MODULE__)
+    create_ets_table()
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:upsert, exchange_id, account_id, asset, balance}, _from, state) do
+    upsert_ets_table(exchange_id, account_id, asset, balance)
+
+    {
+      :reply,
+      :ok,
+      state,
+      {:continue, {:upsert, exchange_id, account_id, asset, balance}}
+    }
   end
 
   def handle_call(
-        {:lock_range, %Tai.Exchanges.AssetBalanceRange{} = balance_range},
+        {:lock_range, exchange_id, account_id,
+         %Tai.Exchanges.AssetBalanceRange{} = balance_range},
         _from,
         state
       ) do
-    with %Tai.Exchanges.AssetBalance{} = balance <- Map.get(state, balance_range.asset),
+    with {:ok, {{_, _, _}, %Tai.Exchanges.AssetBalance{} = balance}} <-
+           find_by(exchange_id: exchange_id, account_id: account_id, asset: balance_range.asset),
          :ok <- Tai.Exchanges.AssetBalanceRange.validate(balance_range) do
       lock_result =
         cond do
@@ -61,7 +74,7 @@ defmodule Tai.Exchanges.AssetBalances do
           |> Map.put(:free, new_free)
           |> Map.put(:locked, new_locked)
 
-        new_state = Map.put(state, balance_range.asset, new_balance)
+        upsert_ets_table(exchange_id, account_id, balance_range.asset, new_balance)
 
         continue = {
           :lock_range_ok,
@@ -71,92 +84,91 @@ defmodule Tai.Exchanges.AssetBalances do
           balance_range.max
         }
 
-        {:reply, {:ok, lock_result}, new_state, {:continue, continue}}
+        {:reply, {:ok, lock_result}, state, {:continue, continue}}
       end
     else
       {:error, _} = error ->
         {:reply, error, state}
-
-      nil ->
-        {:reply, {:error, :not_found}, state}
     end
   end
 
   def handle_call(
-        {:unlock, %Tai.Exchanges.AssetBalanceChangeRequest{asset: asset, amount: amount}},
+        {:unlock, exchange_id, account_id,
+         %Tai.Exchanges.AssetBalanceChangeRequest{asset: asset, amount: amount}},
         _from,
         state
       ) do
-    if detail = Map.get(state, asset) do
-      new_free = Decimal.add(detail.free, amount)
-      new_locked = Decimal.sub(detail.locked, amount)
+    with {:ok, {{_, _, _}, %Tai.Exchanges.AssetBalance{} = balance}} <-
+           find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
+      new_free = Decimal.add(balance.free, amount)
+      new_locked = Decimal.sub(balance.locked, amount)
 
-      new_detail =
-        detail
+      new_balance =
+        balance
         |> Map.put(:free, new_free)
         |> Map.put(:locked, new_locked)
 
       if Decimal.cmp(new_locked, Decimal.new(0)) == :lt do
-        continue = {:unlock_insufficient_balance, asset, detail.locked, amount}
+        continue = {:unlock_insufficient_balance, asset, balance.locked, amount}
         {:reply, {:error, :insufficient_balance}, state, {:continue, continue}}
       else
-        new_state = Map.put(state, asset, new_detail)
+        upsert_ets_table(exchange_id, account_id, asset, new_balance)
         continue = {:unlock_ok, asset, amount}
-        {:reply, :ok, new_state, {:continue, continue}}
+        {:reply, :ok, state, {:continue, continue}}
       end
     else
-      {:reply, {:error, :not_found}, state}
+      {:error, _} = error ->
+        {:reply, error, state}
     end
   end
 
-  def handle_call({:add, asset, val}, _from, state) do
+  def handle_call({:add, exchange_id, account_id, asset, val}, _from, state) do
     if Decimal.cmp(val, Decimal.new(0)) == :gt do
-      case Map.fetch(state, asset) do
-        {:ok, balance} ->
+      case find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
+        {:ok, {_key, balance}} ->
           new_free = Decimal.add(balance.free, val)
           new_balance = Map.put(balance, :free, new_free)
-          new_state = Map.put(state, asset, new_balance)
+          upsert_ets_table(exchange_id, account_id, asset, new_balance)
           continue = {:add, asset, val, new_balance}
 
-          {:reply, {:ok, new_balance}, new_state, {:continue, continue}}
+          {:reply, {:ok, new_balance}, state, {:continue, continue}}
 
-        :error ->
-          {:reply, {:error, :not_found}, state}
+        {:error, _} = error ->
+          {:reply, error, state}
       end
     else
       {:reply, {:error, :value_must_be_positive}, state}
     end
   end
 
-  def handle_call({:sub, asset, val}, _from, state) do
+  def handle_call({:sub, exchange_id, account_id, asset, val}, _from, state) do
     if Decimal.cmp(val, Decimal.new(0)) == :gt do
-      case Map.fetch(state, asset) do
-        {:ok, balance} ->
+      case find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
+        {:ok, {_key, balance}} ->
           new_free = Decimal.sub(balance.free, val)
 
           if Decimal.cmp(new_free, Decimal.new(0)) == :lt do
             {:reply, {:error, :result_less_then_zero}, state}
           else
             new_balance = Map.put(balance, :free, new_free)
-            new_state = Map.put(state, asset, new_balance)
+            upsert_ets_table(exchange_id, account_id, asset, new_balance)
             continue = {:sub, asset, val, new_balance}
 
-            {:reply, {:ok, new_balance}, new_state, {:continue, continue}}
+            {:reply, {:ok, new_balance}, state, {:continue, continue}}
           end
 
-        :error ->
-          {:reply, {:error, :not_found}, state}
+        {:error, _} = error ->
+          {:reply, error, state}
       end
     else
       {:reply, {:error, :value_must_be_positive}, state}
     end
   end
 
-  def handle_continue(:init, state) do
-    state
-    |> Enum.each(fn {asset, balance} ->
-      Logger.info("[init,#{asset},#{balance.free},#{balance.locked}]")
-    end)
+  def handle_continue({:upsert, exchange_id, account_id, asset, balance}, state) do
+    Logger.info(
+      "[upsert,#{exchange_id},#{account_id},#{asset},#{balance.free},#{balance.locked}]"
+    )
 
     {:noreply, state}
   end
@@ -191,11 +203,31 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
-  @spec all(exchange_id :: atom, account_id :: atom) :: map
-  def all(exchange_id, account_id) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call(:all)
+  @spec clear :: :ok
+  def clear() do
+    GenServer.call(__MODULE__, :clear)
+  end
+
+  @spec upsert(exchange_id :: atom, account_id :: atom, asset :: atom, balance :: asset_balance) ::
+          :ok
+  def upsert(exchange_id, account_id, asset, balance) do
+    GenServer.call(__MODULE__, {:upsert, exchange_id, account_id, asset, balance})
+  end
+
+  @spec all :: map
+  def all do
+    __MODULE__
+    |> :ets.select([{{:_, :_}, [], [:"$_"]}])
+    |> Enum.reduce(
+      %{},
+      fn {key, balance}, acc -> Map.put(acc, key, balance) end
+    )
+  end
+
+  @spec count :: number
+  def count do
+    all()
+    |> Enum.count()
   end
 
   @spec lock_range(atom, atom, balance_range) ::
@@ -203,57 +235,83 @@ defmodule Tai.Exchanges.AssetBalances do
           | {:error, :not_found | :insufficient_balance | :min_greater_than_max,
              :min_less_than_zero}
   def lock_range(exchange_id, account_id, range) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call({:lock_range, range})
+    __MODULE__
+    |> GenServer.call({:lock_range, exchange_id, account_id, range})
   end
 
-  @spec unlock(atom, atom, balance_change_request) ::
-          :ok | {:error, :not_found | :insufficient_balance}
+  def where(filters) do
+    all()
+    |> Enum.reduce(
+      %{},
+      fn {{exchange_id, account_id, asset} = key, balance}, acc ->
+        matched_all_filters =
+          filters
+          |> Keyword.keys()
+          |> Enum.all?(fn filter ->
+            case filter do
+              :exchange_id ->
+                exchange_id == Keyword.get(filters, filter)
+
+              :account_id ->
+                account_id == Keyword.get(filters, filter)
+
+              :asset ->
+                asset == Keyword.get(filters, filter)
+
+              _ ->
+                Map.get(balance, filter) == Keyword.get(filters, filter)
+            end
+          end)
+
+        if matched_all_filters do
+          Map.put(acc, key, balance)
+        else
+          acc
+        end
+      end
+    )
+  end
+
+  def find_by(filters) do
+    with matches <- filters |> where(),
+         [found_key | _tail] <- matches |> Map.keys(),
+         balance <- matches |> Map.get(found_key) do
+      {:ok, {found_key, balance}}
+    else
+      [] ->
+        {:error, :not_found}
+    end
+  end
+
   def unlock(exchange_id, account_id, balance_change_request) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call({:unlock, balance_change_request})
+    __MODULE__
+    |> GenServer.call({:unlock, exchange_id, account_id, balance_change_request})
   end
-
-  @spec add(atom, atom, atom, Decimal.t() | number | binary) ::
-          {:ok, balance} | {:error, :not_found | :value_must_be_positive}
-  def add(exchange_id, account_id, asset, val)
 
   def add(exchange_id, account_id, asset, %Decimal{} = val) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call({:add, asset, val})
+    __MODULE__
+    |> GenServer.call({:add, exchange_id, account_id, asset, val})
   end
 
   def add(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
     add(exchange_id, account_id, asset, Decimal.new(val))
   end
 
-  @spec sub(atom, atom, atom, Decimal.t() | number | binary) ::
-          {:ok, balance} | {:error, :not_found | :value_must_be_positive | :result_less_then_zero}
-  def sub(exchange_id, account_id, asset, val)
-
   def sub(exchange_id, account_id, asset, %Decimal{} = val) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call({:sub, asset, val})
+    __MODULE__
+    |> GenServer.call({:sub, exchange_id, account_id, asset, val})
   end
 
   def sub(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
     sub(exchange_id, account_id, asset, Decimal.new(val))
   end
 
-  @doc """
-  Returns an atom which identifies the process for the given account id
+  defp upsert_ets_table(exchange_id, account_id, asset, balance) do
+    record = {{exchange_id, account_id, asset}, balance}
+    :ets.insert(__MODULE__, record)
+  end
 
-  ## Examples
-
-    iex> Tai.Exchanges.AssetBalances.to_name(:my_test_exchange, :my_test_account)
-    :"Elixir.Tai.Exchanges.AssetBalances_my_test_exchange_my_test_account"
-  """
-  @spec to_name(atom, atom) :: atom
-  def to_name(exchange_id, account_id) do
-    :"#{__MODULE__}_#{exchange_id}_#{account_id}"
+  defp create_ets_table do
+    :ets.new(__MODULE__, [:set, :protected, :named_table])
   end
 end

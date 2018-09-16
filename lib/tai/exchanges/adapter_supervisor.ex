@@ -16,11 +16,11 @@ defmodule Tai.Exchanges.AdapterSupervisor do
 
       def init(config) do
         [
-          {hydrate_fees(), [exchange_id: config.id, accounts: config.accounts]},
-          {hydrate_products(), [exchange_id: config.id, whitelist_query: config.products]},
           {Tai.Exchanges.AccountsSupervisor,
            [adapter: account(), exchange_id: config.id, accounts: config.accounts]},
-          {Tai.Exchanges.AssetBalancesSupervisor,
+          {hydrate_products(), [exchange_id: config.id, whitelist_query: config.products]},
+          {hydrate_fees(), [exchange_id: config.id, accounts: config.accounts]},
+          {Tai.Exchanges.HydrateAssetBalances,
            [exchange_id: config.id, accounts: config.accounts]}
         ]
         |> Supervisor.init(strategy: :one_for_one)

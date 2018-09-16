@@ -53,11 +53,7 @@ defmodule Tai.TestSupport.Mock do
           locked :: number | Decimal.t() | String.t()
         ) :: map
   def mock_asset_balance(exchange_id, account_id, asset, free, locked) do
-    exchange_id
-    |> Tai.Exchanges.AssetBalances.to_name(account_id)
-    |> :sys.replace_state(fn balances ->
-      balance = Tai.Exchanges.AssetBalance.new(free, locked)
-      Map.put(balances, asset, balance)
-    end)
+    balance = Tai.Exchanges.AssetBalance.new(free, locked)
+    Tai.Exchanges.AssetBalances.upsert(exchange_id, account_id, asset, balance)
   end
 end

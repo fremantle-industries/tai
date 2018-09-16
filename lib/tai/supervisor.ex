@@ -15,6 +15,7 @@ defmodule Tai.Supervisor do
       {Tai.Settings, Tai.Config.all()},
       Tai.Exchanges.Products,
       Tai.Exchanges.Fees,
+      Tai.Exchanges.AssetBalances,
       Tai.Trading.OrderStore,
       Tai.Advisors.Supervisor,
       Tai.Exchanges.AdaptersSupervisor,

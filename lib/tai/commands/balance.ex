@@ -7,48 +7,20 @@ defmodule Tai.Commands.Balance do
 
   @spec balance :: no_return
   def balance do
-    Tai.Exchanges.Config.all()
-    |> group_by_exchange_accounts
-    |> fetch_balances
-    |> format_rows
-    |> exclude_empty_balances
-    |> render!
+    fetch_balances()
+    |> format_rows()
+    |> exclude_empty_balances()
+    |> render!()
   end
 
-  defp group_by_exchange_accounts(configs) do
-    configs
+  defp fetch_balances do
+    Tai.Exchanges.AssetBalances.all()
+    |> Enum.reverse()
     |> Enum.reduce(
       [],
-      fn config, acc ->
-        config.accounts
-        |> Enum.reduce(
-          acc,
-          fn {account_id, _}, acc ->
-            [{config.id, account_id} | acc]
-          end
-        )
-      end
-    )
-    |> Enum.sort(fn {exchange_id_a, _}, {exchange_id_b, _} ->
-      exchange_id_a |> Atom.to_string() >= exchange_id_b |> Atom.to_string()
-    end)
-  end
-
-  defp fetch_balances(exchange_accounts) do
-    exchange_accounts
-    |> Enum.reduce(
-      [],
-      fn {exchange_id, account_id}, acc ->
-        exchange_id
-        |> Tai.Exchanges.AssetBalances.all(account_id)
-        |> Enum.reverse()
-        |> Enum.reduce(
-          acc,
-          fn {symbol, detail}, acc ->
-            total = Tai.Exchanges.AssetBalance.total(detail)
-            [{exchange_id, account_id, symbol, detail.free, detail.locked, total} | acc]
-          end
-        )
+      fn {{exchange_id, account_id, symbol}, balance}, acc ->
+        total = Tai.Exchanges.AssetBalance.total(balance)
+        [{exchange_id, account_id, symbol, balance.free, balance.locked, total} | acc]
       end
     )
   end
