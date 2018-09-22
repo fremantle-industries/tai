@@ -3,6 +3,7 @@ defmodule Tai.Exchanges.Account do
   Uniform interface for private exchange actions
   """
 
+  @type t :: %Tai.Exchanges.Account{exchange_id: atom, account_id: atom}
   @type order :: Tai.Trading.Order.t()
   @type order_response :: Tai.Trading.OrderResponse.t()
   @type credential_error :: Tai.CredentialError.t()
@@ -10,7 +11,7 @@ defmodule Tai.Exchanges.Account do
   @type insufficient_balance_error :: Tai.Trading.InsufficientBalanceError.t()
   @type invalid_order_type_error :: Tai.Trading.OrderResponses.InvalidOrderType.t()
 
-  @callback all_balances(credentials :: map) :: {:ok, balances :: map} | {:error, reason :: term}
+  @callback all_balances(account :: t) :: {:ok, balances :: map} | {:error, reason :: term}
 
   @callback buy_limit(
               symbol :: atom,
@@ -31,6 +32,9 @@ defmodule Tai.Exchanges.Account do
   @callback cancel_order(server_id :: String.t(), credentials :: map) ::
               {:ok, server_id :: String.t()} | {:error, reason :: term}
 
+  @enforce_keys [:exchange_id, :account_id, :credentials]
+  defstruct [:exchange_id, :account_id, :credentials]
+
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
@@ -39,7 +43,14 @@ defmodule Tai.Exchanges.Account do
 
       def start_link(exchange_id: exchange_id, account_id: account_id, credentials: credentials) do
         name = Tai.Exchanges.Account.to_name(exchange_id, account_id)
-        GenServer.start_link(__MODULE__, credentials, name: name)
+
+        account = %Tai.Exchanges.Account{
+          exchange_id: exchange_id,
+          account_id: account_id,
+          credentials: credentials
+        }
+
+        GenServer.start_link(__MODULE__, account, name: name)
       end
 
       def init(state) do
@@ -52,12 +63,12 @@ defmodule Tai.Exchanges.Account do
       end
 
       def handle_call({:buy_limit, symbol, price, size, time_in_force}, _from, state) do
-        response = buy_limit(symbol, price, size, time_in_force, state)
+        response = buy_limit(symbol, price, size, time_in_force, state.credentials)
         {:reply, response, state}
       end
 
       def handle_call({:sell_limit, symbol, price, size, time_in_force}, _from, state) do
-        response = sell_limit(symbol, price, size, time_in_force, state)
+        response = sell_limit(symbol, price, size, time_in_force, state.credentials)
         {:reply, response, state}
       end
 

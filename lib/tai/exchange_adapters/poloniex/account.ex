@@ -4,15 +4,15 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account do
   """
   use Tai.Exchanges.Account
 
-  def all_balances(_credentials) do
-    Tai.ExchangeAdapters.Poloniex.Account.AllBalances.fetch()
+  def all_balances(account) do
+    Tai.ExchangeAdapters.Poloniex.Account.AllBalances.fetch(account)
   end
 
-  def buy_limit(symbol, price, size, time_in_force, _credentials) do
+  def buy_limit(symbol, price, size, time_in_force, _account) do
     Tai.ExchangeAdapters.Poloniex.Account.Orders.buy_limit(symbol, price, size, time_in_force)
   end
 
-  def sell_limit(symbol, price, size, time_in_force, _credentials) do
+  def sell_limit(symbol, price, size, time_in_force, _account) do
     Tai.ExchangeAdapters.Poloniex.Account.Orders.sell_limit(symbol, price, size, time_in_force)
   end
 

@@ -3,27 +3,28 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.AllBalances do
   Fetch and normalize all balances on the Poloniex account
   """
 
-  alias Tai.{CredentialError, TimeoutError}
-
-  def fetch do
+  def fetch(account) do
     ExPoloniex.Trading.return_complete_balances()
-    |> normalize_accounts
+    |> normalize_accounts(account)
   end
 
-  defp normalize_accounts({:ok, raw_accounts}) do
+  defp normalize_accounts({:ok, raw_accounts}, account) do
     accounts =
       raw_accounts
-      |> Enum.reduce(%{}, &normalize_account/2)
+      |> Enum.reduce(
+        %{},
+        &normalize_account(&1, &2, account)
+      )
 
     {:ok, accounts}
   end
 
-  defp normalize_accounts({:error, %ExPoloniex.AuthenticationError{} = reason}) do
-    {:error, %CredentialError{reason: reason}}
+  defp normalize_accounts({:error, %ExPoloniex.AuthenticationError{} = reason}, _) do
+    {:error, %Tai.CredentialError{reason: reason}}
   end
 
-  defp normalize_accounts({:error, %HTTPoison.Error{reason: "timeout"}}) do
-    {:error, %TimeoutError{reason: "network request timed out"}}
+  defp normalize_accounts({:error, %HTTPoison.Error{reason: "timeout"}}, _) do
+    {:error, %Tai.TimeoutError{reason: "network request timed out"}}
   end
 
   defp normalize_account(
@@ -31,11 +32,23 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.AllBalances do
            raw_currency,
            %{"available" => raw_available, "onOrders" => raw_on_orders}
          },
-         acc
+         acc,
+         account
        ) do
-    with symbol <- raw_currency |> String.downcase() |> String.to_atom(),
-         detail <- Tai.Exchanges.AssetBalance.new(raw_available, raw_on_orders) do
-      Map.put(acc, symbol, detail)
-    end
+    asset =
+      raw_currency
+      |> String.downcase()
+      |> String.to_atom()
+
+    balance =
+      Tai.Exchanges.AssetBalance.new(
+        account.exchange_id,
+        account.account_id,
+        asset,
+        raw_available,
+        raw_on_orders
+      )
+
+    Map.put(acc, asset, balance)
   end
 end

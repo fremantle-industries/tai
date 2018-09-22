@@ -28,14 +28,14 @@ defmodule Tai.Exchanges.AssetBalances do
     {:reply, :ok, state}
   end
 
-  def handle_call({:upsert, exchange_id, account_id, asset, balance}, _from, state) do
-    upsert_ets_table(exchange_id, account_id, asset, balance)
+  def handle_call({:upsert, balance}, _from, state) do
+    upsert_ets_table(balance)
 
     {
       :reply,
       :ok,
       state,
-      {:continue, {:upsert, exchange_id, account_id, asset, balance}}
+      {:continue, {:upsert, balance}}
     }
   end
 
@@ -69,12 +69,10 @@ defmodule Tai.Exchanges.AssetBalances do
         new_free = Decimal.sub(balance.free, lock_result)
         new_locked = Decimal.add(balance.locked, lock_result)
 
-        new_balance =
-          balance
-          |> Map.put(:free, new_free)
-          |> Map.put(:locked, new_locked)
-
-        upsert_ets_table(exchange_id, account_id, balance_range.asset, new_balance)
+        balance
+        |> Map.put(:free, new_free)
+        |> Map.put(:locked, new_locked)
+        |> upsert_ets_table()
 
         continue = {
           :lock_range_ok,
@@ -112,7 +110,7 @@ defmodule Tai.Exchanges.AssetBalances do
         continue = {:unlock_insufficient_balance, asset, balance.locked, amount}
         {:reply, {:error, :insufficient_balance}, state, {:continue, continue}}
       else
-        upsert_ets_table(exchange_id, account_id, asset, new_balance)
+        upsert_ets_table(new_balance)
         continue = {:unlock_ok, asset, amount}
         {:reply, :ok, state, {:continue, continue}}
       end
@@ -128,7 +126,7 @@ defmodule Tai.Exchanges.AssetBalances do
         {:ok, {_key, balance}} ->
           new_free = Decimal.add(balance.free, val)
           new_balance = Map.put(balance, :free, new_free)
-          upsert_ets_table(exchange_id, account_id, asset, new_balance)
+          upsert_ets_table(new_balance)
           continue = {:add, asset, val, new_balance}
 
           {:reply, {:ok, new_balance}, state, {:continue, continue}}
@@ -151,7 +149,7 @@ defmodule Tai.Exchanges.AssetBalances do
             {:reply, {:error, :result_less_then_zero}, state}
           else
             new_balance = Map.put(balance, :free, new_free)
-            upsert_ets_table(exchange_id, account_id, asset, new_balance)
+            upsert_ets_table(new_balance)
             continue = {:sub, asset, val, new_balance}
 
             {:reply, {:ok, new_balance}, state, {:continue, continue}}
@@ -165,9 +163,11 @@ defmodule Tai.Exchanges.AssetBalances do
     end
   end
 
-  def handle_continue({:upsert, exchange_id, account_id, asset, balance}, state) do
+  def handle_continue({:upsert, balance}, state) do
     Logger.info(
-      "[upsert,#{exchange_id},#{account_id},#{asset},#{balance.free},#{balance.locked}]"
+      "[upsert,#{balance.exchange_id},#{balance.account_id},#{balance.asset},#{balance.free},#{
+        balance.locked
+      }]"
     )
 
     {:noreply, state}
@@ -208,10 +208,9 @@ defmodule Tai.Exchanges.AssetBalances do
     GenServer.call(__MODULE__, :clear)
   end
 
-  @spec upsert(exchange_id :: atom, account_id :: atom, asset :: atom, balance :: asset_balance) ::
-          :ok
-  def upsert(exchange_id, account_id, asset, balance) do
-    GenServer.call(__MODULE__, {:upsert, exchange_id, account_id, asset, balance})
+  @spec upsert(balance :: asset_balance) :: :ok
+  def upsert(balance) do
+    GenServer.call(__MODULE__, {:upsert, balance})
   end
 
   @spec all :: map
@@ -306,8 +305,8 @@ defmodule Tai.Exchanges.AssetBalances do
     sub(exchange_id, account_id, asset, Decimal.new(val))
   end
 
-  defp upsert_ets_table(exchange_id, account_id, asset, balance) do
-    record = {{exchange_id, account_id, asset}, balance}
+  defp upsert_ets_table(balance) do
+    record = {{balance.exchange_id, balance.account_id, balance.asset}, balance}
     :ets.insert(__MODULE__, record)
   end
 

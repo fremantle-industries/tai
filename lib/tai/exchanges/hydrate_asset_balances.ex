@@ -20,8 +20,8 @@ defmodule Tai.Exchanges.HydrateAssetBalances do
     |> Enum.map(fn {account_id, _} ->
       with {:ok, balances} <- Tai.Exchanges.Account.all_balances(exchange_id, account_id) do
         balances
-        |> Enum.map(fn {asset, balance} ->
-          Tai.Exchanges.AssetBalances.upsert(exchange_id, account_id, asset, balance)
+        |> Enum.map(fn {_, balance} ->
+          Tai.Exchanges.AssetBalances.upsert(balance)
         end)
       end
     end)

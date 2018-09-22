@@ -1,12 +1,39 @@
 defmodule Tai.Exchanges.AssetBalance do
-  @type t :: %Tai.Exchanges.AssetBalance{free: Decimal.t(), locked: Decimal.t()}
+  @type t :: %Tai.Exchanges.AssetBalance{
+          exchange_id: atom,
+          account_id: atom,
+          asset: atom,
+          free: Decimal.t(),
+          locked: Decimal.t()
+        }
 
-  @enforce_keys [:free, :locked]
-  defstruct [:free, :locked]
+  @enforce_keys [
+    :exchange_id,
+    :account_id,
+    :asset,
+    :free,
+    :locked
+  ]
+  defstruct [
+    :exchange_id,
+    :account_id,
+    :asset,
+    :free,
+    :locked
+  ]
 
-  @spec new(number, number) :: t
-  def new(free, locked) do
+  @spec new(
+          exchange_id :: atom,
+          account_id :: atom,
+          asset :: atom,
+          free :: number | String.t(),
+          locked :: number | String.t()
+        ) :: t
+  def new(exchange_id, account_id, asset, free, locked) do
     %Tai.Exchanges.AssetBalance{
+      exchange_id: exchange_id,
+      account_id: account_id,
+      asset: asset,
       free: Decimal.new(free),
       locked: Decimal.new(locked)
     }

@@ -1,7 +1,7 @@
 defmodule Tai.ExchangeAdapters.Gdax.Account.OrderStatus do
-  def fetch(order_id, credentials) do
+  def fetch(order_id, %Tai.Exchanges.Account{} = account) do
     order_id
-    |> ExGdax.get_order(credentials)
+    |> ExGdax.get_order(account.credentials)
     |> handle_order_status
   end
 

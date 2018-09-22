@@ -3,31 +3,48 @@ defmodule Tai.ExchangeAdapters.Binance.Account.AllBalances do
   Fetch and normalize all balances on the Binance account
   """
 
-  def fetch do
+  def fetch(%Tai.Exchanges.Account{} = account) do
     Binance.get_account()
-    |> normalize_assets
+    |> normalize_assets(account)
   end
 
-  defp normalize_assets({:ok, %Binance.Account{balances: raw_balances}}) do
+  defp normalize_assets({:ok, %Binance.Account{balances: raw_balances}}, account) do
     balances =
       raw_balances
-      |> Enum.reduce(%{}, &normalize_asset/2)
+      |> Enum.reduce(
+        %{},
+        &normalize_asset(&1, &2, account)
+      )
 
     {:ok, balances}
   end
 
-  defp normalize_assets({:error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}}) do
+  defp normalize_assets(
+         {:error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}},
+         _
+       ) do
     {:error, %Tai.CredentialError{reason: reason}}
   end
 
-  defp normalize_assets({:error, {:http_error, %HTTPoison.Error{reason: "timeout"}}}) do
+  defp normalize_assets({:error, {:http_error, %HTTPoison.Error{reason: "timeout"}}}, _) do
     {:error, %Tai.TimeoutError{reason: "network request timed out"}}
   end
 
-  defp normalize_asset(%{"asset" => raw_asset, "free" => free, "locked" => locked}, acc) do
-    with asset <- raw_asset |> String.downcase() |> String.to_atom(),
-         detail <- Tai.Exchanges.AssetBalance.new(free, locked) do
-      Map.put(acc, asset, detail)
-    end
+  defp normalize_asset(%{"asset" => raw_asset, "free" => free, "locked" => locked}, acc, account) do
+    asset =
+      raw_asset
+      |> String.downcase()
+      |> String.to_atom()
+
+    balance =
+      Tai.Exchanges.AssetBalance.new(
+        account.exchange_id,
+        account.account_id,
+        asset,
+        free,
+        locked
+      )
+
+    Map.put(acc, asset, balance)
   end
 end
