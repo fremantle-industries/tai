@@ -8,17 +8,26 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
     end)
+
+    start_supervised!(Tai.TestSupport.Mocks.Server)
+    :ok
   end
 
   describe "unfilled" do
     test "expires buy orders" do
       log_msg =
         capture_log(fn ->
+          Tai.TestSupport.Mocks.Orders.FillOrKill.expired(
+            symbol: :btc_usd,
+            price: Decimal.new(100.1),
+            original_size: Decimal.new(0.1)
+          )
+
           order =
             Tai.Trading.OrderPipeline.buy_limit(
               :test_exchange_a,
               :main,
-              :btc_usd_expired,
+              :btc_usd,
               100.1,
               0.1,
               :fok,
@@ -38,17 +47,23 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
         end)
 
       assert log_msg =~
-               ~r/\[order:.{36,36},expired,test_exchange_a,main,btc_usd_expired,buy,limit,fok,100.1,0.1,\]/
+               ~r/\[order:.{36,36},expired,test_exchange_a,main,btc_usd,buy,limit,fok,100.1,0.1,\]/
     end
 
     test "expires sell orders" do
       log_msg =
         capture_log(fn ->
+          Tai.TestSupport.Mocks.Orders.FillOrKill.expired(
+            symbol: :btc_usd,
+            price: Decimal.new(10_000.1),
+            original_size: Decimal.new(0.1)
+          )
+
           order =
             Tai.Trading.OrderPipeline.sell_limit(
               :test_exchange_a,
               :main,
-              :btc_usd_expired,
+              :btc_usd,
               10_000.1,
               0.1,
               :fok,
@@ -68,7 +83,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
         end)
 
       assert log_msg =~
-               ~r/\[order:.{36,36},expired,test_exchange_a,main,btc_usd_expired,sell,limit,fok,10000.1,0.1,\]/
+               ~r/\[order:.{36,36},expired,test_exchange_a,main,btc_usd,sell,limit,fok,10000.1,0.1,\]/
     end
   end
 
@@ -76,11 +91,17 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     test "updates the filled quantity of buy orders" do
       log_msg =
         capture_log(fn ->
+          Tai.TestSupport.Mocks.Orders.FillOrKill.filled(
+            symbol: :btc_usd,
+            price: Decimal.new(100.1),
+            original_size: Decimal.new(0.1)
+          )
+
           order =
             Tai.Trading.OrderPipeline.buy_limit(
               :test_exchange_a,
               :main,
-              :btc_usd_success,
+              :btc_usd,
               100.1,
               0.1,
               :fok,
@@ -100,17 +121,23 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
         end)
 
       assert log_msg =~
-               ~r/\[order:.{36,36},filled,test_exchange_a,main,btc_usd_success,buy,limit,fok,100.1,0.1,\]/
+               ~r/\[order:.{36,36},filled,test_exchange_a,main,btc_usd,buy,limit,fok,100.1,0.1,\]/
     end
 
     test "updates the filled quantity of sell orders" do
       log_msg =
         capture_log(fn ->
+          Tai.TestSupport.Mocks.Orders.FillOrKill.filled(
+            symbol: :btc_usd,
+            price: Decimal.new(10_000.1),
+            original_size: Decimal.new(0.1)
+          )
+
           order =
             Tai.Trading.OrderPipeline.sell_limit(
               :test_exchange_a,
               :main,
-              :btc_usd_success,
+              :btc_usd,
               10_000.1,
               0.1,
               :fok,
@@ -130,7 +157,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
         end)
 
       assert log_msg =~
-               ~r/\[order:.{36,36},filled,test_exchange_a,main,btc_usd_success,sell,limit,fok,10000.1,0.1,\]/
+               ~r/\[order:.{36,36},filled,test_exchange_a,main,btc_usd,sell,limit,fok,10000.1,0.1,\]/
     end
   end
 end

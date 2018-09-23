@@ -36,11 +36,11 @@ config :tai, send_orders: true
 config :tai,
   exchanges: %{
     test_exchange_a: [
-      supervisor: Tai.ExchangeAdapters.Test.Supervisor,
+      supervisor: Tai.ExchangeAdapters.Mock.Supervisor,
       accounts: %{main: %{}}
     ],
     test_exchange_b: [
-      supervisor: Tai.ExchangeAdapters.Test.Supervisor,
+      supervisor: Tai.ExchangeAdapters.Mock.Supervisor,
       accounts: %{main: %{}}
     ]
   }
@@ -48,11 +48,11 @@ config :tai,
 config :tai,
   order_book_feeds: %{
     test_feed_a: [
-      adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
+      adapter: Tai.ExchangeAdapters.Mock.OrderBookFeed,
       order_books: [:btc_usd, :ltc_usd]
     ],
     test_feed_b: [
-      adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
+      adapter: Tai.ExchangeAdapters.Mock.OrderBookFeed,
       order_books: [:eth_usd, :ltc_usd]
     ]
   }

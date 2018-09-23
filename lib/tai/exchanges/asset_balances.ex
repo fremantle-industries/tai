@@ -191,7 +191,7 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
-  @spec all(atom, atom) :: map
+  @spec all(exchange_id :: atom, account_id :: atom) :: map
   def all(exchange_id, account_id) do
     exchange_id
     |> to_name(account_id)

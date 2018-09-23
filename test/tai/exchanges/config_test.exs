@@ -5,7 +5,7 @@ defmodule Tai.Exchanges.ConfigTest do
   describe "#all" do
     test "products can be provided" do
       exchanges = %{
-        a: [supervisor: Tai.ExchangeAdapters.Test.Supervisor, products: "btc_usdt"]
+        a: [supervisor: Tai.ExchangeAdapters.Mock.Supervisor, products: "btc_usdt"]
       }
 
       assert [%Tai.Exchanges.Config{} = config] = Tai.Exchanges.Config.all(exchanges)
@@ -13,7 +13,7 @@ defmodule Tai.Exchanges.ConfigTest do
     end
 
     test "products returns '*' when not provided" do
-      exchanges = %{a: [supervisor: Tai.ExchangeAdapters.Test.Supervisor]}
+      exchanges = %{a: [supervisor: Tai.ExchangeAdapters.Mock.Supervisor]}
 
       assert [%Tai.Exchanges.Config{} = config] = Tai.Exchanges.Config.all(exchanges)
       assert config.products == "*"
@@ -22,7 +22,7 @@ defmodule Tai.Exchanges.ConfigTest do
 
   test "accounts can be provided" do
     exchanges = %{
-      a: [supervisor: Tai.ExchangeAdapters.Test.Supervisor, accounts: %{test: %{}}]
+      a: [supervisor: Tai.ExchangeAdapters.Mock.Supervisor, accounts: %{test: %{}}]
     }
 
     assert [%Tai.Exchanges.Config{} = config] = Tai.Exchanges.Config.all(exchanges)
@@ -30,7 +30,7 @@ defmodule Tai.Exchanges.ConfigTest do
   end
 
   test "accounts returns an empty map when not provided" do
-    exchanges = %{a: [supervisor: Tai.ExchangeAdapters.Test.Supervisor]}
+    exchanges = %{a: [supervisor: Tai.ExchangeAdapters.Mock.Supervisor]}
 
     assert [%Tai.Exchanges.Config{} = config] = Tai.Exchanges.Config.all(exchanges)
     assert config.accounts == %{}

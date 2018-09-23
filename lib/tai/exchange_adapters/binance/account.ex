@@ -16,4 +16,8 @@ defmodule Tai.ExchangeAdapters.Binance.Account do
   def sell_limit(symbol, price, size, time_in_force, _credentials) do
     Tai.ExchangeAdapters.Binance.Account.Orders.sell_limit(symbol, price, size, time_in_force)
   end
+
+  def cancel_order(_server_id, _credentials) do
+    {:error, :not_implemented}
+  end
 end

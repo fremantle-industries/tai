@@ -12,12 +12,13 @@ defmodule Tai.Commands.HelperTest do
   alias Tai.Trading.{OrderSubmission, TimeInForce}
 
   setup do
-    test_feed_a_btc_usd = [feed_id: :test_feed_a, symbol: :btc_usd] |> OrderBook.to_name()
-    stop_supervised(test_feed_a_btc_usd)
-
     on_exit(fn ->
       restart_application()
     end)
+
+    test_feed_a_btc_usd = [feed_id: :test_feed_a, symbol: :btc_usd] |> OrderBook.to_name()
+    stop_supervised(test_feed_a_btc_usd)
+    start_supervised!(Tai.TestSupport.Mocks.Server)
 
     {:ok, %{test_feed_a_btc_usd: test_feed_a_btc_usd}}
   end
@@ -31,8 +32,6 @@ defmodule Tai.Commands.HelperTest do
            * orders
            * buy_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)
            * sell_limit exchange_id(:gdax), account_id(:main), symbol(:btc_usd), price(101.12), size(1.2)
-           * order_status exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
-           * cancel_order exchange_id(:gdax), account_id(:main), order_id("f1bb2fa3-6218-45be-8691-21b98157f25a")
            * settings
            * enable_send_orders
            * disable_send_orders\n
@@ -110,6 +109,30 @@ defmodule Tai.Commands.HelperTest do
   end
 
   test "balance shows the symbols on each exchange with a non-zero balance" do
+    mock_asset_balance(:test_exchange_a, :main, :btc, 0.1, 1.81227740)
+
+    mock_asset_balance(
+      :test_exchange_a,
+      :main,
+      :eth,
+      "0.000000000000000000",
+      "0.000000000000200000"
+    )
+
+    mock_asset_balance(:test_exchange_a, :main, :ltc, "0.00000000", "0.03000000")
+
+    mock_asset_balance(:test_exchange_b, :main, :btc, 0.1, 1.81227740)
+
+    mock_asset_balance(
+      :test_exchange_b,
+      :main,
+      :eth,
+      "0.000000000000000000",
+      "0.000000000000200000"
+    )
+
+    mock_asset_balance(:test_exchange_b, :main, :ltc, "0.00000000", "0.03000000")
+
     assert capture_io(fn -> Helper.balance() end) == """
            +-----------------+---------+--------+----------------------+----------------------+----------------------+
            |        Exchange | Account | Symbol |                 Free |               Locked |              Balance |
@@ -222,30 +245,6 @@ defmodule Tai.Commands.HelperTest do
                Tai.Trading.TimeInForce.fill_or_kill()
              )
            end) =~ "order enqueued. client_id:"
-  end
-
-  test "order_status displays the order info" do
-    assert capture_io(fn ->
-             Helper.order_status(:test_exchange_a, :main, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
-           end) == "status: open\n"
-  end
-
-  test "order_status displays error messages" do
-    assert capture_io(fn ->
-             Helper.order_status(:test_exchange_a, :main, "invalid-order-id")
-           end) == "error: Invalid order id\n"
-  end
-
-  test "cancel_order cancels a previous order" do
-    assert capture_io(fn ->
-             Helper.cancel_order(:test_exchange_a, :main, "f9df7435-34d5-4861-8ddc-80f0fd2c83d7")
-           end) == "cancel order success\n"
-  end
-
-  test "cancel_order displays error messages" do
-    assert capture_io(fn ->
-             Helper.cancel_order(:test_exchange_a, :main, "invalid-order-id")
-           end) == "error: Invalid order id\n"
   end
 
   test "settings displays the current values" do

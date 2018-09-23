@@ -52,7 +52,10 @@ defmodule Tai.Exchanges.Products do
     end
   end
 
-  @spec where([]) :: []
+  @doc """
+  Return a list of products that match the filters
+  """
+  @spec where(filters :: [...]) :: [product]
   def where(filters) do
     all()
     |> Enum.filter(fn product ->

@@ -123,14 +123,14 @@ defmodule Tai.Trading.OrderStoreTest do
   end
 
   describe "#find" do
-    test "returns the order by client_id" do
+    test "returns an ok tuple with the order " do
       [order] = add_order()
 
-      assert Tai.Trading.OrderStore.find(order.client_id) == order
+      assert {:ok, ^order} = Tai.Trading.OrderStore.find(order.client_id)
     end
 
-    test "returns nil when the client_id doesn't exist" do
-      assert Tai.Trading.OrderStore.find("client_id_doesnt_exist") == nil
+    test "returns an error tuple when no match was found" do
+      assert Tai.Trading.OrderStore.find("client_id_doesnt_exist") == {:error, :not_found}
     end
   end
 

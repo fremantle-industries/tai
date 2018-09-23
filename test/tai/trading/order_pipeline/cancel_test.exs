@@ -1,5 +1,5 @@
 defmodule Tai.Trading.OrderPipeline.CancelTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
 
   import ExUnit.CaptureLog
   import Tai.TestSupport.Helpers
@@ -8,14 +8,25 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
     end)
+
+    start_supervised!(Tai.TestSupport.Mocks.Server)
+
+    :ok
   end
 
   test "updates the status to canceling and sends the request to the exchange in the background" do
+    Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
+      server_id: "UNFILLED_ORDER_SERVER_ID",
+      symbol: :btc_usd,
+      price: Decimal.new(100.1),
+      original_size: Decimal.new(0.1)
+    )
+
     order =
       Tai.Trading.OrderPipeline.buy_limit(
         :test_exchange_a,
         :main,
-        :btc_usd_pending,
+        :btc_usd,
         100.1,
         0.1,
         :gtc,
@@ -30,6 +41,10 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
 
     log_msg =
       capture_log(fn ->
+        Tai.TestSupport.Mocks.Orders.GoodTillCancel.canceled(
+          server_id: "UNFILLED_ORDER_SERVER_ID"
+        )
+
         assert {:ok, %Tai.Trading.Order{status: :canceling}} =
                  Tai.Trading.OrderPipeline.cancel(order)
 
@@ -47,10 +62,10 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
       end)
 
     assert log_msg =~
-             ~r/\[order:.{36,36},canceling,test_exchange_a,main,btc_usd_pending,buy,limit,gtc,100.1,0.1,\]/
+             ~r/\[order:.{36,36},canceling,test_exchange_a,main,btc_usd,buy,limit,gtc,100.1,0.1,\]/
 
     assert log_msg =~
-             ~r/\[order:.{36,36},canceled,test_exchange_a,main,btc_usd_pending,buy,limit,gtc,100.1,0.1,\]/
+             ~r/\[order:.{36,36},canceled,test_exchange_a,main,btc_usd,buy,limit,gtc,100.1,0.1,\]/
   end
 
   test "returns an error tuple when the status is not pending" do

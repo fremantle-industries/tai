@@ -17,13 +17,13 @@ defmodule Tai.Exchanges.Config do
     [
       %Tai.Exchanges.Config{
         id: :test_exchange_a,
-        supervisor: Tai.ExchangeAdapters.Test.Supervisor,
+        supervisor: Tai.ExchangeAdapters.Mock.Supervisor,
         products: "*",
         accounts: %{main: %{}}
       },
       %Tai.Exchanges.Config{
         id: :test_exchange_b,
-        supervisor: Tai.ExchangeAdapters.Test.Supervisor,
+        supervisor: Tai.ExchangeAdapters.Mock.Supervisor,
         products: "*",
         accounts: %{main: %{}}
       }
@@ -50,11 +50,11 @@ defmodule Tai.Exchanges.Config do
     iex> Tai.Exchanges.Config.order_book_feeds()
     %{
       test_feed_a: [
-        adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
+        adapter: Tai.ExchangeAdapters.Mock.OrderBookFeed,
         order_books: [:btc_usd, :ltc_usd]
       ],
       test_feed_b: [
-        adapter: Tai.ExchangeAdapters.Test.OrderBookFeed,
+        adapter: Tai.ExchangeAdapters.Mock.OrderBookFeed,
         order_books: [:eth_usd, :ltc_usd]
       ]
     }
@@ -85,8 +85,8 @@ defmodule Tai.Exchanges.Config do
 
     iex> Tai.Exchanges.Config.order_book_feed_adapters()
     %{
-      test_feed_a: Tai.ExchangeAdapters.Test.OrderBookFeed,
-      test_feed_b: Tai.ExchangeAdapters.Test.OrderBookFeed
+      test_feed_a: Tai.ExchangeAdapters.Mock.OrderBookFeed,
+      test_feed_b: Tai.ExchangeAdapters.Mock.OrderBookFeed
     }
   """
   def order_book_feed_adapters do
@@ -102,7 +102,7 @@ defmodule Tai.Exchanges.Config do
   ## Examples
 
     iex> Tai.Exchanges.Config.order_book_feed_adapter(:test_feed_a)
-    Tai.ExchangeAdapters.Test.OrderBookFeed
+    Tai.ExchangeAdapters.Mock.OrderBookFeed
   """
   def order_book_feed_adapter(feed_id) do
     order_book_feed_adapters()

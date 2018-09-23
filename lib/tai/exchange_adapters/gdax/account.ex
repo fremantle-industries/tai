@@ -28,13 +28,12 @@ defmodule Tai.ExchangeAdapters.Gdax.Account do
     )
   end
 
-  def handle_call({:order_status, order_id}, _from, state) do
-    response = Tai.ExchangeAdapters.Gdax.Account.OrderStatus.fetch(order_id, state)
-    {:reply, response, state}
+  def cancel_order(server_id, credentials) do
+    Tai.ExchangeAdapters.Gdax.Account.CancelOrder.execute(server_id, credentials)
   end
 
-  def handle_call({:cancel_order, order_id}, _from, state) do
-    response = Tai.ExchangeAdapters.Gdax.Account.CancelOrder.execute(order_id, state)
+  def handle_call({:order_status, order_id}, _from, state) do
+    response = Tai.ExchangeAdapters.Gdax.Account.OrderStatus.fetch(order_id, state)
     {:reply, response, state}
   end
 end

@@ -44,4 +44,20 @@ defmodule Tai.TestSupport.Mock do
         asks: asks
       })
   end
+
+  @spec mock_asset_balance(
+          exchange_id :: atom,
+          account_id :: atom,
+          asset :: atom,
+          free :: number | Decimal.t() | String.t(),
+          locked :: number | Decimal.t() | String.t()
+        ) :: map
+  def mock_asset_balance(exchange_id, account_id, asset, free, locked) do
+    exchange_id
+    |> Tai.Exchanges.AssetBalances.to_name(account_id)
+    |> :sys.replace_state(fn balances ->
+      balance = Tai.Exchanges.AssetBalance.new(free, locked)
+      Map.put(balances, asset, balance)
+    end)
+  end
 end

@@ -28,6 +28,9 @@ defmodule Tai.Exchanges.Account do
               credentials :: map
             ) :: {:ok, order_response :: order_response} | {:error, reason :: term}
 
+  @callback cancel_order(server_id :: String.t(), credentials :: map) ::
+              {:ok, server_id :: String.t()} | {:error, reason :: term}
+
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
@@ -55,6 +58,11 @@ defmodule Tai.Exchanges.Account do
 
       def handle_call({:sell_limit, symbol, price, size, time_in_force}, _from, state) do
         response = sell_limit(symbol, price, size, time_in_force, state)
+        {:reply, response, state}
+      end
+
+      def handle_call({:cancel_order, server_id}, _from, state) do
+        response = cancel_order(server_id, state)
         {:reply, response, state}
       end
     end

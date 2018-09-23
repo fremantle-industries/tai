@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Test.HydrateProducts do
+defmodule Tai.ExchangeAdapters.Mock.HydrateProducts do
   use GenServer
 
   def start_link([exchange_id: _, whitelist_query: _] = state) do

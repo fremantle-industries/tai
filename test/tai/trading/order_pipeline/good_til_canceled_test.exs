@@ -8,17 +8,27 @@ defmodule Tai.Trading.OrderPipeline.GoodTilCanceledTest do
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
     end)
+
+    start_supervised!(Tai.TestSupport.Mocks.Server)
+    :ok
   end
 
   describe "unfilled" do
     test "updates status to pending for buy orders" do
       log_msg =
         capture_log(fn ->
+          Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
+            server_id: "UNFILLED_ORDER_SERVER_ID",
+            symbol: :btc_usd,
+            price: Decimal.new(100.1),
+            original_size: Decimal.new(0.1)
+          )
+
           order =
             Tai.Trading.OrderPipeline.buy_limit(
               :test_exchange_a,
               :main,
-              :btc_usd_pending,
+              :btc_usd,
               100.1,
               0.1,
               :gtc,
@@ -38,17 +48,24 @@ defmodule Tai.Trading.OrderPipeline.GoodTilCanceledTest do
         end)
 
       assert log_msg =~
-               ~r/\[order:.{36,36},pending,test_exchange_a,main,btc_usd_pending,buy,limit,gtc,100.1,0.1,\]/
+               ~r/\[order:.{36,36},pending,test_exchange_a,main,btc_usd,buy,limit,gtc,100.1,0.1,\]/
     end
 
     test "updates status to pending for sell orders" do
       log_msg =
         capture_log(fn ->
+          Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
+            server_id: "UNFILLED_ORDER_SERVER_ID",
+            symbol: :btc_usd,
+            price: Decimal.new(100_000.1),
+            original_size: Decimal.new(0.01)
+          )
+
           order =
             Tai.Trading.OrderPipeline.sell_limit(
               :test_exchange_a,
               :main,
-              :btc_usd_pending,
+              :btc_usd,
               100_000.1,
               0.01,
               :gtc,
@@ -70,7 +87,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTilCanceledTest do
         end)
 
       assert log_msg =~
-               ~r/\[order:.{36,36},pending,test_exchange_a,main,btc_usd_pending,sell,limit,gtc,100000.1,0.01,\]/
+               ~r/\[order:.{36,36},pending,test_exchange_a,main,btc_usd,sell,limit,gtc,100000.1,0.01,\]/
     end
   end
 end

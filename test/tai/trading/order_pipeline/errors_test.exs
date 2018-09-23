@@ -8,6 +8,9 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
     on_exit(fn ->
       Tai.Trading.OrderStore.clear()
     end)
+
+    start_supervised!(Tai.TestSupport.Mocks.Server)
+    :ok
   end
 
   test "records the error and its reason" do
@@ -17,7 +20,7 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
           Tai.Trading.OrderPipeline.buy_limit(
             :test_exchange_a,
             :main,
-            :btc_usd_unknown_symbol_error,
+            :btc_usd,
             100.1,
             0.1,
             :fok,
@@ -33,10 +36,10 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
         assert previous_order.client_id == order.client_id
         assert previous_order.error_reason == nil
         assert updated_order.client_id == order.client_id
-        assert updated_order.error_reason == :unknown_error
+        assert updated_order.error_reason == :mock_not_found
       end)
 
     assert log_msg =~
-             ~r/\[order:.{36,36},error,test_exchange_a,main,btc_usd_unknown_symbol_error,buy,limit,fok,100.1,0.1,unknown_error\]/
+             ~r/\[order:.{36,36},error,test_exchange_a,main,btc_usd,buy,limit,fok,100.1,0.1,mock_not_found\]/
   end
 end

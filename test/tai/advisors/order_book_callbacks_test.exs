@@ -42,7 +42,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       start_supervised!({Tai.Markets.OrderBook, feed_id: :my_order_book_feed, symbol: :btc_usd})
 
     start_supervised!(
-      {Tai.ExchangeAdapters.Test.Account,
+      {Tai.ExchangeAdapters.Mock.Account,
        [exchange_id: :my_test_exchange, account_id: :my_test_account, credentials: %{}]}
     )
 

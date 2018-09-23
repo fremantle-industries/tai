@@ -15,4 +15,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account do
   def sell_limit(symbol, price, size, time_in_force, _credentials) do
     Tai.ExchangeAdapters.Poloniex.Account.Orders.sell_limit(symbol, price, size, time_in_force)
   end
+
+  def cancel_order(_server_id, _credentials) do
+    {:error, :not_implemented}
+  end
 end

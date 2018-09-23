@@ -1,7 +1,9 @@
 defmodule Tai.Trading.OrderStore do
   @moduledoc """
-  Converts submissions into orders and keeps track of them for updates
+  In memory store for orders with CRUD commands
   """
+
+  @type order :: Tai.Trading.Order.t()
 
   use GenServer
   require Logger
@@ -35,7 +37,15 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:find, client_id}, _from, state) do
-    {:reply, Map.get(state, client_id), state}
+    result =
+      state
+      |> Map.fetch(client_id)
+      |> case do
+        {:ok, order} -> {:ok, order}
+        :error -> {:error, :not_found}
+      end
+
+    {:reply, result, state}
   end
 
   def handle_call({:find_by_and_update, filters, update_attrs}, _from, state) do
@@ -92,8 +102,9 @@ defmodule Tai.Trading.OrderStore do
   end
 
   @doc """
-  Return the order matching the client_id or nil otherwise
+  Find the order matching the client id
   """
+  @spec find(client_id :: String.t()) :: {:ok, order} | {:error, :not_found}
   def find(client_id) do
     GenServer.call(__MODULE__, {:find, client_id})
   end
