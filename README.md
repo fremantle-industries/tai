@@ -100,9 +100,9 @@ for available options.
 
 ## Commands
 
-You can view your [total balance](#balance), inspect the [state of orders](#orders), 
-list the tradeable [products](#products) on an exchange, display 
-[live markets](#markets) or execute manual orders using the following commands.
+You can monitor your [account balances](#balance), list the tradeable 
+[products](#products) and their [fees](#fees), view [live markets](#markets) 
+and inspect the [state of orders](#orders).
 
 #### help
 
@@ -115,8 +115,6 @@ iex(1)> help
 * fees
 * markets
 * orders
-* buy_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
-* sell_limit account_id(:gdax), symbol(:btc_usd), price(101.12), size(1.2)
 * settings
 * enable_send_orders
 * disable_send_orders
