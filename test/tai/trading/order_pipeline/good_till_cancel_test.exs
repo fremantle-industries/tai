@@ -1,4 +1,4 @@
-defmodule Tai.Trading.OrderPipeline.GoodTilCanceledTest do
+defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureLog

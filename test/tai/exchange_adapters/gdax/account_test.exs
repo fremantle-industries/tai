@@ -54,8 +54,8 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   end
 
   describe "#buy_limit" do
-    test "can create a good til canceled duration order" do
-      use_cassette "exchange_adapters/shared/account/gdax/buy_limit_good_til_canceled_success" do
+    test "can create a good till cancel duration order" do
+      use_cassette "exchange_adapters/shared/account/gdax/buy_limit_good_till_cancel_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
                  Tai.Exchanges.Account.buy_limit(
                    :my_gdax_exchange,
@@ -63,12 +63,12 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    :btc_usd,
                    101.1,
                    0.2,
-                   Tai.Trading.TimeInForce.good_til_canceled()
+                   Tai.Trading.TimeInForce.good_till_cancel()
                  )
 
         assert response.id != nil
         assert response.status == Tai.Trading.OrderStatus.pending()
-        assert response.time_in_force == Tai.Trading.TimeInForce.good_til_canceled()
+        assert response.time_in_force == Tai.Trading.TimeInForce.good_till_cancel()
         assert Decimal.cmp(response.original_size, Decimal.new(0.2)) == :eq
         assert Decimal.cmp(response.executed_size, Decimal.new(0)) == :eq
       end
@@ -90,8 +90,8 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   end
 
   describe "#sell_limit" do
-    test "can create a good til canceled duration order" do
-      use_cassette "exchange_adapters/shared/account/gdax/sell_limit_good_til_canceled_success" do
+    test "can create a good till cancel duration order" do
+      use_cassette "exchange_adapters/shared/account/gdax/sell_limit_good_till_cancel_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
                  Tai.Exchanges.Account.sell_limit(
                    :my_gdax_exchange,
@@ -99,12 +99,12 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    :btc_usd,
                    99_999_999.1,
                    0.2,
-                   Tai.Trading.TimeInForce.good_til_canceled()
+                   Tai.Trading.TimeInForce.good_till_cancel()
                  )
 
         assert response.id != nil
         assert response.status == Tai.Trading.OrderStatus.pending()
-        assert response.time_in_force == Tai.Trading.TimeInForce.good_til_canceled()
+        assert response.time_in_force == Tai.Trading.TimeInForce.good_till_cancel()
         assert Decimal.cmp(response.original_size, Decimal.new(0.2)) == :eq
         assert Decimal.cmp(response.executed_size, Decimal.new(0)) == :eq
       end
@@ -119,7 +119,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    :btc_usd,
                    99_999_999.1,
                    0.3,
-                   Tai.Trading.TimeInForce.good_til_canceled()
+                   Tai.Trading.TimeInForce.good_till_cancel()
                  )
       end
     end

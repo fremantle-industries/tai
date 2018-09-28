@@ -3,7 +3,7 @@ defmodule Tai.Trading.TimeInForce do
   Order lifetime policies
   """
 
-  def good_til_canceled, do: :gtc
+  def good_till_cancel, do: :gtc
   def fill_or_kill, do: :fok
   def immediate_or_cancel, do: :ioc
 end
