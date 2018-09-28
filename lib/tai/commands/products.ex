@@ -41,24 +41,32 @@ defmodule Tai.Commands.Products do
 
   defp format_col(val), do: val
 
-  @spec render!(list) :: no_return
-  defp render!(rows) do
-    header = [
-      "Exchange ID",
-      "Symbol",
-      "Exchange Symbol",
-      "Status",
-      "Min Price",
-      "Max Price",
-      "Price Increment",
-      "Min Size",
-      "Max Size",
-      "Size Increment",
-      "Min Notional"
-    ]
+  @header [
+    "Exchange ID",
+    "Symbol",
+    "Exchange Symbol",
+    "Status",
+    "Min Price",
+    "Max Price",
+    "Price Increment",
+    "Min Size",
+    "Max Size",
+    "Size Increment",
+    "Min Notional"
+  ]
+  @spec render!(rows :: []) :: no_return
+  defp render!(rows)
 
+  defp render!([]) do
+    col_count = @header |> Enum.count()
+
+    [List.duplicate("-", col_count)]
+    |> render!
+  end
+
+  defp render!(rows) do
     rows
-    |> Table.new(header)
+    |> Table.new(@header)
     |> Table.put_column_meta(:all, align: :right)
     |> Table.render!()
     |> IO.puts()

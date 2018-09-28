@@ -57,28 +57,6 @@ defmodule Tai.Commands.Markets do
     end)
   end
 
-  @spec render!(list) :: no_return
-  defp render!(rows) do
-    header = [
-      "Feed",
-      "Symbol",
-      "Bid Price",
-      "Ask Price",
-      "Bid Size",
-      "Ask Size",
-      "Bid Processed At",
-      "Bid Server Changed At",
-      "Ask Processed At",
-      "Ask Server Changed At"
-    ]
-
-    rows
-    |> Table.new(header)
-    |> Table.put_column_meta(:all, align: :right)
-    |> Table.render!()
-    |> IO.puts()
-  end
-
   defp format_row(row) when is_list(row), do: row |> Enum.map(&format_col/1)
   defp format_col({nil, _}), do: format_col(nil)
   defp format_col({receiver, message}), do: receiver |> get_in([message]) |> format_col
@@ -86,4 +64,35 @@ defmodule Tai.Commands.Markets do
   defp format_col(%DateTime{} = date), do: Timex.from_now(date)
   defp format_col(nil), do: "~"
   defp format_col(pass_through), do: pass_through
+
+  @header [
+    "Feed",
+    "Symbol",
+    "Bid Price",
+    "Ask Price",
+    "Bid Size",
+    "Ask Size",
+    "Bid Processed At",
+    "Bid Server Changed At",
+    "Ask Processed At",
+    "Ask Server Changed At"
+  ]
+
+  @spec render!(list) :: no_return
+  defp render!(rows)
+
+  defp render!([]) do
+    col_count = @header |> Enum.count()
+
+    [List.duplicate("-", col_count)]
+    |> render!
+  end
+
+  defp render!(rows) do
+    rows
+    |> Table.new(@header)
+    |> Table.put_column_meta(:all, align: :right)
+    |> Table.render!()
+    |> IO.puts()
+  end
 end

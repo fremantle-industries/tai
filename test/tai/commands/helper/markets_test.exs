@@ -9,7 +9,7 @@ defmodule Tai.Commands.Helper.MarketsTest do
     end)
   end
 
-  test("shows all inside quotes and the time they were last processed and changed") do
+  test "shows all inside quotes and the time they were last processed and changed" do
     :ok =
       [feed_id: :test_feed_a, symbol: :btc_usd]
       |> Tai.Markets.OrderBook.to_name()

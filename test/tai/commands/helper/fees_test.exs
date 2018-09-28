@@ -40,4 +40,14 @@ defmodule Tai.Commands.Helper.FeesTest do
            +-----------------+------------+---------+--------+-------+\n
            """
   end
+
+  test "shows an empty table when there are no fees" do
+    assert capture_io(&Tai.Commands.Helper.fees/0) == """
+           +-------------+------------+--------+-------+-------+
+           | Exchange ID | Account ID | Symbol | Maker | Taker |
+           +-------------+------------+--------+-------+-------+
+           |           - |          - |      - |     - |     - |
+           +-------------+------------+--------+-------+-------+\n
+           """
+  end
 end

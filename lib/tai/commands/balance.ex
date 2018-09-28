@@ -54,8 +54,10 @@ defmodule Tai.Commands.Balance do
   end
 
   defp exclude_empty_balances(balances) do
-    balances
-    |> Enum.reject(fn [_, _, _, _, _, total] -> Tai.Markets.Asset.zero?(total) end)
+    Enum.reject(
+      balances,
+      fn [_, _, _, _, _, total] -> Tai.Markets.Asset.zero?(total) end
+    )
   end
 
   defp format_rows(balances) do
@@ -70,6 +72,15 @@ defmodule Tai.Commands.Balance do
 
   @header ["Exchange", "Account", "Symbol", "Free", "Locked", "Balance"]
   @spec render!(list) :: no_return
+  defp render!(rows)
+
+  defp render!([]) do
+    col_count = @header |> Enum.count()
+
+    [List.duplicate("-", col_count)]
+    |> render!
+  end
+
   defp render!(rows) do
     rows
     |> Table.new(@header)

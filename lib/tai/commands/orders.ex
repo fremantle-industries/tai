@@ -27,7 +27,7 @@ defmodule Tai.Commands.Orders do
         order.error_reason
       ]
     end)
-    |> print_table
+    |> render!
   end
 
   @header [
@@ -46,17 +46,17 @@ defmodule Tai.Commands.Orders do
     "Created At",
     "Error Reason"
   ]
-  @spec print_table(list) :: no_return
-  defp print_table(rows)
+  @spec render!(list) :: no_return
+  defp render!(rows)
 
-  defp print_table([]) do
+  defp render!([]) do
     col_count = @header |> Enum.count()
 
     [List.duplicate("-", col_count)]
-    |> print_table
+    |> render!
   end
 
-  defp print_table(rows) do
+  defp render!(rows) do
     rows
     |> Table.new(@header)
     |> Table.put_column_meta(:all, align: :right)

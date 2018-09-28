@@ -48,4 +48,14 @@ defmodule Tai.Commands.Helper.BalanceTest do
            +-----------------+---------+--------+----------------------+----------------------+----------------------+\n
            """
   end
+
+  test "shows an empty table when there are no balances" do
+    assert capture_io(&Tai.Commands.Helper.balance/0) == """
+           +----------+---------+--------+------+--------+---------+
+           | Exchange | Account | Symbol | Free | Locked | Balance |
+           +----------+---------+--------+------+--------+---------+
+           |        - |       - |      - |    - |      - |       - |
+           +----------+---------+--------+------+--------+---------+\n
+           """
+  end
 end
