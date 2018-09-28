@@ -37,6 +37,7 @@ defmodule Tai.Exchanges.Adapters.FeesTest do
   setup_all do
     on_exit(fn ->
       Tai.Exchanges.Products.clear()
+      Tai.Exchanges.Fees.clear()
     end)
 
     HTTPoison.start()
