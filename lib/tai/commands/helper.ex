@@ -21,20 +21,12 @@ defmodule Tai.Commands.Helper do
   @spec orders :: no_return
   defdelegate orders, to: Tai.Commands.Orders
 
-  @spec buy_limit(atom, atom, atom, float, float, atom) :: no_return
-  defdelegate buy_limit(exchange_id, account_id, symbol, price, size, time_in_force),
-    to: Tai.Commands.Trading
+  @spec settings :: no_return
+  defdelegate settings, to: Tai.Commands.Settings
 
-  @spec sell_limit(atom, atom, atom, float, float, atom) :: no_return
-  defdelegate sell_limit(exchange_id, account_id, symbol, price, size, time_in_force),
-    to: Tai.Commands.Trading
+  @spec disable_send_orders :: no_return
+  defdelegate disable_send_orders, to: Tai.Commands.SendOrders, as: :disable
 
-  @spec settings() :: no_return
-  defdelegate settings(), to: Tai.Commands.Settings
-
-  @spec disable_send_orders() :: no_return
-  defdelegate disable_send_orders(), to: Tai.Commands.SendOrders, as: :disable
-
-  @spec enable_send_orders() :: no_return
-  defdelegate enable_send_orders(), to: Tai.Commands.SendOrders, as: :enable
+  @spec enable_send_orders :: no_return
+  defdelegate enable_send_orders, to: Tai.Commands.SendOrders, as: :enable
 end
