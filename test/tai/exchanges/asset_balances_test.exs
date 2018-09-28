@@ -38,17 +38,15 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   end
 
   describe "#all" do
-    test "returns a map of balances" do
-      assert Tai.Exchanges.AssetBalances.all() == %{}
+    test "returns a list of balances" do
+      assert Tai.Exchanges.AssetBalances.all() == []
 
       balance =
         Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account, :btc, 1.1, 2.1)
 
       :ok = Tai.Exchanges.AssetBalances.upsert(balance)
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => ^balance
-             } = Tai.Exchanges.AssetBalances.all()
+      assert [^balance] = Tai.Exchanges.AssetBalances.all()
     end
   end
 
@@ -74,7 +72,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   end
 
   describe "#where" do
-    test "returns a map of the matching balances" do
+    test "returns a list of the matching balances" do
       balance_1 =
         Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account_a, :btc, 1.1, 2.1)
 
@@ -84,18 +82,14 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       :ok = Tai.Exchanges.AssetBalances.upsert(balance_1)
       :ok = Tai.Exchanges.AssetBalances.upsert(balance_2)
 
-      assert %{
-               {:my_test_exchange, :my_test_account_a, :btc} => ^balance_1,
-               {:my_test_exchange, :my_test_account_b, :btc} => ^balance_2
-             } =
+      assert [^balance_1, ^balance_2] =
                Tai.Exchanges.AssetBalances.where(
                  exchange_id: :my_test_exchange,
                  asset: :btc
                )
+               |> Enum.sort(&(Decimal.cmp(&1.free, &2.free) == :lt))
 
-      assert %{
-               {:my_test_exchange, :my_test_account_a, :btc} => ^balance_1
-             } =
+      assert [^balance_1] =
                Tai.Exchanges.AssetBalances.where(
                  exchange_id: :my_test_exchange,
                  account_id: :my_test_account_a
@@ -104,16 +98,13 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   end
 
   describe "#find_by" do
-    test "returns an ok tuple with the key & balance" do
+    test "returns an ok tuple with the balance" do
       balance =
         Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account_a, :btc, 1.1, 2.1)
 
       :ok = Tai.Exchanges.AssetBalances.upsert(balance)
 
-      assert {
-               :ok,
-               {{:my_test_exchange, :my_test_account_a, :btc}, ^balance}
-             } =
+      assert {:ok, ^balance} =
                Tai.Exchanges.AssetBalances.find_by(
                  exchange_id: :my_test_exchange,
                  account_id: :my_test_account_a
@@ -140,10 +131,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns max when = free balance" do
       assert lock_range(:btc, 0, 2.1) == {:ok, Decimal.new(1.1)}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(0.0)
       assert balance.locked == Decimal.new(3.2)
     end
@@ -151,10 +139,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns max when < free balance" do
       assert lock_range(:btc, 0, 1.0) == {:ok, Decimal.new(1.0)}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(0.1)
       assert balance.locked == Decimal.new(3.1)
     end
@@ -162,10 +147,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns free balance when max >= free balance and min = free balance" do
       assert lock_range(:btc, 1.1, 2.2) == {:ok, Decimal.new(1.1)}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(0.0)
       assert balance.locked == Decimal.new(3.2)
     end
@@ -173,10 +155,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns free balance when max >= free balance and min < free balance" do
       assert lock_range(:btc, 1.0, 2.2) == {:ok, Decimal.new(1.1)}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(0.0)
       assert balance.locked == Decimal.new(3.2)
     end
@@ -184,10 +163,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns an error tuple when the asset doesn't exist" do
       assert lock_range(:xbt, 0.1, 2.2) == {:error, :not_found}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(1.1)
       assert balance.locked == Decimal.new(2.1)
     end
@@ -195,10 +171,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns an error tuple when min > free balance" do
       assert lock_range(:btc, 1.11, 2.2) == {:error, :insufficient_balance}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(1.1)
       assert balance.locked == Decimal.new(2.1)
     end
@@ -206,10 +179,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns an error tuple when min > max" do
       assert lock_range(:btc, 0.11, 0.1) == {:error, :min_greater_than_max}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(1.1)
       assert balance.locked == Decimal.new(2.1)
     end
@@ -217,10 +187,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns an error tuple when min < 0" do
       assert lock_range(:btc, -0.1, 0.1) == {:error, :min_less_than_zero}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(1.1)
       assert balance.locked == Decimal.new(2.1)
     end
@@ -262,10 +229,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "unlocks the balance for the asset" do
       assert unlock(:btc, 1.0) == :ok
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(2.1)
       assert balance.locked == Decimal.new(1.1)
     end
@@ -273,10 +237,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "doesn't unlock the balance if the asset doesn't exist" do
       assert unlock(:xbt, 1.0) == {:error, :not_found}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(1.1)
       assert balance.locked == Decimal.new(2.1)
     end
@@ -284,10 +245,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "doesn't unlock the quantity when there is an insufficient locked balance" do
       assert unlock(:btc, 2.11) == {:error, :insufficient_balance}
 
-      assert %{
-               {:my_test_exchange, :my_test_account, :btc} => balance
-             } = Tai.Exchanges.AssetBalances.all()
-
+      assert [balance] = Tai.Exchanges.AssetBalances.all()
       assert balance.free == Decimal.new(1.1)
       assert balance.locked == Decimal.new(2.1)
     end

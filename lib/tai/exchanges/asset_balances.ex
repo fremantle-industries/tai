@@ -45,7 +45,7 @@ defmodule Tai.Exchanges.AssetBalances do
         _from,
         state
       ) do
-    with {:ok, {{_, _, _}, %Tai.Exchanges.AssetBalance{} = balance}} <-
+    with {:ok, balance} <-
            find_by(exchange_id: exchange_id, account_id: account_id, asset: balance_range.asset),
          :ok <- Tai.Exchanges.AssetBalanceRange.validate(balance_range) do
       lock_result =
@@ -96,8 +96,7 @@ defmodule Tai.Exchanges.AssetBalances do
         _from,
         state
       ) do
-    with {:ok, {{_, _, _}, %Tai.Exchanges.AssetBalance{} = balance}} <-
-           find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
+    with {:ok, balance} <- find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
       new_free = Decimal.add(balance.free, amount)
       new_locked = Decimal.sub(balance.locked, amount)
 
@@ -123,7 +122,7 @@ defmodule Tai.Exchanges.AssetBalances do
   def handle_call({:add, exchange_id, account_id, asset, val}, _from, state) do
     if Decimal.cmp(val, Decimal.new(0)) == :gt do
       case find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
-        {:ok, {_key, balance}} ->
+        {:ok, balance} ->
           new_free = Decimal.add(balance.free, val)
           new_balance = Map.put(balance, :free, new_free)
           upsert_ets_table(new_balance)
@@ -142,7 +141,7 @@ defmodule Tai.Exchanges.AssetBalances do
   def handle_call({:sub, exchange_id, account_id, asset, val}, _from, state) do
     if Decimal.cmp(val, Decimal.new(0)) == :gt do
       case find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
-        {:ok, {_key, balance}} ->
+        {:ok, balance} ->
           new_free = Decimal.sub(balance.free, val)
 
           if Decimal.cmp(new_free, Decimal.new(0)) == :lt do
@@ -213,13 +212,13 @@ defmodule Tai.Exchanges.AssetBalances do
     GenServer.call(__MODULE__, {:upsert, balance})
   end
 
-  @spec all :: map
-  def all do
+  @spec all :: [asset_balance]
+  def all() do
     __MODULE__
     |> :ets.select([{{:_, :_}, [], [:"$_"]}])
     |> Enum.reduce(
-      %{},
-      fn {key, balance}, acc -> Map.put(acc, key, balance) end
+      [],
+      fn {_, balance}, acc -> [balance | acc] end
     )
   end
 
@@ -241,21 +240,21 @@ defmodule Tai.Exchanges.AssetBalances do
   def where(filters) do
     all()
     |> Enum.reduce(
-      %{},
-      fn {{exchange_id, account_id, asset} = key, balance}, acc ->
+      [],
+      fn balance, acc ->
         matched_all_filters =
           filters
           |> Keyword.keys()
           |> Enum.all?(fn filter ->
             case filter do
               :exchange_id ->
-                exchange_id == Keyword.get(filters, filter)
+                balance.exchange_id == Keyword.get(filters, filter)
 
               :account_id ->
-                account_id == Keyword.get(filters, filter)
+                balance.account_id == Keyword.get(filters, filter)
 
               :asset ->
-                asset == Keyword.get(filters, filter)
+                balance.asset == Keyword.get(filters, filter)
 
               _ ->
                 Map.get(balance, filter) == Keyword.get(filters, filter)
@@ -263,7 +262,7 @@ defmodule Tai.Exchanges.AssetBalances do
           end)
 
         if matched_all_filters do
-          Map.put(acc, key, balance)
+          [balance | acc]
         else
           acc
         end
@@ -271,13 +270,12 @@ defmodule Tai.Exchanges.AssetBalances do
     )
   end
 
+  @spec find_by(filters :: [...]) :: {:ok, asset_balance} | {:error, :not_found}
   def find_by(filters) do
-    with matches <- filters |> where(),
-         [found_key | _tail] <- matches |> Map.keys(),
-         balance <- matches |> Map.get(found_key) do
-      {:ok, {found_key, balance}}
+    with %Tai.Exchanges.AssetBalance{} = balance <- filters |> where() |> List.first() do
+      {:ok, balance}
     else
-      [] ->
+      nil ->
         {:error, :not_found}
     end
   end

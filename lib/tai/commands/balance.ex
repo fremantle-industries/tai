@@ -15,12 +15,21 @@ defmodule Tai.Commands.Balance do
 
   defp fetch_balances do
     Tai.Exchanges.AssetBalances.all()
-    |> Enum.reverse()
+    |> Enum.sort(&(&1.asset >= &2.asset))
+    |> Enum.sort(&(&1.exchange_id >= &2.exchange_id))
     |> Enum.reduce(
       [],
-      fn {{exchange_id, account_id, symbol}, balance}, acc ->
-        total = Tai.Exchanges.AssetBalance.total(balance)
-        [{exchange_id, account_id, symbol, balance.free, balance.locked, total} | acc]
+      fn balance, acc ->
+        row = {
+          balance.exchange_id,
+          balance.account_id,
+          balance.asset,
+          balance.free,
+          balance.locked,
+          Tai.Exchanges.AssetBalance.total(balance)
+        }
+
+        [row | acc]
       end
     )
   end
@@ -42,7 +51,14 @@ defmodule Tai.Commands.Balance do
     end)
   end
 
-  @header ["Exchange", "Account", "Symbol", "Free", "Locked", "Balance"]
+  @header [
+    "Exchange",
+    "Account",
+    "Asset",
+    "Free",
+    "Locked",
+    "Balance"
+  ]
   @spec render!(list) :: no_return
   defp render!(rows)
 
