@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Adapters.FeesTest do
+defmodule Tai.Exchanges.Adapters.FeeStoreTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
@@ -37,7 +37,7 @@ defmodule Tai.Exchanges.Adapters.FeesTest do
   setup_all do
     on_exit(fn ->
       Tai.Exchanges.ProductStore.clear()
-      Tai.Exchanges.Fees.clear()
+      Tai.Exchanges.FeeStore.clear()
     end)
 
     HTTPoison.start()
@@ -56,7 +56,7 @@ defmodule Tai.Exchanges.Adapters.FeesTest do
       Tai.Boot.subscribe_fees(exchange_id, account_id)
 
       assert {:error, :not_found} =
-               Tai.Exchanges.Fees.find_by(
+               Tai.Exchanges.FeeStore.find_by(
                  exchange_id: exchange_id,
                  account_id: account_id,
                  symbol: symbol
@@ -69,7 +69,7 @@ defmodule Tai.Exchanges.Adapters.FeesTest do
       end
 
       assert {:ok, %Tai.Exchanges.FeeInfo{} = fee} =
-               Tai.Exchanges.Fees.find_by(
+               Tai.Exchanges.FeeStore.find_by(
                  exchange_id: exchange_id,
                  account_id: account_id,
                  symbol: symbol

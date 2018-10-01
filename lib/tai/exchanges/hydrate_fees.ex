@@ -44,7 +44,7 @@ defmodule Tai.Exchanges.HydrateFees do
               taker_type: Tai.Exchanges.FeeInfo.percent()
             }
 
-            Tai.Exchanges.Fees.upsert(fee_info)
+            Tai.Exchanges.FeeStore.upsert(fee_info)
           end)
 
           Tai.Boot.hydrated_fees(exchange_id, account_id)

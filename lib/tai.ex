@@ -6,7 +6,7 @@ defmodule Tai do
       Tai.PubSub,
       {Tai.Settings, Tai.Config.all()},
       Tai.Exchanges.ProductStore,
-      Tai.Exchanges.Fees,
+      Tai.Exchanges.FeeStore,
       Tai.Exchanges.AssetBalances,
       Tai.Trading.OrderStore,
       Tai.Advisors.Supervisor,

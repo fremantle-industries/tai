@@ -7,7 +7,7 @@ defmodule Tai.Commands.Fees do
 
   @spec fees :: no_return
   def fees do
-    Tai.Exchanges.Fees.all()
+    Tai.Exchanges.FeeStore.all()
     |> Enum.sort(&(&1.exchange_id < &2.exchange_id))
     |> format_rows
     |> render!
