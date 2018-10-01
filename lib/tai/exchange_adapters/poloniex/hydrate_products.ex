@@ -107,7 +107,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.HydrateProducts do
         max_price: @max_price,
         size_increment: @min_size
       }
-      |> Tai.Exchanges.Products.upsert()
+      |> Tai.Exchanges.ProductStore.upsert()
     end
   end
 

@@ -2,13 +2,13 @@ defmodule Tai.TestSupport.Mock do
   @spec mock_product(Tai.Exchanges.Product.t() | map) :: :ok
   def mock_product(%Tai.Exchanges.Product{} = product) do
     product
-    |> Tai.Exchanges.Products.upsert()
+    |> Tai.Exchanges.ProductStore.upsert()
   end
 
   def mock_product(%{} = attrs) do
     Tai.Exchanges.Product
     |> struct(attrs)
-    |> Tai.Exchanges.Products.upsert()
+    |> Tai.Exchanges.ProductStore.upsert()
   end
 
   @spec mock_fee_info(Tai.Exchanges.FeeInfo.t() | map) :: :ok

@@ -68,7 +68,7 @@ defmodule Tai.ExchangeAdapters.Binance.HydrateProducts do
         max_size: max_size,
         size_increment: step_size
       }
-      |> Tai.Exchanges.Products.upsert()
+      |> Tai.Exchanges.ProductStore.upsert()
     end
   end
 

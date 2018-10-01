@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Adapters.ProductsTest do
+defmodule Tai.Exchanges.Adapters.ProductStoreTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
@@ -19,7 +19,7 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
 
   setup_all do
     on_exit(fn ->
-      Tai.Exchanges.Products.clear()
+      Tai.Exchanges.ProductStore.clear()
     end)
 
     HTTPoison.start()
@@ -37,7 +37,7 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
       Tai.Boot.subscribe_products(@config.id)
       key = {@config.id, symbol}
 
-      assert {:error, :not_found} = Tai.Exchanges.Products.find(key)
+      assert {:error, :not_found} = Tai.Exchanges.ProductStore.find(key)
 
       use_cassette "exchange_adapters/shared/products/#{exchange_id}/init_success" do
         start_supervised!({@config.supervisor, @config})
@@ -45,7 +45,7 @@ defmodule Tai.Exchanges.Adapters.ProductsTest do
         assert_receive {:fetched_products, :ok, ^exchange_id}, 1_000
       end
 
-      assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.Products.find(key)
+      assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.ProductStore.find(key)
       assert ^exchange_id = product.exchange_id
       assert ^symbol = product.symbol
       assert product.exchange_symbol =~ "LTC"

@@ -36,7 +36,7 @@ defmodule Tai.Exchanges.Adapters.FeesTest do
 
   setup_all do
     on_exit(fn ->
-      Tai.Exchanges.Products.clear()
+      Tai.Exchanges.ProductStore.clear()
       Tai.Exchanges.Fees.clear()
     end)
 

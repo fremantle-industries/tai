@@ -4,7 +4,7 @@ defmodule Tai.ExchangeAdapters.Gdax.ProductsTest do
 
   setup_all do
     on_exit(fn ->
-      Tai.Exchanges.Products.clear()
+      Tai.Exchanges.ProductStore.clear()
     end)
 
     HTTPoison.start()
@@ -29,7 +29,7 @@ defmodule Tai.ExchangeAdapters.Gdax.ProductsTest do
       assert_receive {:fetched_products, :ok, ^exchange_id}, 1_000
     end
 
-    assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.Products.find(key)
+    assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.ProductStore.find(key)
     assert Decimal.cmp(product.min_notional, Decimal.new(0.000001)) == :eq
     assert Decimal.cmp(product.min_price, Decimal.new(0.00001)) == :eq
     assert Decimal.cmp(product.min_size, Decimal.new(0.1)) == :eq

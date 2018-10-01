@@ -67,7 +67,7 @@ defmodule Tai.ExchangeAdapters.Gdax.HydrateProducts do
         price_increment: quote_increment,
         size_increment: base_min_size
       }
-      |> Tai.Exchanges.Products.upsert()
+      |> Tai.Exchanges.ProductStore.upsert()
     end
   end
 

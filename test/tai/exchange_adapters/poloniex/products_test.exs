@@ -4,7 +4,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
 
   setup_all do
     on_exit(fn ->
-      Tai.Exchanges.Products.clear()
+      Tai.Exchanges.ProductStore.clear()
     end)
 
     HTTPoison.start()
@@ -30,7 +30,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
       assert_receive {:fetched_products, :ok, ^exchange_id}, 1_000
     end
 
-    assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.Products.find(key)
+    assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.ProductStore.find(key)
     assert product.min_notional == Decimal.new(0.0001)
     assert product.min_price == Decimal.new(0.00000001)
     assert product.min_size == Decimal.new(0.000001)
@@ -60,7 +60,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.ProductsTest do
       assert_receive {:fetched_products, :ok, ^exchange_id}, 1_000
     end
 
-    assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.Products.find(key)
+    assert {:ok, %Tai.Exchanges.Product{} = product} = Tai.Exchanges.ProductStore.find(key)
     assert product.status == :halt
 
     Tai.Boot.unsubscribe_products(exchange_id)

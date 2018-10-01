@@ -25,7 +25,7 @@ defmodule Tai.Exchanges.HydrateFees do
             {:fetched_products, :ok, _},
             [exchange_id: exchange_id, accounts: accounts] = state
           ) do
-        products = Tai.Exchanges.Products.where(exchange_id: exchange_id)
+        products = Tai.Exchanges.ProductStore.where(exchange_id: exchange_id)
 
         accounts
         |> Map.keys()

@@ -5,7 +5,7 @@ defmodule Tai do
     children = [
       Tai.PubSub,
       {Tai.Settings, Tai.Config.all()},
-      Tai.Exchanges.Products,
+      Tai.Exchanges.ProductStore,
       Tai.Exchanges.Fees,
       Tai.Exchanges.AssetBalances,
       Tai.Trading.OrderStore,
