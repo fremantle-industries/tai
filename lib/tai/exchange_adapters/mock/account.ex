@@ -1,6 +1,7 @@
 defmodule Tai.ExchangeAdapters.Mock.Account do
   use Tai.Exchanges.Account
 
+  import Tai.TestSupport.Mocks.Client
   require Logger
 
   def all_balances(_credentials) do
@@ -35,14 +36,5 @@ defmodule Tai.ExchangeAdapters.Mock.Account do
         {:error, :not_found} -> {:error, :mock_not_found}
       end
     end)
-  end
-
-  defp with_mock_server(func) do
-    try do
-      func.()
-    catch
-      :exit, {:noproc, {GenServer, :call, [Tai.TestSupport.Mocks.Server, _, _]}} ->
-        {:error, :mock_server_not_started}
-    end
   end
 end

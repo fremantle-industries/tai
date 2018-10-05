@@ -21,38 +21,6 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     :ok
   end
 
-  describe "#all_balances" do
-    test "returns an error tuple when the passphrase is invalid" do
-      use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_passphrase" do
-        assert Tai.Exchanges.Account.all_balances(:my_gdax_exchange, :test) == {
-                 :error,
-                 %Tai.CredentialError{reason: "Invalid Passphrase"}
-               }
-      end
-    end
-
-    test "returns an error tuple when the api key is invalid" do
-      use_cassette "exchange_adapters/gdax/account/all_balances_error_invalid_api_key" do
-        assert Tai.Exchanges.Account.all_balances(:my_gdax_exchange, :test) == {
-                 :error,
-                 %Tai.CredentialError{reason: "Invalid API Key"}
-               }
-      end
-    end
-
-    test "returns an error tuple when down for maintenance" do
-      use_cassette "exchange_adapters/gdax/account/all_balances_error_maintenance" do
-        assert Tai.Exchanges.Account.all_balances(:my_gdax_exchange, :test) == {
-                 :error,
-                 %Tai.ServiceUnavailableError{
-                   reason:
-                     "GDAX is currently under maintenance. For updates please see https://status.gdax.com/"
-                 }
-               }
-      end
-    end
-  end
-
   describe "#buy_limit" do
     test "can create a good till cancel duration order" do
       use_cassette "exchange_adapters/shared/account/gdax/buy_limit_good_till_cancel_success" do

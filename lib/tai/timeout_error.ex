@@ -5,6 +5,5 @@ defmodule Tai.TimeoutError do
 
   @type t :: Tai.TimeoutError
 
-  @enforce_keys [:reason]
-  defstruct [:reason]
+  defstruct reason: "network request timed out"
 end

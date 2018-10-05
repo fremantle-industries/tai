@@ -29,7 +29,7 @@ defmodule Tai.Exchanges.Config do
       }
     ]
   """
-  @spec all :: list(t)
+  @spec all :: [t]
   def all(exchanges \\ Application.get_env(:tai, :exchanges)) do
     exchanges
     |> Enum.map(fn {id, params} ->

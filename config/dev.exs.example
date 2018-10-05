@@ -13,6 +13,31 @@ config :binance,
 config :tai, send_orders: false
 
 config :tai,
+  new_exchanges: %{
+    binance: [
+      adapter: Tai.ExchangeAdapters.New.Binance,
+      accounts: %{main: %{}}
+    ],
+    poloniex: [
+      adapter: Tai.ExchangeAdapters.New.Poloniex,
+      accounts: %{main: %{}}
+    ],
+    gdax: [
+      adapter: Tai.ExchangeAdapters.New.Gdax,
+      accounts: %{
+        main: %{
+          # https://docs.pro.coinbase.com/#api
+          # api_url: "https://api-public.sandbox.pro.coinbase.com",
+          api_url: "https://api.pro.coinbase.com",
+          api_key: System.get_env("GDAX_API_KEY"),
+          api_secret: System.get_env("GDAX_API_SECRET"),
+          api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
+        }
+      }
+    ]
+  }
+
+config :tai,
   exchanges: %{
     binance: [
       supervisor: Tai.ExchangeAdapters.Binance.Supervisor,

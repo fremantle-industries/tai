@@ -25,6 +25,7 @@ defmodule Tai.TestSupport.Mocks.Server do
   def handle_call({:eject, key}, _from, state) do
     result =
       with [{_k, response}] <- :ets.lookup(__MODULE__, key) do
+        :ets.delete(__MODULE__, key)
         {:ok, response}
       else
         [] ->

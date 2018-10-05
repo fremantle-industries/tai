@@ -23,6 +23,9 @@ config :exvcr,
 
 config(:echo_boy, port: 4100)
 
+config :tai, send_orders: true
+config :tai, exchange_boot_handler: Support.ExchangeBootHandler
+
 config :ex_poloniex,
   api_key: System.get_env("POLONIEX_API_KEY"),
   api_secret: System.get_env("POLONIEX_API_SECRET")
@@ -31,7 +34,45 @@ config :binance,
   api_key: System.get_env("BINANCE_API_KEY"),
   secret_key: System.get_env("BINANCE_API_SECRET")
 
-config :tai, send_orders: true
+config(:tai,
+  test_exchange_adapters: %{
+    mock: [
+      adapter: Tai.ExchangeAdapters.New.Mock,
+      accounts: %{main: %{}}
+    ],
+    binance: [
+      adapter: Tai.ExchangeAdapters.New.Binance,
+      accounts: %{main: %{}}
+    ],
+    poloniex: [
+      adapter: Tai.ExchangeAdapters.New.Poloniex,
+      accounts: %{main: %{}}
+    ],
+    gdax: [
+      adapter: Tai.ExchangeAdapters.New.Gdax,
+      accounts: %{
+        main: %{
+          api_url: "https://api-public.sandbox.pro.coinbase.com",
+          api_key: System.get_env("GDAX_API_KEY"),
+          api_secret: System.get_env("GDAX_API_SECRET"),
+          api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
+        }
+      }
+    ]
+  }
+)
+
+config :tai,
+  new_exchanges: %{
+    test_exchange_a: [
+      adapter: Tai.ExchangeAdapters.New.Mock,
+      accounts: %{main: %{}}
+    ],
+    test_exchange_b: [
+      adapter: Tai.ExchangeAdapters.New.Mock,
+      accounts: %{main: %{}}
+    ]
+  }
 
 config :tai,
   exchanges: %{
