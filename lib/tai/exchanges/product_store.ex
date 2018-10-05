@@ -3,8 +3,6 @@ defmodule Tai.Exchanges.ProductStore do
 
   @type product :: Tai.Exchanges.Product.t()
 
-  @table_name :products
-
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
     GenServer.call(pid, :create_ets_table)
@@ -22,12 +20,12 @@ defmodule Tai.Exchanges.ProductStore do
 
   def handle_call({:upsert, product}, _from, state) do
     record = {{product.exchange_id, product.symbol}, product}
-    :ets.insert(@table_name, record)
+    :ets.insert(__MODULE__, record)
     {:reply, :ok, state}
   end
 
   def handle_call(:clear, _from, state) do
-    :ets.delete(@table_name)
+    :ets.delete(__MODULE__)
     create_ets_table()
     {:reply, :ok, state}
   end
@@ -45,7 +43,7 @@ defmodule Tai.Exchanges.ProductStore do
 
   @spec find({atom, atom}) :: {:ok, product} | {:error, :not_found}
   def find(key) do
-    with [[%Tai.Exchanges.Product{} = product]] <- :ets.match(@table_name, {key, :"$1"}) do
+    with [[%Tai.Exchanges.Product{} = product]] <- :ets.match(__MODULE__, {key, :"$1"}) do
       {:ok, product}
     else
       [] -> {:error, :not_found}
@@ -72,12 +70,12 @@ defmodule Tai.Exchanges.ProductStore do
 
   @spec all :: [product]
   def all do
-    @table_name
+    __MODULE__
     |> :ets.select([{{:_, :_}, [], [:"$_"]}])
     |> Enum.map(fn {{_, _}, product} -> product end)
   end
 
   defp create_ets_table do
-    :ets.new(@table_name, [:set, :protected, :named_table])
+    :ets.new(__MODULE__, [:set, :protected, :named_table])
   end
 end

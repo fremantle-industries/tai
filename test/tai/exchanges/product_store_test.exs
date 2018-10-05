@@ -29,7 +29,7 @@ defmodule Tai.Exchanges.ProductStoreTest do
       assert Tai.Exchanges.ProductStore.upsert(product) == :ok
 
       assert [{{:my_exchange, :btc_usdt}, ^product}] =
-               :ets.lookup(:products, {:my_exchange, :btc_usdt})
+               :ets.lookup(Tai.Exchanges.ProductStore, {:my_exchange, :btc_usdt})
     end
   end
 
