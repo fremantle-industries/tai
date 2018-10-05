@@ -164,9 +164,16 @@ defmodule Tai.Exchanges.AssetBalances do
 
   def handle_continue({:upsert, balance}, state) do
     Logger.info(
-      "[upsert,#{balance.exchange_id},#{balance.account_id},#{balance.asset},#{balance.free},#{
-        balance.locked
-      }]"
+      :io_lib.format(
+        "[upsert:~s,~s,~s,~s,~s]",
+        [
+          balance.exchange_id,
+          balance.account_id,
+          balance.asset,
+          balance.free |> Decimal.to_string(:normal),
+          balance.locked |> Decimal.to_string(:normal)
+        ]
+      )
     )
 
     {:noreply, state}

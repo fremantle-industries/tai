@@ -23,17 +23,23 @@ defmodule Tai.Exchanges.AssetBalancesTest do
                )
     end
 
-    test "logs the free & locked balance" do
+    test "logs the free & locked balance with normal type formatting" do
       log_msg =
         capture_log(fn ->
           balance =
-            Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account, :btc, 1, 2)
+            Tai.Exchanges.AssetBalance.new(
+              :my_test_exchange,
+              :my_test_account,
+              :btc,
+              0.00000001,
+              2
+            )
 
           :ok = Tai.Exchanges.AssetBalances.upsert(balance)
           :timer.sleep(100)
         end)
 
-      assert log_msg =~ ~r/\[upsert,my_test_exchange,my_test_account,btc,1,2\]/
+      assert log_msg =~ ~r/\[upsert:my_test_exchange,my_test_account,btc,0.000000010,2\]/
     end
   end
 
