@@ -62,6 +62,15 @@ def deps do
 end
 ```
 
+Create an `.iex.exs` file in the root of your project and import the `tai` helper
+
+```elixir
+# .iex.exs
+Application.put_env(:elixir, :ansi_enabled, true)
+
+import Tai.Commands.Helper
+```
+
 ## Usage
 
 `tai` runs as an OTP application.
