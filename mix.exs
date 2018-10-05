@@ -57,7 +57,7 @@ defmodule Tai.Mixfile do
   end
 
   defp description do
-    "A trading toolkit built with Elixir and running on the Erlang virtual machine"
+    "A trading toolkit built with Elixir that runs on the Erlang virtual machine"
   end
 
   defp package do
