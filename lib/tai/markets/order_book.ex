@@ -3,8 +3,12 @@ defmodule Tai.Markets.OrderBook do
   Manage and query the state for an order book for a symbol on a feed
   """
 
-  use GenServer
+  @type t :: %Tai.Markets.OrderBook{
+          bids: map,
+          asks: map
+        }
 
+  use GenServer
   alias Tai.PubSub
   alias Tai.Markets.{OrderBook, PriceLevel, Quote}
 

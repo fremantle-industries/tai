@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Binance.DepthUpdate do
+defmodule Tai.VenueAdapters.Binance.OrderBookFeed.DepthUpdate do
   @moduledoc """
   Normalize the data received from a depthUpdate event
   """

@@ -9,8 +9,9 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
       Application.stop(:tai)
     end)
 
-    {:ok, _} = Application.ensure_all_started(:tai)
     start_supervised!(Tai.TestSupport.Mocks.Server)
+    mock_products()
+    {:ok, _} = Application.ensure_all_started(:tai)
     Tai.Settings.enable_send_orders!()
 
     start_supervised!({
@@ -49,5 +50,23 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
              ~r/\[order:.{36,36},enqueued,test_exchange_a,main,btc_usd,buy,limit,fok,100.1,0.1,\]/
 
     assert log_msg =~ ~r/filled order %Tai.Trading.Order{/
+  end
+
+  def mock_products() do
+    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+      :test_exchange_a,
+      [
+        %{symbol: :btc_usd},
+        %{symbol: :ltc_usd}
+      ]
+    )
+
+    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+      :test_exchange_b,
+      [
+        %{symbol: :eth_usd},
+        %{symbol: :ltc_usd}
+      ]
+    )
   end
 end

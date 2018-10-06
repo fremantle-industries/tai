@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Poloniex.Snapshot do
+defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed.Snapshot do
   def normalize(%{} = price_and_sizes, processed_at) do
     price_and_sizes
     |> Enum.reduce(%{}, fn {price_str, size_str}, acc ->

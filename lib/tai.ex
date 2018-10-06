@@ -12,13 +12,10 @@ defmodule Tai do
       Tai.Exchanges.FeeStore,
       Tai.Exchanges.AssetBalances,
       Tai.Trading.OrderStore,
-      Tai.AdvisorsSupervisor,
       Tai.Exchanges.AdaptersSupervisor,
+      Tai.Exchanges.OrderBookFeedsSupervisor,
       {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},
-      # TODO
-      # OrderBookFeedsSupervisor will become the responsibility of each 
-      # individual adapter supervisor. Once complete it can be removed.
-      Tai.Exchanges.OrderBookFeedsSupervisor
+      Tai.AdvisorsSupervisor
     ]
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)

@@ -6,7 +6,11 @@ defmodule Tai.Exchanges.OrderBookFeed do
   @typedoc """
   The state of the running order book feed
   """
-  @type t :: %Tai.Exchanges.OrderBookFeed{}
+  @type t :: %Tai.Exchanges.OrderBookFeed{
+          feed_id: atom,
+          symbols: [atom],
+          store: map
+        }
 
   @enforce_keys [:feed_id, :symbols, :store]
   defstruct [:feed_id, :symbols, :store]

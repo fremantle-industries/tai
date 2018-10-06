@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
+defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
   @moduledoc """
   WebSocket order book feed adapter for Binance
 
@@ -6,11 +6,8 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
   """
 
   use Tai.Exchanges.OrderBookFeed
-
+  alias Tai.VenueAdapters.Binance.OrderBookFeed
   require Logger
-
-  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook}
-  alias Tai.ExchangeAdapters.Binance.{OrderBookSnapshot, DepthUpdate}
 
   @doc """
   Secure production Binance WebSocket url
@@ -41,10 +38,11 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
     subscriptions =
       symbols
       |> Enum.map(fn symbol ->
-        with {:ok, %OrderBook{} = snapshot} <- OrderBookSnapshot.fetch(symbol, @price_levels) do
+        with {:ok, %Tai.Markets.OrderBook{} = snapshot} <-
+               OrderBookFeed.Snapshot.fetch(symbol, @price_levels) do
           [feed_id: feed_id, symbol: symbol]
-          |> OrderBook.to_name()
-          |> OrderBook.replace(snapshot)
+          |> Tai.Markets.OrderBook.to_name()
+          |> Tai.Markets.OrderBook.replace(snapshot)
 
           :ok
         else
@@ -93,18 +91,20 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeed do
           },
           "stream" => _stream_name
         },
-        %OrderBookFeed{feed_id: feed_id} = state
+        state
       ) do
     with processed_at <- Timex.now(),
          {:ok, server_changed_at} <- DateTime.from_unix(event_time, :millisecond),
-         normalized_changes <- %OrderBook{
-           bids: changed_bids |> DepthUpdate.normalize(processed_at, server_changed_at),
-           asks: changed_asks |> DepthUpdate.normalize(processed_at, server_changed_at)
+         normalized_changes <- %Tai.Markets.OrderBook{
+           bids:
+             changed_bids |> OrderBookFeed.DepthUpdate.normalize(processed_at, server_changed_at),
+           asks:
+             changed_asks |> OrderBookFeed.DepthUpdate.normalize(processed_at, server_changed_at)
          },
          symbol = Tai.ExchangeAdapters.Binance.SymbolMapping.to_tai(binance_symbol) do
-      [feed_id: feed_id, symbol: symbol]
-      |> OrderBook.to_name()
-      |> OrderBook.update(normalized_changes)
+      [feed_id: state.feed_id, symbol: symbol]
+      |> Tai.Markets.OrderBook.to_name()
+      |> Tai.Markets.OrderBook.update(normalized_changes)
 
       {:ok, state}
     end

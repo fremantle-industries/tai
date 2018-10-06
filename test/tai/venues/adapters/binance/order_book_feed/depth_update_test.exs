@@ -1,8 +1,8 @@
-defmodule Tai.ExchangeAdapters.Binance.DepthUpdateTest do
+defmodule Tai.VenueAdapters.Binance.OrderBookFeed.DepthUpdateTest do
   use ExUnit.Case, async: true
-  doctest Tai.ExchangeAdapters.Binance.DepthUpdate
+  doctest Tai.VenueAdapters.Binance.OrderBookFeed.DepthUpdate
 
-  alias Tai.ExchangeAdapters.Binance.DepthUpdate
+  alias Tai.VenueAdapters.Binance.OrderBookFeed
 
   test "normalize returns a map of price levels" do
     processed_at = Timex.now()
@@ -13,7 +13,7 @@ defmodule Tai.ExchangeAdapters.Binance.DepthUpdateTest do
       ["0.01891000", "1.57000000", []]
     ]
 
-    assert DepthUpdate.normalize(changes, processed_at, server_changed_at) == %{
+    assert OrderBookFeed.DepthUpdate.normalize(changes, processed_at, server_changed_at) == %{
              0.018919 => {3.15, processed_at, server_changed_at},
              0.01891 => {1.57, processed_at, server_changed_at}
            }

@@ -1,15 +1,12 @@
-defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
+defmodule Tai.VenueAdapters.Binance.OrderBookFeedTest do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  doctest Tai.ExchangeAdapters.Binance.OrderBookFeed
+  doctest Tai.VenueAdapters.Binance.OrderBookFeed
 
   import ExUnit.CaptureLog
 
-  alias Tai.{ExchangeAdapters.Binance.OrderBookFeed, WebSocket}
-  alias Tai.Markets.{OrderBook, PriceLevel}
-
   defp send_depth_update(pid, binance_symbol, changed_bids, changed_asks) do
-    WebSocket.send_json_msg(pid, %{
+    Tai.WebSocket.send_json_msg(pid, %{
       data: %{
         e: "depthUpdate",
         E: Timex.now() |> DateTime.to_unix(:millisecond),
@@ -34,37 +31,37 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
 
     my_binance_feed_btc_usdt_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_binance_feed, symbol: :btc_usdt]},
+        {Tai.Markets.OrderBook, [feed_id: :my_binance_feed, symbol: :btc_usdt]},
         id: :my_binance_feed_btc_usdt
       )
 
     my_binance_feed_ltc_usdt_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_binance_feed, symbol: :ltc_usdt]},
+        {Tai.Markets.OrderBook, [feed_id: :my_binance_feed, symbol: :ltc_usdt]},
         id: :my_binance_feed_ltc_usdt
       )
 
     my_feed_b_btc_usdt_pid =
       start_supervised!(
-        {OrderBook, [feed_id: :my_feed_b, symbol: :btc_usdt]},
+        {Tai.Markets.OrderBook, [feed_id: :my_feed_b, symbol: :btc_usdt]},
         id: :my_feed_b_btc_usdt
       )
 
     {:ok, my_binance_feed_pid} =
       use_cassette "exchange_adapters/binance/order_book_feed" do
-        OrderBookFeed.start_link(
+        Tai.VenueAdapters.Binance.OrderBookFeed.start_link(
           "ws://localhost:#{EchoBoy.Config.port()}/ws",
           feed_id: :my_binance_feed,
           symbols: [:btc_usdt, :ltc_usdt]
         )
       end
 
-    OrderBook.replace(my_binance_feed_ltc_usdt_pid, %OrderBook{
+    Tai.Markets.OrderBook.replace(my_binance_feed_ltc_usdt_pid, %Tai.Markets.OrderBook{
       bids: %{100.0 => {0.1, nil, nil}},
       asks: %{100.1 => {0.1, nil, nil}}
     })
 
-    OrderBook.replace(my_feed_b_btc_usdt_pid, %OrderBook{
+    Tai.Markets.OrderBook.replace(my_feed_b_btc_usdt_pid, %Tai.Markets.OrderBook{
       bids: %{1.0 => {1.1, nil, nil}},
       asks: %{1.2 => {0.1, nil, nil}}
     })
@@ -91,22 +88,23 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
     my_binance_feed_ltc_usdt_pid: my_binance_feed_ltc_usdt_pid,
     my_feed_b_btc_usdt_pid: my_feed_b_btc_usdt_pid
   }) do
-    assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btc_usdt_pid)
+    assert {:ok, %{bids: bids, asks: asks}} =
+             Tai.Markets.OrderBook.quotes(my_binance_feed_btc_usdt_pid)
 
     assert [
-             %PriceLevel{price: 8541.0, size: 1.174739, server_changed_at: nil},
-             %PriceLevel{price: 8536.17, size: 0.036, server_changed_at: nil},
-             %PriceLevel{price: 8536.16, size: 0.158082, server_changed_at: nil},
-             %PriceLevel{price: 8536.14, size: 0.003345, server_changed_at: nil},
-             %PriceLevel{price: 8535.97, size: 0.024218, server_changed_at: nil}
+             %Tai.Markets.PriceLevel{price: 8541.0, size: 1.174739, server_changed_at: nil},
+             %Tai.Markets.PriceLevel{price: 8536.17, size: 0.036, server_changed_at: nil},
+             %Tai.Markets.PriceLevel{price: 8536.16, size: 0.158082, server_changed_at: nil},
+             %Tai.Markets.PriceLevel{price: 8536.14, size: 0.003345, server_changed_at: nil},
+             %Tai.Markets.PriceLevel{price: 8535.97, size: 0.024218, server_changed_at: nil}
            ] = bids
 
     assert [
-             %PriceLevel{price: 8555.57, size: 0.039, server_changed_at: nil},
-             %PriceLevel{price: 8555.58, size: 0.089469, server_changed_at: nil},
-             %PriceLevel{price: 8559.99, size: 0.375128, server_changed_at: nil},
-             %PriceLevel{price: 8560.0, size: 0.620366, server_changed_at: nil},
-             %PriceLevel{price: 8561.11, size: 12.0, server_changed_at: nil}
+             %Tai.Markets.PriceLevel{price: 8555.57, size: 0.039, server_changed_at: nil},
+             %Tai.Markets.PriceLevel{price: 8555.58, size: 0.089469, server_changed_at: nil},
+             %Tai.Markets.PriceLevel{price: 8559.99, size: 0.375128, server_changed_at: nil},
+             %Tai.Markets.PriceLevel{price: 8560.0, size: 0.620366, server_changed_at: nil},
+             %Tai.Markets.PriceLevel{price: 8561.11, size: 12.0, server_changed_at: nil}
            ] = asks
 
     send_depth_update(
@@ -124,15 +122,17 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
       ]
     )
 
-    assert_receive {:order_book_changes, :my_binance_feed, :btc_usdt, %OrderBook{}}
-    assert {:ok, %{bids: bids, asks: asks}} = OrderBook.quotes(my_binance_feed_btc_usdt_pid)
+    assert_receive {:order_book_changes, :my_binance_feed, :btc_usdt, %Tai.Markets.OrderBook{}}
+
+    assert {:ok, %{bids: bids, asks: asks}} =
+             Tai.Markets.OrderBook.quotes(my_binance_feed_btc_usdt_pid)
 
     assert [
-             %PriceLevel{price: 8541.01, size: 0.12} = bid_a,
-             %PriceLevel{price: 8541.0, size: 2.23} = bid_b,
-             %PriceLevel{price: 8536.16, size: 0.158082} = bid_c,
-             %PriceLevel{price: 8536.14, size: 0.003345} = bid_d,
-             %PriceLevel{price: 8535.97, size: 0.024218} = bid_e
+             %Tai.Markets.PriceLevel{price: 8541.01, size: 0.12} = bid_a,
+             %Tai.Markets.PriceLevel{price: 8541.0, size: 2.23} = bid_b,
+             %Tai.Markets.PriceLevel{price: 8536.16, size: 0.158082} = bid_c,
+             %Tai.Markets.PriceLevel{price: 8536.14, size: 0.003345} = bid_d,
+             %Tai.Markets.PriceLevel{price: 8535.97, size: 0.024218} = bid_e
            ] = bids
 
     assert DateTime.compare(bid_a.server_changed_at, bid_b.server_changed_at)
@@ -141,11 +141,11 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
     assert bid_e.server_changed_at == nil
 
     assert [
-             %PriceLevel{price: 8555.58, size: 0.089469} = ask_a,
-             %PriceLevel{price: 8559.99, size: 0.22} = ask_b,
-             %PriceLevel{price: 8560.0, size: 0.620366} = ask_c,
-             %PriceLevel{price: 8560.05, size: 1.13} = ask_d,
-             %PriceLevel{price: 8561.11, size: 12.0} = ask_e
+             %Tai.Markets.PriceLevel{price: 8555.58, size: 0.089469} = ask_a,
+             %Tai.Markets.PriceLevel{price: 8559.99, size: 0.22} = ask_b,
+             %Tai.Markets.PriceLevel{price: 8560.0, size: 0.620366} = ask_c,
+             %Tai.Markets.PriceLevel{price: 8560.05, size: 1.13} = ask_d,
+             %Tai.Markets.PriceLevel{price: 8561.11, size: 12.0} = ask_e
            ] = asks
 
     assert DateTime.compare(ask_b.server_changed_at, ask_d.server_changed_at)
@@ -153,26 +153,46 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
     assert ask_c.server_changed_at == nil
     assert ask_e.server_changed_at == nil
 
-    assert OrderBook.quotes(my_binance_feed_ltc_usdt_pid) == {
+    assert Tai.Markets.OrderBook.quotes(my_binance_feed_ltc_usdt_pid) == {
              :ok,
-             %OrderBook{
+             %Tai.Markets.OrderBook{
                bids: [
-                 %PriceLevel{price: 100.0, size: 0.1, processed_at: nil, server_changed_at: nil}
+                 %Tai.Markets.PriceLevel{
+                   price: 100.0,
+                   size: 0.1,
+                   processed_at: nil,
+                   server_changed_at: nil
+                 }
                ],
                asks: [
-                 %PriceLevel{price: 100.1, size: 0.1, processed_at: nil, server_changed_at: nil}
+                 %Tai.Markets.PriceLevel{
+                   price: 100.1,
+                   size: 0.1,
+                   processed_at: nil,
+                   server_changed_at: nil
+                 }
                ]
              }
            }
 
-    assert OrderBook.quotes(my_feed_b_btc_usdt_pid) == {
+    assert Tai.Markets.OrderBook.quotes(my_feed_b_btc_usdt_pid) == {
              :ok,
-             %OrderBook{
+             %Tai.Markets.OrderBook{
                bids: [
-                 %PriceLevel{price: 1.0, size: 1.1, processed_at: nil, server_changed_at: nil}
+                 %Tai.Markets.PriceLevel{
+                   price: 1.0,
+                   size: 1.1,
+                   processed_at: nil,
+                   server_changed_at: nil
+                 }
                ],
                asks: [
-                 %PriceLevel{price: 1.2, size: 0.1, processed_at: nil, server_changed_at: nil}
+                 %Tai.Markets.PriceLevel{
+                   price: 1.2,
+                   size: 0.1,
+                   processed_at: nil,
+                   server_changed_at: nil
+                 }
                ]
              }
            }
@@ -183,7 +203,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
       log_msg =
         capture_log(fn ->
           {:error, _reason} =
-            OrderBookFeed.start_link(
+            Tai.VenueAdapters.Binance.OrderBookFeed.start_link(
               "ws://localhost:#{EchoBoy.Config.port()}/ws",
               feed_id: :my_binance_feed_invalid_symbol,
               symbols: [:idontexist, :wedontexist]

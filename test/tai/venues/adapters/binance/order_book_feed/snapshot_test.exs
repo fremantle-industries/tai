@@ -1,10 +1,9 @@
-defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshotTest do
+defmodule Tai.VenueAdapters.Binance.OrderBookFeed.SnapshotTest do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  doctest Tai.ExchangeAdapters.Binance.OrderBookSnapshot
+  doctest Tai.VenueAdapters.Binance.OrderBookFeed.Snapshot
 
-  alias Tai.Markets.OrderBook
-  alias Tai.ExchangeAdapters.Binance.OrderBookSnapshot
+  alias Tai.VenueAdapters.Binance.OrderBookFeed
 
   setup_all do
     HTTPoison.start()
@@ -13,7 +12,8 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshotTest do
 
   test "fetch returns an ok, order book tuple" do
     use_cassette "exchange_adapters/binance/snapshot_ok" do
-      assert {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBookSnapshot.fetch(:ltcbtc, 5)
+      assert {:ok, %Tai.Markets.OrderBook{bids: bids, asks: asks}} =
+               OrderBookFeed.Snapshot.fetch(:ltcbtc, 5)
 
       assert %{
                0.018689 => {2.12, bid_processed_at_a, nil},
@@ -45,7 +45,7 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookSnapshotTest do
 
   test "fetch returns an error tuple when the symbol is invalid" do
     use_cassette "exchange_adapters/binance/snapshot_invalid_symbol_error" do
-      assert {:error, :invalid_symbol} = OrderBookSnapshot.fetch(:idontexist, 5)
+      assert {:error, :invalid_symbol} = OrderBookFeed.Snapshot.fetch(:idontexist, 5)
     end
   end
 end

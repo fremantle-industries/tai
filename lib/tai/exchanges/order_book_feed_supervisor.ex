@@ -1,48 +1,38 @@
 defmodule Tai.Exchanges.OrderBookFeedSupervisor do
+  @type adapter :: Tai.Exchanges.Adapter.t()
+  @type product :: Tai.Exchanges.Product.t()
+
   use Supervisor
 
-  def start_link(feed_id) do
-    Supervisor.start_link(__MODULE__, feed_id, name: feed_id |> to_name)
+  def start_link([adapter: adapter, trading_products: _] = state) do
+    Supervisor.start_link(__MODULE__, state, name: adapter.id |> to_name)
   end
 
-  def init(feed_id) do
-    feed_id
-    |> to_children
-    |> Supervisor.init(strategy: :one_for_all)
-  end
-
-  def to_name(feed_id) do
-    "#{__MODULE__}_#{feed_id}"
-    |> String.to_atom()
-  end
-
-  defp to_children(feed_id) do
-    order_book_child_specs(feed_id)
-    |> Enum.concat([feed_id |> feed_child_spec])
-  end
-
-  defp order_book_child_specs(feed_id) do
-    feed_id
-    |> Tai.Exchanges.Config.order_book_feed_symbols()
-    |> Enum.map(
-      &Supervisor.child_spec(
-        {Tai.Markets.OrderBook, feed_id: feed_id, symbol: &1},
-        id: "#{Tai.Markets.OrderBook}_#{feed_id}_#{&1}"
+  def init(
+        adapter: %Tai.Exchanges.Adapter{id: venue_id, adapter: adapter},
+        trading_products: trading_products
+      ) do
+    order_book_specs =
+      trading_products
+      |> Enum.map(
+        &Supervisor.child_spec(
+          {Tai.Markets.OrderBook, feed_id: venue_id, symbol: &1.symbol},
+          id: "#{venue_id}_#{&1.symbol}"
+        )
       )
-    )
+
+    symbols = Enum.map(trading_products, & &1.symbol)
+
+    feed_spec =
+      Supervisor.child_spec(
+        {adapter.order_book_feed, feed_id: venue_id, symbols: symbols},
+        id: Tai.Exchanges.OrderBookFeed.to_name(venue_id)
+      )
+
+    children = order_book_specs ++ [feed_spec]
+
+    Supervisor.init(children, strategy: :one_for_all)
   end
 
-  defp feed_child_spec(feed_id) do
-    %{
-      id: feed_id |> Tai.Exchanges.OrderBookFeed.to_name(),
-      start: {
-        feed_id |> Tai.Exchanges.Config.order_book_feed_adapter(),
-        :start_link,
-        [[feed_id: feed_id, symbols: feed_id |> Tai.Exchanges.Config.order_book_feed_symbols()]]
-      },
-      type: :worker,
-      restart: :permanent,
-      shutdown: 500
-    }
-  end
+  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 end
