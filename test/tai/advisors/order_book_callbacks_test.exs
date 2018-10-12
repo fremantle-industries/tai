@@ -336,7 +336,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         end)
 
       assert log_msg =~
-               "[warn]  handle_inside_quote raised an error: '%RuntimeError{message: \"!!!This is an ERROR!!!\"}'"
+               "[warn]  handle_inside_quote raised an error: '%RuntimeError{message: \"!!!This is an ERROR!!!\"}', " <>
+                 "stacktrace: [{Tai.Advisors.OrderBookCallbacksTest.MyAdvisor, :handle_inside_quote, 5, [file: 'test/tai/advisors/order_book_callbacks_test.exs', line:"
     end
   end
 end

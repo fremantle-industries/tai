@@ -261,7 +261,12 @@ defmodule Tai.Advisor do
                 )
             end
           rescue
-            e -> Logger.warn("handle_inside_quote raised an error: '#{inspect(e)}'")
+            e ->
+              Logger.warn(
+                "handle_inside_quote raised an error: '#{inspect(e)}', stacktrace: #{
+                  inspect(__STACKTRACE__)
+                }"
+              )
           end
         end
       end
