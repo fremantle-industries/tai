@@ -45,16 +45,6 @@ defmodule Tai.Advisor do
               state :: Tai.Advisor.t()
             ) :: :ok | {:ok, store :: map}
 
-  @doc """
-  Returns an atom that will identify the process
-
-  ## Examples
-
-    iex> Tai.Advisor.to_name(:my_test_advisor)
-    :advisor_my_test_advisor
-  """
-  def to_name(advisor_id), do: :"advisor_#{advisor_id}"
-
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
@@ -77,7 +67,7 @@ defmodule Tai.Advisor do
             inside_quotes: %{},
             store: Map.merge(%{}, store)
           },
-          name: advisor_id |> Tai.Advisor.to_name()
+          name: :"advisor_#{advisor_id}"
         )
       end
 
