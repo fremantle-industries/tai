@@ -59,6 +59,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
       start_supervised!({
         InitSuccessAdvisor,
         [
+          group_id: :group_a,
           advisor_id: :init_success_advisor,
           order_books: %{init_success_feed: [:btc_usd]},
           store: %{}
@@ -107,6 +108,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
           start_supervised!({
             InitFailureAdvisor,
             [
+              group_id: :group_a,
               advisor_id: :init_failure_advisor,
               order_books: %{init_failure_feed: [:btc_usd]},
               store: %{}

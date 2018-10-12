@@ -24,6 +24,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     start_supervised!({
       advisor,
       [
+        group_id: :group_a,
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btc_usd]},
         store: store

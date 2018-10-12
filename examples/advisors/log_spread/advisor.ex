@@ -1,27 +1,35 @@
 defmodule Examples.Advisors.LogSpread.Advisor do
+  @moduledoc """
+  Log the spread between the bid/ask for a product
+  """
+
   use Tai.Advisor
 
   require Logger
 
-  alias Tai.Markets.{PriceLevel, Quote}
-
   def handle_inside_quote(
         feed_id,
         symbol,
-        %Quote{bid: %PriceLevel{price: bid_price}, ask: %PriceLevel{price: ask_price}},
+        %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{price: bp},
+          ask: %Tai.Markets.PriceLevel{price: ap}
+        },
         _changes,
         _state
       ) do
-    Logger.info(fn ->
-      :io_lib.format(
-        "[~s,~s] spread: ~f",
-        [
-          feed_id,
-          symbol,
-          ask_price - bid_price
-        ]
-      )
-    end)
+    bid_price = Decimal.new(bp)
+    ask_price = Decimal.new(ap)
+    spread = Decimal.sub(ask_price, bid_price)
+
+    "[spread:~s,~s,~s,~s,~s]"
+    |> :io_lib.format([
+      feed_id,
+      symbol,
+      spread |> Decimal.to_string(:normal),
+      bid_price |> Decimal.to_string(:normal),
+      ask_price |> Decimal.to_string(:normal)
+    ])
+    |> Logger.info()
   end
 
   def handle_inside_quote(_feed_id, _symbol, _quote, _changes, _state), do: nil

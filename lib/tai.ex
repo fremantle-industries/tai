@@ -11,7 +11,7 @@ defmodule Tai do
       Tai.Exchanges.FeeStore,
       Tai.Exchanges.AssetBalances,
       Tai.Trading.OrderStore,
-      Tai.Advisors.Supervisor,
+      Tai.AdvisorsSupervisor,
       Tai.Exchanges.AdaptersSupervisor,
       {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},
       # TODO

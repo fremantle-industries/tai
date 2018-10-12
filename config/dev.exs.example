@@ -79,20 +79,17 @@ config :tai,
   }
 
 config :tai,
-  advisors: [
-    %{
-      id: :create_and_cancel_pending_order,
-      supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
-      order_books: "gdax.btc_usd"
-    },
-    %{
-      id: :fill_or_kill_orders,
-      supervisor: Examples.Advisors.FillOrKillOrders.Supervisor,
-      order_books: "binance.btc_usdt"
-    },
-    %{
-      id: :log_spread_advisor,
-      supervisor: Examples.Advisors.LogSpread.Supervisor,
-      order_books: "*"
-    }
-  ]
+  advisor_groups: %{
+    create_and_cancel_pending_order: [
+      factory: Examples.Advisors.CreateAndCancelPendingOrder.Factory,
+      products: "gdax.btc_usd"
+    ],
+    log_spread: [
+      factory: Examples.Advisors.LogSpread.Factory,
+      products: "binance.btc_usdt gdax.btc_usd poloniex.btc_usdt"
+    ],
+    fill_or_kill_orders: [
+      factory: Examples.Advisors.FillOrKillOrders.Factory,
+      products: "binance.btc_usdt"
+    ]
+  }

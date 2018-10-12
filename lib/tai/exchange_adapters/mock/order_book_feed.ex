@@ -22,17 +22,17 @@ defmodule Tai.ExchangeAdapters.Mock.OrderBookFeed do
         },
         %Tai.Exchanges.OrderBookFeed{feed_id: feed_id} = state
       ) do
-    with symbol <- String.to_atom(raw_symbol),
-         processed_at <- Timex.now() do
-      snapshot = %Tai.Markets.OrderBook{
-        bids: Tai.ExchangeAdapters.Mock.Snapshot.normalize(bids, processed_at),
-        asks: Tai.ExchangeAdapters.Mock.Snapshot.normalize(asks, processed_at)
-      }
+    symbol = String.to_atom(raw_symbol)
+    processed_at = Timex.now()
 
-      [feed_id: feed_id, symbol: symbol]
-      |> Tai.Markets.OrderBook.to_name()
-      |> Tai.Markets.OrderBook.replace(snapshot)
-    end
+    snapshot = %Tai.Markets.OrderBook{
+      bids: Tai.ExchangeAdapters.Mock.Snapshot.normalize(bids, processed_at),
+      asks: Tai.ExchangeAdapters.Mock.Snapshot.normalize(asks, processed_at)
+    }
+
+    [feed_id: feed_id, symbol: symbol]
+    |> Tai.Markets.OrderBook.to_name()
+    |> Tai.Markets.OrderBook.replace(snapshot)
 
     {:ok, state}
   end

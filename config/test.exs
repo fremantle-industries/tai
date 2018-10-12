@@ -88,31 +88,28 @@ config :tai,
 
 config :tai,
   order_book_feeds: %{
-    test_feed_a: [
+    test_exchange_a: [
       adapter: Tai.ExchangeAdapters.Mock.OrderBookFeed,
       order_books: [:btc_usd, :ltc_usd]
     ],
-    test_feed_b: [
+    test_exchange_b: [
       adapter: Tai.ExchangeAdapters.Mock.OrderBookFeed,
       order_books: [:eth_usd, :ltc_usd]
     ]
   }
 
 config :tai,
-  advisors: [
-    %{
-      id: :create_and_cancel_pending_order,
-      supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
-      order_books: "test_feed_a test_feed_b.eth_usd"
-    },
-    %{
-      id: :fill_or_kill_orders,
-      supervisor: Examples.Advisors.FillOrKillOrders.Supervisor,
-      order_books: "test_feed_a test_feed_b.eth_usd"
-    },
-    %{
-      id: :log_spread_advisor,
-      supervisor: Examples.Advisors.LogSpread.Supervisor,
-      order_books: "*"
-    }
-  ]
+  advisor_groups: %{
+    log_spread: [
+      factory: Examples.Advisors.LogSpread.Factory,
+      products: "*"
+    ],
+    fill_or_kill_orders: [
+      factory: Examples.Advisors.FillOrKillOrders.Factory,
+      products: "test_exchange_a test_exchange_b.eth_usd"
+    ],
+    create_and_cancel_pending_order: [
+      factory: Examples.Advisors.CreateAndCancelPendingOrder.Factory,
+      products: "test_feed_a test_feed_b.eth_usd"
+    ]
+  }
