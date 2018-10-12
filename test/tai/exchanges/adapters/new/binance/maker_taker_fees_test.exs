@@ -37,6 +37,16 @@ defmodule Tai.ExchangeAdapters.New.Binance.MakerTakerFeesTest do
     end
   end
 
+  test "returns an error tuple when the timestamp of the local machine is outside the Binance receive window",
+       %{adapter: adapter} do
+    use_cassette "exchange_adapters/shared/maker_taker_fees/binance/error_timestamp_outside_recv_window" do
+      assert Tai.Exchanges.Exchange.maker_taker_fees(adapter, :main) == {
+               :error,
+               %Tai.ApiError{reason: "Timestamp for this request is outside of the recvWindow."}
+             }
+    end
+  end
+
   def find_adapter(adapters, exchange_id) do
     Enum.find(adapters, &(&1.id == exchange_id))
   end
