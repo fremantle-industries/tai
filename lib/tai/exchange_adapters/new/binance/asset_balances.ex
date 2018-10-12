@@ -9,6 +9,13 @@ defmodule Tai.ExchangeAdapters.New.Binance.AssetBalances do
 
       {:ok, balances}
     else
+      {:error,
+       %{
+         "code" => -1021,
+         "msg" => "Timestamp for this request is outside of the recvWindow." = reason
+       }} ->
+        {:error, %Tai.ApiError{reason: reason}}
+
       {:error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}} ->
         {:error, %Tai.CredentialError{reason: reason}}
 
