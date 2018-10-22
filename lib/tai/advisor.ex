@@ -213,7 +213,7 @@ defmodule Tai.Advisor do
           (asks |> Enum.any?() && asks |> inside_ask_is_stale?(previous_inside_quote))
       end
 
-      defp inside_bid_is_stale?(_bids, nil), do: false
+      defp inside_bid_is_stale?(_bids, nil), do: true
 
       defp inside_bid_is_stale?(bids, %Tai.Markets.Quote{} = prev_quote) do
         bids
@@ -223,7 +223,7 @@ defmodule Tai.Advisor do
         end)
       end
 
-      defp inside_ask_is_stale?(asks, nil), do: false
+      defp inside_ask_is_stale?(asks, nil), do: true
 
       defp inside_ask_is_stale?(asks, %Tai.Markets.Quote{} = prev_quote) do
         asks
