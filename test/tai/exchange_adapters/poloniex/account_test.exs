@@ -14,34 +14,6 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
     :ok
   end
 
-  describe "#all_balances" do
-    test "returns an error tuple when the secret is invalid" do
-      use_cassette "exchange_adapters/poloniex/account/all_balances_error_invalid_secret" do
-        assert Tai.Exchanges.Account.all_balances(:my_poloniex_exchange, :test) == {
-                 :error,
-                 %Tai.CredentialError{
-                   reason: %ExPoloniex.AuthenticationError{
-                     message: "Invalid API key/secret pair."
-                   }
-                 }
-               }
-      end
-    end
-
-    test "returns an error tuple when the api key is invalid" do
-      use_cassette "exchange_adapters/poloniex/account/all_balances_error_invalid_api_key" do
-        assert Tai.Exchanges.Account.all_balances(:my_poloniex_exchange, :test) == {
-                 :error,
-                 %Tai.CredentialError{
-                   reason: %ExPoloniex.AuthenticationError{
-                     message: "Invalid API key/secret pair."
-                   }
-                 }
-               }
-      end
-    end
-  end
-
   describe "#buy_limit" do
     test "fill or kill returns an error tuple when it can't completely execute a fill or kill order" do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_unable_to_fill_completely" do

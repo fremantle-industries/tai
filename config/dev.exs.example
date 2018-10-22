@@ -13,6 +13,31 @@ config :binance,
 config :tai, send_orders: false
 
 config :tai,
+  new_exchanges: %{
+    binance: [
+      adapter: Tai.ExchangeAdapters.New.Binance,
+      accounts: %{main: %{}}
+    ],
+    poloniex: [
+      adapter: Tai.ExchangeAdapters.New.Poloniex,
+      accounts: %{main: %{}}
+    ],
+    gdax: [
+      adapter: Tai.ExchangeAdapters.New.Gdax,
+      accounts: %{
+        main: %{
+          # https://docs.pro.coinbase.com/#api
+          # api_url: "https://api-public.sandbox.pro.coinbase.com",
+          api_url: "https://api.pro.coinbase.com",
+          api_key: System.get_env("GDAX_API_KEY"),
+          api_secret: System.get_env("GDAX_API_SECRET"),
+          api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
+        }
+      }
+    ]
+  }
+
+config :tai,
   exchanges: %{
     binance: [
       supervisor: Tai.ExchangeAdapters.Binance.Supervisor,
@@ -54,20 +79,17 @@ config :tai,
   }
 
 config :tai,
-  advisors: [
-    %{
-      id: :create_and_cancel_pending_order,
-      supervisor: Examples.Advisors.CreateAndCancelPendingOrder.Supervisor,
-      order_books: "gdax.btc_usd"
-    },
-    %{
-      id: :fill_or_kill_orders,
-      supervisor: Examples.Advisors.FillOrKillOrders.Supervisor,
-      order_books: "binance.btc_usdt"
-    },
-    %{
-      id: :log_spread_advisor,
-      supervisor: Examples.Advisors.LogSpread.Supervisor,
-      order_books: "*"
-    }
-  ]
+  advisor_groups: %{
+    create_and_cancel_pending_order: [
+      factory: Examples.Advisors.CreateAndCancelPendingOrder.Factory,
+      products: "gdax.btc_usd"
+    ],
+    log_spread: [
+      factory: Examples.Advisors.LogSpread.Factory,
+      products: "binance.btc_usdt gdax.btc_usd poloniex.btc_usdt"
+    ],
+    fill_or_kill_orders: [
+      factory: Examples.Advisors.FillOrKillOrders.Factory,
+      products: "binance.btc_usdt"
+    ]
+  }

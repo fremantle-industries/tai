@@ -1,0 +1,40 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v3/account?recvWindow=5000&timestamp=1539369518804&signature=***"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"code\":-1021,\"msg\":\"Timestamp for this request is outside of the recvWindow.\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Fri, 12 Oct 2018 18:38:44 GMT",
+        "Server": "nginx",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Error from cloudfront",
+        "Via": "1.1 01a455b735347358143739c76de1ab1c.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "rrb5ea84xSlpYqGU3C8wfCNl5-Uge4VqmJR7avgjmKLjnXhSUBSbIA=="
+      },
+      "status_code": 400,
+      "type": "ok"
+    }
+  }
+]

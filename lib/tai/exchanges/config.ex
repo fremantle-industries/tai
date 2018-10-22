@@ -29,7 +29,7 @@ defmodule Tai.Exchanges.Config do
       }
     ]
   """
-  @spec all :: list(t)
+  @spec all :: [t]
   def all(exchanges \\ Application.get_env(:tai, :exchanges)) do
     exchanges
     |> Enum.map(fn {id, params} ->
@@ -49,11 +49,11 @@ defmodule Tai.Exchanges.Config do
 
     iex> Tai.Exchanges.Config.order_book_feeds()
     %{
-      test_feed_a: [
+      test_exchange_a: [
         adapter: Tai.ExchangeAdapters.Mock.OrderBookFeed,
         order_books: [:btc_usd, :ltc_usd]
       ],
-      test_feed_b: [
+      test_exchange_b: [
         adapter: Tai.ExchangeAdapters.Mock.OrderBookFeed,
         order_books: [:eth_usd, :ltc_usd]
       ]
@@ -69,7 +69,7 @@ defmodule Tai.Exchanges.Config do
   ## Examples
 
     iex> Tai.Exchanges.Config.order_book_feed_ids()
-    [:test_feed_a, :test_feed_b]
+    [:test_exchange_a, :test_exchange_b]
   """
   def order_book_feed_ids do
     order_book_feeds()
@@ -85,8 +85,8 @@ defmodule Tai.Exchanges.Config do
 
     iex> Tai.Exchanges.Config.order_book_feed_adapters()
     %{
-      test_feed_a: Tai.ExchangeAdapters.Mock.OrderBookFeed,
-      test_feed_b: Tai.ExchangeAdapters.Mock.OrderBookFeed
+      test_exchange_a: Tai.ExchangeAdapters.Mock.OrderBookFeed,
+      test_exchange_b: Tai.ExchangeAdapters.Mock.OrderBookFeed
     }
   """
   def order_book_feed_adapters do
@@ -101,7 +101,7 @@ defmodule Tai.Exchanges.Config do
 
   ## Examples
 
-    iex> Tai.Exchanges.Config.order_book_feed_adapter(:test_feed_a)
+    iex> Tai.Exchanges.Config.order_book_feed_adapter(:test_exchange_a)
     Tai.ExchangeAdapters.Mock.OrderBookFeed
   """
   def order_book_feed_adapter(feed_id) do
@@ -114,7 +114,7 @@ defmodule Tai.Exchanges.Config do
 
   ## Examples
 
-    iex> Tai.Exchanges.Config.order_book_feed_symbols(:test_feed_a)
+    iex> Tai.Exchanges.Config.order_book_feed_symbols(:test_exchange_a)
     [:btc_usd, :ltc_usd]
   """
   def order_book_feed_symbols(feed_id) do

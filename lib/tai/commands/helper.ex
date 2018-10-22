@@ -4,7 +4,7 @@ defmodule Tai.Commands.Helper do
   """
 
   @spec help :: no_return
-  defdelegate help, to: Tai.Commands.Info
+  defdelegate help, to: Tai.Commands.Help
 
   @spec balance :: no_return
   defdelegate balance, to: Tai.Commands.Balance
@@ -21,12 +21,21 @@ defmodule Tai.Commands.Helper do
   @spec orders :: no_return
   defdelegate orders, to: Tai.Commands.Orders
 
+  @spec advisors :: no_return
+  defdelegate advisors, to: Tai.Commands.Advisors
+
   @spec settings :: no_return
   defdelegate settings, to: Tai.Commands.Settings
 
-  @spec disable_send_orders :: no_return
-  defdelegate disable_send_orders, to: Tai.Commands.SendOrders, as: :disable
+  @spec start_advisor_groups :: no_return
+  defdelegate start_advisor_groups, to: Tai.Commands.AdvisorGroups, as: :start
+
+  @spec stop_advisor_groups :: no_return
+  defdelegate stop_advisor_groups, to: Tai.Commands.AdvisorGroups, as: :stop
 
   @spec enable_send_orders :: no_return
   defdelegate enable_send_orders, to: Tai.Commands.SendOrders, as: :enable
+
+  @spec disable_send_orders :: no_return
+  defdelegate disable_send_orders, to: Tai.Commands.SendOrders, as: :disable
 end

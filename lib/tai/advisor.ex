@@ -5,13 +5,14 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  @enforce_keys [:advisor_id, :order_books, :inside_quotes, :store]
-  defstruct advisor_id: nil, order_books: %{}, inside_quotes: %{}, store: %{}
+  @enforce_keys [:group_id, :advisor_id, :order_books, :inside_quotes, :store]
+  defstruct group_id: nil, advisor_id: nil, order_books: %{}, inside_quotes: %{}, store: %{}
 
   @typedoc """
   State of the running advisor
   """
   @type t :: %Tai.Advisor{
+          group_id: atom,
           advisor_id: atom,
           order_books: map,
           inside_quotes: map,
@@ -45,15 +46,9 @@ defmodule Tai.Advisor do
               state :: Tai.Advisor.t()
             ) :: :ok | {:ok, store :: map}
 
-  @doc """
-  Returns an atom that will identify the process
-
-  ## Examples
-
-    iex> Tai.Advisor.to_name(:my_test_advisor)
-    :advisor_my_test_advisor
-  """
-  def to_name(advisor_id), do: :"advisor_#{advisor_id}"
+  def to_name(group_id: gid, advisor_id: aid) do
+    :"advisor_#{gid}_#{aid}"
+  end
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -65,19 +60,23 @@ defmodule Tai.Advisor do
       @behaviour Tai.Advisor
 
       def start_link(
+            group_id: group_id,
             advisor_id: advisor_id,
             order_books: order_books,
-            store: %{} = store
+            store: store
           ) do
+        name = Tai.Advisor.to_name(group_id: group_id, advisor_id: advisor_id)
+
         GenServer.start_link(
           __MODULE__,
           %Tai.Advisor{
+            group_id: group_id,
             advisor_id: advisor_id,
             order_books: order_books,
             inside_quotes: %{},
             store: Map.merge(%{}, store)
           },
-          name: advisor_id |> Tai.Advisor.to_name()
+          name: name
         )
       end
 

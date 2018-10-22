@@ -7,12 +7,12 @@ defmodule Examples.Advisors.FillOrKillOrders.Advisor do
 
   require Logger
 
-  def handle_inside_quote(:binance, :btc_usdt, _inside_quote, _changes, _state) do
+  def handle_inside_quote(feed_id, symbol, _inside_quote, _changes, _state) do
     if Tai.Trading.OrderStore.count() == 0 do
       Tai.Trading.OrderPipeline.buy_limit(
-        :binance,
+        feed_id,
         :main,
-        :btc_usdt,
+        symbol,
         100.1,
         0.1,
         :fok,
@@ -23,15 +23,11 @@ defmodule Examples.Advisors.FillOrKillOrders.Advisor do
     :ok
   end
 
-  def handle_inside_quote(_, _, _, _, _), do: :ok
-
   def order_updated(
         %Tai.Trading.Order{status: :enqueued},
         %Tai.Trading.Order{status: :filled} = updated_order
       ) do
-    Logger.info(fn ->
-      "filled order #{inspect(updated_order)}"
-    end)
+    Logger.info("filled order #{inspect(updated_order)}")
   end
 
   def order_updated(_previous_order, _updated_order), do: nil

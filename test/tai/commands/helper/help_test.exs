@@ -10,7 +10,10 @@ defmodule Tai.Commands.Helper.HelpTest do
            * fees
            * markets
            * orders
+           * advisors
            * settings
+           * start_advisor_groups
+           * stop_advisor_groups
            * enable_send_orders
            * disable_send_orders\n
            """

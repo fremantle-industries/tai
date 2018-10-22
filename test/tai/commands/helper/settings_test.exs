@@ -5,11 +5,12 @@ defmodule Tai.Commands.Helper.SettingsTest do
 
   test "settings displays the current values" do
     assert capture_io(&Tai.Commands.Helper.settings/0) == """
-           +-------------+-------+
-           |        Name | Value |
-           +-------------+-------+
-           | send_orders |  true |
-           +-------------+-------+\n
+           +-----------------------+------------------------------------+
+           |                  Name |                              Value |
+           +-----------------------+------------------------------------+
+           | exchange_boot_handler | Elixir.Support.ExchangeBootHandler |
+           |           send_orders |                               true |
+           +-----------------------+------------------------------------+\n
            """
   end
 end

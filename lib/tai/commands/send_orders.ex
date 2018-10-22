@@ -1,18 +1,33 @@
 defmodule Tai.Commands.SendOrders do
+  alias TableRex.Table
+
+  require Logger
+
   @spec disable :: no_return
   def disable do
     Tai.Settings.disable_send_orders!()
-    render!()
+    rows() |> render!()
   end
 
   @spec enable :: no_return
   def enable do
     Tai.Settings.enable_send_orders!()
-    render!()
+    rows() |> render!()
   end
 
-  @spec render! :: no_return
-  defp render! do
-    Tai.Commands.Settings.settings()
+  defp rows do
+    Tai.Settings.all()
+    |> Enum.filter(fn {k, _} -> k == :send_orders end)
+    |> Enum.map(fn {k, v} -> [k, v] end)
+  end
+
+  @headers ["Name", "Value"]
+  @spec render!(rows :: [...]) :: no_return
+  defp render!(rows) do
+    rows
+    |> Table.new(@headers)
+    |> Table.put_column_meta(:all, align: :right)
+    |> Table.render!()
+    |> IO.puts()
   end
 end
