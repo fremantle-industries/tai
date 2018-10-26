@@ -1,4 +1,4 @@
-defmodule Tai.Queries.ProductsByExchange do
+defmodule Tai.Queries.ProductSymbolsByExchange do
   @moduledoc """
   Query module which returns a map of exchanges with their product symbols 
   """

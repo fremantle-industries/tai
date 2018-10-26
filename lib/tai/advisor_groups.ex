@@ -47,13 +47,13 @@ defmodule Tai.AdvisorGroups do
   end
 
   defp build_specs({:ok, groups}) do
-    products_by_exchange = Tai.Queries.ProductsByExchange.all()
+    product_symbols_by_exchange = Tai.Queries.ProductSymbolsByExchange.all()
 
     groups
     |> Enum.reduce(
       [],
       fn group, acc ->
-        products = Juice.squeeze(products_by_exchange, group.products)
+        products = Juice.squeeze(product_symbols_by_exchange, group.products)
         acc ++ group.factory.advisor_specs(group, products)
       end
     )
