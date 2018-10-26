@@ -1,0 +1,23 @@
+defmodule Tai.ConfigTest do
+  use ExUnit.Case, async: false
+  doctest Tai.Config
+
+  describe ".parse!" do
+    test "returns a default representation" do
+      assert Tai.Config.parse!([]) == %Tai.Config{
+               send_orders: false,
+               exchange_boot_handler: Tai.Exchanges.BootHandler
+             }
+    end
+
+    test "can set send_orders" do
+      assert config = Tai.Config.parse!(send_orders: true)
+      assert config.send_orders == true
+    end
+
+    test "can set exchange_boot_handler" do
+      assert config = Tai.Config.parse!(exchange_boot_handler: MyBootHandler)
+      assert config.exchange_boot_handler == MyBootHandler
+    end
+  end
+end

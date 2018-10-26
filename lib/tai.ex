@@ -2,11 +2,12 @@ defmodule Tai do
   use Application
 
   def start(_type, _args) do
-    settings_config = Tai.SettingsConfig.parse()
+    config = Tai.Config.parse!()
+    settings = Tai.Settings.from_config(config)
 
     children = [
       Tai.PubSub,
-      {Tai.Settings, settings_config},
+      {Tai.Settings, settings},
       Tai.Exchanges.ProductStore,
       Tai.Exchanges.FeeStore,
       Tai.Exchanges.AssetBalances,
@@ -21,7 +22,7 @@ defmodule Tai do
     ]
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)
-    boot_exchanges!(&settings_config.exchange_boot_handler.parse_response/1)
+    boot_exchanges!(&config.exchange_boot_handler.parse_response/1)
     {:ok, pid}
   end
 

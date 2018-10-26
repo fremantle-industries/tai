@@ -5,12 +5,11 @@ defmodule Tai.Settings do
 
   use GenServer
 
-  def start_link(settings) do
-    GenServer.start_link(
-      __MODULE__,
-      settings,
-      name: __MODULE__
-    )
+  @enforce_keys [:send_orders]
+  defstruct [:send_orders]
+
+  def start_link(%Tai.Settings{} = settings) do
+    GenServer.start_link(__MODULE__, settings, name: __MODULE__)
   end
 
   def init(state) do
@@ -45,5 +44,9 @@ defmodule Tai.Settings do
 
   def send_orders? do
     GenServer.call(__MODULE__, :send_orders?)
+  end
+
+  def from_config(%Tai.Config{} = config) do
+    %Tai.Settings{send_orders: config.send_orders}
   end
 end

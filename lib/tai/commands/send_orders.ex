@@ -17,8 +17,9 @@ defmodule Tai.Commands.SendOrders do
 
   defp rows do
     Tai.Settings.all()
+    |> Map.to_list()
     |> Enum.filter(fn {k, _} -> k == :send_orders end)
-    |> Enum.map(fn {k, v} -> [k, v] end)
+    |> Enum.map(&Tuple.to_list/1)
   end
 
   @headers ["Name", "Value"]

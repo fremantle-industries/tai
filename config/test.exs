@@ -24,7 +24,7 @@ config :exvcr,
 config(:echo_boy, port: 4100)
 
 config :tai, send_orders: true
-config :tai, exchange_boot_handler: Support.ExchangeBootHandler
+config :tai, exchange_boot_handler: Tai.TestSupport.ExchangeBootHandler
 
 config :ex_poloniex,
   api_key: System.get_env("POLONIEX_API_KEY"),
