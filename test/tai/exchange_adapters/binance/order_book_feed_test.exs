@@ -24,8 +24,12 @@ defmodule Tai.ExchangeAdapters.Binance.OrderBookFeedTest do
   end
 
   setup do
-    HTTPoison.start()
+    on_exit(fn ->
+      Application.stop(:tai)
+    end)
 
+    {:ok, _} = Application.ensure_all_started(:tai)
+    HTTPoison.start()
     Process.register(self(), :test)
 
     my_binance_feed_btc_usdt_pid =

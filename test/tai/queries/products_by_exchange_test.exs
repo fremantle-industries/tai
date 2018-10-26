@@ -6,8 +6,11 @@ defmodule Tai.Queries.ProductsByExchangeTest do
 
   setup do
     on_exit(fn ->
-      Tai.Exchanges.ProductStore.clear()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
   end
 
   test ".all returns a map keyed by exchange with a list product symbols" do

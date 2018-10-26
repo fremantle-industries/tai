@@ -6,9 +6,10 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
 
   setup do
     on_exit(fn ->
-      Tai.Trading.OrderStore.clear()
+      Application.stop(:tai)
     end)
 
+    {:ok, _} = Application.ensure_all_started(:tai)
     start_supervised!(Tai.TestSupport.Mocks.Server)
     :ok
   end

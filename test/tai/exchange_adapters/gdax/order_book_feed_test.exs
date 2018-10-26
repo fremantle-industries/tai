@@ -39,6 +39,11 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeedTest do
   end
 
   setup do
+    on_exit(fn ->
+      Application.stop(:tai)
+    end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
     HTTPoison.start()
     Process.register(self(), :test)
 

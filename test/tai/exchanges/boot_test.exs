@@ -9,10 +9,11 @@ defmodule Tai.Exchanges.BootTest do
 
   setup do
     on_exit(fn ->
-      Tai.Exchanges.ProductStore.clear()
-      Tai.Exchanges.FeeStore.clear()
-      Tai.Exchanges.AssetBalances.clear()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
   end
 
   @exchange_id :mock_boot

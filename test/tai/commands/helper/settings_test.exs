@@ -3,6 +3,15 @@ defmodule Tai.Commands.Helper.SettingsTest do
 
   import ExUnit.CaptureIO
 
+  setup do
+    on_exit(fn ->
+      Application.stop(:tai)
+    end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
+  end
+
   test "settings displays the current values" do
     assert capture_io(&Tai.Commands.Helper.settings/0) == """
            +-------------+-------+

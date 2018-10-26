@@ -6,8 +6,11 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
 
   setup do
     on_exit(fn ->
-      restart_application()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
   end
 
   test "skips buy limit orders" do

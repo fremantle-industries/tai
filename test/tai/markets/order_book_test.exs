@@ -30,6 +30,11 @@ defmodule Tai.Markets.OrderBookTest do
   end
 
   setup do
+    on_exit(fn ->
+      Application.stop(:tai)
+    end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
     book_pid = start_supervised!({OrderBook, feed_id: :my_test_feed, symbol: :btc_usd})
 
     %{book_pid: book_pid}

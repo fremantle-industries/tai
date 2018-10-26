@@ -5,8 +5,11 @@ defmodule Tai.Commands.Helper.AdvisorGroupsTest do
 
   setup do
     on_exit(fn ->
-      Tai.TestSupport.Helpers.restart_application()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
   end
 
   test "starts and stops all advisors in all groups" do

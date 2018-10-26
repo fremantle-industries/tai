@@ -32,6 +32,11 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeedTest do
   end
 
   setup do
+    on_exit(fn ->
+      Application.stop(:tai)
+    end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
     Process.register(self(), :test)
 
     my_poloniex_feed_btc_usd_pid =

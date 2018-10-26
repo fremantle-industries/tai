@@ -6,8 +6,11 @@ defmodule Tai.Commands.Helper.ProductsTest do
 
   setup do
     on_exit(fn ->
-      Tai.TestSupport.Helpers.restart_application()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
   end
 
   test "show products and their trade restrictions for configured exchanges" do

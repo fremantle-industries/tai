@@ -5,8 +5,11 @@ defmodule Tai.Commands.Helper.MarketsTest do
 
   setup do
     on_exit(fn ->
-      Tai.TestSupport.Helpers.restart_application()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
   end
 
   test "shows all inside quotes and the time they were last processed and changed" do

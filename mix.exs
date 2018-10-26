@@ -11,6 +11,7 @@ defmodule Tai.Mixfile do
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
+      aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
@@ -53,6 +54,13 @@ defmodule Tai.Mixfile do
       {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}
+    ]
+  end
+
+  defp aliases do
+    [
+      test: "test --no-start",
+      "test.watch": "test.watch --no-start"
     ]
   end
 

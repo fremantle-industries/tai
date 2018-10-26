@@ -6,8 +6,11 @@ defmodule Tai.Commands.Helper.FeesTest do
 
   setup do
     on_exit(fn ->
-      Tai.TestSupport.Helpers.restart_application()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
   end
 
   test "show the accounts maker/taker fees for every product on each exchange" do

@@ -34,9 +34,10 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
   setup do
     on_exit(fn ->
-      Tai.Trading.OrderStore.clear()
+      Application.stop(:tai)
     end)
 
+    {:ok, _} = Application.ensure_all_started(:tai)
     Process.register(self(), :test)
 
     book_pid =

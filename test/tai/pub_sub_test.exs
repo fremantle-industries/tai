@@ -2,8 +2,6 @@ defmodule Tai.PubSubTest do
   use ExUnit.Case, async: true
   doctest Tai.PubSub
 
-  alias Tai.PubSub
-
   defmodule MultiSubscriber do
     use GenServer
 
@@ -12,7 +10,7 @@ defmodule Tai.PubSubTest do
     end
 
     def init(state) do
-      PubSub.subscribe([
+      Tai.PubSub.subscribe([
         :my_topic_a,
         :my_topic_b
       ])
@@ -21,7 +19,7 @@ defmodule Tai.PubSubTest do
     end
 
     def handle_call(:unsubscribe, _from, state) do
-      PubSub.unsubscribe([
+      Tai.PubSub.unsubscribe([
         :my_topic_a,
         :my_topic_b
       ])
@@ -40,9 +38,18 @@ defmodule Tai.PubSubTest do
     end
   end
 
+  setup do
+    on_exit(fn ->
+      Application.stop(:tai)
+    end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
+  end
+
   test "subscribe can take a single topic" do
-    PubSub.subscribe(:my_topic)
-    PubSub.broadcast(:my_topic, :my_msg)
+    Tai.PubSub.subscribe(:my_topic)
+    Tai.PubSub.broadcast(:my_topic, :my_msg)
 
     assert_receive :my_msg
   end
@@ -52,25 +59,25 @@ defmodule Tai.PubSubTest do
     start_supervised!({MultiSubscriber, id: :a, test: :subscribe}, id: :subscribe_a)
     start_supervised!({MultiSubscriber, id: :b, test: :subscribe}, id: :subscribe_b)
 
-    PubSub.broadcast(:my_topic_a, :my_topic_a_msg)
+    Tai.PubSub.broadcast(:my_topic_a, :my_topic_a_msg)
 
     assert_receive {:my_topic_a_msg, [id: :a, test: :subscribe]}
     assert_receive {:my_topic_a_msg, [id: :b, test: :subscribe]}
 
-    PubSub.broadcast(:my_topic_b, :my_topic_b_msg)
+    Tai.PubSub.broadcast(:my_topic_b, :my_topic_b_msg)
 
     assert_receive {:my_topic_b_msg, [id: :a, test: :subscribe]}
     assert_receive {:my_topic_b_msg, [id: :b, test: :subscribe]}
   end
 
   test "unsubscribe can take a single topic" do
-    PubSub.subscribe(:my_topic)
-    PubSub.broadcast(:my_topic, :my_msg)
+    Tai.PubSub.subscribe(:my_topic)
+    Tai.PubSub.broadcast(:my_topic, :my_msg)
 
     assert_receive :my_msg
 
-    PubSub.unsubscribe(:my_topic)
-    PubSub.broadcast(:my_topic, :my_msg)
+    Tai.PubSub.unsubscribe(:my_topic)
+    Tai.PubSub.broadcast(:my_topic, :my_msg)
 
     refute_receive :my_msg
   end
@@ -80,8 +87,8 @@ defmodule Tai.PubSubTest do
     start_supervised!({MultiSubscriber, id: :a, test: :unsubscribe}, id: :subscribe_a)
     start_supervised!({MultiSubscriber, id: :b, test: :unsubscribe}, id: :subscribe_b)
 
-    PubSub.broadcast(:my_topic_a, :my_topic_a_msg)
-    PubSub.broadcast(:my_topic_b, :my_topic_b_msg)
+    Tai.PubSub.broadcast(:my_topic_a, :my_topic_a_msg)
+    Tai.PubSub.broadcast(:my_topic_b, :my_topic_b_msg)
 
     assert_receive {:my_topic_a_msg, [id: :a, test: :unsubscribe]}
     assert_receive {:my_topic_a_msg, [id: :b, test: :unsubscribe]}
@@ -90,8 +97,8 @@ defmodule Tai.PubSubTest do
 
     MultiSubscriber.unsubscribe(:b)
 
-    PubSub.broadcast(:my_topic_a, :my_topic_a_msg)
-    PubSub.broadcast(:my_topic_b, :my_topic_b_msg)
+    Tai.PubSub.broadcast(:my_topic_a, :my_topic_a_msg)
+    Tai.PubSub.broadcast(:my_topic_b, :my_topic_b_msg)
 
     assert_receive {:my_topic_a_msg, [id: :a, test: :unsubscribe]}
     refute_receive {:my_topic_a_msg, [id: :b, test: :unsubscribe]}

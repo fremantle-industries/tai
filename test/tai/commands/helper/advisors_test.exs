@@ -6,8 +6,11 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
 
   setup do
     on_exit(fn ->
-      Tai.Exchanges.ProductStore.clear()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
+    :ok
   end
 
   test "shows all advisors and their run status" do

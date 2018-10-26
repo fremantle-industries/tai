@@ -2,14 +2,14 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureLog
-  import Tai.TestSupport.Helpers
   import Tai.TestSupport.Mock
 
   setup do
     on_exit(fn ->
-      restart_application()
+      Application.stop(:tai)
     end)
 
+    {:ok, _} = Application.ensure_all_started(:tai)
     start_supervised!(Tai.TestSupport.Mocks.Server)
     Tai.Settings.enable_send_orders!()
 

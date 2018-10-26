@@ -4,8 +4,10 @@ defmodule Tai.Exchanges.ProductStoreTest do
 
   setup do
     on_exit(fn ->
-      Tai.Exchanges.ProductStore.clear()
+      Application.stop(:tai)
     end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
 
     product = %Tai.Exchanges.Product{
       exchange_id: :my_exchange,
