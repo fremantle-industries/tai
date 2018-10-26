@@ -7,7 +7,8 @@ defmodule Tai.ConfigTest do
       assert Tai.Config.parse([]) == %Tai.Config{
                send_orders: false,
                exchange_boot_handler: Tai.Exchanges.BootHandler,
-               venues: %{}
+               venues: %{},
+               advisor_groups: %{}
              }
     end
 
@@ -24,6 +25,11 @@ defmodule Tai.ConfigTest do
     test "can set venues" do
       assert config = Tai.Config.parse(venues: :venues)
       assert config.venues == :venues
+    end
+
+    test "can set advisor_groups" do
+      assert config = Tai.Config.parse(advisor_groups: :advisor_groups)
+      assert config.advisor_groups == :advisor_groups
     end
   end
 end

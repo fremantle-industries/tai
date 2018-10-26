@@ -4,6 +4,7 @@ defmodule Examples.Advisors.LogSpread.FactoryTest do
 
   test ".advisor_specs returns a supervisable child spec for each product on the given exchanges" do
     group = %Tai.AdvisorGroup{
+      factory: Examples.Advisors.LogSpread.Factory,
       id: :group_a,
       products: "*"
     }
