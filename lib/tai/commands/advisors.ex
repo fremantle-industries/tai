@@ -1,16 +1,17 @@
 defmodule Tai.Commands.Advisors do
   alias TableRex.Table
 
-  require Logger
+  @type config :: Tai.Config.t()
 
-  @spec advisors :: no_return
-  def advisors do
-    Tai.AdvisorGroups.specs()
+  @spec advisors(config :: config) :: no_return
+  def advisors(config \\ Tai.Config.parse()) do
+    config
+    |> Tai.AdvisorGroups.build_specs()
     |> format_rows
     |> render!
   end
 
-  defp format_rows(specs) do
+  defp format_rows({:ok, specs}) do
     specs
     |> Enum.map(fn {_, [group_id: gid, advisor_id: aid, order_books: _, store: _]} ->
       pid = [group_id: gid, advisor_id: aid] |> Tai.Advisor.to_name() |> Process.whereis()

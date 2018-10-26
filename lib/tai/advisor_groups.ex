@@ -1,8 +1,9 @@
 defmodule Tai.AdvisorGroups do
   @type config :: Tai.Config.t()
   @type advisor_group :: Tai.AdvisorGroup.t()
+  @type advisor_spec :: {atom, [group_id: atom, advisor_id: atom, order_books: map, store: map]}
 
-  @spec parse_config(config :: config) :: {:ok, [advisor_group]}
+  @spec parse_config(config :: config) :: {:ok, [advisor_group]} | {:error, map}
   def parse_config(%Tai.Config{advisor_groups: advisor_groups}) do
     results =
       advisor_groups
@@ -40,22 +41,24 @@ defmodule Tai.AdvisorGroups do
     end
   end
 
-  def specs do
-    Tai.Config.parse()
-    |> Tai.AdvisorGroups.parse_config()
-    |> build_specs
-  end
+  @spec build_specs(config :: config, product_symbols_by_exchange :: map) ::
+          {:ok, [advisor_spec]} | {:error, map}
+  def build_specs(
+        %Tai.Config{} = config,
+        product_symbols_by_exchange \\ Tai.Queries.ProductSymbolsByExchange.all()
+      ) do
+    with {:ok, groups} <- config |> Tai.AdvisorGroups.parse_config() do
+      specs =
+        Enum.reduce(
+          groups,
+          [],
+          fn group, acc ->
+            products = Juice.squeeze(product_symbols_by_exchange, group.products)
+            acc ++ group.factory.advisor_specs(group, products)
+          end
+        )
 
-  defp build_specs({:ok, groups}) do
-    product_symbols_by_exchange = Tai.Queries.ProductSymbolsByExchange.all()
-
-    groups
-    |> Enum.reduce(
-      [],
-      fn group, acc ->
-        products = Juice.squeeze(product_symbols_by_exchange, group.products)
-        acc ++ group.factory.advisor_specs(group, products)
-      end
-    )
+      {:ok, specs}
+    end
   end
 end

@@ -71,4 +71,57 @@ defmodule Tai.AdvisorGroupsTest do
                {:error, %{group_b: [:products_not_present]}}
     end
   end
+
+  describe ".build_specs" do
+    defmodule MyTestFactory do
+      def advisor_specs(group, filtered_product_symbols_by_exchange) do
+        [
+          {group.factory, filtered_product_symbols_by_exchange.exchange_a},
+          {group.factory, filtered_product_symbols_by_exchange.exchange_b}
+        ]
+      end
+    end
+
+    test "returns advisor specs with filtered products from the groups factory" do
+      config_without_groups = Tai.Config.parse(advisor_groups: %{})
+
+      product_symbols_by_exchange = %{
+        exchange_a: [:btc_usd, :eth_usd],
+        exchange_b: [:btc_usd, :ltc_usd]
+      }
+
+      assert Tai.AdvisorGroups.build_specs(config_without_groups, product_symbols_by_exchange) ==
+               {:ok, []}
+
+      config_with_groups =
+        Tai.Config.parse(
+          advisor_groups: %{
+            group_a: [
+              factory: MyTestFactory,
+              products: "exchange_a exchange_b.ltc_usd"
+            ]
+          }
+        )
+
+      assert Tai.AdvisorGroups.build_specs(config_with_groups, product_symbols_by_exchange) == {
+               :ok,
+               [
+                 {MyTestFactory, [:btc_usd, :eth_usd]},
+                 {MyTestFactory, [:ltc_usd]}
+               ]
+             }
+    end
+
+    test "surfaces the errors from .parse_config" do
+      config =
+        Tai.Config.parse(
+          advisor_groups: %{
+            group_a: [factory: MyTestFactoryB]
+          }
+        )
+
+      assert Tai.AdvisorGroups.build_specs(config, %{}) ==
+               {:error, %{group_a: [:products_not_present]}}
+    end
+  end
 end
