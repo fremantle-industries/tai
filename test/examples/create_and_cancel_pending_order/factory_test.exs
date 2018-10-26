@@ -2,7 +2,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.FactoryTest do
   use ExUnit.Case, async: true
   doctest Examples.Advisors.CreateAndCancelPendingOrder.Factory
 
-  test ".advisor_specs returns returns a supervisable child spec for each product on the given exchanges" do
+  test ".advisor_specs returns a supervisable child spec for each product on the given exchanges" do
     group = %Tai.AdvisorGroup{
       id: :group_a,
       products: "*"
