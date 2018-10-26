@@ -27,7 +27,7 @@ defmodule Tai do
 
   defp boot_exchanges!(response_handler) do
     :tai
-    |> Application.get_env(:new_exchanges)
+    |> Application.get_env(:venues)
     |> Tai.Exchanges.Exchange.parse_configs()
     |> Enum.map(fn adapter ->
       Task.Supervisor.async(

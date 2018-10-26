@@ -23,7 +23,7 @@ defmodule Tai.Exchanges.BootTest do
 
     @adapter %Tai.Exchanges.Adapter{
       id: @exchange_id,
-      adapter: Tai.ExchangeAdapters.New.Mock,
+      adapter: Tai.VenueAdapters.Mock,
       products: "* -ltc_usdt",
       accounts: %{main: %{}}
     }
@@ -98,7 +98,7 @@ defmodule Tai.Exchanges.BootTest do
     test "returns an error tuple" do
       adapter = %Tai.Exchanges.Adapter{
         id: :mock_boot,
-        adapter: Tai.ExchangeAdapters.New.Mock,
+        adapter: Tai.VenueAdapters.Mock,
         products: "*",
         accounts: %{}
       }
@@ -114,7 +114,7 @@ defmodule Tai.Exchanges.BootTest do
     test "returns an error" do
       adapter = %Tai.Exchanges.Adapter{
         id: :mock_boot,
-        adapter: Tai.ExchangeAdapters.New.Mock,
+        adapter: Tai.VenueAdapters.Mock,
         products: "*",
         accounts: %{main: %{}}
       }
@@ -130,7 +130,7 @@ defmodule Tai.Exchanges.BootTest do
     test "returns an error" do
       adapter = %Tai.Exchanges.Adapter{
         id: :mock_boot,
-        adapter: Tai.ExchangeAdapters.New.Mock,
+        adapter: Tai.VenueAdapters.Mock,
         products: "*",
         accounts: %{main: %{}}
       }

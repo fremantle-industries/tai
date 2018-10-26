@@ -9,7 +9,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Products do
         )
       end)
 
-    key = Tai.ExchangeAdapters.New.Mock.products_response_key(exchange_id)
+    key = Tai.VenueAdapters.Mock.products_response_key(exchange_id)
     :ok = Tai.TestSupport.Mocks.Server.insert(key, products)
 
     :ok

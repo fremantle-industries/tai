@@ -37,19 +37,19 @@ config :binance,
 config(:tai,
   test_exchange_adapters: %{
     mock: [
-      adapter: Tai.ExchangeAdapters.New.Mock,
+      adapter: Tai.VenueAdapters.Mock,
       accounts: %{main: %{}}
     ],
     binance: [
-      adapter: Tai.ExchangeAdapters.New.Binance,
+      adapter: Tai.VenueAdapters.Binance,
       accounts: %{main: %{}}
     ],
     poloniex: [
-      adapter: Tai.ExchangeAdapters.New.Poloniex,
+      adapter: Tai.VenueAdapters.Poloniex,
       accounts: %{main: %{}}
     ],
     gdax: [
-      adapter: Tai.ExchangeAdapters.New.Gdax,
+      adapter: Tai.VenueAdapters.Gdax,
       accounts: %{
         main: %{
           api_url: "https://api-public.sandbox.pro.coinbase.com",
@@ -63,13 +63,13 @@ config(:tai,
 )
 
 config :tai,
-  new_exchanges: %{
+  venues: %{
     test_exchange_a: [
-      adapter: Tai.ExchangeAdapters.New.Mock,
+      adapter: Tai.VenueAdapters.Mock,
       accounts: %{main: %{}}
     ],
     test_exchange_b: [
-      adapter: Tai.ExchangeAdapters.New.Mock,
+      adapter: Tai.VenueAdapters.Mock,
       accounts: %{main: %{}}
     ]
   }

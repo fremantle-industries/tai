@@ -13,17 +13,17 @@ config :binance,
 config :tai, send_orders: false
 
 config :tai,
-  new_exchanges: %{
+  venues: %{
     binance: [
-      adapter: Tai.ExchangeAdapters.New.Binance,
+      adapter: Tai.VenueAdapters.Binance,
       accounts: %{main: %{}}
     ],
     poloniex: [
-      adapter: Tai.ExchangeAdapters.New.Poloniex,
+      adapter: Tai.VenueAdapters.Poloniex,
       accounts: %{main: %{}}
     ],
     gdax: [
-      adapter: Tai.ExchangeAdapters.New.Gdax,
+      adapter: Tai.VenueAdapters.Gdax,
       accounts: %{
         main: %{
           # https://docs.pro.coinbase.com/#api
