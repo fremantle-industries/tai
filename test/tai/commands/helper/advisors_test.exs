@@ -14,33 +14,26 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
   end
 
   test "shows all advisors and their run status" do
-    mock_product(%{
-      exchange_id: :exchange_a,
-      symbol: :btc_usdt
-    })
-
-    mock_product(%{
-      exchange_id: :exchange_b,
-      symbol: :eth_usdt
-    })
+    mock_product(%{exchange_id: :exchange_a, symbol: :btc_usdt})
+    mock_product(%{exchange_id: :exchange_b, symbol: :eth_usdt})
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +------------+---------------------+-----------+-----+
-           |   Group ID |          Advisor ID |    Status | PID |
-           +------------+---------------------+-----------+-----+
-           | log_spread | exchange_a_btc_usdt | unstarted |   - |
-           | log_spread | exchange_b_eth_usdt | unstarted |   - |
-           +------------+---------------------+-----------+-----+\n
+           +------------+---------------------+-------+-----------+-----+
+           |   Group ID |          Advisor ID | Store |    Status | PID |
+           +------------+---------------------+-------+-----------+-----+
+           | log_spread | exchange_a_btc_usdt |   %{} | unstarted |   - |
+           | log_spread | exchange_b_eth_usdt |   %{} | unstarted |   - |
+           +------------+---------------------+-------+-----------+-----+\n
            """
   end
 
   test "shows an empty table when there are no advisors" do
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +----------+------------+--------+-----+
-           | Group ID | Advisor ID | Status | PID |
-           +----------+------------+--------+-----+
-           |        - |          - |      - |   - |
-           +----------+------------+--------+-----+\n
+           +----------+------------+-------+--------+-----+
+           | Group ID | Advisor ID | Store | Status | PID |
+           +----------+------------+-------+--------+-----+
+           |        - |          - |     - |      - |   - |
+           +----------+------------+-------+--------+-----+\n
            """
   end
 end

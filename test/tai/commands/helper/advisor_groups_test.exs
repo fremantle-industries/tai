@@ -28,21 +28,25 @@ defmodule Tai.Commands.Helper.AdvisorGroupsTest do
            """
 
     output = capture_io(&Tai.Commands.Helper.advisors/0)
-    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Status \|\s+PID \|/
-    assert output =~ ~r/\| log_spread \| exchange_a_btc_usdt \| running \| #PID<.+> \|/
-    assert output =~ ~r/\| log_spread \| exchange_b_eth_usdt \| running \| #PID<.+> \|/
+    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Store \|\s+Status \|\s+PID \|/
+
+    assert output =~
+             ~r/\|\s+log_spread \|\s+exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
+
+    assert output =~
+             ~r/\|\s+log_spread \|\s+exchange_b_eth_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
 
     assert capture_io(&Tai.Commands.Helper.stop_advisor_groups/0) == """
            Stopped 2 advisors
            """
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +------------+---------------------+-----------+-----+
-           |   Group ID |          Advisor ID |    Status | PID |
-           +------------+---------------------+-----------+-----+
-           | log_spread | exchange_a_btc_usdt | unstarted |   - |
-           | log_spread | exchange_b_eth_usdt | unstarted |   - |
-           +------------+---------------------+-----------+-----+\n
+           +------------+---------------------+-------+-----------+-----+
+           |   Group ID |          Advisor ID | Store |    Status | PID |
+           +------------+---------------------+-------+-----------+-----+
+           | log_spread | exchange_a_btc_usdt |   %{} | unstarted |   - |
+           | log_spread | exchange_b_eth_usdt |   %{} | unstarted |   - |
+           +------------+---------------------+-------+-----------+-----+\n
            """
   end
 end
