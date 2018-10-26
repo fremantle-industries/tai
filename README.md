@@ -124,7 +124,10 @@ iex(1)> help
 * fees
 * markets
 * orders
+* advisors
 * settings
+* start_advisor_groups
+* stop_advisor_groups
 * enable_send_orders
 * disable_send_orders
 ```
@@ -227,6 +230,55 @@ iex(6)> orders
 +---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
 |    gdax | btc_usd | buy_limit | 100.1 |  0.1 |  error | a6aa15bc-b271-486f-ab40-f9b35b2cd223 |           | 20 minutes ago |            |
 +---------+---------+-----------+-------+------+--------+--------------------------------------+-----------+----------------+------------+
+```
+
+#### settings
+
+Displays the current runtime settings
+
+```
+iex(7)> settings
++-------------+-------+
+|        Name | Value |
++-------------+-------+
+| send_orders | false |
++-------------+-------+
+```
+
+#### start_advisor_groups
+
+Starts every advisor in every group
+
+```
+iex(8)> start_advisor_groups
+Started 5 advisors
+```
+
+#### stop_advisor_groups
+
+Stops every advisor in every group
+
+```
+iex(9)> stop_advisor_groups
+Stopped 5 advisors
+```
+
+#### advisors
+
+Displays every advisor from every group along with their run status 
+
+
+```
+iex(10)> advisors
++---------------------------------+-------------------+-----------+-----+
+|                        Group ID |        Advisor ID |    Status | PID |
++---------------------------------+-------------------+-----------+-----+
+| create_and_cancel_pending_order |      gdax_btc_usd | unstarted |   - |
+|             fill_or_kill_orders |  binance_btc_usdt | unstarted |   - |
+|                      log_spread |  binance_btc_usdt | unstarted |   - |
+|                      log_spread |      gdax_btc_usd | unstarted |   - |
+|                      log_spread | poloniex_btc_usdt | unstarted |   - |
++---------------------------------+-------------------+-----------+-----+
 ```
 
 ## Debugging
