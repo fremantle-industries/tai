@@ -9,29 +9,32 @@ defmodule Tai.Settings do
   defstruct [:send_orders]
 
   def start_link(%Tai.Settings{} = settings) do
-    GenServer.start_link(__MODULE__, settings, name: __MODULE__)
+    {:ok, pid} = GenServer.start_link(__MODULE__, settings, name: __MODULE__)
+    GenServer.call(pid, :create_ets_table)
+    {:ok, pid}
   end
 
   def init(state) do
     {:ok, state}
   end
 
-  def handle_call(:all, _from, state) do
-    {:reply, state, state}
+  def handle_call(:create_ets_table, _from, state) do
+    create_ets_table()
+    upsert_items(state)
+    {:reply, :ok, state}
   end
 
   def handle_call({:set_send_orders, val}, _from, state) do
-    new_state = Map.put(state, :send_orders, val)
-    {:reply, :ok, new_state}
-  end
-
-  def handle_call(:send_orders?, _from, state) do
-    send_orders = Map.get(state, :send_orders)
-    {:reply, send_orders, state}
+    :ets.insert(__MODULE__, {:send_orders, val})
+    {:reply, :ok, state}
   end
 
   def all do
-    GenServer.call(__MODULE__, :all)
+    [{:send_orders, send_orders}] = :ets.lookup(__MODULE__, :send_orders)
+
+    %Tai.Settings{
+      send_orders: send_orders
+    }
   end
 
   def disable_send_orders! do
@@ -43,10 +46,22 @@ defmodule Tai.Settings do
   end
 
   def send_orders? do
-    GenServer.call(__MODULE__, :send_orders?)
+    [{:send_orders, send_orders}] = :ets.lookup(__MODULE__, :send_orders)
+    send_orders
   end
 
   def from_config(%Tai.Config{} = config) do
     %Tai.Settings{send_orders: config.send_orders}
+  end
+
+  defp create_ets_table do
+    :ets.new(__MODULE__, [:set, :protected, :named_table])
+  end
+
+  defp upsert_items(settings) do
+    settings
+    |> Map.to_list()
+    |> Enum.filter(fn {k, _} -> k != :__struct__ end)
+    |> Enum.each(fn item -> :ets.insert(__MODULE__, item) end)
   end
 end
