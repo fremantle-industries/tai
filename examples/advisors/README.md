@@ -6,16 +6,25 @@ A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the
 
 ```bash
 # log/dev.log
-2018-08-11T00:07:30.371 [debug] tid=advisor_log_spread_advisor [poloniex,eth_usdt] spread: 0.760000
-2018-08-11T00:07:30.418 [debug] tid=advisor_log_spread_advisor [gdax,btc_usd] spread: 0.010000
-2018-08-11T00:07:30.508 [debug] tid=advisor_log_spread_advisor [gdax,btc_usd] spread: 0.010000
-2018-08-11T00:07:30.603 [debug] tid=advisor_log_spread_advisor [gdax,btc_usd] spread: 0.010000
-2018-08-11T00:07:30.814 [debug] tid=advisor_log_spread_advisor [gdax,eth_usd] spread: 0.010000
-2018-08-11T00:07:30.821 [debug] tid=advisor_log_spread_advisor [poloniex,btc_usdt] spread: 8.028832
-2018-08-11T00:07:30.858 [debug] tid=advisor_log_spread_advisor [binance,eth_usdt] spread: 0.090000
-2018-08-11T00:07:30.861 [debug] tid=advisor_log_spread_advisor [binance,btc_usdt] spread: 5.930000
-2018-08-11T00:07:30.863 [debug] tid=advisor_log_spread_advisor [binance,ltc_usdt] spread: 0.070000
-2018-08-11T00:07:30.979 [debug] tid=advisor_log_spread_advisor [gdax,eth_usd] spread: 0.010000
+2018-10-26T22:31:12.623 [info]  tid=advisor_log_spread_poloniex_btc_usdt [spread:poloniex,btc_usdt,3.63936650,6541.11444443,6544.75381093]
+2018-10-26T22:31:12.644 [info]  tid=advisor_log_spread_binance_btc_usdt [spread:binance,btc_usdt,0.03,6541.36,6541.39]
+2018-10-26T22:31:12.754 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:13.032 [info]  tid=advisor_log_spread_poloniex_btc_usdt [spread:poloniex,btc_usdt,3.63936639,6541.11444443,6544.75381082]
+2018-10-26T22:31:13.088 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:13.116 [info]  tid=advisor_log_spread_poloniex_btc_usdt [spread:poloniex,btc_usdt,3.62303333,6541.11444443,6544.73747776]
+2018-10-26T22:31:13.149 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:13.167 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:13.187 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:13.507 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:14.098 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:14.119 [info]  tid=advisor_log_spread_poloniex_btc_usdt [spread:poloniex,btc_usdt,3.62303332,6541.11444444,6544.73747776]
+2018-10-26T22:31:14.266 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:14.643 [info]  tid=advisor_log_spread_binance_btc_usdt [spread:binance,btc_usdt,0.02,6541.37,6541.39]
+2018-10-26T22:31:14.658 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:14.786 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+2018-10-26T22:31:14.816 [info]  tid=advisor_log_spread_poloniex_btc_usdt [spread:poloniex,btc_usdt,3.62303376,6541.114444,6544.73747776]
+2018-10-26T22:31:15.123 [info]  tid=advisor_log_spread_poloniex_btc_usdt [spread:poloniex,btc_usdt,3.62303375,6541.114444,6544.73747775]
+2018-10-26T22:31:15.440 [info]  tid=advisor_log_spread_poloniex_btc_usdt [spread:poloniex,btc_usdt,3.62303353,6541.114444,6544.73747753]
 ```
 
 [Example](./log_spread/advisor.ex)
