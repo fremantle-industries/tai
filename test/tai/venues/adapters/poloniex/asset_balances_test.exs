@@ -2,7 +2,7 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalancesTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
-  @test_adapters Tai.TestSupport.Helpers.test_exchange_adapters()
+  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
 
   setup_all do
     HTTPoison.start()

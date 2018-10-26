@@ -7,7 +7,7 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
     HTTPoison.start()
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_exchange_adapters()
+  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
 
   @test_adapters
   |> Enum.map(fn adapter ->

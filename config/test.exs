@@ -35,7 +35,7 @@ config :binance,
   secret_key: System.get_env("BINANCE_API_SECRET")
 
 config(:tai,
-  test_exchange_adapters: %{
+  test_venue_adapters: %{
     mock: [
       adapter: Tai.VenueAdapters.Mock,
       accounts: %{main: %{}}

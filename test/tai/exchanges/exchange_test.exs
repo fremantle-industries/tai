@@ -2,14 +2,17 @@ defmodule Tai.Exchanges.ExchangeTest do
   use ExUnit.Case, async: true
   doctest Tai.Exchanges.Exchange
 
-  describe "#parse_configs!" do
+  describe "#parse_adapters" do
     test "returns a list of adapters parsed from the config" do
-      configs = %{
-        exchange_a: [adapter: MyAdapterA],
-        exchange_b: [adapter: MyAdapterB]
-      }
+      config =
+        Tai.Config.parse(
+          venues: %{
+            exchange_a: [adapter: MyAdapterA],
+            exchange_b: [adapter: MyAdapterB]
+          }
+        )
 
-      assert Tai.Exchanges.Exchange.parse_configs(configs) == [
+      assert Tai.Exchanges.Exchange.parse_adapters(config) == [
                %Tai.Exchanges.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
@@ -26,22 +29,25 @@ defmodule Tai.Exchanges.ExchangeTest do
     end
 
     test "raises an KeyError when there is no adapter specified" do
-      configs = %{invalid_exchange_a: []}
+      config = Tai.Config.parse(venues: %{invalid_exchange_a: []})
 
       assert_raise KeyError, "key :adapter not found in: []", fn ->
-        Tai.Exchanges.Exchange.parse_configs(configs)
+        Tai.Exchanges.Exchange.parse_adapters(config)
       end
     end
 
     test "can provide a products filter" do
-      configs = %{
-        exchange_a: [
-          adapter: MyAdapterA,
-          products: "-btc_usd"
-        ]
-      }
+      config =
+        Tai.Config.parse(
+          venues: %{
+            exchange_a: [
+              adapter: MyAdapterA,
+              products: "-btc_usd"
+            ]
+          }
+        )
 
-      assert Tai.Exchanges.Exchange.parse_configs(configs) == [
+      assert Tai.Exchanges.Exchange.parse_adapters(config) == [
                %Tai.Exchanges.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
@@ -52,14 +58,17 @@ defmodule Tai.Exchanges.ExchangeTest do
     end
 
     test "can provide accounts" do
-      configs = %{
-        exchange_a: [
-          adapter: MyAdapterA,
-          accounts: %{main: %{}}
-        ]
-      }
+      config =
+        Tai.Config.parse(
+          venues: %{
+            exchange_a: [
+              adapter: MyAdapterA,
+              accounts: %{main: %{}}
+            ]
+          }
+        )
 
-      assert Tai.Exchanges.Exchange.parse_configs(configs) == [
+      assert Tai.Exchanges.Exchange.parse_adapters(config) == [
                %Tai.Exchanges.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,

@@ -2,7 +2,7 @@ defmodule Tai do
   use Application
 
   def start(_type, _args) do
-    config = Tai.Config.parse!()
+    config = Tai.Config.parse()
     settings = Tai.Settings.from_config(config)
 
     children = [
@@ -22,14 +22,13 @@ defmodule Tai do
     ]
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)
-    boot_exchanges!(&config.exchange_boot_handler.parse_response/1)
+    config |> boot_exchanges!()
     {:ok, pid}
   end
 
-  defp boot_exchanges!(response_handler) do
-    :tai
-    |> Application.get_env(:venues)
-    |> Tai.Exchanges.Exchange.parse_configs()
+  defp boot_exchanges!(config) do
+    config
+    |> Tai.Exchanges.Exchange.parse_adapters()
     |> Enum.map(fn adapter ->
       Task.Supervisor.async(
         Tai.TaskSupervisor,
@@ -39,6 +38,6 @@ defmodule Tai do
       )
     end)
     |> Enum.map(&Task.await/1)
-    |> Enum.each(response_handler)
+    |> Enum.each(&config.exchange_boot_handler.parse_response/1)
   end
 end

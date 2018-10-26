@@ -1,4 +1,5 @@
 defmodule Tai.Exchanges.Exchange do
+  @type config :: Tai.Config.t()
   @type adapter :: Tai.Exchanges.Adapter.t()
   @type product :: Tai.Exchanges.Product.t()
   @type asset_balance :: Tai.Exchanges.AssetBalance.t()
@@ -6,9 +7,9 @@ defmodule Tai.Exchanges.Exchange do
   @doc """
   Parse a map of exchange configurations into a list of adapter structs
   """
-  @spec parse_configs(configs :: map) :: [adapter]
-  def parse_configs(configs) do
-    configs
+  @spec parse_adapters(config :: config) :: [adapter]
+  def parse_adapters(%Tai.Config{venues: venues}) do
+    venues
     |> Enum.map(fn {id, params} ->
       %Tai.Exchanges.Adapter{
         id: id,

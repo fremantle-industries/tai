@@ -3,7 +3,7 @@ defmodule Tai.SettingsTest do
 
   describe ".from_config" do
     test "returns a settings struct with send_orders from the config" do
-      config = Tai.Config.parse!(send_orders: true)
+      config = Tai.Config.parse(send_orders: true)
 
       assert Tai.Settings.from_config(config) == %Tai.Settings{
                send_orders: true

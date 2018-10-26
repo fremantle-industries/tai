@@ -5,10 +5,10 @@ defmodule Tai.TestSupport.Helpers do
     :ok = Application.start(:tai)
   end
 
-  def test_exchange_adapters do
-    :tai
-    |> Application.get_env(:test_exchange_adapters)
-    |> Tai.Exchanges.Exchange.parse_configs()
+  def test_venue_adapters do
+    test_adapters = Application.get_env(:tai, :test_venue_adapters)
+    config = Tai.Config.parse(venues: test_adapters)
+    Tai.Exchanges.Exchange.parse_adapters(config)
   end
 
   def fire_order_callback(pid) do
