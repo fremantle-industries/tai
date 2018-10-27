@@ -18,11 +18,14 @@ defmodule Tai.AdvisorGroups do
           products = Keyword.get(config, :products)
           errors = if products == nil, do: [:products_not_present | errors], else: errors
 
+          store = Keyword.get(config, :store, %{})
+
           if Enum.empty?(errors) do
             group = %Tai.AdvisorGroup{
               id: id,
               factory: factory,
-              products: products
+              products: products,
+              store: store
             }
 
             new_groups = acc.groups ++ [group]

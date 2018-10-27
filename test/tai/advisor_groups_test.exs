@@ -9,7 +9,8 @@ defmodule Tai.AdvisorGroupsTest do
           advisor_groups: %{
             group_a: [
               factory: MyTestFactoryA,
-              products: "*"
+              products: "*",
+              store: %{min_profit: 0.1}
             ],
             group_b: [
               factory: MyTestFactoryB,
@@ -24,12 +25,14 @@ defmodule Tai.AdvisorGroupsTest do
                  %Tai.AdvisorGroup{
                    id: :group_a,
                    factory: MyTestFactoryA,
-                   products: "*"
+                   products: "*",
+                   store: %{min_profit: 0.1}
                  },
                  %Tai.AdvisorGroup{
                    id: :group_b,
                    factory: MyTestFactoryB,
-                   products: "btc_usdt"
+                   products: "btc_usdt",
+                   store: %{}
                  }
                ]
              }

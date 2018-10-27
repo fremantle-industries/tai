@@ -6,7 +6,8 @@ defmodule Examples.Advisors.LogSpread.FactoryTest do
     group = %Tai.AdvisorGroup{
       factory: Examples.Advisors.LogSpread.Factory,
       id: :group_a,
-      products: "*"
+      products: "*",
+      store: %{}
     }
 
     assert Examples.Advisors.LogSpread.Factory.advisor_specs(group, %{}) == []

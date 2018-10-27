@@ -6,7 +6,8 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.FactoryTest do
     group = %Tai.AdvisorGroup{
       factory: Examples.Advisors.CreateAndCancelPendingOrder.Factory,
       id: :group_a,
-      products: "*"
+      products: "*",
+      store: %{}
     }
 
     assert Examples.Advisors.CreateAndCancelPendingOrder.Factory.advisor_specs(group, %{}) == []

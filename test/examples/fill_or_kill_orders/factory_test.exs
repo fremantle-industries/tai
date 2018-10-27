@@ -6,7 +6,8 @@ defmodule Examples.Advisors.FillOrKillOrders.FactoryTest do
     group = %Tai.AdvisorGroup{
       factory: Examples.Advisors.FillOrKillOrders.Factory,
       id: :group_a,
-      products: "*"
+      products: "*",
+      store: %{}
     }
 
     assert Examples.Advisors.FillOrKillOrders.Factory.advisor_specs(group, %{}) == []
