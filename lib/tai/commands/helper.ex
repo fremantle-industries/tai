@@ -37,6 +37,11 @@ defmodule Tai.Commands.Helper do
     to: Tai.Commands.AdvisorGroups,
     as: :start_group
 
+  @spec start_advisor(group_id :: atom, advisor_id :: atom) :: no_return
+  defdelegate start_advisor(group_id, advisor_id),
+    to: Tai.Commands.AdvisorGroups,
+    as: :start_advisor
+
   @spec stop_advisor_groups :: no_return
   defdelegate stop_advisor_groups, to: Tai.Commands.AdvisorGroups, as: :stop
 
@@ -44,6 +49,11 @@ defmodule Tai.Commands.Helper do
   defdelegate stop_advisor_group(group_id),
     to: Tai.Commands.AdvisorGroups,
     as: :stop_group
+
+  @spec stop_advisor(group_id :: atom, advisor_id :: atom) :: no_return
+  defdelegate stop_advisor(group_id, advisor_id),
+    to: Tai.Commands.AdvisorGroups,
+    as: :stop_advisor
 
   @spec enable_send_orders :: no_return
   defdelegate enable_send_orders, to: Tai.Commands.SendOrders, as: :enable

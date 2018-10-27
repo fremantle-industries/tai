@@ -14,8 +14,10 @@ defmodule Tai.Commands.Helper.HelpTest do
            * settings
            * start_advisor_groups
            * start_advisor_group :group_id
+           * start_advisor :group_id, :advisor_id
            * stop_advisor_groups
            * stop_advisor_group :group_id
+           * stop_advisor :group_id, :advisor_id
            * enable_send_orders
            * disable_send_orders\n
            """

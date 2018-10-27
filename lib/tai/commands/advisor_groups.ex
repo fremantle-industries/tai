@@ -32,4 +32,20 @@ defmodule Tai.Commands.AdvisorGroups do
       IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     end
   end
+
+  @spec start_advisor(group_id :: atom, advisor_id :: atom, config :: config) :: no_return
+  def start_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
+      {:ok, {new, old}} = Tai.Advisors.start(specs)
+      IO.puts("Started advisors: #{new} new, #{old} already running")
+    end
+  end
+
+  @spec stop_advisor(group_id :: atom, advisor_id :: atom, config :: config) :: no_return
+  def stop_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
+      {:ok, {new, old}} = Tai.Advisors.stop(specs)
+      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
+    end
+  end
 end
