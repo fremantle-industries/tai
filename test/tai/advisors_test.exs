@@ -39,4 +39,22 @@ defmodule Tai.AdvisorsTest do
 
     assert Tai.Advisors.start([spec_1, spec_2, spec_3]) == {:ok, {2, 1}}
   end
+
+  test ".stop terminates specs that are running and returns a count of new & existing" do
+    assert Tai.Advisors.stop([]) == {:ok, {0, 0}}
+
+    spec_1 =
+      {TestAdvisor, [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, store: %{}]}
+
+    spec_2 =
+      {TestAdvisor, [group_id: :group_b, advisor_id: :advisor_b, order_books: %{}, store: %{}]}
+
+    spec_3 =
+      {TestAdvisor, [group_id: :group_c, advisor_id: :advisor_b, order_books: %{}, store: %{}]}
+
+    start_supervised!(Tai.AdvisorsSupervisor)
+    start_supervised!(spec_1)
+
+    assert Tai.Advisors.stop([spec_1, spec_2, spec_3]) == {:ok, {1, 2}}
+  end
 end

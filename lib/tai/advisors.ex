@@ -25,6 +25,16 @@ defmodule Tai.Advisors do
     {:ok, counts}
   end
 
+  @spec stop([advisor_spec]) :: {:ok, {new_stopped :: integer, old_stopped :: integer}}
+  def stop(specs) do
+    counts =
+      specs
+      |> Tai.Advisors.info()
+      |> Enum.reduce({0, 0}, &stop_advisor/2)
+
+    {:ok, counts}
+  end
+
   defp start_advisor({_, pid}, {new, old}) when is_pid(pid) do
     {new, old + 1}
   end
@@ -32,5 +42,14 @@ defmodule Tai.Advisors do
   defp start_advisor({spec, nil}, {new, old}) do
     Tai.AdvisorsSupervisor.start_advisor(spec)
     {new + 1, old}
+  end
+
+  defp stop_advisor({_, pid}, {new, old}) when is_pid(pid) do
+    Tai.AdvisorsSupervisor.terminate_advisor(pid)
+    {new + 1, old}
+  end
+
+  defp stop_advisor({_, nil}, {new, old}) do
+    {new, old + 1}
   end
 end

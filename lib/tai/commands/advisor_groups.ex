@@ -12,15 +12,8 @@ defmodule Tai.Commands.AdvisorGroups do
   @spec stop(config :: config) :: no_return
   def stop(config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
-      started_advisors =
-        specs
-        |> Tai.Advisors.info()
-        |> Enum.map(fn {_, pid} -> pid end)
-        |> Enum.filter(&(&1 != nil))
-        |> Enum.map(&Tai.AdvisorsSupervisor.terminate_advisor/1)
-
-      count = Enum.count(started_advisors)
-      IO.puts("Stopped #{count} advisors")
+      {:ok, {new, old}} = Tai.Advisors.stop(specs)
+      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     end
   end
 end
