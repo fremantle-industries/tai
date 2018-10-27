@@ -3,6 +3,8 @@ defmodule Tai.Commands.Helper do
   Commands for using `tai` in IEx
   """
 
+  @type config :: Tai.Config.t()
+
   @spec help :: no_return
   defdelegate help, to: Tai.Commands.Help
 
@@ -27,11 +29,31 @@ defmodule Tai.Commands.Helper do
   @spec settings :: no_return
   defdelegate settings, to: Tai.Commands.Settings
 
-  @spec start_advisor_groups :: no_return
-  defdelegate start_advisor_groups, to: Tai.Commands.AdvisorGroups, as: :start
+  @spec start_advisors :: no_return
+  defdelegate start_advisors, to: Tai.Commands.Advisors, as: :start
 
-  @spec stop_advisor_groups :: no_return
-  defdelegate stop_advisor_groups, to: Tai.Commands.AdvisorGroups, as: :stop
+  @spec start_advisor_group(group_id :: atom) :: no_return
+  defdelegate start_advisor_group(group_id),
+    to: Tai.Commands.Advisors,
+    as: :start_group
+
+  @spec start_advisor(group_id :: atom, advisor_id :: atom) :: no_return
+  defdelegate start_advisor(group_id, advisor_id),
+    to: Tai.Commands.Advisors,
+    as: :start_advisor
+
+  @spec stop_advisors :: no_return
+  defdelegate stop_advisors, to: Tai.Commands.Advisors, as: :stop
+
+  @spec stop_advisor_group(group_id :: atom) :: no_return
+  defdelegate stop_advisor_group(group_id),
+    to: Tai.Commands.Advisors,
+    as: :stop_group
+
+  @spec stop_advisor(group_id :: atom, advisor_id :: atom) :: no_return
+  defdelegate stop_advisor(group_id, advisor_id),
+    to: Tai.Commands.Advisors,
+    as: :stop_advisor
 
   @spec enable_send_orders :: no_return
   defdelegate enable_send_orders, to: Tai.Commands.SendOrders, as: :enable

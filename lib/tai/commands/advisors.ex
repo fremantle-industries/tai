@@ -11,6 +11,54 @@ defmodule Tai.Commands.Advisors do
     |> render!
   end
 
+  @spec start(config :: config) :: no_return
+  def start(config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
+      {:ok, {new, old}} = Tai.Advisors.start(specs)
+      IO.puts("Started advisors: #{new} new, #{old} already running")
+    end
+  end
+
+  @spec stop(config :: config) :: no_return
+  def stop(config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
+      {:ok, {new, old}} = Tai.Advisors.stop(specs)
+      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
+    end
+  end
+
+  @spec start_group(group_id :: atom, config :: config) :: no_return
+  def start_group(group_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_group(config, group_id) do
+      {:ok, {new, old}} = Tai.Advisors.start(specs)
+      IO.puts("Started advisors: #{new} new, #{old} already running")
+    end
+  end
+
+  @spec stop_group(group_id :: atom, config :: config) :: no_return
+  def stop_group(group_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_group(config, group_id) do
+      {:ok, {new, old}} = Tai.Advisors.stop(specs)
+      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
+    end
+  end
+
+  @spec start_advisor(group_id :: atom, advisor_id :: atom, config :: config) :: no_return
+  def start_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
+      {:ok, {new, old}} = Tai.Advisors.start(specs)
+      IO.puts("Started advisors: #{new} new, #{old} already running")
+    end
+  end
+
+  @spec stop_advisor(group_id :: atom, advisor_id :: atom, config :: config) :: no_return
+  def stop_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
+      {:ok, {new, old}} = Tai.Advisors.stop(specs)
+      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
+    end
+  end
+
   defp format_rows({:ok, specs}) do
     specs
     |> Tai.Advisors.info()
