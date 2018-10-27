@@ -2,18 +2,43 @@ defmodule Tai.AdvisorGroupsTest do
   use ExUnit.Case, async: true
   doctest Tai.AdvisorGroups
 
+  defmodule TestFactoryA do
+    def advisor_specs(group, filtered_product_symbols_by_exchange) do
+      [
+        {
+          group.factory,
+          [
+            group_id: group.id,
+            advisor_id: :advisor_a,
+            order_books: %{exchange_a: filtered_product_symbols_by_exchange.exchange_a},
+            store: %{}
+          ]
+        },
+        {
+          group.factory,
+          [
+            group_id: group.id,
+            advisor_id: :advisor_b,
+            order_books: %{exchange_a: filtered_product_symbols_by_exchange.exchange_a},
+            store: %{}
+          ]
+        }
+      ]
+    end
+  end
+
   describe ".parse_config" do
     test "returns an ok tuple with a list of advisor groups" do
       config =
         Tai.Config.parse(
           advisor_groups: %{
             group_a: [
-              factory: MyTestFactoryA,
+              factory: TestFactoryA,
               products: "*",
               store: %{min_profit: 0.1}
             ],
             group_b: [
-              factory: MyTestFactoryB,
+              factory: TestFactoryB,
               products: "btc_usdt"
             ]
           }
@@ -24,13 +49,13 @@ defmodule Tai.AdvisorGroupsTest do
                [
                  %Tai.AdvisorGroup{
                    id: :group_a,
-                   factory: MyTestFactoryA,
+                   factory: TestFactoryA,
                    products: "*",
                    store: %{min_profit: 0.1}
                  },
                  %Tai.AdvisorGroup{
                    id: :group_b,
-                   factory: MyTestFactoryB,
+                   factory: TestFactoryB,
                    products: "btc_usdt",
                    store: %{}
                  }
@@ -46,7 +71,7 @@ defmodule Tai.AdvisorGroupsTest do
               products: "*"
             ],
             group_b: [
-              factory: MyTestFactoryB,
+              factory: TestFactoryB,
               products: "btc_usdt"
             ]
           }
@@ -61,11 +86,11 @@ defmodule Tai.AdvisorGroupsTest do
         Tai.Config.parse(
           advisor_groups: %{
             group_a: [
-              factory: MyTestFactoryA,
+              factory: TestFactoryA,
               products: "*"
             ],
             group_b: [
-              factory: MyTestFactoryB
+              factory: TestFactoryB
             ]
           }
         )
@@ -76,15 +101,6 @@ defmodule Tai.AdvisorGroupsTest do
   end
 
   describe ".build_specs" do
-    defmodule MyTestFactory do
-      def advisor_specs(group, filtered_product_symbols_by_exchange) do
-        [
-          {group.factory, filtered_product_symbols_by_exchange.exchange_a},
-          {group.factory, filtered_product_symbols_by_exchange.exchange_b}
-        ]
-      end
-    end
-
     test "returns advisor specs with filtered products from the groups factory" do
       config_without_groups = Tai.Config.parse(advisor_groups: %{})
 
@@ -100,7 +116,7 @@ defmodule Tai.AdvisorGroupsTest do
         Tai.Config.parse(
           advisor_groups: %{
             group_a: [
-              factory: MyTestFactory,
+              factory: TestFactoryA,
               products: "exchange_a exchange_b.ltc_usd"
             ]
           }
@@ -109,8 +125,24 @@ defmodule Tai.AdvisorGroupsTest do
       assert Tai.AdvisorGroups.build_specs(config_with_groups, product_symbols_by_exchange) == {
                :ok,
                [
-                 {MyTestFactory, [:btc_usd, :eth_usd]},
-                 {MyTestFactory, [:ltc_usd]}
+                 {
+                   TestFactoryA,
+                   [
+                     group_id: :group_a,
+                     advisor_id: :advisor_a,
+                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
+                     store: %{}
+                   ]
+                 },
+                 {
+                   TestFactoryA,
+                   [
+                     group_id: :group_a,
+                     advisor_id: :advisor_b,
+                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
+                     store: %{}
+                   ]
+                 }
                ]
              }
     end
@@ -119,11 +151,82 @@ defmodule Tai.AdvisorGroupsTest do
       config =
         Tai.Config.parse(
           advisor_groups: %{
-            group_a: [factory: MyTestFactoryB]
+            group_a: [factory: TestFactoryA]
           }
         )
 
       assert Tai.AdvisorGroups.build_specs(config, %{}) ==
+               {:error, %{group_a: [:products_not_present]}}
+    end
+  end
+
+  describe ".build_specs_for_group" do
+    test "returns advisor specs with filtered products from the factory of the given group" do
+      config_without_groups = Tai.Config.parse(advisor_groups: %{})
+
+      product_symbols_by_exchange = %{
+        exchange_a: [:btc_usd, :eth_usd],
+        exchange_b: [:btc_usd, :ltc_usd]
+      }
+
+      assert Tai.AdvisorGroups.build_specs_for_group(
+               config_without_groups,
+               :group_a,
+               product_symbols_by_exchange
+             ) == {:ok, []}
+
+      config_with_groups =
+        Tai.Config.parse(
+          advisor_groups: %{
+            group_a: [
+              factory: TestFactoryA,
+              products: "exchange_a exchange_b.ltc_usd"
+            ],
+            group_b: [
+              factory: TestFactoryA,
+              products: "*"
+            ]
+          }
+        )
+
+      assert Tai.AdvisorGroups.build_specs_for_group(
+               config_with_groups,
+               :group_a,
+               product_symbols_by_exchange
+             ) == {
+               :ok,
+               [
+                 {
+                   TestFactoryA,
+                   [
+                     group_id: :group_a,
+                     advisor_id: :advisor_a,
+                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
+                     store: %{}
+                   ]
+                 },
+                 {
+                   TestFactoryA,
+                   [
+                     group_id: :group_a,
+                     advisor_id: :advisor_b,
+                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
+                     store: %{}
+                   ]
+                 }
+               ]
+             }
+    end
+
+    test "surfaces the errors from .parse_config" do
+      config =
+        Tai.Config.parse(
+          advisor_groups: %{
+            group_a: [factory: TestFactoryA]
+          }
+        )
+
+      assert Tai.AdvisorGroups.build_specs_for_group(config, :group_a, %{}) ==
                {:error, %{group_a: [:products_not_present]}}
     end
   end
