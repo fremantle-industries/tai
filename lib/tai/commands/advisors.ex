@@ -13,7 +13,7 @@ defmodule Tai.Commands.Advisors do
 
   defp format_rows({:ok, specs}) do
     specs
-    |> Tai.AdvisorGroups.info()
+    |> Tai.Advisors.info()
     |> Enum.map(fn {{_, opts}, pid} ->
       [
         opts |> Keyword.fetch!(:group_id),

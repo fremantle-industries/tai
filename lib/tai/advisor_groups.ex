@@ -104,18 +104,4 @@ defmodule Tai.AdvisorGroups do
       {:ok, filtered_specs}
     end
   end
-
-  @spec info([advisor_spec]) :: [{advisor_spec, pid}]
-  def info(specs) do
-    specs
-    |> Enum.map(fn {_, opts} = spec ->
-      pid =
-        opts
-        |> Keyword.take([:group_id, :advisor_id])
-        |> Tai.Advisor.to_name()
-        |> Process.whereis()
-
-      {spec, pid}
-    end)
-  end
 end

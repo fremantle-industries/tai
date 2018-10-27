@@ -24,7 +24,7 @@ defmodule Tai.Commands.Helper.AdvisorGroupsTest do
     })
 
     assert capture_io(&Tai.Commands.Helper.start_advisor_groups/0) == """
-           Started 2 advisors
+           Started advisors: 2 new, 0 already running
            """
 
     output = capture_io(&Tai.Commands.Helper.advisors/0)

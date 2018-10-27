@@ -4,9 +4,8 @@ defmodule Tai.Commands.AdvisorGroups do
   @spec start(config :: config) :: no_return
   def start(config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
-      children = Enum.map(specs, &Tai.AdvisorsSupervisor.start_advisor/1)
-      count = Enum.count(children)
-      IO.puts("Started #{count} advisors")
+      {:ok, {new, old}} = Tai.Advisors.start(specs)
+      IO.puts("Started advisors: #{new} new, #{old} already running")
     end
   end
 
@@ -15,7 +14,7 @@ defmodule Tai.Commands.AdvisorGroups do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
       started_advisors =
         specs
-        |> Tai.AdvisorGroups.info()
+        |> Tai.Advisors.info()
         |> Enum.map(fn {_, pid} -> pid end)
         |> Enum.filter(&(&1 != nil))
         |> Enum.map(&Tai.AdvisorsSupervisor.terminate_advisor/1)
