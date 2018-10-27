@@ -2,11 +2,15 @@ defmodule Tai.AdvisorGroupsTest do
   use ExUnit.Case, async: true
   doctest Tai.AdvisorGroups
 
+  defmodule TestAdvisor do
+    use Tai.Advisor
+  end
+
   defmodule TestFactoryA do
     def advisor_specs(group, filtered_product_symbols_by_exchange) do
       [
         {
-          group.factory,
+          TestAdvisor,
           [
             group_id: group.id,
             advisor_id: :advisor_a,
@@ -15,7 +19,7 @@ defmodule Tai.AdvisorGroupsTest do
           ]
         },
         {
-          group.factory,
+          TestAdvisor,
           [
             group_id: group.id,
             advisor_id: :advisor_b,
@@ -126,7 +130,7 @@ defmodule Tai.AdvisorGroupsTest do
                :ok,
                [
                  {
-                   TestFactoryA,
+                   TestAdvisor,
                    [
                      group_id: :group_a,
                      advisor_id: :advisor_a,
@@ -135,7 +139,7 @@ defmodule Tai.AdvisorGroupsTest do
                    ]
                  },
                  {
-                   TestFactoryA,
+                   TestAdvisor,
                    [
                      group_id: :group_a,
                      advisor_id: :advisor_b,
@@ -192,7 +196,7 @@ defmodule Tai.AdvisorGroupsTest do
                :ok,
                [
                  {
-                   TestFactoryA,
+                   TestAdvisor,
                    [
                      group_id: :group_a,
                      advisor_id: :advisor_a,
@@ -201,7 +205,7 @@ defmodule Tai.AdvisorGroupsTest do
                    ]
                  },
                  {
-                   TestFactoryA,
+                   TestAdvisor,
                    [
                      group_id: :group_a,
                      advisor_id: :advisor_b,
@@ -260,7 +264,7 @@ defmodule Tai.AdvisorGroupsTest do
                :ok,
                [
                  {
-                   TestFactoryA,
+                   TestAdvisor,
                    [
                      group_id: :group_a,
                      advisor_id: :advisor_a,
@@ -278,5 +282,21 @@ defmodule Tai.AdvisorGroupsTest do
       assert Tai.AdvisorGroups.build_specs_for_advisor(config, :group_a, :advisor_a, %{}) ==
                {:error, %{group_a: [:products_not_present]}}
     end
+  end
+
+  test ".info returns the pid of each spec if it's running" do
+    assert [] = Tai.AdvisorGroups.info([])
+
+    spec_1 =
+      {TestAdvisor, [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, store: %{}]}
+
+    spec_2 =
+      {TestAdvisor, [group_id: :group_a, advisor_id: :advisor_b, order_books: %{}, store: %{}]}
+
+    start_supervised!(spec_1)
+
+    assert [{^spec_1, pid_1}, {^spec_2, pid_2}] = Tai.AdvisorGroups.info([spec_1, spec_2])
+    assert is_pid(pid_1)
+    assert pid_2 == nil
   end
 end

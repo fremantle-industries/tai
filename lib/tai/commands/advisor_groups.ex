@@ -15,9 +15,8 @@ defmodule Tai.Commands.AdvisorGroups do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
       started_advisors =
         specs
-        |> Enum.map(fn {_, [group_id: gid, advisor_id: aid, order_books: _, store: _]} ->
-          [group_id: gid, advisor_id: aid] |> Tai.Advisor.to_name() |> Process.whereis()
-        end)
+        |> Tai.AdvisorGroups.info()
+        |> Enum.map(fn {_, pid} -> pid end)
         |> Enum.filter(&(&1 != nil))
         |> Enum.map(&Tai.AdvisorsSupervisor.terminate_advisor/1)
 
