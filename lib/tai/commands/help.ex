@@ -13,7 +13,9 @@ defmodule Tai.Commands.Help do
     * advisors
     * settings
     * start_advisor_groups
+    * start_advisor_group :group_id
     * stop_advisor_groups
+    * stop_advisor_group :group_id
     * enable_send_orders
     * disable_send_orders
     """)

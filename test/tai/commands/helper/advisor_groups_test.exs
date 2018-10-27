@@ -14,39 +14,83 @@ defmodule Tai.Commands.Helper.AdvisorGroupsTest do
 
   test "starts and stops all advisors in all groups" do
     mock_product(%{
-      exchange_id: :exchange_a,
+      exchange_id: :test_exchange_a,
       symbol: :btc_usdt
     })
 
     mock_product(%{
-      exchange_id: :exchange_b,
+      exchange_id: :test_exchange_b,
       symbol: :eth_usdt
     })
 
     assert capture_io(&Tai.Commands.Helper.start_advisor_groups/0) == """
-           Started advisors: 2 new, 0 already running
+           Started advisors: 3 new, 0 already running
            """
 
     output = capture_io(&Tai.Commands.Helper.advisors/0)
     assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Store \|\s+Status \|\s+PID \|/
 
     assert output =~
-             ~r/\|\s+log_spread \|\s+exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
+             ~r/\|\s+fill_or_kill_orders \|\s+test_exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
 
     assert output =~
-             ~r/\|\s+log_spread \|\s+exchange_b_eth_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
+             ~r/\|\s+log_spread \|\s+test_exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
+
+    assert output =~
+             ~r/\|\s+log_spread \|\s+test_exchange_b_eth_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
 
     assert capture_io(&Tai.Commands.Helper.stop_advisor_groups/0) == """
+           Stopped advisors: 3 new, 0 already stopped
+           """
+
+    assert capture_io(&Tai.Commands.Helper.advisors/0) == """
+           +---------------------+--------------------------+-------+-----------+-----+
+           |            Group ID |               Advisor ID | Store |    Status | PID |
+           +---------------------+--------------------------+-------+-----------+-----+
+           | fill_or_kill_orders | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
+           |          log_spread | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
+           |          log_spread | test_exchange_b_eth_usdt |   %{} | unstarted |   - |
+           +---------------------+--------------------------+-------+-----------+-----+\n
+           """
+  end
+
+  test "starts and stops all advisors in a single group" do
+    mock_product(%{
+      exchange_id: :test_exchange_a,
+      symbol: :btc_usdt
+    })
+
+    mock_product(%{
+      exchange_id: :test_exchange_b,
+      symbol: :eth_usdt
+    })
+
+    assert capture_io(fn -> Tai.Commands.Helper.start_advisor_group(:log_spread) end) == """
+           Started advisors: 2 new, 0 already running
+           """
+
+    output = capture_io(&Tai.Commands.Helper.advisors/0)
+    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Store \|\s+Status \|\s+PID \|/
+    refute output =~ ~r/\|\s+fill_or_kill_orders.+running \|\s+#PID<.+> \|/
+
+    assert output =~
+             ~r/\|\s+log_spread \|\s+test_exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
+
+    assert output =~
+             ~r/\|\s+log_spread \|\s+test_exchange_b_eth_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
+
+    assert capture_io(fn -> Tai.Commands.Helper.stop_advisor_group(:log_spread) end) == """
            Stopped advisors: 2 new, 0 already stopped
            """
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +------------+---------------------+-------+-----------+-----+
-           |   Group ID |          Advisor ID | Store |    Status | PID |
-           +------------+---------------------+-------+-----------+-----+
-           | log_spread | exchange_a_btc_usdt |   %{} | unstarted |   - |
-           | log_spread | exchange_b_eth_usdt |   %{} | unstarted |   - |
-           +------------+---------------------+-------+-----------+-----+\n
+           +---------------------+--------------------------+-------+-----------+-----+
+           |            Group ID |               Advisor ID | Store |    Status | PID |
+           +---------------------+--------------------------+-------+-----------+-----+
+           | fill_or_kill_orders | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
+           |          log_spread | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
+           |          log_spread | test_exchange_b_eth_usdt |   %{} | unstarted |   - |
+           +---------------------+--------------------------+-------+-----------+-----+\n
            """
   end
 end

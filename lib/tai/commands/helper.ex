@@ -3,6 +3,8 @@ defmodule Tai.Commands.Helper do
   Commands for using `tai` in IEx
   """
 
+  @type config :: Tai.Config.t()
+
   @spec help :: no_return
   defdelegate help, to: Tai.Commands.Help
 
@@ -30,8 +32,18 @@ defmodule Tai.Commands.Helper do
   @spec start_advisor_groups :: no_return
   defdelegate start_advisor_groups, to: Tai.Commands.AdvisorGroups, as: :start
 
+  @spec start_advisor_group(group_id :: atom) :: no_return
+  defdelegate start_advisor_group(group_id),
+    to: Tai.Commands.AdvisorGroups,
+    as: :start_group
+
   @spec stop_advisor_groups :: no_return
   defdelegate stop_advisor_groups, to: Tai.Commands.AdvisorGroups, as: :stop
+
+  @spec stop_advisor_group(group_id :: atom) :: no_return
+  defdelegate stop_advisor_group(group_id),
+    to: Tai.Commands.AdvisorGroups,
+    as: :stop_group
 
   @spec enable_send_orders :: no_return
   defdelegate enable_send_orders, to: Tai.Commands.SendOrders, as: :enable
