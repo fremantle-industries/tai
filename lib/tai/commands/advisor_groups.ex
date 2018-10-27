@@ -4,25 +4,16 @@ defmodule Tai.Commands.AdvisorGroups do
   @spec start(config :: config) :: no_return
   def start(config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
-      children = Enum.map(specs, &Tai.AdvisorsSupervisor.start_advisor/1)
-      count = Enum.count(children)
-      IO.puts("Started #{count} advisors")
+      {:ok, {new, old}} = Tai.Advisors.start(specs)
+      IO.puts("Started advisors: #{new} new, #{old} already running")
     end
   end
 
   @spec stop(config :: config) :: no_return
   def stop(config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
-      started_advisors =
-        specs
-        |> Enum.map(fn {_, [group_id: gid, advisor_id: aid, order_books: _, store: _]} ->
-          [group_id: gid, advisor_id: aid] |> Tai.Advisor.to_name() |> Process.whereis()
-        end)
-        |> Enum.filter(&(&1 != nil))
-        |> Enum.map(&Tai.AdvisorsSupervisor.terminate_advisor/1)
-
-      count = Enum.count(started_advisors)
-      IO.puts("Stopped #{count} advisors")
+      {:ok, {new, old}} = Tai.Advisors.stop(specs)
+      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     end
   end
 end

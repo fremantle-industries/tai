@@ -13,13 +13,12 @@ defmodule Tai.Commands.Advisors do
 
   defp format_rows({:ok, specs}) do
     specs
-    |> Enum.map(fn {_, [group_id: gid, advisor_id: aid, order_books: _, store: store]} ->
-      pid = [group_id: gid, advisor_id: aid] |> Tai.Advisor.to_name() |> Process.whereis()
-
+    |> Tai.Advisors.info()
+    |> Enum.map(fn {{_, opts}, pid} ->
       [
-        gid,
-        aid,
-        store |> format_col,
+        opts |> Keyword.fetch!(:group_id),
+        opts |> Keyword.fetch!(:advisor_id),
+        opts |> Keyword.fetch!(:store) |> format_col,
         pid |> format_status_col,
         pid |> format_col
       ]

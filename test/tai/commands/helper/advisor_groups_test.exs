@@ -24,7 +24,7 @@ defmodule Tai.Commands.Helper.AdvisorGroupsTest do
     })
 
     assert capture_io(&Tai.Commands.Helper.start_advisor_groups/0) == """
-           Started 2 advisors
+           Started advisors: 2 new, 0 already running
            """
 
     output = capture_io(&Tai.Commands.Helper.advisors/0)
@@ -37,7 +37,7 @@ defmodule Tai.Commands.Helper.AdvisorGroupsTest do
              ~r/\|\s+log_spread \|\s+exchange_b_eth_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
 
     assert capture_io(&Tai.Commands.Helper.stop_advisor_groups/0) == """
-           Stopped 2 advisors
+           Stopped advisors: 2 new, 0 already stopped
            """
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
