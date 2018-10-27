@@ -82,4 +82,26 @@ defmodule Tai.AdvisorGroups do
       {:ok, filtered_specs}
     end
   end
+
+  @spec build_specs_for_advisor(
+          config :: config,
+          group_id :: atom,
+          advisor_id :: atom,
+          product_symbols_by_exchange :: map
+        ) :: {:ok, [advisor_spec]} | {:error, map}
+  def build_specs_for_advisor(
+        %Tai.Config{} = config,
+        group_id,
+        advisor_id,
+        product_symbols_by_exchange \\ Tai.Queries.ProductSymbolsByExchange.all()
+      ) do
+    with {:ok, specs} <- build_specs(config, product_symbols_by_exchange) do
+      filtered_specs =
+        specs
+        |> Enum.filter(fn {_, opts} -> Keyword.get(opts, :group_id) == group_id end)
+        |> Enum.filter(fn {_, opts} -> Keyword.get(opts, :advisor_id) == advisor_id end)
+
+      {:ok, filtered_specs}
+    end
+  end
 end
