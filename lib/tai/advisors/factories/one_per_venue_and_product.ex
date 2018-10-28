@@ -1,7 +1,8 @@
 defmodule Tai.Advisors.Factories.OnePerVenueAndProduct do
   @behaviour Tai.Advisors.Factory
 
-  def advisor_specs(%Tai.AdvisorGroup{} = group, product_symbols_by_venue) do
+  def advisor_specs(%Tai.AdvisorGroup{} = group, product_symbols_by_venue)
+      when is_map(product_symbols_by_venue) do
     product_symbols_by_venue
     |> Enum.reduce(
       [],
