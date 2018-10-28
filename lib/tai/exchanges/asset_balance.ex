@@ -26,8 +26,8 @@ defmodule Tai.Exchanges.AssetBalance do
           exchange_id :: atom,
           account_id :: atom,
           asset :: atom,
-          free :: number | String.t(),
-          locked :: number | String.t()
+          free :: number | String.t() | Decimal.t(),
+          locked :: number | String.t() | Decimal.t()
         ) :: t
   def new(exchange_id, account_id, asset, free, locked) do
     %Tai.Exchanges.AssetBalance{

@@ -3,7 +3,7 @@ defmodule Tai.TimeoutError do
   Module which represents a timeout error
   """
 
-  @type t :: Tai.TimeoutError
+  @type t :: %Tai.TimeoutError{reason: String.t()}
 
   defstruct reason: "network request timed out"
 end

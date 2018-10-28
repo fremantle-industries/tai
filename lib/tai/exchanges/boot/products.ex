@@ -1,7 +1,9 @@
 defmodule Tai.Exchanges.Boot.Products do
   @type adapter :: Tai.Exchanges.Adapter.t()
+  @type product :: Tai.Exchanges.Product.t()
 
-  @spec hydrate(adapter :: adapter) :: :ok | {:error, reason :: term}
+  @spec hydrate(adapter :: adapter) ::
+          {:ok, filtered_products :: [product]} | {:error, reason :: term}
   def hydrate(adapter) do
     with {:ok, all_products} <- Tai.Exchanges.Exchange.products(adapter) do
       filtered_products = filter(all_products, adapter.products)

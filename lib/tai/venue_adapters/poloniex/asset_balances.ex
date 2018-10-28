@@ -25,7 +25,8 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalances do
         {raw_asset, %{"available" => raw_available, "onOrders" => raw_on_orders}},
         venue_id,
         account_id
-      ) do
+      )
+      when is_atom(venue_id) and is_atom(account_id) do
     asset =
       raw_asset
       |> String.downcase()

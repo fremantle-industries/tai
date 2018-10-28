@@ -7,6 +7,8 @@ defmodule Tai.ServiceUnavailableError do
   https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503
   """
 
+  @type t :: %Tai.ServiceUnavailableError{reason: String.t()}
+
   @enforce_keys [:reason]
   defstruct [:reason]
 end

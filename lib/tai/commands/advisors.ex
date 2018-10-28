@@ -3,6 +3,7 @@ defmodule Tai.Commands.Advisors do
 
   @type config :: Tai.Config.t()
 
+  @spec advisors() :: no_return
   @spec advisors(config :: config) :: no_return
   def advisors(config \\ Tai.Config.parse()) do
     config
@@ -11,6 +12,7 @@ defmodule Tai.Commands.Advisors do
     |> render!
   end
 
+  @spec start() :: no_return
   @spec start(config :: config) :: no_return
   def start(config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
@@ -19,6 +21,7 @@ defmodule Tai.Commands.Advisors do
     end
   end
 
+  @spec stop() :: no_return
   @spec stop(config :: config) :: no_return
   def stop(config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
@@ -27,6 +30,7 @@ defmodule Tai.Commands.Advisors do
     end
   end
 
+  @spec start_group(group_id :: atom) :: no_return
   @spec start_group(group_id :: atom, config :: config) :: no_return
   def start_group(group_id, config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_group(config, group_id) do
@@ -35,6 +39,7 @@ defmodule Tai.Commands.Advisors do
     end
   end
 
+  @spec stop_group(group_id :: atom) :: no_return
   @spec stop_group(group_id :: atom, config :: config) :: no_return
   def stop_group(group_id, config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_group(config, group_id) do
@@ -43,6 +48,7 @@ defmodule Tai.Commands.Advisors do
     end
   end
 
+  @spec start_advisor(group_id :: atom, advisor_id :: atom) :: no_return
   @spec start_advisor(group_id :: atom, advisor_id :: atom, config :: config) :: no_return
   def start_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
@@ -51,6 +57,7 @@ defmodule Tai.Commands.Advisors do
     end
   end
 
+  @spec stop_advisor(group_id :: atom, advisor_id :: atom) :: no_return
   @spec stop_advisor(group_id :: atom, advisor_id :: atom, config :: config) :: no_return
   def stop_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do

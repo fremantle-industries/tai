@@ -4,7 +4,7 @@ defmodule Tai.Config do
   """
 
   @type t :: %Tai.Config{
-          send_orders: Boolean.t(),
+          send_orders: boolean,
           exchange_boot_handler: atom,
           venues: map,
           advisor_groups: map
