@@ -101,15 +101,18 @@ config :tai,
 config :tai,
   advisor_groups: %{
     log_spread: [
-      factory: Examples.Advisors.LogSpread.Factory,
+      advisor: Examples.Advisors.LogSpread.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       products: "*"
     ],
     fill_or_kill_orders: [
-      factory: Examples.Advisors.FillOrKillOrders.Factory,
+      advisor: Examples.Advisors.FillOrKillOrders.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       products: "test_exchange_a test_exchange_b.eth_usd"
     ],
     create_and_cancel_pending_order: [
-      factory: Examples.Advisors.CreateAndCancelPendingOrder.Factory,
+      advisor: Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       products: "test_feed_a test_feed_b.eth_usd"
     ]
   }

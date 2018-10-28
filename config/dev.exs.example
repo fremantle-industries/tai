@@ -81,15 +81,18 @@ config :tai,
 config :tai,
   advisor_groups: %{
     create_and_cancel_pending_order: [
-      factory: Examples.Advisors.CreateAndCancelPendingOrder.Factory,
+      advisor: Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       products: "gdax.btc_usd"
     ],
     log_spread: [
-      factory: Examples.Advisors.LogSpread.Factory,
+      advisor: Examples.Advisors.LogSpread.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       products: "binance.btc_usdt gdax.btc_usd poloniex.btc_usdt"
     ],
     fill_or_kill_orders: [
-      factory: Examples.Advisors.FillOrKillOrders.Factory,
+      advisor: Examples.Advisors.FillOrKillOrders.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       products: "binance.btc_usdt"
     ]
   }

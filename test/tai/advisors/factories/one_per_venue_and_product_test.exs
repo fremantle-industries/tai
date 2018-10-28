@@ -1,28 +1,29 @@
-defmodule Examples.Advisors.CreateAndCancelPendingOrder.FactoryTest do
+defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
   use ExUnit.Case, async: true
-  doctest Examples.Advisors.CreateAndCancelPendingOrder.Factory
+  doctest Tai.Advisors.Factories.OnePerVenueAndProduct
 
-  test ".advisor_specs returns a supervisable child spec for each product on the given exchanges" do
+  test "returns an advisor spec for each product on the given venues" do
     group = %Tai.AdvisorGroup{
-      factory: Examples.Advisors.CreateAndCancelPendingOrder.Factory,
+      advisor: MyAdvisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       id: :group_a,
       products: "*",
       store: %{}
     }
 
-    assert Examples.Advisors.CreateAndCancelPendingOrder.Factory.advisor_specs(group, %{}) == []
+    assert Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(group, %{}) == []
 
     products_by_exchange = %{
       exchange_a: [:btc_usdt, :eth_usdt],
       exchange_b: [:btc_usdt, :ltc_usdt]
     }
 
-    assert Examples.Advisors.CreateAndCancelPendingOrder.Factory.advisor_specs(
+    assert Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(
              group,
              products_by_exchange
            ) == [
              {
-               Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
+               MyAdvisor,
                [
                  group_id: :group_a,
                  advisor_id: :exchange_a_btc_usdt,
@@ -31,7 +32,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.FactoryTest do
                ]
              },
              {
-               Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
+               MyAdvisor,
                [
                  group_id: :group_a,
                  advisor_id: :exchange_a_eth_usdt,
@@ -40,7 +41,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.FactoryTest do
                ]
              },
              {
-               Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
+               MyAdvisor,
                [
                  group_id: :group_a,
                  advisor_id: :exchange_b_btc_usdt,
@@ -49,7 +50,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.FactoryTest do
                ]
              },
              {
-               Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
+               MyAdvisor,
                [
                  group_id: :group_a,
                  advisor_id: :exchange_b_ltc_usdt,
