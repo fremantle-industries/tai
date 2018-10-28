@@ -28,4 +28,14 @@ jobs:
           paths:
             - _build/test
 
+      - restore_cache:
+          keys:
+            - dialyzer-plt-{{ arch }}-{{ .Branch }}
+      - run: mix dialyzer --halt-exit-status
+      - save_cache:
+          key: dialyzer-plt-{{ arch }}-{{ .Branch }}
+          paths:
+            - _build/dev
+
+
       - run: MIX_ENV=test mix coveralls.circle
