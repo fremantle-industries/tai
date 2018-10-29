@@ -23,14 +23,26 @@ defmodule Tai.TestSupport.Mock do
     |> Tai.Exchanges.FeeStore.upsert()
   end
 
-  @spec mock_snapshot(atom, atom, map, map) ::
+  @spec mock_asset_balance(
+          exchange_id :: atom,
+          account_id :: atom,
+          asset :: atom,
+          free :: number | Decimal.t() | String.t(),
+          locked :: number | Decimal.t() | String.t()
+        ) :: :ok
+  def mock_asset_balance(exchange_id, account_id, asset, free, locked) do
+    balance = Tai.Exchanges.AssetBalance.new(exchange_id, account_id, asset, free, locked)
+    Tai.Exchanges.AssetBalances.upsert(balance)
+  end
+
+  @spec push_market_feed_snapshot(atom, atom, map, map) ::
           :ok
           | {:error,
              %WebSockex.FrameEncodeError{}
              | %WebSockex.ConnError{}
              | %WebSockex.NotConnectedError{}
              | %WebSockex.InvalidFrameError{}}
-  def mock_snapshot(feed_id, symbol, bids, asks) do
+  def push_market_feed_snapshot(feed_id, symbol, bids, asks) do
     feed_pid =
       feed_id
       |> Tai.Exchanges.OrderBookFeed.to_name()
@@ -43,17 +55,5 @@ defmodule Tai.TestSupport.Mock do
         bids: bids,
         asks: asks
       })
-  end
-
-  @spec mock_asset_balance(
-          exchange_id :: atom,
-          account_id :: atom,
-          asset :: atom,
-          free :: number | Decimal.t() | String.t(),
-          locked :: number | Decimal.t() | String.t()
-        ) :: :ok
-  def mock_asset_balance(exchange_id, account_id, asset, free, locked) do
-    balance = Tai.Exchanges.AssetBalance.new(exchange_id, account_id, asset, free, locked)
-    Tai.Exchanges.AssetBalances.upsert(balance)
   end
 end

@@ -28,7 +28,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
 
     log_msg =
       capture_log(fn ->
-        mock_snapshot(
+        push_market_feed_snapshot(
           :test_exchange_a,
           :btc_usd,
           %{6500.1 => 1.1},

@@ -68,7 +68,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
         ]
       })
 
-      mock_snapshot(
+      push_market_feed_snapshot(
         :init_success_feed,
         :btc_usd,
         %{6500.1 => 1.1},
@@ -117,7 +117,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
             ]
           })
 
-          mock_snapshot(
+          push_market_feed_snapshot(
             :init_failure_feed,
             :btc_usd,
             %{6500.1 => 1.1},
