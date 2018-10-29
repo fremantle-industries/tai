@@ -51,7 +51,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
       })
 
       start_supervised!({
-        Tai.ExchangeAdapters.Mock.OrderBookFeed,
+        Tai.VenueAdapters.Mock.OrderBookFeed,
         [
           feed_id: :init_success_feed,
           symbols: [:btc_usd]
@@ -100,7 +100,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
           })
 
           start_supervised!({
-            Tai.ExchangeAdapters.Mock.OrderBookFeed,
+            Tai.VenueAdapters.Mock.OrderBookFeed,
             [
               feed_id: :init_failure_feed,
               symbols: [:btc_usd]

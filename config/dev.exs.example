@@ -1,29 +1,41 @@
 use Mix.Config
 
-config :echo_boy, port: 4200
-
-config :ex_poloniex,
-  api_key: System.get_env("POLONIEX_API_KEY"),
-  api_secret: System.get_env("POLONIEX_API_SECRET")
-
-config :binance,
-  api_key: System.get_env("BINANCE_API_KEY"),
-  secret_key: System.get_env("BINANCE_API_SECRET")
-
 config :tai, send_orders: false
+
+config :tai,
+  advisor_groups: %{
+    create_and_cancel_pending_order: [
+      advisor: Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
+      products: "gdax.btc_usd"
+    ],
+    log_spread: [
+      advisor: Examples.Advisors.LogSpread.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
+      products: "binance.btc_usdt gdax.btc_usd poloniex.btc_usdt"
+    ],
+    fill_or_kill_orders: [
+      advisor: Examples.Advisors.FillOrKillOrders.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
+      products: "binance.btc_usdt"
+    ]
+  }
 
 config :tai,
   venues: %{
     binance: [
       adapter: Tai.VenueAdapters.Binance,
+      products: "btc_usdt ltc_usdt eth_usdt",
       accounts: %{main: %{}}
     ],
     poloniex: [
       adapter: Tai.VenueAdapters.Poloniex,
+      products: "btc_usdt ltc_usdt eth_usdt",
       accounts: %{main: %{}}
     ],
     gdax: [
       adapter: Tai.VenueAdapters.Gdax,
+      products: "btc_usd ltc_usd eth_usd",
       accounts: %{
         main: %{
           # https://docs.pro.coinbase.com/#api
@@ -62,37 +74,12 @@ config :tai,
     ]
   }
 
-config :tai,
-  order_book_feeds: %{
-    gdax: [
-      adapter: Tai.ExchangeAdapters.Gdax.OrderBookFeed,
-      order_books: [:btc_usd, :ltc_usd, :eth_usd]
-    ],
-    binance: [
-      adapter: Tai.ExchangeAdapters.Binance.OrderBookFeed,
-      order_books: [:btc_usdt, :ltc_usdt, :eth_usdt]
-    ],
-    poloniex: [
-      adapter: Tai.ExchangeAdapters.Poloniex.OrderBookFeed,
-      order_books: [:btc_usdt, :ltc_usdt, :eth_usdt]
-    ]
-  }
+config :echo_boy, port: 4200
 
-config :tai,
-  advisor_groups: %{
-    create_and_cancel_pending_order: [
-      advisor: Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
-      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
-      products: "gdax.btc_usd"
-    ],
-    log_spread: [
-      advisor: Examples.Advisors.LogSpread.Advisor,
-      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
-      products: "binance.btc_usdt gdax.btc_usd poloniex.btc_usdt"
-    ],
-    fill_or_kill_orders: [
-      advisor: Examples.Advisors.FillOrKillOrders.Advisor,
-      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
-      products: "binance.btc_usdt"
-    ]
-  }
+config :ex_poloniex,
+  api_key: System.get_env("POLONIEX_API_KEY"),
+  api_secret: System.get_env("POLONIEX_API_SECRET")
+
+config :binance,
+  api_key: System.get_env("BINANCE_API_KEY"),
+  secret_key: System.get_env("BINANCE_API_SECRET")

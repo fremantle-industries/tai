@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Gdax.Serializers.Snapshot do
+defmodule Tai.VenueAdapters.Gdax.OrderBookFeed.Snapshot do
   def normalize(snapshot_side, processed_at) do
     snapshot_side
     |> Enum.reduce(%{}, fn [price, size], acc ->

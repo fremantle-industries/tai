@@ -7,42 +7,27 @@ defmodule Tai.Commands.Markets do
 
   @spec markets :: no_return
   def markets do
-    Tai.Exchanges.Config.order_book_feed_ids()
-    |> group_rows
-    |> fetch_rows
+    Tai.Exchanges.ProductStore.all()
+    |> fetch_inside_quotes
     |> format_rows
+    |> sort_rows
     |> render!
   end
 
-  defp group_rows(feed_ids) do
-    feed_ids
-    |> Enum.reduce(
-      [],
-      fn feed_id, acc ->
-        feed_id
-        |> Tai.Exchanges.Config.order_book_feed_symbols()
-        |> Enum.reduce(
-          acc,
-          fn symbol, acc -> [{feed_id, symbol} | acc] end
-        )
-      end
-    )
-    |> Enum.reverse()
-  end
-
-  defp fetch_rows(groups) when is_list(groups) do
-    groups
-    |> Enum.map(fn {feed_id, symbol} ->
-      {:ok, inside_quote} = Tai.Markets.OrderBook.inside_quote(feed_id, symbol)
-      {feed_id, symbol, inside_quote}
+  defp fetch_inside_quotes(products) when is_list(products) do
+    products
+    |> Enum.map(fn p -> {p.exchange_id, p.symbol} end)
+    |> Enum.map(fn {venue_id, symbol} ->
+      {:ok, inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, symbol)
+      {venue_id, symbol, inside_quote}
     end)
   end
 
-  defp format_rows(groups_with_quotes) when is_list(groups_with_quotes) do
-    groups_with_quotes
-    |> Enum.map(fn {feed_id, symbol, %Tai.Markets.Quote{bid: bid, ask: ask}} ->
+  defp format_rows(products_with_inside_quote) do
+    products_with_inside_quote
+    |> Enum.map(fn {venue_id, symbol, %Tai.Markets.Quote{bid: bid, ask: ask}} ->
       [
-        feed_id,
+        venue_id,
         symbol,
         {bid, :price},
         {ask, :price},
@@ -57,6 +42,8 @@ defmodule Tai.Commands.Markets do
     end)
   end
 
+  defp sort_rows(rows), do: rows |> Enum.sort(&(&1 < &2))
+
   defp format_row(row) when is_list(row), do: row |> Enum.map(&format_col/1)
   defp format_col({nil, _}), do: format_col(nil)
   defp format_col({receiver, message}), do: receiver |> get_in([message]) |> format_col
@@ -66,8 +53,8 @@ defmodule Tai.Commands.Markets do
   defp format_col(pass_through), do: pass_through
 
   @header [
-    "Feed",
-    "Symbol",
+    "Venue",
+    "Product",
     "Bid Price",
     "Ask Price",
     "Bid Size",

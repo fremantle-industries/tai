@@ -1,14 +1,12 @@
-defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
+defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
   @moduledoc """
   WebSocket order book feed adapter for GDAX
   """
 
   use Tai.Exchanges.OrderBookFeed
-
+  alias Tai.VenueAdapters.Gdax.OrderBookFeed
+  alias Tai.ExchangeAdapters.Gdax.{Product}
   require Logger
-
-  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook}
-  alias Tai.ExchangeAdapters.Gdax.{Product, Serializers.Snapshot, Serializers.L2Update}
 
   @doc """
   Secure production GDAX WebSocket url
@@ -48,20 +46,20 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
           "bids" => bids,
           "asks" => asks
         },
-        %OrderBookFeed{feed_id: feed_id} = state
+        state
       ) do
     processed_at = Timex.now()
 
-    snapshot = %OrderBook{
-      bids: bids |> Snapshot.normalize(processed_at),
-      asks: asks |> Snapshot.normalize(processed_at)
+    snapshot = %Tai.Markets.OrderBook{
+      bids: bids |> OrderBookFeed.Snapshot.normalize(processed_at),
+      asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
     }
 
     symbol = Product.to_symbol(product_id)
 
-    [feed_id: feed_id, symbol: symbol]
-    |> OrderBook.to_name()
-    |> OrderBook.replace(snapshot)
+    [feed_id: state.feed_id, symbol: symbol]
+    |> Tai.Markets.OrderBook.to_name()
+    |> Tai.Markets.OrderBook.replace(snapshot)
 
     {:ok, state}
   end
@@ -76,16 +74,19 @@ defmodule Tai.ExchangeAdapters.Gdax.OrderBookFeed do
           "product_id" => product_id,
           "changes" => changes
         },
-        %OrderBookFeed{feed_id: feed_id} = state
+        state
       ) do
     processed_at = Timex.now()
     server_changed_at = Timex.parse!(time, "{ISO:Extended}")
-    normalized_changes = changes |> L2Update.normalize(processed_at, server_changed_at)
+
+    normalized_changes =
+      changes |> OrderBookFeed.L2Update.normalize(processed_at, server_changed_at)
+
     symbol = product_id |> Product.to_symbol()
 
-    [feed_id: feed_id, symbol: symbol]
-    |> OrderBook.to_name()
-    |> OrderBook.update(normalized_changes)
+    [feed_id: state.feed_id, symbol: symbol]
+    |> Tai.Markets.OrderBook.to_name()
+    |> Tai.Markets.OrderBook.update(normalized_changes)
 
     {:ok, state}
   end

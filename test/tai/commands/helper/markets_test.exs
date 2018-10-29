@@ -8,6 +8,8 @@ defmodule Tai.Commands.Helper.MarketsTest do
       Application.stop(:tai)
     end)
 
+    start_supervised!(Tai.TestSupport.Mocks.Server)
+    mock_products()
     {:ok, _} = Application.ensure_all_started(:tai)
     :ok
   end
@@ -29,7 +31,7 @@ defmodule Tai.Commands.Helper.MarketsTest do
 
     assert capture_io(&Tai.Commands.Helper.markets/0) == """
            +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
-           |            Feed |  Symbol | Bid Price | Ask Price | Bid Size | Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
+           |           Venue | Product | Bid Price | Ask Price | Bid Size | Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
            +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
            | test_exchange_a | btc_usd |  12999.99 |  13000.01 | 0.000021 |     1.11 |              now |                   now |              now |                   now |
            | test_exchange_a | ltc_usd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
@@ -37,5 +39,23 @@ defmodule Tai.Commands.Helper.MarketsTest do
            | test_exchange_b | ltc_usd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
            +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+\n
            """
+  end
+
+  def mock_products() do
+    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+      :test_exchange_a,
+      [
+        %{symbol: :btc_usd},
+        %{symbol: :ltc_usd}
+      ]
+    )
+
+    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+      :test_exchange_b,
+      [
+        %{symbol: :eth_usd},
+        %{symbol: :ltc_usd}
+      ]
+    )
   end
 end

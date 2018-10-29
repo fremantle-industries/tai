@@ -3,6 +3,8 @@ defmodule Tai.VenueAdapters.Mock do
 
   import Tai.TestSupport.Mocks.Client
 
+  def order_book_feed, do: Tai.VenueAdapters.Mock.OrderBookFeed
+
   def products(venue_id) do
     with_mock_server(fn ->
       venue_id

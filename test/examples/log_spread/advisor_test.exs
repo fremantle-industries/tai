@@ -9,6 +9,8 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
       Application.stop(:tai)
     end)
 
+    start_supervised!(Tai.TestSupport.Mocks.Server)
+    mock_products()
     {:ok, _} = Application.ensure_all_started(:tai)
     :ok
   end
@@ -37,5 +39,23 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
       end)
 
     assert log_msg =~ ~r/\[spread:test_exchange_a,btc_usd,0.01,6500.1,6500.11\]/
+  end
+
+  def mock_products() do
+    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+      :test_exchange_a,
+      [
+        %{symbol: :btc_usd},
+        %{symbol: :ltc_usd}
+      ]
+    )
+
+    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+      :test_exchange_b,
+      [
+        %{symbol: :eth_usd},
+        %{symbol: :ltc_usd}
+      ]
+    )
   end
 end

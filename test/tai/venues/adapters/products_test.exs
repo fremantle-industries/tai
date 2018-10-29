@@ -3,6 +3,11 @@ defmodule Tai.Venues.Adapters.ProductsTest do
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
   setup_all do
+    on_exit(fn ->
+      Application.stop(:tai)
+    end)
+
+    {:ok, _} = Application.ensure_all_started(:tai)
     start_supervised!(Tai.TestSupport.Mocks.Server)
     HTTPoison.start()
   end

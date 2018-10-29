@@ -1,12 +1,11 @@
-defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
+defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
   @moduledoc """
   Hydrate order books for the Poloniex exchange
   """
 
   use Tai.Exchanges.OrderBookFeed
-
-  alias Tai.{Exchanges.OrderBookFeed, Markets.OrderBook}
-  alias Tai.ExchangeAdapters.Poloniex.{Snapshot, SymbolMapping}
+  alias Tai.ExchangeAdapters.Poloniex.{SymbolMapping}
+  alias Tai.VenueAdapters.Poloniex.OrderBookFeed
 
   @doc """
   Secure production Poloniex WebSocket url.
@@ -77,7 +76,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
           _sequence_id,
           events
         ],
-        %OrderBookFeed{} = state
+        state
       ) do
     new_state =
       state
@@ -102,14 +101,14 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
     processed_at = Timex.now()
     symbol = currency_pair |> SymbolMapping.to_tai()
 
-    snapshot = %OrderBook{
-      bids: bids |> Snapshot.normalize(processed_at),
-      asks: asks |> Snapshot.normalize(processed_at)
+    snapshot = %Tai.Markets.OrderBook{
+      bids: bids |> OrderBookFeed.Snapshot.normalize(processed_at),
+      asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
     }
 
     [feed_id: state.feed_id, symbol: symbol]
-    |> OrderBook.to_name()
-    |> OrderBook.replace(snapshot)
+    |> Tai.Markets.OrderBook.to_name()
+    |> Tai.Markets.OrderBook.replace(snapshot)
 
     new_store = state.store |> Map.put(channel_id, symbol)
     state |> Map.put(:store, new_store)
@@ -127,14 +126,14 @@ defmodule Tai.ExchangeAdapters.Poloniex.OrderBookFeed do
       processed_at = Timex.now()
       symbol = state.store |> Map.get(channel_id)
 
-      changes = %OrderBook{
-        bids: bids |> Snapshot.normalize(processed_at),
-        asks: asks |> Snapshot.normalize(processed_at)
+      changes = %Tai.Markets.OrderBook{
+        bids: bids |> OrderBookFeed.Snapshot.normalize(processed_at),
+        asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
       }
 
       [feed_id: state.feed_id, symbol: symbol]
-      |> OrderBook.to_name()
-      |> OrderBook.update(changes)
+      |> Tai.Markets.OrderBook.to_name()
+      |> Tai.Markets.OrderBook.update(changes)
     end
 
     state
