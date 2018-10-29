@@ -1,4 +1,6 @@
 defmodule Tai.TestSupport.Mock do
+  @type location :: Tai.Markets.Location.t()
+
   @spec mock_product(Tai.Exchanges.Product.t() | map) :: :ok
   def mock_product(%Tai.Exchanges.Product{} = product) do
     product
@@ -35,25 +37,32 @@ defmodule Tai.TestSupport.Mock do
     Tai.Exchanges.AssetBalances.upsert(balance)
   end
 
-  @spec push_market_feed_snapshot(atom, atom, map, map) ::
+  @spec push_market_feed_snapshot(location :: location, bids :: map, asks :: map) ::
           :ok
           | {:error,
              %WebSockex.FrameEncodeError{}
              | %WebSockex.ConnError{}
              | %WebSockex.NotConnectedError{}
              | %WebSockex.InvalidFrameError{}}
-  def push_market_feed_snapshot(feed_id, symbol, bids, asks) do
-    feed_pid =
-      feed_id
-      |> Tai.Exchanges.OrderBookFeed.to_name()
-      |> Process.whereis()
-
+  def push_market_feed_snapshot(location, bids, asks) do
     :ok =
-      Tai.WebSocket.send_json_msg(feed_pid, %{
+      location.venue_id
+      |> whereis_market_data_feed
+      |> send_json_msg(%{
         type: :snapshot,
-        symbol: symbol,
+        symbol: location.product_symbol,
         bids: bids,
         asks: asks
       })
+  end
+
+  defp whereis_market_data_feed(venue_id) do
+    venue_id
+    |> Tai.Exchanges.OrderBookFeed.to_name()
+    |> Process.whereis()
+  end
+
+  defp send_json_msg(pid, msg) do
+    Tai.WebSocket.send_json_msg(pid, msg)
   end
 end

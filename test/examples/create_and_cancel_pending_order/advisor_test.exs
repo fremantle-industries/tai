@@ -40,8 +40,10 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
     log_msg =
       capture_log(fn ->
         push_market_feed_snapshot(
-          :test_exchange_a,
-          :btc_usd,
+          %Tai.Markets.Location{
+            venue_id: :test_exchange_a,
+            product_symbol: :btc_usd
+          },
           %{100.1 => 1.1},
           %{100.11 => 1.2}
         )

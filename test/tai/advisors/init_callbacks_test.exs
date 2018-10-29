@@ -69,8 +69,10 @@ defmodule Tai.Advisors.InitCallbacksTest do
       })
 
       push_market_feed_snapshot(
-        :init_success_feed,
-        :btc_usd,
+        %Tai.Markets.Location{
+          venue_id: :init_success_feed,
+          product_symbol: :btc_usd
+        },
         %{6500.1 => 1.1},
         %{6500.11 => 1.2}
       )
@@ -118,8 +120,10 @@ defmodule Tai.Advisors.InitCallbacksTest do
           })
 
           push_market_feed_snapshot(
-            :init_failure_feed,
-            :btc_usd,
+            %Tai.Markets.Location{
+              venue_id: :init_failure_feed,
+              product_symbol: :btc_usd
+            },
             %{6500.1 => 1.1},
             %{6500.11 => 1.2}
           )
