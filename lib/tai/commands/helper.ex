@@ -23,6 +23,9 @@ defmodule Tai.Commands.Helper do
   @spec orders :: no_return
   defdelegate orders, to: Tai.Commands.Orders
 
+  @spec advisor_groups :: no_return
+  defdelegate advisor_groups, to: Tai.Commands.AdvisorGroups
+
   @spec advisors :: no_return
   defdelegate advisors, to: Tai.Commands.Advisors
 
