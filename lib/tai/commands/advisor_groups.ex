@@ -13,6 +13,24 @@ defmodule Tai.Commands.AdvisorGroups do
     |> render!
   end
 
+  @spec start(group_id :: atom) :: no_return
+  @spec start(group_id :: atom, config :: config) :: no_return
+  def start(group_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_group(config, group_id) do
+      {:ok, {new, old}} = Tai.Advisors.start(specs)
+      IO.puts("Started advisors: #{new} new, #{old} already running")
+    end
+  end
+
+  @spec stop(group_id :: atom) :: no_return
+  @spec stop(group_id :: atom, config :: config) :: no_return
+  def stop(group_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_group(config, group_id) do
+      {:ok, {new, old}} = Tai.Advisors.stop(specs)
+      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
+    end
+  end
+
   defp agg_status_by_group({:ok, specs}) do
     specs
     |> Tai.Advisors.info()
