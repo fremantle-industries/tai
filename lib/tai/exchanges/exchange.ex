@@ -8,14 +8,15 @@ defmodule Tai.Exchanges.Exchange do
   Parse a map of exchange configurations into a list of adapter structs
   """
   @spec parse_adapters(config :: config) :: [adapter]
-  def parse_adapters(%Tai.Config{venues: venues}) do
-    venues
+  def parse_adapters(%Tai.Config{} = config) do
+    config.venues
     |> Enum.map(fn {id, params} ->
       %Tai.Exchanges.Adapter{
         id: id,
         adapter: Keyword.fetch!(params, :adapter),
         products: Keyword.get(params, :products, "*"),
-        accounts: Keyword.get(params, :accounts, %{})
+        accounts: Keyword.get(params, :accounts, %{}),
+        timeout: Keyword.get(params, :timeout, config.adapter_timeout)
       }
     end)
   end

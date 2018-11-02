@@ -3,9 +3,6 @@ defmodule Tai.Exchanges.OrderBookFeed do
   Behaviour to connect to a WebSocket that streams quotes from order books
   """
 
-  @typedoc """
-  The state of the running order book feed
-  """
   @type t :: %Tai.Exchanges.OrderBookFeed{
           feed_id: atom,
           symbols: [atom],

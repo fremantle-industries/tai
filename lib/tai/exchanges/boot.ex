@@ -27,7 +27,7 @@ defmodule Tai.Exchanges.Boot do
   defp wait_for_products({adapter, t_products, t_balances}) do
     working_tasks = [asset_balances: t_balances]
 
-    case Task.await(t_products) do
+    case Task.await(t_products, adapter.timeout) do
       {:ok, products} ->
         {:ok, adapter, working_tasks, products}
 
@@ -66,7 +66,7 @@ defmodule Tai.Exchanges.Boot do
   end
 
   defp collect_remaining_errors(adapter, [{name, working} | tasks], err_reasons) do
-    case Task.await(working) do
+    case Task.await(working, adapter.timeout) do
       {:error, reason} ->
         adapter |> collect_remaining_errors(tasks, [{name, reason} | err_reasons])
 

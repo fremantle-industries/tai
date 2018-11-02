@@ -27,14 +27,17 @@ defmodule Tai do
     config
     |> Tai.Exchanges.Exchange.parse_adapters()
     |> Enum.map(fn adapter ->
-      Task.Supervisor.async(
-        Tai.TaskSupervisor,
-        Tai.Exchanges.Boot,
-        :run,
-        [adapter]
-      )
+      task =
+        Task.Supervisor.async(
+          Tai.TaskSupervisor,
+          Tai.Exchanges.Boot,
+          :run,
+          [adapter]
+        )
+
+      {task, adapter}
     end)
-    |> Enum.map(&Task.await/1)
+    |> Enum.map(fn {task, adapter} -> Task.await(task, adapter.timeout) end)
     |> Enum.each(&config.exchange_boot_handler.parse_response/1)
   end
 end

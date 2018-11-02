@@ -4,26 +4,41 @@ defmodule Tai.Config do
   """
 
   @type t :: %Tai.Config{
-          send_orders: boolean,
+          adapter_timeout: integer,
+          advisor_groups: map,
           exchange_boot_handler: atom,
-          venues: map,
-          advisor_groups: map
+          send_orders: boolean,
+          venues: map
         }
 
-  @enforce_keys [:send_orders, :exchange_boot_handler, :venues]
-  defstruct [:send_orders, :exchange_boot_handler, :venues, :advisor_groups]
+  @enforce_keys [
+    :adapter_timeout,
+    :advisor_groups,
+    :exchange_boot_handler,
+    :send_orders,
+    :venues
+  ]
+  defstruct [
+    :adapter_timeout,
+    :advisor_groups,
+    :exchange_boot_handler,
+    :send_orders,
+    :venues
+  ]
 
   def parse(env \\ Application.get_all_env(:tai)) do
-    send_orders = !!Keyword.get(env, :send_orders)
-    exchange_boot_handler = Keyword.get(env, :exchange_boot_handler, Tai.Exchanges.BootHandler)
-    venues = Keyword.get(env, :venues, %{})
+    adapter_timeout = Keyword.get(env, :adapter_timeout, 10_000)
     advisor_groups = Keyword.get(env, :advisor_groups, %{})
+    exchange_boot_handler = Keyword.get(env, :exchange_boot_handler, Tai.Exchanges.BootHandler)
+    send_orders = !!Keyword.get(env, :send_orders)
+    venues = Keyword.get(env, :venues, %{})
 
     %Tai.Config{
-      send_orders: send_orders,
+      adapter_timeout: adapter_timeout,
+      advisor_groups: advisor_groups,
       exchange_boot_handler: exchange_boot_handler,
-      venues: venues,
-      advisor_groups: advisor_groups
+      send_orders: send_orders,
+      venues: venues
     }
   end
 end

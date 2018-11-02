@@ -9,19 +9,22 @@ defmodule Tai.Exchanges.ExchangeTest do
           venues: %{
             exchange_a: [adapter: MyAdapterA],
             exchange_b: [adapter: MyAdapterB]
-          }
+          },
+          adapter_timeout: 100
         )
 
       assert Tai.Exchanges.Exchange.parse_adapters(config) == [
                %Tai.Exchanges.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
+                 timeout: 100,
                  products: "*",
                  accounts: %{}
                },
                %Tai.Exchanges.Adapter{
                  id: :exchange_b,
                  adapter: MyAdapterB,
+                 timeout: 100,
                  products: "*",
                  accounts: %{}
                }
@@ -36,6 +39,26 @@ defmodule Tai.Exchanges.ExchangeTest do
       end
     end
 
+    test "can provide a timeout" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            exchange_a: [
+              adapter: MyAdapterA,
+              timeout: 10
+            ]
+          }
+        )
+
+      assert [
+               %Tai.Exchanges.Adapter{
+                 id: :exchange_a,
+                 adapter: MyAdapterA,
+                 timeout: 10
+               }
+             ] = Tai.Exchanges.Exchange.parse_adapters(config)
+    end
+
     test "can provide a products filter" do
       config =
         Tai.Config.parse(
@@ -47,14 +70,13 @@ defmodule Tai.Exchanges.ExchangeTest do
           }
         )
 
-      assert Tai.Exchanges.Exchange.parse_adapters(config) == [
+      assert [
                %Tai.Exchanges.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
-                 products: "-btc_usd",
-                 accounts: %{}
+                 products: "-btc_usd"
                }
-             ]
+             ] = Tai.Exchanges.Exchange.parse_adapters(config)
     end
 
     test "can provide accounts" do
@@ -68,14 +90,13 @@ defmodule Tai.Exchanges.ExchangeTest do
           }
         )
 
-      assert Tai.Exchanges.Exchange.parse_adapters(config) == [
+      assert [
                %Tai.Exchanges.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
-                 products: "*",
                  accounts: %{main: %{}}
                }
-             ]
+             ] = Tai.Exchanges.Exchange.parse_adapters(config)
     end
   end
 end

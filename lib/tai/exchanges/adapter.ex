@@ -5,6 +5,7 @@ defmodule Tai.Exchanges.Adapter do
           products: String.t(),
           accounts: map
         }
+
   @type product :: Tai.Exchanges.Product.t()
   @type asset_balance :: Tai.Exchanges.AssetBalance.t()
 
@@ -15,8 +16,20 @@ defmodule Tai.Exchanges.Adapter do
   @callback maker_taker_fees(exchange_id :: atom, account_id :: atom, credentials :: map) ::
               {:ok, {maker :: Decimal.t(), taker :: Decimal.t()}} | {:error, reason :: term}
 
-  @enforce_keys [:id, :adapter, :products, :accounts]
-  defstruct [:id, :adapter, :products, :accounts]
+  @enforce_keys [
+    :id,
+    :adapter,
+    :products,
+    :accounts,
+    :timeout
+  ]
+  defstruct [
+    :id,
+    :adapter,
+    :products,
+    :accounts,
+    :timeout
+  ]
 
   defmacro __using__(_) do
     quote location: :keep do

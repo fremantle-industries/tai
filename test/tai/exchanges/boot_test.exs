@@ -18,6 +18,7 @@ defmodule Tai.Exchanges.BootTest do
 
   @exchange_id :mock_boot
   @account_id :main
+  @timeout 5000
 
   describe ".run success" do
     setup [:mock_products, :mock_asset_balances, :mock_maker_taker_fees]
@@ -26,7 +27,8 @@ defmodule Tai.Exchanges.BootTest do
       id: @exchange_id,
       adapter: Tai.VenueAdapters.Mock,
       products: "* -ltc_usdt",
-      accounts: %{main: %{}}
+      accounts: %{main: %{}},
+      timeout: @timeout
     }
 
     test "hydrates filtered products" do
@@ -101,7 +103,8 @@ defmodule Tai.Exchanges.BootTest do
         id: :mock_boot,
         adapter: Tai.VenueAdapters.Mock,
         products: "*",
-        accounts: %{}
+        accounts: %{},
+        timeout: @timeout
       }
 
       assert {:error, {^adapter, [products: :mock_response_not_found]}} =
@@ -117,7 +120,8 @@ defmodule Tai.Exchanges.BootTest do
         id: :mock_boot,
         adapter: Tai.VenueAdapters.Mock,
         products: "*",
-        accounts: %{main: %{}}
+        accounts: %{main: %{}},
+        timeout: @timeout
       }
 
       assert {:error, {^adapter, [asset_balances: :mock_response_not_found]}} =
@@ -133,7 +137,8 @@ defmodule Tai.Exchanges.BootTest do
         id: :mock_boot,
         adapter: Tai.VenueAdapters.Mock,
         products: "*",
-        accounts: %{main: %{}}
+        accounts: %{main: %{}},
+        timeout: @timeout
       }
 
       assert {:error, {^adapter, [fees: :mock_response_not_found]}} =
