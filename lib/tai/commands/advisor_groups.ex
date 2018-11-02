@@ -3,6 +3,7 @@ defmodule Tai.Commands.AdvisorGroups do
 
   @type config :: Tai.Config.t()
 
+  @spec advisor_groups() :: no_return
   @spec advisor_groups(config :: config) :: no_return
   def advisor_groups(config \\ Tai.Config.parse()) do
     config
