@@ -10,6 +10,7 @@ defmodule Tai.Commands.Help do
     * fees
     * markets
     * orders
+    * advisor_groups
     * advisors
     * settings
     * start_advisors
