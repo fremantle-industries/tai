@@ -124,6 +124,7 @@ iex(1)> help
 * fees
 * markets
 * orders
+* advisor_groups
 * advisors
 * settings
 * start_advisors
@@ -249,13 +250,29 @@ iex(7)> settings
 +-------------+-------+
 ```
 
+#### advisor_groups
+
+Displays the aggregate status of all advisors in all groups
+
+
+```
+iex(8)> advisor_groups
++---------------------------------+---------+-----------+-------+
+|                        Group ID | Running | Unstarted | Total |
++---------------------------------+---------+-----------+-------+
+|                      log_spread |       0 |         3 |     3 |
+|             fill_or_kill_orders |       0 |         1 |     1 |
+| create_and_cancel_pending_order |       0 |         1 |     1 |
++---------------------------------+---------+-----------+-------+
+```
+
 #### advisors
 
 Displays every advisor from every group along with their run status 
 
 
 ```
-iex(8)> advisors
+iex(9)> advisors
 +---------------------------------+-------------------+-------+-----------+-----+
 |                        Group ID |        Advisor ID | Store |    Status | PID |
 +---------------------------------+-------------------+-------+-----------+-----+
@@ -272,7 +289,7 @@ iex(8)> advisors
 Starts every advisor in every group
 
 ```
-iex(9)> start_advisors
+iex(10)> start_advisors
 Started advisors: 5 new, 0 already running
 ```
 
@@ -281,7 +298,7 @@ Started advisors: 5 new, 0 already running
 Starts every advisor in the given group
 
 ```
-iex(10)> start_advisor_group :log_spread
+iex(11)> start_advisor_group :log_spread
 Started advisors: 3 new, 0 already running
 ```
 
@@ -290,7 +307,7 @@ Started advisors: 3 new, 0 already running
 Starts a single advisor in given group
 
 ```
-iex(11)> start_advisor :log_spread, :binance_btc_usdt
+iex(12)> start_advisor :log_spread, :binance_btc_usdt
 Started advisors: 1 new, 0 already running
 ```
 
@@ -299,7 +316,7 @@ Started advisors: 1 new, 0 already running
 Stops every advisor in every group
 
 ```
-iex(12)> stop_advisor_groups
+iex(13)> stop_advisor_groups
 Stopped advisors: 5 new, 0 already stopped
 ```
 
@@ -308,7 +325,7 @@ Stopped advisors: 5 new, 0 already stopped
 Stops every advisor in the given group
 
 ```
-iex(13)> start_advisor_group :log_spread
+iex(14)> start_advisor_group :log_spread
 Stopped advisors: 3 new, 0 already stopped
 ```
 
@@ -317,7 +334,7 @@ Stopped advisors: 3 new, 0 already stopped
 Stops a single advisor in given group
 
 ```
-iex(14)> stop_advisor :log_spread, :binance_btc_usdt
+iex(15)> stop_advisor :log_spread, :binance_btc_usdt
 Stopped advisors: 1 new, 0 already stopped
 ```
 
