@@ -2,8 +2,6 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   use ExUnit.Case
   doctest Tai.Exchanges.AssetBalances
 
-  import ExUnit.CaptureLog
-
   setup do
     on_exit(fn ->
       Application.stop(:tai)
@@ -193,24 +191,28 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert balance.locked == Decimal.new(2.1)
     end
 
-    test "logs the asset, locked quantity & range when successful" do
-      log_msg =
-        capture_log(fn ->
-          lock_range(:btc, 0.5, 0.6)
-          :timer.sleep(100)
-        end)
+    test "broadcasts an event when successful" do
+      Tai.Events.firehose_subscribe()
 
-      assert log_msg =~ ~r/\[lock_range_ok:btc,0.6,0.5..0.6\]/
+      lock_range(:btc, 0.5, 0.6)
+
+      assert_receive {Tai.Event, %Tai.Events.LockAssetBalanceRangeOk{asset: :btc} = event}
+      assert event.qty == Decimal.new(0.6)
+      assert event.min == Decimal.new(0.5)
+      assert event.max == Decimal.new(0.6)
     end
 
-    test "logs the asset, free balance & range when unsuccessful" do
-      log_msg =
-        capture_log(fn ->
-          lock_range(:btc, 1.2, 1.3)
-          :timer.sleep(100)
-        end)
+    test "broadcasts an event when unsuccessful" do
+      Tai.Events.firehose_subscribe()
 
-      assert log_msg =~ ~r/\[lock_range_insufficient_balance:btc,1.1,1.2..1.3\]/
+      lock_range(:btc, 1.2, 1.3)
+
+      assert_receive {Tai.Event,
+                      %Tai.Events.LockAssetBalanceRangeInsufficientFunds{asset: :btc} = event}
+
+      assert event.free == Decimal.new(1.1)
+      assert event.min == Decimal.new(1.2)
+      assert event.max == Decimal.new(1.3)
     end
   end
 
@@ -251,24 +253,25 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert balance.locked == Decimal.new(2.1)
     end
 
-    test "logs the asset & unlocked quantity" do
-      log_msg =
-        capture_log(fn ->
-          unlock(:btc, 1.0)
-          :timer.sleep(100)
-        end)
+    test "broadcasts an event when successful" do
+      Tai.Events.firehose_subscribe()
 
-      assert log_msg =~ ~r/\[unlock_ok:btc,1.0\]/
+      unlock(:btc, 1.0)
+
+      assert_receive {Tai.Event, %Tai.Events.UnlockAssetBalanceOk{asset: :btc} = event}
+      assert event.qty == Decimal.new(1.0)
     end
 
-    test "logs the asset, locked balance & attempted quantity when there is an insufficent locked balance" do
-      log_msg =
-        capture_log(fn ->
-          unlock(:btc, 2.11)
-          :timer.sleep(100)
-        end)
+    test "broadcasts an event when unsuccessful" do
+      Tai.Events.firehose_subscribe()
 
-      assert log_msg =~ ~r/\[unlock_insufficient_balance:btc,2.1,2.11\]/
+      unlock(:btc, 2.11)
+
+      assert_receive {Tai.Event,
+                      %Tai.Events.UnlockAssetBalanceInsufficientFunds{asset: :btc} = event}
+
+      assert event.locked == Decimal.new(2.1)
+      assert event.qty == Decimal.new(2.11)
     end
   end
 
@@ -305,14 +308,15 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert balance.locked == Decimal.new(2.1)
     end
 
-    test "logs the updated free balance" do
-      log_msg =
-        capture_log(fn ->
-          Tai.Exchanges.AssetBalances.add(:my_test_exchange, :my_test_account, :btc, 0.1)
-          :timer.sleep(100)
-        end)
+    test "broadcasts an event with the updated balances" do
+      Tai.Events.firehose_subscribe()
 
-      assert log_msg =~ ~r/\[add:btc,0.1,1.2,2.1\]/
+      Tai.Exchanges.AssetBalances.add(:my_test_exchange, :my_test_account, :btc, 0.1)
+
+      assert_receive {Tai.Event, %Tai.Events.AddFreeAssetBalance{asset: :btc} = event}
+      assert event.val == Decimal.new(0.1)
+      assert event.free == Decimal.new(1.2)
+      assert event.locked == Decimal.new(2.1)
     end
 
     test "returns an error tuple when the asset doesn't exist" do
@@ -362,14 +366,15 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert balance.locked == Decimal.new(2.1)
     end
 
-    test "logs the updated free balance" do
-      log_msg =
-        capture_log(fn ->
-          Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
-          :timer.sleep(100)
-        end)
+    test "broadcasts an event with the updated balances" do
+      Tai.Events.firehose_subscribe()
 
-      assert log_msg =~ ~r/\[sub:btc,0.1,1.0,2.1\]/
+      Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
+
+      assert_receive {Tai.Event, %Tai.Events.SubFreeAssetBalance{asset: :btc} = event}
+      assert event.val == Decimal.new(0.1)
+      assert event.free == Decimal.new(1.0)
+      assert event.locked == Decimal.new(2.1)
     end
 
     test "returns an error tuple when the result is less than 0" do

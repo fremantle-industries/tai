@@ -1,8 +1,14 @@
 defmodule Tai.Event do
   @type t ::
-          Tai.Events.HydrateProducts.t()
-          | Tai.Events.UpsertAssetBalance.t()
+          Tai.Events.AddFreeAssetBalance.t()
+          | Tai.Events.HydrateProducts.t()
+          | Tai.Events.LockAssetBalanceRangeInsufficientFunds.t()
+          | Tai.Events.LockAssetBalanceRangeOk.t()
           | Tai.Events.OrderBookSnapshot.t()
+          | Tai.Events.SubFreeAssetBalance.t()
+          | Tai.Events.UnlockAssetBalanceInsufficientFunds.t()
+          | Tai.Events.UnlockAssetBalanceOk.t()
+          | Tai.Events.UpsertAssetBalance.t()
           | map
 
   @spec encode!(event :: t) :: iodata | no_return

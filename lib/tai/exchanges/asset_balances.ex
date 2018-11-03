@@ -4,7 +4,6 @@ defmodule Tai.Exchanges.AssetBalances do
   @type balance_change_request :: Tai.Exchanges.AssetBalanceChangeRequest.t()
 
   use GenServer
-  require Logger
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -169,32 +168,65 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def handle_continue({:lock_range_ok, asset, qty, min, max}, state) do
-    Logger.info("[lock_range_ok:#{asset},#{qty},#{min}..#{max}]")
+    Tai.Events.broadcast(%Tai.Events.LockAssetBalanceRangeOk{
+      asset: asset,
+      qty: qty,
+      min: min,
+      max: max
+    })
+
     {:noreply, state}
   end
 
   def handle_continue({:lock_range_insufficient_balance, asset, free, min, max}, state) do
-    Logger.warn("[lock_range_insufficient_balance:#{asset},#{free},#{min}..#{max}]")
+    Tai.Events.broadcast(%Tai.Events.LockAssetBalanceRangeInsufficientFunds{
+      asset: asset,
+      free: free,
+      min: min,
+      max: max
+    })
+
     {:noreply, state}
   end
 
-  def handle_continue({:unlock_ok, asset, amount}, state) do
-    Logger.info("[unlock_ok:#{asset},#{amount}]")
+  def handle_continue({:unlock_ok, asset, qty}, state) do
+    Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceOk{
+      asset: asset,
+      qty: qty
+    })
+
     {:noreply, state}
   end
 
-  def handle_continue({:unlock_insufficient_balance, asset, locked, amount}, state) do
-    Logger.warn("[unlock_insufficient_balance:#{asset},#{locked},#{amount}]")
+  def handle_continue({:unlock_insufficient_balance, asset, locked, qty}, state) do
+    Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceInsufficientFunds{
+      asset: asset,
+      locked: locked,
+      qty: qty
+    })
+
     {:noreply, state}
   end
 
   def handle_continue({:add, asset, val, balance}, state) do
-    Logger.info("[add:#{asset},#{val},#{balance.free},#{balance.locked}]")
+    Tai.Events.broadcast(%Tai.Events.AddFreeAssetBalance{
+      asset: asset,
+      val: val,
+      free: balance.free,
+      locked: balance.locked
+    })
+
     {:noreply, state}
   end
 
   def handle_continue({:sub, asset, val, balance}, state) do
-    Logger.info("[sub:#{asset},#{val},#{balance.free},#{balance.locked}]")
+    Tai.Events.broadcast(%Tai.Events.SubFreeAssetBalance{
+      asset: asset,
+      val: val,
+      free: balance.free,
+      locked: balance.locked
+    })
+
     {:noreply, state}
   end
 
@@ -285,7 +317,7 @@ defmodule Tai.Exchanges.AssetBalances do
           account_id :: atom,
           asset :: atom,
           val :: number | String.t() | Decimal.t()
-        ) :: {:ok, asset_balance} | {:error, :value_must_be_positive | term}
+        ) :: {:ok, asset_balance} | {:error, :not_found | :value_must_be_positive}
   def add(exchange_id, account_id, asset, val)
 
   def add(exchange_id, account_id, asset, %Decimal{} = val) do
@@ -304,7 +336,7 @@ defmodule Tai.Exchanges.AssetBalances do
           account_id :: atom,
           asset :: atom,
           val :: number | String.t() | Decimal.t()
-        ) :: {:ok, asset_balance} | {:error, :value_must_be_positive | term}
+        ) :: {:ok, asset_balance} | {:error, :not_found | :value_must_be_positive}
   def sub(exchange_id, account_id, asset, val)
 
   def sub(exchange_id, account_id, asset, %Decimal{} = val) do
