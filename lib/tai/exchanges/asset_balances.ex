@@ -4,7 +4,6 @@ defmodule Tai.Exchanges.AssetBalances do
   @type balance_change_request :: Tai.Exchanges.AssetBalanceChangeRequest.t()
 
   use GenServer
-
   require Logger
 
   def start_link(_) do
@@ -19,12 +18,6 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def handle_call(:create_ets_table, _from, state) do
-    create_ets_table()
-    {:reply, :ok, state}
-  end
-
-  def handle_call(:clear, _from, state) do
-    :ets.delete(__MODULE__)
     create_ets_table()
     {:reply, :ok, state}
   end
@@ -203,11 +196,6 @@ defmodule Tai.Exchanges.AssetBalances do
   def handle_continue({:sub, asset, val, balance}, state) do
     Logger.info("[sub:#{asset},#{val},#{balance.free},#{balance.locked}]")
     {:noreply, state}
-  end
-
-  @spec clear :: :ok
-  def clear() do
-    GenServer.call(__MODULE__, :clear)
   end
 
   @spec upsert(balance :: asset_balance) :: :ok

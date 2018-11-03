@@ -72,17 +72,6 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe ".clear" do
-    test "removes the existing items in the ETS table" do
-      init_asset_balance(:ok)
-
-      assert Tai.Exchanges.AssetBalances.count() == 1
-
-      assert Tai.Exchanges.AssetBalances.clear() == :ok
-      assert Tai.Exchanges.AssetBalances.count() == 0
-    end
-  end
-
   describe ".where" do
     test "returns a list of the matching balances" do
       balance_1 =
