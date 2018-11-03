@@ -8,6 +8,14 @@ defmodule Tai.Exchanges.Boot.Products do
     with {:ok, all_products} <- Tai.Exchanges.Exchange.products(adapter) do
       filtered_products = filter(all_products, adapter.products)
       Enum.each(filtered_products, &Tai.Exchanges.ProductStore.upsert/1)
+
+      :ok =
+        Tai.Events.broadcast(%Tai.Events.HydrateProducts{
+          venue_id: adapter.id,
+          total: all_products |> Enum.count(),
+          filtered: filtered_products |> Enum.count()
+        })
+
       {:ok, filtered_products}
     else
       {:error, _} = error -> error

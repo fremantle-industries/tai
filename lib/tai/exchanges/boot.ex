@@ -1,11 +1,13 @@
 defmodule Tai.Exchanges.Boot do
   @moduledoc """
-  Coordinates the asynchronous hydration of an exchanges:
+  Coordinates the asynchronous hydration of a venue:
 
   - products
   - asset balances
   - fees
   """
+
+  alias Tai.Exchanges.Boot
 
   @type adapter :: Tai.Exchanges.Adapter.t()
 
@@ -19,8 +21,8 @@ defmodule Tai.Exchanges.Boot do
   end
 
   defp hydrate_products_and_balances(adapter) do
-    t_products = Task.async(Tai.Exchanges.Boot.Products, :hydrate, [adapter])
-    t_balances = Task.async(Tai.Exchanges.Boot.AssetBalances, :hydrate, [adapter])
+    t_products = Task.async(Boot.Products, :hydrate, [adapter])
+    t_balances = Task.async(Boot.AssetBalances, :hydrate, [adapter])
     {adapter, t_products, t_balances}
   end
 
@@ -38,8 +40,8 @@ defmodule Tai.Exchanges.Boot do
   end
 
   defp hydrate_fees_and_start_order_books({:ok, adapter, working_tasks, products}) do
-    t_fees = Task.async(Tai.Exchanges.Boot.Fees, :hydrate, [adapter, products])
-    t_order_books = Task.async(Tai.Exchanges.Boot.OrderBooks, :start, [adapter, products])
+    t_fees = Task.async(Boot.Fees, :hydrate, [adapter, products])
+    t_order_books = Task.async(Boot.OrderBooks, :start, [adapter, products])
     new_working_tasks = [{:fees, t_fees} | working_tasks]
     new_working_tasks = [{:order_books, t_order_books} | new_working_tasks]
     {:ok, adapter, new_working_tasks}

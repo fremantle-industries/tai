@@ -81,7 +81,12 @@ defmodule Tai.Markets.OrderBook do
       {:order_book_snapshot, state.feed_id, state.symbol, snapshot}
     )
 
-    new_state = state |> Map.put(:order_book, snapshot)
+    new_state = Map.put(state, :order_book, snapshot)
+
+    Tai.Events.broadcast(%Tai.Events.OrderBookSnapshot{
+      venue_id: new_state.feed_id,
+      symbol: new_state.symbol
+    })
 
     {:reply, :ok, new_state}
   end

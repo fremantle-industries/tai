@@ -163,18 +163,13 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def handle_continue({:upsert, balance}, state) do
-    Logger.info(
-      :io_lib.format(
-        "[upsert:~s,~s,~s,~s,~s]",
-        [
-          balance.exchange_id,
-          balance.account_id,
-          balance.asset,
-          balance.free |> Decimal.to_string(:normal),
-          balance.locked |> Decimal.to_string(:normal)
-        ]
-      )
-    )
+    Tai.Events.broadcast(%Tai.Events.UpsertAssetBalance{
+      venue_id: balance.exchange_id,
+      account_id: balance.account_id,
+      asset: balance.asset,
+      free: balance.free,
+      locked: balance.locked
+    })
 
     {:noreply, state}
   end

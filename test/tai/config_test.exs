@@ -1,16 +1,19 @@
 defmodule Tai.ConfigTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
   doctest Tai.Config
 
   describe ".parse" do
     test "returns a default representation" do
-      assert Tai.Config.parse([]) == %Tai.Config{
+      schedulers_online = System.schedulers_online()
+
+      assert %Tai.Config{
                send_orders: false,
                exchange_boot_handler: Tai.Exchanges.BootHandler,
                venues: %{},
                advisor_groups: %{},
-               adapter_timeout: 10_000
-             }
+               adapter_timeout: 10_000,
+               event_registry_partitions: ^schedulers_online
+             } = Tai.Config.parse([])
     end
 
     test "can set send_orders" do
@@ -21,6 +24,11 @@ defmodule Tai.ConfigTest do
     test "can set adapter_timeout" do
       assert config = Tai.Config.parse(adapter_timeout: 5000)
       assert config.adapter_timeout == 5000
+    end
+
+    test "can set event_registry_partitions" do
+      assert config = Tai.Config.parse(event_registry_partitions: 1)
+      assert config.event_registry_partitions == 1
     end
 
     test "can set exchange_boot_handler" do
