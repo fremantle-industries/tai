@@ -1,17 +1,13 @@
 use Mix.Config
 
+config :logger_json, :backend, metadata: :all
+config :logger, :file_log, path: "./log/#{Mix.env()}.log", metadata: [:tid]
+
 config :logger,
-  backends: [{LoggerFileBackend, :file_log}],
-  utc_log: true
-
-log_format = "$dateT$time [$level]$levelpad $metadata$message\n"
-
-config :logger, :file_log,
-  path: "./log/#{Mix.env()}.log",
-  format: log_format,
-  metadata: [:tid]
-
-config :logger, :console, format: log_format
+  backends: [
+    {LoggerFileBackend, :file_log},
+    LoggerJSON
+  ]
 
 if System.get_env("DEBUG") == "true" do
   config :logger, :file_log, level: :debug

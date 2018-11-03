@@ -25,7 +25,7 @@ defmodule Tai.Mixfile do
   def application do
     [
       mod: {Tai, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :jason, :logger_json]
     ]
   end
 
@@ -37,13 +37,14 @@ defmodule Tai.Mixfile do
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},
-      {:logger_file_backend, "~> 0.0.10"},
       {:table_rex, "~> 2.0"},
       {:timex, "~> 3.1"},
       {:uuid, "~> 1.1"},
       # Fixes dialyzer warning, but can't release new hex package
       {:websockex, github: "Azolo/websockex"},
       # {:websockex, "~> 0.4"},
+      {:logger_file_backend, "~> 0.0.10", only: [:dev, :test]},
+      {:logger_json, "~> 2.0.1", only: [:dev, :test]},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
       {:echo_boy, github: "rupurt/echo_boy", only: [:dev, :test]},

@@ -83,3 +83,5 @@ config :ex_poloniex,
 config :binance,
   api_key: System.get_env("BINANCE_API_KEY"),
   secret_key: System.get_env("BINANCE_API_SECRET")
+
+config :logger, backends: [LoggerJSON]
