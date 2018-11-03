@@ -13,7 +13,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     :ok
   end
 
-  describe "#upsert" do
+  describe ".upsert" do
     test "inserts the balance into the ETS table" do
       balance = Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account, :btc, 1, 2)
 
@@ -49,7 +49,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#all" do
+  describe ".all" do
     test "returns a list of balances" do
       assert Tai.Exchanges.AssetBalances.all() == []
 
@@ -62,7 +62,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#count" do
+  describe ".count" do
     test "returns the number of items in the ETS table" do
       assert Tai.Exchanges.AssetBalances.count() == 0
 
@@ -72,7 +72,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#clear" do
+  describe ".clear" do
     test "removes the existing items in the ETS table" do
       init_asset_balance(:ok)
 
@@ -83,7 +83,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#where" do
+  describe ".where" do
     test "returns a list of the matching balances" do
       balance_1 =
         Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account_a, :btc, 1.1, 2.1)
@@ -109,7 +109,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#find_by" do
+  describe ".find_by" do
     test "returns an ok tuple with the balance" do
       balance =
         Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account_a, :btc, 1.1, 2.1)
@@ -132,7 +132,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#lock_range" do
+  describe ".lock_range" do
     setup [:init_asset_balance]
 
     defp lock_range(asset, min, max) do
@@ -225,7 +225,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#unlock" do
+  describe ".unlock" do
     setup [:init_asset_balance]
 
     defp unlock(asset, qty) do
@@ -283,7 +283,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#add" do
+  describe ".add" do
     setup [:init_asset_balance]
 
     test "adds to free and returns an ok tuple with the new balance" do
@@ -340,7 +340,7 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     end
   end
 
-  describe "#sub" do
+  describe ".sub" do
     setup [:init_asset_balance]
 
     test "subtracts from free and returns an ok tuple with the new balance" do
