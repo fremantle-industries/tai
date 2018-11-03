@@ -1,6 +1,7 @@
 defmodule Tai.Exchanges.AssetBalances do
   @type asset_balance :: Tai.Exchanges.AssetBalance.t()
   @type balance_range :: Tai.Exchanges.AssetBalanceRange.t()
+  @type balance_change_request :: Tai.Exchanges.AssetBalanceChangeRequest.t()
 
   use GenServer
 
@@ -282,19 +283,41 @@ defmodule Tai.Exchanges.AssetBalances do
     end
   end
 
+  @spec unlock(exchange_id :: atom, account_id :: atom, balance_change_request) ::
+          :ok | {:error, :insufficient_balance | term}
   def unlock(exchange_id, account_id, balance_change_request) do
-    __MODULE__
-    |> GenServer.call({:unlock, exchange_id, account_id, balance_change_request})
+    GenServer.call(
+      __MODULE__,
+      {:unlock, exchange_id, account_id, balance_change_request}
+    )
   end
 
+  @spec add(
+          exchange_id :: atom,
+          account_id :: atom,
+          asset :: atom,
+          val :: number | String.t() | Decimal.t()
+        ) :: {:ok, asset_balance} | {:error, :value_must_be_positive | term}
+  def add(exchange_id, account_id, asset, val)
+
   def add(exchange_id, account_id, asset, %Decimal{} = val) do
-    __MODULE__
-    |> GenServer.call({:add, exchange_id, account_id, asset, val})
+    GenServer.call(
+      __MODULE__,
+      {:add, exchange_id, account_id, asset, val}
+    )
   end
 
   def add(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
     add(exchange_id, account_id, asset, Decimal.new(val))
   end
+
+  @spec sub(
+          exchange_id :: atom,
+          account_id :: atom,
+          asset :: atom,
+          val :: number | String.t() | Decimal.t()
+        ) :: {:ok, asset_balance} | {:error, :value_must_be_positive | term}
+  def sub(exchange_id, account_id, asset, val)
 
   def sub(exchange_id, account_id, asset, %Decimal{} = val) do
     __MODULE__
