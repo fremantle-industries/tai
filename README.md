@@ -10,7 +10,7 @@ A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the
 likely to change and no effort will be made to maintain backwards compatibility at this time.
 We are working to make `tai` production quality software.
 
-[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](#advisors) | [Configuration](#configuration) | [Commands](#commands) | [Debugging](#debugging)
+[Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](#advisors) | [Configuration](#configuration) | [Commands](#commands) | [Logging](#logging)
 
 
 ## Supported Exchanges
@@ -338,26 +338,46 @@ iex(15)> stop_advisor :log_spread, :binance_btc_usdt
 Stopped advisors: 1 new, 0 already stopped
 ```
 
-## Debugging
+## Logging
 
-`tai` keeps detailed logs of it's operations while running. They are written to a file with the name of the environment e.g. `logs/dev.log`. By default only `info`, `warn` & `error` messages are logged. If you would like to enable verbose logging that is useful for development and debugging you can set the `DEBUG` environment variable before you run tai.
+`tai` uses a system wide event bus and forwards these events to the Elixir 
+logger. By default Elixir will use the console logger to print logs to `stdout` 
+in the main process running `tai`.  You can configure your Elixir 
+logger to format or change the location of the output.
 
-```bash
-DEBUG=true iex --sname client --remsh tai@mymachinename
+For example. To write to a file, add a file logger:
+
+```elixir
+# mix.exs
+defp deps do
+  {:logger_file_backend, "~> 0.0.10"}
+end
 ```
 
-To monitor a running instance of `tai` you can `tail` it's log
+And configure it's log location:
 
-```bash
-tail -f logs/dev.log
+```elixir
+# config/config.exs
+use Mix.Config
+
+config :logger, :file_log, path: "./log/#{Mix.env()}.log", metadata: [:tid]
+config :logger, backends: [{LoggerFileBackend, :file_log}]
 ```
 
-You can combine `tail` with `grep` to filter the logs for specific components or patterns. 
+If you intend to deploy `tai` on Docker you will need to configure log output 
+in a supported JSON format:
 
-e.g. Filter log messages created by the `CreateAndCancelPendingOrder` advisor
+```elixir
+# mix.exs
+defp deps do
+  {:logger_json, "~> 2.0.1"}
+end
 
-```bash
-tail -f logs/dev.log | grep advisor_create_and_cancel_pending_order
+# config/config.exs
+use Mix.Config
+
+config :logger_json, :backend, metadata: :all
+config :logger, backends: [LoggerJSON]
 ```
 
 ## Help Wanted :)

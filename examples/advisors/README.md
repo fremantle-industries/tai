@@ -2,7 +2,16 @@
 
 A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the [Erlang virtual machine](http://erlang.org/faq/implementations.html)
 
-## Log the spread of every order book
+## Advisors
+
+To run the example advisors included within this repo you will need to start
+`tai` with the `EXAMPLES=true` environment variable.
+
+```bash
+$ EXAMPLES=true iex -S mix
+```
+
+### Log the spread of every order book
 
 ```bash
 # log/dev.log
@@ -13,10 +22,10 @@ A trading toolkit built with [Elixir](https://elixir-lang.org/) that runs on the
 
 [Example](./log_spread/advisor.ex)
 
-## Create fill or kill orders
+### Create fill or kill orders
 
 [Example](./fill_or_kill_orders/advisor.ex)
 
-## Cancel pending orders
+### Cancel pending orders
 
 [Example](./create_and_cancel_pending_order/advisor.ex)
