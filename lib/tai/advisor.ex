@@ -61,9 +61,7 @@ defmodule Tai.Advisor do
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
-
       require Logger
-      require Tai.TimeFrame
 
       @behaviour Tai.Advisor
 
@@ -126,27 +124,25 @@ defmodule Tai.Advisor do
 
       @doc false
       def handle_info({:order_book_changes, feed_id, symbol, changes}, state) do
-        new_state =
-          Tai.TimeFrame.debug "handle_info({:order_book_changes...})" do
-            handle_order_book_changes(feed_id, symbol, changes, state)
+        handle_order_book_changes(feed_id, symbol, changes, state)
 
-            previous_inside_quote = state |> Tai.Advisor.cached_inside_quote(feed_id, symbol)
+        previous_inside_quote = state |> Tai.Advisor.cached_inside_quote(feed_id, symbol)
 
-            if inside_quote_is_stale?(previous_inside_quote, changes) do
-              state
-              |> cache_inside_quote(feed_id, symbol)
-              |> execute_handle_inside_quote(
-                feed_id,
-                symbol,
-                changes,
-                previous_inside_quote
-              )
-            else
-              state
-            end
-          end
+        if inside_quote_is_stale?(previous_inside_quote, changes) do
+          new_state =
+            state
+            |> cache_inside_quote(feed_id, symbol)
+            |> execute_handle_inside_quote(
+              feed_id,
+              symbol,
+              changes,
+              previous_inside_quote
+            )
 
-        {:noreply, new_state}
+          {:noreply, new_state}
+        else
+          {:noreply, state}
+        end
       end
 
       @doc """
