@@ -18,22 +18,22 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
     mock_product(%{exchange_id: :exchange_b, symbol: :eth_usdt})
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +------------+---------------------+-------+-----------+-----+
-           |   Group ID |          Advisor ID | Store |    Status | PID |
-           +------------+---------------------+-------+-----------+-----+
-           | log_spread | exchange_a_btc_usdt |   %{} | unstarted |   - |
-           | log_spread | exchange_b_eth_usdt |   %{} | unstarted |   - |
-           +------------+---------------------+-------+-----------+-----+\n
+           +------------+---------------------+--------+-----------+-----+
+           |   Group ID |          Advisor ID | Config |    Status | PID |
+           +------------+---------------------+--------+-----------+-----+
+           | log_spread | exchange_a_btc_usdt |    %{} | unstarted |   - |
+           | log_spread | exchange_b_eth_usdt |    %{} | unstarted |   - |
+           +------------+---------------------+--------+-----------+-----+\n
            """
   end
 
   test "shows an empty table when there are no advisors" do
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +----------+------------+-------+--------+-----+
-           | Group ID | Advisor ID | Store | Status | PID |
-           +----------+------------+-------+--------+-----+
-           |        - |          - |     - |      - |   - |
-           +----------+------------+-------+--------+-----+\n
+           +----------+------------+--------+--------+-----+
+           | Group ID | Advisor ID | Config | Status | PID |
+           +----------+------------+--------+--------+-----+
+           |        - |          - |      - |      - |   - |
+           +----------+------------+--------+--------+-----+\n
            """
   end
 
@@ -53,7 +53,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
 
     output = capture_io(&Tai.Commands.Helper.advisors/0)
-    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Store \|\s+Status \|\s+PID \|/
+    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Config \|\s+Status \|\s+PID \|/
 
     assert output =~
              ~r/\|\s+fill_or_kill_orders \|\s+test_exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
@@ -69,13 +69,13 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +---------------------+--------------------------+-------+-----------+-----+
-           |            Group ID |               Advisor ID | Store |    Status | PID |
-           +---------------------+--------------------------+-------+-----------+-----+
-           | fill_or_kill_orders | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
-           |          log_spread | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
-           |          log_spread | test_exchange_b_eth_usdt |   %{} | unstarted |   - |
-           +---------------------+--------------------------+-------+-----------+-----+\n
+           +---------------------+--------------------------+--------+-----------+-----+
+           |            Group ID |               Advisor ID | Config |    Status | PID |
+           +---------------------+--------------------------+--------+-----------+-----+
+           | fill_or_kill_orders | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
+           |          log_spread | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
+           |          log_spread | test_exchange_b_eth_usdt |    %{} | unstarted |   - |
+           +---------------------+--------------------------+--------+-----------+-----+\n
            """
   end
 
@@ -95,7 +95,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
 
     output = capture_io(&Tai.Commands.Helper.advisors/0)
-    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Store \|\s+Status \|\s+PID \|/
+    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Config \|\s+Status \|\s+PID \|/
     refute output =~ ~r/\|\s+fill_or_kill_orders.+running \|\s+#PID<.+> \|/
 
     assert output =~
@@ -109,13 +109,13 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +---------------------+--------------------------+-------+-----------+-----+
-           |            Group ID |               Advisor ID | Store |    Status | PID |
-           +---------------------+--------------------------+-------+-----------+-----+
-           | fill_or_kill_orders | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
-           |          log_spread | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
-           |          log_spread | test_exchange_b_eth_usdt |   %{} | unstarted |   - |
-           +---------------------+--------------------------+-------+-----------+-----+\n
+           +---------------------+--------------------------+--------+-----------+-----+
+           |            Group ID |               Advisor ID | Config |    Status | PID |
+           +---------------------+--------------------------+--------+-----------+-----+
+           | fill_or_kill_orders | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
+           |          log_spread | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
+           |          log_spread | test_exchange_b_eth_usdt |    %{} | unstarted |   - |
+           +---------------------+--------------------------+--------+-----------+-----+\n
            """
   end
 
@@ -137,7 +137,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
 
     output = capture_io(&Tai.Commands.Helper.advisors/0)
-    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Store \|\s+Status \|\s+PID \|/
+    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Config \|\s+Status \|\s+PID \|/
 
     assert output =~
              ~r/\|\s+log_spread \|\s+test_exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
@@ -152,13 +152,13 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +---------------------+--------------------------+-------+-----------+-----+
-           |            Group ID |               Advisor ID | Store |    Status | PID |
-           +---------------------+--------------------------+-------+-----------+-----+
-           | fill_or_kill_orders | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
-           |          log_spread | test_exchange_a_btc_usdt |   %{} | unstarted |   - |
-           |          log_spread | test_exchange_b_eth_usdt |   %{} | unstarted |   - |
-           +---------------------+--------------------------+-------+-----------+-----+\n
+           +---------------------+--------------------------+--------+-----------+-----+
+           |            Group ID |               Advisor ID | Config |    Status | PID |
+           +---------------------+--------------------------+--------+-----------+-----+
+           | fill_or_kill_orders | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
+           |          log_spread | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
+           |          log_spread | test_exchange_b_eth_usdt |    %{} | unstarted |   - |
+           +---------------------+--------------------------+--------+-----------+-----+\n
            """
   end
 end

@@ -23,7 +23,14 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProduct do
   def build_spec(group, venue_id, symbol) do
     advisor_id = :"#{venue_id}_#{symbol}"
     order_books = Map.put(%{}, venue_id, [symbol])
-    opts = [group_id: group.id, advisor_id: advisor_id, order_books: order_books, store: %{}]
+
+    opts = [
+      group_id: group.id,
+      advisor_id: advisor_id,
+      order_books: order_books,
+      config: group.config
+    ]
+
     {group.advisor, opts}
   end
 end

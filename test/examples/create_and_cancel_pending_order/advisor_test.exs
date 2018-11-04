@@ -20,7 +20,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
         group_id: :create_and_cancel_pending_order,
         advisor_id: :btc_usd,
         order_books: %{test_exchange_a: [:btc_usd]},
-        store: %{}
+        config: %{}
       ]
     })
 

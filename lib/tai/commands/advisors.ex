@@ -55,7 +55,7 @@ defmodule Tai.Commands.Advisors do
       [
         opts |> Keyword.fetch!(:group_id),
         opts |> Keyword.fetch!(:advisor_id),
-        opts |> Keyword.fetch!(:store) |> format_col,
+        opts |> Keyword.fetch!(:config) |> format_col,
         pid |> format_status_col,
         pid |> format_col
       ]
@@ -69,7 +69,7 @@ defmodule Tai.Commands.Advisors do
   defp format_col(nil), do: "-"
   defp format_col(val), do: val
 
-  @header ["Group ID", "Advisor ID", "Store", "Status", "PID"]
+  @header ["Group ID", "Advisor ID", "Config", "Status", "PID"]
   @spec render!(rows :: [...]) :: no_return
   defp render!(rows)
 

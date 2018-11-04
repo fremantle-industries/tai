@@ -11,23 +11,35 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     end
 
     def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
-      if Map.has_key?(state.store, :error) do
-        raise state.store.error
+      if Map.has_key?(state.config, :error) do
+        raise state.config.error
       end
 
       send(:test, {feed_id, symbol, inside_quote, changes, state})
-      state.store[:return_val] || :ok
+      state.config[:return_val] || :ok
     end
   end
 
-  defp start_advisor!(advisor, store \\ %{}) do
+  defp start_advisor!(advisor) do
     start_supervised!({
       advisor,
       [
         group_id: :group_a,
         advisor_id: :my_advisor,
         order_books: %{my_order_book_feed: [:btc_usd]},
-        store: store
+        config: %{}
+      ]
+    })
+  end
+
+  defp start_advisor!(advisor, config) do
+    start_supervised!({
+      advisor,
+      [
+        group_id: :group_a,
+        advisor_id: :my_advisor,
+        order_books: %{my_order_book_feed: [:btc_usd]},
+        config: config
       ]
     })
   end
@@ -251,7 +263,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         :btc_usd,
         %Tai.Markets.Quote{},
         ^snapshot,
-        %Tai.Advisor{advisor_id: :my_advisor, store: %{return_val: {:ok, %{hello: "world"}}}}
+        %Tai.Advisor{advisor_id: :my_advisor, store: %{}}
       }
 
       changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
@@ -267,16 +279,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     end
 
     test "doesn't change store data state with an ok atom", %{book_pid: book_pid} do
-      defmodule OkAdvisor do
-        use Tai.Advisor
-
-        def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
-          send(:test, {feed_id, symbol, inside_quote, changes, state})
-          :ok
-        end
-      end
-
-      start_advisor!(OkAdvisor, %{hello: "world"})
+      start_advisor!(MyAdvisor, %{return_val: :ok})
 
       snapshot = %Tai.Markets.OrderBook{
         bids: %{101.2 => {1.0, nil, nil}},
@@ -290,7 +293,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         :btc_usd,
         %Tai.Markets.Quote{},
         ^snapshot,
-        %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
+        %Tai.Advisor{advisor_id: :my_advisor, store: %{}}
       }
 
       changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
@@ -301,13 +304,11 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         :btc_usd,
         %Tai.Markets.Quote{},
         ^changes,
-        %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
+        %Tai.Advisor{advisor_id: :my_advisor, store: %{}}
       }
     end
 
-    test("logs a warning message when an error is raised", %{
-      book_pid: book_pid
-    }) do
+    test("logs a warning message when an error is raised", %{book_pid: book_pid}) do
       start_advisor!(MyAdvisor, %{error: "!!!This is an ERROR!!!"})
 
       log_msg =

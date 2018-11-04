@@ -5,19 +5,29 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
-  @enforce_keys [:group_id, :advisor_id, :order_books, :inside_quotes, :store]
-  defstruct group_id: nil, advisor_id: nil, order_books: %{}, inside_quotes: %{}, store: %{}
-
-  @typedoc """
-  State of the running advisor
-  """
   @type t :: %Tai.Advisor{
           group_id: atom,
           advisor_id: atom,
           order_books: map,
           inside_quotes: map,
+          config: map,
           store: map
         }
+
+  @enforce_keys [
+    :group_id,
+    :advisor_id,
+    :order_books,
+    :inside_quotes,
+    :config,
+    :store
+  ]
+  defstruct group_id: nil,
+            advisor_id: nil,
+            order_books: %{},
+            inside_quotes: %{},
+            config: %{},
+            store: %{}
 
   @doc """
   Callback during initilization. Allows the store to be updated before it 
@@ -69,7 +79,7 @@ defmodule Tai.Advisor do
             group_id: group_id,
             advisor_id: advisor_id,
             order_books: order_books,
-            store: store
+            config: config
           ) do
         name = Tai.Advisor.to_name(group_id: group_id, advisor_id: advisor_id)
 
@@ -80,7 +90,8 @@ defmodule Tai.Advisor do
             advisor_id: advisor_id,
             order_books: order_books,
             inside_quotes: %{},
-            store: Map.merge(%{}, store)
+            config: config,
+            store: %{}
           },
           name: name
         )

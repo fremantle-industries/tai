@@ -20,7 +20,7 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
         group_id: :fill_or_kill_orders,
         advisor_id: :btc_usd,
         order_books: %{test_exchange_a: [:btc_usd]},
-        store: %{}
+        config: %{}
       ]
     })
 

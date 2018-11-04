@@ -64,7 +64,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
           group_id: :group_a,
           advisor_id: :init_success_advisor,
           order_books: %{init_success_feed: [:btc_usd]},
-          store: %{}
+          config: %{}
         ]
       })
 
@@ -115,7 +115,7 @@ defmodule Tai.Advisors.InitCallbacksTest do
               group_id: :group_a,
               advisor_id: :init_failure_advisor,
               order_books: %{init_failure_feed: [:btc_usd]},
-              store: %{}
+              config: %{}
             ]
           })
 

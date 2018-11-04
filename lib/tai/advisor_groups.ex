@@ -21,7 +21,7 @@ defmodule Tai.AdvisorGroups do
           products = Keyword.get(config, :products)
           errors = if products == nil, do: [:products_not_present | errors], else: errors
 
-          store = Keyword.get(config, :store, %{})
+          per_advisor_config = Keyword.get(config, :config, %{})
 
           if Enum.empty?(errors) do
             group = %Tai.AdvisorGroup{
@@ -29,7 +29,7 @@ defmodule Tai.AdvisorGroups do
               advisor: advisor,
               factory: factory,
               products: products,
-              store: store
+              config: per_advisor_config
             }
 
             new_groups = acc.groups ++ [group]

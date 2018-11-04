@@ -9,11 +9,15 @@ defmodule Tai.AdvisorsTest do
   test ".info returns the pid of each spec if it's running" do
     assert Tai.Advisors.info([]) == []
 
-    spec_1 =
-      {TestAdvisor, [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, store: %{}]}
+    spec_1 = {
+      TestAdvisor,
+      [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, config: %{}]
+    }
 
-    spec_2 =
-      {TestAdvisor, [group_id: :group_a, advisor_id: :advisor_b, order_books: %{}, store: %{}]}
+    spec_2 = {
+      TestAdvisor,
+      [group_id: :group_a, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+    }
 
     start_supervised!(spec_1)
 
@@ -25,14 +29,20 @@ defmodule Tai.AdvisorsTest do
   test ".start starts specs that aren't already started and returns a count of new & existing" do
     assert Tai.Advisors.start([]) == {:ok, {0, 0}}
 
-    spec_1 =
-      {TestAdvisor, [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, store: %{}]}
+    spec_1 = {
+      TestAdvisor,
+      [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, config: %{}]
+    }
 
-    spec_2 =
-      {TestAdvisor, [group_id: :group_b, advisor_id: :advisor_b, order_books: %{}, store: %{}]}
+    spec_2 = {
+      TestAdvisor,
+      [group_id: :group_b, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+    }
 
-    spec_3 =
-      {TestAdvisor, [group_id: :group_c, advisor_id: :advisor_b, order_books: %{}, store: %{}]}
+    spec_3 = {
+      TestAdvisor,
+      [group_id: :group_c, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+    }
 
     start_supervised!(Tai.AdvisorsSupervisor)
     start_supervised!(spec_1)
@@ -43,14 +53,20 @@ defmodule Tai.AdvisorsTest do
   test ".stop terminates specs that are running and returns a count of new & existing" do
     assert Tai.Advisors.stop([]) == {:ok, {0, 0}}
 
-    spec_1 =
-      {TestAdvisor, [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, store: %{}]}
+    spec_1 = {
+      TestAdvisor,
+      [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, config: %{}]
+    }
 
-    spec_2 =
-      {TestAdvisor, [group_id: :group_b, advisor_id: :advisor_b, order_books: %{}, store: %{}]}
+    spec_2 = {
+      TestAdvisor,
+      [group_id: :group_b, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+    }
 
-    spec_3 =
-      {TestAdvisor, [group_id: :group_c, advisor_id: :advisor_b, order_books: %{}, store: %{}]}
+    spec_3 = {
+      TestAdvisor,
+      [group_id: :group_c, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+    }
 
     start_supervised!(Tai.AdvisorsSupervisor)
     start_supervised!(spec_1)

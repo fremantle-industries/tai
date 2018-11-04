@@ -22,7 +22,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
         group_id: :log_spread,
         advisor_id: :btc_usd,
         order_books: %{test_exchange_a: [:btc_usd]},
-        store: %{}
+        config: %{}
       ]
     })
 

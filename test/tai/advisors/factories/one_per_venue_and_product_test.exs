@@ -8,7 +8,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
       factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       id: :group_a,
       products: "*",
-      store: %{}
+      config: %{hello: :world}
     }
 
     assert Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(group, %{}) == []
@@ -28,7 +28,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
                  group_id: :group_a,
                  advisor_id: :exchange_a_btc_usdt,
                  order_books: %{exchange_a: [:btc_usdt]},
-                 store: %{}
+                 config: %{hello: :world}
                ]
              },
              {
@@ -37,7 +37,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
                  group_id: :group_a,
                  advisor_id: :exchange_a_eth_usdt,
                  order_books: %{exchange_a: [:eth_usdt]},
-                 store: %{}
+                 config: %{hello: :world}
                ]
              },
              {
@@ -46,7 +46,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
                  group_id: :group_a,
                  advisor_id: :exchange_b_btc_usdt,
                  order_books: %{exchange_b: [:btc_usdt]},
-                 store: %{}
+                 config: %{hello: :world}
                ]
              },
              {
@@ -55,7 +55,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
                  group_id: :group_a,
                  advisor_id: :exchange_b_ltc_usdt,
                  order_books: %{exchange_b: [:ltc_usdt]},
-                 store: %{}
+                 config: %{hello: :world}
                ]
              }
            ]

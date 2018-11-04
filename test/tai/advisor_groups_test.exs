@@ -11,7 +11,7 @@ defmodule Tai.AdvisorGroupsTest do
             group_id: group.id,
             advisor_id: :advisor_a,
             order_books: %{exchange_a: filtered_product_symbols_by_exchange.exchange_a},
-            store: %{}
+            config: %{}
           ]
         },
         {
@@ -20,7 +20,7 @@ defmodule Tai.AdvisorGroupsTest do
             group_id: group.id,
             advisor_id: :advisor_b,
             order_books: %{exchange_a: filtered_product_symbols_by_exchange.exchange_a},
-            store: %{}
+            config: %{}
           ]
         }
       ]
@@ -36,7 +36,7 @@ defmodule Tai.AdvisorGroupsTest do
               advisor: AdvisorA,
               factory: TestFactoryA,
               products: "*",
-              store: %{min_profit: 0.1}
+              config: %{min_profit: 0.1}
             ],
             group_b: [
               advisor: AdvisorB,
@@ -54,14 +54,14 @@ defmodule Tai.AdvisorGroupsTest do
                    advisor: AdvisorA,
                    factory: TestFactoryA,
                    products: "*",
-                   store: %{min_profit: 0.1}
+                   config: %{min_profit: 0.1}
                  },
                  %Tai.AdvisorGroup{
                    id: :group_b,
                    advisor: AdvisorB,
                    factory: TestFactoryB,
                    products: "btc_usdt",
-                   store: %{}
+                   config: %{}
                  }
                ]
              }
@@ -160,7 +160,7 @@ defmodule Tai.AdvisorGroupsTest do
                      group_id: :group_a,
                      advisor_id: :advisor_a,
                      order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     store: %{}
+                     config: %{}
                    ]
                  },
                  {
@@ -169,7 +169,7 @@ defmodule Tai.AdvisorGroupsTest do
                      group_id: :group_a,
                      advisor_id: :advisor_b,
                      order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     store: %{}
+                     config: %{}
                    ]
                  }
                ]
@@ -231,7 +231,7 @@ defmodule Tai.AdvisorGroupsTest do
                      group_id: :group_a,
                      advisor_id: :advisor_a,
                      order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     store: %{}
+                     config: %{}
                    ]
                  },
                  {
@@ -240,7 +240,7 @@ defmodule Tai.AdvisorGroupsTest do
                      group_id: :group_a,
                      advisor_id: :advisor_b,
                      order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     store: %{}
+                     config: %{}
                    ]
                  }
                ]
@@ -304,7 +304,7 @@ defmodule Tai.AdvisorGroupsTest do
                      group_id: :group_a,
                      advisor_id: :advisor_a,
                      order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     store: %{}
+                     config: %{}
                    ]
                  }
                ]

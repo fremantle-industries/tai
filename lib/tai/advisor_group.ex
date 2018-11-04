@@ -4,9 +4,9 @@ defmodule Tai.AdvisorGroup do
           advisor: atom,
           factory: atom,
           products: String.t(),
-          store: map
+          config: map
         }
 
-  @enforce_keys [:id, :factory, :products, :store]
-  defstruct [:id, :advisor, :factory, :products, :store]
+  @enforce_keys [:id, :factory, :products, :config]
+  defstruct [:id, :advisor, :factory, :products, :config]
 end

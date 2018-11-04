@@ -273,15 +273,15 @@ Displays every advisor from every group along with their run status
 
 ```
 iex(9)> advisors
-+---------------------------------+-------------------+-------+-----------+-----+
-|                        Group ID |        Advisor ID | Store |    Status | PID |
-+---------------------------------+-------------------+-------+-----------+-----+
-| create_and_cancel_pending_order |      gdax_btc_usd |   %{} | unstarted |   - |
-|             fill_or_kill_orders |  binance_btc_usdt |   %{} | unstarted |   - |
-|                      log_spread |  binance_btc_usdt |   %{} | unstarted |   - |
-|                      log_spread |      gdax_btc_usd |   %{} | unstarted |   - |
-|                      log_spread | poloniex_btc_usdt |   %{} | unstarted |   - |
-+---------------------------------+-------------------+-------+-----------+-----+
++---------------------------------+-------------------+--------+-----------+-----+
+|                        Group ID |        Advisor ID | Config |    Status | PID |
++---------------------------------+-------------------+--------+-----------+-----+
+| create_and_cancel_pending_order |      gdax_btc_usd |    %{} | unstarted |   - |
+|             fill_or_kill_orders |  binance_btc_usdt |    %{} | unstarted |   - |
+|                      log_spread |  binance_btc_usdt |    %{} | unstarted |   - |
+|                      log_spread |      gdax_btc_usd |    %{} | unstarted |   - |
+|                      log_spread | poloniex_btc_usdt |    %{} | unstarted |   - |
++---------------------------------+-------------------+--------+-----------+-----+
 ```
 
 #### start_advisors
