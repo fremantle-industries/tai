@@ -50,6 +50,14 @@ defmodule Tai.Advisor do
     :"advisor_#{gid}_#{aid}"
   end
 
+  def cached_inside_quote(%Tai.Advisor{} = advisor, order_book_feed_id, symbol) do
+    advisor.inside_quotes
+    |> Map.get(
+      [feed_id: order_book_feed_id, symbol: symbol]
+      |> Tai.Markets.OrderBook.to_name()
+    )
+  end
+
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
@@ -122,7 +130,7 @@ defmodule Tai.Advisor do
           Tai.TimeFrame.debug "handle_info({:order_book_changes...})" do
             handle_order_book_changes(feed_id, symbol, changes, state)
 
-            previous_inside_quote = state |> cached_inside_quote(feed_id, symbol)
+            previous_inside_quote = state |> Tai.Advisor.cached_inside_quote(feed_id, symbol)
 
             if inside_quote_is_stale?(previous_inside_quote, changes) do
               state
@@ -153,25 +161,6 @@ defmodule Tai.Advisor do
         [feed_id: feed_id, symbol: symbol]
         |> Tai.Markets.OrderBook.to_name()
         |> Tai.Markets.OrderBook.quotes(depth)
-      end
-
-      @doc """
-      Returns the inside quote stored before the last 'handle_inside_quote' callback
-
-      ## Examples
-
-        iex> Tai.Advisor.cached_inside_quote(state, :test_feed_a, :btc_usd)
-        %Tai.Markets.Quote{
-          bid: %Tai.Markets.PriceLevel{price: 101.1, size: 1.1, processed_at: nil, server_changed_at: nil},
-          ask: %Tai.Markets.PriceLevel{price: 101.2, size: 0.1, processed_at: nil, server_changed_at: nil}
-        }
-      """
-      def cached_inside_quote(%{inside_quotes: inside_quotes}, order_book_feed_id, symbol) do
-        inside_quotes
-        |> Map.get(
-          [feed_id: order_book_feed_id, symbol: symbol]
-          |> Tai.Markets.OrderBook.to_name()
-        )
       end
 
       @doc false
@@ -239,7 +228,7 @@ defmodule Tai.Advisor do
              changes,
              previous_inside_quote \\ nil
            ) do
-        current_inside_quote = cached_inside_quote(state, order_book_feed_id, symbol)
+        current_inside_quote = Tai.Advisor.cached_inside_quote(state, order_book_feed_id, symbol)
 
         if current_inside_quote == previous_inside_quote do
           state
