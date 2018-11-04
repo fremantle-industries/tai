@@ -1,5 +1,5 @@
 defmodule Tai.Events.SubFreeAssetBalanceTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   test ".to_data/1 transforms decimal data to strings" do
     event = %Tai.Events.SubFreeAssetBalance{
