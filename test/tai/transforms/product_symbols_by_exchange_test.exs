@@ -1,6 +1,6 @@
-defmodule Tai.Queries.ProductSymbolsByExchangeTest do
+defmodule Tai.Transforms.ProductSymbolsByExchangeTest do
   use ExUnit.Case, async: false
-  doctest Tai.Queries.ProductSymbolsByExchange
+  doctest Tai.Transforms.ProductSymbolsByExchange
 
   import Tai.TestSupport.Mock
 
@@ -14,7 +14,7 @@ defmodule Tai.Queries.ProductSymbolsByExchangeTest do
   end
 
   test ".all returns a map keyed by exchange with a list product symbols" do
-    assert Tai.Queries.ProductSymbolsByExchange.all() == %{}
+    assert Tai.Transforms.ProductSymbolsByExchange.all() == %{}
 
     mock_product(%{
       exchange_id: :exchange_a,
@@ -39,7 +39,7 @@ defmodule Tai.Queries.ProductSymbolsByExchangeTest do
     assert %{
              exchange_a: exchange_a_products,
              exchange_b: exchange_b_products
-           } = Tai.Queries.ProductSymbolsByExchange.all()
+           } = Tai.Transforms.ProductSymbolsByExchange.all()
 
     assert Enum.member?(exchange_a_products, :btc_usdt)
     assert Enum.member?(exchange_a_products, :eth_usdt)

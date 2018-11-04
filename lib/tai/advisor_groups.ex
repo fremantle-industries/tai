@@ -52,7 +52,7 @@ defmodule Tai.AdvisorGroups do
           {:ok, [advisor_spec]} | {:error, map}
   def build_specs(
         %Tai.Config{} = config,
-        product_symbols_by_exchange \\ Tai.Queries.ProductSymbolsByExchange.all()
+        product_symbols_by_exchange \\ Tai.Transforms.ProductSymbolsByExchange.all()
       ) do
     with {:ok, groups} <- config |> Tai.AdvisorGroups.parse_config() do
       specs =
@@ -77,7 +77,7 @@ defmodule Tai.AdvisorGroups do
   def build_specs_for_group(
         %Tai.Config{} = config,
         group_id,
-        product_symbols_by_exchange \\ Tai.Queries.ProductSymbolsByExchange.all()
+        product_symbols_by_exchange \\ Tai.Transforms.ProductSymbolsByExchange.all()
       ) do
     with {:ok, specs} <- build_specs(config, product_symbols_by_exchange) do
       filtered_specs =
@@ -97,7 +97,7 @@ defmodule Tai.AdvisorGroups do
         %Tai.Config{} = config,
         group_id,
         advisor_id,
-        product_symbols_by_exchange \\ Tai.Queries.ProductSymbolsByExchange.all()
+        product_symbols_by_exchange \\ Tai.Transforms.ProductSymbolsByExchange.all()
       ) do
     with {:ok, specs} <- build_specs(config, product_symbols_by_exchange) do
       filtered_specs =
