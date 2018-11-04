@@ -1,4 +1,4 @@
-defmodule Tai.Transforms.ProductSymbolsByExchange do
+defmodule Tai.Transforms.ProductSymbolsByVenue do
   @moduledoc """
   Transforms a list of products to a map of product symbols by venue
   """
