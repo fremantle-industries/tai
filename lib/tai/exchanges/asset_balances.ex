@@ -51,6 +51,8 @@ defmodule Tai.Exchanges.AssetBalances do
       if lock_result == nil do
         continue = {
           :lock_range_insufficient_balance,
+          exchange_id,
+          account_id,
           balance_range.asset,
           balance.free,
           balance_range.min,
@@ -69,6 +71,8 @@ defmodule Tai.Exchanges.AssetBalances do
 
         continue = {
           :lock_range_ok,
+          exchange_id,
+          account_id,
           balance_range.asset,
           lock_result,
           balance_range.min,
@@ -99,11 +103,13 @@ defmodule Tai.Exchanges.AssetBalances do
         |> Map.put(:locked, new_locked)
 
       if Decimal.cmp(new_locked, Decimal.new(0)) == :lt do
-        continue = {:unlock_insufficient_balance, asset, balance.locked, amount}
+        continue =
+          {:unlock_insufficient_balance, exchange_id, account_id, asset, balance.locked, amount}
+
         {:reply, {:error, :insufficient_balance}, state, {:continue, continue}}
       else
         upsert_ets_table(new_balance)
-        continue = {:unlock_ok, asset, amount}
+        continue = {:unlock_ok, exchange_id, account_id, asset, amount}
         {:reply, :ok, state, {:continue, continue}}
       end
     else
@@ -119,7 +125,7 @@ defmodule Tai.Exchanges.AssetBalances do
           new_free = Decimal.add(balance.free, val)
           new_balance = Map.put(balance, :free, new_free)
           upsert_ets_table(new_balance)
-          continue = {:add, asset, val, new_balance}
+          continue = {:add, exchange_id, account_id, asset, val, new_balance}
 
           {:reply, {:ok, new_balance}, state, {:continue, continue}}
 
@@ -142,7 +148,7 @@ defmodule Tai.Exchanges.AssetBalances do
           else
             new_balance = Map.put(balance, :free, new_free)
             upsert_ets_table(new_balance)
-            continue = {:sub, asset, val, new_balance}
+            continue = {:sub, exchange_id, account_id, asset, val, new_balance}
 
             {:reply, {:ok, new_balance}, state, {:continue, continue}}
           end
@@ -167,8 +173,13 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
-  def handle_continue({:lock_range_ok, asset, qty, min, max}, state) do
+  def handle_continue(
+        {:lock_range_ok, venue_id, account_id, asset, qty, min, max},
+        state
+      ) do
     Tai.Events.broadcast(%Tai.Events.LockAssetBalanceRangeOk{
+      venue_id: venue_id,
+      account_id: account_id,
       asset: asset,
       qty: qty,
       min: min,
@@ -178,8 +189,13 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
-  def handle_continue({:lock_range_insufficient_balance, asset, free, min, max}, state) do
+  def handle_continue(
+        {:lock_range_insufficient_balance, venue_id, account_id, asset, free, min, max},
+        state
+      ) do
     Tai.Events.broadcast(%Tai.Events.LockAssetBalanceRangeInsufficientFunds{
+      venue_id: venue_id,
+      account_id: account_id,
       asset: asset,
       free: free,
       min: min,
@@ -189,8 +205,10 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
-  def handle_continue({:unlock_ok, asset, qty}, state) do
+  def handle_continue({:unlock_ok, venue_id, account_id, asset, qty}, state) do
     Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceOk{
+      venue_id: venue_id,
+      account_id: account_id,
       asset: asset,
       qty: qty
     })
@@ -198,8 +216,13 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
-  def handle_continue({:unlock_insufficient_balance, asset, locked, qty}, state) do
+  def handle_continue(
+        {:unlock_insufficient_balance, venue_id, account_id, asset, locked, qty},
+        state
+      ) do
     Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceInsufficientFunds{
+      venue_id: venue_id,
+      account_id: account_id,
       asset: asset,
       locked: locked,
       qty: qty
@@ -208,8 +231,10 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
-  def handle_continue({:add, asset, val, balance}, state) do
+  def handle_continue({:add, venue_id, account_id, asset, val, balance}, state) do
     Tai.Events.broadcast(%Tai.Events.AddFreeAssetBalance{
+      venue_id: venue_id,
+      account_id: account_id,
       asset: asset,
       val: val,
       free: balance.free,
@@ -219,8 +244,10 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
-  def handle_continue({:sub, asset, val, balance}, state) do
+  def handle_continue({:sub, venue_id, account_id, asset, val, balance}, state) do
     Tai.Events.broadcast(%Tai.Events.SubFreeAssetBalance{
+      venue_id: venue_id,
+      account_id: account_id,
       asset: asset,
       val: val,
       free: balance.free,

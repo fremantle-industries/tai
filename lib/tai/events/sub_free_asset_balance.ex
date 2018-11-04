@@ -1,13 +1,29 @@
 defmodule Tai.Events.SubFreeAssetBalance do
   @type t :: %Tai.Events.SubFreeAssetBalance{
+          venue_id: atom,
+          account_id: atom,
           asset: atom,
           val: Decimal.t(),
           free: Decimal.t(),
           locked: Decimal.t()
         }
 
-  @enforce_keys [:asset, :val, :free, :locked]
-  defstruct [:asset, :val, :free, :locked]
+  @enforce_keys [
+    :venue_id,
+    :account_id,
+    :asset,
+    :val,
+    :free,
+    :locked
+  ]
+  defstruct [
+    :venue_id,
+    :account_id,
+    :asset,
+    :val,
+    :free,
+    :locked
+  ]
 end
 
 defimpl Tai.LogEvent, for: Tai.Events.SubFreeAssetBalance do

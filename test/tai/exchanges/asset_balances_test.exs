@@ -197,6 +197,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       lock_range(:btc, 0.5, 0.6)
 
       assert_receive {Tai.Event, %Tai.Events.LockAssetBalanceRangeOk{asset: :btc} = event}
+      assert event.venue_id == :my_test_exchange
+      assert event.account_id == :my_test_account
       assert event.qty == Decimal.new(0.6)
       assert event.min == Decimal.new(0.5)
       assert event.max == Decimal.new(0.6)
@@ -210,6 +212,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert_receive {Tai.Event,
                       %Tai.Events.LockAssetBalanceRangeInsufficientFunds{asset: :btc} = event}
 
+      assert event.venue_id == :my_test_exchange
+      assert event.account_id == :my_test_account
       assert event.free == Decimal.new(1.1)
       assert event.min == Decimal.new(1.2)
       assert event.max == Decimal.new(1.3)
@@ -259,6 +263,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       unlock(:btc, 1.0)
 
       assert_receive {Tai.Event, %Tai.Events.UnlockAssetBalanceOk{asset: :btc} = event}
+      assert event.venue_id == :my_test_exchange
+      assert event.account_id == :my_test_account
       assert event.qty == Decimal.new(1.0)
     end
 
@@ -270,6 +276,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       assert_receive {Tai.Event,
                       %Tai.Events.UnlockAssetBalanceInsufficientFunds{asset: :btc} = event}
 
+      assert event.venue_id == :my_test_exchange
+      assert event.account_id == :my_test_account
       assert event.locked == Decimal.new(2.1)
       assert event.qty == Decimal.new(2.11)
     end
@@ -314,6 +322,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       Tai.Exchanges.AssetBalances.add(:my_test_exchange, :my_test_account, :btc, 0.1)
 
       assert_receive {Tai.Event, %Tai.Events.AddFreeAssetBalance{asset: :btc} = event}
+      assert event.venue_id == :my_test_exchange
+      assert event.account_id == :my_test_account
       assert event.val == Decimal.new(0.1)
       assert event.free == Decimal.new(1.2)
       assert event.locked == Decimal.new(2.1)
@@ -372,6 +382,8 @@ defmodule Tai.Exchanges.AssetBalancesTest do
       Tai.Exchanges.AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
 
       assert_receive {Tai.Event, %Tai.Events.SubFreeAssetBalance{asset: :btc} = event}
+      assert event.venue_id == :my_test_exchange
+      assert event.account_id == :my_test_account
       assert event.val == Decimal.new(0.1)
       assert event.free == Decimal.new(1.0)
       assert event.locked == Decimal.new(2.1)
