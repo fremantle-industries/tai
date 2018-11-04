@@ -18,12 +18,9 @@ defimpl Tai.LogEvent, for: Tai.Events.UpsertAssetBalance do
       |> Map.keys()
       |> Enum.filter(&(&1 != :__struct__))
 
-    free = event.free |> Decimal.to_string(:normal)
-    locked = event.free |> Decimal.to_string(:normal)
-
     event
     |> Map.take(keys)
-    |> Map.put(:free, free)
-    |> Map.put(:locked, locked)
+    |> Map.put(:free, event.free |> Decimal.to_string(:normal))
+    |> Map.put(:locked, event.locked |> Decimal.to_string(:normal))
   end
 end
