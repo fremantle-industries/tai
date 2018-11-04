@@ -4,14 +4,12 @@ defprotocol Tai.LogEvent do
 end
 
 defimpl Tai.LogEvent, for: Any do
-  def to_data(event), do: event |> extract
-
-  defp extract(event) do
+  def to_data(event) do
     keys =
       event
       |> Map.keys()
       |> Enum.filter(&(&1 != :__struct__))
 
-    event |> Map.take(keys)
+    Map.take(event, keys)
   end
 end
