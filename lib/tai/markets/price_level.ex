@@ -3,6 +3,13 @@ defmodule Tai.Markets.PriceLevel do
   A level of a side in an order book
   """
 
+  @type t :: %Tai.Markets.PriceLevel{
+          price: number,
+          size: number,
+          processed_at: DateTime.t() | nil,
+          server_changed_at: DateTime.t() | nil
+        }
+
   @enforce_keys [:price, :size]
   defstruct [:price, :size, :processed_at, :server_changed_at]
 
