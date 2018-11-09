@@ -3,27 +3,21 @@ defmodule Tai.AdvisorGroupsTest do
   doctest Tai.AdvisorGroups
 
   defmodule TestFactoryA do
-    def advisor_specs(group, filtered_product_symbols_by_exchange) do
-      [
+    def advisor_specs(group, products) do
+      products
+      |> Enum.map(fn p ->
+        order_books = %{} |> Map.put(p.exchange_id, [p.symbol])
+
         {
           TestAdvisor,
           [
             group_id: group.id,
-            advisor_id: :advisor_a,
-            order_books: %{exchange_a: filtered_product_symbols_by_exchange.exchange_a},
-            config: %{}
-          ]
-        },
-        {
-          TestAdvisor,
-          [
-            group_id: group.id,
-            advisor_id: :advisor_b,
-            order_books: %{exchange_a: filtered_product_symbols_by_exchange.exchange_a},
+            advisor_id: :"advisor_#{p.exchange_id}_#{p.symbol}",
+            order_books: order_books,
             config: %{}
           ]
         }
-      ]
+      end)
     end
   end
 
@@ -132,13 +126,13 @@ defmodule Tai.AdvisorGroupsTest do
     test "returns advisor specs with filtered products from the groups factory" do
       config_without_groups = Tai.Config.parse(advisor_groups: %{})
 
-      product_symbols_by_exchange = %{
-        exchange_a: [:btc_usd, :eth_usd],
-        exchange_b: [:btc_usd, :ltc_usd]
-      }
+      product_1 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_a, symbol: :btc_usd})
+      product_2 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_a, symbol: :eth_usd})
+      product_3 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_b, symbol: :btc_usd})
+      product_4 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_b, symbol: :ltc_usd})
+      products = [product_1, product_2, product_3, product_4]
 
-      assert Tai.AdvisorGroups.build_specs(config_without_groups, product_symbols_by_exchange) ==
-               {:ok, []}
+      assert Tai.AdvisorGroups.build_specs(config_without_groups, products) == {:ok, []}
 
       config_with_groups =
         Tai.Config.parse(
@@ -151,29 +145,38 @@ defmodule Tai.AdvisorGroupsTest do
           }
         )
 
-      assert Tai.AdvisorGroups.build_specs(config_with_groups, product_symbols_by_exchange) == {
-               :ok,
+      assert {:ok, [advisor_1, advisor_2, advisor_3]} =
+               Tai.AdvisorGroups.build_specs(config_with_groups, products)
+
+      assert {
+               TestAdvisor,
                [
-                 {
-                   TestAdvisor,
-                   [
-                     group_id: :group_a,
-                     advisor_id: :advisor_a,
-                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     config: %{}
-                   ]
-                 },
-                 {
-                   TestAdvisor,
-                   [
-                     group_id: :group_a,
-                     advisor_id: :advisor_b,
-                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     config: %{}
-                   ]
-                 }
+                 group_id: :group_a,
+                 advisor_id: :advisor_exchange_a_btc_usd,
+                 order_books: %{exchange_a: [:btc_usd]},
+                 config: %{}
                ]
-             }
+             } = advisor_1
+
+      assert {
+               TestAdvisor,
+               [
+                 group_id: :group_a,
+                 advisor_id: :advisor_exchange_a_eth_usd,
+                 order_books: %{exchange_a: [:eth_usd]},
+                 config: %{}
+               ]
+             } = advisor_2
+
+      assert {
+               TestAdvisor,
+               [
+                 group_id: :group_a,
+                 advisor_id: :advisor_exchange_b_ltc_usd,
+                 order_books: %{exchange_b: [:ltc_usd]},
+                 config: %{}
+               ]
+             } = advisor_3
     end
 
     test "surfaces the errors from .parse_config" do
@@ -191,15 +194,16 @@ defmodule Tai.AdvisorGroupsTest do
     test "returns advisor specs with filtered products from the factory of the given group" do
       config_without_groups = Tai.Config.parse(advisor_groups: %{})
 
-      product_symbols_by_exchange = %{
-        exchange_a: [:btc_usd, :eth_usd],
-        exchange_b: [:btc_usd, :ltc_usd]
-      }
+      product_1 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_a, symbol: :btc_usd})
+      product_2 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_a, symbol: :eth_usd})
+      product_3 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_b, symbol: :btc_usd})
+      product_4 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_b, symbol: :ltc_usd})
+      products = [product_1, product_2, product_3, product_4]
 
       assert Tai.AdvisorGroups.build_specs_for_group(
                config_without_groups,
                :group_a,
-               product_symbols_by_exchange
+               products
              ) == {:ok, []}
 
       config_with_groups =
@@ -218,31 +222,40 @@ defmodule Tai.AdvisorGroupsTest do
           }
         )
 
-      assert Tai.AdvisorGroups.build_specs_for_group(
-               config_with_groups,
-               :group_a,
-               product_symbols_by_exchange
-             ) == {
-               :ok,
+      assert {:ok, [advisor_1, advisor_2, advisor_3]} =
+               Tai.AdvisorGroups.build_specs_for_group(
+                 config_with_groups,
+                 :group_a,
+                 products
+               )
+
+      assert advisor_1 == {
+               TestAdvisor,
                [
-                 {
-                   TestAdvisor,
-                   [
-                     group_id: :group_a,
-                     advisor_id: :advisor_a,
-                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     config: %{}
-                   ]
-                 },
-                 {
-                   TestAdvisor,
-                   [
-                     group_id: :group_a,
-                     advisor_id: :advisor_b,
-                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
-                     config: %{}
-                   ]
-                 }
+                 group_id: :group_a,
+                 advisor_id: :advisor_exchange_a_btc_usd,
+                 order_books: %{exchange_a: [:btc_usd]},
+                 config: %{}
+               ]
+             }
+
+      assert advisor_2 == {
+               TestAdvisor,
+               [
+                 group_id: :group_a,
+                 advisor_id: :advisor_exchange_a_eth_usd,
+                 order_books: %{exchange_a: [:eth_usd]},
+                 config: %{}
+               ]
+             }
+
+      assert advisor_3 == {
+               TestAdvisor,
+               [
+                 group_id: :group_a,
+                 advisor_id: :advisor_exchange_b_ltc_usd,
+                 order_books: %{exchange_b: [:ltc_usd]},
+                 config: %{}
                ]
              }
     end
@@ -262,16 +275,17 @@ defmodule Tai.AdvisorGroupsTest do
     test "returns advisor specs with filtered products from the factory of the given advisor & group" do
       config_without_groups = Tai.Config.parse(advisor_groups: %{})
 
-      product_symbols_by_exchange = %{
-        exchange_a: [:btc_usd, :eth_usd],
-        exchange_b: [:btc_usd, :ltc_usd]
-      }
+      product_1 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_a, symbol: :btc_usd})
+      product_2 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_a, symbol: :eth_usd})
+      product_3 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_b, symbol: :btc_usd})
+      product_4 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_b, symbol: :ltc_usd})
+      products = [product_1, product_2, product_3, product_4]
 
       assert Tai.AdvisorGroups.build_specs_for_advisor(
                config_without_groups,
                :group_a,
                :advisor_a,
-               product_symbols_by_exchange
+               products
              ) == {:ok, []}
 
       config_with_groups =
@@ -293,8 +307,8 @@ defmodule Tai.AdvisorGroupsTest do
       assert Tai.AdvisorGroups.build_specs_for_advisor(
                config_with_groups,
                :group_a,
-               :advisor_a,
-               product_symbols_by_exchange
+               :advisor_exchange_a_btc_usd,
+               products
              ) == {
                :ok,
                [
@@ -302,8 +316,8 @@ defmodule Tai.AdvisorGroupsTest do
                    TestAdvisor,
                    [
                      group_id: :group_a,
-                     advisor_id: :advisor_a,
-                     order_books: %{exchange_a: [:btc_usd, :eth_usd]},
+                     advisor_id: :advisor_exchange_a_btc_usd,
+                     order_books: %{exchange_a: [:btc_usd]},
                      config: %{}
                    ]
                  }

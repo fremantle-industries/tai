@@ -11,53 +11,33 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
       config: %{hello: :world}
     }
 
-    assert Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(group, %{}) == []
+    assert Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(group, []) == []
 
-    products_by_exchange = %{
-      exchange_a: [:btc_usdt, :eth_usdt],
-      exchange_b: [:btc_usdt, :ltc_usdt]
-    }
+    product_1 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_a, symbol: :btc_usdt})
+    product_2 = struct(Tai.Exchanges.Product, %{exchange_id: :exchange_b, symbol: :ltc_usdt})
+    products = [product_1, product_2]
 
-    assert Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(
-             group,
-             products_by_exchange
-           ) == [
-             {
-               MyAdvisor,
-               [
-                 group_id: :group_a,
-                 advisor_id: :exchange_a_btc_usdt,
-                 order_books: %{exchange_a: [:btc_usdt]},
-                 config: %{hello: :world}
-               ]
-             },
-             {
-               MyAdvisor,
-               [
-                 group_id: :group_a,
-                 advisor_id: :exchange_a_eth_usdt,
-                 order_books: %{exchange_a: [:eth_usdt]},
-                 config: %{hello: :world}
-               ]
-             },
-             {
-               MyAdvisor,
-               [
-                 group_id: :group_a,
-                 advisor_id: :exchange_b_btc_usdt,
-                 order_books: %{exchange_b: [:btc_usdt]},
-                 config: %{hello: :world}
-               ]
-             },
-             {
-               MyAdvisor,
-               [
-                 group_id: :group_a,
-                 advisor_id: :exchange_b_ltc_usdt,
-                 order_books: %{exchange_b: [:ltc_usdt]},
-                 config: %{hello: :world}
-               ]
-             }
-           ]
+    assert [advisor_1, advisor_2] =
+             Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(group, products)
+
+    assert {
+             MyAdvisor,
+             [
+               group_id: :group_a,
+               advisor_id: :exchange_a_btc_usdt,
+               order_books: %{exchange_a: [:btc_usdt]},
+               config: %{hello: :world}
+             ]
+           } = advisor_1
+
+    assert {
+             MyAdvisor,
+             [
+               group_id: :group_a,
+               advisor_id: :exchange_b_ltc_usdt,
+               order_books: %{exchange_b: [:ltc_usdt]},
+               config: %{hello: :world}
+             ]
+           } = advisor_2
   end
 end
