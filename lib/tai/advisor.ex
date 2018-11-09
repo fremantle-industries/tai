@@ -5,10 +5,12 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
+  @type product :: Tai.Exchanges.Product.t()
+
   @type t :: %Tai.Advisor{
           group_id: atom,
           advisor_id: atom,
-          order_books: map,
+          products: [product],
           inside_quotes: map,
           config: map,
           store: map
@@ -17,14 +19,13 @@ defmodule Tai.Advisor do
   @enforce_keys [
     :group_id,
     :advisor_id,
-    :order_books,
     :inside_quotes,
     :config,
     :store
   ]
   defstruct group_id: nil,
             advisor_id: nil,
-            order_books: %{},
+            products: [],
             inside_quotes: %{},
             config: %{},
             store: %{}
@@ -72,7 +73,7 @@ defmodule Tai.Advisor do
       def start_link(
             group_id: group_id,
             advisor_id: advisor_id,
-            order_books: order_books,
+            products: products,
             config: config
           ) do
         name = Tai.Advisor.to_name(group_id: group_id, advisor_id: advisor_id)
@@ -82,7 +83,7 @@ defmodule Tai.Advisor do
           %Tai.Advisor{
             group_id: group_id,
             advisor_id: advisor_id,
-            order_books: order_books,
+            products: products,
             inside_quotes: %{},
             config: config,
             store: %{}
@@ -94,9 +95,20 @@ defmodule Tai.Advisor do
       @doc false
       def init(state) do
         Tai.MetaLogger.init_tid()
-        subscribe_to_order_book_channels(state.order_books)
+        {:ok, state, {:continue, :subscribe_to_products}}
+      end
 
-        {:ok, state}
+      @doc false
+      def handle_continue(:subscribe_to_products, state) do
+        state.products
+        |> Enum.each(fn p ->
+          Tai.PubSub.subscribe([
+            {:order_book_snapshot, p.exchange_id, p.symbol},
+            {:order_book_changes, p.exchange_id, p.symbol}
+          ])
+        end)
+
+        {:noreply, state}
       end
 
       @doc false
@@ -150,19 +162,6 @@ defmodule Tai.Advisor do
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
       @doc false
       def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state), do: :ok
-
-      defp subscribe_to_order_book_channels(order_books) do
-        order_books
-        |> Enum.each(fn {order_book_feed_id, symbols} ->
-          symbols
-          |> Enum.each(fn symbol ->
-            Tai.PubSub.subscribe([
-              {:order_book_snapshot, order_book_feed_id, symbol},
-              {:order_book_changes, order_book_feed_id, symbol}
-            ])
-          end)
-        end)
-      end
 
       defp cache_inside_quote(state, feed_id, symbol) do
         with {:ok, current_inside_quote} <- Tai.Markets.OrderBook.inside_quote(feed_id, symbol),

@@ -19,7 +19,12 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
       [
         group_id: :fill_or_kill_orders,
         advisor_id: :btc_usd,
-        order_books: %{test_exchange_a: [:btc_usd]},
+        products: [
+          struct(
+            Tai.Exchanges.Product,
+            %{exchange_id: :test_exchange_a, symbol: :btc_usd}
+          )
+        ],
         config: %{}
       ]
     })

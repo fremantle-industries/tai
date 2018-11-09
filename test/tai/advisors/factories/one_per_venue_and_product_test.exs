@@ -25,7 +25,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
              [
                group_id: :group_a,
                advisor_id: :exchange_a_btc_usdt,
-               order_books: %{exchange_a: [:btc_usdt]},
+               products: [^product_1],
                config: %{hello: :world}
              ]
            } = advisor_1
@@ -35,7 +35,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
              [
                group_id: :group_a,
                advisor_id: :exchange_b_ltc_usdt,
-               order_books: %{exchange_b: [:ltc_usdt]},
+               products: [^product_2],
                config: %{hello: :world}
              ]
            } = advisor_2

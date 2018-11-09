@@ -11,12 +11,12 @@ defmodule Tai.AdvisorsTest do
 
     spec_1 = {
       TestAdvisor,
-      [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, config: %{}]
+      [group_id: :group_a, advisor_id: :advisor_a, products: [], config: %{}]
     }
 
     spec_2 = {
       TestAdvisor,
-      [group_id: :group_a, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+      [group_id: :group_a, advisor_id: :advisor_b, products: [], config: %{}]
     }
 
     start_supervised!(spec_1)
@@ -31,17 +31,17 @@ defmodule Tai.AdvisorsTest do
 
     spec_1 = {
       TestAdvisor,
-      [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, config: %{}]
+      [group_id: :group_a, advisor_id: :advisor_a, products: [], config: %{}]
     }
 
     spec_2 = {
       TestAdvisor,
-      [group_id: :group_b, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+      [group_id: :group_b, advisor_id: :advisor_b, products: [], config: %{}]
     }
 
     spec_3 = {
       TestAdvisor,
-      [group_id: :group_c, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+      [group_id: :group_c, advisor_id: :advisor_b, products: [], config: %{}]
     }
 
     start_supervised!(Tai.AdvisorsSupervisor)
@@ -55,17 +55,17 @@ defmodule Tai.AdvisorsTest do
 
     spec_1 = {
       TestAdvisor,
-      [group_id: :group_a, advisor_id: :advisor_a, order_books: %{}, config: %{}]
+      [group_id: :group_a, advisor_id: :advisor_a, products: [], config: %{}]
     }
 
     spec_2 = {
       TestAdvisor,
-      [group_id: :group_b, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+      [group_id: :group_b, advisor_id: :advisor_b, products: [], config: %{}]
     }
 
     spec_3 = {
       TestAdvisor,
-      [group_id: :group_c, advisor_id: :advisor_b, order_books: %{}, config: %{}]
+      [group_id: :group_c, advisor_id: :advisor_b, products: [], config: %{}]
     }
 
     start_supervised!(Tai.AdvisorsSupervisor)

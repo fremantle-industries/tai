@@ -20,25 +20,14 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     end
   end
 
-  defp start_advisor!(advisor) do
+  @btc_usd struct(Tai.Exchanges.Product, %{exchange_id: :my_venue, symbol: :btc_usd})
+  defp start_advisor!(advisor, config \\ %{}) do
     start_supervised!({
       advisor,
       [
         group_id: :group_a,
         advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btc_usd]},
-        config: %{}
-      ]
-    })
-  end
-
-  defp start_advisor!(advisor, config) do
-    start_supervised!({
-      advisor,
-      [
-        group_id: :group_a,
-        advisor_id: :my_advisor,
-        order_books: %{my_order_book_feed: [:btc_usd]},
+        products: [@btc_usd],
         config: config
       ]
     })
@@ -49,11 +38,9 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Application.stop(:tai)
     end)
 
-    {:ok, _} = Application.ensure_all_started(:tai)
     Process.register(self(), :test)
-
-    book_pid =
-      start_supervised!({Tai.Markets.OrderBook, feed_id: :my_order_book_feed, symbol: :btc_usd})
+    {:ok, _} = Application.ensure_all_started(:tai)
+    book_pid = start_supervised!({Tai.Markets.OrderBook, feed_id: :my_venue, symbol: :btc_usd})
 
     start_supervised!(
       {Tai.ExchangeAdapters.Mock.Account,
@@ -73,7 +60,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         ^changes,
         %Tai.Advisor{}
@@ -93,7 +80,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.replace(book_pid, snapshot)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{
@@ -128,7 +115,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.update(book_pid, changes_1)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{
@@ -152,7 +139,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.update(book_pid, changes_2)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{
@@ -187,7 +174,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.update(book_pid, changes_1)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{
@@ -211,7 +198,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.update(book_pid, changes_2)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{
@@ -259,7 +246,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.replace(book_pid, snapshot)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{},
         ^snapshot,
@@ -270,7 +257,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{},
         ^changes,
@@ -289,7 +276,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.replace(book_pid, snapshot)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{},
         ^snapshot,
@@ -300,7 +287,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
-        :my_order_book_feed,
+        :my_venue,
         :btc_usd,
         %Tai.Markets.Quote{},
         ^changes,

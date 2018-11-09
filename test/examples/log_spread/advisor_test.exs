@@ -21,7 +21,12 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
       [
         group_id: :log_spread,
         advisor_id: :btc_usd,
-        order_books: %{test_exchange_a: [:btc_usd]},
+        products: [
+          struct(
+            Tai.Exchanges.Product,
+            %{exchange_id: :test_exchange_a, symbol: :btc_usd}
+          )
+        ],
         config: %{}
       ]
     })
