@@ -30,12 +30,6 @@ defmodule Tai.Advisor do
             store: %{}
 
   @doc """
-  Callback during initilization. Allows the store to be updated before it 
-  starts responding to events
-  """
-  @callback init_store(state :: t) :: {:ok, map}
-
-  @doc """
   Callback when order book has bid or ask changes
   """
   @callback handle_order_book_changes(
@@ -98,29 +92,11 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def init(%Tai.Advisor{order_books: order_books} = state) do
+      def init(state) do
         Tai.MetaLogger.init_tid()
-        subscribe_to_order_book_channels(order_books)
-        new_store = init_store_callback(state)
-        new_state = Map.put(state, :store, new_store)
+        subscribe_to_order_book_channels(state.order_books)
 
-        {:ok, new_state}
-      end
-
-      defp init_store_callback(state) do
-        state
-        |> init_store
-        |> case do
-          {:ok, new_store} ->
-            new_store
-
-          return_error ->
-            Logger.error(
-              "init_store must return {:ok, store} but it returned '#{inspect(return_error)}'"
-            )
-
-            state.store
-        end
+        {:ok, state}
       end
 
       @doc false
@@ -170,8 +146,6 @@ defmodule Tai.Advisor do
         |> Tai.Markets.OrderBook.quotes(depth)
       end
 
-      @doc false
-      def init_store(%Tai.Advisor{store: store}), do: {:ok, store}
       @doc false
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
       @doc false
@@ -266,8 +240,7 @@ defmodule Tai.Advisor do
         end
       end
 
-      defoverridable init_store: 1,
-                     handle_order_book_changes: 4,
+      defoverridable handle_order_book_changes: 4,
                      handle_inside_quote: 5
     end
   end
