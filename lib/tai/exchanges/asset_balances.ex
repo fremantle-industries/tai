@@ -1,9 +1,16 @@
 defmodule Tai.Exchanges.AssetBalances do
-  @type asset_balance :: Tai.Exchanges.AssetBalance.t()
-  @type balance_range :: Tai.Exchanges.AssetBalanceRange.t()
-  @type balance_change_request :: Tai.Exchanges.AssetBalanceChangeRequest.t()
-
+  alias Tai.Exchanges.AssetBalances
   use GenServer
+
+  @type asset_balance :: Tai.Exchanges.AssetBalance.t()
+  @type lock_request :: AssetBalances.LockRequest.t()
+  @type lock_result ::
+          {:ok, Decimal.t()}
+          | {:error,
+             :not_found | :insufficient_balance | :min_greater_than_max | :min_less_than_zero}
+  @type unlock_request :: AssetBalances.UnlockRequest.t()
+  @type unlock_result :: :ok | {:error, :insufficient_balance | term}
+  @type modify_result :: {:ok, asset_balance} | {:error, :not_found | :value_must_be_positive}
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -24,96 +31,74 @@ defmodule Tai.Exchanges.AssetBalances do
   def handle_call({:upsert, balance}, _from, state) do
     upsert_ets_table(balance)
 
-    {
-      :reply,
-      :ok,
-      state,
-      {:continue, {:upsert, balance}}
-    }
+    Tai.Events.broadcast(%Tai.Events.UpsertAssetBalance{
+      venue_id: balance.exchange_id,
+      account_id: balance.account_id,
+      asset: balance.asset,
+      free: balance.free,
+      locked: balance.locked
+    })
+
+    {:reply, :ok, state}
   end
 
-  def handle_call(
-        {:lock_range, exchange_id, account_id,
-         %Tai.Exchanges.AssetBalanceRange{} = balance_range},
-        _from,
-        state
-      ) do
-    with {:ok, balance} <-
-           find_by(exchange_id: exchange_id, account_id: account_id, asset: balance_range.asset),
-         :ok <- Tai.Exchanges.AssetBalanceRange.validate(balance_range) do
-      lock_result =
-        cond do
-          Decimal.cmp(balance_range.max, balance.free) != :gt -> balance_range.max
-          Decimal.cmp(balance_range.min, balance.free) != :gt -> balance.free
-          true -> nil
-        end
+  def handle_call({:lock, lock_request}, _from, state) do
+    with {:ok, {with_locked_balance, locked_qty}} <- AssetBalances.Lock.from_request(lock_request) do
+      upsert_ets_table(with_locked_balance)
 
-      if lock_result == nil do
-        continue = {
-          :lock_range_insufficient_balance,
-          exchange_id,
-          account_id,
-          balance_range.asset,
-          balance.free,
-          balance_range.min,
-          balance_range.max
-        }
+      Tai.Events.broadcast(%Tai.Events.LockAssetBalanceOk{
+        venue_id: lock_request.exchange_id,
+        account_id: lock_request.account_id,
+        asset: lock_request.asset,
+        qty: locked_qty,
+        min: lock_request.min,
+        max: lock_request.max
+      })
 
-        {:reply, {:error, :insufficient_balance}, state, {:continue, continue}}
-      else
-        new_free = Decimal.sub(balance.free, lock_result)
-        new_locked = Decimal.add(balance.locked, lock_result)
-
-        balance
-        |> Map.put(:free, new_free)
-        |> Map.put(:locked, new_locked)
-        |> upsert_ets_table()
-
-        continue = {
-          :lock_range_ok,
-          exchange_id,
-          account_id,
-          balance_range.asset,
-          lock_result,
-          balance_range.min,
-          balance_range.max
-        }
-
-        {:reply, {:ok, lock_result}, state, {:continue, continue}}
-      end
+      {:reply, {:ok, locked_qty}, state}
     else
+      {:error, {:insufficient_balance, free}} = error ->
+        Tai.Events.broadcast(%Tai.Events.LockAssetBalanceInsufficientFunds{
+          venue_id: lock_request.exchange_id,
+          account_id: lock_request.account_id,
+          asset: lock_request.asset,
+          min: lock_request.min,
+          max: lock_request.max,
+          free: free
+        })
+
+        {:reply, error, state}
+
       {:error, _} = error ->
         {:reply, error, state}
     end
   end
 
-  def handle_call(
-        {:unlock, exchange_id, account_id,
-         %Tai.Exchanges.AssetBalanceChangeRequest{asset: asset, amount: amount}},
-        _from,
-        state
-      ) do
-    with {:ok, balance} <- find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
-      new_free = Decimal.add(balance.free, amount)
-      new_locked = Decimal.sub(balance.locked, amount)
+  def handle_call({:unlock, unlock_request}, _from, state) do
+    with {:ok, with_unlocked_balance} <- AssetBalances.Unlock.from_request(unlock_request) do
+      upsert_ets_table(with_unlocked_balance)
 
-      new_balance =
-        balance
-        |> Map.put(:free, new_free)
-        |> Map.put(:locked, new_locked)
+      Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceOk{
+        venue_id: unlock_request.exchange_id,
+        account_id: unlock_request.account_id,
+        asset: unlock_request.asset,
+        qty: unlock_request.qty
+      })
 
-      if Decimal.cmp(new_locked, Decimal.new(0)) == :lt do
-        continue =
-          {:unlock_insufficient_balance, exchange_id, account_id, asset, balance.locked, amount}
-
-        {:reply, {:error, :insufficient_balance}, state, {:continue, continue}}
-      else
-        upsert_ets_table(new_balance)
-        continue = {:unlock_ok, exchange_id, account_id, asset, amount}
-        {:reply, :ok, state, {:continue, continue}}
-      end
+      {:reply, :ok, state}
     else
-      {:error, _} = error ->
+      {:error, {:insufficient_balance, locked}} = error ->
+        Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceInsufficientFunds{
+          venue_id: unlock_request.exchange_id,
+          account_id: unlock_request.account_id,
+          asset: unlock_request.asset,
+          qty: unlock_request.qty,
+          locked: locked
+        })
+
+        {:reply, error, state}
+
+      {:error, :not_found} = error ->
         {:reply, error, state}
     end
   end
@@ -161,76 +146,6 @@ defmodule Tai.Exchanges.AssetBalances do
     end
   end
 
-  def handle_continue({:upsert, balance}, state) do
-    Tai.Events.broadcast(%Tai.Events.UpsertAssetBalance{
-      venue_id: balance.exchange_id,
-      account_id: balance.account_id,
-      asset: balance.asset,
-      free: balance.free,
-      locked: balance.locked
-    })
-
-    {:noreply, state}
-  end
-
-  def handle_continue(
-        {:lock_range_ok, venue_id, account_id, asset, qty, min, max},
-        state
-      ) do
-    Tai.Events.broadcast(%Tai.Events.LockAssetBalanceRangeOk{
-      venue_id: venue_id,
-      account_id: account_id,
-      asset: asset,
-      qty: qty,
-      min: min,
-      max: max
-    })
-
-    {:noreply, state}
-  end
-
-  def handle_continue(
-        {:lock_range_insufficient_balance, venue_id, account_id, asset, free, min, max},
-        state
-      ) do
-    Tai.Events.broadcast(%Tai.Events.LockAssetBalanceRangeInsufficientFunds{
-      venue_id: venue_id,
-      account_id: account_id,
-      asset: asset,
-      free: free,
-      min: min,
-      max: max
-    })
-
-    {:noreply, state}
-  end
-
-  def handle_continue({:unlock_ok, venue_id, account_id, asset, qty}, state) do
-    Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceOk{
-      venue_id: venue_id,
-      account_id: account_id,
-      asset: asset,
-      qty: qty
-    })
-
-    {:noreply, state}
-  end
-
-  def handle_continue(
-        {:unlock_insufficient_balance, venue_id, account_id, asset, locked, qty},
-        state
-      ) do
-    Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceInsufficientFunds{
-      venue_id: venue_id,
-      account_id: account_id,
-      asset: asset,
-      locked: locked,
-      qty: qty
-    })
-
-    {:noreply, state}
-  end
-
   def handle_continue({:add, venue_id, account_id, asset, val, balance}, state) do
     Tai.Events.broadcast(%Tai.Events.AddFreeAssetBalance{
       venue_id: venue_id,
@@ -257,9 +172,55 @@ defmodule Tai.Exchanges.AssetBalances do
     {:noreply, state}
   end
 
+  @spec lock(lock_request) :: lock_result
+  def lock(%AssetBalances.LockRequest{} = lock_request) do
+    GenServer.call(__MODULE__, {:lock, lock_request})
+  end
+
+  @spec unlock(unlock_request) :: unlock_result
+  def unlock(%AssetBalances.UnlockRequest{} = unlock_request) do
+    GenServer.call(__MODULE__, {:unlock, unlock_request})
+  end
+
   @spec upsert(balance :: asset_balance) :: :ok
   def upsert(balance) do
     GenServer.call(__MODULE__, {:upsert, balance})
+  end
+
+  @spec add(
+          exchange_id :: atom,
+          account_id :: atom,
+          asset :: atom,
+          val :: number | String.t() | Decimal.t()
+        ) :: modify_result
+  def add(exchange_id, account_id, asset, val)
+
+  def add(exchange_id, account_id, asset, %Decimal{} = val) do
+    GenServer.call(
+      __MODULE__,
+      {:add, exchange_id, account_id, asset, val}
+    )
+  end
+
+  def add(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
+    add(exchange_id, account_id, asset, Decimal.new(val))
+  end
+
+  @spec sub(
+          exchange_id :: atom,
+          account_id :: atom,
+          asset :: atom,
+          val :: number | String.t() | Decimal.t()
+        ) :: modify_result
+  def sub(exchange_id, account_id, asset, val)
+
+  def sub(exchange_id, account_id, asset, %Decimal{} = val) do
+    __MODULE__
+    |> GenServer.call({:sub, exchange_id, account_id, asset, val})
+  end
+
+  def sub(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
+    sub(exchange_id, account_id, asset, Decimal.new(val))
   end
 
   @spec all :: [asset_balance]
@@ -272,21 +233,7 @@ defmodule Tai.Exchanges.AssetBalances do
     )
   end
 
-  @spec count :: number
-  def count do
-    all()
-    |> Enum.count()
-  end
-
-  @spec lock_range(atom, atom, balance_range) ::
-          {:ok, Decimal.t()}
-          | {:error, :not_found | :insufficient_balance | :min_greater_than_max,
-             :min_less_than_zero}
-  def lock_range(exchange_id, account_id, range) do
-    __MODULE__
-    |> GenServer.call({:lock_range, exchange_id, account_id, range})
-  end
-
+  @spec where(filters :: [...]) :: [asset_balance]
   def where(filters) do
     all()
     |> Enum.reduce(
@@ -328,51 +275,6 @@ defmodule Tai.Exchanges.AssetBalances do
       nil ->
         {:error, :not_found}
     end
-  end
-
-  @spec unlock(exchange_id :: atom, account_id :: atom, balance_change_request) ::
-          :ok | {:error, :insufficient_balance | term}
-  def unlock(exchange_id, account_id, balance_change_request) do
-    GenServer.call(
-      __MODULE__,
-      {:unlock, exchange_id, account_id, balance_change_request}
-    )
-  end
-
-  @spec add(
-          exchange_id :: atom,
-          account_id :: atom,
-          asset :: atom,
-          val :: number | String.t() | Decimal.t()
-        ) :: {:ok, asset_balance} | {:error, :not_found | :value_must_be_positive}
-  def add(exchange_id, account_id, asset, val)
-
-  def add(exchange_id, account_id, asset, %Decimal{} = val) do
-    GenServer.call(
-      __MODULE__,
-      {:add, exchange_id, account_id, asset, val}
-    )
-  end
-
-  def add(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
-    add(exchange_id, account_id, asset, Decimal.new(val))
-  end
-
-  @spec sub(
-          exchange_id :: atom,
-          account_id :: atom,
-          asset :: atom,
-          val :: number | String.t() | Decimal.t()
-        ) :: {:ok, asset_balance} | {:error, :not_found | :value_must_be_positive}
-  def sub(exchange_id, account_id, asset, val)
-
-  def sub(exchange_id, account_id, asset, %Decimal{} = val) do
-    __MODULE__
-    |> GenServer.call({:sub, exchange_id, account_id, asset, val})
-  end
-
-  def sub(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
-    sub(exchange_id, account_id, asset, Decimal.new(val))
   end
 
   defp upsert_ets_table(balance) do

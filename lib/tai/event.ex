@@ -2,8 +2,8 @@ defmodule Tai.Event do
   @type t ::
           Tai.Events.AddFreeAssetBalance.t()
           | Tai.Events.HydrateProducts.t()
-          | Tai.Events.LockAssetBalanceRangeInsufficientFunds.t()
-          | Tai.Events.LockAssetBalanceRangeOk.t()
+          | Tai.Events.LockAssetBalanceInsufficientFunds.t()
+          | Tai.Events.LockAssetBalanceOk.t()
           | Tai.Events.OrderBookSnapshot.t()
           | Tai.Events.SubFreeAssetBalance.t()
           | Tai.Events.UnlockAssetBalanceInsufficientFunds.t()

@@ -19,3 +19,16 @@ defmodule Tai.Events.UnlockAssetBalanceOk do
     :qty
   ]
 end
+
+defimpl Tai.LogEvent, for: Tai.Events.UnlockAssetBalanceOk do
+  def to_data(event) do
+    keys =
+      event
+      |> Map.keys()
+      |> Enum.filter(&(&1 != :__struct__))
+
+    event
+    |> Map.take(keys)
+    |> Map.put(:qty, event.qty |> Decimal.to_string(:normal))
+  end
+end
