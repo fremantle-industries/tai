@@ -33,12 +33,12 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    Tai.Exchanges.AssetBalance.new(
-      venue_id,
-      account_id,
-      asset,
-      available |> Decimal.new() |> Decimal.reduce(),
-      hold |> Decimal.new() |> Decimal.reduce()
-    )
+    %Tai.Exchanges.AssetBalance{
+      exchange_id: venue_id,
+      account_id: account_id,
+      asset: asset,
+      free: available |> Decimal.new() |> Decimal.reduce(),
+      locked: hold |> Decimal.new() |> Decimal.reduce()
+    }
   end
 end

@@ -36,14 +36,13 @@ defmodule Tai.ExchangeAdapters.Binance.Account.AllBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    balance =
-      Tai.Exchanges.AssetBalance.new(
-        account.exchange_id,
-        account.account_id,
-        asset,
-        free,
-        locked
-      )
+    balance = %Tai.Exchanges.AssetBalance{
+      exchange_id: account.exchange_id,
+      account_id: account.account_id,
+      asset: asset,
+      free: free,
+      locked: locked
+    }
 
     Map.put(acc, asset, balance)
   end

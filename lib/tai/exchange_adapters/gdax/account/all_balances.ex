@@ -46,15 +46,14 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.AllBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    detail =
-      Tai.Exchanges.AssetBalance.new(
-        account.exchange_id,
-        account.account_id,
-        asset,
-        available,
-        hold
-      )
+    balance = %Tai.Exchanges.AssetBalance{
+      exchange_id: account.exchange_id,
+      account_id: account.account_id,
+      asset: asset,
+      free: available,
+      locked: hold
+    }
 
-    Map.put(acc, asset, detail)
+    Map.put(acc, asset, balance)
   end
 end

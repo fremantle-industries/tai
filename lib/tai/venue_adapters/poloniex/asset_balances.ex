@@ -32,12 +32,12 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    Tai.Exchanges.AssetBalance.new(
-      venue_id,
-      account_id,
-      asset,
-      raw_available |> Decimal.new() |> Decimal.reduce(),
-      raw_on_orders |> Decimal.new() |> Decimal.reduce()
-    )
+    %Tai.Exchanges.AssetBalance{
+      exchange_id: venue_id,
+      account_id: account_id,
+      asset: asset,
+      free: raw_available |> Decimal.new() |> Decimal.reduce(),
+      locked: raw_on_orders |> Decimal.new() |> Decimal.reduce()
+    }
   end
 end

@@ -15,7 +15,12 @@ defmodule Tai.Exchanges.AssetBalancesTest do
 
   describe ".upsert" do
     test "inserts the balance into the ETS table" do
-      balance = Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account, :btc, 1, 2)
+      balance =
+        struct(Tai.Exchanges.AssetBalance, %{
+          exchange_id: :my_test_exchange,
+          account_id: :my_test_account,
+          asset: :btc
+        })
 
       assert AssetBalances.upsert(balance) == :ok
 
@@ -29,14 +34,13 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "broadcasts an event" do
       Tai.Events.firehose_subscribe()
 
-      balance =
-        Tai.Exchanges.AssetBalance.new(
-          :my_test_exchange,
-          :my_test_account,
-          :btc,
-          0.00000001,
-          2
-        )
+      balance = %Tai.Exchanges.AssetBalance{
+        exchange_id: :my_test_exchange,
+        account_id: :my_test_account,
+        asset: :btc,
+        free: Decimal.new(0.00000001),
+        locked: Decimal.new(2)
+      }
 
       :ok = AssetBalances.upsert(balance)
 
@@ -53,8 +57,13 @@ defmodule Tai.Exchanges.AssetBalancesTest do
     test "returns a list of balances" do
       assert AssetBalances.all() == []
 
-      balance =
-        Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account, :btc, 1.1, 2.1)
+      balance = %Tai.Exchanges.AssetBalance{
+        exchange_id: :my_test_exchange,
+        account_id: :my_test_account,
+        asset: :btc,
+        free: Decimal.new(1.1),
+        locked: Decimal.new(2.1)
+      }
 
       :ok = AssetBalances.upsert(balance)
 
@@ -65,10 +74,20 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   describe ".where" do
     test "returns a list of the matching balances" do
       balance_1 =
-        Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account_a, :btc, 1.1, 2.1)
+        struct(Tai.Exchanges.AssetBalance, %{
+          exchange_id: :my_test_exchange,
+          account_id: :my_test_account_a,
+          asset: :btc,
+          free: Decimal.new(1.1)
+        })
 
       balance_2 =
-        Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account_b, :btc, 2.1, 3.1)
+        struct(Tai.Exchanges.AssetBalance, %{
+          exchange_id: :my_test_exchange,
+          account_id: :my_test_account_b,
+          asset: :btc,
+          free: Decimal.new(2.1)
+        })
 
       :ok = AssetBalances.upsert(balance_1)
       :ok = AssetBalances.upsert(balance_2)
@@ -91,7 +110,11 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   describe ".find_by" do
     test "returns an ok tuple with the balance" do
       balance =
-        Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account_a, :btc, 1.1, 2.1)
+        struct(Tai.Exchanges.AssetBalance, %{
+          exchange_id: :my_test_exchange,
+          account_id: :my_test_account_a,
+          asset: :btc
+        })
 
       :ok = AssetBalances.upsert(balance)
 
@@ -407,11 +430,15 @@ defmodule Tai.Exchanges.AssetBalancesTest do
   @free Decimal.new(1.1)
   @locked Decimal.new(2.1)
   defp init_asset_balance(_context) do
-    balance =
-      Tai.Exchanges.AssetBalance.new(:my_test_exchange, :my_test_account, :btc, @free, @locked)
+    balance = %Tai.Exchanges.AssetBalance{
+      exchange_id: :my_test_exchange,
+      account_id: :my_test_account,
+      asset: :btc,
+      free: @free,
+      locked: @locked
+    }
 
     :ok = AssetBalances.upsert(balance)
-
     {:ok, %{balance: balance}}
   end
 end

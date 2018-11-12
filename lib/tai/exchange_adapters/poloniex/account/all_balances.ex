@@ -40,14 +40,13 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.AllBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    balance =
-      Tai.Exchanges.AssetBalance.new(
-        account.exchange_id,
-        account.account_id,
-        asset,
-        raw_available,
-        raw_on_orders
-      )
+    balance = %Tai.Exchanges.AssetBalance{
+      exchange_id: account.exchange_id,
+      account_id: account.account_id,
+      asset: asset,
+      free: raw_available,
+      locked: raw_on_orders
+    }
 
     Map.put(acc, asset, balance)
   end

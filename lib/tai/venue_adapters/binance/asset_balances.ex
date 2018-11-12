@@ -34,12 +34,12 @@ defmodule Tai.VenueAdapters.Binance.AssetBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    Tai.Exchanges.AssetBalance.new(
-      venue_id,
-      account_id,
-      asset,
-      free |> Decimal.new() |> Decimal.reduce(),
-      locked |> Decimal.new() |> Decimal.reduce()
-    )
+    %Tai.Exchanges.AssetBalance{
+      exchange_id: venue_id,
+      account_id: account_id,
+      asset: asset,
+      free: free |> Decimal.new() |> Decimal.reduce(),
+      locked: locked |> Decimal.new() |> Decimal.reduce()
+    }
   end
 end
