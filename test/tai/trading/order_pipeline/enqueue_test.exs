@@ -1,7 +1,6 @@
 defmodule Tai.Trading.OrderPipeline.EnqueueTest do
   use ExUnit.Case, async: false
 
-  import ExUnit.CaptureLog
   import Tai.TestSupport.Helpers
 
   setup do
@@ -13,59 +12,89 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
     :ok
   end
 
-  test "buy_limit enqueues an order and logs a message" do
-    assert Tai.Trading.OrderStore.count() == 0
+  describe "buy_limit" do
+    setup do
+      Tai.Events.firehose_subscribe()
+      assert Tai.Trading.OrderStore.count() == 0
 
-    log_msg =
-      capture_log(fn ->
-        order =
-          Tai.Trading.OrderPipeline.buy_limit(
-            :test_exchange_a,
-            :main,
-            :btc_usd_success,
-            100.1,
-            0.1,
-            :fok,
-            fire_order_callback(self())
-          )
+      order =
+        Tai.Trading.OrderPipeline.buy_limit(
+          :test_exchange_a,
+          :main,
+          :btc_usd,
+          100.1,
+          0.1,
+          :fok,
+          fire_order_callback(self())
+        )
 
-        assert Tai.Trading.OrderStore.count() == 1
-        assert order.status == Tai.Trading.OrderStatus.enqueued()
-        assert order.price == Decimal.new(100.1)
-        assert order.size == Decimal.new(0.1)
-        assert order.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
-        assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
-      end)
+      {:ok, %{client_id: order.client_id}}
+    end
 
-    assert log_msg =~
-             ~r/\[order:.{36,36},enqueued,test_exchange_a,main,btc_usd_success,buy,limit,fok,100.1,0.1,\]/
+    test "adds an order to the store and fires the callback", %{client_id: client_id} do
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{client_id: ^client_id}}
+      assert Tai.Trading.OrderStore.count() == 1
+      assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
+    end
+
+    test "broadcasts an event with the submissions details", %{client_id: client_id} do
+      assert_receive {Tai.Event,
+                      %Tai.Events.OrderUpdated{
+                        client_id: ^client_id,
+                        status: :enqueued,
+                        venue_id: :test_exchange_a,
+                        account_id: :main,
+                        product_symbol: :btc_usd,
+                        side: :buy,
+                        type: :limit,
+                        time_in_force: :fok
+                      } = event}
+
+      assert event.price == Decimal.new(100.1)
+      assert event.size == Decimal.new(0.1)
+    end
   end
 
-  test "sell_limit enqueues an order and logs a message" do
-    assert Tai.Trading.OrderStore.count() == 0
+  describe "sell limit" do
+    setup do
+      Tai.Events.firehose_subscribe()
+      assert Tai.Trading.OrderStore.count() == 0
 
-    log_msg =
-      capture_log(fn ->
-        order =
-          Tai.Trading.OrderPipeline.sell_limit(
-            :test_exchange_a,
-            :main,
-            :btc_usd_success,
-            100_000.1,
-            0.01,
-            :fok,
-            fire_order_callback(self())
-          )
+      order =
+        Tai.Trading.OrderPipeline.sell_limit(
+          :test_exchange_a,
+          :main,
+          :ltc_usd,
+          100_000.1,
+          0.01,
+          :ioc,
+          fire_order_callback(self())
+        )
 
-        assert Tai.Trading.OrderStore.count() == 1
-        assert order.status == Tai.Trading.OrderStatus.enqueued()
-        assert order.price == Decimal.new(100_000.1)
-        assert order.size == Decimal.new(0.01)
-        assert order.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
-        assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
-      end)
+      {:ok, %{client_id: order.client_id}}
+    end
 
-    assert log_msg =~
-             ~r/\[order:.{36,36},enqueued,test_exchange_a,main,btc_usd_success,sell,limit,fok,100000.1,0.01,\]/
+    test "adds an order to the store and fires the callback", %{client_id: client_id} do
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{client_id: ^client_id}}
+      assert Tai.Trading.OrderStore.count() == 1
+      assert_receive {:callback_fired, nil, %Tai.Trading.Order{status: :enqueued}}
+    end
+
+    test "broadcasts an event with the submissions details", %{client_id: client_id} do
+      assert_receive {Tai.Event,
+                      %Tai.Events.OrderUpdated{
+                        client_id: ^client_id,
+                        status: :enqueued,
+                        venue_id: :test_exchange_a,
+                        account_id: :main,
+                        product_symbol: :ltc_usd,
+                        side: :sell,
+                        type: :limit,
+                        time_in_force: :ioc
+                      } = event}
+
+      assert event.price == Decimal.new(100_000.1)
+      assert event.size == Decimal.new(0.01)
+    end
   end
 end

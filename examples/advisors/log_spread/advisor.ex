@@ -8,8 +8,8 @@ defmodule Examples.Advisors.LogSpread.Advisor do
   require Logger
 
   def handle_inside_quote(
-        feed_id,
-        symbol,
+        venue_id,
+        product_symbol,
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{price: bp},
           ask: %Tai.Markets.PriceLevel{price: ap}
@@ -23,13 +23,21 @@ defmodule Examples.Advisors.LogSpread.Advisor do
 
     "[spread:~s,~s,~s,~s,~s]"
     |> :io_lib.format([
-      feed_id,
-      symbol,
+      venue_id,
+      product_symbol,
       spread |> Decimal.to_string(:normal),
       bid_price |> Decimal.to_string(:normal),
       ask_price |> Decimal.to_string(:normal)
     ])
     |> Logger.info()
+
+    Tai.Events.broadcast(%Examples.Advisors.LogSpread.Events.Spread{
+      venue_id: venue_id,
+      product_symbol: product_symbol,
+      bid_price: bid_price |> Decimal.to_string(:normal),
+      ask_price: ask_price |> Decimal.to_string(:normal),
+      spread: spread |> Decimal.to_string(:normal)
+    })
   end
 
   def handle_inside_quote(_feed_id, _symbol, _quote, _changes, _state), do: nil

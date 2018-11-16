@@ -1,6 +1,7 @@
 defmodule Examples.Advisors.FillOrKillOrders.Advisor do
   @moduledoc """
-  Example advisor that shows how to use fill or kill limit orders 
+  Example advisor that demonstrates how to use fill or kill limit orders. It 
+  logs a success message when the order is successfully filled
   """
 
   use Tai.Advisor
@@ -27,7 +28,7 @@ defmodule Examples.Advisors.FillOrKillOrders.Advisor do
         %Tai.Trading.Order{status: :enqueued},
         %Tai.Trading.Order{status: :filled} = updated_order
       ) do
-    Logger.info("filled order #{inspect(updated_order)}")
+    Logger.info("successfully filled order #{inspect(updated_order)}")
   end
 
   def order_updated(_previous_order, _updated_order), do: nil

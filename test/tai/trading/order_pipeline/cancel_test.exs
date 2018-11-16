@@ -1,98 +1,139 @@
 defmodule Tai.Trading.OrderPipeline.CancelTest do
   use ExUnit.Case, async: false
 
-  import ExUnit.CaptureLog
   import Tai.TestSupport.Helpers
+  alias Tai.Trading.OrderPipeline
+  alias Tai.TestSupport.Mocks
 
   setup do
     on_exit(fn ->
       Application.stop(:tai)
     end)
 
-    {:ok, _} = Application.ensure_all_started(:tai)
     start_supervised!(Tai.TestSupport.Mocks.Server)
+    {:ok, _} = Application.ensure_all_started(:tai)
 
     :ok
   end
 
-  test "updates the status to canceling and sends the request to the exchange in the background" do
-    Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
-      server_id: "UNFILLED_ORDER_SERVER_ID",
-      symbol: :btc_usd,
-      price: Decimal.new(100.1),
-      original_size: Decimal.new(0.1)
-    )
+  describe "success" do
+    @server_id "UNFILLED_ORDER_SERVER_ID"
 
-    order =
-      Tai.Trading.OrderPipeline.buy_limit(
-        :test_exchange_a,
-        :main,
-        :btc_usd,
-        100.1,
-        0.1,
-        :gtc,
-        fire_order_callback(self())
+    setup do
+      Mocks.Orders.GoodTillCancel.unfilled(
+        server_id: @server_id,
+        symbol: :btc_usd,
+        price: Decimal.new(100.1),
+        original_size: Decimal.new(0.1)
       )
 
-    assert_receive {
-      :callback_fired,
-      %Tai.Trading.Order{status: :enqueued},
-      %Tai.Trading.Order{status: :pending}
-    }
-
-    log_msg =
-      capture_log(fn ->
-        Tai.TestSupport.Mocks.Orders.GoodTillCancel.canceled(
-          server_id: "UNFILLED_ORDER_SERVER_ID"
+      order =
+        OrderPipeline.buy_limit(
+          :test_exchange_a,
+          :main,
+          :btc_usd,
+          100.1,
+          0.1,
+          :gtc,
+          fire_order_callback(self())
         )
 
-        assert {:ok, %Tai.Trading.Order{status: :canceling}} =
-                 Tai.Trading.OrderPipeline.cancel(order)
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{status: :enqueued},
+        %Tai.Trading.Order{status: :pending}
+      }
 
-        assert_receive {
-          :callback_fired,
-          %Tai.Trading.Order{status: :pending},
-          %Tai.Trading.Order{status: :canceling}
-        }
+      {:ok, %{order: order}}
+    end
 
-        assert_receive {
-          :callback_fired,
-          %Tai.Trading.Order{status: :canceling},
-          %Tai.Trading.Order{status: :canceled}
-        }
-      end)
+    test "executes the callback when the status is updated",
+         %{order: order} do
+      Mocks.Orders.GoodTillCancel.canceled(server_id: @server_id)
 
-    assert log_msg =~
-             ~r/\[order:.{36,36},canceling,test_exchange_a,main,btc_usd,buy,limit,gtc,100.1,0.1,\]/
+      assert {:ok, %Tai.Trading.Order{status: :canceling}} = OrderPipeline.cancel(order)
 
-    assert log_msg =~
-             ~r/\[order:.{36,36},canceled,test_exchange_a,main,btc_usd,buy,limit,gtc,100.1,0.1,\]/
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{status: :pending},
+        %Tai.Trading.Order{status: :canceling}
+      }
+
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{status: :canceling},
+        %Tai.Trading.Order{status: :canceled}
+      }
+    end
+
+    test "broadcasts updated events when the status changes",
+         %{order: order} do
+      Tai.Events.firehose_subscribe()
+
+      Mocks.Orders.GoodTillCancel.canceled(server_id: @server_id)
+
+      assert {:ok, %Tai.Trading.Order{status: :canceling}} = OrderPipeline.cancel(order)
+
+      client_id = order.client_id
+
+      assert_receive {Tai.Event,
+                      %Tai.Events.OrderUpdated{
+                        client_id: ^client_id,
+                        venue_id: :test_exchange_a,
+                        account_id: :main,
+                        product_symbol: :btc_usd,
+                        side: :buy,
+                        type: :limit,
+                        time_in_force: :gtc,
+                        status: :canceling,
+                        error_reason: nil
+                      } = event_1}
+
+      assert event_1.price == Decimal.new(100.1)
+      assert event_1.size == Decimal.new(0.1)
+
+      assert_receive {Tai.Event,
+                      %Tai.Events.OrderUpdated{
+                        client_id: ^client_id,
+                        venue_id: :test_exchange_a,
+                        account_id: :main,
+                        product_symbol: :btc_usd,
+                        side: :buy,
+                        type: :limit,
+                        time_in_force: :gtc,
+                        status: :canceled,
+                        error_reason: nil
+                      } = event_2}
+
+      assert event_2.price == Decimal.new(100.1)
+      assert event_2.size == Decimal.new(0.1)
+    end
   end
 
-  test "returns an error tuple when the status is not pending" do
+  test "returns an error tuple and broadcasts and event when the status is not pending" do
+    Tai.Events.firehose_subscribe()
+
     order =
-      Tai.Trading.OrderPipeline.buy_limit(
+      OrderPipeline.buy_limit(
         :test_exchange_a,
         :main,
         :btc_usd_expired,
         100.1,
         0.1,
-        :gtc,
-        fire_order_callback(self())
+        :gtc
       )
 
-    assert_receive {
-      :callback_fired,
-      %Tai.Trading.Order{status: :enqueued},
-      %Tai.Trading.Order{status: :error}
-    }
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
 
-    log_msg =
-      capture_log(fn ->
-        assert {:error, :order_status_must_be_pending} = Tai.Trading.OrderPipeline.cancel(order)
-      end)
+    assert OrderPipeline.cancel(order) == {:error, :order_status_must_be_pending}
 
-    assert log_msg =~
-             ~r/could not cancel order client_id: .+ status must be 'pending' but it was 'error'/
+    client_id = order.client_id
+
+    assert_receive {Tai.Event,
+                    %Tai.Events.CancelOrderInvalidStatus{
+                      client_id: ^client_id,
+                      was: :error,
+                      required: :pending
+                    }}
   end
 end

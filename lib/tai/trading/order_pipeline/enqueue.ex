@@ -1,4 +1,6 @@
 defmodule Tai.Trading.OrderPipeline.Enqueue do
+  alias Tai.Trading.OrderPipeline
+
   def execute_step(%Tai.Trading.OrderSubmission{} = submission) do
     [order] = Tai.Trading.OrderStore.add(submission)
 
@@ -13,7 +15,7 @@ defmodule Tai.Trading.OrderPipeline.Enqueue do
   end
 
   defp log_enqueued(order) do
-    Tai.Trading.OrderPipeline.Logger.info(order)
+    OrderPipeline.Events.info(order)
     order
   end
 
@@ -23,6 +25,6 @@ defmodule Tai.Trading.OrderPipeline.Enqueue do
   end
 
   defp next_step(order) do
-    Tai.Trading.OrderPipeline.Send.execute_step(order)
+    OrderPipeline.Send.execute_step(order)
   end
 end

@@ -1,9 +1,13 @@
 defmodule Tai.Trading.OrderPipeline.Cancel do
-  require Logger
+  @type order :: Tai.Trading.Order.t()
 
+  alias Tai.Trading.OrderPipeline
+
+  @spec execute_step(order) ::
+          {:ok, updated_order :: order} | {:error, :order_status_must_be_pending}
   def execute_step(%Tai.Trading.Order{client_id: client_id}) do
     with {:ok, [old_order, updated_order]} <- find_pending_order_and_pre_cancel(client_id) do
-      Tai.Trading.OrderPipeline.Logger.info(updated_order)
+      OrderPipeline.Events.info(updated_order)
       Tai.Trading.Order.execute_update_callback(old_order, updated_order)
 
       Task.start_link(fn ->
@@ -14,14 +18,7 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
 
       {:ok, updated_order}
     else
-      {:error, :not_found} ->
-        client_id
-        |> Tai.Trading.OrderStore.find()
-        |> case do
-          {:ok, order = %Tai.Trading.Order{}} ->
-            log_could_not_cancel(order)
-            {:error, :order_status_must_be_pending}
-        end
+      {:error, :not_found} -> handle_invalid_status(client_id)
     end
   end
 
@@ -31,13 +28,13 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
 
   defp parse_cancel_order_response({:ok, _order_id}, order) do
     {:ok, [old_order, updated_order]} = find_canceling_order_and_cancel(order.client_id)
-    Tai.Trading.OrderPipeline.Logger.info(updated_order)
+    OrderPipeline.Events.info(updated_order)
     Tai.Trading.Order.execute_update_callback(old_order, updated_order)
   end
 
   defp parse_cancel_order_response({:error, :not_found = reason}, order) do
     {:ok, [old_order, updated_order]} = find_canceling_order_and_error(order.client_id, reason)
-    Tai.Trading.OrderPipeline.Logger.info(updated_order)
+    OrderPipeline.Events.info(updated_order)
     Tai.Trading.Order.execute_update_callback(old_order, updated_order)
   end
 
@@ -63,9 +60,15 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
     )
   end
 
-  defp log_could_not_cancel(%Tai.Trading.Order{client_id: client_id, status: status}) do
-    "could not cancel order client_id: ~s, status must be '~s' but it was '~s'"
-    |> :io_lib.format([client_id, Tai.Trading.OrderStatus.pending(), status])
-    |> Logger.warn()
+  defp handle_invalid_status(client_id) do
+    {:ok, order} = Tai.Trading.OrderStore.find(client_id)
+
+    Tai.Events.broadcast(%Tai.Events.CancelOrderInvalidStatus{
+      client_id: client_id,
+      was: order.status,
+      required: Tai.Trading.OrderStatus.pending()
+    })
+
+    {:error, :order_status_must_be_pending}
   end
 end

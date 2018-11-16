@@ -1,14 +1,20 @@
 defmodule Tai.Trading.Order do
+  @type client_id :: String.t()
+  @type side :: :buy | :sell
+  @type time_in_force :: :gtc | :fok | :ioc
+  @type type :: :limit
+  @type status ::
+          :enqueued | :expired | :pending | :filled | :canceling | :canceled | :error | :skip
   @type t :: %Tai.Trading.Order{
+          client_id: client_id,
           exchange_id: atom,
           account_id: atom,
-          client_id: String.t(),
           enqueued_at: DateTime.t(),
-          side: atom,
-          status: atom,
+          side: side,
+          status: status,
           symbol: atom,
-          time_in_force: atom,
-          type: atom,
+          time_in_force: time_in_force,
+          type: type,
           price: Decimal.t(),
           size: Decimal.t()
         }

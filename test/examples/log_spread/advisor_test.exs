@@ -1,8 +1,8 @@
 defmodule Examples.Advisors.LogSpread.AdvisorTest do
   use ExUnit.Case, async: false
 
-  import ExUnit.CaptureLog
   import Tai.TestSupport.Mock
+  alias Tai.TestSupport.Mocks
 
   setup do
     on_exit(fn ->
@@ -10,12 +10,9 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
     end)
 
     start_supervised!(Tai.TestSupport.Mocks.Server)
-    mock_products()
+    mock_product_responses()
     {:ok, _} = Application.ensure_all_started(:tai)
-    :ok
-  end
 
-  test "logs the bid/ask spread" do
     start_supervised!({
       Examples.Advisors.LogSpread.Advisor,
       [
@@ -31,25 +28,33 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
       ]
     })
 
-    log_msg =
-      capture_log(fn ->
-        push_market_feed_snapshot(
-          %Tai.Markets.Location{
-            venue_id: :test_exchange_a,
-            product_symbol: :btc_usd
-          },
-          %{6500.1 => 1.1},
-          %{6500.11 => 1.2}
-        )
-
-        :timer.sleep(100)
-      end)
-
-    assert log_msg =~ ~r/\[spread:test_exchange_a,btc_usd,0.01,6500.1,6500.11\]/
+    :ok
   end
 
-  def mock_products() do
-    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+  test "logs the bid/ask spread with a custom event" do
+    Tai.Events.firehose_subscribe()
+
+    push_market_feed_snapshot(
+      %Tai.Markets.Location{
+        venue_id: :test_exchange_a,
+        product_symbol: :btc_usd
+      },
+      %{6500.1 => 1.1},
+      %{6500.11 => 1.2}
+    )
+
+    assert_receive {Tai.Event,
+                    %Examples.Advisors.LogSpread.Events.Spread{
+                      venue_id: :test_exchange_a,
+                      product_symbol: :btc_usd,
+                      bid_price: "6500.1",
+                      ask_price: "6500.11",
+                      spread: "0.01"
+                    }}
+  end
+
+  def mock_product_responses do
+    Mocks.Responses.Products.for_exchange(
       :test_exchange_a,
       [
         %{symbol: :btc_usd},
@@ -57,7 +62,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
       ]
     )
 
-    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+    Mocks.Responses.Products.for_exchange(
       :test_exchange_b,
       [
         %{symbol: :eth_usd},
