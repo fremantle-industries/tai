@@ -44,7 +44,7 @@ defmodule Tai.Mixfile do
       {:websockex, github: "Azolo/websockex"},
       # {:websockex, "~> 0.4"},
       {:logger_file_backend, "~> 0.0.10", only: [:dev, :test]},
-      {:logger_json, "~> 2.0.1", only: [:dev, :test]},
+      {:logger_json, "~> 3.0.0", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
       {:echo_boy, github: "rupurt/echo_boy", only: [:dev, :test]},
