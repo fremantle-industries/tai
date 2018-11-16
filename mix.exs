@@ -32,7 +32,7 @@ defmodule Tai.Mixfile do
   defp deps do
     [
       {:binance, "~> 0.6.0"},
-      {:decimal, "~> 1.3.0"},
+      {:decimal, "~> 1.5.0"},
       {:ex_gdax, "~> 0.1.4"},
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
