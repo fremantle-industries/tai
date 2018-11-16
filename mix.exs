@@ -46,7 +46,7 @@ defmodule Tai.Mixfile do
       {:logger_file_backend, "~> 0.0.10", only: [:dev, :test]},
       {:logger_json, "~> 2.0.1", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:cowboy, "~> 1.0.0", only: [:dev, :test]},
+      {:cowboy, "~> 2.5.0", only: [:dev, :test]},
       {:echo_boy, github: "rupurt/echo_boy", only: [:dev, :test]},
       {:exvcr, "~> 0.10.2", only: [:dev, :test]},
       {:plug, "~> 1.0", only: [:dev, :test]},
