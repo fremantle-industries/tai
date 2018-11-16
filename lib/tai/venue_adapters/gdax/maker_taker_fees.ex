@@ -5,7 +5,7 @@ defmodule Tai.VenueAdapters.Gdax.MakerTakerFees do
   # the highest taker fee rate of 0.30%.
   def maker_taker_fees(_venue_id, _account_id, _credentials) do
     maker = Decimal.new(0)
-    taker = Decimal.new(0.003)
+    taker = Decimal.new("0.003")
 
     {:ok, {maker, taker}}
   end
