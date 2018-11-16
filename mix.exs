@@ -45,7 +45,7 @@ defmodule Tai.Mixfile do
       # {:websockex, "~> 0.4"},
       {:logger_file_backend, "~> 0.0.10", only: [:dev, :test]},
       {:logger_json, "~> 2.0.1", only: [:dev, :test]},
-      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.0.0", only: [:dev, :test]},
       {:echo_boy, github: "rupurt/echo_boy", only: [:dev, :test]},
       {:exvcr, "~> 0.10.2", only: [:dev, :test]},
