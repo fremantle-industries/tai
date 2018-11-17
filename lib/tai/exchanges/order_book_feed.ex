@@ -98,7 +98,16 @@ defmodule Tai.Exchanges.OrderBookFeed do
         end
       end
 
-      defp init_subscriptions({:error, _} = error, %Tai.Exchanges.OrderBookFeed{}), do: error
+      defp init_subscriptions(
+             {:error, reason} = error,
+             %Tai.Exchanges.OrderBookFeed{feed_id: feed_id}
+           ) do
+        Logger.error(
+          "could not connect to feed: #{inspect(feed_id)} - reason: #{inspect(reason)}"
+        )
+
+        error
+      end
 
       @doc false
       def handle_frame({:text, msg}, %Tai.Exchanges.OrderBookFeed{feed_id: feed_id} = state) do
