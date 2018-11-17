@@ -5,8 +5,6 @@ defmodule Examples.Advisors.LogSpread.Advisor do
 
   use Tai.Advisor
 
-  require Logger
-
   def handle_inside_quote(
         venue_id,
         product_symbol,
@@ -21,16 +19,6 @@ defmodule Examples.Advisors.LogSpread.Advisor do
     ask_price = Decimal.new(ap)
     spread = Decimal.sub(ask_price, bid_price)
 
-    "[spread:~s,~s,~s,~s,~s]"
-    |> :io_lib.format([
-      venue_id,
-      product_symbol,
-      spread |> Decimal.to_string(:normal),
-      bid_price |> Decimal.to_string(:normal),
-      ask_price |> Decimal.to_string(:normal)
-    ])
-    |> Logger.info()
-
     Tai.Events.broadcast(%Examples.Advisors.LogSpread.Events.Spread{
       venue_id: venue_id,
       product_symbol: product_symbol,
@@ -40,5 +28,5 @@ defmodule Examples.Advisors.LogSpread.Advisor do
     })
   end
 
-  def handle_inside_quote(_feed_id, _symbol, _quote, _changes, _state), do: nil
+  def handle_inside_quote(_, _, _, _, _), do: :ok
 end

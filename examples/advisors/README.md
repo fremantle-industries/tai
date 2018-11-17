@@ -15,9 +15,11 @@ $ EXAMPLES=true iex -S mix
 
 ```bash
 # log/dev.log
-2018-10-26T22:31:12.623 [info]  tid=advisor_log_spread_poloniex_btc_usdt [spread:poloniex,btc_usdt,3.63936650,6541.11444443,6544.75381093]
-2018-10-26T22:31:12.644 [info]  tid=advisor_log_spread_binance_btc_usdt [spread:binance,btc_usdt,0.03,6541.36,6541.39]
-2018-10-26T22:31:12.754 [info]  tid=advisor_log_spread_gdax_btc_usd [spread:gdax,btc_usd,0.01,6402.07,6402.08]
+09:41:35.950 tid=Tai.EventsLogger [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"gdax","spread":"0.01","product_symbol":"btc_usd","bid_price":"5491.05","ask_price":"5491.06"}}
+09:41:37.211 tid=Tai.EventsLogger [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"binance","spread":"1.76","product_symbol":"btc_usdt","bid_price":"5620.64","ask_price":"5622.4"}}
+09:41:37.686 tid=Tai.EventsLogger [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"gdax","spread":"0.01","product_symbol":"btc_usd","bid_price":"5491.05","ask_price":"5491.06"}}
+09:41:37.862 tid=Tai.EventsLogger [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"poloniex","spread":"6.75064342","product_symbol":"btc_usdt","bid_price":"5615.60680303","ask_price":"5622.35744645"}}
+09:41:38.214 tid=Tai.EventsLogger [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"binance","spread":"1.77","product_symbol":"btc_usdt","bid_price":"5620.64","ask_price":"5622.41"}}
 ```
 
 [Example](./log_spread/advisor.ex)
