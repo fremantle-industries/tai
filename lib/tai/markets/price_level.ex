@@ -6,11 +6,11 @@ defmodule Tai.Markets.PriceLevel do
   @type t :: %Tai.Markets.PriceLevel{
           price: number,
           size: number,
-          processed_at: DateTime.t() | nil,
+          processed_at: DateTime.t(),
           server_changed_at: DateTime.t() | nil
         }
 
-  @enforce_keys [:price, :size]
+  @enforce_keys [:price, :size, :processed_at]
   defstruct [:price, :size, :processed_at, :server_changed_at]
 
   def fetch(term, :price), do: {:ok, term.price}
