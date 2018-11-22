@@ -39,42 +39,6 @@ defmodule Tai.Markets.OrderBook do
     {:reply, {:ok, order_book}, state}
   end
 
-  def handle_call(:bid, _from, state) do
-    bid =
-      state.order_book
-      |> ordered_bids
-      |> List.first()
-
-    {:reply, {:ok, bid}, state}
-  end
-
-  def handle_call({:bids, depth}, _from, state) do
-    bids =
-      state.order_book
-      |> ordered_bids
-      |> take(depth)
-
-    {:reply, {:ok, bids}, state}
-  end
-
-  def handle_call(:ask, _from, state) do
-    ask =
-      state.order_book
-      |> ordered_asks
-      |> List.first()
-
-    {:reply, {:ok, ask}, state}
-  end
-
-  def handle_call({:asks, depth}, _from, state) do
-    asks =
-      state.order_book
-      |> ordered_asks
-      |> take(depth)
-
-    {:reply, {:ok, asks}, state}
-  end
-
   def handle_call({:replace, snapshot}, _from, state) do
     PubSub.broadcast(
       {:order_book_snapshot, state.feed_id, state.symbol},
@@ -131,22 +95,6 @@ defmodule Tai.Markets.OrderBook do
           {:ok, %Quote{bid: top_bid, ask: top_ask}}
         end
     end
-  end
-
-  def bid(name) do
-    GenServer.call(name, :bid)
-  end
-
-  def bids(name, depth \\ :all) do
-    GenServer.call(name, {:bids, depth})
-  end
-
-  def ask(name) do
-    GenServer.call(name, :ask)
-  end
-
-  def asks(name, depth \\ :all) do
-    GenServer.call(name, {:asks, depth})
   end
 
   def replace(name, %OrderBook{} = replacement) do
