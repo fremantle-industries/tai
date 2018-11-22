@@ -144,20 +144,6 @@ defmodule Tai.Advisor do
         end
       end
 
-      @doc """
-      Returns the current state of the order book up to the given depth
-
-      ## Examples
-
-        iex> Tai.Advisor.quotes(feed_id: :test_feed_a, symbol: :btc_usd, depth: 1)
-        {:ok, %Tai.Markets.OrderBook{bids: [], asks: []}
-      """
-      def quotes(feed_id: feed_id, symbol: symbol, depth: depth) do
-        [feed_id: feed_id, symbol: symbol]
-        |> Tai.Markets.OrderBook.to_name()
-        |> Tai.Markets.OrderBook.quotes(depth)
-      end
-
       @doc false
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
       @doc false
