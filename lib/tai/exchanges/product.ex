@@ -10,7 +10,9 @@ defmodule Tai.Exchanges.Product do
           size_increment: Decimal.t(),
           price_increment: Decimal.t() | nil,
           max_price: Decimal.t() | nil,
-          max_size: Decimal.t() | nil
+          max_size: Decimal.t() | nil,
+          maker_fee: Decimal.t() | nil,
+          taker_fee: Decimal.t() | nil
         }
 
   @enforce_keys [
@@ -34,6 +36,8 @@ defmodule Tai.Exchanges.Product do
     :max_size,
     :max_price,
     :price_increment,
-    :size_increment
+    :size_increment,
+    :maker_fee,
+    :taker_fee
   ]
 end
