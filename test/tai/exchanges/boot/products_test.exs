@@ -1,5 +1,6 @@
-defmodule Tai.Exchange.Boot.ProductsTest do
+defmodule Tai.Exchanges.Boot.ProductsTest do
   use ExUnit.Case, async: false
+  doctest Tai.Exchanges.Boot.Products
 
   defmodule MyAdapter do
     def products(_) do

@@ -19,9 +19,9 @@ defmodule Tai.Exchanges.Boot.Fees do
           exchange_id: adapter.id,
           account_id: account_id,
           symbol: product.symbol,
-          maker: maker,
+          maker: lowest_fee(product.maker_fee, maker),
           maker_type: Tai.Exchanges.FeeInfo.percent(),
-          taker: taker,
+          taker: lowest_fee(product.taker_fee, taker),
           taker_type: Tai.Exchanges.FeeInfo.percent()
         }
         |> Tai.Exchanges.FeeStore.upsert()
@@ -35,4 +35,7 @@ defmodule Tai.Exchanges.Boot.Fees do
   end
 
   defp fetch_and_upsert({_, _}, {:error, _} = error, _, _), do: error
+
+  defp lowest_fee(%Decimal{} = product, %Decimal{} = schedule), do: Decimal.min(product, schedule)
+  defp lowest_fee(nil, %Decimal{} = schedule), do: schedule
 end

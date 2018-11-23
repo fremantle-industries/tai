@@ -41,7 +41,7 @@ defmodule Tai.Exchanges.ProductStore do
     |> Enum.count()
   end
 
-  @spec find({atom, atom}) :: {:ok, product} | {:error, :not_found}
+  @spec find({venue_id :: atom, symbol :: atom}) :: {:ok, product} | {:error, :not_found}
   def find(key) do
     with [[%Tai.Exchanges.Product{} = product]] <- :ets.match(__MODULE__, {key, :"$1"}) do
       {:ok, product}

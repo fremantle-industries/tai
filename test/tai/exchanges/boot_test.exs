@@ -163,7 +163,7 @@ defmodule Tai.Exchanges.BootTest do
     Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_exchange_and_account(
       @exchange_id,
       @account_id,
-      {Decimal.new(0.001), Decimal.new(0.001)}
+      {Decimal.new("0.001"), Decimal.new("0.001")}
     )
   end
 
@@ -172,9 +172,9 @@ defmodule Tai.Exchanges.BootTest do
       @exchange_id,
       @account_id,
       [
-        %{asset: :btc, free: Decimal.new(0.1), locked: Decimal.new(0.2)},
-        %{asset: :eth, free: Decimal.new(0.3), locked: Decimal.new(0.4)},
-        %{asset: :ltc, free: Decimal.new(0.5), locked: Decimal.new(0.6)},
+        %{asset: :btc, free: Decimal.new("0.1"), locked: Decimal.new("0.2")},
+        %{asset: :eth, free: Decimal.new("0.3"), locked: Decimal.new("0.4")},
+        %{asset: :ltc, free: Decimal.new("0.5"), locked: Decimal.new("0.6")},
         %{asset: :usdt, free: Decimal.new(0), locked: Decimal.new(0)}
       ]
     )
