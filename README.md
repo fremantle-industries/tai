@@ -21,11 +21,11 @@ We are working to make `tai` production quality software.
 | Binance        | [x] | [x] | [x] | [x] | [x] |
 | Poloniex       | [x] | [x] | [x] | [x] | [x] |
 
-## In Progress Exchanges
+## Exchanges In Progress
 
 | Exchange       | Live Order Book  | Account Balance | Orders | Products | Fees |
 |----------------|:---:|:---:|:---:|:---:|:---:|
-| Bitmex         | [x] | [] | [] | [x] | [x] |
+| Bitmex         | [x] | [ ] | [ ] | [x] | [x] |
 
 ## Planned Exchanges
 
@@ -34,7 +34,6 @@ We are working to make `tai` production quality software.
 | Bitfinex       |
 | Bitflyer       |
 | Bithumb        |
-| Bitmex         |
 | Bitstamp       |
 | Bittrex        |
 | Gemini         |
@@ -168,14 +167,13 @@ iex(3)> products
 | Exchange ID |   Symbol | Exchange Symbol |  Status | Maker Fee | Taker Fee |  Min Price | Max Price | Price Increment | Min Size | Max Size | Size Increment | Min Notional |
 +-------------+----------+-----------------+---------+-----------+-----------+------------+-----------+-----------------+----------+----------+----------------+--------------+
 |        gdax |  btc_usd |         BTC-USD | trading |           |           |       0.01 |           |            0.01 |    0.001 |       70 |          0.001 |      0.00001 |
+|     binance | btc_usdt |         BTCUSDT | trading |           |           |     444.36 |  44435.55 |            0.01 | 0.000001 | 10000000 |       0.000001 |           10 |
 |    poloniex | btc_usdt |        USDT_BTC | trading |           |           | 0.00000001 |    100000 |                 | 0.000001 |          |       0.000001 |            1 |
-|     binance | btc_usdt |         BTCUSDT | trading |           |           |     463.97 |   46396.1 |            0.01 | 0.000001 | 10000000 |       0.000001 |           10 |
-|        gdax |  eth_usd |         ETH-USD | trading |           |           |       0.01 |           |            0.01 |     0.01 |      700 |           0.01 |       0.0001 |
-|    poloniex | eth_usdt |        USDT_ETH | trading |           |           | 0.00000001 |    100000 |                 | 0.000001 |          |       0.000001 |            1 |
-|     binance | eth_usdt |         ETHUSDT | trading |           |           |      13.85 |    1384.4 |            0.01 |  0.00001 | 10000000 |        0.00001 |           10 |
 |        gdax |  ltc_usd |         LTC-USD | trading |           |           |       0.01 |           |            0.01 |      0.1 |     4000 |            0.1 |        0.001 |
 |    poloniex | ltc_usdt |        USDT_LTC | trading |           |           | 0.00000001 |    100000 |                 | 0.000001 |          |       0.000001 |            1 |
-|     binance | ltc_usdt |         LTCUSDT | trading |           |           |       3.52 |     351.4 |            0.01 |  0.00001 | 10000000 |        0.00001 |           10 |
+|     binance | ltc_usdt |         LTCUSDT | trading |           |           |       3.32 |    331.85 |            0.01 |  0.00001 | 10000000 |        0.00001 |           10 |
+|      bitmex |   xbth19 |          XBTH19 | trading |   -0.025% |    0.075% |            |   1000000 |             0.5 |        1 | 10000000 |            0.5 |              |
+|      bitmex |   xbtz18 |          XBTZ18 | trading |   -0.025% |    0.075% |            |   1000000 |             0.5 |        1 | 10000000 |            0.5 |              |
 +-------------+----------+-----------------+---------+-----------+-----------+------------+-----------+-----------------+----------+----------+----------------+--------------+
 ```
 
