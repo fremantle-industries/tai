@@ -2,10 +2,12 @@ defmodule Tai.Exchanges.Boot.FeesTest do
   use ExUnit.Case, async: false
   doctest Tai.Exchanges.Boot.Fees
 
-  defmodule MyAdapter do
-    def maker_taker_fees(_venue_id, _account_id, _credentials) do
-      {:ok, {Decimal.new("0.1"), Decimal.new("0.2")}}
-    end
+  defmodule AdapterWithFeeSchedule do
+    def maker_taker_fees(_, _, _), do: {:ok, {Decimal.new("0.1"), Decimal.new("0.2")}}
+  end
+
+  defmodule AdapterWithoutFeeSchedule do
+    def maker_taker_fees(_, _, _), do: {:ok, nil}
   end
 
   setup do
@@ -17,41 +19,50 @@ defmodule Tai.Exchanges.Boot.FeesTest do
     :ok
   end
 
-  @venue_id :venue_a
-  @account_id :account_a
-  @products [
-    struct(Tai.Exchanges.Product, %{
-      exchange_id: @venue_id,
-      symbol: :btc_usd,
-      maker_fee: Decimal.new("0.001"),
-      taker_fee: Decimal.new("0.002")
-    }),
-    struct(Tai.Exchanges.Product, %{
-      exchange_id: @venue_id,
-      symbol: :eth_usd
-    })
-  ]
+  @venue_a :venue_a
+  @venue_b :venue_b
+  @account_a :account_a
+  @account_b :account_b
+  @btc_usd_product struct(Tai.Exchanges.Product, %{
+                     exchange_id: @venue_a,
+                     symbol: :btc_usd,
+                     maker_fee: Decimal.new("0.001"),
+                     taker_fee: Decimal.new("0.002")
+                   })
+  @eth_usd_product struct(Tai.Exchanges.Product, %{
+                     exchange_id: @venue_a,
+                     symbol: :eth_usd
+                   })
+  @ltc_usd_product struct(Tai.Exchanges.Product, %{
+                     exchange_id: @venue_b,
+                     symbol: :ltc_usd,
+                     maker_fee: Decimal.new("0.003"),
+                     taker_fee: Decimal.new("0.004")
+                   })
   @config Tai.Config.parse(
             venues: %{
               venue_a: [
-                adapter: MyAdapter,
-                products: "btc_usd",
-                accounts: %{} |> Map.put(@account_id, %{})
+                adapter: AdapterWithFeeSchedule,
+                accounts: %{} |> Map.put(@account_a, %{})
+              ],
+              venue_b: [
+                adapter: AdapterWithoutFeeSchedule,
+                accounts: %{} |> Map.put(@account_b, %{})
               ]
             }
           )
 
   describe ".hydrate" do
     test "uses the lowest fee between the product or schedule" do
-      [adapter] = Tai.Exchanges.Exchange.parse_adapters(@config)
+      [adapter_a, _] = Tai.Exchanges.Exchange.parse_adapters(@config)
 
-      Tai.Exchanges.Boot.Fees.hydrate(adapter, @products)
+      Tai.Exchanges.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
       assert {:ok, btc_usd_fee} =
                Tai.Exchanges.FeeStore.find_by(
-                 exchange_id: @venue_id,
-                 account_id: @account_id,
-                 symbol: :btc_usd
+                 exchange_id: @venue_a,
+                 account_id: @account_a,
+                 symbol: @btc_usd_product.symbol
                )
 
       assert btc_usd_fee.maker == Decimal.new("0.001")
@@ -59,19 +70,35 @@ defmodule Tai.Exchanges.Boot.FeesTest do
     end
 
     test "uses the fee schedule when product doesn't have a maker/taker fee" do
-      [adapter] = Tai.Exchanges.Exchange.parse_adapters(@config)
+      [adapter_a, _] = Tai.Exchanges.Exchange.parse_adapters(@config)
 
-      Tai.Exchanges.Boot.Fees.hydrate(adapter, @products)
+      Tai.Exchanges.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
       assert {:ok, eth_usd_fee} =
                Tai.Exchanges.FeeStore.find_by(
-                 exchange_id: @venue_id,
-                 account_id: @account_id,
-                 symbol: :eth_usd
+                 exchange_id: @venue_a,
+                 account_id: @account_a,
+                 symbol: @eth_usd_product.symbol
                )
 
       assert eth_usd_fee.maker == Decimal.new("0.1")
       assert eth_usd_fee.taker == Decimal.new("0.2")
+    end
+
+    test "uses the product fees when the venue doesn't have a fee schedule" do
+      [_, adapter_b] = Tai.Exchanges.Exchange.parse_adapters(@config)
+
+      Tai.Exchanges.Boot.Fees.hydrate(adapter_b, [@ltc_usd_product])
+
+      assert {:ok, ltc_usd_fee} =
+               Tai.Exchanges.FeeStore.find_by(
+                 exchange_id: @venue_b,
+                 account_id: @account_b,
+                 symbol: :ltc_usd
+               )
+
+      assert ltc_usd_fee.maker == Decimal.new("0.003")
+      assert ltc_usd_fee.taker == Decimal.new("0.004")
     end
   end
 end

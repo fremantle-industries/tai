@@ -1,5 +1,14 @@
 defmodule Tai.Exchanges.FeeInfo do
-  @type t :: %Tai.Exchanges.FeeInfo{}
+  @type fee_type :: :percent
+  @type t :: %Tai.Exchanges.FeeInfo{
+          exchange_id: atom,
+          account_id: atom,
+          symbol: atom,
+          maker: Decimal.t(),
+          maker_type: fee_type,
+          taker: Decimal.t(),
+          taker_type: fee_type
+        }
 
   @enforce_keys [
     :exchange_id,

@@ -14,7 +14,7 @@ defmodule Tai.Exchanges.Adapter do
   @callback asset_balances(exchange_id :: atom, account_id :: atom, credentials :: map) ::
               {:ok, [asset_balance]} | {:error, reason :: term}
   @callback maker_taker_fees(exchange_id :: atom, account_id :: atom, credentials :: map) ::
-              {:ok, {maker :: Decimal.t(), taker :: Decimal.t()}} | {:error, reason :: term}
+              {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil} | {:error, reason :: term}
 
   @enforce_keys [
     :id,
