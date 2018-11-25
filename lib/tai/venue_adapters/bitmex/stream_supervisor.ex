@@ -1,6 +1,5 @@
 defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   use Supervisor
-  require Logger
 
   @type product :: Tai.Exchanges.Product.t()
 
@@ -43,6 +42,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     system = [
       {Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBooks,
        [venue_id: venue_id, products: products]},
+      {Tai.VenueAdapters.Bitmex.Stream.ProcessMessages, [venue_id: venue_id]},
       {Tai.VenueAdapters.Bitmex.Stream.Connection,
        [url: @default_url, venue_id: venue_id, products: products]}
     ]
