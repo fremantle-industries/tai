@@ -1,17 +1,17 @@
 defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
   use Tai.Advisor
 
-  def handle_inside_quote(feed_id, symbol, _inside_quote, _changes, _state) do
+  def handle_inside_quote(venue_id, product_symbol, _inside_quote, _changes, _state) do
     if Tai.Trading.OrderStore.count() == 0 do
-      Tai.Trading.OrderPipeline.buy_limit(
-        feed_id,
-        :main,
-        symbol,
-        100.1,
-        0.1,
-        :gtc,
-        &order_updated/2
-      )
+      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+        venue_id: venue_id,
+        account_id: :main,
+        product_symbol: product_symbol,
+        price: 100.1,
+        qty: 0.1,
+        time_in_force: :gtc,
+        order_updated_callback: &order_updated/2
+      })
     end
 
     :ok

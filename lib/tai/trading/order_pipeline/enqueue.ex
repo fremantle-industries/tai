@@ -1,6 +1,10 @@
 defmodule Tai.Trading.OrderPipeline.Enqueue do
   alias Tai.Trading.OrderPipeline
 
+  @type submission :: Tai.Trading.OrderSubmission.t()
+  @type order :: Tai.Trading.Order.t()
+
+  @spec execute_step(submission) :: order
   def execute_step(%Tai.Trading.OrderSubmission{} = submission) do
     [order] = Tai.Trading.OrderStore.add(submission)
 

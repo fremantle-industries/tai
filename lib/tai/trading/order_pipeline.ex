@@ -1,48 +1,31 @@
 defmodule Tai.Trading.OrderPipeline do
-  @doc """
-  Enqueue a buy limit order
-  """
-  def buy_limit(
-        exchange_id,
-        account_id,
-        symbol,
-        price,
-        size,
-        time_in_force,
-        order_updated_callback \\ nil
-      ) do
-    exchange_id
+  @type order :: Tai.Trading.Order.t()
+  @type buy_limit :: Tai.Trading.Orders.BuyLimit.t()
+  @type sell_limit :: Tai.Trading.Orders.SellLimit.t()
+
+  @spec enqueue(buy_limit | sell_limit) :: order
+  def enqueue(%Tai.Trading.Orders.BuyLimit{} = order) do
+    order.venue_id
     |> Tai.Trading.OrderSubmission.buy_limit(
-      account_id,
-      symbol,
-      price,
-      size,
-      time_in_force,
-      order_updated_callback
+      order.account_id,
+      order.product_symbol,
+      order.price,
+      order.qty,
+      order.time_in_force,
+      order.order_updated_callback
     )
     |> Tai.Trading.OrderPipeline.Enqueue.execute_step()
   end
 
-  @doc """
-  Enqueue a sell limit order
-  """
-  def sell_limit(
-        exchange_id,
-        account_id,
-        symbol,
-        price,
-        size,
-        time_in_force,
-        order_updated_callback \\ nil
-      ) do
-    exchange_id
+  def enqueue(%Tai.Trading.Orders.SellLimit{} = order) do
+    order.venue_id
     |> Tai.Trading.OrderSubmission.sell_limit(
-      account_id,
-      symbol,
-      price,
-      size,
-      time_in_force,
-      order_updated_callback
+      order.account_id,
+      order.product_symbol,
+      order.price,
+      order.qty,
+      order.time_in_force,
+      order.order_updated_callback
     )
     |> Tai.Trading.OrderPipeline.Enqueue.execute_step()
   end

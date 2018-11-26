@@ -3,6 +3,17 @@ defmodule Tai.Trading.OrderSubmission do
   Order details that are turned into an order and assigned a tracking client id
   """
 
+  @type t :: %Tai.Trading.OrderSubmission{
+          exchange_id: atom,
+          account_id: atom,
+          symbol: atom,
+          side: atom,
+          price: number,
+          size: number,
+          time_in_force: term,
+          type: term
+        }
+
   @enforce_keys [
     :exchange_id,
     :account_id,

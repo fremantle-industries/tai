@@ -17,15 +17,15 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
 
   describe "buy" do
     test "fires the callback" do
-      OrderPipeline.buy_limit(
-        :test_exchange_a,
-        :main,
-        :btc_usd_pending,
-        100.1,
-        0.1,
-        :gtc,
-        fire_order_callback(self())
-      )
+      OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd_pending,
+        price: 100.1,
+        qty: 0.1,
+        time_in_force: :gtc,
+        order_updated_callback: fire_order_callback(self())
+      })
 
       assert_receive {
         :callback_fired,
@@ -38,14 +38,14 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        OrderPipeline.buy_limit(
-          :test_exchange_a,
-          :main,
-          :btc_usd_pending,
-          100.1,
-          0.1,
-          :gtc
-        )
+        OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+          venue_id: :test_exchange_a,
+          account_id: :main,
+          product_symbol: :btc_usd_pending,
+          price: 100.1,
+          qty: 0.1,
+          time_in_force: :gtc
+        })
 
       client_id = order.client_id
 
@@ -60,15 +60,15 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
 
   describe "sell" do
     test "fires the callback" do
-      OrderPipeline.sell_limit(
-        :test_exchange_a,
-        :main,
-        :btc_usd_pending,
-        100.1,
-        0.1,
-        :gtc,
-        fire_order_callback(self())
-      )
+      OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd_pending,
+        price: 100.1,
+        qty: 0.1,
+        time_in_force: :gtc,
+        order_updated_callback: fire_order_callback(self())
+      })
 
       assert_receive {
         :callback_fired,
@@ -81,14 +81,14 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        OrderPipeline.sell_limit(
-          :test_exchange_a,
-          :main,
-          :btc_usd_pending,
-          100.1,
-          0.1,
-          :gtc
-        )
+        OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+          venue_id: :test_exchange_a,
+          account_id: :main,
+          product_symbol: :btc_usd_pending,
+          price: 100.1,
+          qty: 0.1,
+          time_in_force: :gtc
+        })
 
       client_id = order.client_id
 

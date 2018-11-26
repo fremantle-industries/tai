@@ -27,15 +27,15 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
     end
 
     test "fires the callback" do
-      Tai.Trading.OrderPipeline.buy_limit(
-        :test_exchange_a,
-        :main,
-        :btc_usd,
-        100.1,
-        0.1,
-        :gtc,
-        fire_order_callback(self())
-      )
+      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd,
+        price: 100.1,
+        qty: 0.1,
+        time_in_force: :gtc,
+        order_updated_callback: fire_order_callback(self())
+      })
 
       assert_receive {
         :callback_fired,
@@ -48,14 +48,14 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        Tai.Trading.OrderPipeline.buy_limit(
-          :test_exchange_a,
-          :main,
-          :btc_usd,
-          100.1,
-          0.1,
-          :gtc
-        )
+        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+          venue_id: :test_exchange_a,
+          account_id: :main,
+          product_symbol: :btc_usd,
+          price: 100.1,
+          qty: 0.1,
+          time_in_force: :gtc
+        })
 
       client_id = order.client_id
 
@@ -81,15 +81,15 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
     end
 
     test "fires the callback" do
-      Tai.Trading.OrderPipeline.sell_limit(
-        :test_exchange_a,
-        :main,
-        :btc_usd,
-        100_000.1,
-        0.01,
-        :gtc,
-        fire_order_callback(self())
-      )
+      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd,
+        price: 100_000.1,
+        qty: 0.01,
+        time_in_force: :gtc,
+        order_updated_callback: fire_order_callback(self())
+      })
 
       assert_receive {
         :callback_fired,
@@ -102,15 +102,14 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        Tai.Trading.OrderPipeline.sell_limit(
-          :test_exchange_a,
-          :main,
-          :btc_usd,
-          100_000.1,
-          0.01,
-          :gtc,
-          fire_order_callback(self())
-        )
+        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+          venue_id: :test_exchange_a,
+          account_id: :main,
+          product_symbol: :btc_usd,
+          price: 100_000.1,
+          qty: 0.01,
+          time_in_force: :gtc
+        })
 
       client_id = order.client_id
 

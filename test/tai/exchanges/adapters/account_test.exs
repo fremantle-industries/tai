@@ -31,7 +31,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
   end
 
   @adapters [@binance_adapter, @poloniex_adapter]
-  describe "#buy_limit" do
+  describe ".buy_limit" do
     @adapters
     |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->
       @exchange_id exchange_id
@@ -94,7 +94,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
   end
 
   @adapters [@binance_adapter, @poloniex_adapter]
-  describe "#sell_limit" do
+  describe ".sell_limit" do
     @adapters
     |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->
       @exchange_id exchange_id

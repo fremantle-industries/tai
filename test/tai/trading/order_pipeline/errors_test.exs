@@ -16,15 +16,15 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
   end
 
   test "fires the callback" do
-    Tai.Trading.OrderPipeline.buy_limit(
-      :test_exchange_a,
-      :main,
-      :btc_usd,
-      100.1,
-      0.1,
-      :fok,
-      fire_order_callback(self())
-    )
+    Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+      venue_id: :test_exchange_a,
+      account_id: :main,
+      product_symbol: :btc_usd,
+      price: 100.1,
+      qty: 0.1,
+      time_in_force: :fok,
+      order_updated_callback: fire_order_callback(self())
+    })
 
     assert_receive {
       :callback_fired,
@@ -35,14 +35,14 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
 
   test "broadcasts an event with the reason for the error" do
     order =
-      Tai.Trading.OrderPipeline.buy_limit(
-        :test_exchange_a,
-        :main,
-        :btc_usd,
-        100.1,
-        0.1,
-        :fok
-      )
+      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd,
+        price: 100.1,
+        qty: 0.1,
+        time_in_force: :fok
+      })
 
     client_id = order.client_id
 

@@ -12,21 +12,21 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
     :ok
   end
 
-  describe "buy_limit" do
+  describe ".enqueue buy_limit" do
     setup do
       Tai.Events.firehose_subscribe()
       assert Tai.Trading.OrderStore.count() == 0
 
       order =
-        Tai.Trading.OrderPipeline.buy_limit(
-          :test_exchange_a,
-          :main,
-          :btc_usd,
-          100.1,
-          0.1,
-          :fok,
-          fire_order_callback(self())
-        )
+        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+          venue_id: :test_exchange_a,
+          account_id: :main,
+          product_symbol: :btc_usd,
+          price: 100.1,
+          qty: 0.1,
+          time_in_force: :fok,
+          order_updated_callback: fire_order_callback(self())
+        })
 
       {:ok, %{client_id: order.client_id}}
     end
@@ -55,21 +55,21 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
     end
   end
 
-  describe "sell limit" do
+  describe ".enqueue sell limit" do
     setup do
       Tai.Events.firehose_subscribe()
       assert Tai.Trading.OrderStore.count() == 0
 
       order =
-        Tai.Trading.OrderPipeline.sell_limit(
-          :test_exchange_a,
-          :main,
-          :ltc_usd,
-          100_000.1,
-          0.01,
-          :ioc,
-          fire_order_callback(self())
-        )
+        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+          venue_id: :test_exchange_a,
+          account_id: :main,
+          product_symbol: :ltc_usd,
+          price: 100_000.1,
+          qty: 0.01,
+          time_in_force: :ioc,
+          order_updated_callback: fire_order_callback(self())
+        })
 
       {:ok, %{client_id: order.client_id}}
     end
