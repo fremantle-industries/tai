@@ -22,5 +22,7 @@ defmodule Tai.Commands.Help do
     * enable_send_orders
     * disable_send_orders
     """)
+
+    IEx.dont_display_result()
   end
 end

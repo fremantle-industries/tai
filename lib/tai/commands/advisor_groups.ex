@@ -1,7 +1,14 @@
 defmodule Tai.Commands.AdvisorGroups do
-  alias TableRex.Table
+  import Tai.Commands.Table, only: [render!: 2]
 
   @type config :: Tai.Config.t()
+
+  @header [
+    "Group ID",
+    "Running",
+    "Unstarted",
+    "Total"
+  ]
 
   @spec advisor_groups() :: no_return
   @spec advisor_groups(config :: config) :: no_return
@@ -10,7 +17,7 @@ defmodule Tai.Commands.AdvisorGroups do
     |> Tai.AdvisorGroups.build_specs()
     |> agg_status_by_group
     |> format_rows
-    |> render!
+    |> render!(@header)
   end
 
   @spec start(group_id :: atom) :: no_return
@@ -20,6 +27,8 @@ defmodule Tai.Commands.AdvisorGroups do
       {:ok, {new, old}} = Tai.Advisors.start(specs)
       IO.puts("Started advisors: #{new} new, #{old} already running")
     end
+
+    IEx.dont_display_result()
   end
 
   @spec stop(group_id :: atom) :: no_return
@@ -29,6 +38,8 @@ defmodule Tai.Commands.AdvisorGroups do
       {:ok, {new, old}} = Tai.Advisors.stop(specs)
       IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     end
+
+    IEx.dont_display_result()
   end
 
   defp agg_status_by_group({:ok, specs}) do
@@ -56,24 +67,5 @@ defmodule Tai.Commands.AdvisorGroups do
     |> Enum.sort(fn [group_a, _, _, _], [group_b, _, _, _] ->
       group_a > group_b
     end)
-  end
-
-  @header ["Group ID", "Running", "Unstarted", "Total"]
-  @spec render!(rows :: [...]) :: no_return
-  defp render!(rows)
-
-  defp render!([]) do
-    col_count = @header |> Enum.count()
-
-    [List.duplicate("-", col_count)]
-    |> render!
-  end
-
-  defp render!(rows) do
-    rows
-    |> Table.new(@header)
-    |> Table.put_column_meta(:all, align: :right)
-    |> Table.render!()
-    |> IO.puts()
   end
 end

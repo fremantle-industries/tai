@@ -3,14 +3,23 @@ defmodule Tai.Commands.Balance do
   Display symbols on each exchange with a non-zero balance
   """
 
-  alias TableRex.Table
+  import Tai.Commands.Table, only: [render!: 2]
+
+  @header [
+    "Exchange",
+    "Account",
+    "Asset",
+    "Free",
+    "Locked",
+    "Balance"
+  ]
 
   @spec balance :: no_return
   def balance do
     fetch_balances()
     |> format_rows()
     |> exclude_empty_balances()
-    |> render!()
+    |> render!(@header)
   end
 
   defp fetch_balances do
@@ -49,31 +58,5 @@ defmodule Tai.Commands.Balance do
       formatted_total = Tai.Markets.Asset.new(total, symbol)
       [exchange_id, account_id, symbol, formatted_free, formatted_locked, formatted_total]
     end)
-  end
-
-  @header [
-    "Exchange",
-    "Account",
-    "Asset",
-    "Free",
-    "Locked",
-    "Balance"
-  ]
-  @spec render!(list) :: no_return
-  defp render!(rows)
-
-  defp render!([]) do
-    col_count = @header |> Enum.count()
-
-    [List.duplicate("-", col_count)]
-    |> render!
-  end
-
-  defp render!(rows) do
-    rows
-    |> Table.new(@header)
-    |> Table.put_column_meta(:all, align: :right)
-    |> Table.render!()
-    |> IO.puts()
   end
 end

@@ -3,7 +3,20 @@ defmodule Tai.Commands.Markets do
   Display the bid/ask for each symbol on all order book feeds
   """
 
-  alias TableRex.Table
+  import Tai.Commands.Table, only: [render!: 2]
+
+  @header [
+    "Venue",
+    "Product",
+    "Bid Price",
+    "Ask Price",
+    "Bid Size",
+    "Ask Size",
+    "Bid Processed At",
+    "Bid Server Changed At",
+    "Ask Processed At",
+    "Ask Server Changed At"
+  ]
 
   @spec markets :: no_return
   def markets do
@@ -11,7 +24,7 @@ defmodule Tai.Commands.Markets do
     |> fetch_inside_quotes
     |> format_rows
     |> sort_rows
-    |> render!
+    |> render!(@header)
   end
 
   defp fetch_inside_quotes(products) when is_list(products) do
@@ -51,35 +64,4 @@ defmodule Tai.Commands.Markets do
   defp format_col(%DateTime{} = date), do: Timex.from_now(date)
   defp format_col(nil), do: "~"
   defp format_col(pass_through), do: pass_through
-
-  @header [
-    "Venue",
-    "Product",
-    "Bid Price",
-    "Ask Price",
-    "Bid Size",
-    "Ask Size",
-    "Bid Processed At",
-    "Bid Server Changed At",
-    "Ask Processed At",
-    "Ask Server Changed At"
-  ]
-
-  @spec render!(list) :: no_return
-  defp render!(rows)
-
-  defp render!([]) do
-    col_count = @header |> Enum.count()
-
-    [List.duplicate("-", col_count)]
-    |> render!
-  end
-
-  defp render!(rows) do
-    rows
-    |> Table.new(@header)
-    |> Table.put_column_meta(:all, align: :right)
-    |> Table.render!()
-    |> IO.puts()
-  end
 end

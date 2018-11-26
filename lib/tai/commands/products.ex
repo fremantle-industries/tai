@@ -3,14 +3,30 @@ defmodule Tai.Commands.Products do
   Display the list of products and their trade requirements for each exchange
   """
 
-  alias TableRex.Table
+  import Tai.Commands.Table, only: [render!: 2]
+
+  @header [
+    "Exchange ID",
+    "Symbol",
+    "Exchange Symbol",
+    "Status",
+    "Maker Fee",
+    "Taker Fee",
+    "Min Price",
+    "Max Price",
+    "Price Increment",
+    "Min Size",
+    "Max Size",
+    "Size Increment",
+    "Min Notional"
+  ]
 
   @spec products :: no_return
   def products do
     Tai.Exchanges.ProductStore.all()
     |> Enum.sort(&(&1.symbol < &2.symbol))
     |> format_rows
-    |> render!
+    |> render!(@header)
   end
 
   defp format_rows(products) do
@@ -47,37 +63,4 @@ defmodule Tai.Commands.Products do
   end
 
   defp format_col(val), do: val
-
-  @header [
-    "Exchange ID",
-    "Symbol",
-    "Exchange Symbol",
-    "Status",
-    "Maker Fee",
-    "Taker Fee",
-    "Min Price",
-    "Max Price",
-    "Price Increment",
-    "Min Size",
-    "Max Size",
-    "Size Increment",
-    "Min Notional"
-  ]
-  @spec render!(rows :: []) :: no_return
-  defp render!(rows)
-
-  defp render!([]) do
-    col_count = @header |> Enum.count()
-
-    [List.duplicate("-", col_count)]
-    |> render!
-  end
-
-  defp render!(rows) do
-    rows
-    |> Table.new(@header)
-    |> Table.put_column_meta(:all, align: :right)
-    |> Table.render!()
-    |> IO.puts()
-  end
 end

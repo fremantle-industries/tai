@@ -3,7 +3,24 @@ defmodule Tai.Commands.Orders do
   Display the list of orders and their details
   """
 
-  alias TableRex.Table
+  import Tai.Commands.Table, only: [render!: 2]
+
+  @header [
+    "Exchange",
+    "Account",
+    "Symbol",
+    "Side",
+    "Type",
+    "Price",
+    "Size",
+    "Time in Force",
+    "Status",
+    "Client ID",
+    "Server ID",
+    "Enqueued At",
+    "Created At",
+    "Error Reason"
+  ]
 
   @spec orders :: no_return
   def orders do
@@ -27,40 +44,6 @@ defmodule Tai.Commands.Orders do
         order.error_reason
       ]
     end)
-    |> render!
-  end
-
-  @header [
-    "Exchange",
-    "Account",
-    "Symbol",
-    "Side",
-    "Type",
-    "Price",
-    "Size",
-    "Time in Force",
-    "Status",
-    "Client ID",
-    "Server ID",
-    "Enqueued At",
-    "Created At",
-    "Error Reason"
-  ]
-  @spec render!(list) :: no_return
-  defp render!(rows)
-
-  defp render!([]) do
-    col_count = @header |> Enum.count()
-
-    [List.duplicate("-", col_count)]
-    |> render!
-  end
-
-  defp render!(rows) do
-    rows
-    |> Table.new(@header)
-    |> Table.put_column_meta(:all, align: :right)
-    |> Table.render!()
-    |> IO.puts()
+    |> render!(@header)
   end
 end

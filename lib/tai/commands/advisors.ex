@@ -1,7 +1,15 @@
 defmodule Tai.Commands.Advisors do
-  alias TableRex.Table
+  import Tai.Commands.Table, only: [render!: 2]
 
   @type config :: Tai.Config.t()
+
+  @header [
+    "Group ID",
+    "Advisor ID",
+    "Config",
+    "Status",
+    "PID"
+  ]
 
   @spec advisors() :: no_return
   @spec advisors(config :: config) :: no_return
@@ -9,7 +17,7 @@ defmodule Tai.Commands.Advisors do
     config
     |> Tai.AdvisorGroups.build_specs()
     |> format_rows
-    |> render!
+    |> render!(@header)
   end
 
   @spec start() :: no_return
@@ -19,6 +27,8 @@ defmodule Tai.Commands.Advisors do
       {:ok, {new, old}} = Tai.Advisors.start(specs)
       IO.puts("Started advisors: #{new} new, #{old} already running")
     end
+
+    IEx.dont_display_result()
   end
 
   @spec stop() :: no_return
@@ -28,6 +38,8 @@ defmodule Tai.Commands.Advisors do
       {:ok, {new, old}} = Tai.Advisors.stop(specs)
       IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     end
+
+    IEx.dont_display_result()
   end
 
   @spec start_advisor(group_id :: atom, advisor_id :: atom) :: no_return
@@ -37,6 +49,8 @@ defmodule Tai.Commands.Advisors do
       {:ok, {new, old}} = Tai.Advisors.start(specs)
       IO.puts("Started advisors: #{new} new, #{old} already running")
     end
+
+    IEx.dont_display_result()
   end
 
   @spec stop_advisor(group_id :: atom, advisor_id :: atom) :: no_return
@@ -46,6 +60,8 @@ defmodule Tai.Commands.Advisors do
       {:ok, {new, old}} = Tai.Advisors.stop(specs)
       IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     end
+
+    IEx.dont_display_result()
   end
 
   defp format_rows({:ok, specs}) do
@@ -68,23 +84,4 @@ defmodule Tai.Commands.Advisors do
   defp format_col(val) when is_pid(val) or is_map(val), do: val |> inspect()
   defp format_col(nil), do: "-"
   defp format_col(val), do: val
-
-  @header ["Group ID", "Advisor ID", "Config", "Status", "PID"]
-  @spec render!(rows :: [...]) :: no_return
-  defp render!(rows)
-
-  defp render!([]) do
-    col_count = @header |> Enum.count()
-
-    [List.duplicate("-", col_count)]
-    |> render!
-  end
-
-  defp render!(rows) do
-    rows
-    |> Table.new(@header)
-    |> Table.put_column_meta(:all, align: :right)
-    |> Table.render!()
-    |> IO.puts()
-  end
 end

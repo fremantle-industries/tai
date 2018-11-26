@@ -3,14 +3,22 @@ defmodule Tai.Commands.Fees do
   Display the list of maker/taker fees for tradable products
   """
 
-  alias TableRex.Table
+  import Tai.Commands.Table, only: [render!: 2]
+
+  @header [
+    "Exchange ID",
+    "Account ID",
+    "Symbol",
+    "Maker",
+    "Taker"
+  ]
 
   @spec fees :: no_return
   def fees do
     Tai.Exchanges.FeeStore.all()
     |> Enum.sort(&(&1.exchange_id < &2.exchange_id))
     |> format_rows
-    |> render!
+    |> render!(@header)
   end
 
   defp format_rows(fees) do
@@ -44,29 +52,4 @@ defmodule Tai.Commands.Fees do
   end
 
   defp format_col(val), do: val
-
-  @header [
-    "Exchange ID",
-    "Account ID",
-    "Symbol",
-    "Maker",
-    "Taker"
-  ]
-  @spec render!(list) :: no_return
-  defp render!(rows)
-
-  defp render!([]) do
-    col_count = @header |> Enum.count()
-
-    [List.duplicate("-", col_count)]
-    |> render!
-  end
-
-  defp render!(rows) do
-    rows
-    |> Table.new(@header)
-    |> Table.put_column_meta(:all, align: :right)
-    |> Table.render!()
-    |> IO.puts()
-  end
 end
