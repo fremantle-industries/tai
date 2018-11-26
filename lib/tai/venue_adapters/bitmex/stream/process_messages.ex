@@ -33,10 +33,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
     {:noreply, state}
   end
 
-  def handle_cast(
-        {%{"table" => "funding", "data" => funding}, received_at},
-        state
-      ) do
+  def handle_cast({%{"table" => "funding", "data" => funding}, received_at}, state) do
     Enum.each(
       funding,
       &Stream.Funding.broadcast(&1, state.venue_id, received_at)
@@ -45,10 +42,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
     {:noreply, state}
   end
 
-  def handle_cast(
-        {%{"table" => "settlement", "data" => settlements}, received_at},
-        state
-      ) do
+  def handle_cast({%{"table" => "settlement", "data" => settlements}, received_at}, state) do
     Enum.each(
       settlements,
       &Stream.Settlements.broadcast(&1, state.venue_id, received_at)
@@ -57,10 +51,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
     {:noreply, state}
   end
 
-  def handle_cast(
-        {%{"table" => "connected", "data" => stats}, received_at},
-        state
-      ) do
+  def handle_cast({%{"table" => "connected", "data" => stats}, received_at}, state) do
     Enum.each(
       stats,
       &Stream.ConnectedStats.broadcast(&1, state.venue_id, received_at)

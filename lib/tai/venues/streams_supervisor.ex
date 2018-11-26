@@ -15,12 +15,13 @@ defmodule Tai.Venues.StreamsSupervisor do
   @spec start_stream(
           stream_supervisor :: atom | null_supervisor,
           venue_id :: atom,
+          accounts :: map,
           products :: [product]
         ) :: DynamicSupervisor.on_start_child()
-  def start_stream(Tai.Venues.NullStreamSupervisor, _, _), do: :ignore
+  def start_stream(Tai.Venues.NullStreamSupervisor, _, _, _), do: :ignore
 
-  def start_stream(stream_supervisor, venue_id, products) do
-    spec = {stream_supervisor, [venue_id: venue_id, products: products]}
+  def start_stream(stream_supervisor, venue_id, accounts, products) do
+    spec = {stream_supervisor, [venue_id: venue_id, accounts: accounts, products: products]}
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 end

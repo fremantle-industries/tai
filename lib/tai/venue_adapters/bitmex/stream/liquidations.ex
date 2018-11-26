@@ -7,10 +7,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Liquidations do
           "side" => side,
           "orderID" => order_id
         },
-        "insert",
+        action,
         venue_id,
         received_at
-      ) do
+      )
+      when action == "insert" or action == "partial" do
     Tai.Events.broadcast(%Tai.Events.InsertLiquidation{
       venue_id: venue_id,
       # TODO: The list of products or a map of exchange symbol to symbol should be passed in
@@ -25,10 +26,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Liquidations do
 
   def broadcast(
         %{"symbol" => exchange_symbol, "orderID" => order_id, "leavesQty" => leaves_qty},
-        "update",
+        action,
         venue_id,
         received_at
-      ) do
+      )
+      when action == "update" or action == "partial" do
     Tai.Events.broadcast(%Tai.Events.UpdateLiquidationLeavesQty{
       venue_id: venue_id,
       # TODO: The list of products or a map of exchange symbol to symbol should be passed in
@@ -41,10 +43,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Liquidations do
 
   def broadcast(
         %{"symbol" => exchange_symbol, "orderID" => order_id, "price" => price},
-        "update",
+        action,
         venue_id,
         received_at
-      ) do
+      )
+      when action == "update" or action == "partial" do
     Tai.Events.broadcast(%Tai.Events.UpdateLiquidationPrice{
       venue_id: venue_id,
       # TODO: The list of products or a map of exchange symbol to symbol should be passed in
@@ -57,10 +60,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Liquidations do
 
   def broadcast(
         %{"symbol" => exchange_symbol, "orderID" => order_id},
-        "delete",
+        action,
         venue_id,
         received_at
-      ) do
+      )
+      when action == "delete" or action == "partial" do
     Tai.Events.broadcast(%Tai.Events.DeleteLiquidation{
       venue_id: venue_id,
       # TODO: The list of products or a map of exchange symbol to symbol should be passed in
