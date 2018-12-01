@@ -6,7 +6,7 @@ defmodule Tai.Events.UnlockAssetBalanceOkTest do
       venue_id: :my_venue,
       account_id: :my_account,
       asset: :btc,
-      qty: Decimal.new(0.1)
+      qty: Decimal.new("0.1")
     }
 
     assert Tai.LogEvent.to_data(event) == %{

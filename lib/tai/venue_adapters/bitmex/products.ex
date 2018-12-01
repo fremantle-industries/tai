@@ -34,13 +34,16 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
       symbol: symbol,
       exchange_symbol: bitmex_symbol,
       status: status,
-      min_size: lot_size && lot_size |> Decimal.new(),
-      price_increment: tick_size |> Decimal.new(),
-      max_price: max_price && max_price |> Decimal.new(),
-      max_size: max_order_qty && max_order_qty |> Decimal.new(),
-      size_increment: tick_size |> Decimal.new(),
-      maker_fee: maker_fee && maker_fee |> Decimal.new(),
-      taker_fee: maker_fee && taker_fee |> Decimal.new()
+      min_size: lot_size && lot_size |> to_decimal,
+      price_increment: tick_size |> to_decimal,
+      max_price: max_price && max_price |> to_decimal,
+      max_size: max_order_qty && max_order_qty |> to_decimal,
+      size_increment: tick_size |> to_decimal,
+      maker_fee: maker_fee && maker_fee |> to_decimal,
+      taker_fee: maker_fee && taker_fee |> to_decimal
     }
   end
+
+  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
+  defp to_decimal(val), do: val |> Decimal.new()
 end

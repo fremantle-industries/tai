@@ -203,7 +203,7 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def add(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
-    add(exchange_id, account_id, asset, Decimal.new(val))
+    add(exchange_id, account_id, asset, to_decimal(val))
   end
 
   @spec sub(
@@ -220,7 +220,7 @@ defmodule Tai.Exchanges.AssetBalances do
   end
 
   def sub(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
-    sub(exchange_id, account_id, asset, Decimal.new(val))
+    sub(exchange_id, account_id, asset, to_decimal(val))
   end
 
   @spec all :: [asset_balance]
@@ -285,4 +285,7 @@ defmodule Tai.Exchanges.AssetBalances do
   defp create_ets_table do
     :ets.new(__MODULE__, [:set, :protected, :named_table])
   end
+
+  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
+  defp to_decimal(val), do: val |> Decimal.new()
 end

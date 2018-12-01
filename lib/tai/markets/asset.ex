@@ -9,7 +9,7 @@ defmodule Tai.Markets.Asset do
   defstruct [:val, :symbol]
 
   def new(val, symbol) do
-    %Asset{val: Decimal.new(val), symbol: symbol}
+    %Asset{val: val |> to_decimal(), symbol: symbol}
   end
 
   def add(%Asset{} = a, %Asset{} = b) do
@@ -33,6 +33,9 @@ defmodule Tai.Markets.Asset do
 
   @zero Decimal.new(0)
   def zero?(%Asset{val: val}), do: val |> Decimal.cmp(@zero) == :eq
+
+  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
+  defp to_decimal(val), do: val |> Decimal.new()
 end
 
 defimpl String.Chars, for: Tai.Markets.Asset do

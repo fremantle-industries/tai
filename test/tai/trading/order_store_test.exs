@@ -52,8 +52,8 @@ defmodule Tai.Trading.OrderStoreTest do
       assert order.exchange_id == :my_test_exchange
       assert order.account_id == :my_test_account
       assert order.symbol == :btc_usd
-      assert order.price == Decimal.new(100.0)
-      assert order.size == Decimal.new(1.0)
+      assert order.price == Decimal.new("100.0")
+      assert order.size == Decimal.new("1.0")
       assert order.status == Tai.Trading.OrderStatus.enqueued()
       assert order.side == Tai.Trading.Order.buy()
       assert order.type == Tai.Trading.Order.limit()
@@ -96,8 +96,8 @@ defmodule Tai.Trading.OrderStoreTest do
       assert order_1.side == Tai.Trading.Order.buy()
       assert order_1.type == Tai.Trading.Order.limit()
       assert order_1.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
-      assert order_1.price == Decimal.new(100.0)
-      assert order_1.size == Decimal.new(1.0)
+      assert order_1.price == Decimal.new("100.0")
+      assert order_1.size == Decimal.new("1.0")
       assert order_1.status == Tai.Trading.OrderStatus.enqueued()
       assert %DateTime{} = order_1.enqueued_at
 
@@ -108,8 +108,8 @@ defmodule Tai.Trading.OrderStoreTest do
       assert order_2.side == Tai.Trading.Order.sell()
       assert order_2.type == Tai.Trading.Order.limit()
       assert order_2.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
-      assert order_2.price == Decimal.new(10.0)
-      assert order_2.size == Decimal.new(1.1)
+      assert order_2.price == Decimal.new("10.0")
+      assert order_2.size == Decimal.new("1.1")
       assert order_2.status == Tai.Trading.OrderStatus.enqueued()
       assert %DateTime{} = order_2.enqueued_at
     end

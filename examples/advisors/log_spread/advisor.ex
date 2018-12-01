@@ -9,14 +9,14 @@ defmodule Examples.Advisors.LogSpread.Advisor do
         venue_id,
         product_symbol,
         %Tai.Markets.Quote{
-          bid: %Tai.Markets.PriceLevel{price: bp},
-          ask: %Tai.Markets.PriceLevel{price: ap}
-        },
+          bid: %Tai.Markets.PriceLevel{},
+          ask: %Tai.Markets.PriceLevel{}
+        } = market_quote,
         _changes,
         _state
       ) do
-    bid_price = Decimal.new(bp)
-    ask_price = Decimal.new(ap)
+    bid_price = market_quote.bid.price |> to_decimal
+    ask_price = market_quote.ask.price |> to_decimal
     spread = Decimal.sub(ask_price, bid_price)
 
     Tai.Events.broadcast(%Examples.Advisors.LogSpread.Events.Spread{
@@ -29,4 +29,7 @@ defmodule Examples.Advisors.LogSpread.Advisor do
   end
 
   def handle_inside_quote(_, _, _, _, _), do: :ok
+
+  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
+  defp to_decimal(val), do: val |> Decimal.new()
 end

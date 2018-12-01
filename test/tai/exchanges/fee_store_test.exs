@@ -13,9 +13,9 @@ defmodule Tai.Exchanges.FeeStoreTest do
       exchange_id: :my_exchange,
       account_id: :main_account,
       symbol: :btc_usdt,
-      maker: Decimal.new(0.1),
+      maker: Decimal.new("0.1"),
       maker_type: Tai.Exchanges.FeeInfo.percent(),
-      taker: Decimal.new(0.1),
+      taker: Decimal.new("0.1"),
       taker_type: Tai.Exchanges.FeeInfo.percent()
     }
 

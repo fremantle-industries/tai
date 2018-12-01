@@ -6,9 +6,9 @@ defmodule Tai.Events.LockAssetBalanceInsufficientFundsTest do
       venue_id: :my_venue,
       account_id: :my_account,
       asset: :btc,
-      min: Decimal.new(0.1),
-      max: Decimal.new(0.3),
-      free: Decimal.new(0.2)
+      min: Decimal.new("0.1"),
+      max: Decimal.new("0.3"),
+      free: Decimal.new("0.2")
     }
 
     assert Tai.LogEvent.to_data(event) == %{

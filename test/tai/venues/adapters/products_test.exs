@@ -41,18 +41,18 @@ defmodule Tai.Venues.Adapters.ProductsTest do
         %{
           symbol: :btc_usd,
           status: Tai.Exchanges.ProductStatus.trading(),
-          min_notional: Decimal.new(0.0001),
-          min_size: Decimal.new(0.0001),
-          min_price: Decimal.new(0.01),
-          size_increment: Decimal.new(0.001)
+          min_notional: Decimal.new("0.0001"),
+          min_size: Decimal.new("0.0001"),
+          min_price: Decimal.new("0.01"),
+          size_increment: Decimal.new("0.001")
         },
         %{
           symbol: :ltc_usd,
           status: Tai.Exchanges.ProductStatus.trading(),
-          min_notional: Decimal.new(0.0001),
-          min_size: Decimal.new(0.0001),
-          min_price: Decimal.new(0.01),
-          size_increment: Decimal.new(0.001)
+          min_notional: Decimal.new("0.0001"),
+          min_size: Decimal.new("0.0001"),
+          min_price: Decimal.new("0.01"),
+          size_increment: Decimal.new("0.001")
         }
       ]
     )

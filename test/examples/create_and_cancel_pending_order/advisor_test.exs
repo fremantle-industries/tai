@@ -54,8 +54,8 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
     Mocks.Orders.GoodTillCancel.unfilled(
       server_id: "orderA",
       symbol: :btc_usd,
-      price: Decimal.new(100.1),
-      original_size: Decimal.new(0.1)
+      price: Decimal.new("100.1"),
+      original_size: Decimal.new("0.1")
     )
 
     Mocks.Orders.GoodTillCancel.canceled(server_id: "orderA")

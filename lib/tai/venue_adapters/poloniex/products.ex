@@ -40,14 +40,14 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
   end
 
   @min_notional %{
-    btc: Decimal.new(0.0001),
-    eth: Decimal.new(0.0001),
-    xmr: Decimal.new(0.0001),
-    usdt: Decimal.new(1.0)
+    btc: Decimal.new("0.0001"),
+    eth: Decimal.new("0.0001"),
+    xmr: Decimal.new("0.0001"),
+    usdt: Decimal.new("1.0")
   }
-  @min_size Decimal.new(0.000001)
-  @min_price Decimal.new(0.00000001)
-  @max_price Decimal.new(100_000.0)
+  @min_size Decimal.new("0.000001")
+  @min_price Decimal.new("0.00000001")
+  @max_price Decimal.new("100000.0")
   defp build({exchange_symbol, %{"isFrozen" => is_frozen}}, venue_id) do
     [exchange_quote_asset, exchange_base_asset] = String.split(exchange_symbol, "_")
     symbol = Tai.Symbol.build(exchange_base_asset, exchange_quote_asset)

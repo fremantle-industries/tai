@@ -32,7 +32,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
       id: poloniex_response.order_number,
       status: status(time_in_force),
       time_in_force: time_in_force,
-      original_size: Decimal.new(original_size),
+      original_size: original_size |> to_decimal,
       executed_size: executed_size(poloniex_response.resulting_trades)
     }
 
@@ -68,9 +68,12 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
       Decimal.new(0),
       fn %ExPoloniex.Trade{amount: amount}, acc ->
         amount
-        |> Decimal.new()
+        |> to_decimal
         |> Decimal.add(acc)
       end
     )
   end
+
+  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
+  defp to_decimal(val), do: val |> Decimal.new()
 end

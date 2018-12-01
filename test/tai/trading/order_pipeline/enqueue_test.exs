@@ -50,8 +50,8 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
                         time_in_force: :fok
                       } = event}
 
-      assert event.price == Decimal.new(100.1)
-      assert event.size == Decimal.new(0.1)
+      assert event.price == Decimal.new("100.1")
+      assert event.size == Decimal.new("0.1")
     end
   end
 
@@ -93,8 +93,8 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
                         time_in_force: :ioc
                       } = event}
 
-      assert event.price == Decimal.new(100_000.1)
-      assert event.size == Decimal.new(0.01)
+      assert event.price == Decimal.new("100000.1")
+      assert event.size == Decimal.new("0.01")
     end
   end
 end

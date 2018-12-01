@@ -45,8 +45,8 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
       :mock,
       :main,
       [
-        %{asset: :btc, free: Decimal.new(0.1), locked: Decimal.new(0.2)},
-        %{asset: :ltc, free: Decimal.new(0.3), locked: Decimal.new(0.4)}
+        %{asset: :btc, free: Decimal.new("0.1"), locked: Decimal.new("0.2")},
+        %{asset: :ltc, free: Decimal.new("0.3"), locked: Decimal.new("0.4")}
       ]
     )
   end

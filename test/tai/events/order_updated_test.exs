@@ -11,9 +11,9 @@ defmodule Tai.Events.OrderUpdatedTest do
       type: :limit,
       time_in_force: :gtc,
       status: :pending,
-      price: Decimal.new(0.1),
-      size: Decimal.new(0.2),
-      executed_size: Decimal.new(0.3),
+      price: Decimal.new("0.1"),
+      size: Decimal.new("0.2"),
+      executed_size: Decimal.new("0.3"),
       error_reason: :my_error_reason
     }
 

@@ -57,14 +57,14 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
                       status: :filled
                     } = filled_event}
 
-    assert filled_event.executed_size == Decimal.new(0.1)
+    assert filled_event.executed_size == Decimal.new("0.1")
   end
 
   def mock_order_response do
     Mocks.Orders.FillOrKill.filled(
       symbol: :btc_usd,
-      price: Decimal.new(100.1),
-      original_size: Decimal.new(0.1)
+      price: Decimal.new("100.1"),
+      original_size: Decimal.new("0.1")
     )
   end
 

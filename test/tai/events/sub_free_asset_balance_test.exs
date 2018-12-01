@@ -6,9 +6,9 @@ defmodule Tai.Events.SubFreeAssetBalanceTest do
       venue_id: :my_venue,
       account_id: :my_account,
       asset: :btc,
-      val: Decimal.new(0.1),
-      free: Decimal.new(0.2),
-      locked: Decimal.new(0.3)
+      val: Decimal.new("0.1"),
+      free: Decimal.new("0.2"),
+      locked: Decimal.new("0.3")
     }
 
     assert Tai.LogEvent.to_data(event) == %{

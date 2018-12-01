@@ -150,8 +150,8 @@ defmodule Tai.Trading.OrderStore do
     |> Enum.reduce(
       [],
       fn %Tai.Trading.OrderSubmission{} = submission, acc ->
-        with price <- submission.price |> Decimal.new() |> Decimal.abs(),
-             size <- submission.size |> Decimal.new() |> Decimal.abs(),
+        with price <- submission.price |> to_decimal |> Decimal.abs(),
+             size <- submission.size |> to_decimal |> Decimal.abs(),
              enqueued_at <- Timex.now() do
           order = %Tai.Trading.Order{
             client_id: UUID.uuid4(),
@@ -195,6 +195,9 @@ defmodule Tai.Trading.OrderStore do
     |> filter([head])
     |> filter(tail)
   end
+
+  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
+  defp to_decimal(val), do: val |> Decimal.new()
 
   defmodule AttributeWhitelist do
     @whitelist_attrs [

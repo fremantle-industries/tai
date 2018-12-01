@@ -23,8 +23,8 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
       Mocks.Orders.GoodTillCancel.unfilled(
         server_id: @server_id,
         symbol: :btc_usd,
-        price: Decimal.new(100.1),
-        original_size: Decimal.new(0.1)
+        price: Decimal.new("100.1"),
+        original_size: Decimal.new("0.1")
       )
 
       order =
@@ -89,8 +89,8 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
                         error_reason: nil
                       } = event_1}
 
-      assert event_1.price == Decimal.new(100.1)
-      assert event_1.size == Decimal.new(0.1)
+      assert event_1.price == Decimal.new("100.1")
+      assert event_1.size == Decimal.new("0.1")
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderUpdated{
@@ -105,8 +105,8 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
                         error_reason: nil
                       } = event_2}
 
-      assert event_2.price == Decimal.new(100.1)
-      assert event_2.size == Decimal.new(0.1)
+      assert event_2.price == Decimal.new("100.1")
+      assert event_2.size == Decimal.new("0.1")
     end
   end
 

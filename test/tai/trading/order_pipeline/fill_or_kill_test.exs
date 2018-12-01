@@ -20,8 +20,8 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     setup do
       Mocks.Orders.FillOrKill.expired(
         symbol: :btc_usd,
-        price: Decimal.new(100.1),
-        original_size: Decimal.new(0.1)
+        price: Decimal.new("100.1"),
+        original_size: Decimal.new("0.1")
       )
     end
 
@@ -73,8 +73,8 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     setup do
       Mocks.Orders.FillOrKill.expired(
         symbol: :btc_usd,
-        price: Decimal.new(10_000.1),
-        original_size: Decimal.new(0.1)
+        price: Decimal.new("10000.1"),
+        original_size: Decimal.new("0.1")
       )
     end
 
@@ -126,8 +126,8 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     setup do
       Mocks.Orders.FillOrKill.filled(
         symbol: :btc_usd,
-        price: Decimal.new(100.1),
-        original_size: Decimal.new(0.1)
+        price: Decimal.new("100.1"),
+        original_size: Decimal.new("0.1")
       )
     end
 
@@ -171,7 +171,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
                         status: :filled
                       } = event}
 
-      assert event.executed_size == Decimal.new(0.1)
+      assert event.executed_size == Decimal.new("0.1")
     end
   end
 
@@ -179,8 +179,8 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     setup do
       Mocks.Orders.FillOrKill.filled(
         symbol: :btc_usd,
-        price: Decimal.new(10_000.1),
-        original_size: Decimal.new(0.1)
+        price: Decimal.new("10000.1"),
+        original_size: Decimal.new("0.1")
       )
     end
 
@@ -224,7 +224,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
                         status: :filled
                       } = event}
 
-      assert event.executed_size == Decimal.new(0.1)
+      assert event.executed_size == Decimal.new("0.1")
     end
   end
 end

@@ -52,8 +52,8 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
           assert response.id != nil
           assert response.status == Tai.Trading.OrderStatus.expired()
           assert response.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
-          assert Decimal.cmp(response.original_size, Decimal.new(0.01)) == :eq
-          assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
+          assert Decimal.cmp(response.original_size, Decimal.new("0.01")) == :eq
+          assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
         end
       end
 
@@ -86,8 +86,8 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
           assert response.id != nil
           assert response.status == Tai.Trading.OrderStatus.expired()
           assert response.time_in_force == Tai.Trading.TimeInForce.immediate_or_cancel()
-          assert Decimal.cmp(response.original_size, Decimal.new(0.02)) == :eq
-          assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
+          assert Decimal.cmp(response.original_size, Decimal.new("0.02")) == :eq
+          assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
         end
       end
     end)
@@ -115,8 +115,8 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
           assert response.id != nil
           assert response.status == Tai.Trading.OrderStatus.expired()
           assert response.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
-          assert Decimal.cmp(response.original_size, Decimal.new(0.01)) == :eq
-          assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
+          assert Decimal.cmp(response.original_size, Decimal.new("0.01")) == :eq
+          assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
         end
       end
 
@@ -135,8 +135,8 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
           assert response.id != nil
           assert response.status == Tai.Trading.OrderStatus.expired()
           assert response.time_in_force == Tai.Trading.TimeInForce.immediate_or_cancel()
-          assert Decimal.cmp(response.original_size, Decimal.new(0.02)) == :eq
-          assert Decimal.cmp(response.executed_size, Decimal.new(0.01)) == :eq
+          assert Decimal.cmp(response.original_size, Decimal.new("0.02")) == :eq
+          assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
         end
       end
     end)

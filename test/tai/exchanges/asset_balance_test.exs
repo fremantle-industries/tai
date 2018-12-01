@@ -8,11 +8,11 @@ defmodule Tai.Exchanges.AssetBalanceTest do
         exchange_id: :mock,
         account_id: :mock,
         asset: :mock,
-        free: Decimal.new(0.1),
-        locked: Decimal.new(0.2)
+        free: Decimal.new("0.1"),
+        locked: Decimal.new("0.2")
       }
 
-      assert Tai.Exchanges.AssetBalance.total(detail) == Decimal.new(0.3)
+      assert Tai.Exchanges.AssetBalance.total(detail) == Decimal.new("0.3")
     end
   end
 end

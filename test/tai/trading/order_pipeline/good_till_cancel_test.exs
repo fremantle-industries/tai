@@ -21,8 +21,8 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
         server_id: @server_id,
         symbol: :btc_usd,
-        price: Decimal.new(100.1),
-        original_size: Decimal.new(0.1)
+        price: Decimal.new("100.1"),
+        original_size: Decimal.new("0.1")
       )
     end
 
@@ -75,8 +75,8 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
         server_id: @server_id,
         symbol: :btc_usd,
-        price: Decimal.new(100_000.1),
-        original_size: Decimal.new(0.01)
+        price: Decimal.new("100000.1"),
+        original_size: Decimal.new("0.01")
       )
     end
 

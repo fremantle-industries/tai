@@ -18,9 +18,9 @@ defmodule Tai.Commands.Helper.FeesTest do
       exchange_id: :test_exchange_a,
       account_id: :main,
       symbol: :btc_usd,
-      maker: Decimal.new(-0.0005),
+      maker: Decimal.new("-0.0005"),
       maker_type: Tai.Exchanges.FeeInfo.percent(),
-      taker: Decimal.new(0.002),
+      taker: Decimal.new("0.002"),
       taker_type: Tai.Exchanges.FeeInfo.percent()
     })
 
@@ -30,7 +30,7 @@ defmodule Tai.Commands.Helper.FeesTest do
       symbol: :eth_usd,
       maker: Decimal.new(0),
       maker_type: Tai.Exchanges.FeeInfo.percent(),
-      taker: Decimal.new(0.001),
+      taker: Decimal.new("0.001"),
       taker_type: Tai.Exchanges.FeeInfo.percent()
     })
 
