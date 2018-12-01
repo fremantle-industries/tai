@@ -39,8 +39,8 @@ defmodule Tai.TestSupport.Mock do
       exchange_id: exchange_id,
       account_id: account_id,
       asset: asset,
-      free: Decimal.new(free),
-      locked: Decimal.new(locked)
+      free: free |> to_decimal,
+      locked: locked |> to_decimal
     })
   end
 
@@ -72,4 +72,7 @@ defmodule Tai.TestSupport.Mock do
   defp send_json_msg(pid, msg) do
     Tai.WebSocket.send_json_msg(pid, msg)
   end
+
+  def to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
+  def to_decimal(val), do: val |> Decimal.new()
 end
