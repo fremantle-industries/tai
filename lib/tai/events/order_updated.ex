@@ -1,13 +1,18 @@
 defmodule Tai.Events.OrderUpdated do
+  @type client_id :: Tai.Trading.Order.client_id()
+  @type side :: Tai.Trading.Order.side()
+  @type type :: Tai.Trading.Order.type()
+  @type time_in_force :: Tai.Trading.Order.time_in_force()
+  @type status :: Tai.Trading.Order.status()
   @type t :: %Tai.Events.OrderUpdated{
-          client_id: Tai.Trading.Order.client_id(),
+          client_id: client_id,
           venue_id: atom,
           account_id: atom,
           product_symbol: atom,
-          side: Tai.Trading.Order.side(),
-          type: Tai.Trading.Order.type(),
-          time_in_force: Tai.Trading.Order.time_in_force(),
-          status: Tai.Trading.Order.status(),
+          side: side,
+          type: type,
+          time_in_force: time_in_force,
+          status: status,
           price: Decimal.t(),
           size: Decimal.t(),
           executed_size: Decimal.t()
