@@ -5,11 +5,10 @@ defmodule Tai.Advisors do
   def info(specs) do
     specs
     |> Enum.map(fn {_, opts} = spec ->
-      pid =
-        opts
-        |> Keyword.take([:group_id, :advisor_id])
-        |> Tai.Advisor.to_name()
-        |> Process.whereis()
+      group_id = Keyword.fetch!(opts, :group_id)
+      advisor_id = Keyword.fetch!(opts, :advisor_id)
+      name = Tai.Advisor.to_name(group_id, advisor_id)
+      pid = Process.whereis(name)
 
       {spec, pid}
     end)

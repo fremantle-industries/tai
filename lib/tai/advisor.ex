@@ -51,8 +51,9 @@ defmodule Tai.Advisor do
               state :: Tai.Advisor.t()
             ) :: :ok | {:ok, store :: map}
 
-  def to_name(group_id: gid, advisor_id: aid) do
-    :"advisor_#{gid}_#{aid}"
+  @spec to_name(atom, atom) :: atom
+  def to_name(group_id, advisor_id) do
+    :"advisor_#{group_id}_#{advisor_id}"
   end
 
   def cached_inside_quote(%Tai.Advisor{} = advisor, order_book_feed_id, symbol) do
@@ -76,7 +77,7 @@ defmodule Tai.Advisor do
             products: products,
             config: config
           ) do
-        name = Tai.Advisor.to_name(group_id: group_id, advisor_id: advisor_id)
+        name = Tai.Advisor.to_name(group_id, advisor_id)
 
         GenServer.start_link(
           __MODULE__,
