@@ -13,6 +13,7 @@ defmodule Tai.Mixfile do
       deps: deps(),
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
+      dialyzer: [ignore_warnings: ".dialyzer_ignore.exs"],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
