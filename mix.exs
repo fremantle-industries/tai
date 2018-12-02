@@ -41,9 +41,7 @@ defmodule Tai.Mixfile do
       {:table_rex, "~> 2.0"},
       {:timex, "~> 3.1"},
       {:uuid, "~> 1.1"},
-      # Fixes dialyzer warning, but can't release new hex package
-      {:websockex, github: "Azolo/websockex", override: true},
-      # {:websockex, "~> 0.4"},
+      {:websockex, "~> 0.4.0"},
       {:logger_file_backend, "~> 0.0.10", only: [:dev, :test]},
       {:logger_json, "~> 3.0.0", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
