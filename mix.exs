@@ -4,7 +4,7 @@ defmodule Tai.Mixfile do
   def project do
     [
       app: :tai,
-      version: "0.0.8",
+      version: "0.0.9",
       elixir: "~> 1.7",
       package: package(),
       start_permanent: Mix.env() == :prod,
