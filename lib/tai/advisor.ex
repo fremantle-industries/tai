@@ -5,8 +5,9 @@ defmodule Tai.Advisor do
   It can be used to monitor multiple quote streams and create, update or cancel orders.
   """
 
+  @type advisor :: Tai.Advisor.t()
+  @type store :: map
   @type product :: Tai.Exchanges.Product.t()
-
   @type t :: %Tai.Advisor{
           group_id: atom,
           advisor_id: atom,
@@ -15,6 +16,27 @@ defmodule Tai.Advisor do
           config: map,
           store: map
         }
+
+  @callback handle_order_book_changes(
+              order_book_feed_id :: atom,
+              symbol :: atom,
+              changes :: term,
+              state :: advisor
+            ) :: :ok
+
+  @callback handle_inside_quote(
+              order_book_feed_id :: atom,
+              symbol :: atom,
+              inside_quote :: Tai.Markets.Quote.t(),
+              changes :: map | list,
+              state :: advisor
+            ) :: :ok | {:ok, store}
+
+  @callback handle_order_updated(
+              old_order :: term,
+              updated_order :: term,
+              state :: advisor
+            ) :: :ok | {:ok, store}
 
   @enforce_keys [
     :group_id,
@@ -30,27 +52,6 @@ defmodule Tai.Advisor do
             config: %{},
             store: %{}
 
-  @doc """
-  Callback when order book has bid or ask changes
-  """
-  @callback handle_order_book_changes(
-              order_book_feed_id :: atom,
-              symbol :: atom,
-              changes :: term,
-              state :: Tai.Advisor.t()
-            ) :: :ok
-
-  @doc """
-  Callback when the highest bid or lowest ask changes price or size
-  """
-  @callback handle_inside_quote(
-              order_book_feed_id :: atom,
-              symbol :: atom,
-              inside_quote :: Tai.Markets.Quote.t(),
-              changes :: map | list,
-              state :: Tai.Advisor.t()
-            ) :: :ok | {:ok, store :: map}
-
   @spec to_name(atom, atom) :: atom
   def to_name(group_id, advisor_id) do
     :"advisor_#{group_id}_#{advisor_id}"
@@ -62,6 +63,10 @@ defmodule Tai.Advisor do
       [feed_id: order_book_feed_id, symbol: symbol]
       |> Tai.Markets.OrderBook.to_name()
     )
+  end
+
+  def order_updated(name, old_order, updated_order) do
+    GenServer.cast(name, {:order_updated, old_order, updated_order})
   end
 
   defmacro __using__(_) do
@@ -145,10 +150,27 @@ defmodule Tai.Advisor do
         end
       end
 
+      def handle_cast({:order_updated, old_order, updated_order}, state) do
+        try do
+          case handle_order_updated(old_order, updated_order, state) do
+            {:ok, new_store} -> {:noreply, state |> Map.put(:store, new_store)}
+            _ -> {:noreply, state}
+          end
+        rescue
+          e ->
+            Tai.Events.broadcast(%Tai.Events.AdvisorOrderUpdatedError{
+              error: e,
+              stacktrace: __STACKTRACE__
+            })
+        end
+      end
+
       @doc false
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
       @doc false
       def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state), do: :ok
+      @doc false
+      def handle_order_updated(old_order, updated_order, state), do: :ok
 
       defp cache_inside_quote(state, feed_id, symbol) do
         with {:ok, current_inside_quote} <- Tai.Markets.OrderBook.inside_quote(feed_id, symbol),
@@ -227,7 +249,8 @@ defmodule Tai.Advisor do
       end
 
       defoverridable handle_order_book_changes: 4,
-                     handle_inside_quote: 5
+                     handle_inside_quote: 5,
+                     handle_order_updated: 3
     end
   end
 end
