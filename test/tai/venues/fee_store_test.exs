@@ -1,6 +1,6 @@
-defmodule Tai.Exchanges.FeeStoreTest do
+defmodule Tai.Venues.FeeStoreTest do
   use ExUnit.Case, async: false
-  doctest Tai.Exchanges.FeeStore
+  doctest Tai.Venues.FeeStore
 
   setup do
     on_exit(fn ->
@@ -24,39 +24,39 @@ defmodule Tai.Exchanges.FeeStoreTest do
 
   describe "#upsert" do
     test "insert the fee info into the ETS table", %{fee_info: fee_info} do
-      assert Tai.Exchanges.FeeStore.upsert(fee_info) == :ok
+      assert Tai.Venues.FeeStore.upsert(fee_info) == :ok
 
       assert [{{:my_exchange, :main_account, :btc_usdt}, ^fee_info}] =
-               :ets.lookup(Tai.Exchanges.FeeStore, {:my_exchange, :main_account, :btc_usdt})
+               :ets.lookup(Tai.Venues.FeeStore, {:my_exchange, :main_account, :btc_usdt})
     end
   end
 
   describe "#clear" do
     test "removes the existing items in the ETS table", %{fee_info: fee_info} do
-      assert Tai.Exchanges.FeeStore.upsert(fee_info) == :ok
-      assert Tai.Exchanges.FeeStore.count() == 1
+      assert Tai.Venues.FeeStore.upsert(fee_info) == :ok
+      assert Tai.Venues.FeeStore.count() == 1
 
-      assert Tai.Exchanges.FeeStore.clear() == :ok
-      assert Tai.Exchanges.FeeStore.count() == 0
+      assert Tai.Venues.FeeStore.clear() == :ok
+      assert Tai.Venues.FeeStore.count() == 0
     end
   end
 
   describe "#all" do
     test "returns a list of all the existing items", %{fee_info: fee_info} do
-      assert Tai.Exchanges.FeeStore.all() == []
+      assert Tai.Venues.FeeStore.all() == []
 
-      assert Tai.Exchanges.FeeStore.upsert(fee_info) == :ok
+      assert Tai.Venues.FeeStore.upsert(fee_info) == :ok
 
-      assert [^fee_info] = Tai.Exchanges.FeeStore.all()
+      assert [^fee_info] = Tai.Venues.FeeStore.all()
     end
   end
 
   describe "#find_by" do
     test "returns the fee info in an ok tuple", %{fee_info: fee_info} do
-      assert Tai.Exchanges.FeeStore.upsert(fee_info) == :ok
+      assert Tai.Venues.FeeStore.upsert(fee_info) == :ok
 
       assert {:ok, ^fee_info} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: :my_exchange,
                  account_id: :main_account,
                  symbol: :btc_usdt
@@ -64,7 +64,7 @@ defmodule Tai.Exchanges.FeeStoreTest do
     end
 
     test "returns an error tuple when not found" do
-      assert Tai.Exchanges.FeeStore.find_by(
+      assert Tai.Venues.FeeStore.find_by(
                exchange_id: :my_exchange,
                account_id: :main_account,
                symbol: :idontexist

@@ -59,7 +59,7 @@ defmodule Tai.Exchanges.Boot.FeesTest do
       Tai.Exchanges.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
       assert {:ok, btc_usd_fee} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @venue_a,
                  account_id: @account_a,
                  symbol: @btc_usd_product.symbol
@@ -75,7 +75,7 @@ defmodule Tai.Exchanges.Boot.FeesTest do
       Tai.Exchanges.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
       assert {:ok, eth_usd_fee} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @venue_a,
                  account_id: @account_a,
                  symbol: @eth_usd_product.symbol
@@ -91,7 +91,7 @@ defmodule Tai.Exchanges.Boot.FeesTest do
       Tai.Exchanges.Boot.Fees.hydrate(adapter_b, [@ltc_usd_product])
 
       assert {:ok, ltc_usd_fee} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @venue_b,
                  account_id: @account_b,
                  symbol: :ltc_usd

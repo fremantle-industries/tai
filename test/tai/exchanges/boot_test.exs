@@ -75,21 +75,21 @@ defmodule Tai.Exchanges.BootTest do
       assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Exchanges.Boot.run(@adapter)
 
       assert {:ok, btc_usdt_fee} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @exchange_id,
                  account_id: @account_id,
                  symbol: :btc_usdt
                )
 
       assert {:ok, eth_usdt_fee} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @exchange_id,
                  account_id: @account_id,
                  symbol: :eth_usdt
                )
 
       assert {:error, :not_found} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @exchange_id,
                  account_id: @account_id,
                  symbol: :ltc_usdt

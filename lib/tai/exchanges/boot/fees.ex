@@ -45,7 +45,7 @@ defmodule Tai.Exchanges.Boot.Fees do
       taker: taker,
       taker_type: :percent
     }
-    |> Tai.Exchanges.FeeStore.upsert()
+    |> Tai.Venues.FeeStore.upsert()
   end
 
   defp lowest_fee(%Decimal{} = product, %Decimal{} = schedule), do: Decimal.min(product, schedule)

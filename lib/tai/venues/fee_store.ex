@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.FeeStore do
+defmodule Tai.Venues.FeeStore do
   use GenServer
 
   @type fee_info :: Tai.Venues.FeeInfo.t()

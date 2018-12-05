@@ -18,13 +18,13 @@ defmodule Tai.TestSupport.Mock do
   @spec mock_fee_info(fee_info | map) :: :ok
   def mock_fee_info(%Tai.Venues.FeeInfo{} = fee_info) do
     fee_info
-    |> Tai.Exchanges.FeeStore.upsert()
+    |> Tai.Venues.FeeStore.upsert()
   end
 
   def mock_fee_info(attrs) when is_map(attrs) do
     Tai.Venues.FeeInfo
     |> struct(attrs)
-    |> Tai.Exchanges.FeeStore.upsert()
+    |> Tai.Venues.FeeStore.upsert()
   end
 
   @spec mock_asset_balance(

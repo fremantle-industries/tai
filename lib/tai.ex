@@ -11,7 +11,7 @@ defmodule Tai do
       Tai.EventsLogger,
       {Tai.Settings, settings},
       Tai.Venues.ProductStore,
-      Tai.Exchanges.FeeStore,
+      Tai.Venues.FeeStore,
       Tai.Exchanges.AssetBalances,
       Tai.Trading.OrderStore,
       Tai.Exchanges.AdaptersSupervisor,
