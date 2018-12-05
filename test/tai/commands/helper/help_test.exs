@@ -12,6 +12,7 @@ defmodule Tai.Commands.Helper.HelpTest do
            * orders
            * advisor_groups
            * advisors
+           * advisor :group_id, :advisor_id
            * settings
            * start_advisors
            * start_advisor_group :group_id
