@@ -1,5 +1,5 @@
 defmodule Tai.Venues.Boot.Stream do
-  @type adapter :: Tai.Exchanges.Adapter.t()
+  @type adapter :: Tai.Venues.Adapter.t()
   @type product :: Tai.Venues.Product.t()
 
   @spec start(adapter :: adapter, products :: [product]) :: DynamicSupervisor.on_start_child()

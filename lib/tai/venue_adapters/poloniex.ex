@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Poloniex do
-  use Tai.Exchanges.Adapter
+  use Tai.Venues.Adapter
 
   def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
 

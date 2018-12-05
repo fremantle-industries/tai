@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Mock do
-  use Tai.Exchanges.Adapter
+  use Tai.Venues.Adapter
   import Tai.TestSupport.Mocks.Client
 
   def stream_supervisor, do: Tai.Venues.NullStreamSupervisor

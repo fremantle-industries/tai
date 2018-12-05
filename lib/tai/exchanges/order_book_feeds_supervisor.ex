@@ -9,7 +9,7 @@ defmodule Tai.Exchanges.OrderBookFeedsSupervisor do
   def init(:ok), do: DynamicSupervisor.init(strategy: :one_for_one)
 
   @spec start_feed(
-          adapter :: Tai.Exchanges.Adapter.t() | null_feed,
+          adapter :: Tai.Venues.Adapter.t() | null_feed,
           products :: [product]
         ) :: DynamicSupervisor.on_start_child()
   def start_feed(Tai.Venues.NullOrderBookFeed, _), do: :ignore

@@ -23,7 +23,7 @@ defmodule Tai.Venues.BootTest do
   describe ".run success" do
     setup [:mock_products, :mock_asset_balances, :mock_maker_taker_fees]
 
-    @adapter %Tai.Exchanges.Adapter{
+    @adapter %Tai.Venues.Adapter{
       id: @exchange_id,
       adapter: Tai.VenueAdapters.Mock,
       products: "* -ltc_usdt",
@@ -32,7 +32,7 @@ defmodule Tai.Venues.BootTest do
     }
 
     test "hydrates filtered products" do
-      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Venues.Boot.run(@adapter)
+      assert {:ok, %Tai.Venues.Adapter{}} = Tai.Venues.Boot.run(@adapter)
 
       assert {:ok, btc_usdt_product} = Tai.Venues.ProductStore.find({@exchange_id, :btc_usdt})
       assert {:ok, eth_usdt_product} = Tai.Venues.ProductStore.find({@exchange_id, :eth_usdt})
@@ -40,7 +40,7 @@ defmodule Tai.Venues.BootTest do
     end
 
     test "hydrates asset balances" do
-      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Venues.Boot.run(@adapter)
+      assert {:ok, %Tai.Venues.Adapter{}} = Tai.Venues.Boot.run(@adapter)
 
       assert {:ok, btc_balance} =
                Tai.Venues.AssetBalances.find_by(
@@ -72,7 +72,7 @@ defmodule Tai.Venues.BootTest do
     end
 
     test "hydrates fees" do
-      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Venues.Boot.run(@adapter)
+      assert {:ok, %Tai.Venues.Adapter{}} = Tai.Venues.Boot.run(@adapter)
 
       assert {:ok, btc_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
@@ -99,7 +99,7 @@ defmodule Tai.Venues.BootTest do
 
   describe ".run products hydrate error" do
     test "returns an error tuple" do
-      adapter = %Tai.Exchanges.Adapter{
+      adapter = %Tai.Venues.Adapter{
         id: :mock_boot,
         adapter: Tai.VenueAdapters.Mock,
         products: "*",
@@ -116,7 +116,7 @@ defmodule Tai.Venues.BootTest do
     setup [:mock_products, :mock_maker_taker_fees]
 
     test "returns an error" do
-      adapter = %Tai.Exchanges.Adapter{
+      adapter = %Tai.Venues.Adapter{
         id: :mock_boot,
         adapter: Tai.VenueAdapters.Mock,
         products: "*",
@@ -133,7 +133,7 @@ defmodule Tai.Venues.BootTest do
     setup [:mock_products, :mock_asset_balances]
 
     test "returns an error" do
-      adapter = %Tai.Exchanges.Adapter{
+      adapter = %Tai.Venues.Adapter{
         id: :mock_boot,
         adapter: Tai.VenueAdapters.Mock,
         products: "*",

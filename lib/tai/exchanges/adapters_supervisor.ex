@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.AdaptersSupervisor do
+defmodule Tai.Venues.AdaptersSupervisor do
   use Supervisor
 
   def start_link(_) do

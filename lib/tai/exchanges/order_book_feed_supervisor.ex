@@ -1,5 +1,5 @@
 defmodule Tai.Exchanges.OrderBookFeedSupervisor do
-  @type adapter :: Tai.Exchanges.Adapter.t()
+  @type adapter :: Tai.Venues.Adapter.t()
   @type product :: Tai.Venues.Product.t()
 
   use Supervisor
@@ -9,7 +9,7 @@ defmodule Tai.Exchanges.OrderBookFeedSupervisor do
   end
 
   def init(
-        adapter: %Tai.Exchanges.Adapter{id: venue_id, adapter: adapter},
+        adapter: %Tai.Venues.Adapter{id: venue_id, adapter: adapter},
         trading_products: trading_products
       ) do
     order_book_specs =

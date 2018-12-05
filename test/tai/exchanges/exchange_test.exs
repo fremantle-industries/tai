@@ -14,14 +14,14 @@ defmodule Tai.Exchanges.ExchangeTest do
         )
 
       assert Tai.Exchanges.Exchange.parse_adapters(config) == [
-               %Tai.Exchanges.Adapter{
+               %Tai.Venues.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
                  timeout: 100,
                  products: "*",
                  accounts: %{}
                },
-               %Tai.Exchanges.Adapter{
+               %Tai.Venues.Adapter{
                  id: :exchange_b,
                  adapter: MyAdapterB,
                  timeout: 100,
@@ -51,7 +51,7 @@ defmodule Tai.Exchanges.ExchangeTest do
         )
 
       assert [
-               %Tai.Exchanges.Adapter{
+               %Tai.Venues.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
                  timeout: 10
@@ -71,7 +71,7 @@ defmodule Tai.Exchanges.ExchangeTest do
         )
 
       assert [
-               %Tai.Exchanges.Adapter{
+               %Tai.Venues.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
                  products: "-btc_usd"
@@ -91,7 +91,7 @@ defmodule Tai.Exchanges.ExchangeTest do
         )
 
       assert [
-               %Tai.Exchanges.Adapter{
+               %Tai.Venues.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
                  accounts: %{main: %{}}

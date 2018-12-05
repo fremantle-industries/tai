@@ -1,6 +1,6 @@
 defmodule Tai.Exchanges.Exchange do
   @type config :: Tai.Config.t()
-  @type adapter :: Tai.Exchanges.Adapter.t()
+  @type adapter :: Tai.Venues.Adapter.t()
   @type product :: Tai.Venues.Product.t()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
 
@@ -11,7 +11,7 @@ defmodule Tai.Exchanges.Exchange do
   def parse_adapters(%Tai.Config{} = config) do
     config.venues
     |> Enum.map(fn {id, params} ->
-      %Tai.Exchanges.Adapter{
+      %Tai.Venues.Adapter{
         id: id,
         adapter: Keyword.fetch!(params, :adapter),
         products: Keyword.get(params, :products, "*"),
@@ -22,13 +22,13 @@ defmodule Tai.Exchanges.Exchange do
   end
 
   @spec products(adapter :: adapter) :: {:ok, [product]}
-  def products(%Tai.Exchanges.Adapter{adapter: adapter, id: exchange_id}) do
+  def products(%Tai.Venues.Adapter{adapter: adapter, id: exchange_id}) do
     adapter.products(exchange_id)
   end
 
   @spec asset_balances(adapter :: adapter, account_id :: atom) :: {:ok, [asset_balance]}
   def asset_balances(
-        %Tai.Exchanges.Adapter{adapter: adapter, id: exchange_id, accounts: accounts},
+        %Tai.Venues.Adapter{adapter: adapter, id: exchange_id, accounts: accounts},
         account_id
       ) do
     {:ok, credentials} = Map.fetch(accounts, account_id)
@@ -38,7 +38,7 @@ defmodule Tai.Exchanges.Exchange do
   @spec maker_taker_fees(adapter :: adapter, account_id :: atom) ::
           {:ok, {maker :: Decimal.t(), taker :: Decimal.t()}}
   def maker_taker_fees(
-        %Tai.Exchanges.Adapter{adapter: adapter, id: exchange_id, accounts: accounts},
+        %Tai.Venues.Adapter{adapter: adapter, id: exchange_id, accounts: accounts},
         account_id
       ) do
     {:ok, credentials} = Map.fetch(accounts, account_id)

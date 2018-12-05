@@ -1,5 +1,5 @@
 defmodule Tai.Venues.Boot.AssetBalances do
-  @type adapter :: Tai.Exchanges.Adapter.t()
+  @type adapter :: Tai.Venues.Adapter.t()
 
   @spec hydrate(adapter :: adapter) :: :ok | {:error, reason :: term}
   def hydrate(adapter) do

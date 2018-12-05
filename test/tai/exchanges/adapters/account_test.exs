@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Adapters.AccountTest do
+defmodule Tai.Venues.Adapters.AccountTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 

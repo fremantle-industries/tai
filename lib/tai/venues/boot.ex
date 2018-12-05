@@ -9,10 +9,10 @@ defmodule Tai.Venues.Boot do
 
   alias Tai.Venues.Boot
 
-  @type adapter :: Tai.Exchanges.Adapter.t()
+  @type adapter :: Tai.Venues.Adapter.t()
 
   @spec run(adapter :: adapter) :: {:ok, adapter} | {:error, [reasons :: term]}
-  def run(%Tai.Exchanges.Adapter{} = adapter) do
+  def run(%Tai.Venues.Adapter{} = adapter) do
     adapter
     |> hydrate_products_and_balances
     |> wait_for_products

@@ -1,11 +1,11 @@
-defmodule Tai.Exchanges.AdapterSupervisor do
+defmodule Tai.Venues.AdapterSupervisor do
   @callback account() :: atom
 
   defmacro __using__(_) do
     quote location: :keep do
       use Supervisor
 
-      @behaviour Tai.Exchanges.AdapterSupervisor
+      @behaviour Tai.Venues.AdapterSupervisor
 
       def start_link(%Tai.Exchanges.Config{} = config) do
         name = :"#{__MODULE__}_#{config.id}"

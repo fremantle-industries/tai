@@ -14,7 +14,7 @@ defmodule Tai do
       Tai.Venues.FeeStore,
       Tai.Venues.AssetBalances,
       Tai.Trading.OrderStore,
-      Tai.Exchanges.AdaptersSupervisor,
+      Tai.Venues.AdaptersSupervisor,
       Tai.Exchanges.OrderBookFeedsSupervisor,
       Tai.Venues.StreamsSupervisor,
       {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},

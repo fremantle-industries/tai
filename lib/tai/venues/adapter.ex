@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.Adapter do
-  @type t :: %Tai.Exchanges.Adapter{
+defmodule Tai.Venues.Adapter do
+  @type t :: %Tai.Venues.Adapter{
           id: :atom,
           adapter: :atom,
           products: String.t(),
@@ -34,7 +34,7 @@ defmodule Tai.Exchanges.Adapter do
 
   defmacro __using__(_) do
     quote location: :keep do
-      @behaviour Tai.Exchanges.Adapter
+      @behaviour Tai.Venues.Adapter
     end
   end
 end
