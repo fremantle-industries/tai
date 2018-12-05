@@ -22,11 +22,11 @@ defmodule Tai do
     ]
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)
-    config |> boot_exchanges!()
+    config |> boot_venues!()
     {:ok, pid}
   end
 
-  defp boot_exchanges!(config) do
+  defp boot_venues!(config) do
     config
     |> Tai.Venue.parse_adapters()
     |> Enum.map(fn adapter ->
