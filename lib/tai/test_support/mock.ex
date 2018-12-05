@@ -6,13 +6,13 @@ defmodule Tai.TestSupport.Mock do
   @spec mock_product(product | map) :: :ok
   def mock_product(%Tai.Exchanges.Product{} = product) do
     product
-    |> Tai.Exchanges.ProductStore.upsert()
+    |> Tai.Venues.ProductStore.upsert()
   end
 
   def mock_product(attrs) when is_map(attrs) do
     Tai.Exchanges.Product
     |> struct(attrs)
-    |> Tai.Exchanges.ProductStore.upsert()
+    |> Tai.Venues.ProductStore.upsert()
   end
 
   @spec mock_fee_info(fee_info | map) :: :ok

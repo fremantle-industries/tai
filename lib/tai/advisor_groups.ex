@@ -53,7 +53,7 @@ defmodule Tai.AdvisorGroups do
           {:ok, [advisor_spec]} | {:error, map}
   def build_specs(
         %Tai.Config{} = config,
-        products \\ Tai.Exchanges.ProductStore.all()
+        products \\ Tai.Venues.ProductStore.all()
       ) do
     product_symbols_by_exchange = Tai.Transforms.ProductSymbolsByVenue.all(products)
 
@@ -91,7 +91,7 @@ defmodule Tai.AdvisorGroups do
   def build_specs_for_group(
         %Tai.Config{} = config,
         group_id,
-        products \\ Tai.Exchanges.ProductStore.all()
+        products \\ Tai.Venues.ProductStore.all()
       ) do
     with {:ok, specs} <- build_specs(config, products) do
       filtered_specs =
@@ -114,7 +114,7 @@ defmodule Tai.AdvisorGroups do
         %Tai.Config{} = config,
         group_id,
         advisor_id,
-        products \\ Tai.Exchanges.ProductStore.all()
+        products \\ Tai.Venues.ProductStore.all()
       ) do
     with {:ok, specs} <- build_specs(config, products) do
       filtered_specs =

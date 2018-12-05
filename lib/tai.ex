@@ -10,7 +10,7 @@ defmodule Tai do
       {Tai.Events, config.event_registry_partitions},
       Tai.EventsLogger,
       {Tai.Settings, settings},
-      Tai.Exchanges.ProductStore,
+      Tai.Venues.ProductStore,
       Tai.Exchanges.FeeStore,
       Tai.Exchanges.AssetBalances,
       Tai.Trading.OrderStore,

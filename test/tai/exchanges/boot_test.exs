@@ -34,9 +34,9 @@ defmodule Tai.Exchanges.BootTest do
     test "hydrates filtered products" do
       assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Exchanges.Boot.run(@adapter)
 
-      assert {:ok, btc_usdt_product} = Tai.Exchanges.ProductStore.find({@exchange_id, :btc_usdt})
-      assert {:ok, eth_usdt_product} = Tai.Exchanges.ProductStore.find({@exchange_id, :eth_usdt})
-      assert {:error, :not_found} = Tai.Exchanges.ProductStore.find({@exchange_id, :ltc_usdt})
+      assert {:ok, btc_usdt_product} = Tai.Venues.ProductStore.find({@exchange_id, :btc_usdt})
+      assert {:ok, eth_usdt_product} = Tai.Venues.ProductStore.find({@exchange_id, :eth_usdt})
+      assert {:error, :not_found} = Tai.Venues.ProductStore.find({@exchange_id, :ltc_usdt})
     end
 
     test "hydrates asset balances" do

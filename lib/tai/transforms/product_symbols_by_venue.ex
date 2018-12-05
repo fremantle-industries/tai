@@ -7,7 +7,7 @@ defmodule Tai.Transforms.ProductSymbolsByVenue do
 
   @spec all :: map
   @spec all([product]) :: map
-  def all(products \\ Tai.Exchanges.ProductStore.all()) do
+  def all(products \\ Tai.Venues.ProductStore.all()) do
     products
     |> Enum.reduce(
       %{},

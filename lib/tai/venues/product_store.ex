@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.ProductStore do
+defmodule Tai.Venues.ProductStore do
   use GenServer
 
   @type product :: Tai.Exchanges.Product.t()
