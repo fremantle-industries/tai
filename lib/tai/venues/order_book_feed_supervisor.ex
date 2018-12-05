@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.OrderBookFeedSupervisor do
+defmodule Tai.Venues.OrderBookFeedSupervisor do
   @type adapter :: Tai.Venues.Adapter.t()
   @type product :: Tai.Venues.Product.t()
 
@@ -26,7 +26,7 @@ defmodule Tai.Exchanges.OrderBookFeedSupervisor do
     feed_spec =
       Supervisor.child_spec(
         {adapter.order_book_feed, feed_id: venue_id, symbols: symbols},
-        id: Tai.Exchanges.OrderBookFeed.to_name(venue_id)
+        id: Tai.Venues.OrderBookFeed.to_name(venue_id)
       )
 
     children = order_book_specs ++ [feed_spec]

@@ -5,7 +5,7 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
   https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
   """
 
-  use Tai.Exchanges.OrderBookFeed
+  use Tai.Venues.OrderBookFeed
   alias Tai.VenueAdapters.Binance.OrderBookFeed
   require Logger
 

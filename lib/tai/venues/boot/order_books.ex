@@ -5,7 +5,7 @@ defmodule Tai.Venues.Boot.OrderBooks do
   @spec start(adapter :: adapter, products :: [product]) :: :ok
   def start(adapter, products) do
     # TODO: This should have much better error handling
-    Tai.Exchanges.OrderBookFeedsSupervisor.start_feed(adapter, products)
+    Tai.Venues.OrderBookFeedsSupervisor.start_feed(adapter, products)
     :ok
   end
 end

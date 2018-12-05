@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
   Hydrate order books for the Poloniex exchange
   """
 
-  use Tai.Exchanges.OrderBookFeed
+  use Tai.Venues.OrderBookFeed
   alias Tai.ExchangeAdapters.Poloniex.{SymbolMapping}
   alias Tai.VenueAdapters.Poloniex.OrderBookFeed
 

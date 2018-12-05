@@ -1,9 +1,9 @@
-defmodule Tai.Exchanges.OrderBookFeed do
+defmodule Tai.Venues.OrderBookFeed do
   @moduledoc """
   Behaviour to connect to a WebSocket that streams quotes from order books
   """
 
-  @type t :: %Tai.Exchanges.OrderBookFeed{
+  @type t :: %Tai.Venues.OrderBookFeed{
           feed_id: atom,
           symbols: [atom],
           store: map
@@ -28,7 +28,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
   ## Examples
 
-    iex> Tai.Exchanges.OrderBookFeed.to_name(:my_test_feed)
+    iex> Tai.Venues.OrderBookFeed.to_name(:my_test_feed)
     :order_book_feed_my_test_feed
   """
   def to_name(feed_id), do: :"order_book_feed_#{feed_id}"
@@ -39,19 +39,19 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       require Logger
 
-      @behaviour Tai.Exchanges.OrderBookFeed
+      @behaviour Tai.Venues.OrderBookFeed
 
       def default_url, do: raise("No default_url/0 in #{__MODULE__}")
 
       def start_link(url, feed_id: feed_id, symbols: symbols) do
-        state = %Tai.Exchanges.OrderBookFeed{feed_id: feed_id, symbols: symbols, store: %{}}
+        state = %Tai.Venues.OrderBookFeed{feed_id: feed_id, symbols: symbols, store: %{}}
 
         url
         |> build_connection_url(symbols)
         |> WebSockex.start_link(
           __MODULE__,
           state,
-          name: feed_id |> Tai.Exchanges.OrderBookFeed.to_name()
+          name: feed_id |> Tai.Venues.OrderBookFeed.to_name()
         )
         |> init_subscriptions(state)
       end
@@ -76,16 +76,16 @@ defmodule Tai.Exchanges.OrderBookFeed do
       """
       def build_connection_url(url, symbols), do: url
 
-      # state should use the type Tai.Exchanges.OrderBookFeed.t but there is 
+      # state should use the type Tai.Venues.OrderBookFeed.t but there is 
       # and outstanding dialyzer problem.
       # https://github.com/elixir-lang/elixir/issues/7700
       @spec init_subscriptions(
               {:ok, pid} | {:error, term},
-              state :: Tai.Exchanges.OrderBookFeed.t()
+              state :: Tai.Venues.OrderBookFeed.t()
             ) :: {:ok, pid} | {:error | term}
       defp(init_subscriptions(_websockex_result, _state))
 
-      defp init_subscriptions({:ok, pid}, %Tai.Exchanges.OrderBookFeed{
+      defp init_subscriptions({:ok, pid}, %Tai.Venues.OrderBookFeed{
              feed_id: feed_id,
              symbols: symbols
            }) do
@@ -102,7 +102,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       defp init_subscriptions(
              {:error, %WebSockex.RequestError{code: 429, message: "Too Many Requests"}} = error,
-             %Tai.Exchanges.OrderBookFeed{feed_id: feed_id}
+             %Tai.Venues.OrderBookFeed{feed_id: feed_id}
            ) do
         Logger.error(
           "Could not connect to feed: #{inspect(feed_id)}. Too many requests. Try again later."
@@ -113,7 +113,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
 
       defp init_subscriptions(
              {:error, reason} = error,
-             %Tai.Exchanges.OrderBookFeed{feed_id: feed_id}
+             %Tai.Venues.OrderBookFeed{feed_id: feed_id}
            ) do
         Logger.error(
           "could not connect to feed: #{inspect(feed_id)} - reason: #{inspect(reason)}"
@@ -123,7 +123,7 @@ defmodule Tai.Exchanges.OrderBookFeed do
       end
 
       @doc false
-      def handle_frame({:text, msg}, %Tai.Exchanges.OrderBookFeed{feed_id: feed_id} = state) do
+      def handle_frame({:text, msg}, %Tai.Venues.OrderBookFeed{feed_id: feed_id} = state) do
         Logger.debug(fn -> "received msg: #{msg}" end)
 
         msg

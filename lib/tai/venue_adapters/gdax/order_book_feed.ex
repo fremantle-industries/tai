@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
   WebSocket order book feed adapter for GDAX
   """
 
-  use Tai.Exchanges.OrderBookFeed
+  use Tai.Venues.OrderBookFeed
   alias Tai.VenueAdapters.Gdax.OrderBookFeed
   alias Tai.ExchangeAdapters.Gdax.{Product}
   require Logger

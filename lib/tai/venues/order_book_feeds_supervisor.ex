@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.OrderBookFeedsSupervisor do
+defmodule Tai.Venues.OrderBookFeedsSupervisor do
   use DynamicSupervisor
 
   @type product :: Tai.Venues.Product.t()
@@ -15,7 +15,7 @@ defmodule Tai.Exchanges.OrderBookFeedsSupervisor do
   def start_feed(Tai.Venues.NullOrderBookFeed, _), do: :ignore
 
   def start_feed(adapter, products) do
-    spec = {Tai.Exchanges.OrderBookFeedSupervisor, [adapter: adapter, trading_products: products]}
+    spec = {Tai.Venues.OrderBookFeedSupervisor, [adapter: adapter, trading_products: products]}
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 end

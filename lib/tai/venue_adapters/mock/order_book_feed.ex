@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Mock.OrderBookFeed do
   Mock adapter for an order book feed. Simulate a stream of order book updates
   """
 
-  use Tai.Exchanges.OrderBookFeed
+  use Tai.Venues.OrderBookFeed
   alias Tai.VenueAdapters.Mock.OrderBookFeed
 
   def default_url, do: "ws://localhost:#{EchoBoy.Config.port()}/ws"

@@ -1,10 +1,10 @@
-defmodule Tai.Exchanges.OrderBookFeedTest do
+defmodule Tai.Venues.OrderBookFeedTest do
   use ExUnit.Case, async: true
-  doctest Tai.Exchanges.OrderBookFeed
+  doctest Tai.Venues.OrderBookFeed
 
   import ExUnit.CaptureLog
 
-  alias Tai.{Exchanges.OrderBookFeed, WebSocket}
+  alias Tai.{Venues.OrderBookFeed, WebSocket}
 
   defmodule ExampleOrderBookFeed do
     use OrderBookFeed
@@ -54,7 +54,7 @@ defmodule Tai.Exchanges.OrderBookFeedTest do
 
   test "start_link returns an :error, reason tuple when the url is not valid" do
     defmodule InvalidUrlOrderBookFeed do
-      use Tai.Exchanges.OrderBookFeed
+      use Tai.Venues.OrderBookFeed
 
       def default_url, do: ""
       def subscribe_to_order_books(_pid, _feed_id, _symbols), do: :ok
