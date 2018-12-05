@@ -4,25 +4,25 @@ defmodule Tai.VenueAdapters.Binance.ProductStatusTest do
   describe "#normalize" do
     test "returns an ok tuple for a supported status" do
       assert Tai.VenueAdapters.Binance.ProductStatus.normalize("PRE_TRADING") ==
-               {:ok, Tai.Exchanges.ProductStatus.pre_trading()}
+               {:ok, Tai.Venues.ProductStatus.pre_trading()}
 
       assert Tai.VenueAdapters.Binance.ProductStatus.normalize("TRADING") ==
-               {:ok, Tai.Exchanges.ProductStatus.trading()}
+               {:ok, Tai.Venues.ProductStatus.trading()}
 
       assert Tai.VenueAdapters.Binance.ProductStatus.normalize("POST_TRADING") ==
-               {:ok, Tai.Exchanges.ProductStatus.post_trading()}
+               {:ok, Tai.Venues.ProductStatus.post_trading()}
 
       assert Tai.VenueAdapters.Binance.ProductStatus.normalize("END_OF_DAY") ==
-               {:ok, Tai.Exchanges.ProductStatus.end_of_day()}
+               {:ok, Tai.Venues.ProductStatus.end_of_day()}
 
       assert Tai.VenueAdapters.Binance.ProductStatus.normalize("HALT") ==
-               {:ok, Tai.Exchanges.ProductStatus.halt()}
+               {:ok, Tai.Venues.ProductStatus.halt()}
 
       assert Tai.VenueAdapters.Binance.ProductStatus.normalize("AUCTION_MATCH") ==
-               {:ok, Tai.Exchanges.ProductStatus.auction_match()}
+               {:ok, Tai.Venues.ProductStatus.auction_match()}
 
       assert Tai.VenueAdapters.Binance.ProductStatus.normalize("BREAK") ==
-               {:ok, Tai.Exchanges.ProductStatus.break()}
+               {:ok, Tai.Venues.ProductStatus.break()}
     end
 
     test "returns an error tuple for an unsupported status" do

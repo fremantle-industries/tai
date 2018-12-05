@@ -1,10 +1,10 @@
-defmodule Tai.Exchanges.AssetBalanceTest do
+defmodule Tai.Venues.AssetBalanceTest do
   use ExUnit.Case, async: true
-  doctest Tai.Exchanges.AssetBalance
+  doctest Tai.Venues.AssetBalance
 
   describe "#total" do
     test "returns the sum of free and locked balances" do
-      detail = %Tai.Exchanges.AssetBalance{
+      detail = %Tai.Venues.AssetBalance{
         exchange_id: :mock,
         account_id: :mock,
         asset: :mock,
@@ -12,7 +12,7 @@ defmodule Tai.Exchanges.AssetBalanceTest do
         locked: Decimal.new("0.2")
       }
 
-      assert Tai.Exchanges.AssetBalance.total(detail) == Decimal.new("0.3")
+      assert Tai.Venues.AssetBalance.total(detail) == Decimal.new("0.3")
     end
   end
 end

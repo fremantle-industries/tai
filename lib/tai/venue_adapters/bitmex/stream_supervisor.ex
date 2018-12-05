@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   use Supervisor
 
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
 
   @spec start_link(venue_id: atom, accounts: map, products: [product]) :: Supervisor.on_start()
   def start_link([venue_id: _, accounts: _, products: _] = args) do

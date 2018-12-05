@@ -10,9 +10,9 @@ defmodule Tai do
       {Tai.Events, config.event_registry_partitions},
       Tai.EventsLogger,
       {Tai.Settings, settings},
-      Tai.Exchanges.ProductStore,
-      Tai.Exchanges.FeeStore,
-      Tai.Exchanges.AssetBalances,
+      Tai.Venues.ProductStore,
+      Tai.Venues.FeeStore,
+      Tai.Venues.AssetBalances,
       Tai.Trading.OrderStore,
       Tai.Exchanges.AdaptersSupervisor,
       Tai.Exchanges.OrderBookFeedsSupervisor,
@@ -33,7 +33,7 @@ defmodule Tai do
       task =
         Task.Supervisor.async(
           Tai.TaskSupervisor,
-          Tai.Exchanges.Boot,
+          Tai.Venues.Boot,
           :run,
           [adapter],
           timeout: adapter.timeout

@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Boot.AssetBalances do
+defmodule Tai.Venues.Boot.AssetBalances do
   @type adapter :: Tai.Exchanges.Adapter.t()
 
   @spec hydrate(adapter :: adapter) :: :ok | {:error, reason :: term}
@@ -12,7 +12,7 @@ defmodule Tai.Exchanges.Boot.AssetBalances do
 
   defp fetch_and_upsert({account_id, _}, :ok, adapter) do
     with {:ok, balances} <- Tai.Exchanges.Exchange.asset_balances(adapter, account_id) do
-      Enum.each(balances, &Tai.Exchanges.AssetBalances.upsert/1)
+      Enum.each(balances, &Tai.Venues.AssetBalances.upsert/1)
       :ok
     else
       {:error, _} = error ->

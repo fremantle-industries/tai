@@ -4,7 +4,7 @@ defmodule Tai.TestSupport.Mocks.Responses.AssetBalances do
       balances_attrs
       |> Enum.map(fn attrs ->
         struct(
-          Tai.Exchanges.AssetBalance,
+          Tai.Venues.AssetBalance,
           Map.merge(%{exchange_id: exchange_id, account_id: account_id}, attrs)
         )
       end)

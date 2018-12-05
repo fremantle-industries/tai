@@ -31,7 +31,7 @@ defmodule Tai.Config do
   def parse(env \\ Application.get_all_env(:tai)) do
     adapter_timeout = Keyword.get(env, :adapter_timeout, 10_000)
     advisor_groups = Keyword.get(env, :advisor_groups, %{})
-    exchange_boot_handler = Keyword.get(env, :exchange_boot_handler, Tai.Exchanges.BootHandler)
+    exchange_boot_handler = Keyword.get(env, :exchange_boot_handler, Tai.Venues.BootHandler)
     send_orders = !!Keyword.get(env, :send_orders)
     venues = Keyword.get(env, :venues, %{})
 

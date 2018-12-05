@@ -6,8 +6,8 @@ defmodule Tai.Exchanges.Adapter do
           accounts: map
         }
 
-  @type product :: Tai.Exchanges.Product.t()
-  @type asset_balance :: Tai.Exchanges.AssetBalance.t()
+  @type product :: Tai.Venues.Product.t()
+  @type asset_balance :: Tai.Venues.AssetBalance.t()
 
   @callback stream_supervisor :: atom
   @callback order_book_feed :: atom

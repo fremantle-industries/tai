@@ -1,7 +1,7 @@
-defmodule Tai.Exchanges.FeeStore do
+defmodule Tai.Venues.FeeStore do
   use GenServer
 
-  @type fee_info :: Tai.Exchanges.FeeInfo.t()
+  @type fee_info :: Tai.Venues.FeeInfo.t()
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -32,7 +32,7 @@ defmodule Tai.Exchanges.FeeStore do
   end
 
   @spec upsert(fee_info) :: :ok
-  def upsert(%Tai.Exchanges.FeeInfo{} = fee_info) do
+  def upsert(%Tai.Venues.FeeInfo{} = fee_info) do
     GenServer.call(__MODULE__, {:upsert, fee_info})
   end
 
@@ -45,7 +45,7 @@ defmodule Tai.Exchanges.FeeStore do
           {:ok, fee_info} | {:error, :not_found}
   def find_by(exchange_id: exchange_id, account_id: account_id, symbol: symbol) do
     with key <- {exchange_id, account_id, symbol},
-         [[%Tai.Exchanges.FeeInfo{} = fee_info]] <- :ets.match(__MODULE__, {key, :"$1"}) do
+         [[%Tai.Venues.FeeInfo{} = fee_info]] <- :ets.match(__MODULE__, {key, :"$1"}) do
       {:ok, fee_info}
     else
       [] -> {:error, :not_found}

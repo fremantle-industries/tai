@@ -40,7 +40,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.AllBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    balance = %Tai.Exchanges.AssetBalance{
+    balance = %Tai.Venues.AssetBalance{
       exchange_id: account.exchange_id,
       account_id: account.account_id,
       asset: asset,

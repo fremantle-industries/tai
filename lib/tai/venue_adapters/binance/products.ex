@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
     {min_size, max_size, step_size} = filters |> size_filter
     %Decimal{} = min_notional = filters |> notional_filter
 
-    %Tai.Exchanges.Product{
+    %Tai.Venues.Product{
       exchange_id: venue_id,
       symbol: Tai.Symbol.build(base_asset, quote_asset),
       exchange_symbol: exchange_symbol,

@@ -19,9 +19,9 @@ defmodule Tai.Commands.Helper.FeesTest do
       account_id: :main,
       symbol: :btc_usd,
       maker: Decimal.new("-0.0005"),
-      maker_type: Tai.Exchanges.FeeInfo.percent(),
+      maker_type: Tai.Venues.FeeInfo.percent(),
       taker: Decimal.new("0.002"),
-      taker_type: Tai.Exchanges.FeeInfo.percent()
+      taker_type: Tai.Venues.FeeInfo.percent()
     })
 
     mock_fee_info(%{
@@ -29,9 +29,9 @@ defmodule Tai.Commands.Helper.FeesTest do
       account_id: :main,
       symbol: :eth_usd,
       maker: Decimal.new(0),
-      maker_type: Tai.Exchanges.FeeInfo.percent(),
+      maker_type: Tai.Venues.FeeInfo.percent(),
       taker: Decimal.new("0.001"),
-      taker_type: Tai.Exchanges.FeeInfo.percent()
+      taker_type: Tai.Venues.FeeInfo.percent()
     })
 
     assert capture_io(&Tai.Commands.Helper.fees/0) == """

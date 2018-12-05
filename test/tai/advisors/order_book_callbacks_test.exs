@@ -20,7 +20,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     end
   end
 
-  @btc_usd struct(Tai.Exchanges.Product, %{exchange_id: :my_venue, symbol: :btc_usd})
+  @btc_usd struct(Tai.Venues.Product, %{exchange_id: :my_venue, symbol: :btc_usd})
   defp start_advisor!(advisor, config \\ %{}) do
     start_supervised!({
       advisor,

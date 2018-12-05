@@ -4,7 +4,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Products do
       products_attrs
       |> Enum.map(fn attrs ->
         struct(
-          Tai.Exchanges.Product,
+          Tai.Venues.Product,
           Map.merge(%{exchange_id: exchange_id}, attrs)
         )
       end)

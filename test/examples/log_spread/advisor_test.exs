@@ -20,7 +20,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
         advisor_id: :btc_usd,
         products: [
           struct(
-            Tai.Exchanges.Product,
+            Tai.Venues.Product,
             %{exchange_id: :test_exchange_a, symbol: :btc_usd}
           )
         ],

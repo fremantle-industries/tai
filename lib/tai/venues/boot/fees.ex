@@ -1,6 +1,6 @@
-defmodule Tai.Exchanges.Boot.Fees do
+defmodule Tai.Venues.Boot.Fees do
   @type adapter :: Tai.Exchanges.Adapter.t()
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
 
   @spec hydrate(adapter :: adapter, products :: [product]) :: :ok | {:error, reason :: term}
   def hydrate(adapter, products) do
@@ -36,7 +36,7 @@ defmodule Tai.Exchanges.Boot.Fees do
   end
 
   defp upsert_product(product, adapter_id, account_id, maker, taker) do
-    %Tai.Exchanges.FeeInfo{
+    %Tai.Venues.FeeInfo{
       exchange_id: adapter_id,
       account_id: account_id,
       symbol: product.symbol,
@@ -45,7 +45,7 @@ defmodule Tai.Exchanges.Boot.Fees do
       taker: taker,
       taker_type: :percent
     }
-    |> Tai.Exchanges.FeeStore.upsert()
+    |> Tai.Venues.FeeStore.upsert()
   end
 
   defp lowest_fee(%Decimal{} = product, %Decimal{} = schedule), do: Decimal.min(product, schedule)

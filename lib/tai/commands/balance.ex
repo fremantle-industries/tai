@@ -23,7 +23,7 @@ defmodule Tai.Commands.Balance do
   end
 
   defp fetch_balances do
-    Tai.Exchanges.AssetBalances.all()
+    Tai.Venues.AssetBalances.all()
     |> Enum.sort(&(&1.asset >= &2.asset))
     |> Enum.sort(&(&1.exchange_id >= &2.exchange_id))
     |> Enum.reduce(
@@ -35,7 +35,7 @@ defmodule Tai.Commands.Balance do
           balance.asset,
           balance.free,
           balance.locked,
-          Tai.Exchanges.AssetBalance.total(balance)
+          Tai.Venues.AssetBalance.total(balance)
         }
 
         [row | acc]

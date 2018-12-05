@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.AssetBalances.Lock do
-  alias Tai.Exchanges.AssetBalances
+defmodule Tai.Venues.AssetBalances.Lock do
+  alias Tai.Venues.AssetBalances
 
   @type lock_request :: AssetBalances.LockRequest.t()
 

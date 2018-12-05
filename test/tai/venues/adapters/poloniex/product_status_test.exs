@@ -4,10 +4,10 @@ defmodule Tai.VenueAdapters.Poloniex.ProductStatusTest do
   describe "#normalize" do
     test "returns an ok tuple for a supported status" do
       assert Tai.VenueAdapters.Poloniex.ProductStatus.normalize("0") ==
-               {:ok, Tai.Exchanges.ProductStatus.trading()}
+               {:ok, Tai.Venues.ProductStatus.trading()}
 
       assert Tai.VenueAdapters.Poloniex.ProductStatus.normalize("1") ==
-               {:ok, Tai.Exchanges.ProductStatus.halt()}
+               {:ok, Tai.Venues.ProductStatus.halt()}
     end
 
     test "returns an error tuple for an unsupported status" do

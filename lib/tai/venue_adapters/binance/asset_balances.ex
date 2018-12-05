@@ -34,7 +34,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    %Tai.Exchanges.AssetBalance{
+    %Tai.Venues.AssetBalance{
       exchange_id: venue_id,
       account_id: account_id,
       asset: asset,

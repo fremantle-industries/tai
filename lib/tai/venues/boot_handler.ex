@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.BootHandler do
+defmodule Tai.Venues.BootHandler do
   require Logger
 
   def parse_response({:ok, adapter}) do

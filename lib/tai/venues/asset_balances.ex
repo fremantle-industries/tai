@@ -1,8 +1,8 @@
-defmodule Tai.Exchanges.AssetBalances do
-  alias Tai.Exchanges.AssetBalances
+defmodule Tai.Venues.AssetBalances do
+  alias Tai.Venues.AssetBalances
   use GenServer
 
-  @type asset_balance :: Tai.Exchanges.AssetBalance.t()
+  @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type lock_request :: AssetBalances.LockRequest.t()
   @type lock_result ::
           {:ok, Decimal.t()}
@@ -269,7 +269,7 @@ defmodule Tai.Exchanges.AssetBalances do
 
   @spec find_by(filters :: [...]) :: {:ok, asset_balance} | {:error, :not_found}
   def find_by(filters) do
-    with %Tai.Exchanges.AssetBalance{} = balance <- filters |> where() |> List.first() do
+    with %Tai.Venues.AssetBalance{} = balance <- filters |> where() |> List.first() do
       {:ok, balance}
     else
       nil ->

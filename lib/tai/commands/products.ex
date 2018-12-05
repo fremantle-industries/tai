@@ -23,7 +23,7 @@ defmodule Tai.Commands.Products do
 
   @spec products :: no_return
   def products do
-    Tai.Exchanges.ProductStore.all()
+    Tai.Venues.ProductStore.all()
     |> Enum.sort(&(&1.symbol < &2.symbol))
     |> format_rows
     |> render!(@header)

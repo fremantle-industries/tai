@@ -1,6 +1,6 @@
-defmodule Tai.Exchanges.Boot.FeesTest do
+defmodule Tai.Venues.Boot.FeesTest do
   use ExUnit.Case, async: false
-  doctest Tai.Exchanges.Boot.Fees
+  doctest Tai.Venues.Boot.Fees
 
   defmodule AdapterWithFeeSchedule do
     def maker_taker_fees(_, _, _), do: {:ok, {Decimal.new("0.1"), Decimal.new("0.2")}}
@@ -23,17 +23,17 @@ defmodule Tai.Exchanges.Boot.FeesTest do
   @venue_b :venue_b
   @account_a :account_a
   @account_b :account_b
-  @btc_usd_product struct(Tai.Exchanges.Product, %{
+  @btc_usd_product struct(Tai.Venues.Product, %{
                      exchange_id: @venue_a,
                      symbol: :btc_usd,
                      maker_fee: Decimal.new("0.001"),
                      taker_fee: Decimal.new("0.002")
                    })
-  @eth_usd_product struct(Tai.Exchanges.Product, %{
+  @eth_usd_product struct(Tai.Venues.Product, %{
                      exchange_id: @venue_a,
                      symbol: :eth_usd
                    })
-  @ltc_usd_product struct(Tai.Exchanges.Product, %{
+  @ltc_usd_product struct(Tai.Venues.Product, %{
                      exchange_id: @venue_b,
                      symbol: :ltc_usd,
                      maker_fee: Decimal.new("0.003"),
@@ -56,10 +56,10 @@ defmodule Tai.Exchanges.Boot.FeesTest do
     test "uses the lowest fee between the product or schedule" do
       [adapter_a, _] = Tai.Exchanges.Exchange.parse_adapters(@config)
 
-      Tai.Exchanges.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
+      Tai.Venues.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
       assert {:ok, btc_usd_fee} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @venue_a,
                  account_id: @account_a,
                  symbol: @btc_usd_product.symbol
@@ -72,10 +72,10 @@ defmodule Tai.Exchanges.Boot.FeesTest do
     test "uses the fee schedule when product doesn't have a maker/taker fee" do
       [adapter_a, _] = Tai.Exchanges.Exchange.parse_adapters(@config)
 
-      Tai.Exchanges.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
+      Tai.Venues.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
       assert {:ok, eth_usd_fee} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @venue_a,
                  account_id: @account_a,
                  symbol: @eth_usd_product.symbol
@@ -88,10 +88,10 @@ defmodule Tai.Exchanges.Boot.FeesTest do
     test "uses the product fees when the venue doesn't have a fee schedule" do
       [_, adapter_b] = Tai.Exchanges.Exchange.parse_adapters(@config)
 
-      Tai.Exchanges.Boot.Fees.hydrate(adapter_b, [@ltc_usd_product])
+      Tai.Venues.Boot.Fees.hydrate(adapter_b, [@ltc_usd_product])
 
       assert {:ok, ltc_usd_fee} =
-               Tai.Exchanges.FeeStore.find_by(
+               Tai.Venues.FeeStore.find_by(
                  exchange_id: @venue_b,
                  account_id: @account_b,
                  symbol: :ltc_usd

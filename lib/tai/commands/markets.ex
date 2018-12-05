@@ -20,7 +20,7 @@ defmodule Tai.Commands.Markets do
 
   @spec markets :: no_return
   def markets do
-    Tai.Exchanges.ProductStore.all()
+    Tai.Venues.ProductStore.all()
     |> fetch_inside_quotes
     |> format_rows
     |> sort_rows
