@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.Binance.ProductsTest do
   test "retrieves the trade rules for each product", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/binance/success" do
       assert {:ok, products} = Tai.Exchanges.Exchange.products(adapter)
-      assert %Tai.Exchanges.Product{} = product = find_product_by_symbol(products, :ltc_btc)
+      assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :ltc_btc)
       assert Decimal.cmp(product.min_notional, Decimal.new("0.001")) == :eq
       assert Decimal.cmp(product.min_price, Decimal.new("0.000001")) == :eq
       assert Decimal.cmp(product.min_size, Decimal.new("0.01")) == :eq

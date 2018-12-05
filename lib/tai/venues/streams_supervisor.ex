@@ -1,7 +1,7 @@
 defmodule Tai.Venues.StreamsSupervisor do
   use DynamicSupervisor
 
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
   @type null_supervisor :: Tai.Venues.NullStreamSupervisor
 
   def start_link(_) do

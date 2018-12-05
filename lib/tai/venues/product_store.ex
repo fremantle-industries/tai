@@ -1,7 +1,7 @@
 defmodule Tai.Venues.ProductStore do
   use GenServer
 
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -43,7 +43,7 @@ defmodule Tai.Venues.ProductStore do
 
   @spec find({venue_id :: atom, symbol :: atom}) :: {:ok, product} | {:error, :not_found}
   def find(key) do
-    with [[%Tai.Exchanges.Product{} = product]] <- :ets.match(__MODULE__, {key, :"$1"}) do
+    with [[%Tai.Venues.Product{} = product]] <- :ets.match(__MODULE__, {key, :"$1"}) do
       {:ok, product}
     else
       [] -> {:error, :not_found}

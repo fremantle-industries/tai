@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.Poloniex.ProductsTest do
   test "retrieves the trade rules for each product", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/poloniex/success" do
       assert {:ok, products} = Tai.Exchanges.Exchange.products(adapter)
-      assert %Tai.Exchanges.Product{} = product = find_product_by_symbol(products, :ltc_btc)
+      assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :ltc_btc)
       assert product.min_notional == Decimal.new("0.0001")
       assert product.min_price == Decimal.new("0.00000001")
       assert product.min_size == Decimal.new("0.000001")

@@ -9,7 +9,7 @@ defmodule Tai.Venues.ProductStoreTest do
 
     {:ok, _} = Application.ensure_all_started(:tai)
 
-    product = %Tai.Exchanges.Product{
+    product = %Tai.Venues.Product{
       exchange_id: :my_exchange,
       symbol: :btc_usdt,
       exchange_symbol: "BTC_USDT",

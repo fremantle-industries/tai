@@ -1,7 +1,7 @@
 defmodule Tai.Exchanges.OrderBookFeedsSupervisor do
   use DynamicSupervisor
 
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
   @type null_feed :: Tai.Venues.NullOrderBookFeed
 
   def start_link(_), do: DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)

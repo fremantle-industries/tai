@@ -1,7 +1,7 @@
 defmodule Tai.Exchanges.Exchange do
   @type config :: Tai.Config.t()
   @type adapter :: Tai.Exchanges.Adapter.t()
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
   @type asset_balance :: Tai.Exchanges.AssetBalance.t()
 
   @doc """

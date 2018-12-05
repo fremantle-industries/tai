@@ -29,7 +29,7 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
     symbol = bitmex_symbol |> String.downcase() |> String.to_atom()
     status = Tai.VenueAdapters.Bitmex.ProductStatus.normalize(state)
 
-    %Tai.Exchanges.Product{
+    %Tai.Venues.Product{
       exchange_id: venue_id,
       symbol: symbol,
       exchange_symbol: bitmex_symbol,

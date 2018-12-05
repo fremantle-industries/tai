@@ -24,7 +24,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
       use_cassette "exchange_adapters/shared/products/#{@adapter.id}/success" do
         assert {:ok, products} = Tai.Exchanges.Exchange.products(@adapter)
         assert Enum.count(products) > 0
-        assert [%Tai.Exchanges.Product{} = product | _] = products
+        assert [%Tai.Venues.Product{} = product | _] = products
         assert product.exchange_id == @adapter.id
         assert product.symbol != nil
         assert product.status != nil
@@ -40,7 +40,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
       [
         %{
           symbol: :btc_usd,
-          status: Tai.Exchanges.ProductStatus.trading(),
+          status: Tai.Venues.ProductStatus.trading(),
           min_notional: Decimal.new("0.0001"),
           min_size: Decimal.new("0.0001"),
           min_price: Decimal.new("0.01"),
@@ -48,7 +48,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
         },
         %{
           symbol: :ltc_usd,
-          status: Tai.Exchanges.ProductStatus.trading(),
+          status: Tai.Venues.ProductStatus.trading(),
           min_notional: Decimal.new("0.0001"),
           min_size: Decimal.new("0.0001"),
           min_price: Decimal.new("0.01"),

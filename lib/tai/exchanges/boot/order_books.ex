@@ -1,6 +1,6 @@
 defmodule Tai.Exchanges.Boot.OrderBooks do
   @type adapter :: Tai.Exchanges.Adapter.t()
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
 
   @spec start(adapter :: adapter, products :: [product]) :: :ok
   def start(adapter, products) do

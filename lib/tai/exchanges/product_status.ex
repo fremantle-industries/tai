@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.ProductStatus do
+defmodule Tai.Venues.ProductStatus do
   def pre_trading, do: :pre_trading
   def trading, do: :trading
   def post_trading, do: :post_trading

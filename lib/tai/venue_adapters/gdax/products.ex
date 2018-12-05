@@ -8,7 +8,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
           | Tai.CredentialError.t()
           | Tai.ServiceUnavailableError.t()
           | Tai.TimeoutError.t()
-  @type products :: Tai.Exchanges.Product.t()
+  @type products :: Tai.Venues.Product.t()
 
   @spec products(venue_id :: atom) :: {:ok, [products]} | {:error, error}
   def products(venue_id) do
@@ -49,7 +49,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
     quote_increment = raw_quote_increment |> to_decimal
     min_notional = Decimal.mult(base_min_size, quote_increment)
 
-    %Tai.Exchanges.Product{
+    %Tai.Venues.Product{
       exchange_id: venue_id,
       symbol: symbol,
       exchange_symbol: id,

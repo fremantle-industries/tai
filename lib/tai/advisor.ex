@@ -7,7 +7,7 @@ defmodule Tai.Advisor do
 
   @type advisor :: Tai.Advisor.t()
   @type store :: map
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
   @type t :: %Tai.Advisor{
           group_id: atom,
           advisor_id: atom,

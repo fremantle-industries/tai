@@ -5,8 +5,8 @@ defmodule Tai.Exchanges.Boot.ProductsTest do
   defmodule MyAdapter do
     def products(_) do
       products = [
-        struct(Tai.Exchanges.Product, %{symbol: :btc_usd}),
-        struct(Tai.Exchanges.Product, %{symbol: :eth_usd})
+        struct(Tai.Venues.Product, %{symbol: :btc_usd}),
+        struct(Tai.Venues.Product, %{symbol: :eth_usd})
       ]
 
       {:ok, products}

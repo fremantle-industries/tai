@@ -1,6 +1,6 @@
 defmodule Tai.Exchanges.Boot.Fees do
   @type adapter :: Tai.Exchanges.Adapter.t()
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
 
   @spec hydrate(adapter :: adapter, products :: [product]) :: :ok | {:error, reason :: term}
   def hydrate(adapter, products) do

@@ -2,7 +2,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   use WebSockex
   require Logger
 
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
   @type t :: %Tai.VenueAdapters.Bitmex.Stream.Connection{
           venue_id: atom
         }

@@ -23,17 +23,17 @@ defmodule Tai.Exchanges.Boot.FeesTest do
   @venue_b :venue_b
   @account_a :account_a
   @account_b :account_b
-  @btc_usd_product struct(Tai.Exchanges.Product, %{
+  @btc_usd_product struct(Tai.Venues.Product, %{
                      exchange_id: @venue_a,
                      symbol: :btc_usd,
                      maker_fee: Decimal.new("0.001"),
                      taker_fee: Decimal.new("0.002")
                    })
-  @eth_usd_product struct(Tai.Exchanges.Product, %{
+  @eth_usd_product struct(Tai.Venues.Product, %{
                      exchange_id: @venue_a,
                      symbol: :eth_usd
                    })
-  @ltc_usd_product struct(Tai.Exchanges.Product, %{
+  @ltc_usd_product struct(Tai.Venues.Product, %{
                      exchange_id: @venue_b,
                      symbol: :ltc_usd,
                      maker_fee: Decimal.new("0.003"),

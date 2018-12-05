@@ -1,16 +1,16 @@
 defmodule Tai.TestSupport.Mock do
   @type location :: Tai.Markets.Location.t()
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
   @type fee_info :: Tai.Exchanges.FeeInfo.t()
 
   @spec mock_product(product | map) :: :ok
-  def mock_product(%Tai.Exchanges.Product{} = product) do
+  def mock_product(%Tai.Venues.Product{} = product) do
     product
     |> Tai.Venues.ProductStore.upsert()
   end
 
   def mock_product(attrs) when is_map(attrs) do
-    Tai.Exchanges.Product
+    Tai.Venues.Product
     |> struct(attrs)
     |> Tai.Venues.ProductStore.upsert()
   end

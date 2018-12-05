@@ -3,7 +3,7 @@ defmodule Tai.Transforms.ProductSymbolsByVenue do
   Transforms a list of products to a map of product symbols by venue
   """
 
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
 
   @spec all :: map
   @spec all([product]) :: map

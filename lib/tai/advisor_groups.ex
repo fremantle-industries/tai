@@ -2,7 +2,7 @@ defmodule Tai.AdvisorGroups do
   @type config :: Tai.Config.t()
   @type advisor_group :: Tai.AdvisorGroup.t()
   @type advisor_spec :: {atom, [group_id: atom, advisor_id: atom, order_books: map, store: map]}
-  @type product :: Tai.Exchanges.Product.t()
+  @type product :: Tai.Venues.Product.t()
 
   @spec parse_config(config :: config) :: {:ok, [advisor_group]} | {:error, map}
   def parse_config(%Tai.Config{advisor_groups: advisor_groups}) do

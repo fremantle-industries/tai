@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Product do
+defmodule Tai.Venues.Product do
   @type status ::
           :pre_trading
           | :trading
@@ -10,7 +10,7 @@ defmodule Tai.Exchanges.Product do
           | :settled
           | :unlisted
 
-  @type t :: %Tai.Exchanges.Product{
+  @type t :: %Tai.Venues.Product{
           exchange_id: atom,
           symbol: atom,
           exchange_symbol: String.t(),
