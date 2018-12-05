@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalancesTest do
 
   test "returns an error tuple when the secret is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/poloniex/error_invalid_secret" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.CredentialError{
                  reason: %ExPoloniex.AuthenticationError{
@@ -25,7 +25,7 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalancesTest do
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/poloniex/error_invalid_api_key" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.CredentialError{
                  reason: %ExPoloniex.AuthenticationError{
@@ -38,7 +38,7 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalancesTest do
 
   test "returns an error tuple when the request times out", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/poloniex/error_timeout" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.TimeoutError{reason: "network request timed out"}
              }

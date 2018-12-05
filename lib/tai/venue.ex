@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Exchange do
+defmodule Tai.Venue do
   @type config :: Tai.Config.t()
   @type adapter :: Tai.Venues.Adapter.t()
   @type product :: Tai.Venues.Product.t()

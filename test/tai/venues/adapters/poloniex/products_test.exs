@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Poloniex.ProductsTest do
 
   test "retrieves the trade rules for each product", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/poloniex/success" do
-      assert {:ok, products} = Tai.Exchanges.Exchange.products(adapter)
+      assert {:ok, products} = Tai.Venue.products(adapter)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :ltc_btc)
       assert product.min_notional == Decimal.new("0.0001")
       assert product.min_price == Decimal.new("0.00000001")
@@ -26,7 +26,7 @@ defmodule Tai.VenueAdapters.Poloniex.ProductsTest do
 
   test "returns an error tuple when the request times out", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/poloniex/error_timeout" do
-      assert Tai.Exchanges.Exchange.products(adapter) == {
+      assert Tai.Venue.products(adapter) == {
                :error,
                %Tai.TimeoutError{reason: "network request timed out"}
              }

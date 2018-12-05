@@ -22,7 +22,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
       setup_adapter(@adapter.id)
 
       use_cassette "exchange_adapters/shared/products/#{@adapter.id}/success" do
-        assert {:ok, products} = Tai.Exchanges.Exchange.products(@adapter)
+        assert {:ok, products} = Tai.Venue.products(@adapter)
         assert Enum.count(products) > 0
         assert [%Tai.Venues.Product{} = product | _] = products
         assert product.exchange_id == @adapter.id

@@ -28,7 +28,7 @@ defmodule Tai do
 
   defp boot_exchanges!(config) do
     config
-    |> Tai.Exchanges.Exchange.parse_adapters()
+    |> Tai.Venue.parse_adapters()
     |> Enum.map(fn adapter ->
       task =
         Task.Supervisor.async(

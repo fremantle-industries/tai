@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
 
   test "returns an error tuple when the secret is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/binance/error_invalid_secret" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.CredentialError{reason: "API-key format invalid."}
              }
@@ -21,7 +21,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/binance/error_invalid_api_key" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.CredentialError{reason: "API-key format invalid."}
              }
@@ -30,7 +30,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
 
   test "returns an error tuple when the request times out", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/binance/error_timeout" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.TimeoutError{reason: "network request timed out"}
              }
@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
   test "returns an error tuple when the timestamp of the local machine is outside the Binance receive window",
        %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/binance/error_timestamp_outside_recv_window" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.ApiError{reason: "Timestamp for this request is outside of the recvWindow."}
              }

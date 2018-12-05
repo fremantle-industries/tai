@@ -5,7 +5,7 @@ defmodule Tai.Venues.Boot.Products do
   @spec hydrate(adapter :: adapter) ::
           {:ok, filtered_products :: [product]} | {:error, reason :: term}
   def hydrate(adapter) do
-    with {:ok, all_products} <- Tai.Exchanges.Exchange.products(adapter) do
+    with {:ok, all_products} <- Tai.Venue.products(adapter) do
       filtered_products = filter(all_products, adapter.products)
       Enum.each(filtered_products, &Tai.Venues.ProductStore.upsert/1)
 

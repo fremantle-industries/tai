@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalancesTest do
 
   test "returns an error tuple when the passphrase is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/gdax/error_invalid_passphrase" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.CredentialError{reason: "Invalid Passphrase"}
              }
@@ -21,7 +21,7 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalancesTest do
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/gdax/error_invalid_api_key" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.CredentialError{reason: "Invalid API Key"}
              }
@@ -30,7 +30,7 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalancesTest do
 
   test "returns an error tuple when down for maintenance", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/gdax/error_maintenance" do
-      assert Tai.Exchanges.Exchange.asset_balances(adapter, :main) == {
+      assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
                %Tai.ServiceUnavailableError{
                  reason:

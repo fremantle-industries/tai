@@ -1,6 +1,6 @@
-defmodule Tai.Exchanges.ExchangeTest do
+defmodule Tai.VenueTest do
   use ExUnit.Case, async: true
-  doctest Tai.Exchanges.Exchange
+  doctest Tai.Venue
 
   describe "#parse_adapters" do
     test "returns a list of adapters parsed from the config" do
@@ -13,7 +13,7 @@ defmodule Tai.Exchanges.ExchangeTest do
           adapter_timeout: 100
         )
 
-      assert Tai.Exchanges.Exchange.parse_adapters(config) == [
+      assert Tai.Venue.parse_adapters(config) == [
                %Tai.Venues.Adapter{
                  id: :exchange_a,
                  adapter: MyAdapterA,
@@ -35,7 +35,7 @@ defmodule Tai.Exchanges.ExchangeTest do
       config = Tai.Config.parse(venues: %{invalid_exchange_a: []})
 
       assert_raise KeyError, "key :adapter not found in: []", fn ->
-        Tai.Exchanges.Exchange.parse_adapters(config)
+        Tai.Venue.parse_adapters(config)
       end
     end
 
@@ -56,7 +56,7 @@ defmodule Tai.Exchanges.ExchangeTest do
                  adapter: MyAdapterA,
                  timeout: 10
                }
-             ] = Tai.Exchanges.Exchange.parse_adapters(config)
+             ] = Tai.Venue.parse_adapters(config)
     end
 
     test "can provide a products filter" do
@@ -76,7 +76,7 @@ defmodule Tai.Exchanges.ExchangeTest do
                  adapter: MyAdapterA,
                  products: "-btc_usd"
                }
-             ] = Tai.Exchanges.Exchange.parse_adapters(config)
+             ] = Tai.Venue.parse_adapters(config)
     end
 
     test "can provide accounts" do
@@ -96,7 +96,7 @@ defmodule Tai.Exchanges.ExchangeTest do
                  adapter: MyAdapterA,
                  accounts: %{main: %{}}
                }
-             ] = Tai.Exchanges.Exchange.parse_adapters(config)
+             ] = Tai.Venue.parse_adapters(config)
     end
   end
 end

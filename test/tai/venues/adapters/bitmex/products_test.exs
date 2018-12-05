@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
 
   test "retrieves the trade rules for each product", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/bitmex/success" do
-      assert {:ok, products} = Tai.Exchanges.Exchange.products(adapter)
+      assert {:ok, products} = Tai.Venue.products(adapter)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :xbtusd)
       assert product.exchange_id == :bitmex
       assert product.exchange_symbol == "XBTUSD"
@@ -26,7 +26,7 @@ defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
 
   test "returns an error tuple on timeout", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/bitmex/error_timeout" do
-      assert Tai.Exchanges.Exchange.products(adapter) ==
+      assert Tai.Venue.products(adapter) ==
                {:error, %Tai.TimeoutError{reason: "network request timed out"}}
     end
   end

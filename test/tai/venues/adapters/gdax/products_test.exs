@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Gdax.ProductsTest do
 
   test "retrieves the trade rules for each product", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/gdax/success" do
-      assert {:ok, products} = Tai.Exchanges.Exchange.products(adapter)
+      assert {:ok, products} = Tai.Venue.products(adapter)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :ltc_btc)
       assert Decimal.cmp(product.min_notional, Decimal.new("0.000001")) == :eq
       assert Decimal.cmp(product.min_price, Decimal.new("0.00001")) == :eq
@@ -25,7 +25,7 @@ defmodule Tai.VenueAdapters.Gdax.ProductsTest do
 
   test "returns an error tuple when the passphrase is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/gdax/error_invalid_passphrase" do
-      assert Tai.Exchanges.Exchange.products(adapter) == {
+      assert Tai.Venue.products(adapter) == {
                :error,
                %Tai.CredentialError{reason: "Invalid Passphrase"}
              }
@@ -34,7 +34,7 @@ defmodule Tai.VenueAdapters.Gdax.ProductsTest do
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/gdax/error_invalid_api_key" do
-      assert Tai.Exchanges.Exchange.products(adapter) == {
+      assert Tai.Venue.products(adapter) == {
                :error,
                %Tai.CredentialError{reason: "Invalid API Key"}
              }
@@ -43,7 +43,7 @@ defmodule Tai.VenueAdapters.Gdax.ProductsTest do
 
   test "returns an error tuple when the request times out", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/gdax/error_timeout" do
-      assert Tai.Exchanges.Exchange.products(adapter) == {
+      assert Tai.Venue.products(adapter) == {
                :error,
                %Tai.TimeoutError{reason: "network request timed out"}
              }
@@ -52,7 +52,7 @@ defmodule Tai.VenueAdapters.Gdax.ProductsTest do
 
   test "returns an error tuple when down for maintenance", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/gdax/error_maintenance" do
-      assert Tai.Exchanges.Exchange.products(adapter) == {
+      assert Tai.Venue.products(adapter) == {
                :error,
                %Tai.ServiceUnavailableError{
                  reason:
