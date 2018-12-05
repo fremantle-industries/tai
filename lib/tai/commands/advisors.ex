@@ -12,7 +12,7 @@ defmodule Tai.Commands.Advisors do
   ]
 
   @spec advisors() :: no_return
-  @spec advisors(config :: config) :: no_return
+  @spec advisors(config) :: no_return
   def advisors(config \\ Tai.Config.parse()) do
     config
     |> Tai.AdvisorGroups.build_specs()
@@ -32,7 +32,7 @@ defmodule Tai.Commands.Advisors do
   end
 
   @spec stop() :: no_return
-  @spec stop(config :: config) :: no_return
+  @spec stop(config) :: no_return
   def stop(config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
       {:ok, {new, old}} = Tai.Advisors.stop(specs)
@@ -42,8 +42,8 @@ defmodule Tai.Commands.Advisors do
     IEx.dont_display_result()
   end
 
-  @spec start_advisor(group_id :: atom, advisor_id :: atom) :: no_return
-  @spec start_advisor(group_id :: atom, advisor_id :: atom, config :: config) :: no_return
+  @spec start_advisor(atom, atom) :: no_return
+  @spec start_advisor(atom, atom, config) :: no_return
   def start_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
       {:ok, {new, old}} = Tai.Advisors.start(specs)
@@ -53,8 +53,8 @@ defmodule Tai.Commands.Advisors do
     IEx.dont_display_result()
   end
 
-  @spec stop_advisor(group_id :: atom, advisor_id :: atom) :: no_return
-  @spec stop_advisor(group_id :: atom, advisor_id :: atom, config :: config) :: no_return
+  @spec stop_advisor(atom, atom) :: no_return
+  @spec stop_advisor(atom, atom, config) :: no_return
   def stop_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
     with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
       {:ok, {new, old}} = Tai.Advisors.stop(specs)

@@ -37,7 +37,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
   end
 
-  test "starts and stops all advisors in all groups" do
+  test "can start and stop all advisors in all groups" do
     mock_product(%{
       exchange_id: :test_exchange_a,
       symbol: :btc_usdt
@@ -119,7 +119,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
   end
 
-  test "starts and stops a single advisor in a group" do
+  test "can start and stop a single advisor in a group" do
     mock_product(%{
       exchange_id: :test_exchange_a,
       symbol: :btc_usdt
