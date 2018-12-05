@@ -1,8 +1,8 @@
-defmodule Tai.Exchanges.AssetBalancesTest do
+defmodule Tai.Venues.AssetBalancesTest do
   use ExUnit.Case
-  doctest Tai.Exchanges.AssetBalances
+  doctest Tai.Venues.AssetBalances
 
-  alias Tai.Exchanges.AssetBalances
+  alias Tai.Venues.AssetBalances
 
   setup do
     on_exit(fn ->

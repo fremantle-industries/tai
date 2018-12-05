@@ -43,28 +43,28 @@ defmodule Tai.Exchanges.BootTest do
       assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Exchanges.Boot.run(@adapter)
 
       assert {:ok, btc_balance} =
-               Tai.Exchanges.AssetBalances.find_by(
+               Tai.Venues.AssetBalances.find_by(
                  exchange_id: @exchange_id,
                  account_id: @account_id,
                  asset: :btc
                )
 
       assert {:ok, eth_balance} =
-               Tai.Exchanges.AssetBalances.find_by(
+               Tai.Venues.AssetBalances.find_by(
                  exchange_id: @exchange_id,
                  account_id: @account_id,
                  asset: :eth
                )
 
       assert {:ok, ltc_balance} =
-               Tai.Exchanges.AssetBalances.find_by(
+               Tai.Venues.AssetBalances.find_by(
                  exchange_id: @exchange_id,
                  account_id: @account_id,
                  asset: :ltc
                )
 
       assert {:ok, usdt_balance} =
-               Tai.Exchanges.AssetBalances.find_by(
+               Tai.Venues.AssetBalances.find_by(
                  exchange_id: @exchange_id,
                  account_id: :main,
                  asset: :usdt

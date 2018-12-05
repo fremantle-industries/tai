@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.AssetBalances.Unlock do
-  alias Tai.Exchanges.AssetBalances
+defmodule Tai.Venues.AssetBalances.Unlock do
+  alias Tai.Venues.AssetBalances
 
   @type unlock_request :: AssetBalances.UnlockRequest.t()
 

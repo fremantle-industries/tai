@@ -35,7 +35,7 @@ defmodule Tai.TestSupport.Mock do
           locked :: number | Decimal.t() | String.t()
         ) :: :ok
   def mock_asset_balance(exchange_id, account_id, asset, free, locked) do
-    Tai.Exchanges.AssetBalances.upsert(%Tai.Exchanges.AssetBalance{
+    Tai.Venues.AssetBalances.upsert(%Tai.Exchanges.AssetBalance{
       exchange_id: exchange_id,
       account_id: account_id,
       asset: asset,

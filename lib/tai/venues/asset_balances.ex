@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.AssetBalances do
-  alias Tai.Exchanges.AssetBalances
+defmodule Tai.Venues.AssetBalances do
+  alias Tai.Venues.AssetBalances
   use GenServer
 
   @type asset_balance :: Tai.Exchanges.AssetBalance.t()

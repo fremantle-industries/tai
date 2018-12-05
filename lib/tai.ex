@@ -12,7 +12,7 @@ defmodule Tai do
       {Tai.Settings, settings},
       Tai.Venues.ProductStore,
       Tai.Venues.FeeStore,
-      Tai.Exchanges.AssetBalances,
+      Tai.Venues.AssetBalances,
       Tai.Trading.OrderStore,
       Tai.Exchanges.AdaptersSupervisor,
       Tai.Exchanges.OrderBookFeedsSupervisor,
