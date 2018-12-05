@@ -1,5 +1,5 @@
-defmodule Tai.Exchanges.AssetBalance do
-  @type t :: %Tai.Exchanges.AssetBalance{
+defmodule Tai.Venues.AssetBalance do
+  @type t :: %Tai.Venues.AssetBalance{
           exchange_id: atom,
           account_id: atom,
           asset: atom,
@@ -23,7 +23,7 @@ defmodule Tai.Exchanges.AssetBalance do
   ]
 
   @spec total(balance :: t) :: Decimal.t()
-  def total(%Tai.Exchanges.AssetBalance{free: free, locked: locked}) do
+  def total(%Tai.Venues.AssetBalance{free: free, locked: locked}) do
     Decimal.add(free, locked)
   end
 end

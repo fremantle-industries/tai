@@ -35,7 +35,7 @@ defmodule Tai.Commands.Balance do
           balance.asset,
           balance.free,
           balance.locked,
-          Tai.Exchanges.AssetBalance.total(balance)
+          Tai.Venues.AssetBalance.total(balance)
         }
 
         [row | acc]

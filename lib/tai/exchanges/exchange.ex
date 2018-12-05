@@ -2,7 +2,7 @@ defmodule Tai.Exchanges.Exchange do
   @type config :: Tai.Config.t()
   @type adapter :: Tai.Exchanges.Adapter.t()
   @type product :: Tai.Venues.Product.t()
-  @type asset_balance :: Tai.Exchanges.AssetBalance.t()
+  @type asset_balance :: Tai.Venues.AssetBalance.t()
 
   @doc """
   Parse a map of exchange configurations into a list of adapter structs

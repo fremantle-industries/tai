@@ -16,7 +16,7 @@ defmodule Tai.Venues.AssetBalancesTest do
   describe ".upsert" do
     test "inserts the balance into the ETS table" do
       balance =
-        struct(Tai.Exchanges.AssetBalance, %{
+        struct(Tai.Venues.AssetBalance, %{
           exchange_id: :my_test_exchange,
           account_id: :my_test_account,
           asset: :btc
@@ -34,7 +34,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "broadcasts an event" do
       Tai.Events.firehose_subscribe()
 
-      balance = %Tai.Exchanges.AssetBalance{
+      balance = %Tai.Venues.AssetBalance{
         exchange_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: :btc,
@@ -57,7 +57,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns a list of balances" do
       assert AssetBalances.all() == []
 
-      balance = %Tai.Exchanges.AssetBalance{
+      balance = %Tai.Venues.AssetBalance{
         exchange_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: :btc,
@@ -74,7 +74,7 @@ defmodule Tai.Venues.AssetBalancesTest do
   describe ".where" do
     test "returns a list of the matching balances" do
       balance_1 =
-        struct(Tai.Exchanges.AssetBalance, %{
+        struct(Tai.Venues.AssetBalance, %{
           exchange_id: :my_test_exchange,
           account_id: :my_test_account_a,
           asset: :btc,
@@ -82,7 +82,7 @@ defmodule Tai.Venues.AssetBalancesTest do
         })
 
       balance_2 =
-        struct(Tai.Exchanges.AssetBalance, %{
+        struct(Tai.Venues.AssetBalance, %{
           exchange_id: :my_test_exchange,
           account_id: :my_test_account_b,
           asset: :btc,
@@ -110,7 +110,7 @@ defmodule Tai.Venues.AssetBalancesTest do
   describe ".find_by" do
     test "returns an ok tuple with the balance" do
       balance =
-        struct(Tai.Exchanges.AssetBalance, %{
+        struct(Tai.Venues.AssetBalance, %{
           exchange_id: :my_test_exchange,
           account_id: :my_test_account_a,
           asset: :btc
@@ -430,7 +430,7 @@ defmodule Tai.Venues.AssetBalancesTest do
   @free Decimal.new("1.1")
   @locked Decimal.new("2.1")
   defp init_asset_balance(_context) do
-    balance = %Tai.Exchanges.AssetBalance{
+    balance = %Tai.Venues.AssetBalance{
       exchange_id: :my_test_exchange,
       account_id: :my_test_account,
       asset: :btc,
