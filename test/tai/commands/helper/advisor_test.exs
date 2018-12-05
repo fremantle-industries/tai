@@ -60,10 +60,10 @@ defmodule Tai.Commands.Helper.AdvisorTest do
            """
 
     output = capture_io(&Tai.Commands.Helper.advisors/0)
-    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Config \|\s+Status \|\s+PID \|/
+    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Status \|\s+PID \|/
 
     assert output =~
-             ~r/\|\s+log_spread \|\s+test_exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
+             ~r/\|\s+log_spread \|\s+test_exchange_a_btc_usdt \|\s+running \|\s+#PID<.+> \|/
 
     refute output =~ ~r/\|\s+log_spread \|\s+test_exchange_b_eth_usdt.+running \|\s+#PID<.+> \|/
     refute output =~ ~r/\|\s+fill_or_kill_orders.+running \|\s+#PID<.+> \|/
@@ -75,13 +75,13 @@ defmodule Tai.Commands.Helper.AdvisorTest do
            """
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +---------------------+--------------------------+--------+-----------+-----+
-           |            Group ID |               Advisor ID | Config |    Status | PID |
-           +---------------------+--------------------------+--------+-----------+-----+
-           | fill_or_kill_orders | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
-           |          log_spread | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
-           |          log_spread | test_exchange_b_eth_usdt |    %{} | unstarted |   - |
-           +---------------------+--------------------------+--------+-----------+-----+\n
+           +---------------------+--------------------------+-----------+-----+
+           |            Group ID |               Advisor ID |    Status | PID |
+           +---------------------+--------------------------+-----------+-----+
+           | fill_or_kill_orders | test_exchange_a_btc_usdt | unstarted |   - |
+           |          log_spread | test_exchange_a_btc_usdt | unstarted |   - |
+           |          log_spread | test_exchange_b_eth_usdt | unstarted |   - |
+           +---------------------+--------------------------+-----------+-----+\n
            """
   end
 end

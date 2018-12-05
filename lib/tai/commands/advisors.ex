@@ -6,7 +6,6 @@ defmodule Tai.Commands.Advisors do
   @header [
     "Group ID",
     "Advisor ID",
-    "Config",
     "Status",
     "PID"
   ]
@@ -49,7 +48,6 @@ defmodule Tai.Commands.Advisors do
       [
         opts |> Keyword.fetch!(:group_id),
         opts |> Keyword.fetch!(:advisor_id),
-        opts |> Keyword.fetch!(:config) |> format_col,
         pid |> format_status_col,
         pid |> format_col
       ]
