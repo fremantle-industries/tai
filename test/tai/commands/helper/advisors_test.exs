@@ -118,47 +118,4 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            +---------------------+--------------------------+--------+-----------+-----+\n
            """
   end
-
-  test "can start and stop a single advisor in a group" do
-    mock_product(%{
-      exchange_id: :test_exchange_a,
-      symbol: :btc_usdt
-    })
-
-    mock_product(%{
-      exchange_id: :test_exchange_b,
-      symbol: :eth_usdt
-    })
-
-    assert capture_io(fn ->
-             Tai.Commands.Helper.start_advisor(:log_spread, :test_exchange_a_btc_usdt)
-           end) == """
-           Started advisors: 1 new, 0 already running
-           """
-
-    output = capture_io(&Tai.Commands.Helper.advisors/0)
-    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Config \|\s+Status \|\s+PID \|/
-
-    assert output =~
-             ~r/\|\s+log_spread \|\s+test_exchange_a_btc_usdt \|\s+%{} \|\s+running \|\s+#PID<.+> \|/
-
-    refute output =~ ~r/\|\s+log_spread \|\s+test_exchange_b_eth_usdt.+running \|\s+#PID<.+> \|/
-    refute output =~ ~r/\|\s+fill_or_kill_orders.+running \|\s+#PID<.+> \|/
-
-    assert capture_io(fn ->
-             Tai.Commands.Helper.stop_advisor(:log_spread, :test_exchange_a_btc_usdt)
-           end) == """
-           Stopped advisors: 1 new, 0 already stopped
-           """
-
-    assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +---------------------+--------------------------+--------+-----------+-----+
-           |            Group ID |               Advisor ID | Config |    Status | PID |
-           +---------------------+--------------------------+--------+-----------+-----+
-           | fill_or_kill_orders | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
-           |          log_spread | test_exchange_a_btc_usdt |    %{} | unstarted |   - |
-           |          log_spread | test_exchange_b_eth_usdt |    %{} | unstarted |   - |
-           +---------------------+--------------------------+--------+-----------+-----+\n
-           """
-  end
 end

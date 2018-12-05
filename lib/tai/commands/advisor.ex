@@ -27,6 +27,28 @@ defmodule Tai.Commands.Advisor do
     IEx.dont_display_result()
   end
 
+  @spec start_advisor(atom, atom) :: no_return
+  @spec start_advisor(atom, atom, config) :: no_return
+  def start_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
+      {:ok, {new, old}} = Tai.Advisors.start(specs)
+      IO.puts("Started advisors: #{new} new, #{old} already running")
+    end
+
+    IEx.dont_display_result()
+  end
+
+  @spec stop_advisor(atom, atom) :: no_return
+  @spec stop_advisor(atom, atom, config) :: no_return
+  def stop_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
+    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
+      {:ok, {new, old}} = Tai.Advisors.stop(specs)
+      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
+    end
+
+    IEx.dont_display_result()
+  end
+
   def format_status_col(val) when is_pid(val), do: :running
   def format_status_col(_), do: :unstarted
 
