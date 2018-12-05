@@ -9,14 +9,14 @@ defmodule Tai.Exchanges.FeeStoreTest do
 
     {:ok, _} = Application.ensure_all_started(:tai)
 
-    fee_info = %Tai.Exchanges.FeeInfo{
+    fee_info = %Tai.Venues.FeeInfo{
       exchange_id: :my_exchange,
       account_id: :main_account,
       symbol: :btc_usdt,
       maker: Decimal.new("0.1"),
-      maker_type: Tai.Exchanges.FeeInfo.percent(),
+      maker_type: Tai.Venues.FeeInfo.percent(),
       taker: Decimal.new("0.1"),
-      taker_type: Tai.Exchanges.FeeInfo.percent()
+      taker_type: Tai.Venues.FeeInfo.percent()
     }
 
     {:ok, %{fee_info: fee_info}}

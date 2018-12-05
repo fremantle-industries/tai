@@ -1,6 +1,6 @@
-defmodule Tai.Exchanges.FeeInfo do
+defmodule Tai.Venues.FeeInfo do
   @type fee_type :: :percent
-  @type t :: %Tai.Exchanges.FeeInfo{
+  @type t :: %Tai.Venues.FeeInfo{
           exchange_id: atom,
           account_id: atom,
           symbol: atom,

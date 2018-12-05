@@ -36,7 +36,7 @@ defmodule Tai.Exchanges.Boot.Fees do
   end
 
   defp upsert_product(product, adapter_id, account_id, maker, taker) do
-    %Tai.Exchanges.FeeInfo{
+    %Tai.Venues.FeeInfo{
       exchange_id: adapter_id,
       account_id: account_id,
       symbol: product.symbol,
