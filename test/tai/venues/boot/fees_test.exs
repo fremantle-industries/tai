@@ -1,6 +1,6 @@
-defmodule Tai.Exchanges.Boot.FeesTest do
+defmodule Tai.Venues.Boot.FeesTest do
   use ExUnit.Case, async: false
-  doctest Tai.Exchanges.Boot.Fees
+  doctest Tai.Venues.Boot.Fees
 
   defmodule AdapterWithFeeSchedule do
     def maker_taker_fees(_, _, _), do: {:ok, {Decimal.new("0.1"), Decimal.new("0.2")}}
@@ -56,7 +56,7 @@ defmodule Tai.Exchanges.Boot.FeesTest do
     test "uses the lowest fee between the product or schedule" do
       [adapter_a, _] = Tai.Exchanges.Exchange.parse_adapters(@config)
 
-      Tai.Exchanges.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
+      Tai.Venues.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
       assert {:ok, btc_usd_fee} =
                Tai.Venues.FeeStore.find_by(
@@ -72,7 +72,7 @@ defmodule Tai.Exchanges.Boot.FeesTest do
     test "uses the fee schedule when product doesn't have a maker/taker fee" do
       [adapter_a, _] = Tai.Exchanges.Exchange.parse_adapters(@config)
 
-      Tai.Exchanges.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
+      Tai.Venues.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
       assert {:ok, eth_usd_fee} =
                Tai.Venues.FeeStore.find_by(
@@ -88,7 +88,7 @@ defmodule Tai.Exchanges.Boot.FeesTest do
     test "uses the product fees when the venue doesn't have a fee schedule" do
       [_, adapter_b] = Tai.Exchanges.Exchange.parse_adapters(@config)
 
-      Tai.Exchanges.Boot.Fees.hydrate(adapter_b, [@ltc_usd_product])
+      Tai.Venues.Boot.Fees.hydrate(adapter_b, [@ltc_usd_product])
 
       assert {:ok, ltc_usd_fee} =
                Tai.Venues.FeeStore.find_by(

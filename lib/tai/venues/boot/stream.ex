@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Boot.Stream do
+defmodule Tai.Venues.Boot.Stream do
   @type adapter :: Tai.Exchanges.Adapter.t()
   @type product :: Tai.Venues.Product.t()
 

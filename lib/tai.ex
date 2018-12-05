@@ -33,7 +33,7 @@ defmodule Tai do
       task =
         Task.Supervisor.async(
           Tai.TaskSupervisor,
-          Tai.Exchanges.Boot,
+          Tai.Venues.Boot,
           :run,
           [adapter],
           timeout: adapter.timeout

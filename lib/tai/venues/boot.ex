@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Boot do
+defmodule Tai.Venues.Boot do
   @moduledoc """
   Coordinates the asynchronous hydration of a venue:
 
@@ -7,7 +7,7 @@ defmodule Tai.Exchanges.Boot do
   - fees
   """
 
-  alias Tai.Exchanges.Boot
+  alias Tai.Venues.Boot
 
   @type adapter :: Tai.Exchanges.Adapter.t()
 

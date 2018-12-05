@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Boot.Products do
+defmodule Tai.Venues.Boot.Products do
   @type adapter :: Tai.Exchanges.Adapter.t()
   @type product :: Tai.Venues.Product.t()
 

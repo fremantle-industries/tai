@@ -1,6 +1,6 @@
-defmodule Tai.Exchanges.Boot.ProductsTest do
+defmodule Tai.Venues.Boot.ProductsTest do
   use ExUnit.Case, async: false
-  doctest Tai.Exchanges.Boot.Products
+  doctest Tai.Venues.Boot.Products
 
   defmodule MyAdapter do
     def products(_) do
@@ -27,7 +27,7 @@ defmodule Tai.Exchanges.Boot.ProductsTest do
     [adapter] = Tai.Exchanges.Exchange.parse_adapters(config)
     Tai.Events.subscribe(Tai.Events.HydrateProducts)
 
-    Tai.Exchanges.Boot.Products.hydrate(adapter)
+    Tai.Venues.Boot.Products.hydrate(adapter)
 
     assert_receive {Tai.Event,
                     %Tai.Events.HydrateProducts{

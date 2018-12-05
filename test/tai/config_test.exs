@@ -8,7 +8,7 @@ defmodule Tai.ConfigTest do
 
       assert %Tai.Config{
                send_orders: false,
-               exchange_boot_handler: Tai.Exchanges.BootHandler,
+               exchange_boot_handler: Tai.Venues.BootHandler,
                venues: %{},
                advisor_groups: %{},
                adapter_timeout: 10_000,

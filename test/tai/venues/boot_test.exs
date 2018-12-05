@@ -1,6 +1,6 @@
-defmodule Tai.Exchanges.BootTest do
+defmodule Tai.Venues.BootTest do
   use ExUnit.Case, async: false
-  doctest Tai.Exchanges.Boot
+  doctest Tai.Venues.Boot
 
   setup_all do
     start_supervised!(Tai.TestSupport.Mocks.Server)
@@ -32,7 +32,7 @@ defmodule Tai.Exchanges.BootTest do
     }
 
     test "hydrates filtered products" do
-      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Exchanges.Boot.run(@adapter)
+      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Venues.Boot.run(@adapter)
 
       assert {:ok, btc_usdt_product} = Tai.Venues.ProductStore.find({@exchange_id, :btc_usdt})
       assert {:ok, eth_usdt_product} = Tai.Venues.ProductStore.find({@exchange_id, :eth_usdt})
@@ -40,7 +40,7 @@ defmodule Tai.Exchanges.BootTest do
     end
 
     test "hydrates asset balances" do
-      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Exchanges.Boot.run(@adapter)
+      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Venues.Boot.run(@adapter)
 
       assert {:ok, btc_balance} =
                Tai.Venues.AssetBalances.find_by(
@@ -72,7 +72,7 @@ defmodule Tai.Exchanges.BootTest do
     end
 
     test "hydrates fees" do
-      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Exchanges.Boot.run(@adapter)
+      assert {:ok, %Tai.Exchanges.Adapter{}} = Tai.Venues.Boot.run(@adapter)
 
       assert {:ok, btc_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
@@ -108,7 +108,7 @@ defmodule Tai.Exchanges.BootTest do
       }
 
       assert {:error, {^adapter, [products: :mock_response_not_found]}} =
-               Tai.Exchanges.Boot.run(adapter)
+               Tai.Venues.Boot.run(adapter)
     end
   end
 
@@ -125,7 +125,7 @@ defmodule Tai.Exchanges.BootTest do
       }
 
       assert {:error, {^adapter, [asset_balances: :mock_response_not_found]}} =
-               Tai.Exchanges.Boot.run(adapter)
+               Tai.Venues.Boot.run(adapter)
     end
   end
 
@@ -142,7 +142,7 @@ defmodule Tai.Exchanges.BootTest do
       }
 
       assert {:error, {^adapter, [fees: :mock_response_not_found]}} =
-               Tai.Exchanges.Boot.run(adapter)
+               Tai.Venues.Boot.run(adapter)
     end
   end
 

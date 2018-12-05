@@ -1,4 +1,4 @@
-defmodule Tai.Exchanges.Boot.AssetBalances do
+defmodule Tai.Venues.Boot.AssetBalances do
   @type adapter :: Tai.Exchanges.Adapter.t()
 
   @spec hydrate(adapter :: adapter) :: :ok | {:error, reason :: term}
