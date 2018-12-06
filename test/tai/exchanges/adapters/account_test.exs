@@ -40,14 +40,18 @@ defmodule Tai.Venues.Adapters.AccountTest do
       test "#{exchange_id} adapter can create a fill or kill duration order" do
         use_cassette "exchange_adapters/shared/account/#{@exchange_id}/buy_limit_fill_or_kill_success" do
           assert {:ok, %Tai.Trading.OrderResponse{} = response} =
-                   Tai.Exchanges.Account.buy_limit(
-                     @exchange_id,
-                     @account_id,
-                     :ltcbtc,
-                     0.0165,
-                     0.01,
-                     Tai.Trading.TimeInForce.fill_or_kill()
-                   )
+                   Tai.Trading.Order
+                   |> struct(%{
+                     exchange_id: @exchange_id,
+                     account_id: @account_id,
+                     side: :buy,
+                     type: :limit,
+                     symbol: :ltcbtc,
+                     price: Decimal.new("0.0165"),
+                     size: Decimal.new("0.01"),
+                     time_in_force: :fok
+                   })
+                   |> Tai.Exchanges.Account.buy_limit()
 
           assert response.id != nil
           assert response.status == Tai.Trading.OrderStatus.expired()
@@ -60,28 +64,36 @@ defmodule Tai.Venues.Adapters.AccountTest do
       test "#{exchange_id} adapter returns an insufficient funds error tuple" do
         use_cassette "exchange_adapters/shared/account/#{@exchange_id}/buy_limit_fill_or_kill_error_insufficient_funds" do
           assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
-                   Tai.Exchanges.Account.buy_limit(
-                     @exchange_id,
-                     @account_id,
-                     :ltcbtc,
-                     0.001,
-                     10_000.01,
-                     Tai.Trading.TimeInForce.fill_or_kill()
-                   )
+                   Tai.Trading.Order
+                   |> struct(%{
+                     exchange_id: @exchange_id,
+                     account_id: @account_id,
+                     side: :buy,
+                     type: :limit,
+                     symbol: :ltcbtc,
+                     price: Decimal.new("0.001"),
+                     size: Decimal.new("10000.01"),
+                     time_in_force: :fok
+                   })
+                   |> Tai.Exchanges.Account.buy_limit()
         end
       end
 
       test "#{exchange_id} adapter can create an immediate or cancel duration order" do
         use_cassette "exchange_adapters/shared/account/#{@exchange_id}/buy_limit_immediate_or_cancel_success" do
           assert {:ok, %Tai.Trading.OrderResponse{} = response} =
-                   Tai.Exchanges.Account.buy_limit(
-                     @exchange_id,
-                     @account_id,
-                     :ltcbtc,
-                     0.016,
-                     0.02,
-                     Tai.Trading.TimeInForce.immediate_or_cancel()
-                   )
+                   Tai.Trading.Order
+                   |> struct(%{
+                     exchange_id: @exchange_id,
+                     account_id: @account_id,
+                     side: :buy,
+                     type: :limit,
+                     symbol: :ltcbtc,
+                     price: Decimal.new("0.016"),
+                     size: Decimal.new("0.02"),
+                     time_in_force: :ioc
+                   })
+                   |> Tai.Exchanges.Account.buy_limit()
 
           assert response.id != nil
           assert response.status == Tai.Trading.OrderStatus.expired()
@@ -103,14 +115,18 @@ defmodule Tai.Venues.Adapters.AccountTest do
       test "#{exchange_id} adapter can create a fill or kill duration order" do
         use_cassette "exchange_adapters/shared/account/#{@exchange_id}/sell_limit_fill_or_kill_success" do
           assert {:ok, %Tai.Trading.OrderResponse{} = response} =
-                   Tai.Exchanges.Account.sell_limit(
-                     @exchange_id,
-                     @account_id,
-                     :ltcbtc,
-                     0.16,
-                     0.01,
-                     Tai.Trading.TimeInForce.fill_or_kill()
-                   )
+                   Tai.Trading.Order
+                   |> struct(%{
+                     exchange_id: @exchange_id,
+                     account_id: @account_id,
+                     side: :sell,
+                     type: :limit,
+                     symbol: :ltcbtc,
+                     price: Decimal.new("0.016"),
+                     size: Decimal.new("0.01"),
+                     time_in_force: :fok
+                   })
+                   |> Tai.Exchanges.Account.sell_limit()
 
           assert response.id != nil
           assert response.status == Tai.Trading.OrderStatus.expired()
@@ -123,14 +139,18 @@ defmodule Tai.Venues.Adapters.AccountTest do
       test "#{exchange_id} adapter can create an immediate or cancel duration order" do
         use_cassette "exchange_adapters/shared/account/#{@exchange_id}/sell_limit_immediate_or_cancel_success" do
           assert {:ok, %Tai.Trading.OrderResponse{} = response} =
-                   Tai.Exchanges.Account.sell_limit(
-                     @exchange_id,
-                     @account_id,
-                     :ltcbtc,
-                     0.16,
-                     0.02,
-                     Tai.Trading.TimeInForce.immediate_or_cancel()
-                   )
+                   Tai.Trading.Order
+                   |> struct(%{
+                     exchange_id: @exchange_id,
+                     account_id: @account_id,
+                     side: :sell,
+                     type: :limit,
+                     symbol: :ltcbtc,
+                     price: Decimal.new("0.16"),
+                     size: Decimal.new("0.02"),
+                     time_in_force: :ioc
+                   })
+                   |> Tai.Exchanges.Account.sell_limit()
 
           assert response.id != nil
           assert response.status == Tai.Trading.OrderStatus.expired()

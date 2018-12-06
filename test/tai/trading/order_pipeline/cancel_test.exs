@@ -28,13 +28,13 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
       )
 
       order =
-        OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+        OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
-          price: 100.1,
-          qty: 0.1,
-          time_in_force: :gtc,
+          price: Decimal.new("100.1"),
+          qty: Decimal.new("0.1"),
+          post_only: false,
           order_updated_callback: fire_order_callback(self())
         })
 
@@ -114,13 +114,13 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
     Tai.Events.firehose_subscribe()
 
     order =
-      OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+      OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd_expired,
-        price: 100.1,
-        qty: 0.1,
-        time_in_force: :gtc
+        price: Decimal.new("100.1"),
+        qty: Decimal.new("0.1"),
+        post_only: false
       })
 
     assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}

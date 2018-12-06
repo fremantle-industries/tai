@@ -27,13 +27,13 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
     end
 
     test "fires the callback" do
-      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
-        price: 100.1,
-        qty: 0.1,
-        time_in_force: :gtc,
+        price: Decimal.new("100.1"),
+        qty: Decimal.new("0.1"),
+        post_only: false,
         order_updated_callback: fire_order_callback(self())
       })
 
@@ -48,13 +48,13 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
-          price: 100.1,
-          qty: 0.1,
-          time_in_force: :gtc
+          price: Decimal.new("100.1"),
+          qty: Decimal.new("0.1"),
+          post_only: false
         })
 
       client_id = order.client_id
@@ -81,13 +81,13 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
     end
 
     test "fires the callback" do
-      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
-        price: 100_000.1,
-        qty: 0.01,
-        time_in_force: :gtc,
+        price: Decimal.new("100000.1"),
+        qty: Decimal.new("0.01"),
+        post_only: false,
         order_updated_callback: fire_order_callback(self())
       })
 
@@ -102,13 +102,13 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
-          price: 100_000.1,
-          qty: 0.01,
-          time_in_force: :gtc
+          price: Decimal.new("100000.1"),
+          qty: Decimal.new("0.01"),
+          post_only: false
         })
 
       client_id = order.client_id

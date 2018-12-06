@@ -1,12 +1,12 @@
 defmodule Tai.Trading.OrderPipeline.Enqueue do
-  alias Tai.Trading.OrderPipeline
+  alias Tai.Trading
 
-  @type submission :: Tai.Trading.OrderSubmission.t()
-  @type order :: Tai.Trading.Order.t()
+  @type submission :: Trading.OrderStore.submission()
+  @type order :: Trading.Order.t()
 
   @spec execute_step(submission) :: order
-  def execute_step(%Tai.Trading.OrderSubmission{} = submission) do
-    [order] = Tai.Trading.OrderStore.add(submission)
+  def execute_step(submission) do
+    {:ok, order} = Trading.OrderStore.add(submission)
 
     Task.start_link(fn ->
       order
@@ -19,16 +19,16 @@ defmodule Tai.Trading.OrderPipeline.Enqueue do
   end
 
   defp log_enqueued(order) do
-    OrderPipeline.Events.info(order)
+    Trading.OrderPipeline.Events.info(order)
     order
   end
 
   defp initial_update_callback(order) do
-    Tai.Trading.Order.execute_update_callback(nil, order)
+    Trading.Order.execute_update_callback(nil, order)
     order
   end
 
   defp next_step(order) do
-    OrderPipeline.Send.execute_step(order)
+    Trading.OrderPipeline.Send.execute_step(order)
   end
 end

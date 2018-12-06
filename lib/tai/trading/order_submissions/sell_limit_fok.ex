@@ -1,11 +1,10 @@
-defmodule Tai.Trading.Orders.SellLimit do
-  @type t :: %Tai.Trading.Orders.SellLimit{
+defmodule Tai.Trading.OrderSubmissions.SellLimitFok do
+  @type t :: %Tai.Trading.OrderSubmissions.SellLimitFok{
           venue_id: atom,
           account_id: atom,
           product_symbol: atom,
-          price: number,
-          qty: number,
-          time_in_force: Tai.Trading.Order.time_in_force(),
+          price: Decimal.t(),
+          qty: Decimal.t(),
           order_updated_callback: function | nil
         }
 
@@ -14,8 +13,7 @@ defmodule Tai.Trading.Orders.SellLimit do
     :account_id,
     :product_symbol,
     :price,
-    :qty,
-    :time_in_force
+    :qty
   ]
   defstruct [
     :venue_id,
@@ -23,7 +21,6 @@ defmodule Tai.Trading.Orders.SellLimit do
     :product_symbol,
     :price,
     :qty,
-    :time_in_force,
     :order_updated_callback
   ]
 end

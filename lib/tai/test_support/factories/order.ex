@@ -12,6 +12,7 @@ defmodule Tai.TestSupport.Factories.Order do
       status: Tai.Trading.OrderStatus.enqueued(),
       symbol: :ignore,
       time_in_force: :ignore,
+      post_only: false,
       order_updated_callback: callback
     }
   end

@@ -7,8 +7,9 @@ defmodule Tai.Venue do
   @doc """
   Parse a map of exchange configurations into a list of adapter structs
   """
+  @spec parse_adapters() :: [adapter]
   @spec parse_adapters(config :: config) :: [adapter]
-  def parse_adapters(%Tai.Config{} = config) do
+  def parse_adapters(%Tai.Config{} = config \\ Tai.Config.parse()) do
     config.venues
     |> Enum.map(fn {id, params} ->
       %Tai.Venues.Adapter{

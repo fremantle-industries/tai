@@ -16,13 +16,12 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
   end
 
   test "fires the callback" do
-    Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+    Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
       venue_id: :test_exchange_a,
       account_id: :main,
       product_symbol: :btc_usd,
-      price: 100.1,
-      qty: 0.1,
-      time_in_force: :fok,
+      price: Decimal.new("100.1"),
+      qty: Decimal.new("0.1"),
       order_updated_callback: fire_order_callback(self())
     })
 
@@ -35,13 +34,12 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
 
   test "broadcasts an event with the reason for the error" do
     order =
-      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
-        price: 100.1,
-        qty: 0.1,
-        time_in_force: :fok
+        price: Decimal.new("100.1"),
+        qty: Decimal.new("0.1")
       })
 
     client_id = order.client_id

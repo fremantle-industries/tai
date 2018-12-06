@@ -11,121 +11,72 @@ defmodule Tai.Trading.OrderStoreTest do
     :ok
   end
 
-  defp add_order do
-    Tai.Trading.OrderSubmission.buy_limit(
-      :my_test_exchange,
-      :my_test_account,
-      :btc_usd,
-      100.0,
-      1.0,
-      Tai.Trading.TimeInForce.fill_or_kill()
-    )
-    |> Tai.Trading.OrderStore.add()
-  end
+  describe ".add" do
+    @sides [:buy, :sell]
 
-  test "count returns the total number of orders" do
-    assert Tai.Trading.OrderStore.count() == 0
+    @sides
+    |> Enum.each(fn side ->
+      @side side
 
-    add_order()
+      test "enqueues #{side} gtc orders" do
+        submission = build_submission(@side, :gtc, post_only: true)
 
-    assert Tai.Trading.OrderStore.count() == 1
-  end
+        assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.OrderStore.add(submission)
 
-  test "count can filter by status" do
-    assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.enqueued()) == 0
-    assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.pending()) == 0
+        assert order.client_id != nil
+        assert order.side == @side
+        assert order.post_only == true
+        assert order.time_in_force == :gtc
+        assert order.exchange_id == :test_exchange_a
+        assert order.account_id == :main
+        assert order.symbol == :btc_usd
+        assert %Decimal{} = order.price
+        assert %Decimal{} = order.size
+        assert order.status == :enqueued
+        assert %DateTime{} = order.enqueued_at
+      end
 
-    add_order()
+      test "enqueues #{side} fok orders" do
+        submission = build_submission(@side, :fok)
 
-    assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.enqueued()) == 1
-    assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.pending()) == 0
-  end
+        assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.OrderStore.add(submission)
 
-  describe "#add" do
-    test "can take a single submission" do
-      assert Tai.Trading.OrderStore.count() == 0
+        assert order.client_id != nil
+        assert order.side == @side
+        assert order.post_only == false
+        assert order.time_in_force == :fok
+        assert order.exchange_id == :test_exchange_a
+        assert order.account_id == :main
+        assert order.symbol == :btc_usd
+        assert %Decimal{} = order.price
+        assert %Decimal{} = order.size
+        assert order.status == :enqueued
+        assert %DateTime{} = order.enqueued_at
+      end
 
-      [order] = add_order()
+      test "enqueues #{side} ioc orders" do
+        submission = build_submission(@side, :ioc)
 
-      assert Tai.Trading.OrderStore.count() == 1
-      assert {:ok, _} = UUID.info(order.client_id)
-      assert order.exchange_id == :my_test_exchange
-      assert order.account_id == :my_test_account
-      assert order.symbol == :btc_usd
-      assert order.price == Decimal.new("100.0")
-      assert order.size == Decimal.new("1.0")
-      assert order.status == Tai.Trading.OrderStatus.enqueued()
-      assert order.side == Tai.Trading.Order.buy()
-      assert order.type == Tai.Trading.Order.limit()
-      assert %DateTime{} = order.enqueued_at
-    end
+        assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.OrderStore.add(submission)
 
-    test "can take multiple submissions" do
-      assert Tai.Trading.OrderStore.count() == 0
-
-      submission_1 =
-        Tai.Trading.OrderSubmission.buy_limit(
-          :my_test_exchange,
-          :my_test_account,
-          :btc_usd,
-          100.0,
-          1.0,
-          Tai.Trading.TimeInForce.fill_or_kill()
-        )
-
-      submission_2 =
-        Tai.Trading.OrderSubmission.sell_limit(
-          :my_test_exchange,
-          :my_test_account,
-          :ltc_usd,
-          10.0,
-          1.1,
-          Tai.Trading.TimeInForce.fill_or_kill()
-        )
-
-      [order_1, order_2] =
-        [submission_1, submission_2]
-        |> Tai.Trading.OrderStore.add()
-
-      assert Tai.Trading.OrderStore.count() == 2
-
-      assert {:ok, _} = UUID.info(order_1.client_id)
-      assert order_1.exchange_id == :my_test_exchange
-      assert order_1.account_id == :my_test_account
-      assert order_1.symbol == :btc_usd
-      assert order_1.side == Tai.Trading.Order.buy()
-      assert order_1.type == Tai.Trading.Order.limit()
-      assert order_1.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
-      assert order_1.price == Decimal.new("100.0")
-      assert order_1.size == Decimal.new("1.0")
-      assert order_1.status == Tai.Trading.OrderStatus.enqueued()
-      assert %DateTime{} = order_1.enqueued_at
-
-      assert {:ok, _} = UUID.info(order_2.client_id)
-      assert order_2.exchange_id == :my_test_exchange
-      assert order_2.account_id == :my_test_account
-      assert order_2.symbol == :ltc_usd
-      assert order_2.side == Tai.Trading.Order.sell()
-      assert order_2.type == Tai.Trading.Order.limit()
-      assert order_2.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
-      assert order_2.price == Decimal.new("10.0")
-      assert order_2.size == Decimal.new("1.1")
-      assert order_2.status == Tai.Trading.OrderStatus.enqueued()
-      assert %DateTime{} = order_2.enqueued_at
-    end
-
-    test "can take an empty list" do
-      assert Tai.Trading.OrderStore.count() == 0
-
-      [] = Tai.Trading.OrderStore.add([])
-
-      assert Tai.Trading.OrderStore.count() == 0
-    end
+        assert order.client_id != nil
+        assert order.side == @side
+        assert order.time_in_force == :ioc
+        assert order.post_only == false
+        assert order.exchange_id == :test_exchange_a
+        assert order.account_id == :main
+        assert order.symbol == :btc_usd
+        assert %Decimal{} = order.price
+        assert %Decimal{} = order.size
+        assert order.status == :enqueued
+        assert %DateTime{} = order.enqueued_at
+      end
+    end)
   end
 
   describe "#find" do
     test "returns an ok tuple with the order " do
-      [order] = add_order()
+      {:ok, order} = submit_order()
 
       assert {:ok, ^order} = Tai.Trading.OrderStore.find(order.client_id)
     end
@@ -137,7 +88,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
   describe "#find_by_and_update" do
     test "can change the whitelist of attributes" do
-      [order] = add_order()
+      {:ok, order} = submit_order()
 
       assert {:ok, [old_order, updated_order]} =
                Tai.Trading.OrderStore.find_by_and_update(
@@ -160,8 +111,8 @@ defmodule Tai.Trading.OrderStoreTest do
     end
 
     test "returns an error tuple when multiple orders are found" do
-      add_order()
-      add_order()
+      {:ok, _} = submit_order()
+      {:ok, _} = submit_order()
 
       assert {:error, :multiple_orders_found} =
                Tai.Trading.OrderStore.find_by_and_update(
@@ -171,28 +122,48 @@ defmodule Tai.Trading.OrderStoreTest do
     end
   end
 
-  test "all returns a list of current orders" do
+  test ".all returns a list of current orders" do
     assert Tai.Trading.OrderStore.all() == []
 
-    [order] = add_order()
+    {:ok, order} = submit_order()
 
     assert Tai.Trading.OrderStore.all() == [order]
   end
 
-  describe "#where" do
+  describe ".count" do
+    test "count returns the total number of orders" do
+      assert Tai.Trading.OrderStore.count() == 0
+
+      {:ok, _} = submit_order()
+
+      assert Tai.Trading.OrderStore.count() == 1
+    end
+
+    test "count can filter by status" do
+      assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.enqueued()) == 0
+      assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.pending()) == 0
+
+      {:ok, _} = submit_order()
+
+      assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.enqueued()) == 1
+      assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.pending()) == 0
+    end
+  end
+
+  describe ".where" do
     test "can filter by a singular client_id" do
-      add_order()
-      [order_2] = add_order()
-      add_order()
+      {:ok, _} = submit_order()
+      {:ok, order_2} = submit_order()
+      {:ok, _} = submit_order()
 
       assert Tai.Trading.OrderStore.where(client_id: order_2.client_id) == [order_2]
       assert Tai.Trading.OrderStore.where(client_id: "client_id_does_not_exist") == []
     end
 
     test "can filter by multiple client_ids" do
-      add_order()
-      [order_2] = add_order()
-      [order_3] = add_order()
+      {:ok, _} = submit_order()
+      {:ok, order_2} = submit_order()
+      {:ok, order_3} = submit_order()
 
       found_orders =
         [client_id: [order_2.client_id, order_3.client_id]]
@@ -205,8 +176,8 @@ defmodule Tai.Trading.OrderStoreTest do
     end
 
     test "can filter by a single status" do
-      [order_1] = add_order()
-      [order_2] = add_order()
+      {:ok, order_1} = submit_order()
+      {:ok, order_2} = submit_order()
 
       found_orders =
         [status: Tai.Trading.OrderStatus.enqueued()]
@@ -219,9 +190,9 @@ defmodule Tai.Trading.OrderStoreTest do
     end
 
     test "can filter by multiple status'" do
-      [order_1] = add_order()
-      [order_2] = add_order()
-      [order_3] = add_order()
+      {:ok, order_1} = submit_order()
+      {:ok, order_2} = submit_order()
+      {:ok, order_3} = submit_order()
 
       {:ok, [_, updated_order_2]} =
         Tai.Trading.OrderStore.find_by_and_update(
@@ -245,9 +216,9 @@ defmodule Tai.Trading.OrderStoreTest do
     end
 
     test "can filter by client_ids and status" do
-      add_order()
-      [order_2] = add_order()
-      [order_3] = add_order()
+      submit_order()
+      {:ok, order_2} = submit_order()
+      {:ok, order_3} = submit_order()
 
       {:ok, [_, updated_order_2]} =
         Tai.Trading.OrderStore.find_by_and_update(
@@ -271,5 +242,73 @@ defmodule Tai.Trading.OrderStoreTest do
 
       assert error_orders == [updated_order_2, updated_order_3]
     end
+  end
+
+  defp submit_order do
+    :buy
+    |> build_submission(:fok)
+    |> Tai.Trading.OrderStore.add()
+  end
+
+  def build_submission(:buy, :gtc, post_only: post_only) do
+    %Tai.Trading.OrderSubmissions.BuyLimitGtc{
+      venue_id: :test_exchange_a,
+      account_id: :main,
+      product_symbol: :btc_usd,
+      price: Decimal.new("100.1"),
+      qty: Decimal.new("1.1"),
+      post_only: post_only
+    }
+  end
+
+  def build_submission(:sell, :gtc, post_only: post_only) do
+    %Tai.Trading.OrderSubmissions.SellLimitGtc{
+      venue_id: :test_exchange_a,
+      account_id: :main,
+      product_symbol: :btc_usd,
+      price: Decimal.new("50000.5"),
+      qty: Decimal.new("0.1"),
+      post_only: post_only
+    }
+  end
+
+  def build_submission(:buy, :fok) do
+    %Tai.Trading.OrderSubmissions.BuyLimitFok{
+      venue_id: :test_exchange_a,
+      account_id: :main,
+      product_symbol: :btc_usd,
+      price: Decimal.new("100.1"),
+      qty: Decimal.new("1.1")
+    }
+  end
+
+  def build_submission(:sell, :fok) do
+    %Tai.Trading.OrderSubmissions.SellLimitFok{
+      venue_id: :test_exchange_a,
+      account_id: :main,
+      product_symbol: :btc_usd,
+      price: Decimal.new("50000.5"),
+      qty: Decimal.new("0.1")
+    }
+  end
+
+  def build_submission(:buy, :ioc) do
+    %Tai.Trading.OrderSubmissions.BuyLimitIoc{
+      venue_id: :test_exchange_a,
+      account_id: :main,
+      product_symbol: :btc_usd,
+      price: Decimal.new("100.1"),
+      qty: Decimal.new("1.1")
+    }
+  end
+
+  def build_submission(:sell, :ioc) do
+    %Tai.Trading.OrderSubmissions.SellLimitIoc{
+      venue_id: :test_exchange_a,
+      account_id: :main,
+      product_symbol: :btc_usd,
+      price: Decimal.new("50000.5"),
+      qty: Decimal.new("0.1")
+    }
   end
 end

@@ -26,13 +26,12 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     end
 
     test "fires the callback when the status changes to expired" do
-      OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+      OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
-        price: 100.1,
-        qty: 0.1,
-        time_in_force: :fok,
+        price: Decimal.new("100.1"),
+        qty: Decimal.new("0.1"),
         order_updated_callback: fire_order_callback(self())
       })
 
@@ -47,13 +46,12 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+        OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
-          price: 100.1,
-          qty: 0.1,
-          time_in_force: :fok
+          price: Decimal.new("100.1"),
+          qty: Decimal.new("0.1")
         })
 
       client_id = order.client_id
@@ -79,13 +77,12 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     end
 
     test "fires the callback when the status changes to expired" do
-      OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+      OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
-        price: 10_000.1,
-        qty: 0.1,
-        time_in_force: :fok,
+        price: Decimal.new("10000.1"),
+        qty: Decimal.new("0.1"),
         order_updated_callback: fire_order_callback(self())
       })
 
@@ -100,13 +97,12 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+        OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitFok{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
-          price: 10_000.1,
-          qty: 0.1,
-          time_in_force: :fok
+          price: Decimal.new("10000.1"),
+          qty: Decimal.new("0.1")
         })
 
       client_id = order.client_id
@@ -132,13 +128,12 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     end
 
     test "fires the callback" do
-      OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+      OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
-        price: 100.1,
-        qty: 0.1,
-        time_in_force: :fok,
+        price: Decimal.new("100.1"),
+        qty: Decimal.new("0.1"),
         order_updated_callback: fire_order_callback(self())
       })
 
@@ -153,13 +148,12 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        OrderPipeline.enqueue(%Tai.Trading.Orders.BuyLimit{
+        OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
-          price: 100.1,
-          qty: 0.1,
-          time_in_force: :fok
+          price: Decimal.new("100.1"),
+          qty: Decimal.new("0.1")
         })
 
       client_id = order.client_id
@@ -185,13 +179,12 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
     end
 
     test "fires the callback" do
-      OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+      OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
-        price: 10_000.1,
-        qty: 0.1,
-        time_in_force: :fok,
+        price: Decimal.new("10000.1"),
+        qty: Decimal.new("0.1"),
         order_updated_callback: fire_order_callback(self())
       })
 
@@ -206,13 +199,12 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        OrderPipeline.enqueue(%Tai.Trading.Orders.SellLimit{
+        OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitFok{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
-          price: 10_000.1,
-          qty: 0.1,
-          time_in_force: :fok
+          price: Decimal.new("10000.1"),
+          qty: Decimal.new("0.1")
         })
 
       client_id = order.client_id

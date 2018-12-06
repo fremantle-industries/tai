@@ -1,11 +1,13 @@
 defmodule Tai.Trading.Order do
+  alias Tai.Trading.Order
+
   @type client_id :: String.t()
   @type side :: :buy | :sell
   @type time_in_force :: :gtc | :fok | :ioc
   @type type :: :limit
   @type status ::
           :enqueued | :expired | :pending | :filled | :canceling | :canceled | :error | :skip
-  @type t :: %Tai.Trading.Order{
+  @type t :: %Order{
           client_id: client_id,
           exchange_id: atom,
           account_id: atom,
@@ -16,7 +18,8 @@ defmodule Tai.Trading.Order do
           time_in_force: time_in_force,
           type: type,
           price: Decimal.t(),
-          size: Decimal.t()
+          size: Decimal.t(),
+          post_only: boolean
         }
 
   @enforce_keys [
@@ -30,7 +33,8 @@ defmodule Tai.Trading.Order do
     :status,
     :symbol,
     :time_in_force,
-    :type
+    :type,
+    :post_only
   ]
   defstruct executed_size: Decimal.new(0),
             client_id: nil,
@@ -47,41 +51,23 @@ defmodule Tai.Trading.Order do
             symbol: nil,
             time_in_force: nil,
             type: nil,
+            post_only: nil,
             order_updated_callback: nil
 
-  @doc """
-  Returns the buy side symbol
-  """
-  def buy, do: :buy
+  @spec buy_limit?(t) :: boolean
+  def buy_limit?(%Order{side: :buy, type: :limit}), do: true
+  def buy_limit?(%Order{}), do: false
 
-  @doc """
-  Returns the sell side symbol
-  """
-  def sell, do: :sell
-
-  @doc """
-  Returns the limit type symbol
-  """
-  def limit, do: :limit
-
-  @doc """
-  Returns true for buy side orders with a limit type, returns false otherwise
-  """
-  def buy_limit?(%Tai.Trading.Order{side: :buy, type: :limit}), do: true
-  def buy_limit?(%Tai.Trading.Order{}), do: false
-
-  @doc """
-  Returns true for sell side orders with a limit type, returns false otherwise
-  """
-  def sell_limit?(%Tai.Trading.Order{side: :sell, type: :limit}), do: true
-  def sell_limit?(%Tai.Trading.Order{}), do: false
+  @spec sell_limit?(t) :: boolean
+  def sell_limit?(%Order{side: :sell, type: :limit}), do: true
+  def sell_limit?(%Order{}), do: false
 
   @doc """
   Execute the callback function if provided
   """
-  def execute_update_callback(_prev, %Tai.Trading.Order{order_updated_callback: nil}), do: :ok
+  def execute_update_callback(_, %Order{order_updated_callback: nil}), do: :ok
 
-  def execute_update_callback(previous, %Tai.Trading.Order{} = updated) do
+  def execute_update_callback(previous, %Order{} = updated) do
     updated.order_updated_callback.(previous, updated)
   end
 end

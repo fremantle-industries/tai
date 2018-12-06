@@ -89,73 +89,30 @@ defmodule Tai.Exchanges.Account do
     |> GenServer.call(:all_balances)
   end
 
-  @doc """
-  Create a buy limit order on the exchange with the given
-
-  - symbol
-  - price
-  - size
-  - time_in_force
-  """
-  @spec buy_limit(atom, atom, atom, number, number, atom) ::
-          {:ok, order_response} | {:error, insufficient_balance_error}
-  def buy_limit(exchange_id, account_id, symbol, price, size, time_in_force \\ :ioc) do
-    server = to_name(exchange_id, account_id)
-    GenServer.call(server, {:buy_limit, symbol, price, size, time_in_force})
-  end
-
-  @doc """
-  Create a buy limit order from the given order struct. It returns an error tuple
-  when the type is not accepted.
-
-  {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
-  """
   @spec buy_limit(order) ::
           {:ok, order_response} | {:error, invalid_order_type_error | insufficient_balance_error}
   def buy_limit(%Tai.Trading.Order{} = order) do
     if Tai.Trading.Order.buy_limit?(order) do
-      buy_limit(
-        order.exchange_id,
-        order.account_id,
-        order.symbol,
-        order.price,
-        order.size,
-        order.time_in_force
+      server = to_name(order.exchange_id, order.account_id)
+
+      GenServer.call(
+        server,
+        {:buy_limit, order.symbol, order.price, order.size, order.time_in_force}
       )
     else
       {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
     end
   end
 
-  @doc """
-  Create a sell limit order on the exchange with the given
-
-  - symbol
-  - price
-  - size
-  - time_in_force
-  """
-  def sell_limit(exchange_id, account_id, symbol, price, size, time_in_force \\ :ioc) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call({:sell_limit, symbol, price, size, time_in_force})
-  end
-
-  @doc """
-  Create a sell limit order from the given order struct. It returns an error tuple
-  when the type is not accepted.
-
-  {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
-  """
+  @spec sell_limit(order) ::
+          {:ok, order_response} | {:error, invalid_order_type_error | insufficient_balance_error}
   def sell_limit(%Tai.Trading.Order{} = order) do
     if Tai.Trading.Order.sell_limit?(order) do
-      sell_limit(
-        order.exchange_id,
-        order.account_id,
-        order.symbol,
-        order.price,
-        order.size,
-        order.time_in_force
+      server = to_name(order.exchange_id, order.account_id)
+
+      GenServer.call(
+        server,
+        {:sell_limit, order.symbol, order.price, order.size, order.time_in_force}
       )
     else
       {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}

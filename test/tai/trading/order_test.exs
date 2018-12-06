@@ -4,8 +4,8 @@ defmodule Tai.Trading.OrderTest do
 
   test "buy_limit? is true for buy side orders with a limit type" do
     buy_limit_order = %Tai.Trading.Order{
-      side: Tai.Trading.Order.buy(),
-      type: Tai.Trading.Order.limit(),
+      side: :buy,
+      type: :limit,
       client_id: :ignore,
       enqueued_at: :ignore,
       exchange_id: :ignore,
@@ -14,11 +14,12 @@ defmodule Tai.Trading.OrderTest do
       size: :ignore,
       status: :ignore,
       symbol: :ignore,
-      time_in_force: :ignore
+      time_in_force: :ignore,
+      post_only: false
     }
 
     buy_market_order = %Tai.Trading.Order{
-      side: Tai.Trading.Order.buy(),
+      side: :buy,
       type: :market,
       client_id: :ignore,
       enqueued_at: :ignore,
@@ -28,12 +29,13 @@ defmodule Tai.Trading.OrderTest do
       size: :ignore,
       status: :ignore,
       symbol: :ignore,
-      time_in_force: :ignore
+      time_in_force: :ignore,
+      post_only: false
     }
 
     sell_limit_order = %Tai.Trading.Order{
-      side: Tai.Trading.Order.sell(),
-      type: Tai.Trading.Order.limit(),
+      side: :sell,
+      type: :limit,
       client_id: :ignore,
       enqueued_at: :ignore,
       exchange_id: :ignore,
@@ -42,7 +44,8 @@ defmodule Tai.Trading.OrderTest do
       size: :ignore,
       status: :ignore,
       symbol: :ignore,
-      time_in_force: :ignore
+      time_in_force: :ignore,
+      post_only: false
     }
 
     assert Tai.Trading.Order.buy_limit?(buy_limit_order) == true
@@ -52,8 +55,8 @@ defmodule Tai.Trading.OrderTest do
 
   test "sell_limit? is true for sell side orders with a limit type" do
     sell_limit_order = %Tai.Trading.Order{
-      side: Tai.Trading.Order.sell(),
-      type: Tai.Trading.Order.limit(),
+      side: :sell,
+      type: :limit,
       client_id: :ignore,
       enqueued_at: :ignore,
       exchange_id: :ignore,
@@ -62,11 +65,12 @@ defmodule Tai.Trading.OrderTest do
       size: :ignore,
       status: :ignore,
       symbol: :ignore,
-      time_in_force: :ignore
+      time_in_force: :ignore,
+      post_only: false
     }
 
     sell_market_order = %Tai.Trading.Order{
-      side: Tai.Trading.Order.sell(),
+      side: :sell,
       type: :market,
       client_id: :ignore,
       enqueued_at: :ignore,
@@ -76,12 +80,13 @@ defmodule Tai.Trading.OrderTest do
       size: :ignore,
       status: :ignore,
       symbol: :ignore,
-      time_in_force: :ignore
+      time_in_force: :ignore,
+      post_only: false
     }
 
     buy_limit_order = %Tai.Trading.Order{
-      side: Tai.Trading.Order.buy(),
-      type: Tai.Trading.Order.limit(),
+      side: :buy,
+      type: :limit,
       client_id: :ignore,
       enqueued_at: :ignore,
       exchange_id: :ignore,
@@ -90,7 +95,8 @@ defmodule Tai.Trading.OrderTest do
       size: :ignore,
       status: :ignore,
       symbol: :ignore,
-      time_in_force: :ignore
+      time_in_force: :ignore,
+      post_only: false
     }
 
     assert Tai.Trading.Order.sell_limit?(sell_limit_order) == true

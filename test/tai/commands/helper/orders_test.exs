@@ -13,29 +13,25 @@ defmodule Tai.Commands.Helper.OrdersTest do
   end
 
   test "shows items in ascending order from when they were enqueued" do
-    [btc_usd_order] =
-      Tai.Trading.OrderStore.add(
-        Tai.Trading.OrderSubmission.buy_limit(
-          :test_exchange_a,
-          :main,
-          :btc_usd,
-          12_999.99,
-          1.1,
-          Tai.Trading.TimeInForce.fill_or_kill()
-        )
-      )
+    {:ok, btc_usd_order} =
+      %Tai.Trading.OrderSubmissions.BuyLimitFok{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd,
+        price: Decimal.new("12999.99"),
+        qty: Decimal.new("1.1")
+      }
+      |> Tai.Trading.OrderStore.add()
 
-    [ltc_usd_order] =
-      Tai.Trading.OrderStore.add(
-        Tai.Trading.OrderSubmission.sell_limit(
-          :test_exchange_b,
-          :main,
-          :ltc_usd,
-          75.23,
-          1.0,
-          Tai.Trading.TimeInForce.fill_or_kill()
-        )
-      )
+    {:ok, ltc_usd_order} =
+      %Tai.Trading.OrderSubmissions.SellLimitFok{
+        venue_id: :test_exchange_b,
+        account_id: :main,
+        product_symbol: :ltc_usd,
+        price: Decimal.new("75.23"),
+        qty: Decimal.new("1.0")
+      }
+      |> Tai.Trading.OrderStore.add()
 
     assert capture_io(&Tai.Commands.Helper.orders/0) == """
            +-----------------+---------+---------+------+-------+----------+------+---------------+----------+--------------------------------------+-----------+-------------+------------+--------------+

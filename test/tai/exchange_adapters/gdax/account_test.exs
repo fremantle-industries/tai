@@ -25,14 +25,18 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "can create a good till cancel duration order" do
       use_cassette "exchange_adapters/shared/account/gdax/buy_limit_good_till_cancel_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
-                 Tai.Exchanges.Account.buy_limit(
-                   :my_gdax_exchange,
-                   :test,
-                   :btc_usd,
-                   101.1,
-                   0.2,
-                   Tai.Trading.TimeInForce.good_till_cancel()
-                 )
+                 Tai.Trading.Order
+                 |> struct(%{
+                   exchange_id: :my_gdax_exchange,
+                   account_id: :test,
+                   side: :buy,
+                   type: :limit,
+                   symbol: :btc_usd,
+                   price: Decimal.new("101.1"),
+                   size: Decimal.new("0.2"),
+                   time_in_force: :gtc
+                 })
+                 |> Tai.Exchanges.Account.buy_limit()
 
         assert response.id != nil
         assert response.status == Tai.Trading.OrderStatus.pending()
@@ -45,14 +49,18 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns an insufficient funds error tuple" do
       use_cassette "exchange_adapters/shared/account/gdax/buy_limit_error_insufficient_funds" do
         assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
-                 Tai.Exchanges.Account.buy_limit(
-                   :my_gdax_exchange,
-                   :test,
-                   :btc_usd,
-                   101.1,
-                   0.3,
-                   Tai.Trading.TimeInForce.fill_or_kill()
-                 )
+                 Tai.Trading.Order
+                 |> struct(%{
+                   exchange_id: :my_gdax_exchange,
+                   account_id: :test,
+                   side: :buy,
+                   type: :limit,
+                   symbol: :btc_usd,
+                   price: Decimal.new("101.1"),
+                   size: Decimal.new("0.3"),
+                   time_in_force: :gtc
+                 })
+                 |> Tai.Exchanges.Account.buy_limit()
       end
     end
   end
@@ -61,14 +69,18 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "can create a good till cancel duration order" do
       use_cassette "exchange_adapters/shared/account/gdax/sell_limit_good_till_cancel_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
-                 Tai.Exchanges.Account.sell_limit(
-                   :my_gdax_exchange,
-                   :test,
-                   :btc_usd,
-                   99_999_999.1,
-                   0.2,
-                   Tai.Trading.TimeInForce.good_till_cancel()
-                 )
+                 Tai.Trading.Order
+                 |> struct(%{
+                   exchange_id: :my_gdax_exchange,
+                   account_id: :test,
+                   side: :sell,
+                   type: :limit,
+                   symbol: :btc_usd,
+                   price: Decimal.new("99999999.1"),
+                   size: Decimal.new("0.2"),
+                   time_in_force: :gtc
+                 })
+                 |> Tai.Exchanges.Account.sell_limit()
 
         assert response.id != nil
         assert response.status == Tai.Trading.OrderStatus.pending()
@@ -81,14 +93,18 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns an insufficient funds error tuple" do
       use_cassette "exchange_adapters/shared/account/gdax/sell_limit_error_insufficient_funds" do
         assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
-                 Tai.Exchanges.Account.sell_limit(
-                   :my_gdax_exchange,
-                   :test,
-                   :btc_usd,
-                   99_999_999.1,
-                   0.3,
-                   Tai.Trading.TimeInForce.good_till_cancel()
-                 )
+                 Tai.Trading.Order
+                 |> struct(%{
+                   exchange_id: :my_gdax_exchange,
+                   account_id: :test,
+                   side: :sell,
+                   type: :limit,
+                   symbol: :btc_usd,
+                   price: Decimal.new("99999999.1"),
+                   size: Decimal.new("0.3"),
+                   time_in_force: :gtc
+                 })
+                 |> Tai.Exchanges.Account.sell_limit()
       end
     end
   end
@@ -97,7 +113,18 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns the status" do
       use_cassette "exchange_adapters/gdax/account/order_status_success" do
         {:ok, order_response} =
-          Tai.Exchanges.Account.buy_limit(:my_gdax_exchange, :test, :btc_usd, 101.1, 0.2)
+          Tai.Trading.Order
+          |> struct(%{
+            exchange_id: :my_gdax_exchange,
+            account_id: :test,
+            side: :buy,
+            type: :limit,
+            symbol: :btc_usd,
+            price: Decimal.new("101.1"),
+            size: Decimal.new("0.2"),
+            time_in_force: :gtc
+          })
+          |> Tai.Exchanges.Account.buy_limit()
 
         assert Tai.Exchanges.Account.order_status(:my_gdax_exchange, :test, order_response.id) ==
                  {:ok, :open}
@@ -116,7 +143,18 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     test "returns an ok tuple with the order id when it's successfully canceled" do
       use_cassette "exchange_adapters/gdax/account/cancel_order_success" do
         {:ok, order_response} =
-          Tai.Exchanges.Account.buy_limit(:my_gdax_exchange, :test, :btc_usd, 101.1, 0.2)
+          Tai.Trading.Order
+          |> struct(%{
+            exchange_id: :my_gdax_exchange,
+            account_id: :test,
+            side: :buy,
+            type: :limit,
+            symbol: :btc_usd,
+            price: Decimal.new("101.1"),
+            size: Decimal.new("0.2"),
+            time_in_force: :gtc
+          })
+          |> Tai.Exchanges.Account.buy_limit()
 
         {:ok, canceled_order_id} =
           Tai.Exchanges.Account.cancel_order(:my_gdax_exchange, :test, order_response.id)

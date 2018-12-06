@@ -1,12 +1,19 @@
 defmodule Tai.Trading.OrderStore do
   @moduledoc """
-  In memory store for orders with CRUD commands
+  In memory store for the local state of orders
   """
 
-  @type order :: Tai.Trading.Order.t()
-
   use GenServer
-  require Logger
+  alias Tai.Trading
+
+  @type order :: Trading.Order.t()
+  @type submission ::
+          Trading.OrderSubmissions.BuyLimitGtc.t()
+          | Trading.OrderSubmissions.SellLimitGtc.t()
+          | Trading.OrderSubmissions.BuyLimitFok.t()
+          | Trading.OrderSubmissions.SellLimitFok.t()
+          | Trading.OrderSubmissions.BuyLimitIoc.t()
+          | Trading.OrderSubmissions.SellLimitIoc.t()
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -20,20 +27,12 @@ defmodule Tai.Trading.OrderStore do
     {:reply, :ok, %{}}
   end
 
-  def handle_call({:add, submissions}, _from, state) do
-    new_orders =
-      submissions
-      |> List.wrap()
-      |> build_orders
+  def handle_call({:add, submission}, _from, state) do
+    order = build_order(submission)
+    new_state = Map.put(state, order.client_id, order)
+    response = {:ok, order}
 
-    new_state =
-      new_orders
-      |> Enum.reduce(
-        state,
-        fn order, acc -> Map.put(acc, order.client_id, order) end
-      )
-
-    {:reply, new_orders, new_state}
+    {:reply, response, new_state}
   end
 
   def handle_call({:find, client_id}, _from, state) do
@@ -51,7 +50,7 @@ defmodule Tai.Trading.OrderStore do
   def handle_call({:find_by_and_update, filters, update_attrs}, _from, state) do
     with [current_order] <- state |> filter(filters) |> Map.values(),
          updated_order <-
-           Tai.Trading.OrderStore.AttributeWhitelist.apply(
+           Trading.OrderStore.AttributeWhitelist.apply(
              current_order,
              update_attrs
            ) do
@@ -91,19 +90,11 @@ defmodule Tai.Trading.OrderStore do
     GenServer.call(__MODULE__, :clear)
   end
 
-  @doc """
-  Creates orders from the submissions.
-
-  - Assigning a client id in the uuid v4 format
-  - Tracks the order
-  """
-  def add(submissions) do
-    GenServer.call(__MODULE__, {:add, submissions})
+  @spec add(submission) :: {:ok, order}
+  def add(submission) do
+    GenServer.call(__MODULE__, {:add, submission})
   end
 
-  @doc """
-  Find the order matching the client id
-  """
   @spec find(client_id :: String.t()) :: {:ok, order} | {:error, :not_found}
   def find(client_id) do
     GenServer.call(__MODULE__, {:find, client_id})
@@ -145,35 +136,51 @@ defmodule Tai.Trading.OrderStore do
     GenServer.call(__MODULE__, {:count, status: status})
   end
 
-  defp build_orders(submissions) do
-    submissions
-    |> Enum.reduce(
-      [],
-      fn %Tai.Trading.OrderSubmission{} = submission, acc ->
-        with price <- submission.price |> to_decimal |> Decimal.abs(),
-             size <- submission.size |> to_decimal |> Decimal.abs(),
-             enqueued_at <- Timex.now() do
-          order = %Tai.Trading.Order{
-            client_id: UUID.uuid4(),
-            exchange_id: submission.exchange_id,
-            account_id: submission.account_id,
-            symbol: submission.symbol,
-            side: submission.side,
-            type: submission.type,
-            price: price,
-            size: size,
-            time_in_force: submission.time_in_force,
-            status: Tai.Trading.OrderStatus.enqueued(),
-            enqueued_at: enqueued_at,
-            order_updated_callback: submission.order_updated_callback
-          }
-
-          [order | acc]
-        end
-      end
-    )
-    |> Enum.reverse()
+  defp build_order(submission) do
+    %Trading.Order{
+      client_id: UUID.uuid4(),
+      exchange_id: submission.venue_id,
+      account_id: submission.account_id,
+      symbol: submission.product_symbol,
+      side: submission |> side,
+      type: submission |> type,
+      price: submission.price |> Decimal.abs(),
+      size: submission.qty |> Decimal.abs(),
+      time_in_force: submission |> time_in_force,
+      post_only: submission |> post_only,
+      status: :enqueued,
+      enqueued_at: Timex.now(),
+      order_updated_callback: submission.order_updated_callback
+    }
   end
+
+  defp type(%Trading.OrderSubmissions.BuyLimitGtc{}), do: :limit
+  defp type(%Trading.OrderSubmissions.BuyLimitFok{}), do: :limit
+  defp type(%Trading.OrderSubmissions.BuyLimitIoc{}), do: :limit
+  defp type(%Trading.OrderSubmissions.SellLimitGtc{}), do: :limit
+  defp type(%Trading.OrderSubmissions.SellLimitFok{}), do: :limit
+  defp type(%Trading.OrderSubmissions.SellLimitIoc{}), do: :limit
+
+  defp side(%Trading.OrderSubmissions.BuyLimitGtc{}), do: :buy
+  defp side(%Trading.OrderSubmissions.BuyLimitFok{}), do: :buy
+  defp side(%Trading.OrderSubmissions.BuyLimitIoc{}), do: :buy
+  defp side(%Trading.OrderSubmissions.SellLimitGtc{}), do: :sell
+  defp side(%Trading.OrderSubmissions.SellLimitFok{}), do: :sell
+  defp side(%Trading.OrderSubmissions.SellLimitIoc{}), do: :sell
+
+  defp time_in_force(%Trading.OrderSubmissions.BuyLimitGtc{}), do: :gtc
+  defp time_in_force(%Trading.OrderSubmissions.BuyLimitFok{}), do: :fok
+  defp time_in_force(%Trading.OrderSubmissions.BuyLimitIoc{}), do: :ioc
+  defp time_in_force(%Trading.OrderSubmissions.SellLimitGtc{}), do: :gtc
+  defp time_in_force(%Trading.OrderSubmissions.SellLimitFok{}), do: :fok
+  defp time_in_force(%Trading.OrderSubmissions.SellLimitIoc{}), do: :ioc
+
+  defp post_only(%Trading.OrderSubmissions.BuyLimitGtc{post_only: post_only}), do: post_only
+  defp post_only(%Trading.OrderSubmissions.BuyLimitFok{}), do: false
+  defp post_only(%Trading.OrderSubmissions.BuyLimitIoc{}), do: false
+  defp post_only(%Trading.OrderSubmissions.SellLimitGtc{post_only: post_only}), do: post_only
+  defp post_only(%Trading.OrderSubmissions.SellLimitFok{}), do: false
+  defp post_only(%Trading.OrderSubmissions.SellLimitIoc{}), do: false
 
   defp filter(state, [{attr, [_head | _tail] = vals}]) do
     state
@@ -195,9 +202,6 @@ defmodule Tai.Trading.OrderStore do
     |> filter([head])
     |> filter(tail)
   end
-
-  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
-  defp to_decimal(val), do: val |> Decimal.new()
 
   defmodule AttributeWhitelist do
     @whitelist_attrs [
