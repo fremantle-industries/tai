@@ -4,19 +4,19 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account do
   """
   use Tai.Exchanges.Account
 
-  def all_balances(account) do
-    Tai.ExchangeAdapters.Poloniex.Account.AllBalances.fetch(account)
+  def all_balances(credentials) do
+    Tai.ExchangeAdapters.Poloniex.Account.AllBalances.fetch(credentials)
   end
 
-  def buy_limit(symbol, price, size, time_in_force, _account) do
-    Tai.ExchangeAdapters.Poloniex.Account.Orders.buy_limit(symbol, price, size, time_in_force)
+  def create_order(%Tai.Trading.Order{} = order, credentials) do
+    Tai.ExchangeAdapters.Poloniex.Account.Orders.create(order, credentials)
   end
 
-  def sell_limit(symbol, price, size, time_in_force, _account) do
-    Tai.ExchangeAdapters.Poloniex.Account.Orders.sell_limit(symbol, price, size, time_in_force)
+  def cancel_order(_venue_order_id, _credentials) do
+    {:error, :not_implemented}
   end
 
-  def cancel_order(_server_id, _credentials) do
+  def order_status(_venue_order_id, _credentials) do
     {:error, :not_implemented}
   end
 end

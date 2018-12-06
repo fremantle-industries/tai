@@ -3,34 +3,36 @@ defmodule Tai.Exchanges.Account do
   Uniform interface for private exchange actions
   """
 
-  @type t :: %Tai.Exchanges.Account{exchange_id: atom, account_id: atom}
+  @type t :: %Tai.Exchanges.Account{
+          exchange_id: atom,
+          account_id: atom
+        }
   @type order :: Tai.Trading.Order.t()
+  @type order_status :: Tai.Trading.Order.status()
+  @type venue_order_id :: Tai.Trading.Order.venue_order_id()
   @type order_response :: Tai.Trading.OrderResponse.t()
-  @type credential_error :: Tai.CredentialError.t()
-  @type timeout_error :: Tai.TimeoutError.t()
+  @type credentials :: map
+  @type time_in_force :: Tai.Trading.Order.time_in_force()
   @type insufficient_balance_error :: Tai.Trading.InsufficientBalanceError.t()
-  @type invalid_order_type_error :: Tai.Trading.OrderResponses.InvalidOrderType.t()
+  @type shared_error_reason ::
+          Tai.CredentialError.t()
+          | Tai.TimeoutError.t()
+  @type create_order_error_reason ::
+          :not_implemented
+          | shared_error_reason
+          | Tai.Trading.InsufficientBalanceError.t()
 
-  @callback all_balances(account :: t) :: {:ok, balances :: map} | {:error, reason :: term}
+  @callback all_balances(t) ::
+              {:ok, balances :: map} | {:error, :not_implemented | reason :: term}
 
-  @callback buy_limit(
-              symbol :: atom,
-              price :: float,
-              size :: float,
-              time_in_force :: atom,
-              credentials :: map
-            ) :: {:ok, order_response :: order_response} | {:error, reason :: term}
+  @callback create_order(order, credentials) ::
+              {:ok, order_response} | {:error, create_order_error_reason}
 
-  @callback sell_limit(
-              symbol :: atom,
-              price :: float,
-              size :: float,
-              time_in_force :: atom,
-              credentials :: map
-            ) :: {:ok, order_response :: order_response} | {:error, reason :: term}
+  @callback cancel_order(venue_order_id, credentials) ::
+              {:ok, venue_order_id} | {:error, :not_implemented | reason :: term}
 
-  @callback cancel_order(server_id :: String.t(), credentials :: map) ::
-              {:ok, server_id :: String.t()} | {:error, reason :: term}
+  @callback order_status(venue_order_id, credentials) ::
+              {:ok, order_status} | {:error, :not_implemented | reason :: term}
 
   @enforce_keys [:exchange_id, :account_id, :credentials]
   defstruct [:exchange_id, :account_id, :credentials]
@@ -62,89 +64,52 @@ defmodule Tai.Exchanges.Account do
         {:reply, response, state}
       end
 
-      def handle_call({:buy_limit, symbol, price, size, time_in_force}, _from, state) do
-        response = buy_limit(symbol, price, size, time_in_force, state.credentials)
+      def handle_call({:create_order, order}, _from, state) do
+        response = create_order(order, state.credentials)
         {:reply, response, state}
       end
 
-      def handle_call({:sell_limit, symbol, price, size, time_in_force}, _from, state) do
-        response = sell_limit(symbol, price, size, time_in_force, state.credentials)
+      def handle_call({:cancel_order, venue_order_id}, _from, state) do
+        response = cancel_order(venue_order_id, state)
         {:reply, response, state}
       end
 
-      def handle_call({:cancel_order, server_id}, _from, state) do
-        response = cancel_order(server_id, state)
+      def handle_call({:order_status, venue_order_id}, _from, state) do
+        response = order_status(venue_order_id, state.credentials)
         {:reply, response, state}
       end
     end
   end
 
-  @doc """
-  Fetches all balances on the exchange for the account
-  """
-  @spec all_balances(atom, atom) :: {:ok, map} | {:error, credential_error | timeout_error}
+  @spec all_balances(atom, atom) :: {:ok, map} | {:error, shared_error_reason}
   def all_balances(exchange_id, account_id) do
     exchange_id
     |> to_name(account_id)
     |> GenServer.call(:all_balances)
   end
 
-  @spec buy_limit(order) ::
-          {:ok, order_response} | {:error, invalid_order_type_error | insufficient_balance_error}
-  def buy_limit(%Tai.Trading.Order{} = order) do
-    if Tai.Trading.Order.buy_limit?(order) do
-      server = to_name(order.exchange_id, order.account_id)
-
-      GenServer.call(
-        server,
-        {:buy_limit, order.symbol, order.price, order.size, order.time_in_force}
-      )
-    else
-      {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
-    end
+  @spec create_order(order) :: {:ok, order_response} | {:error, create_order_error_reason}
+  def create_order(%Tai.Trading.Order{} = order) do
+    server = to_name(order.exchange_id, order.account_id)
+    GenServer.call(server, {:create_order, order})
   end
 
-  @spec sell_limit(order) ::
-          {:ok, order_response} | {:error, invalid_order_type_error | insufficient_balance_error}
-  def sell_limit(%Tai.Trading.Order{} = order) do
-    if Tai.Trading.Order.sell_limit?(order) do
-      server = to_name(order.exchange_id, order.account_id)
-
-      GenServer.call(
-        server,
-        {:sell_limit, order.symbol, order.price, order.size, order.time_in_force}
-      )
-    else
-      {:error, %Tai.Trading.OrderResponses.InvalidOrderType{}}
-    end
-  end
-
-  @doc """
-  Fetches the status of the order from the exchange
-  """
-  def order_status(exchange_id, account_id, order_id) do
+  @spec order_status(atom, atom, venue_order_id) :: {:ok, order_status} | {:error, reason :: term}
+  def order_status(exchange_id, account_id, venue_order_id) do
     exchange_id
     |> to_name(account_id)
-    |> GenServer.call({:order_status, order_id})
+    |> GenServer.call({:order_status, venue_order_id})
   end
 
-  @doc """
-  Cancels the order on the exchange and returns the order_id
-  """
-  def cancel_order(exchange_id, account_id, order_id) do
+  @spec cancel_order(atom, atom, venue_order_id) ::
+          {:ok, venue_order_id} | {:error, reason :: term}
+  def cancel_order(exchange_id, account_id, venue_order_id) do
     exchange_id
     |> to_name(account_id)
-    |> GenServer.call({:cancel_order, order_id})
+    |> GenServer.call({:cancel_order, venue_order_id})
   end
 
-  @doc """
-  Returns an atom which identifies the process for the given account_id
-
-  ## Examples
-
-    iex> Tai.Exchanges.Account.to_name(:my_test_exchange, :my_test_account)
-    :"Elixir.Tai.Exchanges.Account_my_test_exchange_my_test_account"
-  """
+  @spec to_name(atom, atom) :: atom
   def to_name(exchange_id, account_id),
     do: :"#{Tai.Exchanges.Account}_#{exchange_id}_#{account_id}"
 end

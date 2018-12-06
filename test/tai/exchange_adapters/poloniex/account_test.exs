@@ -14,7 +14,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
     :ok
   end
 
-  describe ".buy_limit" do
+  describe ".create_order buy limit" do
     setup do
       order =
         struct(Tai.Trading.Order, %{
@@ -34,7 +34,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
     test "fill or kill returns an error tuple when it can't completely execute a fill or kill order",
          %{order: order} do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_fill_or_kill_error_unable_to_fill_completely" do
-        assert Tai.Exchanges.Account.buy_limit(order) == {
+        assert Tai.Exchanges.Account.create_order(order) == {
                  :error,
                  %Tai.Trading.FillOrKillError{
                    reason: %ExPoloniex.FillOrKillError{
@@ -47,7 +47,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     test "returns an error tuple when the request times out", %{order: order} do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_timeout" do
-        assert Tai.Exchanges.Account.buy_limit(order) == {
+        assert Tai.Exchanges.Account.create_order(order) == {
                  :error,
                  %Tai.TimeoutError{reason: %HTTPoison.Error{reason: "timeout"}}
                }
@@ -56,7 +56,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     test "returns an error tuple when the api key is invalid", %{order: order} do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_invalid_api_key" do
-        assert Tai.Exchanges.Account.buy_limit(order) == {
+        assert Tai.Exchanges.Account.create_order(order) == {
                  :error,
                  %Tai.CredentialError{
                    reason: %ExPoloniex.AuthenticationError{
@@ -81,7 +81,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
             time_in_force: :fok
           })
 
-        assert Tai.Exchanges.Account.buy_limit(order) == {
+        assert Tai.Exchanges.Account.create_order(order) == {
                  :error,
                  %Tai.Trading.InsufficientBalanceError{
                    reason: %ExPoloniex.NotEnoughError{message: "Not enough BTC."}

@@ -21,7 +21,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     :ok
   end
 
-  describe "#buy_limit" do
+  describe ".create_order buy limit" do
     test "can create a good till cancel duration order" do
       use_cassette "exchange_adapters/shared/account/gdax/buy_limit_good_till_cancel_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
@@ -36,7 +36,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    size: Decimal.new("0.2"),
                    time_in_force: :gtc
                  })
-                 |> Tai.Exchanges.Account.buy_limit()
+                 |> Tai.Exchanges.Account.create_order()
 
         assert response.id != nil
         assert response.status == Tai.Trading.OrderStatus.pending()
@@ -60,12 +60,12 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    size: Decimal.new("0.3"),
                    time_in_force: :gtc
                  })
-                 |> Tai.Exchanges.Account.buy_limit()
+                 |> Tai.Exchanges.Account.create_order()
       end
     end
   end
 
-  describe "#sell_limit" do
+  describe ".create_order sell limit" do
     test "can create a good till cancel duration order" do
       use_cassette "exchange_adapters/shared/account/gdax/sell_limit_good_till_cancel_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
@@ -80,7 +80,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    size: Decimal.new("0.2"),
                    time_in_force: :gtc
                  })
-                 |> Tai.Exchanges.Account.sell_limit()
+                 |> Tai.Exchanges.Account.create_order()
 
         assert response.id != nil
         assert response.status == Tai.Trading.OrderStatus.pending()
@@ -104,12 +104,12 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    size: Decimal.new("0.3"),
                    time_in_force: :gtc
                  })
-                 |> Tai.Exchanges.Account.sell_limit()
+                 |> Tai.Exchanges.Account.create_order()
       end
     end
   end
 
-  describe "#order_status" do
+  describe ".order_status" do
     test "returns the status" do
       use_cassette "exchange_adapters/gdax/account/order_status_success" do
         {:ok, order_response} =
@@ -124,7 +124,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
             size: Decimal.new("0.2"),
             time_in_force: :gtc
           })
-          |> Tai.Exchanges.Account.buy_limit()
+          |> Tai.Exchanges.Account.create_order()
 
         assert Tai.Exchanges.Account.order_status(:my_gdax_exchange, :test, order_response.id) ==
                  {:ok, :open}
@@ -139,7 +139,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
     end
   end
 
-  describe "#cancel_order" do
+  describe ".cancel_order" do
     test "returns an ok tuple with the order id when it's successfully canceled" do
       use_cassette "exchange_adapters/gdax/account/cancel_order_success" do
         {:ok, order_response} =
@@ -154,7 +154,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
             size: Decimal.new("0.2"),
             time_in_force: :gtc
           })
-          |> Tai.Exchanges.Account.buy_limit()
+          |> Tai.Exchanges.Account.create_order()
 
         {:ok, canceled_order_id} =
           Tai.Exchanges.Account.cancel_order(:my_gdax_exchange, :test, order_response.id)

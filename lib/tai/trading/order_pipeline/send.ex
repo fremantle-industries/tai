@@ -14,12 +14,8 @@ defmodule Tai.Trading.OrderPipeline.Send do
     end
   end
 
-  defp send_request(%Order{side: :buy, type: :limit} = o) do
-    o |> Tai.Exchanges.Account.buy_limit()
-  end
-
-  defp send_request(%Order{side: :sell, type: :limit} = o) do
-    o |> Tai.Exchanges.Account.sell_limit()
+  defp send_request(%Order{} = o) do
+    Tai.Exchanges.Account.create_order(o)
   end
 
   defp parse_response({:ok, %OrderResponse{status: :filled} = r}, %Order{} = o) do

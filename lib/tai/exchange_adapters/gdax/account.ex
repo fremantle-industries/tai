@@ -4,36 +4,19 @@ defmodule Tai.ExchangeAdapters.Gdax.Account do
   """
   use Tai.Exchanges.Account
 
-  def all_balances(account) do
-    Tai.ExchangeAdapters.Gdax.Account.AllBalances.fetch(account)
+  def all_balances(credentials) do
+    Tai.ExchangeAdapters.Gdax.Account.AllBalances.fetch(credentials)
   end
 
-  def buy_limit(symbol, price, size, time_in_force, account) do
-    Tai.ExchangeAdapters.Gdax.Account.Orders.buy_limit(
-      symbol,
-      price,
-      size,
-      time_in_force,
-      account
-    )
+  def create_order(%Tai.Trading.Order{} = order, credentials) do
+    Tai.ExchangeAdapters.Gdax.Account.Orders.create(order, credentials)
   end
 
-  def sell_limit(symbol, price, size, time_in_force, account) do
-    Tai.ExchangeAdapters.Gdax.Account.Orders.sell_limit(
-      symbol,
-      price,
-      size,
-      time_in_force,
-      account
-    )
+  def cancel_order(venue_order_id, credentials) do
+    Tai.ExchangeAdapters.Gdax.Account.CancelOrder.execute(venue_order_id, credentials)
   end
 
-  def cancel_order(server_id, account) do
-    Tai.ExchangeAdapters.Gdax.Account.CancelOrder.execute(server_id, account)
-  end
-
-  def handle_call({:order_status, order_id}, _from, state) do
-    response = Tai.ExchangeAdapters.Gdax.Account.OrderStatus.fetch(order_id, state)
-    {:reply, response, state}
+  def order_status(venue_order_id, credentials) do
+    Tai.ExchangeAdapters.Gdax.Account.OrderStatus.fetch(venue_order_id, credentials)
   end
 end

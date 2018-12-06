@@ -1,18 +1,19 @@
 defmodule Tai.ExchangeAdapters.Gdax.Account.OrderStatus do
-  def fetch(order_id, %Tai.Exchanges.Account{} = account) do
+  def fetch(order_id, credentials) do
     order_id
-    |> ExGdax.get_order(account.credentials)
-    |> handle_order_status
+    |> ExGdax.get_order(credentials)
+    |> parse_response
   end
 
-  defp handle_order_status({:ok, %{"status" => status}}) do
-    {:ok, status |> to_atom}
+  defp parse_response({:ok, %{"status" => venue_status}}) do
+    status = venue_status |> from_venue_status
+    {:ok, status}
   end
 
-  defp handle_order_status({:error, message, _status_code}) do
+  defp parse_response({:error, message, _status_code}) do
     {:error, message}
   end
 
-  def to_atom("pending"), do: :pending
-  def to_atom("open"), do: :open
+  def from_venue_status("pending"), do: :pending
+  def from_venue_status("open"), do: :open
 end

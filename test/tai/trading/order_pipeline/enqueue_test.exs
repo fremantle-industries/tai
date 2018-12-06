@@ -12,7 +12,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
     :ok
   end
 
-  describe ".enqueue buy_limit" do
+  describe ".enqueue buy limit" do
     setup do
       Tai.Events.firehose_subscribe()
       assert Tai.Trading.OrderStore.count() == 0

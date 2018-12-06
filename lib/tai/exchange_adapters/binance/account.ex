@@ -9,25 +9,15 @@ defmodule Tai.ExchangeAdapters.Binance.Account do
     Tai.ExchangeAdapters.Binance.Account.AllBalances.fetch(account)
   end
 
-  def buy_limit(symbol, price, size, time_in_force, _account) do
-    Tai.ExchangeAdapters.Binance.Account.Orders.buy_limit(
-      symbol,
-      price,
-      size,
-      time_in_force
-    )
+  def create_order(%Tai.Trading.Order{} = order, _credentials) do
+    Tai.ExchangeAdapters.Binance.Account.Orders.create(order)
   end
 
-  def sell_limit(symbol, price, size, time_in_force, _account) do
-    Tai.ExchangeAdapters.Binance.Account.Orders.sell_limit(
-      symbol,
-      price,
-      size,
-      time_in_force
-    )
+  def cancel_order(_venue_order_id, _credentials) do
+    {:error, :not_implemented}
   end
 
-  def cancel_order(_server_id, _credentials) do
+  def order_status(_venue_order_id, _credentials) do
     {:error, :not_implemented}
   end
 end

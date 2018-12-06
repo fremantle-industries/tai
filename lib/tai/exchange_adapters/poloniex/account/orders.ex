@@ -5,25 +5,24 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
 
   alias Tai.ExchangeAdapters.Poloniex.SymbolMapping
 
-  def buy_limit(symbol, price, size, time_in_force) do
-    with normalized_tif <- normalize_duration(time_in_force) do
-      symbol
-      |> SymbolMapping.to_poloniex()
-      |> ExPoloniex.Trading.buy(price, size, normalized_tif)
-      |> parse_create_order(size, time_in_force)
-    end
+  def create(order, _credentials) do
+    venue_time_in_force = to_venue_time_in_force(order.time_in_force)
+    venue_product_symbol = SymbolMapping.to_poloniex(order.symbol)
+
+    venue_product_symbol
+    |> send(order.price, order.size, venue_time_in_force, order.side)
+    |> parse_response(order.size, order.time_in_force)
   end
 
-  def sell_limit(symbol, price, size, time_in_force) do
-    with normalized_tif <- normalize_duration(time_in_force) do
-      symbol
-      |> SymbolMapping.to_poloniex()
-      |> ExPoloniex.Trading.sell(price, size, normalized_tif)
-      |> parse_create_order(size, time_in_force)
-    end
+  defp send(venue_product_symbol, price, size, venue_time_in_force, :buy) do
+    ExPoloniex.Trading.buy(venue_product_symbol, price, size, venue_time_in_force)
   end
 
-  defp parse_create_order(
+  defp send(venue_product_symbol, price, size, venue_time_in_force, :sell) do
+    ExPoloniex.Trading.sell(venue_product_symbol, price, size, venue_time_in_force)
+  end
+
+  defp parse_response(
          {:ok, %ExPoloniex.OrderResponse{} = poloniex_response},
          original_size,
          time_in_force
@@ -39,29 +38,28 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
     {:ok, response}
   end
 
-  defp parse_create_order({:error, %ExPoloniex.FillOrKillError{} = error}, _, _) do
+  defp parse_response({:error, %ExPoloniex.FillOrKillError{} = error}, _, _) do
     {:error, %Tai.Trading.FillOrKillError{reason: error}}
   end
 
-  defp parse_create_order({:error, %HTTPoison.Error{reason: "timeout"} = error}, _, _) do
+  defp parse_response({:error, %HTTPoison.Error{reason: "timeout"} = error}, _, _) do
     {:error, %Tai.TimeoutError{reason: error}}
   end
 
-  defp parse_create_order({:error, %ExPoloniex.AuthenticationError{} = error}, _, _) do
+  defp parse_response({:error, %ExPoloniex.AuthenticationError{} = error}, _, _) do
     {:error, %Tai.CredentialError{reason: error}}
   end
 
-  defp parse_create_order({:error, %ExPoloniex.NotEnoughError{} = error}, _, _) do
+  defp parse_response({:error, %ExPoloniex.NotEnoughError{} = error}, _, _) do
     {:error, %Tai.Trading.InsufficientBalanceError{reason: error}}
   end
 
-  defp normalize_duration(:fok), do: %ExPoloniex.OrderDurations.FillOrKill{}
-  defp normalize_duration(:ioc), do: %ExPoloniex.OrderDurations.ImmediateOrCancel{}
+  defp to_venue_time_in_force(:fok), do: %ExPoloniex.OrderDurations.FillOrKill{}
+  defp to_venue_time_in_force(:ioc), do: %ExPoloniex.OrderDurations.ImmediateOrCancel{}
 
-  defp status(:fok), do: Tai.Trading.OrderStatus.expired()
-  defp status(:ioc), do: Tai.Trading.OrderStatus.expired()
+  defp status(:fok), do: :expired
+  defp status(:ioc), do: :expired
 
-  @spec executed_size(list) :: Decimal.t()
   defp executed_size(resulting_trades) do
     resulting_trades
     |> Enum.reduce(

@@ -31,7 +31,7 @@ defmodule Tai.Venues.Adapters.AccountTest do
   end
 
   @adapters [@binance_adapter, @poloniex_adapter]
-  describe ".buy_limit" do
+  describe "buy limit" do
     @adapters
     |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->
       @exchange_id exchange_id
@@ -51,11 +51,11 @@ defmodule Tai.Venues.Adapters.AccountTest do
                      size: Decimal.new("0.01"),
                      time_in_force: :fok
                    })
-                   |> Tai.Exchanges.Account.buy_limit()
+                   |> Tai.Exchanges.Account.create_order()
 
           assert response.id != nil
-          assert response.status == Tai.Trading.OrderStatus.expired()
-          assert response.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
+          assert response.status == :expired
+          assert response.time_in_force == :fok
           assert Decimal.cmp(response.original_size, Decimal.new("0.01")) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
         end
@@ -75,7 +75,7 @@ defmodule Tai.Venues.Adapters.AccountTest do
                      size: Decimal.new("10000.01"),
                      time_in_force: :fok
                    })
-                   |> Tai.Exchanges.Account.buy_limit()
+                   |> Tai.Exchanges.Account.create_order()
         end
       end
 
@@ -93,11 +93,11 @@ defmodule Tai.Venues.Adapters.AccountTest do
                      size: Decimal.new("0.02"),
                      time_in_force: :ioc
                    })
-                   |> Tai.Exchanges.Account.buy_limit()
+                   |> Tai.Exchanges.Account.create_order()
 
           assert response.id != nil
-          assert response.status == Tai.Trading.OrderStatus.expired()
-          assert response.time_in_force == Tai.Trading.TimeInForce.immediate_or_cancel()
+          assert response.status == :expired
+          assert response.time_in_force == :ioc
           assert Decimal.cmp(response.original_size, Decimal.new("0.02")) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
         end
@@ -106,7 +106,7 @@ defmodule Tai.Venues.Adapters.AccountTest do
   end
 
   @adapters [@binance_adapter, @poloniex_adapter]
-  describe ".sell_limit" do
+  describe "sell limit" do
     @adapters
     |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->
       @exchange_id exchange_id
@@ -126,11 +126,11 @@ defmodule Tai.Venues.Adapters.AccountTest do
                      size: Decimal.new("0.01"),
                      time_in_force: :fok
                    })
-                   |> Tai.Exchanges.Account.sell_limit()
+                   |> Tai.Exchanges.Account.create_order()
 
           assert response.id != nil
-          assert response.status == Tai.Trading.OrderStatus.expired()
-          assert response.time_in_force == Tai.Trading.TimeInForce.fill_or_kill()
+          assert response.status == :expired
+          assert response.time_in_force == :fok
           assert Decimal.cmp(response.original_size, Decimal.new("0.01")) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
         end
@@ -150,11 +150,11 @@ defmodule Tai.Venues.Adapters.AccountTest do
                      size: Decimal.new("0.02"),
                      time_in_force: :ioc
                    })
-                   |> Tai.Exchanges.Account.sell_limit()
+                   |> Tai.Exchanges.Account.create_order()
 
           assert response.id != nil
-          assert response.status == Tai.Trading.OrderStatus.expired()
-          assert response.time_in_force == Tai.Trading.TimeInForce.immediate_or_cancel()
+          assert response.status == :expired
+          assert response.time_in_force == :ioc
           assert Decimal.cmp(response.original_size, Decimal.new("0.02")) == :eq
           assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
         end
