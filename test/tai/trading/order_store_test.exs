@@ -74,7 +74,7 @@ defmodule Tai.Trading.OrderStoreTest do
     end)
   end
 
-  describe "#find" do
+  describe ".find" do
     test "returns an ok tuple with the order " do
       {:ok, order} = submit_order()
 
@@ -86,7 +86,7 @@ defmodule Tai.Trading.OrderStoreTest do
     end
   end
 
-  describe "#find_by_and_update" do
+  describe ".find_by_and_update" do
     test "can change the whitelist of attributes" do
       {:ok, order} = submit_order()
 

@@ -7,6 +7,7 @@ defmodule Tai.Trading.OrderStore do
   alias Tai.Trading
 
   @type order :: Trading.Order.t()
+  @type order_status :: Trading.Order.status()
   @type submission ::
           Trading.OrderSubmissions.BuyLimitGtc.t()
           | Trading.OrderSubmissions.SellLimitGtc.t()
@@ -19,13 +20,7 @@ defmodule Tai.Trading.OrderStore do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
-  def init(state) do
-    {:ok, state}
-  end
-
-  def handle_call(:clear, _from, _state) do
-    {:reply, :ok, %{}}
-  end
+  def init(state), do: {:ok, state}
 
   def handle_call({:add, submission}, _from, state) do
     order = build_order(submission)
@@ -83,13 +78,6 @@ defmodule Tai.Trading.OrderStore do
     {:reply, count, state}
   end
 
-  @doc """
-  Deletes the record of all existing orders
-  """
-  def clear do
-    GenServer.call(__MODULE__, :clear)
-  end
-
   @spec add(submission) :: {:ok, order}
   def add(submission) do
     GenServer.call(__MODULE__, {:add, submission})
@@ -100,41 +88,26 @@ defmodule Tai.Trading.OrderStore do
     GenServer.call(__MODULE__, {:find, client_id})
   end
 
-  @doc """
-  Find an order by a list of query parameters and update whitelisted 
-  attributes in an atomic operation
-  """
+  @spec find_by_and_update(list, list) ::
+          {:ok, term} | {:error, :not_found | :multiple_orders_found}
   def find_by_and_update(query, update_attrs) do
     GenServer.call(__MODULE__, {:find_by_and_update, query, update_attrs})
   end
 
-  @doc """
-  Return a list of all the orders
-  """
+  @spec all :: [order]
   def all do
     GenServer.call(__MODULE__, :all)
   end
 
-  @doc """
-  Return a list of orders filtered by their attributes
-  """
+  @spec where(list) :: [order]
   def where([_head | _tail] = filters) do
     GenServer.call(__MODULE__, {:where, filters})
   end
 
-  @doc """
-  Return the total number of orders
-  """
-  def count do
-    GenServer.call(__MODULE__, :count)
-  end
-
-  @doc """
-  Return the total number of orders with the given status
-  """
-  def count(status: status) do
-    GenServer.call(__MODULE__, {:count, status: status})
-  end
+  @spec count :: pos_integer
+  @spec count(status: order_status) :: pos_integer
+  def count, do: GenServer.call(__MODULE__, :count)
+  def count(status: status), do: GenServer.call(__MODULE__, {:count, status: status})
 
   defp build_order(submission) do
     %Trading.Order{
