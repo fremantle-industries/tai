@@ -8,7 +8,7 @@ defmodule Tai.TestSupport.Mocks.Orders.GoodTillCancel do
   def unfilled(server_id: server_id, symbol: symbol, price: price, original_size: original_size) do
     order_response = %Tai.Trading.OrderResponse{
       id: server_id,
-      time_in_force: Tai.Trading.TimeInForce.good_till_cancel(),
+      time_in_force: :gtc,
       status: :pending,
       original_size: original_size,
       executed_size: nil

@@ -40,7 +40,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
         assert response.id != nil
         assert response.status == :pending
-        assert response.time_in_force == Tai.Trading.TimeInForce.good_till_cancel()
+        assert response.time_in_force == :gtc
         assert Decimal.cmp(response.original_size, Decimal.new("0.2")) == :eq
         assert Decimal.cmp(response.executed_size, Decimal.new(0)) == :eq
       end
@@ -84,7 +84,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
         assert response.id != nil
         assert response.status == :pending
-        assert response.time_in_force == Tai.Trading.TimeInForce.good_till_cancel()
+        assert response.time_in_force == :gtc
         assert Decimal.cmp(response.original_size, Decimal.new("0.2")) == :eq
         assert Decimal.cmp(response.executed_size, Decimal.new(0)) == :eq
       end
