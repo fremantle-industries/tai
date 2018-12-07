@@ -111,7 +111,8 @@ defmodule Tai.Markets.OrderBookTest do
       assert_receive {Tai.Event,
                       %Tai.Events.OrderBookSnapshot{
                         venue_id: :my_test_feed,
-                        symbol: :btc_usd
+                        symbol: :btc_usd,
+                        snapshot: ^snapshot
                       }}
     end
   end

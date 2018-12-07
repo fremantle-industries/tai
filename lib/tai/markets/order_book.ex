@@ -49,7 +49,8 @@ defmodule Tai.Markets.OrderBook do
 
     Tai.Events.broadcast(%Tai.Events.OrderBookSnapshot{
       venue_id: new_state.feed_id,
-      symbol: new_state.symbol
+      symbol: new_state.symbol,
+      snapshot: snapshot
     })
 
     {:reply, :ok, new_state}

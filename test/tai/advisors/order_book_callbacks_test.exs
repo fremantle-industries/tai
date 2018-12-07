@@ -35,7 +35,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
   setup do
     on_exit(fn ->
-      Application.stop(:tai)
+      :ok = Application.stop(:tai)
     end)
 
     Process.register(self(), :test)
