@@ -94,11 +94,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.find_by_and_update(
                  [client_id: order.client_id],
                  client_id: "changed_client_id",
-                 status: Tai.Trading.OrderStatus.error()
+                 status: :error
                )
 
       assert old_order == order
-      assert updated_order.status == Tai.Trading.OrderStatus.error()
+      assert updated_order.status == :error
       assert updated_order.client_id == order.client_id
     end
 
@@ -116,7 +116,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
       assert {:error, :multiple_orders_found} =
                Tai.Trading.OrderStore.find_by_and_update(
-                 [status: Tai.Trading.OrderStatus.enqueued()],
+                 [status: :enqueued],
                  []
                )
     end
@@ -140,13 +140,13 @@ defmodule Tai.Trading.OrderStoreTest do
     end
 
     test "count can filter by status" do
-      assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.enqueued()) == 0
-      assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.pending()) == 0
+      assert Tai.Trading.OrderStore.count(status: :enqueued) == 0
+      assert Tai.Trading.OrderStore.count(status: :pending) == 0
 
       {:ok, _} = submit_order()
 
-      assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.enqueued()) == 1
-      assert Tai.Trading.OrderStore.count(status: Tai.Trading.OrderStatus.pending()) == 0
+      assert Tai.Trading.OrderStore.count(status: :enqueued) == 1
+      assert Tai.Trading.OrderStore.count(status: :pending) == 0
     end
   end
 
@@ -180,12 +180,12 @@ defmodule Tai.Trading.OrderStoreTest do
       {:ok, order_2} = submit_order()
 
       found_orders =
-        [status: Tai.Trading.OrderStatus.enqueued()]
+        [status: :enqueued]
         |> Tai.Trading.OrderStore.where()
         |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
 
       assert found_orders == [order_1, order_2]
-      assert Tai.Trading.OrderStore.where(status: Tai.Trading.OrderStatus.pending()) == []
+      assert Tai.Trading.OrderStore.where(status: :pending) == []
       assert Tai.Trading.OrderStore.where(status: :status_does_not_exist) == []
     end
 
@@ -197,16 +197,16 @@ defmodule Tai.Trading.OrderStoreTest do
       {:ok, [_, updated_order_2]} =
         Tai.Trading.OrderStore.find_by_and_update(
           [client_id: order_2.client_id],
-          status: Tai.Trading.OrderStatus.pending()
+          status: :pending
         )
 
       Tai.Trading.OrderStore.find_by_and_update(
         [client_id: order_3.client_id],
-        status: Tai.Trading.OrderStatus.error()
+        status: :error
       )
 
       found_orders =
-        [status: [Tai.Trading.OrderStatus.enqueued(), Tai.Trading.OrderStatus.pending()]]
+        [status: [:enqueued, :pending]]
         |> Tai.Trading.OrderStore.where()
         |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
 
@@ -223,19 +223,19 @@ defmodule Tai.Trading.OrderStoreTest do
       {:ok, [_, updated_order_2]} =
         Tai.Trading.OrderStore.find_by_and_update(
           [client_id: order_2.client_id],
-          status: Tai.Trading.OrderStatus.error()
+          status: :error
         )
 
       {:ok, [_, updated_order_3]} =
         Tai.Trading.OrderStore.find_by_and_update(
           [client_id: order_3.client_id],
-          status: Tai.Trading.OrderStatus.error()
+          status: :error
         )
 
       error_orders =
         [
           client_id: [updated_order_2.client_id, updated_order_3.client_id],
-          status: Tai.Trading.OrderStatus.error()
+          status: :error
         ]
         |> Tai.Trading.OrderStore.where()
         |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))

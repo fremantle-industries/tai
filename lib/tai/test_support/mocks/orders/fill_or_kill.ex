@@ -3,7 +3,7 @@ defmodule Tai.TestSupport.Mocks.Orders.FillOrKill do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       time_in_force: Tai.Trading.TimeInForce.fill_or_kill(),
-      status: Tai.Trading.OrderStatus.expired(),
+      status: :expired,
       original_size: Decimal.new(original_size),
       executed_size: nil
     }
@@ -18,7 +18,7 @@ defmodule Tai.TestSupport.Mocks.Orders.FillOrKill do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       time_in_force: Tai.Trading.TimeInForce.fill_or_kill(),
-      status: Tai.Trading.OrderStatus.filled(),
+      status: :filled,
       original_size: Decimal.new(original_size),
       executed_size: Decimal.new(original_size)
     }

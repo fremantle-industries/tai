@@ -37,20 +37,20 @@ defmodule Tai.Trading.OrderPipeline.Send do
   defp fill!(cid, executed_size) do
     cid
     |> find_by_and_update(
-      status: Tai.Trading.OrderStatus.filled(),
+      status: :filled,
       executed_size: Decimal.new(executed_size)
     )
   end
 
   defp expire!(cid) do
     cid
-    |> find_by_and_update(status: Tai.Trading.OrderStatus.expired())
+    |> find_by_and_update(status: :expired)
   end
 
   defp pend!(cid, server_id) do
     cid
     |> find_by_and_update(
-      status: Tai.Trading.OrderStatus.pending(),
+      status: :pending,
       server_id: server_id
     )
   end
@@ -58,14 +58,14 @@ defmodule Tai.Trading.OrderPipeline.Send do
   defp error!(cid, reason) do
     cid
     |> find_by_and_update(
-      status: Tai.Trading.OrderStatus.error(),
+      status: :error,
       error_reason: reason
     )
   end
 
   defp skip!(cid) do
     cid
-    |> find_by_and_update(status: Tai.Trading.OrderStatus.skip())
+    |> find_by_and_update(status: :skip)
   end
 
   defp find_by_and_update(client_id, attrs) do

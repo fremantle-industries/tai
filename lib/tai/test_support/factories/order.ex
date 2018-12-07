@@ -9,7 +9,7 @@ defmodule Tai.TestSupport.Factories.Order do
       account_id: :ignore,
       price: :ignore,
       size: :ignore,
-      status: Tai.Trading.OrderStatus.enqueued(),
+      status: :enqueued,
       symbol: :ignore,
       time_in_force: :ignore,
       post_only: false,

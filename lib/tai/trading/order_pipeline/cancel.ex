@@ -40,22 +40,22 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
 
   defp find_pending_order_and_pre_cancel(client_id) do
     Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: Tai.Trading.OrderStatus.pending()],
-      status: Tai.Trading.OrderStatus.canceling()
+      [client_id: client_id, status: :pending],
+      status: :canceling
     )
   end
 
   defp find_canceling_order_and_cancel(client_id) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id],
-      status: Tai.Trading.OrderStatus.canceled()
+      status: :canceled
     )
   end
 
   defp find_canceling_order_and_error(client_id, reason) do
     Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: Tai.Trading.OrderStatus.canceling()],
-      status: Tai.Trading.OrderStatus.error(),
+      [client_id: client_id, status: :canceling],
+      status: :error,
       error_reason: reason
     )
   end
@@ -66,7 +66,7 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
     Tai.Events.broadcast(%Tai.Events.CancelOrderInvalidStatus{
       client_id: client_id,
       was: order.status,
-      required: Tai.Trading.OrderStatus.pending()
+      required: :pending
     })
 
     {:error, :order_status_must_be_pending}
