@@ -69,7 +69,7 @@ defmodule Tai.Trading.OrderPipeline.Send do
   end
 
   defp find_by_and_update(client_id, attrs) do
-    {:ok, [old_order, updated_order]} =
+    {:ok, {old_order, updated_order}} =
       Tai.Trading.OrderStore.find_by_and_update(
         [client_id: client_id],
         attrs

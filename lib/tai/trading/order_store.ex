@@ -50,7 +50,7 @@ defmodule Tai.Trading.OrderStore do
              update_attrs
            ) do
       new_state = Map.put(state, current_order.client_id, updated_order)
-      {:reply, {:ok, [current_order, updated_order]}, new_state}
+      {:reply, {:ok, {current_order, updated_order}}, new_state}
     else
       [] -> {:reply, {:error, :not_found}, state}
       [_head | _tail] -> {:reply, {:error, :multiple_orders_found}, state}
@@ -89,7 +89,8 @@ defmodule Tai.Trading.OrderStore do
   end
 
   @spec find_by_and_update(list, list) ::
-          {:ok, term} | {:error, :not_found | :multiple_orders_found}
+          {:ok, {previous_order :: order, updated_order :: order}}
+          | {:error, :not_found | :multiple_orders_found}
   def find_by_and_update(query, update_attrs) do
     GenServer.call(__MODULE__, {:find_by_and_update, query, update_attrs})
   end

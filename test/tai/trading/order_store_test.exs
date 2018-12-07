@@ -90,7 +90,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "can change the whitelist of attributes" do
       {:ok, order} = submit_order()
 
-      assert {:ok, [old_order, updated_order]} =
+      assert {:ok, {old_order, updated_order}} =
                Tai.Trading.OrderStore.find_by_and_update(
                  [client_id: order.client_id],
                  client_id: "changed_client_id",
@@ -194,7 +194,7 @@ defmodule Tai.Trading.OrderStoreTest do
       {:ok, order_2} = submit_order()
       {:ok, order_3} = submit_order()
 
-      {:ok, [_, updated_order_2]} =
+      {:ok, {_, updated_order_2}} =
         Tai.Trading.OrderStore.find_by_and_update(
           [client_id: order_2.client_id],
           status: :pending
@@ -220,13 +220,13 @@ defmodule Tai.Trading.OrderStoreTest do
       {:ok, order_2} = submit_order()
       {:ok, order_3} = submit_order()
 
-      {:ok, [_, updated_order_2]} =
+      {:ok, {_, updated_order_2}} =
         Tai.Trading.OrderStore.find_by_and_update(
           [client_id: order_2.client_id],
           status: :error
         )
 
-      {:ok, [_, updated_order_3]} =
+      {:ok, {_, updated_order_3}} =
         Tai.Trading.OrderStore.find_by_and_update(
           [client_id: order_3.client_id],
           status: :error
