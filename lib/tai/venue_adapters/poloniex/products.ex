@@ -35,7 +35,7 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
       {:ok, products}
     else
       {:error, %HTTPoison.Error{id: nil, reason: "timeout"}} ->
-        {:error, %Tai.TimeoutError{}}
+        {:error, :timeout}
     end
   end
 

@@ -8,7 +8,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
         {:error, %Tai.CredentialError{reason: reason}}
 
       {:error, {:http_error, %HTTPoison.Error{reason: "timeout"}}} ->
-        {:error, %Tai.TimeoutError{}}
+        {:error, :timeout}
     end
   end
 

@@ -14,9 +14,7 @@ defmodule Tai.Exchanges.Account do
   @type credentials :: map
   @type time_in_force :: Tai.Trading.Order.time_in_force()
   @type insufficient_balance_error :: Tai.Trading.InsufficientBalanceError.t()
-  @type shared_error_reason ::
-          Tai.CredentialError.t()
-          | Tai.TimeoutError.t()
+  @type shared_error_reason :: :timeout | Tai.CredentialError.t()
   @type create_order_error_reason ::
           :not_implemented
           | shared_error_reason

@@ -17,7 +17,7 @@ defmodule Tai.VenueAdapters.Binance.MakerTakerFees do
         {:error, %Tai.CredentialError{reason: reason}}
 
       {:error, {:http_error, %HTTPoison.Error{reason: "timeout"}}} ->
-        {:error, %Tai.TimeoutError{reason: "network request timed out"}}
+        {:error, :timeout}
     end
   end
 end

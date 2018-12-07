@@ -30,10 +30,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
 
   test "returns an error tuple when the request times out", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/binance/error_timeout" do
-      assert Tai.Venue.asset_balances(adapter, :main) == {
-               :error,
-               %Tai.TimeoutError{reason: "network request timed out"}
-             }
+      assert Tai.Venue.asset_balances(adapter, :main) == {:error, :timeout}
     end
   end
 

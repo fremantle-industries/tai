@@ -42,8 +42,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
     {:error, %Tai.Trading.FillOrKillError{reason: error}}
   end
 
-  defp parse_response({:error, %HTTPoison.Error{reason: "timeout"} = error}, _, _) do
-    {:error, %Tai.TimeoutError{reason: error}}
+  defp parse_response({:error, %HTTPoison.Error{reason: "timeout"}}, _, _) do
+    {:error, :timeout}
   end
 
   defp parse_response({:error, %ExPoloniex.AuthenticationError{} = error}, _, _) do

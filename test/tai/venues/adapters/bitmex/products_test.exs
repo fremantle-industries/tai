@@ -26,8 +26,7 @@ defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
 
   test "returns an error tuple on timeout", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/bitmex/error_timeout" do
-      assert Tai.Venue.products(adapter) ==
-               {:error, %Tai.TimeoutError{reason: "network request timed out"}}
+      assert Tai.Venue.products(adapter) == {:error, :timeout}
     end
   end
 

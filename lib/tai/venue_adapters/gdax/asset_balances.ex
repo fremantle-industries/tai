@@ -19,7 +19,7 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalances do
         {:error, %Tai.ServiceUnavailableError{reason: reason}}
 
       {:error, "timeout"} ->
-        {:error, %Tai.TimeoutError{reason: "network request timed out"}}
+        {:error, :timeout}
     end
   end
 

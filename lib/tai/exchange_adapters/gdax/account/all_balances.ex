@@ -32,9 +32,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.AllBalances do
     {:error, %Tai.ServiceUnavailableError{reason: reason}}
   end
 
-  defp normalize_accounts({:error, "timeout"}, _) do
-    {:error, %Tai.TimeoutError{reason: "network request timed out"}}
-  end
+  defp normalize_accounts({:error, "timeout"}, _), do: {:error, :timeout}
 
   defp normalize_account(
          %{"currency" => raw_currency, "available" => available, "hold" => hold},

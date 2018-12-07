@@ -3,14 +3,14 @@ defmodule Tai.VenueAdapters.Gdax.Products do
   Retrieves the available products on the GDAX exchange
   """
 
-  @type error ::
-          Tai.CredentialError.t()
+  @type error_reason ::
+          :timeout
+          | Tai.CredentialError.t()
           | Tai.CredentialError.t()
           | Tai.ServiceUnavailableError.t()
-          | Tai.TimeoutError.t()
   @type products :: Tai.Venues.Product.t()
 
-  @spec products(venue_id :: atom) :: {:ok, [products]} | {:error, error}
+  @spec products(venue_id :: atom) :: {:ok, [products]} | {:error, error_reason}
   def products(venue_id) do
     with {:ok, exchange_products} <- ExGdax.list_products() do
       products = Enum.map(exchange_products, &build(&1, venue_id))
@@ -26,7 +26,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
         {:error, %Tai.ServiceUnavailableError{reason: reason}}
 
       {:error, "timeout"} ->
-        {:error, %Tai.TimeoutError{}}
+        {:error, :timeout}
     end
   end
 

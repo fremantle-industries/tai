@@ -9,7 +9,7 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
       {:ok, products}
     else
       {:error, %HTTPoison.Error{id: nil, reason: "timeout"}} ->
-        {:error, %Tai.TimeoutError{}}
+        {:error, :timeout}
     end
   end
 

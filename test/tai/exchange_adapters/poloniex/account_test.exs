@@ -47,10 +47,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     test "returns an error tuple when the request times out", %{order: order} do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_timeout" do
-        assert Tai.Exchanges.Account.create_order(order) == {
-                 :error,
-                 %Tai.TimeoutError{reason: %HTTPoison.Error{reason: "timeout"}}
-               }
+        assert Tai.Exchanges.Account.create_order(order) == {:error, :timeout}
       end
     end
 

@@ -24,7 +24,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.AllBalances do
   end
 
   defp normalize_accounts({:error, %HTTPoison.Error{reason: "timeout"}}, _) do
-    {:error, %Tai.TimeoutError{reason: "network request timed out"}}
+    {:error, :timeout}
   end
 
   defp normalize_account(

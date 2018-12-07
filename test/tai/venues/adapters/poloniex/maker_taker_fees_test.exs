@@ -38,10 +38,7 @@ defmodule Tai.VenueAdapters.Poloniex.MakerTakerFeesTest do
 
   test "returns an error tuple when the request times out", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/maker_taker_fees/poloniex/error_timeout" do
-      assert Tai.Venue.maker_taker_fees(adapter, :main) == {
-               :error,
-               %Tai.TimeoutError{reason: "network request timed out"}
-             }
+      assert Tai.Venue.maker_taker_fees(adapter, :main) == {:error, :timeout}
     end
   end
 

@@ -26,10 +26,7 @@ defmodule Tai.VenueAdapters.Poloniex.ProductsTest do
 
   test "returns an error tuple when the request times out", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/poloniex/error_timeout" do
-      assert Tai.Venue.products(adapter) == {
-               :error,
-               %Tai.TimeoutError{reason: "network request timed out"}
-             }
+      assert Tai.Venue.products(adapter) == {:error, :timeout}
     end
   end
 
