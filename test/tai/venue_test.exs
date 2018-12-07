@@ -2,7 +2,7 @@ defmodule Tai.VenueTest do
   use ExUnit.Case, async: true
   doctest Tai.Venue
 
-  describe "#parse_adapters" do
+  describe ".parse_adapters" do
     test "returns a list of adapters parsed from the config" do
       config =
         Tai.Config.parse(
