@@ -2,10 +2,6 @@ defmodule Tai.ExchangeAdapters.Mock.Account do
   use Tai.Exchanges.Account
   import Tai.TestSupport.Mocks.Client
 
-  def all_balances(_credentials) do
-    {:ok, %{}}
-  end
-
   def create_order(%Tai.Trading.Order{} = order, _credentials) do
     eject_buy_or_sell_limit(order.symbol, order.price, order.size, order.time_in_force)
   end

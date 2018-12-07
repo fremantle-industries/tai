@@ -20,9 +20,6 @@ defmodule Tai.Exchanges.Account do
           | shared_error_reason
           | Tai.Trading.InsufficientBalanceError.t()
 
-  @callback all_balances(t) ::
-              {:ok, balances :: map} | {:error, :not_implemented | reason :: term}
-
   @callback create_order(order, credentials) ::
               {:ok, order_response} | {:error, create_order_error_reason}
 
@@ -57,11 +54,6 @@ defmodule Tai.Exchanges.Account do
         {:ok, state}
       end
 
-      def handle_call(:all_balances, _from, state) do
-        response = all_balances(state)
-        {:reply, response, state}
-      end
-
       def handle_call({:create_order, order}, _from, state) do
         response = create_order(order, state.credentials)
         {:reply, response, state}
@@ -77,13 +69,6 @@ defmodule Tai.Exchanges.Account do
         {:reply, response, state}
       end
     end
-  end
-
-  @spec all_balances(atom, atom) :: {:ok, map} | {:error, shared_error_reason}
-  def all_balances(exchange_id, account_id) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call(:all_balances)
   end
 
   @spec create_order(order) :: {:ok, order_response} | {:error, create_order_error_reason}

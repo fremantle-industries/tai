@@ -5,10 +5,6 @@ defmodule Tai.ExchangeAdapters.Binance.Account do
 
   use Tai.Exchanges.Account
 
-  def all_balances(account) do
-    Tai.ExchangeAdapters.Binance.Account.AllBalances.fetch(account)
-  end
-
   def create_order(%Tai.Trading.Order{} = order, _credentials) do
     Tai.ExchangeAdapters.Binance.Account.Orders.create(order)
   end

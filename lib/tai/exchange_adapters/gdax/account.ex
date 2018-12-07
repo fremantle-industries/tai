@@ -4,10 +4,6 @@ defmodule Tai.ExchangeAdapters.Gdax.Account do
   """
   use Tai.Exchanges.Account
 
-  def all_balances(credentials) do
-    Tai.ExchangeAdapters.Gdax.Account.AllBalances.fetch(credentials)
-  end
-
   def create_order(%Tai.Trading.Order{} = order, credentials) do
     Tai.ExchangeAdapters.Gdax.Account.Orders.create(order, credentials)
   end
