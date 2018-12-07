@@ -78,18 +78,16 @@ defmodule Tai.Exchanges.Account do
   end
 
   @spec order_status(atom, atom, venue_order_id) :: {:ok, order_status} | {:error, reason :: term}
-  def order_status(exchange_id, account_id, venue_order_id) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call({:order_status, venue_order_id})
+  def order_status(venue_id, account_id, venue_order_id) do
+    server = to_name(venue_id, account_id)
+    GenServer.call(server, {:order_status, venue_order_id})
   end
 
   @spec cancel_order(atom, atom, venue_order_id) ::
           {:ok, venue_order_id} | {:error, reason :: term}
-  def cancel_order(exchange_id, account_id, venue_order_id) do
-    exchange_id
-    |> to_name(account_id)
-    |> GenServer.call({:cancel_order, venue_order_id})
+  def cancel_order(venue_id, account_id, venue_order_id) do
+    server = to_name(venue_id, account_id)
+    GenServer.call(server, {:cancel_order, venue_order_id})
   end
 
   @spec to_name(atom, atom) :: atom
