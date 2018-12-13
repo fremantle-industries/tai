@@ -6,7 +6,7 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalancesTest do
 
   setup_all do
     HTTPoison.start()
-    adapter = find_adapter(@test_adapters, :poloniex)
+    adapter = @test_adapters |> Map.fetch!(:poloniex)
     {:ok, %{adapter: adapter}}
   end
 
@@ -40,9 +40,5 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalancesTest do
     use_cassette "exchange_adapters/shared/asset_balances/poloniex/error_timeout" do
       assert Tai.Venue.asset_balances(adapter, :main) == {:error, :timeout}
     end
-  end
-
-  def find_adapter(adapters, exchange_id) do
-    Enum.find(adapters, &(&1.id == exchange_id))
   end
 end

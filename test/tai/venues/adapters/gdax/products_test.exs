@@ -6,7 +6,7 @@ defmodule Tai.VenueAdapters.Gdax.ProductsTest do
 
   setup_all do
     HTTPoison.start()
-    adapter = find_adapter(@test_adapters, :gdax)
+    adapter = @test_adapters |> Map.fetch!(:gdax)
     {:ok, %{adapter: adapter}}
   end
 
@@ -57,10 +57,6 @@ defmodule Tai.VenueAdapters.Gdax.ProductsTest do
                }
              }
     end
-  end
-
-  def find_adapter(adapters, exchange_id) do
-    Enum.find(adapters, &(&1.id == exchange_id))
   end
 
   def find_product_by_symbol(products, symbol) do

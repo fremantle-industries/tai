@@ -1,41 +1,41 @@
-defmodule Tai.VenueTest do
+defmodule Tai.Venues.ConfigTest do
   use ExUnit.Case, async: true
-  doctest Tai.Venue
+  doctest Tai.Venues.Config
 
   describe ".parse_adapters" do
-    test "returns a list of adapters parsed from the config" do
+    test "returns a map of adapters parsed from the config" do
       config =
         Tai.Config.parse(
           venues: %{
-            exchange_a: [adapter: MyAdapterA],
-            exchange_b: [adapter: MyAdapterB]
+            venue_a: [adapter: MyAdapterA],
+            venue_b: [adapter: MyAdapterB]
           },
           adapter_timeout: 100
         )
 
-      assert Tai.Venue.parse_adapters(config) == [
-               %Tai.Venues.Adapter{
-                 id: :exchange_a,
+      assert Tai.Venues.Config.parse_adapters(config) == %{
+               venue_a: %Tai.Venues.Adapter{
+                 id: :venue_a,
                  adapter: MyAdapterA,
                  timeout: 100,
                  products: "*",
                  accounts: %{}
                },
-               %Tai.Venues.Adapter{
-                 id: :exchange_b,
+               venue_b: %Tai.Venues.Adapter{
+                 id: :venue_b,
                  adapter: MyAdapterB,
                  timeout: 100,
                  products: "*",
                  accounts: %{}
                }
-             ]
+             }
     end
 
     test "raises an KeyError when there is no adapter specified" do
       config = Tai.Config.parse(venues: %{invalid_exchange_a: []})
 
       assert_raise KeyError, "key :adapter not found in: []", fn ->
-        Tai.Venue.parse_adapters(config)
+        Tai.Venues.Config.parse_adapters(config)
       end
     end
 
@@ -43,60 +43,60 @@ defmodule Tai.VenueTest do
       config =
         Tai.Config.parse(
           venues: %{
-            exchange_a: [
+            venue_a: [
               adapter: MyAdapterA,
               timeout: 10
             ]
           }
         )
 
-      assert [
-               %Tai.Venues.Adapter{
-                 id: :exchange_a,
+      assert %{
+               venue_a: %Tai.Venues.Adapter{
+                 id: :venue_a,
                  adapter: MyAdapterA,
                  timeout: 10
                }
-             ] = Tai.Venue.parse_adapters(config)
+             } = Tai.Venues.Config.parse_adapters(config)
     end
 
     test "can provide a products filter" do
       config =
         Tai.Config.parse(
           venues: %{
-            exchange_a: [
+            venue_a: [
               adapter: MyAdapterA,
               products: "-btc_usd"
             ]
           }
         )
 
-      assert [
-               %Tai.Venues.Adapter{
-                 id: :exchange_a,
+      assert %{
+               venue_a: %Tai.Venues.Adapter{
+                 id: :venue_a,
                  adapter: MyAdapterA,
                  products: "-btc_usd"
                }
-             ] = Tai.Venue.parse_adapters(config)
+             } = Tai.Venues.Config.parse_adapters(config)
     end
 
     test "can provide accounts" do
       config =
         Tai.Config.parse(
           venues: %{
-            exchange_a: [
+            venue_a: [
               adapter: MyAdapterA,
               accounts: %{main: %{}}
             ]
           }
         )
 
-      assert [
-               %Tai.Venues.Adapter{
-                 id: :exchange_a,
+      assert %{
+               venue_a: %Tai.Venues.Adapter{
+                 id: :venue_a,
                  adapter: MyAdapterA,
                  accounts: %{main: %{}}
                }
-             ] = Tai.Venue.parse_adapters(config)
+             } = Tai.Venues.Config.parse_adapters(config)
     end
   end
 end

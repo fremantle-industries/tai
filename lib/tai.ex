@@ -28,8 +28,8 @@ defmodule Tai do
 
   defp boot_venues!(config) do
     config
-    |> Tai.Venue.parse_adapters()
-    |> Enum.map(fn adapter ->
+    |> Tai.Venues.Config.parse_adapters()
+    |> Enum.map(fn {_, adapter} ->
       task =
         Task.Supervisor.async(
           Tai.TaskSupervisor,

@@ -24,7 +24,7 @@ defmodule Tai.Venues.Boot.ProductsTest do
 
   test ".hydrate broadcasts a summary event" do
     config = Tai.Config.parse(venues: %{my_venue: [adapter: MyAdapter, products: "btc_usd"]})
-    [adapter] = Tai.Venue.parse_adapters(config)
+    %{my_venue: adapter} = Tai.Venues.Config.parse_adapters(config)
     Tai.Events.subscribe(Tai.Events.HydrateProducts)
 
     Tai.Venues.Boot.Products.hydrate(adapter)

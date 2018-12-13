@@ -6,7 +6,7 @@ defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
 
   setup_all do
     HTTPoison.start()
-    adapter = find_adapter(@test_adapters, :bitmex)
+    adapter = @test_adapters |> Map.fetch!(:bitmex)
     {:ok, %{adapter: adapter}}
   end
 
@@ -28,10 +28,6 @@ defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
     use_cassette "exchange_adapters/shared/products/bitmex/error_timeout" do
       assert Tai.Venue.products(adapter) == {:error, :timeout}
     end
-  end
-
-  def find_adapter(adapters, exchange_id) do
-    Enum.find(adapters, &(&1.id == exchange_id))
   end
 
   def find_product_by_symbol(products, symbol) do

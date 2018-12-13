@@ -6,7 +6,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
 
   setup_all do
     HTTPoison.start()
-    adapter = find_adapter(@test_adapters, :binance)
+    adapter = @test_adapters |> Map.fetch!(:binance)
     {:ok, %{adapter: adapter}}
   end
 
@@ -42,9 +42,5 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
                %Tai.ApiError{reason: "Timestamp for this request is outside of the recvWindow."}
              }
     end
-  end
-
-  def find_adapter(adapters, exchange_id) do
-    Enum.find(adapters, &(&1.id == exchange_id))
   end
 end

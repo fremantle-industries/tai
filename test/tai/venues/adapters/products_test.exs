@@ -15,7 +15,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
   @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
 
   @test_adapters
-  |> Enum.map(fn adapter ->
+  |> Enum.map(fn {_, adapter} ->
     @adapter adapter
 
     test "#{adapter.id} retrieves the product information for the exchange" do
