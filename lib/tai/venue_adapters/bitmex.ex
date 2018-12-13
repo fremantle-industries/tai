@@ -10,4 +10,6 @@ defmodule Tai.VenueAdapters.Bitmex do
   def asset_balances(_, _, _), do: {:ok, []}
 
   def maker_taker_fees(_, _, _), do: {:ok, nil}
+
+  defdelegate create_order(order, credentials), to: Tai.VenueAdapters.Bitmex.Orders
 end

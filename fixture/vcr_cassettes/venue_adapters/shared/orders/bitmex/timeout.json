@@ -1,0 +1,24 @@
+[
+  {
+    "request": {
+      "body": "{\"ordType\":\"Limit\",\"orderQty\":\"1\",\"price\":\"100.5\",\"side\":\"Buy\",\"symbol\":\"XBTH19\",\"timeInForce\":\"GoodTillCancel\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "59865098845935",
+        "api-key": "Tl3U0ypceDLxBtqxr8Z81PRL",
+        "api-signature": "ef916d9b8b4515afe1990525d909e502fc94e0f68d41427a34aadad3a597a5d3"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "timeout",
+      "headers": [],
+      "status_code": null,
+      "type": "error"
+    }
+  }
+]

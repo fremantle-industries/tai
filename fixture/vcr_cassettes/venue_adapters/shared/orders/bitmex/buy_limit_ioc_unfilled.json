@@ -1,0 +1,35 @@
+[
+  {
+    "request": {
+      "body": "{\"ordType\":\"Limit\",\"orderQty\":\"10\",\"price\":\"4450.5\",\"side\":\"Buy\",\"symbol\":\"XBTH19\",\"timeInForce\":\"ImmediateOrCancel\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "59858123192725",
+        "api-key": "Tl3U0ypceDLxBtqxr8Z81PRL",
+        "api-signature": "df40ee8b608158c49fb1f1659873f4e7b3fec10504eaebbaef73d5ec364cf4ef"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"orderID\":\"cc69c612-8d16-b667-1fb7-3df4e1b985b7\",\"clOrdID\":\"\",\"clOrdLinkID\":\"\",\"account\":158677,\"symbol\":\"XBTH19\",\"side\":\"Buy\",\"simpleOrderQty\":null,\"orderQty\":10,\"price\":4450.5,\"displayQty\":null,\"stopPx\":null,\"pegOffsetValue\":null,\"pegPriceType\":\"\",\"currency\":\"USD\",\"settlCurrency\":\"XBt\",\"ordType\":\"Limit\",\"timeInForce\":\"ImmediateOrCancel\",\"execInst\":\"\",\"contingencyType\":\"\",\"exDestination\":\"XBME\",\"ordStatus\":\"Canceled\",\"triggered\":\"\",\"workingIndicator\":false,\"ordRejReason\":\"\",\"simpleLeavesQty\":null,\"leavesQty\":0,\"simpleCumQty\":null,\"cumQty\":0,\"avgPx\":null,\"multiLegReportingType\":\"SingleSecurity\",\"text\":\"Canceled: Order had timeInForce of ImmediateOrCancel\\nSubmitted via API.\",\"transactTime\":\"2018-12-14T03:26:43.335Z\",\"timestamp\":\"2018-12-14T03:26:43.335Z\"}",
+      "headers": {
+        "Date": "Fri, 14 Dec 2018 03:26:43 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "766",
+        "Connection": "keep-alive",
+        "X-RateLimit-Limit": "300",
+        "X-RateLimit-Remaining": "298",
+        "X-RateLimit-Reset": "1544758004",
+        "X-Powered-By": "Profit",
+        "ETag": "W/\"2fe-uD0LqB33Q3lmm3v1dI6cDq7KWhs\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

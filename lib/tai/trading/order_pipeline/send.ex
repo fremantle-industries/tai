@@ -14,8 +14,8 @@ defmodule Tai.Trading.OrderPipeline.Send do
     end
   end
 
-  defp send_request(%Order{} = o) do
-    Tai.Exchanges.Account.create_order(o)
+  defp send_request(order) do
+    Tai.Exchanges.Account.create_order(order)
   end
 
   defp parse_response({:ok, %OrderResponse{status: :filled} = r}, %Order{} = o) do

@@ -1,0 +1,35 @@
+[
+  {
+    "request": {
+      "body": "{\"ordType\":\"Limit\",\"orderQty\":\"10\",\"price\":\"3755.5\",\"side\":\"Sell\",\"symbol\":\"XBTH19\",\"timeInForce\":\"ImmediateOrCancel\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "59858121506473",
+        "api-key": "Tl3U0ypceDLxBtqxr8Z81PRL",
+        "api-signature": "560db58c9195c7bd667690dabe82f4afce62461e9a8376f5c50ac1fa8e586ffb"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"orderID\":\"fa7ac433-e6ca-83cb-a66d-ee459adf6b01\",\"clOrdID\":\"\",\"clOrdLinkID\":\"\",\"account\":158677,\"symbol\":\"XBTH19\",\"side\":\"Sell\",\"simpleOrderQty\":null,\"orderQty\":10,\"price\":3755.5,\"displayQty\":null,\"stopPx\":null,\"pegOffsetValue\":null,\"pegPriceType\":\"\",\"currency\":\"USD\",\"settlCurrency\":\"XBt\",\"ordType\":\"Limit\",\"timeInForce\":\"ImmediateOrCancel\",\"execInst\":\"\",\"contingencyType\":\"\",\"exDestination\":\"XBME\",\"ordStatus\":\"Canceled\",\"triggered\":\"\",\"workingIndicator\":false,\"ordRejReason\":\"\",\"simpleLeavesQty\":null,\"leavesQty\":0,\"simpleCumQty\":null,\"cumQty\":0,\"avgPx\":null,\"multiLegReportingType\":\"SingleSecurity\",\"text\":\"Canceled: Order had timeInForce of ImmediateOrCancel\\nSubmitted via API.\",\"transactTime\":\"2018-12-14T03:26:42.590Z\",\"timestamp\":\"2018-12-14T03:26:42.590Z\"}",
+      "headers": {
+        "Date": "Fri, 14 Dec 2018 03:26:42 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "767",
+        "Connection": "keep-alive",
+        "X-RateLimit-Limit": "300",
+        "X-RateLimit-Remaining": "299",
+        "X-RateLimit-Reset": "1544758003",
+        "X-Powered-By": "Profit",
+        "ETag": "W/\"2ff-WfaOgw+iB4UlsuJOdbSx+cBfuSs\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]
