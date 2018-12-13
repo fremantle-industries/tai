@@ -7,7 +7,15 @@ defmodule Tai.Trading.Order do
   @type time_in_force :: :gtc | :fok | :ioc
   @type type :: :limit
   @type status ::
-          :enqueued | :expired | :pending | :filled | :canceling | :canceled | :error | :skip
+          :enqueued
+          | :skip
+          | :pending
+          | :open
+          | :expired
+          | :filled
+          | :canceling
+          | :canceled
+          | :error
   @type t :: %Order{
           client_id: client_id,
           server_id: venue_order_id | nil,

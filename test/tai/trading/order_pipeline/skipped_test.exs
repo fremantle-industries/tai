@@ -20,7 +20,7 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
       OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
-        product_symbol: :btc_usd_pending,
+        product_symbol: :btc_usd_open,
         price: Decimal.new("100.1"),
         qty: Decimal.new("0.1"),
         post_only: false,
@@ -41,7 +41,7 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
         OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
-          product_symbol: :btc_usd_pending,
+          product_symbol: :btc_usd_open,
           price: Decimal.new("100.1"),
           qty: Decimal.new("0.1"),
           post_only: false
@@ -63,7 +63,7 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
       OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
-        product_symbol: :btc_usd_pending,
+        product_symbol: :btc_usd_open,
         price: Decimal.new("100.1"),
         qty: Decimal.new("0.1"),
         post_only: false,
@@ -84,7 +84,7 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
         OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
-          product_symbol: :btc_usd_pending,
+          product_symbol: :btc_usd_open,
           price: Decimal.new("100.1"),
           qty: Decimal.new("0.1"),
           post_only: false

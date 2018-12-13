@@ -9,7 +9,7 @@ defmodule Tai.TestSupport.Mocks.Orders.GoodTillCancel do
     order_response = %Tai.Trading.OrderResponse{
       id: server_id,
       time_in_force: :gtc,
-      status: :pending,
+      status: :open,
       original_size: original_size,
       executed_size: nil
     }

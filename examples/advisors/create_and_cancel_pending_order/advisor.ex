@@ -19,9 +19,9 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
 
   def order_updated(
         %Tai.Trading.Order{status: :enqueued},
-        %Tai.Trading.Order{status: :pending} = pending_order
+        %Tai.Trading.Order{status: :open} = open_order
       ) do
-    Tai.Trading.OrderPipeline.cancel(pending_order)
+    Tai.Trading.OrderPipeline.cancel(open_order)
   end
 
   def order_updated(_previous_order, _updated_order), do: nil

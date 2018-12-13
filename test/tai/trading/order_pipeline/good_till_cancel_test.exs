@@ -40,7 +40,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       assert_receive {
         :callback_fired,
         %Tai.Trading.Order{status: :enqueued},
-        %Tai.Trading.Order{status: :pending}
+        %Tai.Trading.Order{status: :open}
       }
     end
 
@@ -63,7 +63,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
                       %Tai.Events.OrderUpdated{
                         client_id: ^client_id,
                         side: :buy,
-                        status: :pending
+                        status: :open
                       } = event}
 
       assert event.executed_size == Decimal.new(0)
@@ -94,7 +94,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       assert_receive {
         :callback_fired,
         %Tai.Trading.Order{status: :enqueued} = previous_order,
-        %Tai.Trading.Order{status: :pending} = updated_order
+        %Tai.Trading.Order{status: :open} = updated_order
       }
     end
 
@@ -117,7 +117,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
                       %Tai.Events.OrderUpdated{
                         client_id: ^client_id,
                         side: :sell,
-                        status: :pending
+                        status: :open
                       } = event}
 
       assert event.executed_size == Decimal.new(0)

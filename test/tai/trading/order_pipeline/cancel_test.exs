@@ -41,7 +41,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
       assert_receive {
         :callback_fired,
         %Tai.Trading.Order{status: :enqueued},
-        %Tai.Trading.Order{status: :pending}
+        %Tai.Trading.Order{status: :open}
       }
 
       {:ok, %{order: order}}
@@ -55,7 +55,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
 
       assert_receive {
         :callback_fired,
-        %Tai.Trading.Order{status: :pending},
+        %Tai.Trading.Order{status: :open},
         %Tai.Trading.Order{status: :canceling}
       }
 
@@ -110,7 +110,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
     end
   end
 
-  test "returns an error tuple and broadcasts and event when the status is not pending" do
+  test "returns an error tuple and broadcasts and event when the status is not open" do
     Tai.Events.firehose_subscribe()
 
     order =
@@ -125,7 +125,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
 
     assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
 
-    assert OrderPipeline.cancel(order) == {:error, :order_status_must_be_pending}
+    assert OrderPipeline.cancel(order) == {:error, :order_status_must_be_open}
 
     client_id = order.client_id
 
@@ -133,7 +133,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
                     %Tai.Events.CancelOrderInvalidStatus{
                       client_id: ^client_id,
                       was: :error,
-                      required: :pending
+                      required: :open
                     }}
   end
 end

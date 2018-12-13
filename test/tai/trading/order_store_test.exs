@@ -141,12 +141,12 @@ defmodule Tai.Trading.OrderStoreTest do
 
     test "count can filter by status" do
       assert Tai.Trading.OrderStore.count(status: :enqueued) == 0
-      assert Tai.Trading.OrderStore.count(status: :pending) == 0
+      assert Tai.Trading.OrderStore.count(status: :open) == 0
 
       {:ok, _} = submit_order()
 
       assert Tai.Trading.OrderStore.count(status: :enqueued) == 1
-      assert Tai.Trading.OrderStore.count(status: :pending) == 0
+      assert Tai.Trading.OrderStore.count(status: :open) == 0
     end
   end
 
@@ -185,7 +185,7 @@ defmodule Tai.Trading.OrderStoreTest do
         |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
 
       assert found_orders == [order_1, order_2]
-      assert Tai.Trading.OrderStore.where(status: :pending) == []
+      assert Tai.Trading.OrderStore.where(status: :open) == []
       assert Tai.Trading.OrderStore.where(status: :status_does_not_exist) == []
     end
 
@@ -197,7 +197,7 @@ defmodule Tai.Trading.OrderStoreTest do
       {:ok, {_, updated_order_2}} =
         Tai.Trading.OrderStore.find_by_and_update(
           [client_id: order_2.client_id],
-          status: :pending
+          status: :open
         )
 
       Tai.Trading.OrderStore.find_by_and_update(
@@ -206,7 +206,7 @@ defmodule Tai.Trading.OrderStoreTest do
       )
 
       found_orders =
-        [status: [:enqueued, :pending]]
+        [status: [:enqueued, :open]]
         |> Tai.Trading.OrderStore.where()
         |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
 

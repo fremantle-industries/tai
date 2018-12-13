@@ -53,5 +53,6 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
     {:error, reason}
   end
 
+  defp from_venue_status("open"), do: :open
   defp from_venue_status("pending"), do: :pending
 end

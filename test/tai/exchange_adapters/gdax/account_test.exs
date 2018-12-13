@@ -22,7 +22,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   end
 
   describe ".create_order buy limit" do
-    test "can create a good till cancel duration order" do
+    test "can create a gtc order" do
       use_cassette "exchange_adapters/shared/account/gdax/buy_limit_good_till_cancel_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
                  Tai.Trading.Order
@@ -66,7 +66,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
   end
 
   describe ".create_order sell limit" do
-    test "can create a good till cancel duration order" do
+    test "can create a gtc order" do
       use_cassette "exchange_adapters/shared/account/gdax/sell_limit_good_till_cancel_success" do
         assert {:ok, %Tai.Trading.OrderResponse{} = response} =
                  Tai.Trading.Order

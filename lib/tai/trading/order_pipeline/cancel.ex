@@ -4,9 +4,9 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
   alias Tai.Trading.OrderPipeline
 
   @spec execute_step(order) ::
-          {:ok, updated_order :: order} | {:error, :order_status_must_be_pending}
+          {:ok, updated_order :: order} | {:error, :order_status_must_be_open}
   def execute_step(%Tai.Trading.Order{client_id: client_id}) do
-    with {:ok, {old_order, updated_order}} <- find_pending_order_and_pre_cancel(client_id) do
+    with {:ok, {old_order, updated_order}} <- find_open_order_and_pre_cancel(client_id) do
       OrderPipeline.Events.info(updated_order)
       Tai.Trading.Order.execute_update_callback(old_order, updated_order)
 
@@ -38,9 +38,9 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
     Tai.Trading.Order.execute_update_callback(old_order, updated_order)
   end
 
-  defp find_pending_order_and_pre_cancel(client_id) do
+  defp find_open_order_and_pre_cancel(client_id) do
     Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: :pending],
+      [client_id: client_id, status: :open],
       status: :canceling
     )
   end
@@ -66,9 +66,9 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
     Tai.Events.broadcast(%Tai.Events.CancelOrderInvalidStatus{
       client_id: client_id,
       was: order.status,
-      required: :pending
+      required: :open
     })
 
-    {:error, :order_status_must_be_pending}
+    {:error, :order_status_must_be_open}
   end
 end

@@ -18,7 +18,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
     start_supervised!({
       Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
       [
-        group_id: :create_and_cancel_pending_order,
+        group_id: :create_and_cancel_open_order,
         advisor_id: :btc_usd,
         products: [
           struct(
@@ -33,7 +33,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
     :ok
   end
 
-  test "creates a single pending limit order and then cancels it" do
+  test "creates a single limit order and then cancels it" do
     Tai.Events.firehose_subscribe()
 
     push_market_feed_snapshot(
@@ -45,7 +45,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
       %{100.11 => 1.2}
     )
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :pending, time_in_force: :gtc}}
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :open, time_in_force: :gtc}}
     assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :canceling, time_in_force: :gtc}}
     assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :canceled, time_in_force: :gtc}}
   end
