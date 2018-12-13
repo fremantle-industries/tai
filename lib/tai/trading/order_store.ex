@@ -105,8 +105,8 @@ defmodule Tai.Trading.OrderStore do
     GenServer.call(__MODULE__, {:where, filters})
   end
 
-  @spec count :: pos_integer
-  @spec count(status: order_status) :: pos_integer
+  @spec count :: non_neg_integer
+  @spec count(status: order_status) :: non_neg_integer
   def count, do: GenServer.call(__MODULE__, :count)
   def count(status: status), do: GenServer.call(__MODULE__, {:count, status: status})
 
