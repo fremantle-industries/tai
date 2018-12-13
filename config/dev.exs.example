@@ -29,8 +29,7 @@ config :tai,
       accounts: %{
         main: %{
           api_key: System.get_env("BITMEX_API_KEY"),
-          api_secret: System.get_env("BITMEX_SECRET"),
-          test_mode: false
+          api_secret: System.get_env("BITMEX_SECRET")
         }
       },
       timeout: 60_000
@@ -90,6 +89,8 @@ config :echo_boy, port: 4200
 
 config :logger, backends: [{LoggerFileBackend, :file_log}]
 
+config :ex_bitmex, domain: "www.bitmex.com"
+
 config :ex_poloniex,
   api_key: System.get_env("POLONIEX_API_KEY"),
   api_secret: System.get_env("POLONIEX_API_SECRET")
@@ -97,7 +98,3 @@ config :ex_poloniex,
 config :binance,
   api_key: System.get_env("BINANCE_API_KEY"),
   secret_key: System.get_env("BINANCE_API_SECRET")
-
-config :bitmex, api_key: System.get_env("BITMEX_API_KEY")
-config :bitmex, api_secret: System.get_env("BITMEX_SECRET")
-config :bitmex, test_mode: false

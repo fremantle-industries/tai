@@ -8,8 +8,9 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
 
-  # TODO: Make url configurable
-  @default_url "wss://www.bitmex.com/realtime"
+  # TODO: Make this configurable
+  @url "wss://" <> ExBitmex.Rest.HTTPClient.domain() <> "/realtime"
+
   def init(venue_id: venue_id, accounts: accounts, products: products) do
     # TODO: Potentially this could use new order books? Send the change quote 
     # event to subscribing advisors?
@@ -46,7 +47,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
       {Tai.VenueAdapters.Bitmex.Stream.ProcessMessages, [venue_id: venue_id]},
       {Tai.VenueAdapters.Bitmex.Stream.Connection,
        [
-         url: @default_url,
+         url: @url,
          venue_id: venue_id,
          account: accounts |> Map.to_list() |> List.first(),
          products: products

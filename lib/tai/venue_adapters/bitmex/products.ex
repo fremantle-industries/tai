@@ -2,14 +2,17 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
   require Logger
 
   def products(venue_id) do
-    with {:ok, response} <-
-           Bitmex.Rest.Client.non_auth_get("/instrument", %{start: 0, count: 500}) do
-      products = Enum.map(response.body, &build(&1, venue_id))
+    with {:ok, instruments, _rate_limit} <-
+           ExBitmex.Rest.HTTPClient.non_auth_get("/instrument", %{start: 0, count: 500}) do
+      products = Enum.map(instruments, &build(&1, venue_id))
 
       {:ok, products}
     else
-      {:error, %HTTPoison.Error{id: nil, reason: "timeout"}} ->
+      {:error, :timeout, nil} ->
         {:error, :timeout}
+
+      {:error, reason, _} ->
+        {:error, reason}
     end
   end
 

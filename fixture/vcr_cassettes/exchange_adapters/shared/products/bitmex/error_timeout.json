@@ -9,7 +9,7 @@
       "method": "get",
       "options": [],
       "request_body": "",
-      "url": "https://www.bitmex.com/api/v1/instrument?count=500&start=0"
+      "url": "https://testnet.bitmex.com/api/v1/instrument?count=500&start=0"
     },
     "response": {
       "binary": false,

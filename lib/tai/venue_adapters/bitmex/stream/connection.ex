@@ -30,8 +30,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
         products: products
       ) do
     conn = %Tai.VenueAdapters.Bitmex.Stream.Connection{venue_id: venue_id}
-    nonce = Bitmex.Auth.nonce()
-    api_signature = Bitmex.Auth.sign(api_secret, "GET", "/realtime", nonce, "")
+    nonce = ExBitmex.Auth.nonce()
+    api_signature = ExBitmex.Auth.sign(api_secret, "GET", "/realtime", nonce, "")
 
     {:ok, pid} =
       WebSockex.start_link(
