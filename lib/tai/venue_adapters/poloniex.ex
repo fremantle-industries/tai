@@ -16,4 +16,8 @@ defmodule Tai.VenueAdapters.Poloniex do
   def create_order(%Tai.Trading.Order{} = _order, _credentials) do
     {:error, :not_implemented}
   end
+
+  def cancel_order(_venue_order_id, _credentials) do
+    {:error, :not_implemented}
+  end
 end

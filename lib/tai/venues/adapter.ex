@@ -9,6 +9,7 @@ defmodule Tai.Venues.Adapter do
           :not_implemented
           | shared_error_reason
           | Tai.Trading.InsufficientBalanceError.t()
+  @type venue_order_id :: String.t()
   @type t :: %Tai.Venues.Adapter{
           id: :atom,
           adapter: :atom,
@@ -25,6 +26,8 @@ defmodule Tai.Venues.Adapter do
               {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil} | {:error, reason :: term}
   @callback create_order(order, credentials) ::
               {:ok, order_response} | {:error, create_order_error_reason}
+  @callback cancel_order(venue_order_id, credentials) ::
+              {:ok, venue_order_id} | {:error, :not_implemented | reason :: term}
 
   @enforce_keys [
     :id,

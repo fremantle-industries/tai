@@ -1,0 +1,57 @@
+[
+  {
+    "request": {
+      "body": "{\"ordType\":\"Limit\",\"orderQty\":\"1\",\"price\":\"100.5\",\"side\":\"Buy\",\"symbol\":\"XBTH19\",\"timeInForce\":\"GoodTillCancel\",\"execInst\":\"ParticipateDoNotInitiate\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "59890512104212",
+        "api-key": "Tl3U0ypceDLxBtqxr8Z81PRL",
+        "api-signature": "d87b4b4e0320d1a44e9ac6d3c44b0868effbf8817a68e78ba5a6d8221649e2e4"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"orderID\":\"8dca984e-430f-d211-924e-789bd17d454e\",\"clOrdID\":\"\",\"clOrdLinkID\":\"\",\"account\":158677,\"symbol\":\"XBTH19\",\"side\":\"Buy\",\"simpleOrderQty\":null,\"orderQty\":1,\"price\":100.5,\"displayQty\":null,\"stopPx\":null,\"pegOffsetValue\":null,\"pegPriceType\":\"\",\"currency\":\"USD\",\"settlCurrency\":\"XBt\",\"ordType\":\"Limit\",\"timeInForce\":\"GoodTillCancel\",\"execInst\":\"ParticipateDoNotInitiate\",\"contingencyType\":\"\",\"exDestination\":\"XBME\",\"ordStatus\":\"New\",\"triggered\":\"\",\"workingIndicator\":true,\"ordRejReason\":\"\",\"simpleLeavesQty\":null,\"leavesQty\":1,\"simpleCumQty\":null,\"cumQty\":0,\"avgPx\":null,\"multiLegReportingType\":\"SingleSecurity\",\"text\":\"Submitted via API.\",\"transactTime\":\"2018-12-14T12:26:33.476Z\",\"timestamp\":\"2018-12-14T12:26:33.476Z\"}",
+      "headers": {
+        "Date": "Fri, 14 Dec 2018 12:26:33 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "725",
+        "Connection": "keep-alive",
+        "X-RateLimit-Limit": "300",
+        "X-RateLimit-Remaining": "299",
+        "X-RateLimit-Reset": "1544790394",
+        "X-Powered-By": "Profit",
+        "ETag": "W/\"2d5-8Xd7gh5gGzyEP0Ynfaoeq6FxE34\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "{\"orderID\":\"8dca984e-430f-d211-924e-789bd17d454e\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "59890513657460",
+        "api-key": "Tl3U0ypceDLxBtqxr8Z81PRL",
+        "api-signature": "3471b1ea13486b6e504679e9bd5e6786634e40716c9ad86dc75d77a438521079"
+      },
+      "method": "delete",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "timeout",
+      "headers": [],
+      "status_code": null,
+      "type": "error"
+    }
+  }
+]

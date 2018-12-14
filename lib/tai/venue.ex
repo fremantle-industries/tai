@@ -46,4 +46,11 @@ defmodule Tai.Venue do
     credentials = Map.fetch!(venue_adapter.accounts, order.account_id)
     venue_adapter.adapter.create_order(order, credentials)
   end
+
+  @spec cancel_order(order) :: term
+  def cancel_order(%Tai.Trading.Order{} = order, adapters \\ @adapters) do
+    venue_adapter = adapters |> Map.fetch!(order.exchange_id)
+    credentials = Map.fetch!(venue_adapter.accounts, order.account_id)
+    venue_adapter.adapter.cancel_order(order.venue_order_id, credentials)
+  end
 end

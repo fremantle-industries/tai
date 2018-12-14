@@ -46,6 +46,10 @@ defmodule Tai.VenueAdapters.Mock do
     {:error, :not_implemented}
   end
 
+  def cancel_order(_venue_order_id, _credentials) do
+    {:error, :not_implemented}
+  end
+
   def products_response_key(venue_id), do: {__MODULE__, :products, venue_id}
 
   def asset_balances_response_key({venue_id, account_id}),

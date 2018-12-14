@@ -239,7 +239,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
     test "#{adapter.id} timeout" do
       order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/timeout" do
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_timeout" do
         assert {:error, :timeout} = Tai.Venue.create_order(order, @test_adapters)
       end
     end
@@ -247,7 +247,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
     test "#{adapter.id} insufficient balance" do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/insufficient_balance" do
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_insufficient_balance" do
         assert {:error, :insufficient_balance} = Tai.Venue.create_order(order, @test_adapters)
       end
     end

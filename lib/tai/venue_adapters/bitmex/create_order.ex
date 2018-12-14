@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Bitmex.Orders do
+defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   @moduledoc """
   Create orders for the Bitmex adapter
   """
