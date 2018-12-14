@@ -18,11 +18,13 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
 
   describe "unfilled buy" do
     setup do
-      Mocks.Orders.FillOrKill.expired(
-        symbol: :btc_usd,
+      Mocks.Orders.FillOrKill.expired(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+        venue_id: :test_exchange_id,
+        account_id: :main,
+        product_symbol: :btc_usd,
         price: Decimal.new("100.1"),
-        original_size: Decimal.new("0.1")
-      )
+        qty: Decimal.new("0.1")
+      })
     end
 
     test "fires the callback when the status changes to expired" do
@@ -69,11 +71,13 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
 
   describe "unfilled sell" do
     setup do
-      Mocks.Orders.FillOrKill.expired(
-        symbol: :btc_usd,
+      Mocks.Orders.FillOrKill.expired(%Tai.Trading.OrderSubmissions.SellLimitFok{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd,
         price: Decimal.new("10000.1"),
-        original_size: Decimal.new("0.1")
-      )
+        qty: Decimal.new("0.1")
+      })
     end
 
     test "fires the callback when the status changes to expired" do
@@ -120,11 +124,13 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
 
   describe "filled buy" do
     setup do
-      Mocks.Orders.FillOrKill.filled(
-        symbol: :btc_usd,
+      Mocks.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd,
         price: Decimal.new("100.1"),
-        original_size: Decimal.new("0.1")
-      )
+        qty: Decimal.new("0.1")
+      })
     end
 
     test "fires the callback" do
@@ -171,11 +177,13 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
 
   describe "filled sell" do
     setup do
-      Mocks.Orders.FillOrKill.filled(
-        symbol: :btc_usd,
+      Mocks.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.SellLimitFok{
+        venue_id: :test_exchange_a,
+        account_id: :main,
+        product_symbol: :btc_usd,
         price: Decimal.new("10000.1"),
-        original_size: Decimal.new("0.1")
-      )
+        qty: Decimal.new("0.1")
+      })
     end
 
     test "fires the callback" do

@@ -1,29 +1,35 @@
 defmodule Tai.TestSupport.Mocks.Orders.GoodTillCancel do
-  @spec unfilled(
-          venue_order_id: String.t(),
-          symbol: atom,
-          price: Decimal.t(),
-          original_size: Decimal.t()
-        ) :: :ok
-  def unfilled(venue_order_id: venue_order_id, symbol: symbol, price: price, original_size: original_size) do
+  alias Tai.TestSupport.Mocks
+
+  @type buy_limit :: Tai.Trading.OrderSubmissions.BuyLimitGtc.t()
+  @type sell_limit :: Tai.Trading.OrderSubmissions.SellLimitGtc.t()
+  @type submission :: buy_limit | sell_limit
+  @type venue_order_id :: String.t()
+
+  @spec unfilled(venue_order_id, submission) :: :ok
+  def unfilled(server_id, submission) do
     order_response = %Tai.Trading.OrderResponse{
-      id: venue_order_id,
+      id: server_id,
       time_in_force: :gtc,
       status: :open,
-      original_size: original_size,
+      original_size: submission.qty,
       executed_size: nil
     }
 
-    key = {symbol, price, original_size, order_response.time_in_force}
-    :ok = Tai.TestSupport.Mocks.Server.insert(key, order_response)
+    key =
+      {Tai.Trading.OrderResponse,
+       [
+         symbol: submission.product_symbol,
+         price: submission.price,
+         size: submission.qty,
+         time_in_force: :gtc
+       ]}
 
-    :ok
+    Mocks.Server.insert(key, order_response)
   end
 
-  @spec canceled(venue_order_id: String.t()) :: :ok
-  def canceled(venue_order_id: venue_order_id) do
-    key = venue_order_id
-    :ok = Tai.TestSupport.Mocks.Server.insert(key, :cancel_ok)
-    :ok
+  @spec canceled(venue_order_id) :: :ok
+  def canceled(venue_order_id) do
+    Mocks.Server.insert(venue_order_id, :cancel_ok)
   end
 end

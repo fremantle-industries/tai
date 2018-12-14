@@ -19,10 +19,15 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
   describe "unfilled buy" do
     setup do
       Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
-        venue_order_id: @venue_order_id,
-        symbol: :btc_usd,
-        price: Decimal.new("100.1"),
-        original_size: Decimal.new("0.1")
+        @venue_order_id,
+        %Tai.Trading.OrderSubmissions.BuyLimitGtc{
+          venue_id: :test_exchange_a,
+          account_id: :main,
+          product_symbol: :btc_usd,
+          price: Decimal.new("100.1"),
+          qty: Decimal.new("0.1"),
+          post_only: true
+        }
       )
     end
 
@@ -73,10 +78,15 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
   describe "unfilled sell" do
     setup do
       Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
-        venue_order_id: @venue_order_id,
-        symbol: :btc_usd,
-        price: Decimal.new("100000.1"),
-        original_size: Decimal.new("0.01")
+        @venue_order_id,
+        %Tai.Trading.OrderSubmissions.SellLimitGtc{
+          venue_id: :test_exchange_a,
+          account_id: :main,
+          product_symbol: :btc_usd,
+          price: Decimal.new("100000.1"),
+          qty: Decimal.new("0.01"),
+          post_only: true
+        }
       )
     end
 

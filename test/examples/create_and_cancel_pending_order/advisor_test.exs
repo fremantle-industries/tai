@@ -51,14 +51,21 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
   end
 
   def mock_order_responses do
+    venue_order_id = "e116de5f-8d14-491f-a794-0f94fbcdd7c1"
+
     Mocks.Orders.GoodTillCancel.unfilled(
-      venue_order_id: "orderA",
-      symbol: :btc_usd,
-      price: Decimal.new("100.1"),
-      original_size: Decimal.new("0.1")
+      venue_order_id,
+      %Tai.Trading.OrderSubmissions.BuyLimitGtc{
+        venue_id: :test_exchange_a,
+        account_id: :mock_account,
+        product_symbol: :btc_usd,
+        price: Decimal.new("100.1"),
+        qty: Decimal.new("0.1"),
+        post_only: true
+      }
     )
 
-    Mocks.Orders.GoodTillCancel.canceled(venue_order_id: "orderA")
+    Mocks.Orders.GoodTillCancel.canceled(venue_order_id)
   end
 
   def mock_product_responses() do

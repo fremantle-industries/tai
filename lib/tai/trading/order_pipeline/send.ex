@@ -26,8 +26,11 @@ defmodule Tai.Trading.OrderPipeline.Send do
     expire!(cid)
   end
 
-  defp parse_response({:ok, %OrderResponse{status: :open, id: sid}}, %Order{client_id: cid}) do
-    pend!(cid, sid)
+  defp parse_response(
+         {:ok, %OrderResponse{status: :open, id: venue_order_id}},
+         %Order{client_id: cid}
+       ) do
+    open!(cid, venue_order_id)
   end
 
   defp parse_response({:error, reason}, %Order{client_id: cid}) do
@@ -47,7 +50,7 @@ defmodule Tai.Trading.OrderPipeline.Send do
     |> find_by_and_update(status: :expired)
   end
 
-  defp pend!(cid, venue_order_id) do
+  defp open!(cid, venue_order_id) do
     cid
     |> find_by_and_update(
       status: :open,

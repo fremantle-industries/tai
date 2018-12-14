@@ -61,11 +61,13 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
   end
 
   def mock_order_response do
-    Mocks.Orders.FillOrKill.filled(
-      symbol: :btc_usd,
+    Mocks.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+      venue_id: :test_exchange_a,
+      account_id: :mock_account,
+      product_symbol: :btc_usd,
       price: Decimal.new("100.1"),
-      original_size: Decimal.new("0.1")
-    )
+      qty: Decimal.new("0.1")
+    })
   end
 
   def mock_product_responses do

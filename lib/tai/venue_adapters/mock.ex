@@ -42,8 +42,21 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def create_order(%Tai.Trading.Order{} = _order, _credentials) do
-    {:error, :not_implemented}
+  def create_order(%Tai.Trading.Order{} = order, _credentials) do
+    with_mock_server(fn ->
+      {Tai.Trading.OrderResponse,
+       [
+         symbol: order.symbol,
+         price: order.price,
+         size: order.size,
+         time_in_force: order.time_in_force
+       ]}
+      |> Tai.TestSupport.Mocks.Server.eject()
+      |> case do
+        {:ok, _response} = result -> result
+        {:error, :not_found} -> {:error, :mock_not_found}
+      end
+    end)
   end
 
   def cancel_order(_venue_order_id, _credentials) do

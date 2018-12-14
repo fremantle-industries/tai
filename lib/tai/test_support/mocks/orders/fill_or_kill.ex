@@ -1,31 +1,51 @@
 defmodule Tai.TestSupport.Mocks.Orders.FillOrKill do
-  def expired(symbol: symbol, price: price, original_size: original_size) do
+  alias Tai.TestSupport.Mocks
+
+  @type buy_limit :: Tai.Trading.OrderSubmissions.BuyLimitFok.t()
+  @type sell_limit :: Tai.Trading.OrderSubmissions.SellLimitFok.t()
+  @type submission :: buy_limit | sell_limit
+
+  @spec expired(submission) :: :ok
+  def expired(submission) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       time_in_force: :fok,
       status: :expired,
-      original_size: Decimal.new(original_size),
-      executed_size: nil
+      original_size: submission.qty,
+      executed_size: Decimal.new(0)
     }
 
-    key = {symbol, price, original_size, order_response.time_in_force}
-    :ok = Tai.TestSupport.Mocks.Server.insert(key, order_response)
+    key =
+      {Tai.Trading.OrderResponse,
+       [
+         symbol: submission.product_symbol,
+         price: submission.price,
+         size: submission.qty,
+         time_in_force: :fok
+       ]}
 
-    :ok
+    Mocks.Server.insert(key, order_response)
   end
 
-  def filled(symbol: symbol, price: price, original_size: original_size) do
+  @spec filled(submission) :: :ok
+  def filled(submission) do
     order_response = %Tai.Trading.OrderResponse{
       id: UUID.uuid4(),
       time_in_force: :fok,
       status: :filled,
-      original_size: Decimal.new(original_size),
-      executed_size: Decimal.new(original_size)
+      original_size: submission.qty,
+      executed_size: submission.qty
     }
 
-    key = {symbol, price, original_size, order_response.time_in_force}
-    :ok = Tai.TestSupport.Mocks.Server.insert(key, order_response)
+    key =
+      {Tai.Trading.OrderResponse,
+       [
+         symbol: submission.product_symbol,
+         price: submission.price,
+         size: submission.qty,
+         time_in_force: :fok
+       ]}
 
-    :ok
+    Mocks.Server.insert(key, order_response)
   end
 end
