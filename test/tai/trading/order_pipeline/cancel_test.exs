@@ -17,11 +17,11 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
   end
 
   describe "success" do
-    @server_id "UNFILLED_ORDER_SERVER_ID"
+    @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
 
     setup do
       Mocks.Orders.GoodTillCancel.unfilled(
-        server_id: @server_id,
+        venue_order_id: @venue_order_id,
         symbol: :btc_usd,
         price: Decimal.new("100.1"),
         original_size: Decimal.new("0.1")
@@ -49,7 +49,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
 
     test "executes the callback when the status is updated",
          %{order: order} do
-      Mocks.Orders.GoodTillCancel.canceled(server_id: @server_id)
+      Mocks.Orders.GoodTillCancel.canceled(venue_order_id: @venue_order_id)
 
       assert {:ok, %Tai.Trading.Order{status: :canceling}} = OrderPipeline.cancel(order)
 
@@ -70,7 +70,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
          %{order: order} do
       Tai.Events.firehose_subscribe()
 
-      Mocks.Orders.GoodTillCancel.canceled(server_id: @server_id)
+      Mocks.Orders.GoodTillCancel.canceled(venue_order_id: @venue_order_id)
 
       assert {:ok, %Tai.Trading.Order{status: :canceling}} = OrderPipeline.cancel(order)
 

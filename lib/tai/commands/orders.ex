@@ -16,7 +16,7 @@ defmodule Tai.Commands.Orders do
     "Time in Force",
     "Status",
     "Client ID",
-    "Server ID",
+    "Venue Order ID",
     "Enqueued At",
     "Created At",
     "Error Reason"
@@ -38,7 +38,7 @@ defmodule Tai.Commands.Orders do
         order.time_in_force,
         order.status,
         order.client_id,
-        order.server_id,
+        order.venue_order_id,
         Timex.from_now(order.enqueued_at),
         order.created_at && Timex.from_now(order.created_at),
         order.error_reason

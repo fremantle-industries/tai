@@ -1,13 +1,13 @@
 defmodule Tai.TestSupport.Mocks.Orders.GoodTillCancel do
   @spec unfilled(
-          server_id: String.t(),
+          venue_order_id: String.t(),
           symbol: atom,
           price: Decimal.t(),
           original_size: Decimal.t()
         ) :: :ok
-  def unfilled(server_id: server_id, symbol: symbol, price: price, original_size: original_size) do
+  def unfilled(venue_order_id: venue_order_id, symbol: symbol, price: price, original_size: original_size) do
     order_response = %Tai.Trading.OrderResponse{
-      id: server_id,
+      id: venue_order_id,
       time_in_force: :gtc,
       status: :open,
       original_size: original_size,
@@ -20,9 +20,9 @@ defmodule Tai.TestSupport.Mocks.Orders.GoodTillCancel do
     :ok
   end
 
-  @spec canceled(server_id: String.t()) :: :ok
-  def canceled(server_id: server_id) do
-    key = server_id
+  @spec canceled(venue_order_id: String.t()) :: :ok
+  def canceled(venue_order_id: venue_order_id) do
+    key = venue_order_id
     :ok = Tai.TestSupport.Mocks.Server.insert(key, :cancel_ok)
     :ok
   end

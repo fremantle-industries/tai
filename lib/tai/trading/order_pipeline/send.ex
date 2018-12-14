@@ -47,11 +47,11 @@ defmodule Tai.Trading.OrderPipeline.Send do
     |> find_by_and_update(status: :expired)
   end
 
-  defp pend!(cid, server_id) do
+  defp pend!(cid, venue_order_id) do
     cid
     |> find_by_and_update(
       status: :open,
-      server_id: server_id
+      venue_order_id: venue_order_id
     )
   end
 

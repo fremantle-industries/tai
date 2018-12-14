@@ -14,12 +14,12 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
     :ok
   end
 
-  @server_id "UNFILLED_ORDER_SERVER_ID"
+  @venue_order_id "5adb3759-e45f-4d58-ad50-757b6a84ed7b"
 
   describe "unfilled buy" do
     setup do
       Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
-        server_id: @server_id,
+        venue_order_id: @venue_order_id,
         symbol: :btc_usd,
         price: Decimal.new("100.1"),
         original_size: Decimal.new("0.1")
@@ -73,7 +73,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
   describe "unfilled sell" do
     setup do
       Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
-        server_id: @server_id,
+        venue_order_id: @venue_order_id,
         symbol: :btc_usd,
         price: Decimal.new("100000.1"),
         original_size: Decimal.new("0.01")

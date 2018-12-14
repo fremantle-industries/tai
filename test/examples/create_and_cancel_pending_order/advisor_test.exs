@@ -52,13 +52,13 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
 
   def mock_order_responses do
     Mocks.Orders.GoodTillCancel.unfilled(
-      server_id: "orderA",
+      venue_order_id: "orderA",
       symbol: :btc_usd,
       price: Decimal.new("100.1"),
       original_size: Decimal.new("0.1")
     )
 
-    Mocks.Orders.GoodTillCancel.canceled(server_id: "orderA")
+    Mocks.Orders.GoodTillCancel.canceled(venue_order_id: "orderA")
   end
 
   def mock_product_responses() do

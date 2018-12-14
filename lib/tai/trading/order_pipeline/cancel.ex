@@ -23,7 +23,7 @@ defmodule Tai.Trading.OrderPipeline.Cancel do
   end
 
   defp send_cancel_order(order) do
-    Tai.Exchanges.Account.cancel_order(order.exchange_id, order.account_id, order.server_id)
+    Tai.Exchanges.Account.cancel_order(order.exchange_id, order.account_id, order.venue_order_id)
   end
 
   defp parse_cancel_order_response({:ok, _order_id}, order) do

@@ -182,7 +182,7 @@ defmodule Tai.Trading.OrderStore do
       :created_at,
       :error_reason,
       :executed_size,
-      :server_id,
+      :venue_order_id,
       :status
     ]
 

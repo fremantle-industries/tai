@@ -19,7 +19,7 @@ defmodule Tai.Trading.Order do
           | :error
   @type t :: %Order{
           client_id: client_id,
-          server_id: venue_order_id | nil,
+          venue_order_id: venue_order_id | nil,
           exchange_id: atom,
           account_id: atom,
           enqueued_at: DateTime.t(),
@@ -55,7 +55,7 @@ defmodule Tai.Trading.Order do
             exchange_id: nil,
             account_id: nil,
             price: nil,
-            server_id: nil,
+            venue_order_id: nil,
             side: nil,
             size: nil,
             status: nil,
