@@ -10,7 +10,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
       Application.stop(:tai)
     end)
 
-    start_supervised!(Tai.TestSupport.Mocks.Server)
+    start_supervised!(Mocks.Server)
     {:ok, _} = Application.ensure_all_started(:tai)
 
     :ok
@@ -20,7 +20,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
     @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
 
     setup do
-      Mocks.Orders.GoodTillCancel.unfilled(
+      Mocks.Responses.Orders.GoodTillCancel.unfilled(
         @venue_order_id,
         %Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
@@ -54,7 +54,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
 
     test "executes the callback when the status is updated",
          %{order: order} do
-      Mocks.Orders.GoodTillCancel.canceled(@venue_order_id)
+      Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
 
       assert {:ok, %Tai.Trading.Order{status: :canceling}} = OrderPipeline.cancel(order)
 
@@ -75,7 +75,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
          %{order: order} do
       Tai.Events.firehose_subscribe()
 
-      Mocks.Orders.GoodTillCancel.canceled(@venue_order_id)
+      Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
 
       assert {:ok, %Tai.Trading.Order{status: :canceling}} = OrderPipeline.cancel(order)
 

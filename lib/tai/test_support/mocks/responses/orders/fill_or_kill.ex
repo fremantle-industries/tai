@@ -1,4 +1,4 @@
-defmodule Tai.TestSupport.Mocks.Orders.FillOrKill do
+defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
   alias Tai.TestSupport.Mocks
 
   @type buy_limit :: Tai.Trading.OrderSubmissions.BuyLimitFok.t()

@@ -1,4 +1,4 @@
-defmodule Tai.TestSupport.Mocks.Orders.GoodTillCancel do
+defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   alias Tai.TestSupport.Mocks
 
   @type buy_limit :: Tai.Trading.OrderSubmissions.BuyLimitGtc.t()

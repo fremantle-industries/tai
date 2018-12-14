@@ -9,7 +9,7 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
       Application.stop(:tai)
     end)
 
-    start_supervised!(Tai.TestSupport.Mocks.Server)
+    start_supervised!(Mocks.Server)
     mock_product_responses()
     mock_order_response()
     {:ok, _} = Application.ensure_all_started(:tai)
@@ -61,7 +61,7 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
   end
 
   def mock_order_response do
-    Mocks.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+    Mocks.Responses.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.BuyLimitFok{
       venue_id: :test_exchange_a,
       account_id: :mock_account,
       product_symbol: :btc_usd,

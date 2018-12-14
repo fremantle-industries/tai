@@ -10,7 +10,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
       Application.stop(:tai)
     end)
 
-    start_supervised!(Tai.TestSupport.Mocks.Server)
+    start_supervised!(Mocks.Server)
     {:ok, _} = Application.ensure_all_started(:tai)
 
     :ok
@@ -18,7 +18,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
 
   describe "unfilled buy" do
     setup do
-      Mocks.Orders.FillOrKill.expired(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+      Mocks.Responses.Orders.FillOrKill.expired(%Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: :test_exchange_id,
         account_id: :main,
         product_symbol: :btc_usd,
@@ -71,7 +71,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
 
   describe "unfilled sell" do
     setup do
-      Mocks.Orders.FillOrKill.expired(%Tai.Trading.OrderSubmissions.SellLimitFok{
+      Mocks.Responses.Orders.FillOrKill.expired(%Tai.Trading.OrderSubmissions.SellLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
@@ -124,7 +124,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
 
   describe "filled buy" do
     setup do
-      Mocks.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+      Mocks.Responses.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
@@ -177,7 +177,7 @@ defmodule Tai.Trading.OrderPipeline.FillOrKillTest do
 
   describe "filled sell" do
     setup do
-      Mocks.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.SellLimitFok{
+      Mocks.Responses.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.SellLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,

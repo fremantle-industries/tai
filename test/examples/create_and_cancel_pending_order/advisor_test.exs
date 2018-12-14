@@ -9,7 +9,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
       Application.stop(:tai)
     end)
 
-    start_supervised!(Tai.TestSupport.Mocks.Server)
+    start_supervised!(Mocks.Server)
     mock_product_responses()
     mock_order_responses()
     {:ok, _} = Application.ensure_all_started(:tai)
@@ -53,7 +53,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
   def mock_order_responses do
     venue_order_id = "e116de5f-8d14-491f-a794-0f94fbcdd7c1"
 
-    Mocks.Orders.GoodTillCancel.unfilled(
+    Mocks.Responses.Orders.GoodTillCancel.unfilled(
       venue_order_id,
       %Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: :test_exchange_a,
@@ -65,7 +65,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
       }
     )
 
-    Mocks.Orders.GoodTillCancel.canceled(venue_order_id)
+    Mocks.Responses.Orders.GoodTillCancel.canceled(venue_order_id)
   end
 
   def mock_product_responses() do

@@ -2,13 +2,14 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
   use ExUnit.Case, async: false
 
   import Tai.TestSupport.Helpers
+  alias Tai.TestSupport.Mocks
 
   setup do
     on_exit(fn ->
       Application.stop(:tai)
     end)
 
-    start_supervised!(Tai.TestSupport.Mocks.Server)
+    start_supervised!(Mocks.Server)
     {:ok, _} = Application.ensure_all_started(:tai)
 
     :ok
@@ -18,7 +19,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
 
   describe "unfilled buy" do
     setup do
-      Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
+      Mocks.Responses.Orders.GoodTillCancel.unfilled(
         @venue_order_id,
         %Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
@@ -77,7 +78,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
 
   describe "unfilled sell" do
     setup do
-      Tai.TestSupport.Mocks.Orders.GoodTillCancel.unfilled(
+      Mocks.Responses.Orders.GoodTillCancel.unfilled(
         @venue_order_id,
         %Tai.Trading.OrderSubmissions.SellLimitGtc{
           venue_id: :test_exchange_a,
