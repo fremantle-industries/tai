@@ -1,4 +1,4 @@
-defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
+defmodule Tai.Trading.Orders.GoodTillCancelTest do
   use ExUnit.Case, async: false
 
   import Tai.TestSupport.Helpers
@@ -33,7 +33,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
     end
 
     test "fires the callback" do
-      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
+      Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
@@ -54,7 +54,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
+        Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
@@ -92,7 +92,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
     end
 
     test "fires the callback" do
-      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
+      Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,
@@ -113,7 +113,7 @@ defmodule Tai.Trading.OrderPipeline.GoodTillCancelTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
+        Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,

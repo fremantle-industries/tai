@@ -1,4 +1,4 @@
-defmodule Tai.Trading.OrderPipeline.Events do
+defmodule Tai.Trading.Orders.Events do
   def info(%Tai.Trading.Order{} = order) do
     Tai.Events.broadcast(%Tai.Events.OrderUpdated{
       client_id: order.client_id,

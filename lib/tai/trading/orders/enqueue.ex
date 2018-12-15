@@ -1,4 +1,4 @@
-defmodule Tai.Trading.OrderPipeline.Enqueue do
+defmodule Tai.Trading.Orders.Enqueue do
   alias Tai.Trading
 
   @type submission :: Trading.OrderStore.submission()
@@ -19,7 +19,7 @@ defmodule Tai.Trading.OrderPipeline.Enqueue do
   end
 
   defp log_enqueued(order) do
-    Trading.OrderPipeline.Events.info(order)
+    Trading.Orders.Events.info(order)
     order
   end
 
@@ -29,6 +29,6 @@ defmodule Tai.Trading.OrderPipeline.Enqueue do
   end
 
   defp next_step(order) do
-    Trading.OrderPipeline.Send.execute_step(order)
+    Trading.Orders.Send.execute_step(order)
   end
 end

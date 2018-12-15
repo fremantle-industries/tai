@@ -1,5 +1,5 @@
-defmodule Tai.Trading.OrderPipeline.Send do
-  alias Tai.Trading.{OrderResponse, Order, OrderPipeline}
+defmodule Tai.Trading.Orders.Send do
+  alias Tai.Trading.{OrderResponse, Order, Orders}
 
   def execute_step(%Order{status: :enqueued} = o) do
     if Tai.Settings.send_orders?() do
@@ -78,7 +78,7 @@ defmodule Tai.Trading.OrderPipeline.Send do
         attrs
       )
 
-    OrderPipeline.Events.info(updated_order)
+    Orders.Events.info(updated_order)
 
     {old_order, updated_order}
   end

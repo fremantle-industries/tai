@@ -3,7 +3,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
 
   def handle_inside_quote(venue_id, product_symbol, _inside_quote, _changes, _state) do
     if Tai.Trading.OrderStore.count() == 0 do
-      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
+      Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: venue_id,
         account_id: :main,
         product_symbol: product_symbol,
@@ -21,7 +21,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
         %Tai.Trading.Order{status: :enqueued},
         %Tai.Trading.Order{status: :open} = open_order
       ) do
-    Tai.Trading.OrderPipeline.cancel(open_order)
+    Tai.Trading.Orders.cancel(open_order)
   end
 
   def order_updated(_previous_order, _updated_order), do: nil

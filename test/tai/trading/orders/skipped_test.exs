@@ -1,8 +1,8 @@
-defmodule Tai.Trading.OrderPipeline.SkippedTest do
+defmodule Tai.Trading.Orders.SkippedTest do
   use ExUnit.Case, async: false
 
   import Tai.TestSupport.Helpers
-  alias Tai.Trading.OrderPipeline
+  alias Tai.Trading.Orders
 
   setup do
     on_exit(fn ->
@@ -17,7 +17,7 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
 
   describe "buy" do
     test "fires the callback" do
-      OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
+      Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd_open,
@@ -38,7 +38,7 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
+        Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd_open,
@@ -60,7 +60,7 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
 
   describe "sell" do
     test "fires the callback" do
-      OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
+      Orders.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd_open,
@@ -81,7 +81,7 @@ defmodule Tai.Trading.OrderPipeline.SkippedTest do
       Tai.Events.firehose_subscribe()
 
       order =
-        OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
+        Orders.enqueue(%Tai.Trading.OrderSubmissions.SellLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd_open,

@@ -1,4 +1,4 @@
-defmodule Tai.Trading.OrderPipeline.ErrorsTest do
+defmodule Tai.Trading.Orders.ErrorsTest do
   use ExUnit.Case, async: false
 
   import Tai.TestSupport.Helpers
@@ -16,7 +16,7 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
   end
 
   test "fires the callback" do
-    Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+    Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
       venue_id: :test_exchange_a,
       account_id: :main,
       product_symbol: :btc_usd,
@@ -34,7 +34,7 @@ defmodule Tai.Trading.OrderPipeline.ErrorsTest do
 
   test "broadcasts an event with the reason for the error" do
     order =
-      Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+      Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd,

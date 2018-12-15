@@ -1,8 +1,8 @@
-defmodule Tai.Trading.OrderPipeline.CancelTest do
+defmodule Tai.Trading.Orders.CancelTest do
   use ExUnit.Case, async: false
 
   import Tai.TestSupport.Helpers
-  alias Tai.Trading.OrderPipeline
+  alias Tai.Trading.Orders
   alias Tai.TestSupport.Mocks
 
   setup do
@@ -33,7 +33,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
       )
 
       order =
-        OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
+        Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
@@ -56,7 +56,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
          %{order: order} do
       Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
 
-      assert {:ok, %Tai.Trading.Order{status: :canceling}} = OrderPipeline.cancel(order)
+      assert {:ok, %Tai.Trading.Order{status: :canceling}} = Orders.cancel(order)
 
       assert_receive {
         :callback_fired,
@@ -77,7 +77,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
 
       Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
 
-      assert {:ok, %Tai.Trading.Order{status: :canceling}} = OrderPipeline.cancel(order)
+      assert {:ok, %Tai.Trading.Order{status: :canceling}} = Orders.cancel(order)
 
       client_id = order.client_id
 
@@ -119,7 +119,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
     Tai.Events.firehose_subscribe()
 
     order =
-      OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
+      Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: :test_exchange_a,
         account_id: :main,
         product_symbol: :btc_usd_expired,
@@ -130,7 +130,7 @@ defmodule Tai.Trading.OrderPipeline.CancelTest do
 
     assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
 
-    assert OrderPipeline.cancel(order) == {:error, :order_status_must_be_open}
+    assert Orders.cancel(order) == {:error, :order_status_must_be_open}
 
     client_id = order.client_id
 

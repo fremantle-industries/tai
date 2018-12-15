@@ -1,4 +1,4 @@
-defmodule Tai.Trading.OrderPipeline.EnqueueTest do
+defmodule Tai.Trading.Orders.EnqueueTest do
   use ExUnit.Case, async: false
 
   import Tai.TestSupport.Helpers
@@ -18,7 +18,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
       assert Tai.Trading.OrderStore.count() == 0
 
       order =
-        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+        Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitFok{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :btc_usd,
@@ -60,7 +60,7 @@ defmodule Tai.Trading.OrderPipeline.EnqueueTest do
       assert Tai.Trading.OrderStore.count() == 0
 
       order =
-        Tai.Trading.OrderPipeline.enqueue(%Tai.Trading.OrderSubmissions.SellLimitIoc{
+        Tai.Trading.Orders.enqueue(%Tai.Trading.OrderSubmissions.SellLimitIoc{
           venue_id: :test_exchange_a,
           account_id: :main,
           product_symbol: :ltc_usd,
