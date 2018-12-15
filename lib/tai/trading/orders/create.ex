@@ -1,22 +1,48 @@
-defmodule Tai.Trading.Orders.Send do
-  alias Tai.Trading.{OrderResponse, Order, Orders}
+defmodule Tai.Trading.Orders.Create do
+  alias Tai.Trading.{OrderStore, OrderResponse, Order, Orders}
 
-  def execute_step(%Order{status: :enqueued} = o) do
-    if Tai.Settings.send_orders?() do
-      o
-      |> send_request
-      |> parse_response(o)
-      |> execute_callback
-    else
-      o.client_id
-      |> skip!
-      |> execute_callback
-    end
+  @type order :: Order.t()
+  @type submission :: OrderStore.submission()
+
+  @spec create(submission) :: {:ok, order}
+  def create(submission) do
+    {:ok, order} = OrderStore.add(submission)
+
+    order
+    |> broadcast_updated_event()
+    |> initial_update_callback()
+
+    Task.async(fn ->
+      if Tai.Settings.send_orders?() do
+        order
+        |> send
+        |> parse_response(order)
+        |> execute_callback()
+      else
+        order.client_id
+        |> skip!
+        |> execute_callback()
+      end
+    end)
+
+    {:ok, order}
   end
 
-  defp send_request(order) do
-    Tai.Exchanges.Account.create_order(order)
+  defp broadcast_updated_event(order) do
+    Orders.broadcast(order)
+    order
   end
+
+  defp initial_update_callback(order) do
+    execute_callback({nil, order})
+  end
+
+  defp execute_callback({previous_order, order}) do
+    Orders.execute_update_callback(previous_order, order)
+    order
+  end
+
+  defp send(order), do: Tai.Exchanges.Account.create_order(order)
 
   defp parse_response({:ok, %OrderResponse{status: :filled} = r}, %Order{} = o) do
     fill!(o.client_id, r.executed_size)
@@ -73,7 +99,7 @@ defmodule Tai.Trading.Orders.Send do
 
   defp find_by_and_update(client_id, attrs) do
     {:ok, {old_order, updated_order}} =
-      Tai.Trading.OrderStore.find_by_and_update(
+      OrderStore.find_by_and_update(
         [client_id: client_id],
         attrs
       )
@@ -81,9 +107,5 @@ defmodule Tai.Trading.Orders.Send do
     Orders.Events.info(updated_order)
 
     {old_order, updated_order}
-  end
-
-  defp execute_callback({old_order, updated_order}) do
-    Tai.Trading.Order.execute_update_callback(old_order, updated_order)
   end
 end

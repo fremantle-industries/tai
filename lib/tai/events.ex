@@ -31,7 +31,7 @@ defmodule Tai.Events do
     Registry.register(__MODULE__, event_type, [])
   end
 
-  @spec broadcast(event) :: term
+  @spec broadcast(event) :: :ok
   def broadcast(event) do
     event_type = Map.fetch!(event, :__struct__)
     msg = {Tai.Event, event}
@@ -43,5 +43,7 @@ defmodule Tai.Events do
     Registry.dispatch(__MODULE__, :firehose, fn entries ->
       for {pid, _} <- entries, do: send(pid, msg)
     end)
+
+    :ok
   end
 end

@@ -32,16 +32,12 @@ defmodule Tai.Trading.Orders.CancelTest do
         }
       )
 
-      order =
-        Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
-          venue_id: :test_exchange_a,
-          account_id: :main,
-          product_symbol: :btc_usd,
-          price: Decimal.new("100.1"),
-          qty: Decimal.new("0.1"),
-          post_only: false,
+      submission =
+        Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc, %{
           order_updated_callback: fire_order_callback(self())
         })
+
+      {:ok, order} = Orders.create(submission)
 
       assert_receive {
         :callback_fired,
@@ -71,7 +67,7 @@ defmodule Tai.Trading.Orders.CancelTest do
       }
     end
 
-    test "broadcasts updated events when the status changes",
+    test "broadcasts events when the status changes",
          %{order: order} do
       Tai.Events.firehose_subscribe()
 
@@ -115,18 +111,10 @@ defmodule Tai.Trading.Orders.CancelTest do
     end
   end
 
-  test "returns an error tuple and broadcasts and event when the status is not open" do
+  test "returns an error tuple and broadcasts an event when the status is not open" do
     Tai.Events.firehose_subscribe()
-
-    order =
-      Orders.enqueue(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
-        venue_id: :test_exchange_a,
-        account_id: :main,
-        product_symbol: :btc_usd_expired,
-        price: Decimal.new("100.1"),
-        qty: Decimal.new("0.1"),
-        post_only: false
-      })
+    submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
+    {:ok, order} = Orders.create(submission)
 
     assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
 
