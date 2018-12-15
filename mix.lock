@@ -12,7 +12,7 @@
   "earmark": {:hex, :earmark, "1.2.6", "b6da42b3831458d3ecc57314dff3051b080b9b2be88c2e5aa41cd642a5b044ed", [:mix], [], "hexpm"},
   "echo_boy": {:git, "https://github.com/rupurt/echo_boy.git", "1b599fa2c9865e7cfdea3cb76cb71b7b12df9d9b", []},
   "erlex": {:hex, :erlex, "0.1.5", "fca8568751216266b343e182c9f494654e93c8adce3a0189c86ea45b632e8c55", [:mix], [], "hexpm"},
-  "ex_bitmex": {:git, "https://github.com/fremantle-capital/ex_bitmex.git", "32365a963f6db891787317fe2f96b4d1af6b147c", []},
+  "ex_bitmex": {:hex, :ex_bitmex, "0.0.2", "f952d1ecc296fbdba2e1940a1c74964f155cbf112504b5a6530f3c9137b65c8d", [:mix], [{:httpoison, "~> 1.4.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:jason, "~> 1.1.0", [hex: :jason, repo: "hexpm", optional: false]}, {:mapail, "~> 1.0.2", [hex: :mapail, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_doc": {:hex, :ex_doc, "0.19.1", "519bb9c19526ca51d326c060cb1778d4a9056b190086a8c6c115828eaccea6cf", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, repo: "hexpm", optional: false]}, {:makeup_elixir, "~> 0.7", [hex: :makeup_elixir, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_gdax": {:hex, :ex_gdax, "0.1.5", "63a92ab5e41213bbba7f1ccc451cfd7fe369026130f381d49e324e64dd5588ba", [:mix], [{:httpoison, "~> 1.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 3.1", [hex: :poison, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_poloniex": {:hex, :ex_poloniex, "0.0.4", "c40555b1c0f4cde22b40013a91d065208e701604d614a7c0861cda1b99424f97", [:mix], [{:httpoison, "~> 1.1", [hex: :httpoison, repo: "hexpm", optional: false]}, {:timex, "~> 3.1", [hex: :timex, repo: "hexpm", optional: false]}], "hexpm"},
