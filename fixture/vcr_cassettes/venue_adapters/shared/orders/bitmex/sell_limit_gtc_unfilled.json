@@ -4,9 +4,9 @@
       "body": "{\"ordType\":\"Limit\",\"orderQty\":\"1\",\"price\":\"50000.5\",\"side\":\"Sell\",\"symbol\":\"XBTH19\",\"timeInForce\":\"GoodTillCancel\"}",
       "headers": {
         "Content-Type": "application/json",
-        "api-nonce": "59810503484658",
-        "api-key": "Tl3U0ypceDLxBtqxr8Z81PRL",
-        "api-signature": "c5da6251b966a257b9e56cae0cc5829fc3226535b2e396f376a4cdab5e260146"
+        "api-nonce": "***",
+        "api-key": "***",
+        "api-signature": "***"
       },
       "method": "post",
       "options": [],

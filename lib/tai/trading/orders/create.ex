@@ -34,7 +34,8 @@ defmodule Tai.Trading.Orders.Create do
     order
   end
 
-  defp send(order), do: Tai.Exchanges.Account.create_order(order)
+  # defp send(order), do: Tai.Exchanges.Account.create_order(order)
+  defp send(order), do: Tai.Venue.create_order(order)
 
   defp parse_response({:ok, %OrderResponse{status: :filled} = r}, %Order{} = o) do
     fill!(o.client_id, r.cumulative_qty)

@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Gdax do
-  use Tai.Venues.Adapter
+  @behaviour Tai.Venues.Adapter
 
   def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
 
@@ -14,6 +14,10 @@ defmodule Tai.VenueAdapters.Gdax do
     to: Tai.VenueAdapters.Gdax.MakerTakerFees
 
   def create_order(%Tai.Trading.Order{} = _order, _credentials) do
+    {:error, :not_implemented}
+  end
+
+  def amend_order(_venue_order_id, _attrs, _credentials) do
     {:error, :not_implemented}
   end
 

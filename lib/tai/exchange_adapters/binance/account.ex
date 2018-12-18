@@ -13,6 +13,10 @@ defmodule Tai.ExchangeAdapters.Binance.Account do
     {:error, :not_implemented}
   end
 
+  def amend_order(_order, _attrs, _credentials) do
+    {:error, :not_implemented}
+  end
+
   def order_status(_venue_order_id, _credentials) do
     {:error, :not_implemented}
   end

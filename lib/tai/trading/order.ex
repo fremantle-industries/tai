@@ -11,6 +11,7 @@ defmodule Tai.Trading.Order do
           | :skip
           | :pending
           | :open
+          | :pending_amend
           | :expired
           | :filled
           | :canceling

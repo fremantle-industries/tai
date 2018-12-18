@@ -59,6 +59,11 @@ defmodule Tai.Exchanges.Account do
         {:reply, response, state}
       end
 
+      def handle_call({:amend_order, order, attrs}, _from, state) do
+        response = amend_order(order.venue_order_id, attrs, state.credentials)
+        {:reply, response, state}
+      end
+
       def handle_call({:cancel_order, venue_order_id}, _from, state) do
         response = cancel_order(venue_order_id, state)
         {:reply, response, state}
@@ -75,6 +80,12 @@ defmodule Tai.Exchanges.Account do
   def create_order(%Tai.Trading.Order{} = order) do
     server = to_name(order.exchange_id, order.account_id)
     GenServer.call(server, {:create_order, order})
+  end
+
+  @spec amend_order(order, map) :: {:ok, order} | {:error, reason :: term}
+  def amend_order(%Tai.Trading.Order{} = order, attrs) do
+    server = to_name(order.exchange_id, order.account_id)
+    GenServer.call(server, {:amend_order, order, attrs})
   end
 
   @spec order_status(atom, atom, venue_order_id) :: {:ok, order_status} | {:error, reason :: term}

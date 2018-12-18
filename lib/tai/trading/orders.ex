@@ -4,6 +4,7 @@ defmodule Tai.Trading.Orders do
   @type order :: Tai.Trading.Order.t()
 
   defdelegate create(submission), to: Orders.Create
+  defdelegate amend(order, attrs), to: Orders.Amend
   defdelegate cancel(order), to: Orders.Cancel
 
   @spec broadcast(order) :: :ok

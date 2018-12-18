@@ -4,9 +4,9 @@
       "body": "{\"ordType\":\"Limit\",\"orderQty\":\"1\",\"price\":\"100.5\",\"side\":\"Buy\",\"symbol\":\"XBTH19\",\"timeInForce\":\"GoodTillCancel\",\"execInst\":\"ParticipateDoNotInitiate\"}",
       "headers": {
         "Content-Type": "application/json",
-        "api-nonce": "59890512104212",
-        "api-key": "Tl3U0ypceDLxBtqxr8Z81PRL",
-        "api-signature": "d87b4b4e0320d1a44e9ac6d3c44b0868effbf8817a68e78ba5a6d8221649e2e4"
+        "api-nonce": "***",
+        "api-key": "***",
+        "api-signature": "***"
       },
       "method": "post",
       "options": [],
@@ -37,9 +37,9 @@
       "body": "{\"orderID\":\"8dca984e-430f-d211-924e-789bd17d454e\"}",
       "headers": {
         "Content-Type": "application/json",
-        "api-nonce": "59890513657460",
-        "api-key": "Tl3U0ypceDLxBtqxr8Z81PRL",
-        "api-signature": "3471b1ea13486b6e504679e9bd5e6786634e40716c9ad86dc75d77a438521079"
+        "api-nonce": "***",
+        "api-key": "***",
+        "api-signature": "***"
       },
       "method": "delete",
       "options": [],

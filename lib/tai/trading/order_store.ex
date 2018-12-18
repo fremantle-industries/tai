@@ -184,7 +184,9 @@ defmodule Tai.Trading.OrderStore do
       :error_reason,
       :cumulative_qty,
       :venue_order_id,
-      :status
+      :status,
+      :price,
+      :size
     ]
 
     def apply(order, update_attrs) do

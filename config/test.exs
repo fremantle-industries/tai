@@ -96,7 +96,11 @@ config :exvcr,
     "Key",
     "Sign",
     # Binance
-    "X-MBX-APIKEY"
+    "X-MBX-APIKEY",
+    # Bitmex
+    "api-key",
+    "api-nonce",
+    "api-signature"
   ],
   filter_sensitive_data: [
     # GDAX

@@ -4,12 +4,21 @@ defmodule Tai.Venues.Adapter do
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type order :: Tai.Trading.Order.t()
   @type order_response :: Tai.Trading.OrderResponse.t()
+  @type venue_order_id :: String.t()
+  @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type shared_error_reason :: :timeout | Tai.CredentialError.t()
   @type create_order_error_reason ::
           :not_implemented
           | shared_error_reason
           | Tai.Trading.InsufficientBalanceError.t()
-  @type venue_order_id :: String.t()
+  @type amend_order_error_reason ::
+          :not_implemented
+          | :not_found
+          | shared_error_reason
+  @type cancel_order_error_reason ::
+          :not_implemented
+          | :not_found
+          | shared_error_reason
   @type t :: %Tai.Venues.Adapter{
           id: :atom,
           adapter: :atom,
@@ -26,8 +35,10 @@ defmodule Tai.Venues.Adapter do
               {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil} | {:error, reason :: term}
   @callback create_order(order, credentials) ::
               {:ok, order_response} | {:error, create_order_error_reason}
+  @callback amend_order(venue_order_id, amend_attrs, credentials) ::
+              {:ok, order_response} | {:error, amend_order_error_reason}
   @callback cancel_order(venue_order_id, credentials) ::
-              {:ok, venue_order_id} | {:error, :not_implemented | reason :: term}
+              {:ok, venue_order_id} | {:error, cancel_order_error_reason}
 
   @enforce_keys [
     :id,
@@ -43,10 +54,4 @@ defmodule Tai.Venues.Adapter do
     :accounts,
     :timeout
   ]
-
-  defmacro __using__(_) do
-    quote location: :keep do
-      @behaviour Tai.Venues.Adapter
-    end
-  end
 end

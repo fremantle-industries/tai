@@ -12,6 +12,10 @@ defmodule Tai.ExchangeAdapters.Gdax.Account do
     Tai.ExchangeAdapters.Gdax.Account.CancelOrder.execute(venue_order_id, credentials)
   end
 
+  def amend_order(_order, _attrs, _credentials) do
+    {:error, :not_implemented}
+  end
+
   def order_status(venue_order_id, credentials) do
     Tai.ExchangeAdapters.Gdax.Account.OrderStatus.fetch(venue_order_id, credentials)
   end

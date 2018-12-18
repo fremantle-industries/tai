@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Mock do
-  use Tai.Venues.Adapter
+  @behaviour Tai.Venues.Adapter
   import Tai.TestSupport.Mocks.Client
 
   def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
@@ -59,8 +59,26 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def cancel_order(_venue_order_id, _credentials) do
-    {:error, :not_implemented}
+  def amend_order(venue_order_id, _attrs, _credentials) do
+    with_mock_server(fn ->
+      {Tai.Trading.OrderResponse, :amend_order, venue_order_id}
+      |> Tai.TestSupport.Mocks.Server.eject()
+      |> case do
+        {:ok, _} = response -> response
+        {:error, :not_found} -> {:error, :mock_not_found}
+      end
+    end)
+  end
+
+  def cancel_order(venue_order_id, _credentials) do
+    with_mock_server(fn ->
+      venue_order_id
+      |> Tai.TestSupport.Mocks.Server.eject()
+      |> case do
+        {:ok, :cancel_ok} -> {:ok, venue_order_id}
+        {:error, :not_found} -> {:error, :mock_not_found}
+      end
+    end)
   end
 
   def products_response_key(venue_id), do: {__MODULE__, :products, venue_id}

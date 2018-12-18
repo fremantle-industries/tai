@@ -1,0 +1,68 @@
+[
+  {
+    "request": {
+      "body": "{\"ordType\":\"Limit\",\"orderQty\":\"2\",\"price\":\"2001.5\",\"side\":\"Buy\",\"symbol\":\"XBTH19\",\"timeInForce\":\"GoodTillCancel\",\"execInst\":\"ParticipateDoNotInitiate\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "***",
+        "api-key": "***",
+        "api-signature": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"orderID\":\"43cd651c-c289-b6d3-0051-aa45d67527aa\",\"clOrdID\":\"\",\"clOrdLinkID\":\"\",\"account\":158677,\"symbol\":\"XBTH19\",\"side\":\"Buy\",\"simpleOrderQty\":null,\"orderQty\":2,\"price\":2001.5,\"displayQty\":null,\"stopPx\":null,\"pegOffsetValue\":null,\"pegPriceType\":\"\",\"currency\":\"USD\",\"settlCurrency\":\"XBt\",\"ordType\":\"Limit\",\"timeInForce\":\"GoodTillCancel\",\"execInst\":\"ParticipateDoNotInitiate\",\"contingencyType\":\"\",\"exDestination\":\"XBME\",\"ordStatus\":\"New\",\"triggered\":\"\",\"workingIndicator\":true,\"ordRejReason\":\"\",\"simpleLeavesQty\":null,\"leavesQty\":2,\"simpleCumQty\":null,\"cumQty\":0,\"avgPx\":null,\"multiLegReportingType\":\"SingleSecurity\",\"text\":\"Submitted via API.\",\"transactTime\":\"2018-12-18T22:46:31.513Z\",\"timestamp\":\"2018-12-18T22:46:31.513Z\"}",
+      "headers": {
+        "Date": "Tue, 18 Dec 2018 22:46:31 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "726",
+        "Connection": "keep-alive",
+        "X-RateLimit-Limit": "300",
+        "X-RateLimit-Remaining": "298",
+        "X-RateLimit-Reset": "1545173192",
+        "X-Powered-By": "Profit",
+        "ETag": "W/\"2d6-afGy0CBf50X5bzPq5MVsst+VavI\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "{\"orderID\":\"43cd651c-c289-b6d3-0051-aa45d67527aa\",\"price\":\"2300.5\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "***",
+        "api-key": "***",
+        "api-signature": "***"
+      },
+      "method": "put",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"orderID\":\"43cd651c-c289-b6d3-0051-aa45d67527aa\",\"clOrdID\":\"\",\"clOrdLinkID\":\"\",\"account\":158677,\"symbol\":\"XBTH19\",\"side\":\"Buy\",\"simpleOrderQty\":null,\"orderQty\":2,\"price\":2300.5,\"displayQty\":null,\"stopPx\":null,\"pegOffsetValue\":null,\"pegPriceType\":\"\",\"currency\":\"USD\",\"settlCurrency\":\"XBt\",\"ordType\":\"Limit\",\"timeInForce\":\"GoodTillCancel\",\"execInst\":\"ParticipateDoNotInitiate\",\"contingencyType\":\"\",\"exDestination\":\"XBME\",\"ordStatus\":\"New\",\"triggered\":\"\",\"workingIndicator\":true,\"ordRejReason\":\"\",\"simpleLeavesQty\":null,\"leavesQty\":2,\"simpleCumQty\":null,\"cumQty\":0,\"avgPx\":null,\"multiLegReportingType\":\"SingleSecurity\",\"text\":\"Amended price: Amended via API.\\nSubmitted via API.\",\"transactTime\":\"2018-12-18T22:46:31.963Z\",\"timestamp\":\"2018-12-18T22:46:31.963Z\"}",
+      "headers": {
+        "Date": "Tue, 18 Dec 2018 22:46:31 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "759",
+        "Connection": "keep-alive",
+        "X-RateLimit-Limit": "300",
+        "X-RateLimit-Remaining": "298",
+        "X-RateLimit-Reset": "1545173192",
+        "X-Powered-By": "Profit",
+        "ETag": "W/\"2f7-VtJHZCLZmI+fSkUleNJQHHFCawU\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

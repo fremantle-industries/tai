@@ -8,6 +8,10 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account do
     Tai.ExchangeAdapters.Poloniex.Account.Orders.create(order, credentials)
   end
 
+  def amend_order(_order, _attrs, _credentials) do
+    {:error, :not_implemented}
+  end
+
   def cancel_order(_venue_order_id, _credentials) do
     {:error, :not_implemented}
   end

@@ -1,19 +1,31 @@
 defmodule Tai.Trading.OrderResponse do
   @moduledoc """
-  Returned from creating an order
+  Returned from creating or amending an order
   """
 
-  @typedoc """
-  Details of an order executed on an account 
-  """
   @type t :: %Tai.Trading.OrderResponse{
           id: String.t(),
           status: atom,
-          original_size: Decimal.t(),
           time_in_force: atom,
-          cumulative_qty: Decimal.t() | nil
+          original_size: Decimal.t(),
+          cumulative_qty: Decimal.t(),
+          remaining_qty: Decimal.t()
         }
 
-  @enforce_keys [:id, :status, :original_size, :time_in_force, :cumulative_qty]
-  defstruct [:id, :status, :original_size, :time_in_force, :cumulative_qty]
+  @enforce_keys [
+    :id,
+    :status,
+    :time_in_force,
+    :original_size,
+    :cumulative_qty
+    # :remaining_qty
+  ]
+  defstruct [
+    :id,
+    :status,
+    :time_in_force,
+    :original_size,
+    :cumulative_qty,
+    :remaining_qty
+  ]
 end
