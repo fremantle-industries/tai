@@ -64,12 +64,4 @@ defmodule Tai.Trading.Order do
             type: nil,
             post_only: nil,
             order_updated_callback: nil
-
-  @spec buy_limit?(t) :: boolean
-  def buy_limit?(%Order{side: :buy, type: :limit}), do: true
-  def buy_limit?(%Order{}), do: false
-
-  @spec sell_limit?(t) :: boolean
-  def sell_limit?(%Order{side: :sell, type: :limit}), do: true
-  def sell_limit?(%Order{}), do: false
 end
