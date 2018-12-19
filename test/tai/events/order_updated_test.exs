@@ -13,7 +13,7 @@ defmodule Tai.Events.OrderUpdatedTest do
       status: :open,
       price: Decimal.new("0.1"),
       size: Decimal.new("0.2"),
-      executed_size: Decimal.new("0.3"),
+      cumulative_qty: Decimal.new("0.3"),
       error_reason: :my_error_reason
     }
 
@@ -28,7 +28,7 @@ defmodule Tai.Events.OrderUpdatedTest do
              status: :open,
              price: "0.1",
              size: "0.2",
-             executed_size: "0.3",
+             cumulative_qty: "0.3",
              error_reason: :my_error_reason
            }
   end

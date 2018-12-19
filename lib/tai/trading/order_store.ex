@@ -120,6 +120,7 @@ defmodule Tai.Trading.OrderStore do
       type: submission |> type,
       price: submission.price |> Decimal.abs(),
       size: submission.qty |> Decimal.abs(),
+      cumulative_qty: Decimal.new(0),
       time_in_force: submission |> time_in_force,
       post_only: submission |> post_only,
       status: :enqueued,
@@ -181,7 +182,7 @@ defmodule Tai.Trading.OrderStore do
     @whitelist_attrs [
       :created_at,
       :error_reason,
-      :executed_size,
+      :cumulative_qty,
       :venue_order_id,
       :status
     ]

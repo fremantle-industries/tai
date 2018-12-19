@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
       status: venue_order.ord_status |> from_venue_status(),
       time_in_force: :gtc,
       original_size: Decimal.new(venue_order.order_qty),
-      executed_size: Decimal.new(venue_order.cum_qty)
+      cumulative_qty: Decimal.new(venue_order.cum_qty)
     }
 
     {:ok, response}

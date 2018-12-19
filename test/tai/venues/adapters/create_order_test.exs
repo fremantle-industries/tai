@@ -35,14 +35,14 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert %Decimal{} = executed_size
-            assert original_size == executed_size
+            assert %Decimal{} = cumulative_qty
+            assert original_size == cumulative_qty
             assert status == :filled
             assert time_in_force == :fok
           end
@@ -58,13 +58,13 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert executed_size == Decimal.new(0)
+            assert cumulative_qty == Decimal.new(0)
             assert status == :expired
             assert time_in_force == :fok
           end
@@ -82,14 +82,14 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert %Decimal{} = executed_size
-            assert original_size == executed_size
+            assert %Decimal{} = cumulative_qty
+            assert original_size == cumulative_qty
             assert status == :filled
             assert time_in_force == :ioc
           end
@@ -105,15 +105,15 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert %Decimal{} = executed_size
-            assert executed_size != Decimal.new(0)
-            assert original_size != executed_size
+            assert %Decimal{} = cumulative_qty
+            assert cumulative_qty != Decimal.new(0)
+            assert original_size != cumulative_qty
             assert status == :expired
             assert time_in_force == :ioc
           end
@@ -129,13 +129,13 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert executed_size == Decimal.new(0)
+            assert cumulative_qty == Decimal.new(0)
             assert status == :expired
             assert time_in_force == :ioc
           end
@@ -153,14 +153,14 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert %Decimal{} = executed_size
-            assert original_size == executed_size
+            assert %Decimal{} = cumulative_qty
+            assert original_size == cumulative_qty
             assert status == :filled
             assert time_in_force == :gtc
           end
@@ -177,14 +177,14 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert original_size != executed_size
-            assert executed_size != Decimal.new(0)
+            assert original_size != cumulative_qty
+            assert cumulative_qty != Decimal.new(0)
             assert status == :open
             assert time_in_force == :gtc
           end
@@ -200,13 +200,13 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert executed_size == Decimal.new(0)
+            assert cumulative_qty == Decimal.new(0)
             assert status == :open
             assert time_in_force == :gtc
           end
@@ -222,13 +222,13 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
                      id: id,
                      status: status,
                      time_in_force: time_in_force,
-                     executed_size: executed_size,
+                     cumulative_qty: cumulative_qty,
                      original_size: original_size
                    } = order_response
 
             assert id != nil
             assert %Decimal{} = original_size
-            assert executed_size == Decimal.new(0)
+            assert cumulative_qty == Decimal.new(0)
             assert status == :rejected
             assert time_in_force == :gtc
           end

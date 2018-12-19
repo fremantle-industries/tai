@@ -13,7 +13,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       time_in_force: :gtc,
       status: :open,
       original_size: submission.qty,
-      executed_size: nil
+      cumulative_qty: nil
     }
 
     key =

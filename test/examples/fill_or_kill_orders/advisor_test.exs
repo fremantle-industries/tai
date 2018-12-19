@@ -50,14 +50,14 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
                       status: :enqueued
                     } = enqueued_event}
 
-    assert enqueued_event.executed_size == Decimal.new(0)
+    assert enqueued_event.cumulative_qty == Decimal.new(0)
 
     assert_receive {Tai.Event,
                     %Tai.Events.OrderUpdated{
                       status: :filled
                     } = filled_event}
 
-    assert filled_event.executed_size == Decimal.new("0.1")
+    assert filled_event.cumulative_qty == Decimal.new("0.1")
   end
 
   def mock_order_response do

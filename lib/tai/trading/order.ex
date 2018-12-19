@@ -30,6 +30,7 @@ defmodule Tai.Trading.Order do
           type: type,
           price: Decimal.t(),
           size: Decimal.t(),
+          cumulative_qty: Decimal.t(),
           post_only: boolean
         }
 
@@ -47,21 +48,23 @@ defmodule Tai.Trading.Order do
     :type,
     :post_only
   ]
-  defstruct executed_size: Decimal.new(0),
-            client_id: nil,
-            created_at: nil,
-            enqueued_at: nil,
-            error_reason: nil,
-            exchange_id: nil,
-            account_id: nil,
-            price: nil,
-            venue_order_id: nil,
-            side: nil,
-            size: nil,
-            status: nil,
-            symbol: nil,
-            time_in_force: nil,
-            type: nil,
-            post_only: nil,
-            order_updated_callback: nil
+  defstruct [
+    :client_id,
+    :created_at,
+    :enqueued_at,
+    :error_reason,
+    :exchange_id,
+    :account_id,
+    :price,
+    :venue_order_id,
+    :side,
+    :size,
+    :cumulative_qty,
+    :status,
+    :symbol,
+    :time_in_force,
+    :type,
+    :post_only,
+    :order_updated_callback
+  ]
 end

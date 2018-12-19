@@ -12,7 +12,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
       time_in_force: :fok,
       status: :expired,
       original_size: submission.qty,
-      executed_size: Decimal.new(0)
+      cumulative_qty: Decimal.new(0)
     }
 
     key =
@@ -34,7 +34,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
       time_in_force: :fok,
       status: :filled,
       original_size: submission.qty,
-      executed_size: submission.qty
+      cumulative_qty: submission.qty
     }
 
     key =

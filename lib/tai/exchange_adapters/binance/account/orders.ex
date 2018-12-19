@@ -26,7 +26,7 @@ defmodule Tai.ExchangeAdapters.Binance.Account.Orders do
       status: binance_response.status |> from_venue_status,
       time_in_force: time_in_force,
       original_size: Decimal.new(binance_response.orig_qty),
-      executed_size: Decimal.new(binance_response.executed_qty)
+      cumulative_qty: Decimal.new(binance_response.executed_qty)
     }
 
     {:ok, response}

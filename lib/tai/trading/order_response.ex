@@ -11,9 +11,9 @@ defmodule Tai.Trading.OrderResponse do
           status: atom,
           original_size: Decimal.t(),
           time_in_force: atom,
-          executed_size: Decimal.t() | nil
+          cumulative_qty: Decimal.t() | nil
         }
 
-  @enforce_keys [:id, :status, :original_size, :time_in_force, :executed_size]
-  defstruct [:id, :status, :original_size, :time_in_force, :executed_size]
+  @enforce_keys [:id, :status, :original_size, :time_in_force, :cumulative_qty]
+  defstruct [:id, :status, :original_size, :time_in_force, :cumulative_qty]
 end

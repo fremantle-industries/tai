@@ -12,7 +12,7 @@ defmodule Tai.Trading.Orders.Events do
       price: order.price,
       size: order.size,
       error_reason: order.error_reason,
-      executed_size: order.executed_size
+      cumulative_qty: order.cumulative_qty
     })
   end
 end

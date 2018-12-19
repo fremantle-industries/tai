@@ -42,7 +42,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
         assert response.status == :pending
         assert response.time_in_force == :gtc
         assert Decimal.cmp(response.original_size, Decimal.new("0.2")) == :eq
-        assert Decimal.cmp(response.executed_size, Decimal.new(0)) == :eq
+        assert Decimal.cmp(response.cumulative_qty, Decimal.new(0)) == :eq
       end
     end
 
@@ -86,7 +86,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
         assert response.status == :pending
         assert response.time_in_force == :gtc
         assert Decimal.cmp(response.original_size, Decimal.new("0.2")) == :eq
-        assert Decimal.cmp(response.executed_size, Decimal.new(0)) == :eq
+        assert Decimal.cmp(response.cumulative_qty, Decimal.new(0)) == :eq
       end
     end
 

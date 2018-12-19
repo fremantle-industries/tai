@@ -39,7 +39,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
       status: from_venue_status(venue_status),
       time_in_force: time_in_force,
       original_size: Decimal.new(size),
-      executed_size: Decimal.new(filled_size)
+      cumulative_qty: Decimal.new(filled_size)
     }
 
     {:ok, response}

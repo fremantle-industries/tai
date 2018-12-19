@@ -32,7 +32,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
       status: status(time_in_force),
       time_in_force: time_in_force,
       original_size: original_size |> to_decimal,
-      executed_size: executed_size(poloniex_response.resulting_trades)
+      cumulative_qty: cumulative_qty(poloniex_response.resulting_trades)
     }
 
     {:ok, response}
@@ -60,7 +60,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
   defp status(:fok), do: :expired
   defp status(:ioc), do: :expired
 
-  defp executed_size(resulting_trades) do
+  defp cumulative_qty(resulting_trades) do
     resulting_trades
     |> Enum.reduce(
       Decimal.new(0),

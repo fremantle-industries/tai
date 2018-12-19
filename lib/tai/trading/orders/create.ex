@@ -45,7 +45,7 @@ defmodule Tai.Trading.Orders.Create do
   defp send(order), do: Tai.Exchanges.Account.create_order(order)
 
   defp parse_response({:ok, %OrderResponse{status: :filled} = r}, %Order{} = o) do
-    fill!(o.client_id, r.executed_size)
+    fill!(o.client_id, r.cumulative_qty)
   end
 
   defp parse_response({:ok, %OrderResponse{status: :expired}}, %Order{client_id: cid}) do
@@ -63,11 +63,11 @@ defmodule Tai.Trading.Orders.Create do
     error!(cid, reason)
   end
 
-  defp fill!(cid, executed_size) do
+  defp fill!(cid, cumulative_qty) do
     cid
     |> find_by_and_update(
       status: :filled,
-      executed_size: Decimal.new(executed_size)
+      cumulative_qty: Decimal.new(cumulative_qty)
     )
   end
 

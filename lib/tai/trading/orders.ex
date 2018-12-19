@@ -22,7 +22,7 @@ defmodule Tai.Trading.Orders do
       price: order.price,
       size: order.size,
       error_reason: order.error_reason,
-      executed_size: order.executed_size
+      cumulative_qty: order.cumulative_qty
     }
     |> Tai.Events.broadcast()
   end

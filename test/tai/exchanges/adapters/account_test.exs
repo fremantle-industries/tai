@@ -57,7 +57,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
           assert response.status == :expired
           assert response.time_in_force == :fok
           assert Decimal.cmp(response.original_size, Decimal.new("0.01")) == :eq
-          assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
+          assert Decimal.cmp(response.cumulative_qty, Decimal.new("0.01")) == :eq
         end
       end
 
@@ -99,7 +99,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
           assert response.status == :expired
           assert response.time_in_force == :ioc
           assert Decimal.cmp(response.original_size, Decimal.new("0.02")) == :eq
-          assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
+          assert Decimal.cmp(response.cumulative_qty, Decimal.new("0.01")) == :eq
         end
       end
     end)
@@ -132,7 +132,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
           assert response.status == :expired
           assert response.time_in_force == :fok
           assert Decimal.cmp(response.original_size, Decimal.new("0.01")) == :eq
-          assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
+          assert Decimal.cmp(response.cumulative_qty, Decimal.new("0.01")) == :eq
         end
       end
 
@@ -156,7 +156,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
           assert response.status == :expired
           assert response.time_in_force == :ioc
           assert Decimal.cmp(response.original_size, Decimal.new("0.02")) == :eq
-          assert Decimal.cmp(response.executed_size, Decimal.new("0.01")) == :eq
+          assert Decimal.cmp(response.cumulative_qty, Decimal.new("0.01")) == :eq
         end
       end
     end)
