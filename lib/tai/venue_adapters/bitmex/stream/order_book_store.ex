@@ -92,16 +92,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
         end
       )
 
-    update = %Tai.Markets.OrderBook{
+    %Tai.Markets.OrderBook{
       venue_id: state.venue_id,
       product_symbol: state.symbol,
       bids: normalized.bids,
       asks: normalized.asks
     }
-
-    state.venue_id
-    |> Tai.Markets.OrderBook.to_name(state.symbol)
-    |> Tai.Markets.OrderBook.update(update)
+    |> Tai.Markets.OrderBook.update()
 
     new_table = Map.merge(state.table, normalized.table)
     new_state = Map.put(state, :table, new_table)
@@ -127,16 +124,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
         end
       )
 
-    update = %Tai.Markets.OrderBook{
+    %Tai.Markets.OrderBook{
       venue_id: state.venue_id,
       product_symbol: state.symbol,
       bids: normalized.bids,
       asks: normalized.asks
     }
-
-    state.venue_id
-    |> Tai.Markets.OrderBook.to_name(state.symbol)
-    |> Tai.Markets.OrderBook.update(update)
+    |> Tai.Markets.OrderBook.update()
 
     {:noreply, state}
   end
@@ -159,16 +153,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
         end
       )
 
-    update = %Tai.Markets.OrderBook{
+    %Tai.Markets.OrderBook{
       venue_id: state.venue_id,
       product_symbol: state.symbol,
       bids: normalized.bids,
       asks: normalized.asks
     }
-
-    state.venue_id
-    |> Tai.Markets.OrderBook.to_name(state.symbol)
-    |> Tai.Markets.OrderBook.update(update)
+    |> Tai.Markets.OrderBook.update()
 
     {:noreply, state}
   end

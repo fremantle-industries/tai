@@ -125,16 +125,13 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
       processed_at = Timex.now()
       symbol = state.store |> Map.get(channel_id)
 
-      changes = %Tai.Markets.OrderBook{
+      %Tai.Markets.OrderBook{
         venue_id: state.feed_id,
         product_symbol: symbol,
         bids: bids |> OrderBookFeed.Snapshot.normalize(processed_at),
         asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
       }
-
-      state.feed_id
-      |> Tai.Markets.OrderBook.to_name(symbol)
-      |> Tai.Markets.OrderBook.update(changes)
+      |> Tai.Markets.OrderBook.update()
     end
 
     state

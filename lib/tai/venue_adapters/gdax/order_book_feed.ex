@@ -90,9 +90,7 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
         server_changed_at
       )
 
-    state.feed_id
-    |> Tai.Markets.OrderBook.to_name(symbol)
-    |> Tai.Markets.OrderBook.update(normalized_changes)
+    Tai.Markets.OrderBook.update(normalized_changes)
 
     {:ok, state}
   end

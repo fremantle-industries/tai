@@ -51,9 +51,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
   end
 
   describe "#handle_order_book_changes" do
-    test("is called when it receives a broadcast message", %{
-      book_pid: book_pid
-    }) do
+    test "is called when it receives a broadcast message" do
       start_advisor!(MyAdvisor)
 
       changes = %Tai.Markets.OrderBook{
@@ -63,7 +61,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{}
       }
 
-      Tai.Markets.OrderBook.update(book_pid, changes)
+      Tai.Markets.OrderBook.update(changes)
 
       assert_receive {
         :my_venue,
@@ -109,10 +107,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       }
     end
 
-    test(
-      "is called on broadcast changes when the inside bid price is >= to the previous bid or != size ",
-      %{book_pid: book_pid}
-    ) do
+    test "is called on broadcast changes when the inside bid price is >= to the previous bid or != size" do
       start_advisor!(MyAdvisor)
 
       changes_1 = %Tai.Markets.OrderBook{
@@ -122,7 +117,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      Tai.Markets.OrderBook.update(book_pid, changes_1)
+      Tai.Markets.OrderBook.update(changes_1)
 
       assert_receive {
         :my_venue,
@@ -152,7 +147,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{}
       }
 
-      Tai.Markets.OrderBook.update(book_pid, changes_2)
+      Tai.Markets.OrderBook.update(changes_2)
 
       assert_receive {
         :my_venue,
@@ -176,10 +171,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       }
     end
 
-    test(
-      "is called on broadcast changes when the inside ask price is <= to the previous ask or != size ",
-      %{book_pid: book_pid}
-    ) do
+    test "is called on broadcast changes when the inside ask price is <= to the previous ask or != size" do
       start_advisor!(MyAdvisor)
 
       changes_1 = %Tai.Markets.OrderBook{
@@ -189,7 +181,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      Tai.Markets.OrderBook.update(book_pid, changes_1)
+      Tai.Markets.OrderBook.update(changes_1)
 
       assert_receive {
         :my_venue,
@@ -219,7 +211,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{101.3 => {0.2, nil, nil}}
       }
 
-      Tai.Markets.OrderBook.update(book_pid, changes_2)
+      Tai.Markets.OrderBook.update(changes_2)
 
       assert_receive {
         :my_venue,
@@ -263,7 +255,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
                "[warn]  handle_inside_quote returned an invalid value: '{:unknown, :return_val}'"
     end
 
-    test "can store data in state by returning an ok tuple", %{book_pid: book_pid} do
+    test "can store data in state by returning an ok tuple" do
       start_advisor!(MyAdvisor, %{return_val: {:ok, %{hello: "world"}}})
 
       snapshot = %Tai.Markets.OrderBook{
@@ -290,7 +282,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{101.3 => {0.2, nil, nil}}
       }
 
-      Tai.Markets.OrderBook.update(book_pid, changes)
+      Tai.Markets.OrderBook.update(changes)
 
       assert_receive {
         :my_venue,
@@ -301,7 +293,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       }
     end
 
-    test "doesn't change store data state with an ok atom", %{book_pid: book_pid} do
+    test "doesn't change store data state with an ok atom" do
       start_advisor!(MyAdvisor, %{return_val: :ok})
 
       snapshot = %Tai.Markets.OrderBook{
@@ -328,7 +320,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{101.3 => {0.2, nil, nil}}
       }
 
-      Tai.Markets.OrderBook.update(book_pid, changes)
+      Tai.Markets.OrderBook.update(changes)
 
       assert_receive {
         :my_venue,

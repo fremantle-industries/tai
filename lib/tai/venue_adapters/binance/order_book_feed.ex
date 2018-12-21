@@ -97,16 +97,13 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
     bids = changed_bids |> OrderBookFeed.DepthUpdate.normalize(processed_at, server_changed_at)
     asks = changed_asks |> OrderBookFeed.DepthUpdate.normalize(processed_at, server_changed_at)
 
-    normalized_changes = %Tai.Markets.OrderBook{
+    %Tai.Markets.OrderBook{
       venue_id: state.feed_id,
       product_symbol: symbol,
       bids: bids,
       asks: asks
     }
-
-    state.feed_id
-    |> Tai.Markets.OrderBook.to_name(symbol)
-    |> Tai.Markets.OrderBook.update(normalized_changes)
+    |> Tai.Markets.OrderBook.update()
 
     {:ok, state}
   end

@@ -146,7 +146,7 @@ defmodule Tai.Markets.OrderBookTest do
   describe ".update" do
     test "changes the given bids and asks", %{book_pid: book_pid} do
       :ok =
-        Markets.OrderBook.update(book_pid, %Markets.OrderBook{
+        Markets.OrderBook.update(%Markets.OrderBook{
           venue_id: :my_test_feed,
           product_symbol: :btc_usd,
           bids: %{
@@ -254,7 +254,7 @@ defmodule Tai.Markets.OrderBookTest do
              ]
 
       :ok =
-        Markets.OrderBook.update(book_pid, %Markets.OrderBook{
+        Markets.OrderBook.update(%Markets.OrderBook{
           venue_id: :my_test_feed,
           product_symbol: :btc_usd,
           bids: %{100.0 => {0.0, nil, nil}},
@@ -282,7 +282,7 @@ defmodule Tai.Markets.OrderBookTest do
              ]
     end
 
-    test "broadcasts a pubsub event", %{book_pid: book_pid} do
+    test "broadcasts a pubsub event" do
       start_supervised!(Subscriber)
       Subscriber.subscribe_to_order_book_changes()
 
@@ -292,7 +292,7 @@ defmodule Tai.Markets.OrderBookTest do
       ask_server_changed_at = Timex.now()
 
       :ok =
-        Markets.OrderBook.update(book_pid, %Markets.OrderBook{
+        Markets.OrderBook.update(%Markets.OrderBook{
           venue_id: :my_test_feed,
           product_symbol: :btc_usd,
           bids: %{100.0 => {0.1, bid_processed_at, bid_server_changed_at}},
