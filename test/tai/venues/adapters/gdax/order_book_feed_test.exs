@@ -71,7 +71,7 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
         )
       end
 
-    Tai.Markets.OrderBook.replace(my_gdax_feed_btc_usd_pid, %Tai.Markets.OrderBook{
+    Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
       venue_id: :my_gdax_feed,
       product_symbol: :btc_usd,
       bids: %{
@@ -84,14 +84,14 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
       }
     })
 
-    Tai.Markets.OrderBook.replace(my_gdax_feed_ltc_usd_pid, %Tai.Markets.OrderBook{
+    Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
       venue_id: :my_gdax_feed,
       product_symbol: :ltc_usd,
       bids: %{100.0 => {0.1, nil, nil}},
       asks: %{100.1 => {0.1, nil, nil}}
     })
 
-    Tai.Markets.OrderBook.replace(my_feed_b_btc_usd_pid, %Tai.Markets.OrderBook{
+    Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
       venue_id: :my_feed_b,
       product_symbol: :btc_usd,
       bids: %{1.0 => {1.1, nil, nil}},

@@ -59,9 +59,7 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
       asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
     }
 
-    state.feed_id
-    |> Tai.Markets.OrderBook.to_name(symbol)
-    |> Tai.Markets.OrderBook.replace(snapshot)
+    Tai.Markets.OrderBook.replace(snapshot)
 
     {:ok, state}
   end

@@ -33,9 +33,7 @@ defmodule Tai.VenueAdapters.Mock.OrderBookFeed do
       asks: OrderBookFeed.Snapshot.normalize(asks, processed_at)
     }
 
-    state.feed_id
-    |> Tai.Markets.OrderBook.to_name(symbol)
-    |> Tai.Markets.OrderBook.replace(snapshot)
+    Tai.Markets.OrderBook.replace(snapshot)
 
     {:ok, state}
   end

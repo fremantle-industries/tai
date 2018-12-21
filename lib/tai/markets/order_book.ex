@@ -106,8 +106,11 @@ defmodule Tai.Markets.OrderBook do
     end
   end
 
-  def replace(name, %Markets.OrderBook{} = replacement) do
-    GenServer.call(name, {:replace, replacement})
+  @spec replace(t) :: :ok
+  def replace(%Markets.OrderBook{} = replacement) do
+    replacement.venue_id
+    |> Markets.OrderBook.to_name(replacement.product_symbol)
+    |> GenServer.call({:replace, replacement})
   end
 
   def update(name, %Markets.OrderBook{} = changes) do

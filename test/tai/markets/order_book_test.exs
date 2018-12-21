@@ -43,7 +43,7 @@ defmodule Tai.Markets.OrderBookTest do
   describe ".replace" do
     test "overrides the bids & asks", %{book_pid: book_pid} do
       :ok =
-        Markets.OrderBook.replace(book_pid, %Markets.OrderBook{
+        Markets.OrderBook.replace(%Markets.OrderBook{
           venue_id: :my_test_feed,
           product_symbol: :btc_usd,
           bids: %{
@@ -89,7 +89,7 @@ defmodule Tai.Markets.OrderBookTest do
              ]
     end
 
-    test "broadcasts a pubsub event", %{book_pid: book_pid} do
+    test "broadcasts a pubsub event" do
       start_supervised!(Subscriber)
       Subscriber.subscribe_to_order_book_snapshot()
 
@@ -99,7 +99,7 @@ defmodule Tai.Markets.OrderBookTest do
       ask_server_changed_at = Timex.now()
 
       :ok =
-        Markets.OrderBook.replace(book_pid, %Markets.OrderBook{
+        Markets.OrderBook.replace(%Markets.OrderBook{
           venue_id: :my_test_feed,
           product_symbol: :btc_usd,
           bids: %{999.9 => {1.1, bid_processed_at, bid_server_changed_at}},
@@ -122,7 +122,7 @@ defmodule Tai.Markets.OrderBookTest do
       assert DateTime.compare(as, ask_server_changed_at)
     end
 
-    test "broadcasts a system event", %{book_pid: book_pid} do
+    test "broadcasts a system event" do
       Tai.Events.firehose_subscribe()
 
       snapshot = %Markets.OrderBook{
@@ -132,7 +132,7 @@ defmodule Tai.Markets.OrderBookTest do
         asks: %{1000.0 => {0.1, Timex.now(), Timex.now()}}
       }
 
-      assert Markets.OrderBook.replace(book_pid, snapshot) == :ok
+      assert Markets.OrderBook.replace(snapshot) == :ok
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderBookSnapshot{
@@ -208,7 +208,7 @@ defmodule Tai.Markets.OrderBookTest do
 
     test "removes prices when they have a size of 0", %{book_pid: book_pid} do
       :ok =
-        Markets.OrderBook.replace(book_pid, %Markets.OrderBook{
+        Markets.OrderBook.replace(%Markets.OrderBook{
           venue_id: :my_test_feed,
           product_symbol: :btc_usd,
           bids: %{
@@ -319,7 +319,7 @@ defmodule Tai.Markets.OrderBookTest do
   describe ".quotes" do
     test "returns a price ordered list of all bids and asks", %{book_pid: book_pid} do
       :ok =
-        Markets.OrderBook.replace(book_pid, %Markets.OrderBook{
+        Markets.OrderBook.replace(%Markets.OrderBook{
           venue_id: :my_test_feed,
           product_symbol: :btc_usd,
           bids: %{
@@ -381,7 +381,7 @@ defmodule Tai.Markets.OrderBookTest do
 
     test "can limit the depth of bids and asks returned", %{book_pid: book_pid} do
       :ok =
-        Markets.OrderBook.replace(book_pid, %Markets.OrderBook{
+        Markets.OrderBook.replace(%Markets.OrderBook{
           venue_id: :my_test_feed,
           product_symbol: :btc_usd,
           bids: %{

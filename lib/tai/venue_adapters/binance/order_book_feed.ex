@@ -40,10 +40,7 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
       |> Enum.map(fn symbol ->
         with {:ok, %Tai.Markets.OrderBook{} = snapshot} <-
                OrderBookFeed.Snapshot.fetch(feed_id, symbol, @price_levels) do
-          feed_id
-          |> Tai.Markets.OrderBook.to_name(symbol)
-          |> Tai.Markets.OrderBook.replace(snapshot)
-
+          :ok = Tai.Markets.OrderBook.replace(snapshot)
           :ok
         else
           {:error, :invalid_symbol} ->

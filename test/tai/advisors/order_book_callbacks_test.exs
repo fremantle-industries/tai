@@ -75,7 +75,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
   end
 
   describe "#handle_inside_quote" do
-    test("is called after the snapshot broadcast message", %{book_pid: book_pid}) do
+    test "is called after the snapshot broadcast message" do
       start_advisor!(MyAdvisor)
 
       snapshot = %Tai.Markets.OrderBook{
@@ -85,7 +85,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      Tai.Markets.OrderBook.replace(book_pid, snapshot)
+      Tai.Markets.OrderBook.replace(snapshot)
 
       assert_receive {
         :my_venue,
@@ -243,9 +243,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       }
     end
 
-    test("logs a warning message when it returns an unknown type", %{
-      book_pid: book_pid
-    }) do
+    test "logs a warning message when it returns an unknown type" do
       start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
 
       log_msg =
@@ -257,7 +255,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
             asks: %{}
           }
 
-          Tai.Markets.OrderBook.replace(book_pid, snapshot)
+          Tai.Markets.OrderBook.replace(snapshot)
           :timer.sleep(100)
         end)
 
@@ -275,7 +273,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      Tai.Markets.OrderBook.replace(book_pid, snapshot)
+      Tai.Markets.OrderBook.replace(snapshot)
 
       assert_receive {
         :my_venue,
@@ -313,7 +311,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         asks: %{101.3 => {0.1, nil, nil}}
       }
 
-      Tai.Markets.OrderBook.replace(book_pid, snapshot)
+      Tai.Markets.OrderBook.replace(snapshot)
 
       assert_receive {
         :my_venue,
@@ -341,7 +339,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       }
     end
 
-    test("logs a warning message when an error is raised", %{book_pid: book_pid}) do
+    test "logs a warning message when an error is raised" do
       start_advisor!(MyAdvisor, %{error: "!!!This is an ERROR!!!"})
 
       log_msg =
@@ -353,7 +351,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
             asks: %{}
           }
 
-          Tai.Markets.OrderBook.replace(book_pid, snapshot)
+          Tai.Markets.OrderBook.replace(snapshot)
           :timer.sleep(100)
         end)
 

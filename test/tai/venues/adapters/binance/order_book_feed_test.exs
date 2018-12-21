@@ -56,14 +56,14 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeedTest do
         )
       end
 
-    Tai.Markets.OrderBook.replace(my_binance_feed_ltc_usdt_pid, %Tai.Markets.OrderBook{
+    Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
       venue_id: :my_binance_feed,
       product_symbol: :ltc_usdt,
       bids: %{100.0 => {0.1, nil, nil}},
       asks: %{100.1 => {0.1, nil, nil}}
     })
 
-    Tai.Markets.OrderBook.replace(my_feed_b_btc_usdt_pid, %Tai.Markets.OrderBook{
+    Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
       venue_id: :my_binance_feed,
       product_symbol: :btc_usdt,
       bids: %{1.0 => {1.1, nil, nil}},
@@ -96,19 +96,21 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeedTest do
              Tai.Markets.OrderBook.quotes(my_binance_feed_btc_usdt_pid)
 
     assert [
-             %Tai.Markets.PriceLevel{price: 8541.0, size: 1.174739, server_changed_at: nil},
-             %Tai.Markets.PriceLevel{price: 8536.17, size: 0.036, server_changed_at: nil},
-             %Tai.Markets.PriceLevel{price: 8536.16, size: 0.158082, server_changed_at: nil},
-             %Tai.Markets.PriceLevel{price: 8536.14, size: 0.003345, server_changed_at: nil},
-             %Tai.Markets.PriceLevel{price: 8535.97, size: 0.024218, server_changed_at: nil}
+             %Tai.Markets.PriceLevel{
+               price: 1.0,
+               processed_at: nil,
+               server_changed_at: nil,
+               size: 1.1
+             }
            ] = bids
 
     assert [
-             %Tai.Markets.PriceLevel{price: 8555.57, size: 0.039, server_changed_at: nil},
-             %Tai.Markets.PriceLevel{price: 8555.58, size: 0.089469, server_changed_at: nil},
-             %Tai.Markets.PriceLevel{price: 8559.99, size: 0.375128, server_changed_at: nil},
-             %Tai.Markets.PriceLevel{price: 8560.0, size: 0.620366, server_changed_at: nil},
-             %Tai.Markets.PriceLevel{price: 8561.11, size: 12.0, server_changed_at: nil}
+             %Tai.Markets.PriceLevel{
+               price: 1.2,
+               processed_at: nil,
+               server_changed_at: nil,
+               size: 0.1
+             }
            ] = asks
 
     send_depth_update(
@@ -134,28 +136,20 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeedTest do
     assert [
              %Tai.Markets.PriceLevel{price: 8541.01, size: 0.12} = bid_a,
              %Tai.Markets.PriceLevel{price: 8541.0, size: 2.23} = bid_b,
-             %Tai.Markets.PriceLevel{price: 8536.16, size: 0.158082} = bid_c,
-             %Tai.Markets.PriceLevel{price: 8536.14, size: 0.003345} = bid_d,
-             %Tai.Markets.PriceLevel{price: 8535.97, size: 0.024218} = bid_e
+             %Tai.Markets.PriceLevel{price: 1.0, size: 1.1} = bid_c
            ] = bids
 
     assert DateTime.compare(bid_a.server_changed_at, bid_b.server_changed_at)
     assert bid_c.server_changed_at == nil
-    assert bid_d.server_changed_at == nil
-    assert bid_e.server_changed_at == nil
 
     assert [
-             %Tai.Markets.PriceLevel{price: 8555.58, size: 0.089469} = ask_a,
+             %Tai.Markets.PriceLevel{price: 1.2, size: 0.1} = ask_a,
              %Tai.Markets.PriceLevel{price: 8559.99, size: 0.22} = ask_b,
-             %Tai.Markets.PriceLevel{price: 8560.0, size: 0.620366} = ask_c,
-             %Tai.Markets.PriceLevel{price: 8560.05, size: 1.13} = ask_d,
-             %Tai.Markets.PriceLevel{price: 8561.11, size: 12.0} = ask_e
+             %Tai.Markets.PriceLevel{price: 8560.05, size: 1.13} = ask_c
            ] = asks
 
-    assert DateTime.compare(ask_b.server_changed_at, ask_d.server_changed_at)
+    assert DateTime.compare(ask_b.server_changed_at, ask_c.server_changed_at)
     assert ask_a.server_changed_at == nil
-    assert ask_c.server_changed_at == nil
-    assert ask_e.server_changed_at == nil
 
     assert Tai.Markets.OrderBook.quotes(my_binance_feed_ltc_usdt_pid) == {
              :ok,
@@ -184,24 +178,10 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeedTest do
     assert Tai.Markets.OrderBook.quotes(my_feed_b_btc_usdt_pid) == {
              :ok,
              %Tai.Markets.OrderBook{
-               venue_id: :my_binance_feed,
+               venue_id: :my_feed_b,
                product_symbol: :btc_usdt,
-               bids: [
-                 %Tai.Markets.PriceLevel{
-                   price: 1.0,
-                   size: 1.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
-               ],
-               asks: [
-                 %Tai.Markets.PriceLevel{
-                   price: 1.2,
-                   size: 0.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
-               ]
+               bids: [],
+               asks: []
              }
            }
   end

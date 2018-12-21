@@ -60,9 +60,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       asks: normalized.asks
     }
 
-    state.venue_id
-    |> Tai.Markets.OrderBook.to_name(state.symbol)
-    |> Tai.Markets.OrderBook.replace(snapshot)
+    :ok = Tai.Markets.OrderBook.replace(snapshot)
 
     new_table = Map.merge(state.table, normalized.table)
     new_state = Map.put(state, :table, new_table)

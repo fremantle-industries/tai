@@ -101,16 +101,13 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
     processed_at = Timex.now()
     symbol = currency_pair |> SymbolMapping.to_tai()
 
-    snapshot = %Tai.Markets.OrderBook{
+    %Tai.Markets.OrderBook{
       venue_id: state.feed_id,
       product_symbol: symbol,
       bids: bids |> OrderBookFeed.Snapshot.normalize(processed_at),
       asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
     }
-
-    state.feed_id
-    |> Tai.Markets.OrderBook.to_name(symbol)
-    |> Tai.Markets.OrderBook.replace(snapshot)
+    |> Tai.Markets.OrderBook.replace()
 
     new_store = state.store |> Map.put(channel_id, symbol)
     state |> Map.put(:store, new_store)

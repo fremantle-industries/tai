@@ -16,9 +16,7 @@ defmodule Tai.Commands.Helper.MarketsTest do
 
   test "shows all inside quotes and the time they were last processed and changed" do
     :ok =
-      :test_exchange_a
-      |> Tai.Markets.OrderBook.to_name(:btc_usd)
-      |> Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
+      %Tai.Markets.OrderBook{
         venue_id: :test_exchange_a,
         product_symbol: :btc_usd,
         bids: %{
@@ -29,7 +27,8 @@ defmodule Tai.Commands.Helper.MarketsTest do
           13_000.01 => {1.11, Timex.now(), Timex.now()},
           13_000.02 => {1.25, nil, nil}
         }
-      })
+      }
+      |> Tai.Markets.OrderBook.replace()
 
     assert capture_io(&Tai.Commands.Helper.markets/0) == """
            +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
