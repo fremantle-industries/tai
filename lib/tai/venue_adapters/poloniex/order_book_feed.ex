@@ -108,8 +108,8 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
       asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
     }
 
-    [feed_id: state.feed_id, symbol: symbol]
-    |> Tai.Markets.OrderBook.to_name()
+    state.feed_id
+    |> Tai.Markets.OrderBook.to_name(symbol)
     |> Tai.Markets.OrderBook.replace(snapshot)
 
     new_store = state.store |> Map.put(channel_id, symbol)
@@ -135,8 +135,8 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
         asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
       }
 
-      [feed_id: state.feed_id, symbol: symbol]
-      |> Tai.Markets.OrderBook.to_name()
+      state.feed_id
+      |> Tai.Markets.OrderBook.to_name(symbol)
       |> Tai.Markets.OrderBook.update(changes)
     end
 

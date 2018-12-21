@@ -40,8 +40,8 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
       |> Enum.map(fn symbol ->
         with {:ok, %Tai.Markets.OrderBook{} = snapshot} <-
                OrderBookFeed.Snapshot.fetch(feed_id, symbol, @price_levels) do
-          [feed_id: feed_id, symbol: symbol]
-          |> Tai.Markets.OrderBook.to_name()
+          feed_id
+          |> Tai.Markets.OrderBook.to_name(symbol)
           |> Tai.Markets.OrderBook.replace(snapshot)
 
           :ok
@@ -107,8 +107,8 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
       asks: asks
     }
 
-    [feed_id: state.feed_id, symbol: symbol]
-    |> Tai.Markets.OrderBook.to_name()
+    state.feed_id
+    |> Tai.Markets.OrderBook.to_name(symbol)
     |> Tai.Markets.OrderBook.update(normalized_changes)
 
     {:ok, state}

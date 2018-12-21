@@ -57,12 +57,9 @@ defmodule Tai.Advisor do
     :"advisor_#{group_id}_#{advisor_id}"
   end
 
-  def cached_inside_quote(%Tai.Advisor{} = advisor, order_book_feed_id, symbol) do
-    advisor.inside_quotes
-    |> Map.get(
-      [feed_id: order_book_feed_id, symbol: symbol]
-      |> Tai.Markets.OrderBook.to_name()
-    )
+  def cached_inside_quote(%Tai.Advisor{} = advisor, venue_id, product_symbol) do
+    name = Tai.Markets.OrderBook.to_name(venue_id, product_symbol)
+    Map.get(advisor.inside_quotes, name)
   end
 
   def order_updated(name, old_order, updated_order) do
@@ -172,10 +169,10 @@ defmodule Tai.Advisor do
       @doc false
       def handle_order_updated(old_order, updated_order, state), do: :ok
 
-      defp cache_inside_quote(state, feed_id, symbol) do
-        with {:ok, current_inside_quote} <- Tai.Markets.OrderBook.inside_quote(feed_id, symbol),
-             feed_and_symbol <- [feed_id: feed_id, symbol: symbol],
-             key <- Tai.Markets.OrderBook.to_name(feed_and_symbol),
+      defp cache_inside_quote(state, venue_id, product_symbol) do
+        with {:ok, current_inside_quote} <-
+               Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol),
+             key <- Tai.Markets.OrderBook.to_name(venue_id, product_symbol),
              old <- state.inside_quotes,
              updated <- Map.put(old, key, current_inside_quote) do
           Map.put(state, :inside_quotes, updated)

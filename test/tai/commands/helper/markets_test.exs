@@ -16,8 +16,8 @@ defmodule Tai.Commands.Helper.MarketsTest do
 
   test "shows all inside quotes and the time they were last processed and changed" do
     :ok =
-      [feed_id: :test_exchange_a, symbol: :btc_usd]
-      |> Tai.Markets.OrderBook.to_name()
+      :test_exchange_a
+      |> Tai.Markets.OrderBook.to_name(:btc_usd)
       |> Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
         venue_id: :test_exchange_a,
         product_symbol: :btc_usd,

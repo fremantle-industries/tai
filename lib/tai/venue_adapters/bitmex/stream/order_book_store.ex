@@ -60,8 +60,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       asks: normalized.asks
     }
 
-    [feed_id: state.venue_id, symbol: state.symbol]
-    |> Tai.Markets.OrderBook.to_name()
+    state.venue_id
+    |> Tai.Markets.OrderBook.to_name(state.symbol)
     |> Tai.Markets.OrderBook.replace(snapshot)
 
     new_table = Map.merge(state.table, normalized.table)
@@ -101,8 +101,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       asks: normalized.asks
     }
 
-    [feed_id: state.venue_id, symbol: state.symbol]
-    |> Tai.Markets.OrderBook.to_name()
+    state.venue_id
+    |> Tai.Markets.OrderBook.to_name(state.symbol)
     |> Tai.Markets.OrderBook.update(update)
 
     new_table = Map.merge(state.table, normalized.table)
@@ -136,8 +136,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       asks: normalized.asks
     }
 
-    [feed_id: state.venue_id, symbol: state.symbol]
-    |> Tai.Markets.OrderBook.to_name()
+    state.venue_id
+    |> Tai.Markets.OrderBook.to_name(state.symbol)
     |> Tai.Markets.OrderBook.update(update)
 
     {:noreply, state}
@@ -168,8 +168,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       asks: normalized.asks
     }
 
-    [feed_id: state.venue_id, symbol: state.symbol]
-    |> Tai.Markets.OrderBook.to_name()
+    state.venue_id
+    |> Tai.Markets.OrderBook.to_name(state.symbol)
     |> Tai.Markets.OrderBook.update(update)
 
     {:noreply, state}

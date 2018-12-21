@@ -27,7 +27,7 @@ defmodule Tai.Markets.OrderBook do
   ]
 
   def start_link(feed_id: venue_id, symbol: product_symbol) do
-    name = to_name(feed_id: venue_id, symbol: product_symbol)
+    name = to_name(venue_id, product_symbol)
 
     order_book = %Markets.OrderBook{
       venue_id: venue_id,
@@ -93,8 +93,9 @@ defmodule Tai.Markets.OrderBook do
   Return the bid/ask at the top of the book
   """
   def inside_quote(feed_id, symbol) do
-    [feed_id: feed_id, symbol: symbol]
-    |> to_name()
+    name = to_name(feed_id, symbol)
+
+    name
     |> quotes(1)
     |> case do
       {:ok, %{bids: bids, asks: asks}} ->
@@ -113,16 +114,9 @@ defmodule Tai.Markets.OrderBook do
     GenServer.call(name, {:update, changes})
   end
 
-  @doc """
-  Returns an atom that will identify the process
-
-  ## Examples
-
-    iex> Tai.Markets.OrderBook.to_name(feed_id: :my_test_feed, symbol: :btc_usd)
-    Tai.Markets.OrderBook_my_test_feed_btc_usd
-  """
-  def to_name(feed_id: feed_id, symbol: symbol) do
-    :"#{__MODULE__}_#{feed_id}_#{symbol}"
+  @spec to_name(atom, atom) :: atom
+  def to_name(venue_id, product_symbol) do
+    :"#{__MODULE__}_#{venue_id}_#{product_symbol}"
   end
 
   defp ordered_bids(state) do

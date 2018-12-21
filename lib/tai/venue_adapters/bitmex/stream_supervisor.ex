@@ -17,8 +17,10 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     order_books =
       products
       |> Enum.map(fn p ->
+        name = Tai.Markets.OrderBook.to_name(venue_id, p.symbol)
+
         %{
-          id: Tai.Markets.OrderBook.to_name(feed_id: venue_id, symbol: p.symbol),
+          id: name,
           start: {
             Tai.Markets.OrderBook,
             :start_link,
