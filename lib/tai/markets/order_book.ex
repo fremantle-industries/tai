@@ -92,17 +92,25 @@ defmodule Tai.Markets.OrderBook do
   @doc """
   Return the bid/ask at the top of the book
   """
-  def inside_quote(feed_id, symbol) do
-    name = to_name(feed_id, symbol)
+  @spec inside_quote(atom, atom) :: {:ok, Markets.Quote.t()}
+  def inside_quote(venue_id, product_symbol) do
+    name = to_name(venue_id, product_symbol)
 
     name
     |> quotes(1)
     |> case do
       {:ok, %{bids: bids, asks: asks}} ->
-        with top_bid <- List.first(bids),
-             top_ask <- List.first(asks) do
-          {:ok, %Markets.Quote{bid: top_bid, ask: top_ask}}
-        end
+        inside_bid = List.first(bids)
+        inside_ask = List.first(asks)
+
+        q = %Markets.Quote{
+          venue_id: venue_id,
+          product_symbol: product_symbol,
+          bid: inside_bid,
+          ask: inside_ask
+        }
+
+        {:ok, q}
     end
   end
 
