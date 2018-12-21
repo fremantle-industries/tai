@@ -19,6 +19,8 @@ defmodule Tai.Commands.Helper.MarketsTest do
       [feed_id: :test_exchange_a, symbol: :btc_usd]
       |> Tai.Markets.OrderBook.to_name()
       |> Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
+        venue_id: :test_exchange_a,
+        product_symbol: :btc_usd,
         bids: %{
           12_999.99 => {0.000021, Timex.now(), Timex.now()},
           12_999.98 => {1.0, nil, nil}

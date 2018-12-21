@@ -102,6 +102,8 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
     symbol = currency_pair |> SymbolMapping.to_tai()
 
     snapshot = %Tai.Markets.OrderBook{
+      venue_id: state.feed_id,
+      product_symbol: symbol,
       bids: bids |> OrderBookFeed.Snapshot.normalize(processed_at),
       asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
     }
@@ -127,6 +129,8 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
       symbol = state.store |> Map.get(channel_id)
 
       changes = %Tai.Markets.OrderBook{
+        venue_id: state.feed_id,
+        product_symbol: symbol,
         bids: bids |> OrderBookFeed.Snapshot.normalize(processed_at),
         asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
       }

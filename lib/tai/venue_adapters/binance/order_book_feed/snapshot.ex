@@ -1,11 +1,13 @@
 defmodule Tai.VenueAdapters.Binance.OrderBookFeed.Snapshot do
-  def fetch(symbol, depth) do
+  def fetch(venue_id, symbol, depth) do
     exchange_symbol = Tai.ExchangeAdapters.Binance.SymbolMapping.to_binance(symbol)
 
     with {:ok, %Binance.OrderBook{} = binance_book} <- Binance.get_depth(exchange_symbol, depth) do
       processed_at = Timex.now()
 
       book = %Tai.Markets.OrderBook{
+        venue_id: venue_id,
+        product_symbol: symbol,
         bids: binance_book.bids |> to_price_points(processed_at),
         asks: binance_book.asks |> to_price_points(processed_at)
       }

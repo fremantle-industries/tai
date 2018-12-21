@@ -3,35 +3,54 @@ defmodule Tai.Markets.OrderBook do
   Manage and query the state for an order book for a symbol on a feed
   """
 
-  @type t :: %Tai.Markets.OrderBook{
+  use GenServer
+  alias Tai.{Markets, PubSub}
+
+  @type t :: %Markets.OrderBook{
+          venue_id: atom,
+          product_symbol: atom,
           bids: map,
           asks: map
         }
 
-  use GenServer
-  alias Tai.PubSub
-  alias Tai.Markets.{OrderBook, PriceLevel, Quote}
+  @enforce_keys [
+    :venue_id,
+    :product_symbol,
+    :bids,
+    :asks
+  ]
+  defstruct [
+    :venue_id,
+    :product_symbol,
+    :bids,
+    :asks
+  ]
 
-  defstruct bids: %{}, asks: %{}
+  def start_link(feed_id: venue_id, symbol: product_symbol) do
+    name = to_name(feed_id: venue_id, symbol: product_symbol)
 
-  def start_link(feed_id: feed_id, symbol: symbol) do
     GenServer.start_link(
       __MODULE__,
       %{
-        feed_id: feed_id,
-        symbol: symbol,
-        order_book: %OrderBook{}
+        feed_id: venue_id,
+        symbol: product_symbol,
+        order_book: %Markets.OrderBook{
+          venue_id: venue_id,
+          product_symbol: product_symbol,
+          bids: %{},
+          asks: %{}
+        }
       },
-      name: to_name(feed_id: feed_id, symbol: symbol)
+      name: name
     )
   end
 
-  def init(state) do
-    {:ok, state}
-  end
+  def init(state), do: {:ok, state}
 
   def handle_call({:quotes, depth: depth}, _from, state) do
-    order_book = %OrderBook{
+    order_book = %Markets.OrderBook{
+      venue_id: state.order_book.venue_id,
+      product_symbol: state.order_book.product_symbol,
       bids: state |> Map.get(:order_book) |> ordered_bids |> take(depth),
       asks: state |> Map.get(:order_book) |> ordered_asks |> take(depth)
     }
@@ -56,7 +75,7 @@ defmodule Tai.Markets.OrderBook do
     {:reply, :ok, new_state}
   end
 
-  def handle_call({:update, %OrderBook{bids: bids, asks: asks} = changes}, _from, state) do
+  def handle_call({:update, %Markets.OrderBook{bids: bids, asks: asks} = changes}, _from, state) do
     PubSub.broadcast(
       {:order_book_changes, state.feed_id, state.symbol},
       {:order_book_changes, state.feed_id, state.symbol, changes}
@@ -93,16 +112,16 @@ defmodule Tai.Markets.OrderBook do
       {:ok, %{bids: bids, asks: asks}} ->
         with top_bid <- List.first(bids),
              top_ask <- List.first(asks) do
-          {:ok, %Quote{bid: top_bid, ask: top_ask}}
+          {:ok, %Markets.Quote{bid: top_bid, ask: top_ask}}
         end
     end
   end
 
-  def replace(name, %OrderBook{} = replacement) do
+  def replace(name, %Markets.OrderBook{} = replacement) do
     GenServer.call(name, {:replace, replacement})
   end
 
-  def update(name, %OrderBook{} = changes) do
+  def update(name, %Markets.OrderBook{} = changes) do
     GenServer.call(name, {:update, changes})
   end
 
@@ -138,7 +157,7 @@ defmodule Tai.Markets.OrderBook do
     |> Enum.map(fn price ->
       {size, processed_at, server_changed_at} = level_details[price]
 
-      %PriceLevel{
+      %Markets.PriceLevel{
         price: price,
         size: size,
         processed_at: processed_at,

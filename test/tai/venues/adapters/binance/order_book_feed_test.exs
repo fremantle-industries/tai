@@ -57,11 +57,15 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeedTest do
       end
 
     Tai.Markets.OrderBook.replace(my_binance_feed_ltc_usdt_pid, %Tai.Markets.OrderBook{
+      venue_id: :my_binance_feed,
+      product_symbol: :ltc_usdt,
       bids: %{100.0 => {0.1, nil, nil}},
       asks: %{100.1 => {0.1, nil, nil}}
     })
 
     Tai.Markets.OrderBook.replace(my_feed_b_btc_usdt_pid, %Tai.Markets.OrderBook{
+      venue_id: :my_binance_feed,
+      product_symbol: :btc_usdt,
       bids: %{1.0 => {1.1, nil, nil}},
       asks: %{1.2 => {0.1, nil, nil}}
     })
@@ -156,6 +160,8 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeedTest do
     assert Tai.Markets.OrderBook.quotes(my_binance_feed_ltc_usdt_pid) == {
              :ok,
              %Tai.Markets.OrderBook{
+               venue_id: :my_binance_feed,
+               product_symbol: :ltc_usdt,
                bids: [
                  %Tai.Markets.PriceLevel{
                    price: 100.0,
@@ -178,6 +184,8 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeedTest do
     assert Tai.Markets.OrderBook.quotes(my_feed_b_btc_usdt_pid) == {
              :ok,
              %Tai.Markets.OrderBook{
+               venue_id: :my_binance_feed,
+               product_symbol: :btc_usdt,
                bids: [
                  %Tai.Markets.PriceLevel{
                    price: 1.0,

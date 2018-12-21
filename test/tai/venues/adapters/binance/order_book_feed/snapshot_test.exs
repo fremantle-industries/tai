@@ -12,8 +12,11 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed.SnapshotTest do
 
   test "fetch returns an ok, order book tuple" do
     use_cassette "exchange_adapters/binance/snapshot_ok" do
-      assert {:ok, %Tai.Markets.OrderBook{bids: bids, asks: asks}} =
-               OrderBookFeed.Snapshot.fetch(:ltcbtc, 5)
+      assert {:ok, %Tai.Markets.OrderBook{} = order_book} =
+               OrderBookFeed.Snapshot.fetch(:my_venue, :my_symbol, 5)
+
+      assert order_book.venue_id == :my_venue
+      assert order_book.product_symbol == :my_symbol
 
       assert %{
                0.018689 => {2.12, bid_processed_at_a, nil},
@@ -21,7 +24,7 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed.SnapshotTest do
                0.0187 => {16.38, bid_processed_at_c, nil},
                0.018715 => {0.44, bid_processed_at_d, nil},
                0.01872 => {7.6, bid_processed_at_e, nil}
-             } = bids
+             } = order_book.bids
 
       assert DateTime.compare(bid_processed_at_a, bid_processed_at_b)
       assert DateTime.compare(bid_processed_at_a, bid_processed_at_c)
@@ -34,7 +37,7 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed.SnapshotTest do
                0.018727 => {0.82, ask_processed_at_c, nil},
                0.018728 => {12.2, ask_processed_at_d, nil},
                0.018729 => {6.0, ask_processed_at_e, nil}
-             } = asks
+             } = order_book.asks
 
       assert DateTime.compare(ask_processed_at_a, ask_processed_at_b)
       assert DateTime.compare(ask_processed_at_a, ask_processed_at_c)
@@ -45,7 +48,7 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed.SnapshotTest do
 
   test "fetch returns an error tuple when the symbol is invalid" do
     use_cassette "exchange_adapters/binance/snapshot_invalid_symbol_error" do
-      assert {:error, :invalid_symbol} = OrderBookFeed.Snapshot.fetch(:idontexist, 5)
+      assert {:error, :invalid_symbol} = OrderBookFeed.Snapshot.fetch(:my_venue, :idontexist, 5)
     end
   end
 end

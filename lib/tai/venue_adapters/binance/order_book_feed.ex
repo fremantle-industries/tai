@@ -39,7 +39,7 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
       symbols
       |> Enum.map(fn symbol ->
         with {:ok, %Tai.Markets.OrderBook{} = snapshot} <-
-               OrderBookFeed.Snapshot.fetch(symbol, @price_levels) do
+               OrderBookFeed.Snapshot.fetch(feed_id, symbol, @price_levels) do
           [feed_id: feed_id, symbol: symbol]
           |> Tai.Markets.OrderBook.to_name()
           |> Tai.Markets.OrderBook.replace(snapshot)
@@ -93,21 +93,25 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
         },
         state
       ) do
-    with processed_at <- Timex.now(),
-         {:ok, server_changed_at} <- DateTime.from_unix(event_time, :millisecond),
-         normalized_changes <- %Tai.Markets.OrderBook{
-           bids:
-             changed_bids |> OrderBookFeed.DepthUpdate.normalize(processed_at, server_changed_at),
-           asks:
-             changed_asks |> OrderBookFeed.DepthUpdate.normalize(processed_at, server_changed_at)
-         },
-         symbol = Tai.ExchangeAdapters.Binance.SymbolMapping.to_tai(binance_symbol) do
-      [feed_id: state.feed_id, symbol: symbol]
-      |> Tai.Markets.OrderBook.to_name()
-      |> Tai.Markets.OrderBook.update(normalized_changes)
+    processed_at = Timex.now()
+    {:ok, server_changed_at} = DateTime.from_unix(event_time, :millisecond)
+    symbol = Tai.ExchangeAdapters.Binance.SymbolMapping.to_tai(binance_symbol)
 
-      {:ok, state}
-    end
+    bids = changed_bids |> OrderBookFeed.DepthUpdate.normalize(processed_at, server_changed_at)
+    asks = changed_asks |> OrderBookFeed.DepthUpdate.normalize(processed_at, server_changed_at)
+
+    normalized_changes = %Tai.Markets.OrderBook{
+      venue_id: state.feed_id,
+      product_symbol: symbol,
+      bids: bids,
+      asks: asks
+    }
+
+    [feed_id: state.feed_id, symbol: symbol]
+    |> Tai.Markets.OrderBook.to_name()
+    |> Tai.Markets.OrderBook.update(normalized_changes)
+
+    {:ok, state}
   end
 
   @doc """

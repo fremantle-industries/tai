@@ -56,7 +56,13 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     }) do
       start_advisor!(MyAdvisor)
 
-      changes = %Tai.Markets.OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+      changes = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
+        bids: %{101.2 => {1.1, nil, nil}},
+        asks: %{}
+      }
+
       Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
@@ -73,6 +79,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       start_advisor!(MyAdvisor)
 
       snapshot = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
@@ -108,6 +116,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       start_advisor!(MyAdvisor)
 
       changes_1 = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
@@ -135,7 +145,13 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         %Tai.Advisor{}
       }
 
-      changes_2 = %Tai.Markets.OrderBook{bids: %{101.2 => {1.1, nil, nil}}, asks: %{}}
+      changes_2 = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
+        bids: %{101.2 => {1.1, nil, nil}},
+        asks: %{}
+      }
+
       Tai.Markets.OrderBook.update(book_pid, changes_2)
 
       assert_receive {
@@ -167,6 +183,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       start_advisor!(MyAdvisor)
 
       changes_1 = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
@@ -194,7 +212,13 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         %Tai.Advisor{}
       }
 
-      changes_2 = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+      changes_2 = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
+        bids: %{},
+        asks: %{101.3 => {0.2, nil, nil}}
+      }
+
       Tai.Markets.OrderBook.update(book_pid, changes_2)
 
       assert_receive {
@@ -226,7 +250,13 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
       log_msg =
         capture_log(fn ->
-          snapshot = %Tai.Markets.OrderBook{bids: %{101.2 => {1.0, nil, nil}}, asks: %{}}
+          snapshot = %Tai.Markets.OrderBook{
+            venue_id: :my_venue,
+            product_symbol: :btc_usd,
+            bids: %{101.2 => {1.0, nil, nil}},
+            asks: %{}
+          }
+
           Tai.Markets.OrderBook.replace(book_pid, snapshot)
           :timer.sleep(100)
         end)
@@ -239,6 +269,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       start_advisor!(MyAdvisor, %{return_val: {:ok, %{hello: "world"}}})
 
       snapshot = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
@@ -253,7 +285,13 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         %Tai.Advisor{advisor_id: :my_advisor, store: %{}}
       }
 
-      changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+      changes = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
+        bids: %{},
+        asks: %{101.3 => {0.2, nil, nil}}
+      }
+
       Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
@@ -269,6 +307,8 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       start_advisor!(MyAdvisor, %{return_val: :ok})
 
       snapshot = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
         bids: %{101.2 => {1.0, nil, nil}},
         asks: %{101.3 => {0.1, nil, nil}}
       }
@@ -283,7 +323,13 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         %Tai.Advisor{advisor_id: :my_advisor, store: %{}}
       }
 
-      changes = %Tai.Markets.OrderBook{bids: %{}, asks: %{101.3 => {0.2, nil, nil}}}
+      changes = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
+        bids: %{},
+        asks: %{101.3 => {0.2, nil, nil}}
+      }
+
       Tai.Markets.OrderBook.update(book_pid, changes)
 
       assert_receive {
@@ -300,7 +346,13 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
       log_msg =
         capture_log(fn ->
-          snapshot = %Tai.Markets.OrderBook{bids: %{101.2 => {1.0, nil, nil}}, asks: %{}}
+          snapshot = %Tai.Markets.OrderBook{
+            venue_id: :my_venue,
+            product_symbol: :btc_usd,
+            bids: %{101.2 => {1.0, nil, nil}},
+            asks: %{}
+          }
+
           Tai.Markets.OrderBook.replace(book_pid, snapshot)
           :timer.sleep(100)
         end)

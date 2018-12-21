@@ -72,6 +72,8 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
       end
 
     Tai.Markets.OrderBook.replace(my_gdax_feed_btc_usd_pid, %Tai.Markets.OrderBook{
+      venue_id: :my_gdax_feed,
+      product_symbol: :btc_usd,
       bids: %{
         1.0 => {1.1, nil, nil},
         1.1 => {1.0, nil, nil}
@@ -83,11 +85,15 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
     })
 
     Tai.Markets.OrderBook.replace(my_gdax_feed_ltc_usd_pid, %Tai.Markets.OrderBook{
+      venue_id: :my_gdax_feed,
+      product_symbol: :ltc_usd,
       bids: %{100.0 => {0.1, nil, nil}},
       asks: %{100.1 => {0.1, nil, nil}}
     })
 
     Tai.Markets.OrderBook.replace(my_feed_b_btc_usd_pid, %Tai.Markets.OrderBook{
+      venue_id: :my_feed_b,
+      product_symbol: :btc_usd,
       bids: %{1.0 => {1.1, nil, nil}},
       asks: %{1.2 => {0.1, nil, nil}}
     })
@@ -141,6 +147,8 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
     assert Tai.Markets.OrderBook.quotes(my_gdax_feed_ltc_usd_pid) == {
              :ok,
              %Tai.Markets.OrderBook{
+               venue_id: :my_gdax_feed,
+               product_symbol: :ltc_usd,
                bids: [
                  %Tai.Markets.PriceLevel{
                    price: 100.0,
@@ -163,6 +171,8 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
     assert Tai.Markets.OrderBook.quotes(my_feed_b_btc_usd_pid) == {
              :ok,
              %Tai.Markets.OrderBook{
+               venue_id: :my_feed_b,
+               product_symbol: :btc_usd,
                bids: [
                  %Tai.Markets.PriceLevel{
                    price: 1.0,
@@ -223,6 +233,8 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
     assert Tai.Markets.OrderBook.quotes(my_gdax_feed_ltc_usd_pid) == {
              :ok,
              %Tai.Markets.OrderBook{
+               venue_id: :my_gdax_feed,
+               product_symbol: :ltc_usd,
                bids: [
                  %Tai.Markets.PriceLevel{
                    price: 100.0,
@@ -245,6 +257,8 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
     assert Tai.Markets.OrderBook.quotes(my_feed_b_btc_usd_pid) == {
              :ok,
              %Tai.Markets.OrderBook{
+               venue_id: :my_feed_b,
+               product_symbol: :btc_usd,
                bids: [
                  %Tai.Markets.PriceLevel{
                    price: 1.0,

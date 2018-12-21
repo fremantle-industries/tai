@@ -27,6 +27,8 @@ defmodule Tai.VenueAdapters.Mock.OrderBookFeed do
     processed_at = Timex.now()
 
     snapshot = %Tai.Markets.OrderBook{
+      venue_id: state.feed_id,
+      product_symbol: symbol,
       bids: OrderBookFeed.Snapshot.normalize(bids, processed_at),
       asks: OrderBookFeed.Snapshot.normalize(asks, processed_at)
     }

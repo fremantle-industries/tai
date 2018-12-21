@@ -54,6 +54,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       )
 
     snapshot = %Tai.Markets.OrderBook{
+      venue_id: state.venue_id,
+      product_symbol: state.symbol,
       bids: normalized.bids,
       asks: normalized.asks
     }
@@ -93,6 +95,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       )
 
     update = %Tai.Markets.OrderBook{
+      venue_id: state.venue_id,
+      product_symbol: state.symbol,
       bids: normalized.bids,
       asks: normalized.asks
     }
@@ -126,6 +130,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       )
 
     update = %Tai.Markets.OrderBook{
+      venue_id: state.venue_id,
+      product_symbol: state.symbol,
       bids: normalized.bids,
       asks: normalized.asks
     }
@@ -156,6 +162,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
       )
 
     update = %Tai.Markets.OrderBook{
+      venue_id: state.venue_id,
+      product_symbol: state.symbol,
       bids: normalized.bids,
       asks: normalized.asks
     }

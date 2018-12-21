@@ -6,6 +6,8 @@ defmodule Tai.Events.OrderBookSnapshotTest do
     {:ok, date} = Timex.parse(date_str, "{ISO:Extended}")
 
     order_book = %Tai.Markets.OrderBook{
+      venue_id: :my_venue,
+      product_symbol: :btc_usd,
       bids: %{
         999.9 => {1.1, date, date},
         999.8 => {1.2, date, date}

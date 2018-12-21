@@ -66,11 +66,15 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeedTest do
       )
 
     Tai.Markets.OrderBook.replace(my_poloniex_feed_ltc_usd_pid, %Tai.Markets.OrderBook{
+      venue_id: :my_poloniex_feed,
+      product_symbol: :btc_usd,
       bids: %{100.0 => {0.1, nil, nil}},
       asks: %{100.1 => {0.1, nil, nil}}
     })
 
     Tai.Markets.OrderBook.replace(my_feed_b_btc_usd_pid, %Tai.Markets.OrderBook{
+      venue_id: :my_feed_b,
+      product_symbol: :btc_usd,
       bids: %{1.0 => {1.1, nil, nil}},
       asks: %{1.2 => {0.1, nil, nil}}
     })
