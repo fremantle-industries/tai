@@ -32,29 +32,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages do
         state
       ) do
     positions
-    |> Enum.each(fn %{
-                      "timestamp" => timestamp,
-                      "symbol" => exchange_symbol,
-                      "markPrice" => mark_price,
-                      "liquidationPrice" => liquidation_price,
-                      "lastPrice" => last_price,
-                      "currentTimestamp" => current_timestamp,
-                      "currentQty" => current_qty,
-                      "currency" => currency,
-                      "account" => account
-                    } ->
+    |> Enum.each(fn %{"symbol" => exchange_symbol} = p ->
       Tai.Events.broadcast(%Tai.Events.PositionUpdate{
         venue_id: state.venue_id,
         symbol: exchange_symbol |> String.downcase() |> String.to_atom(),
         received_at: received_at,
-        timestamp: timestamp,
-        mark_price: mark_price,
-        liquidation_price: liquidation_price,
-        last_price: last_price,
-        current_timestamp: current_timestamp,
-        current_qty: current_qty,
-        currency: currency,
-        account: account
+        data: p
       })
     end)
 
