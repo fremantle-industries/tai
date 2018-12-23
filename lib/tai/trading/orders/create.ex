@@ -104,7 +104,7 @@ defmodule Tai.Trading.Orders.Create do
         attrs
       )
 
-    Orders.Events.info(updated_order)
+    Orders.broadcast(updated_order)
 
     {old_order, updated_order}
   end

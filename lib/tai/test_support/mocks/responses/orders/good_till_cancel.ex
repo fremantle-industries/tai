@@ -1,15 +1,16 @@
 defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   alias Tai.TestSupport.Mocks
 
+  @type order :: Tai.Trading.Order.t()
   @type buy_limit :: Tai.Trading.OrderSubmissions.BuyLimitGtc.t()
   @type sell_limit :: Tai.Trading.OrderSubmissions.SellLimitGtc.t()
   @type submission :: buy_limit | sell_limit
   @type venue_order_id :: String.t()
 
   @spec unfilled(venue_order_id, submission) :: :ok
-  def unfilled(server_id, submission) do
+  def unfilled(venue_order_id, submission) do
     order_response = %Tai.Trading.OrderResponse{
-      id: server_id,
+      id: venue_order_id,
       time_in_force: :gtc,
       status: :open,
       original_size: submission.qty,

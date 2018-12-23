@@ -18,10 +18,10 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
   test "enqueues the order" do
     submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-
     Mocks.Responses.Orders.GoodTillCancel.unfilled(@venue_order_id, submission)
 
     assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.Orders.create(submission)
+    assert order.venue_order_id == nil
     assert order.client_id != nil
     assert order.exchange_id == submission.venue_id
     assert order.account_id == submission.account_id
@@ -35,15 +35,18 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
   test "broadcasts events when the status changes" do
     Tai.Events.firehose_subscribe()
-
     submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-
     Mocks.Responses.Orders.GoodTillCancel.unfilled(@venue_order_id, submission)
 
     assert {:ok, _} = Tai.Trading.Orders.create(submission)
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{side: :buy, status: :enqueued}}
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{side: :buy, status: :open}}
+    assert_receive {Tai.Event,
+                    %Tai.Events.OrderUpdated{side: :buy, status: :enqueued} = enqueued_order}
+
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{side: :buy, status: :open} = open_order}
+
+    assert enqueued_order.venue_order_id == nil
+    assert open_order.venue_order_id == @venue_order_id
   end
 
   test "fires the callback when the status changes" do
@@ -64,8 +67,11 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
     assert_receive {
       :callback_fired,
-      %Tai.Trading.Order{side: :sell, status: :enqueued},
-      %Tai.Trading.Order{side: :sell, status: :open}
+      %Tai.Trading.Order{side: :sell, status: :enqueued} = enqueued_order,
+      %Tai.Trading.Order{side: :sell, status: :open} = open_order
     }
+
+    assert enqueued_order.venue_order_id == nil
+    assert open_order.venue_order_id == @venue_order_id
   end
 end

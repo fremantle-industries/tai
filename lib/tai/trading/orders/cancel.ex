@@ -6,7 +6,7 @@ defmodule Tai.Trading.Orders.Cancel do
   @spec cancel(order) :: {:ok, updated_order :: order} | {:error, :order_status_must_be_open}
   def cancel(%Tai.Trading.Order{client_id: client_id}) do
     with {:ok, {old_order, updated_order}} <- find_open_order_and_pre_cancel(client_id) do
-      Orders.Events.info(updated_order)
+      Orders.broadcast(updated_order)
       Orders.execute_update_callback(old_order, updated_order)
 
       Task.start_link(fn ->
@@ -27,13 +27,13 @@ defmodule Tai.Trading.Orders.Cancel do
 
   defp parse_cancel_order_response({:ok, _order_id}, order) do
     {:ok, {old_order, updated_order}} = find_canceling_order_and_cancel(order.client_id)
-    Orders.Events.info(updated_order)
+    Orders.broadcast(updated_order)
     Orders.execute_update_callback(old_order, updated_order)
   end
 
   defp parse_cancel_order_response({:error, :not_found = reason}, order) do
     {:ok, {old_order, updated_order}} = find_canceling_order_and_error(order.client_id, reason)
-    Orders.Events.info(updated_order)
+    Orders.broadcast(updated_order)
     Orders.execute_update_callback(old_order, updated_order)
   end
 

@@ -2,9 +2,7 @@ defmodule Tai.Trading.Orders do
   alias Tai.Trading.Orders
 
   @type order :: Tai.Trading.Order.t()
-  @type submission :: Tai.Trading.OrderStore.submission()
 
-  @spec create(submission) :: {:ok, order}
   defdelegate create(submission), to: Orders.Create
   defdelegate cancel(order), to: Orders.Cancel
 
@@ -14,6 +12,7 @@ defmodule Tai.Trading.Orders do
       client_id: order.client_id,
       venue_id: order.exchange_id,
       account_id: order.account_id,
+      venue_order_id: order.venue_order_id,
       product_symbol: order.symbol,
       side: order.side,
       type: order.type,
