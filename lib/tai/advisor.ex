@@ -31,13 +31,13 @@ defmodule Tai.Advisor do
               inside_quote :: Tai.Markets.Quote.t(),
               changes :: map | list,
               state :: advisor
-            ) :: :ok | {:ok, store}
+            ) :: :ok | {:ok, store} | term
 
   @callback handle_order_updated(
               old_order :: term,
               updated_order :: term,
               state :: advisor
-            ) :: :ok | {:ok, store}
+            ) :: :ok | {:ok, store} | term
 
   @enforce_keys [
     :group_id,
