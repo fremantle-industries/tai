@@ -5,6 +5,7 @@ defmodule Tai.Venue do
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type order :: Tai.Trading.Order.t()
   @type order_response :: Tai.Trading.OrderResponse.t()
+  @type venue_order_id :: String.t()
   @type amend_attrs :: map
   @type shared_error_reason :: :timeout | Tai.CredentialError.t()
   @type create_order_error_reason ::
@@ -13,6 +14,10 @@ defmodule Tai.Venue do
           | Tai.Trading.InsufficientBalanceError.t()
   @type amend_order_error_reason ::
           :not_implemented
+          | shared_error_reason
+  @type cancel_order_error_reason ::
+          :not_implemented
+          | :not_found
           | shared_error_reason
 
   @adapters Tai.Venues.Config.parse_adapters()
@@ -50,13 +55,14 @@ defmodule Tai.Venue do
     venue_adapter.adapter.create_order(order, credentials)
   end
 
-  @spec amend_order(order, amend_attrs) :: :ok | {:error, amend_order_error_reason}
+  @spec amend_order(order, amend_attrs) ::
+          {:ok, order_response} | {:error, amend_order_error_reason}
   def amend_order(%Tai.Trading.Order{} = order, attrs, adapters \\ @adapters) do
     {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
     venue_adapter.adapter.amend_order(order.venue_order_id, attrs, credentials)
   end
 
-  @spec cancel_order(order) :: :ok | {:error, create_order_error_reason}
+  @spec cancel_order(order) :: {:ok, venue_order_id} | {:error, cancel_order_error_reason}
   def cancel_order(%Tai.Trading.Order{} = order, adapters \\ @adapters) do
     {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
     venue_adapter.adapter.cancel_order(order.venue_order_id, credentials)

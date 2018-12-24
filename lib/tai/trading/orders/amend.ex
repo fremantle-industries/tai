@@ -7,7 +7,8 @@ defmodule Tai.Trading.Orders.Amend do
           optional(:size) => Decimal.t()
         }
 
-  @spec amend(order, attrs) :: {:ok, order} | {:error, :order_status_must_be_open}
+  @spec amend(order, attrs) ::
+          {:ok, updated_order :: order} | {:error, :order_status_must_be_open}
   def amend(order, attrs) when is_map(attrs) do
     with {:ok, {old_order, updated_order}} <- find_open_order_and_pend_amend(order.client_id) do
       Orders.updated!(old_order, updated_order)
