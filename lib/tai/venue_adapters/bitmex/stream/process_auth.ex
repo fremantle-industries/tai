@@ -52,6 +52,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages do
     {:noreply, state}
   end
 
+  def handle_cast(
+        {%{"table" => "margin", "action" => "update", "data" => _data}, _received_at},
+        state
+      ) do
+    {:noreply, state}
+  end
+
   def handle_cast({%{"table" => "execution", "action" => "partial"}, _received_at}, state) do
     {:noreply, state}
   end
