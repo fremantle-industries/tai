@@ -7,38 +7,30 @@ defmodule Tai.Trading.Orders.Create do
   @spec create(submission) :: {:ok, order}
   def create(submission) do
     {:ok, order} = OrderStore.add(submission)
-
-    order
-    |> broadcast_updated_event()
-    |> initial_update_callback()
+    notify_initial_updated_order(order)
 
     Task.async(fn ->
       if Tai.Settings.send_orders?() do
         order
         |> send
         |> parse_response(order)
-        |> execute_callback()
+        |> notify_updated_order()
       else
         order.client_id
         |> skip!
-        |> execute_callback()
+        |> notify_updated_order()
       end
     end)
 
     {:ok, order}
   end
 
-  defp broadcast_updated_event(order) do
-    Orders.broadcast(order)
-    order
+  defp notify_initial_updated_order(order) do
+    notify_updated_order({nil, order})
   end
 
-  defp initial_update_callback(order) do
-    execute_callback({nil, order})
-  end
-
-  defp execute_callback({previous_order, order}) do
-    Orders.execute_update_callback(previous_order, order)
+  defp notify_updated_order({previous_order, order}) do
+    Orders.updated!(previous_order, order)
     order
   end
 
@@ -103,8 +95,6 @@ defmodule Tai.Trading.Orders.Create do
         [client_id: client_id],
         attrs
       )
-
-    Orders.broadcast(updated_order)
 
     {old_order, updated_order}
   end

@@ -26,9 +26,14 @@ defmodule Tai.Trading.Orders do
     |> Tai.Events.broadcast()
   end
 
-  def execute_update_callback(_, %Tai.Trading.Order{order_updated_callback: nil}), do: :ok
+  @spec updated!(order | nil, order) :: :ok
+  def updated!(previous, %Tai.Trading.Order{} = updated) do
+    broadcast(updated)
 
-  def execute_update_callback(previous, %Tai.Trading.Order{} = updated) do
-    updated.order_updated_callback.(previous, updated)
+    if updated.order_updated_callback do
+      updated.order_updated_callback.(previous, updated)
+    else
+      :ok
+    end
   end
 end
