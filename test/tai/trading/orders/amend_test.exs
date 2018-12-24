@@ -110,7 +110,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         })
 
       {:ok, enqueued_order} = Tai.Trading.OrderStore.add(submission)
-      {:ok, %{order: enqueued_order}}
+      {:ok, %{submission: submission, order: enqueued_order}}
     end
 
     test "returns an error tuple when the order is not open", %{order: enqueued_order} do
@@ -127,6 +127,24 @@ defmodule Tai.Trading.Orders.AmendTest do
       assert event.client_id != nil
       assert event.was == :enqueued
       assert event.required == :open
+    end
+
+    test "changes status to :error when the venue returns an error", %{submission: submission} do
+      Mocks.Responses.Orders.GoodTillCancel.unfilled(@venue_order_id, submission)
+      {:ok, _} = Tai.Trading.Orders.create(submission)
+
+      assert_receive {:callback_fired, _,
+                      %Tai.Trading.Order{side: :buy, status: :open} = open_order}
+
+      Tai.Trading.Orders.amend(open_order, %{price: Decimal.new(1)})
+
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{side: :buy, status: :pending_amend},
+        %Tai.Trading.Order{side: :buy, status: :error} = error_order
+      }
+
+      assert error_order.error_reason == :mock_not_found
     end
   end
 end

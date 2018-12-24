@@ -32,6 +32,11 @@ defmodule Tai.Trading.Orders.Amend do
     Orders.updated!(old_order, updated_order)
   end
 
+  defp parse_response({:error, reason}, client_id, _attrs) do
+    {:ok, {old_order, updated_order}} = find_pending_amend_order_and_error(client_id, reason)
+    Orders.updated!(old_order, updated_order)
+  end
+
   defp find_open_order_and_pend_amend(client_id) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id, status: :open],
@@ -48,6 +53,14 @@ defmodule Tai.Trading.Orders.Amend do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id, status: :pending_amend],
       update_attrs
+    )
+  end
+
+  defp find_pending_amend_order_and_error(client_id, reason) do
+    Tai.Trading.OrderStore.find_by_and_update(
+      [client_id: client_id, status: :pending_amend],
+      status: :error,
+      error_reason: reason
     )
   end
 
