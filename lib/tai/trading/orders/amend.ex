@@ -24,7 +24,6 @@ defmodule Tai.Trading.Orders.Amend do
     end
   end
 
-  # defp send_amend_order(order, attrs), do: Tai.Venue.amend_order(order, attrs)
   defp send_amend_order(order, attrs), do: Tai.Exchanges.Account.amend_order(order, attrs)
 
   defp parse_response({:ok, _order_response}, client_id, attrs) do
