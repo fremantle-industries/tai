@@ -8,6 +8,7 @@ defmodule Tai.Advisor do
   @type advisor :: Tai.Advisor.t()
   @type store :: map
   @type product :: Tai.Venues.Product.t()
+  @type order :: Tai.Trading.Order.t()
   @type t :: %Tai.Advisor{
           group_id: atom,
           advisor_id: atom,
@@ -62,6 +63,7 @@ defmodule Tai.Advisor do
     Map.get(advisor.inside_quotes, name)
   end
 
+  @spec order_updated(atom, order | nil, order) :: no_return
   def order_updated(name, old_order, updated_order) do
     GenServer.cast(name, {:order_updated, old_order, updated_order})
   end
@@ -159,6 +161,8 @@ defmodule Tai.Advisor do
               error: e,
               stacktrace: __STACKTRACE__
             })
+
+            {:noreply, state}
         end
       end
 
