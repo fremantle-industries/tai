@@ -157,6 +157,10 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     venue_id |> process_auth_messages(msg)
   end
 
+  defp handle_msg(%{"table" => "order"} = msg, venue_id) do
+    venue_id |> process_auth_messages(msg)
+  end
+
   defp handle_msg(%{"table" => "execution"} = msg, venue_id) do
     venue_id |> process_auth_messages(msg)
   end
