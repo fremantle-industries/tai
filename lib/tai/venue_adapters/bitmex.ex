@@ -7,7 +7,8 @@ defmodule Tai.VenueAdapters.Bitmex do
 
   defdelegate products(venue_id), to: Tai.VenueAdapters.Bitmex.Products
 
-  def asset_balances(_, _, _), do: {:ok, []}
+  defdelegate asset_balances(venue_id, account_id, credentials),
+    to: Tai.VenueAdapters.Bitmex.AssetBalances
 
   def maker_taker_fees(_, _, _), do: {:ok, nil}
 

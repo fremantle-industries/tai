@@ -25,7 +25,7 @@ We are working to make `tai` production quality software.
 
 | Exchange       | Live Order Book  | Account Balance | Orders | Products | Fees |
 |----------------|:---:|:---:|:---:|:---:|:---:|
-| Bitmex         | [x] | [ ] | [ ] | [x] | [x] |
+| Bitmex         | [x] | [x] | [ ] | [x] | [x] |
 
 ## Planned Exchanges
 

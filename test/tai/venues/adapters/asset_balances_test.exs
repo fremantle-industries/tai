@@ -20,7 +20,6 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
   @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
 
   @test_adapters
-  |> Enum.filter(fn {adapter_id, _} -> adapter_id != :bitmex end)
   |> Enum.map(fn {_, adapter} ->
     @adapter adapter
     @account_id adapter.accounts |> Map.keys() |> List.first()
