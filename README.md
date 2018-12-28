@@ -17,15 +17,15 @@ We are working to make `tai` production quality software.
 
 | Exchange       | Live Order Book  | Account Balance | Orders | Products | Fees |
 |----------------|:---:|:---:|:---:|:---:|:---:|
-| GDAX           | [x] | [x] | [x] | [x] | [x] |
-| Binance        | [x] | [x] | [x] | [x] | [x] |
-| Poloniex       | [x] | [x] | [x] | [x] | [x] |
+| Bitmex         | [x] | [x] | [x] | [x] | [x] |
 
 ## Exchanges In Progress
 
 | Exchange       | Live Order Book  | Account Balance | Orders | Products | Fees |
 |----------------|:---:|:---:|:---:|:---:|:---:|
-| Bitmex         | [x] | [x] | [ ] | [x] | [x] |
+| GDAX           | [x] | [x] | [ ] | [x] | [x] |
+| Binance        | [x] | [x] | [ ] | [x] | [x] |
+| Poloniex       | [x] | [x] | [ ] | [x] | [x] |
 
 ## Planned Exchanges
 

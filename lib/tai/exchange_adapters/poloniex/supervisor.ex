@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.Supervisor do
   Supervisor for the Poloniex exchange adapter
   """
 
-  use Tai.Venues.AdapterSupervisor
+  use Tai.Exchanges.AdapterSupervisor
 
   def account do
     Tai.ExchangeAdapters.Poloniex.Account

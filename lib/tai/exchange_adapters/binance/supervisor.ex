@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Binance.Supervisor do
   Supervisor for the Binance exchange adapter
   """
 
-  use Tai.Venues.AdapterSupervisor
+  use Tai.Exchanges.AdapterSupervisor
 
   def account do
     Tai.ExchangeAdapters.Binance.Account

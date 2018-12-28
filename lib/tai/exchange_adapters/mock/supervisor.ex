@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Mock.Supervisor do
   Supervisor for the mock exchange adapter
   """
 
-  use Tai.Venues.AdapterSupervisor
+  use Tai.Exchanges.AdapterSupervisor
 
   def account() do
     Tai.ExchangeAdapters.Mock.Account

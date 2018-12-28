@@ -3,7 +3,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Supervisor do
   Supervisor for the GDAX exchange adapter
   """
 
-  use Tai.Venues.AdapterSupervisor
+  use Tai.Exchanges.AdapterSupervisor
 
   def account do
     Tai.ExchangeAdapters.Gdax.Account

@@ -73,18 +73,6 @@ config :tai,
     ]
   }
 
-config :tai,
-  exchanges: %{
-    test_exchange_a: [
-      supervisor: Tai.ExchangeAdapters.Mock.Supervisor,
-      accounts: %{main: %{}}
-    ],
-    test_exchange_b: [
-      supervisor: Tai.ExchangeAdapters.Mock.Supervisor,
-      accounts: %{main: %{}}
-    ]
-  }
-
 config :exvcr,
   filter_request_headers: [
     # GDAX
