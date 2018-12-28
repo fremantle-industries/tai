@@ -62,6 +62,15 @@ defmodule Tai.Venue do
     venue_adapter.adapter.create_order(order, credentials)
   end
 
+  # TODO: Add specs
+  def create_all_orders(
+        [%Tai.Trading.Order{} = order | _] = orders,
+        adapters \\ Tai.Venues.Config.parse_adapters()
+      ) do
+    {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
+    venue_adapter.adapter.create_orders(orders, credentials)
+  end
+
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
   @type amend_order_error_reason ::
