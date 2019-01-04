@@ -20,11 +20,6 @@ defmodule Tai.Venue do
           | :not_found
           | shared_error_reason
 
-  @adapters Tai.Venues.Config.parse_adapters()
-            |> Enum.reduce(%{}, fn {_, adapter}, acc ->
-              Map.put(acc, adapter.id, adapter)
-            end)
-
   @spec products(adapter :: adapter) :: {:ok, [product]}
   def products(%Tai.Venues.Adapter{adapter: adapter, id: exchange_id}) do
     adapter.products(exchange_id)
@@ -50,20 +45,24 @@ defmodule Tai.Venue do
   end
 
   @spec create_order(order) :: {:ok, order_response} | {:error, create_order_error_reason}
-  def create_order(%Tai.Trading.Order{} = order, adapters \\ @adapters) do
+  def create_order(%Tai.Trading.Order{} = order, adapters \\ Tai.Venues.Config.parse_adapters()) do
     {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
     venue_adapter.adapter.create_order(order, credentials)
   end
 
   @spec amend_order(order, amend_attrs) ::
           {:ok, order_response} | {:error, amend_order_error_reason}
-  def amend_order(%Tai.Trading.Order{} = order, attrs, adapters \\ @adapters) do
+  def amend_order(
+        %Tai.Trading.Order{} = order,
+        attrs,
+        adapters \\ Tai.Venues.Config.parse_adapters()
+      ) do
     {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
     venue_adapter.adapter.amend_order(order.venue_order_id, attrs, credentials)
   end
 
   @spec cancel_order(order) :: {:ok, venue_order_id} | {:error, cancel_order_error_reason}
-  def cancel_order(%Tai.Trading.Order{} = order, adapters \\ @adapters) do
+  def cancel_order(%Tai.Trading.Order{} = order, adapters \\ Tai.Venues.Config.parse_adapters()) do
     {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
     venue_adapter.adapter.cancel_order(order.venue_order_id, credentials)
   end

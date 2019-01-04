@@ -1,6 +1,6 @@
 use Mix.Config
 
-config :tai, send_orders: false
+config :tai, send_orders: true
 
 config :tai,
   advisor_groups: %{
@@ -25,7 +25,7 @@ config :tai,
   venues: %{
     bitmex: [
       adapter: Tai.VenueAdapters.Bitmex,
-      products: "xbtz18 xbth19",
+      products: "xbth19 xbtm19",
       accounts: %{
         main: %{
           api_key: {:system_file, "BITMEX_API_KEY"},
@@ -59,8 +59,6 @@ config :tai,
   }
 
 config :echo_boy, port: 4200
-
-config :logger, backends: [{LoggerFileBackend, :file_log}]
 
 config :ex_poloniex,
   api_key: {:system_file, "POLONIEX_API_KEY"},

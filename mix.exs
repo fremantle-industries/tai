@@ -43,6 +43,9 @@ defmodule Tai.Mixfile do
       {:timex, "~> 3.1"},
       {:uuid, "~> 1.1"},
       {:websockex, "~> 0.4.0"},
+      # https://github.com/Nebo15/confex/pull/34
+      # {:confex, "~> 3.3.1"},
+      {:confex, github: "Nebo15/confex"},
       {:logger_file_backend, "~> 0.0.10", only: [:dev, :test]},
       {:logger_json, "~> 3.0.0", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},

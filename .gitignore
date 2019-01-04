@@ -24,3 +24,6 @@ erl_crash.dump
 
 # Ignore dev config from repo. Use the example file to recreate a local config
 config/dev.exs
+
+# Ignore secrets
+secrets/*

@@ -5,13 +5,14 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
   setup_all do
     HTTPoison.start()
+    Confex.resolve_env!(:tai)
 
-    credentials = %{
-      api_url: "https://api-public.sandbox.pro.coinbase.com",
-      api_key: System.get_env("GDAX_API_KEY"),
-      api_secret: System.get_env("GDAX_API_SECRET"),
-      api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
-    }
+    credentials =
+      :tai
+      |> Application.get_env(:test_venue_adapters)
+      |> Map.fetch!(:gdax)
+      |> Keyword.fetch!(:accounts)
+      |> Map.fetch!(:main)
 
     start_supervised!(
       {Tai.ExchangeAdapters.Gdax.Account,

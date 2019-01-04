@@ -5,6 +5,7 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
   setup_all do
     HTTPoison.start()
+    Confex.resolve_env!(:ex_poloniex)
 
     start_supervised!(
       {Tai.ExchangeAdapters.Poloniex.Account,

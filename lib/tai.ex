@@ -2,6 +2,13 @@ defmodule Tai do
   use Application
 
   def start(_type, _args) do
+    # TODO:
+    # binance & ex_poloniex adapters won't need to resolve env on boot
+    # when the venue adapters support per account configuration
+    Confex.resolve_env!(:binance)
+    Confex.resolve_env!(:ex_poloniex)
+    Confex.resolve_env!(:tai)
+
     config = Tai.Config.parse()
     settings = Tai.Settings.from_config(config)
 

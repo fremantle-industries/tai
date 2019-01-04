@@ -32,8 +32,8 @@ config(:tai,
       adapter: Tai.VenueAdapters.Bitmex,
       accounts: %{
         main: %{
-          api_key: System.get_env("BITMEX_API_KEY"),
-          api_secret: System.get_env("BITMEX_SECRET")
+          api_key: {:system_file, "BITMEX_API_KEY"},
+          api_secret: {:system_file, "BITMEX_SECRET"}
         }
       }
     ],
@@ -50,9 +50,9 @@ config(:tai,
       accounts: %{
         main: %{
           api_url: "https://api-public.sandbox.pro.coinbase.com",
-          api_key: System.get_env("GDAX_API_KEY"),
-          api_secret: System.get_env("GDAX_API_SECRET"),
-          api_passphrase: System.get_env("GDAX_API_PASSPHRASE")
+          api_key: {:system_file, "GDAX_API_KEY"},
+          api_secret: {:system_file, "GDAX_API_SECRET"},
+          api_passphrase: {:system_file, "GDAX_API_PASSPHRASE"}
         }
       }
     ]
@@ -105,9 +105,9 @@ config(:echo_boy, port: 4100)
 config :ex_bitmex, domain: "testnet.bitmex.com"
 
 config :ex_poloniex,
-  api_key: System.get_env("POLONIEX_API_KEY"),
-  api_secret: System.get_env("POLONIEX_API_SECRET")
+  api_key: {:system_file, "POLONIEX_API_KEY"},
+  api_secret: {:system_file, "POLONIEX_API_SECRET"}
 
 config :binance,
-  api_key: System.get_env("BINANCE_API_KEY"),
-  secret_key: System.get_env("BINANCE_API_SECRET")
+  api_key: {:system_file, "BINANCE_API_KEY"},
+  secret_key: {:system_file, "BINANCE_API_SECRET"}
