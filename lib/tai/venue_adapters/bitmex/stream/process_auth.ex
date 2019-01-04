@@ -21,7 +21,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages do
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   def handle_cast(
-        {%{"table" => "position", "data" => _data, "action" => "partial"}, _received_at},
+        {%{"table" => "position", "data" => _positions, "action" => "partial"}, _received_at},
+        state
+      ) do
+    {:noreply, state}
+  end
+
+  def handle_cast(
+        {%{"table" => "position", "data" => _positions, "action" => "insert"}, _received_at},
         state
       ) do
     {:noreply, state}
