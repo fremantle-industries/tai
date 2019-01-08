@@ -23,6 +23,8 @@ defmodule Tai.Commands.Helper.OrdersTest do
       }
       |> Tai.Trading.OrderStore.add()
 
+    btc_usd_order_client_id = "#{btc_usd_order.client_id |> String.slice(0..5)}..."
+
     {:ok, ltc_usd_order} =
       %Tai.Trading.OrderSubmissions.SellLimitFok{
         venue_id: :test_exchange_b,
@@ -33,17 +35,19 @@ defmodule Tai.Commands.Helper.OrdersTest do
       }
       |> Tai.Trading.OrderStore.add()
 
+    ltc_usd_order_client_id = "#{ltc_usd_order.client_id |> String.slice(0..5)}..."
+
     assert capture_io(&Tai.Commands.Helper.orders/0) == """
-           +-----------------+---------+---------+------+-------+----------+-----------+-----+----------------+---------------+----------+--------------------------------------+----------------+-------------+------------+--------------+
-           |        Exchange | Account |  Symbol | Side |  Type |    Price | Avg Price | Qty | Cumulative Qty | Time in Force |   Status |                            Client ID | Venue Order ID | Enqueued At | Created At | Error Reason |
-           +-----------------+---------+---------+------+-------+----------+-----------+-----+----------------+---------------+----------+--------------------------------------+----------------+-------------+------------+--------------+
+           +-----------------+---------+---------+------+-------+----------+-----------+-----+----------------+---------------+----------+-----------+----------------+-------------+------------+--------------+
+           |        Exchange | Account |  Symbol | Side |  Type |    Price | Avg Price | Qty | Cumulative Qty | Time in Force |   Status | Client ID | Venue Order ID | Enqueued At | Created At | Error Reason |
+           +-----------------+---------+---------+------+-------+----------+-----------+-----+----------------+---------------+----------+-----------+----------------+-------------+------------+--------------+
            | test_exchange_a |    main | btc_usd |  buy | limit | 12999.99 |         0 | 1.1 |              0 |           fok | enqueued | #{
-             btc_usd_order.client_id
+             btc_usd_order_client_id
            } |                |         now |            |              |
            | test_exchange_b |    main | ltc_usd | sell | limit |    75.23 |         0 | 1.0 |              0 |           fok | enqueued | #{
-             ltc_usd_order.client_id
+             ltc_usd_order_client_id
            } |                |         now |            |              |
-           +-----------------+---------+---------+------+-------+----------+-----------+-----+----------------+---------------+----------+--------------------------------------+----------------+-------------+------------+--------------+\n
+           +-----------------+---------+---------+------+-------+----------+-----------+-----+----------------+---------------+----------+-----------+----------------+-------------+------------+--------------+\n
            """
   end
 
