@@ -31,6 +31,7 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
     assert order.price == submission.price
     assert order.qty == submission.qty
     assert order.time_in_force == :gtc
+    assert order.venue_created_at == nil
   end
 
   test "broadcasts events when the status changes" do
@@ -43,10 +44,11 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
     assert_receive {Tai.Event,
                     %Tai.Events.OrderUpdated{side: :buy, status: :enqueued} = enqueued_order}
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{side: :buy, status: :open} = open_order}
+    assert_receive {Tai.Event,
+                    %Tai.Events.OrderUpdated{side: :buy, status: :open} = open_order_event}
 
     assert enqueued_order.venue_order_id == nil
-    assert open_order.venue_order_id == @venue_order_id
+    assert open_order_event.venue_order_id == @venue_order_id
   end
 
   test "fires the callback when the status changes" do
@@ -73,5 +75,6 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
     assert enqueued_order.venue_order_id == nil
     assert open_order.venue_order_id == @venue_order_id
+    assert %DateTime{} = open_order.venue_created_at
   end
 end

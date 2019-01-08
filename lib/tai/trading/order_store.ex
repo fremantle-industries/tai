@@ -182,7 +182,7 @@ defmodule Tai.Trading.OrderStore do
 
   defmodule AttributeWhitelist do
     @whitelist_attrs [
-      :created_at,
+      :venue_created_at,
       :error_reason,
       :cumulative_qty,
       :venue_order_id,

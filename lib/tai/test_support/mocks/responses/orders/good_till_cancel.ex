@@ -14,7 +14,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       time_in_force: :gtc,
       status: :open,
       original_size: submission.qty,
-      cumulative_qty: nil
+      cumulative_qty: nil,
+      timestamp: Timex.now()
     }
 
     key =
@@ -36,7 +37,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       time_in_force: :gtc,
       status: :open,
       original_size: order.qty,
-      cumulative_qty: Decimal.new(0)
+      cumulative_qty: Decimal.new(0),
+      timestamp: Timex.now()
       # TODO: price
     }
 
@@ -51,7 +53,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       time_in_force: :gtc,
       status: :open,
       original_size: qty,
-      cumulative_qty: Decimal.new(0)
+      cumulative_qty: Decimal.new(0),
+      timestamp: Timex.now()
       # TODO: price
     }
 

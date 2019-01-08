@@ -9,7 +9,8 @@ defmodule Tai.Trading.OrderResponse do
           time_in_force: atom,
           original_size: Decimal.t(),
           cumulative_qty: Decimal.t(),
-          remaining_qty: Decimal.t()
+          remaining_qty: Decimal.t(),
+          timestamp: DateTime.t() | nil
         }
 
   @enforce_keys [
@@ -26,6 +27,7 @@ defmodule Tai.Trading.OrderResponse do
     :time_in_force,
     :original_size,
     :cumulative_qty,
-    :remaining_qty
+    :remaining_qty,
+    :timestamp
   ]
 end

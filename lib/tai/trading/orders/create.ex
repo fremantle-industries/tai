@@ -36,43 +36,54 @@ defmodule Tai.Trading.Orders.Create do
 
   defp send(order), do: Tai.Venue.create_order(order)
 
-  defp parse_response({:ok, %OrderResponse{status: :filled} = r}, %Order{} = o) do
-    fill!(o.client_id, r.cumulative_qty)
-  end
-
-  defp parse_response({:ok, %OrderResponse{status: :expired}}, %Order{client_id: cid}) do
-    expire!(cid)
+  defp parse_response(
+         {:ok, %OrderResponse{status: :filled} = response},
+         %Order{} = o
+       ) do
+    fill!(o.client_id, response)
   end
 
   defp parse_response(
-         {:ok, %OrderResponse{status: :open, id: venue_order_id}},
+         {:ok, %OrderResponse{status: :expired} = response},
          %Order{client_id: cid}
        ) do
-    open!(cid, venue_order_id)
+    expire!(cid, response)
+  end
+
+  defp parse_response(
+         {:ok, %OrderResponse{status: :open} = response},
+         %Order{client_id: cid}
+       ) do
+    open!(cid, response)
   end
 
   defp parse_response({:error, reason}, %Order{client_id: cid}) do
     error!(cid, reason)
   end
 
-  defp fill!(cid, cumulative_qty) do
+  defp fill!(cid, response) do
     cid
     |> find_by_and_update(
       status: :filled,
-      cumulative_qty: Decimal.new(cumulative_qty)
+      cumulative_qty: Decimal.new(response.cumulative_qty),
+      venue_created_at: response.timestamp
     )
   end
 
-  defp expire!(cid) do
+  defp expire!(cid, response) do
     cid
-    |> find_by_and_update(status: :expired)
+    |> find_by_and_update(
+      status: :expired,
+      venue_created_at: response.timestamp
+    )
   end
 
-  defp open!(cid, venue_order_id) do
+  defp open!(cid, response) do
     cid
     |> find_by_and_update(
       status: :open,
-      venue_order_id: venue_order_id
+      venue_order_id: response.id,
+      venue_created_at: response.timestamp
     )
   end
 

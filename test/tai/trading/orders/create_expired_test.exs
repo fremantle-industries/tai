@@ -45,7 +45,9 @@ defmodule Tai.Trading.Orders.CreateExpiredTest do
     assert_receive {
       :callback_fired,
       %Tai.Trading.Order{side: :sell, status: :enqueued},
-      %Tai.Trading.Order{side: :sell, status: :expired}
+      %Tai.Trading.Order{side: :sell, status: :expired} = expired_order
     }
+
+    assert %DateTime{} = expired_order.venue_created_at
   end
 end

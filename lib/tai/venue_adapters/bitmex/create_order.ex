@@ -46,6 +46,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   defp to_venue_time_in_force(:ioc), do: "ImmediateOrCancel"
   defp to_venue_time_in_force(:fok), do: "FillOrKill"
 
+  @format "{ISO:Extended}"
   defp parse_response(
          {:ok, %ExBitmex.Order{} = venue_order, %ExBitmex.RateLimit{}},
          order
@@ -55,7 +56,8 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
       status: venue_order.ord_status |> from_venue_status(order),
       time_in_force: order.time_in_force,
       original_size: Decimal.new(venue_order.order_qty),
-      cumulative_qty: Decimal.new(venue_order.cum_qty)
+      cumulative_qty: Decimal.new(venue_order.cum_qty),
+      timestamp: Timex.parse!(venue_order.timestamp, @format)
     }
 
     {:ok, response}

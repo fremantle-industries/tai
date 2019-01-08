@@ -31,20 +31,13 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_fok_filled" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert %Decimal{} = cumulative_qty
-            assert original_size == cumulative_qty
-            assert status == :filled
-            assert time_in_force == :fok
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert %Decimal{} = order_response.cumulative_qty
+            assert order_response.original_size == order_response.cumulative_qty
+            assert order_response.status == :filled
+            assert order_response.time_in_force == :fok
+            assert %DateTime{} = order_response.timestamp
           end
         end
 
@@ -54,19 +47,12 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_fok_expired" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert cumulative_qty == Decimal.new(0)
-            assert status == :expired
-            assert time_in_force == :fok
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert order_response.cumulative_qty == Decimal.new(0)
+            assert order_response.status == :expired
+            assert order_response.time_in_force == :fok
+            assert %DateTime{} = order_response.timestamp
           end
         end
       end
@@ -78,20 +64,13 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_filled" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert %Decimal{} = cumulative_qty
-            assert original_size == cumulative_qty
-            assert status == :filled
-            assert time_in_force == :ioc
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert %Decimal{} = order_response.cumulative_qty
+            assert order_response.original_size == order_response.cumulative_qty
+            assert order_response.status == :filled
+            assert order_response.time_in_force == :ioc
+            assert %DateTime{} = order_response.timestamp
           end
         end
 
@@ -101,21 +80,14 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_partially_filled" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert %Decimal{} = cumulative_qty
-            assert cumulative_qty != Decimal.new(0)
-            assert original_size != cumulative_qty
-            assert status == :expired
-            assert time_in_force == :ioc
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert %Decimal{} = order_response.cumulative_qty
+            assert order_response.cumulative_qty != Decimal.new(0)
+            assert order_response.original_size != order_response.cumulative_qty
+            assert order_response.status == :expired
+            assert order_response.time_in_force == :ioc
+            assert %DateTime{} = order_response.timestamp
           end
         end
 
@@ -125,19 +97,12 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_unfilled" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert cumulative_qty == Decimal.new(0)
-            assert status == :expired
-            assert time_in_force == :ioc
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert order_response.cumulative_qty == Decimal.new(0)
+            assert order_response.status == :expired
+            assert order_response.time_in_force == :ioc
+            assert %DateTime{} = order_response.timestamp
           end
         end
       end
@@ -149,20 +114,13 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_filled" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert %Decimal{} = cumulative_qty
-            assert original_size == cumulative_qty
-            assert status == :filled
-            assert time_in_force == :gtc
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert %Decimal{} = order_response.cumulative_qty
+            assert order_response.original_size == order_response.cumulative_qty
+            assert order_response.status == :filled
+            assert order_response.time_in_force == :gtc
+            assert %DateTime{} = order_response.timestamp
           end
         end
 
@@ -173,20 +131,13 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_partially_filled" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert original_size != cumulative_qty
-            assert cumulative_qty != Decimal.new(0)
-            assert status == :open
-            assert time_in_force == :gtc
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert order_response.original_size != order_response.cumulative_qty
+            assert order_response.cumulative_qty != Decimal.new(0)
+            assert order_response.status == :open
+            assert order_response.time_in_force == :gtc
+            assert %DateTime{} = order_response.timestamp
           end
         end
 
@@ -196,19 +147,12 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_unfilled" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert cumulative_qty == Decimal.new(0)
-            assert status == :open
-            assert time_in_force == :gtc
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert order_response.cumulative_qty == Decimal.new(0)
+            assert order_response.status == :open
+            assert order_response.time_in_force == :gtc
+            assert %DateTime{} = order_response.timestamp
           end
         end
 
@@ -218,19 +162,12 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_rejected" do
             assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
 
-            assert %Tai.Trading.OrderResponse{
-                     id: id,
-                     status: status,
-                     time_in_force: time_in_force,
-                     cumulative_qty: cumulative_qty,
-                     original_size: original_size
-                   } = order_response
-
-            assert id != nil
-            assert %Decimal{} = original_size
-            assert cumulative_qty == Decimal.new(0)
-            assert status == :rejected
-            assert time_in_force == :gtc
+            assert order_response.id != nil
+            assert %Decimal{} = order_response.original_size
+            assert order_response.cumulative_qty == Decimal.new(0)
+            assert order_response.status == :rejected
+            assert order_response.time_in_force == :gtc
+            assert %DateTime{} = order_response.timestamp
           end
         end
       end

@@ -45,7 +45,9 @@ defmodule Tai.Trading.Orders.CreateFilledTest do
     assert_receive {
       :callback_fired,
       %Tai.Trading.Order{side: :sell, status: :enqueued},
-      %Tai.Trading.Order{side: :sell, status: :filled}
+      %Tai.Trading.Order{side: :sell, status: :filled} = filled_order
     }
+
+    assert %DateTime{} = filled_order.venue_created_at
   end
 end

@@ -54,7 +54,7 @@ defmodule Tai.Trading.Order do
   ]
   defstruct [
     :client_id,
-    :created_at,
+    :venue_created_at,
     :enqueued_at,
     :error_reason,
     :exchange_id,
