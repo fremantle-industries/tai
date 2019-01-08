@@ -18,8 +18,8 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
       end
 
     params =
-      if size = Map.get(attrs, :size) do
-        Map.put(params, :leavesQty, size)
+      if qty = Map.get(attrs, :qty) do
+        Map.put(params, :leavesQty, qty)
       else
         params
       end

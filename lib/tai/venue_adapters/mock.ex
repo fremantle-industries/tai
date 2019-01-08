@@ -48,7 +48,7 @@ defmodule Tai.VenueAdapters.Mock do
        [
          symbol: order.symbol,
          price: order.price,
-         size: order.size,
+         size: order.qty,
          time_in_force: order.time_in_force
        ]}
       |> Tai.TestSupport.Mocks.Server.eject()

@@ -4,7 +4,7 @@ defmodule Tai.Trading.Orders.Amend do
   @type order :: Tai.Trading.Order.t()
   @type attrs :: %{
           optional(:price) => Decimal.t(),
-          optional(:size) => Decimal.t()
+          optional(:qty) => Decimal.t()
         }
 
   @spec amend(order, attrs) ::

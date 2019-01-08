@@ -91,7 +91,7 @@ defmodule Tai.Trading.Orders.CancelTest do
                       } = event_1}
 
       assert event_1.price == Decimal.new("100.1")
-      assert event_1.size == Decimal.new("0.1")
+      assert event_1.qty == Decimal.new("0.1")
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderUpdated{
@@ -107,7 +107,7 @@ defmodule Tai.Trading.Orders.CancelTest do
                       } = event_2}
 
       assert event_2.price == Decimal.new("100.1")
-      assert event_2.size == Decimal.new("0.1")
+      assert event_2.qty == Decimal.new("0.1")
     end
   end
 

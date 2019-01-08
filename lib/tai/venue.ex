@@ -6,7 +6,7 @@ defmodule Tai.Venue do
   @type order :: Tai.Trading.Order.t()
   @type order_response :: Tai.Trading.OrderResponse.t()
   @type venue_order_id :: String.t()
-  @type amend_attrs :: map
+  @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type shared_error_reason :: :timeout | Tai.CredentialError.t()
   @type create_order_error_reason ::
           :not_implemented

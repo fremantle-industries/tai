@@ -17,7 +17,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
       side: order.side |> to_venue_side,
       ordType: "Limit",
       symbol: order.symbol |> to_venue_symbol,
-      orderQty: order.size,
+      orderQty: order.qty,
       price: order.price,
       timeInForce: order.time_in_force |> to_venue_time_in_force
     }

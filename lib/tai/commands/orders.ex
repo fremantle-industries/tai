@@ -34,7 +34,7 @@ defmodule Tai.Commands.Orders do
         order.side,
         order.type,
         order.price,
-        order.size,
+        order.qty,
         order.time_in_force,
         order.status,
         order.client_id,

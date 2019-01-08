@@ -16,7 +16,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
       "side" => venue_side,
       "product_id" => venue_product_id,
       "price" => order.price,
-      "size" => order.size
+      "size" => order.qty
     }
     |> ExGdax.create_order(credentials)
     |> parse_response(order.time_in_force)

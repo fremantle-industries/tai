@@ -31,7 +31,7 @@ defmodule Tai.Trading.Order do
           type: type,
           price: Decimal.t(),
           avg_price: Decimal.t(),
-          size: Decimal.t(),
+          qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
           post_only: boolean
         }
@@ -44,7 +44,7 @@ defmodule Tai.Trading.Order do
     :price,
     :avg_price,
     :side,
-    :size,
+    :qty,
     :cumulative_qty,
     :status,
     :symbol,
@@ -63,7 +63,7 @@ defmodule Tai.Trading.Order do
     :avg_price,
     :venue_order_id,
     :side,
-    :size,
+    :qty,
     :cumulative_qty,
     :status,
     :symbol,

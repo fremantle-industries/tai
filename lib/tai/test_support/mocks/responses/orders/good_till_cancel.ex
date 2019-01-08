@@ -35,7 +35,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       id: order.venue_order_id,
       time_in_force: :gtc,
       status: :open,
-      original_size: order.size,
+      original_size: order.qty,
       cumulative_qty: Decimal.new(0)
       # TODO: price
     }

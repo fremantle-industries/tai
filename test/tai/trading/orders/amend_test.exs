@@ -49,14 +49,14 @@ defmodule Tai.Trading.Orders.AmendTest do
       assert {:ok, %Tai.Trading.Order{} = pending_amend_order} =
                Tai.Trading.Orders.amend(open_order, %{
                  price: amend_price,
-                 size: amend_qty
+                 qty: amend_qty
                })
 
       assert pending_amend_order.venue_order_id == @venue_order_id
       assert pending_amend_order.side == :buy
       assert pending_amend_order.status == :pending_amend
       assert pending_amend_order.price != amend_price
-      assert pending_amend_order.size != amend_qty
+      assert pending_amend_order.qty != amend_qty
 
       assert_receive {
         :callback_fired,
@@ -72,7 +72,7 @@ defmodule Tai.Trading.Orders.AmendTest do
 
       assert amended_order.venue_order_id == @venue_order_id
       assert amended_order.price == amend_price
-      assert amended_order.size == amend_qty
+      assert amended_order.qty == amend_qty
     end
 
     test "broadcasts the status changes", %{order: open_order} do

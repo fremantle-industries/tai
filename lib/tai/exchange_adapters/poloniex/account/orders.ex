@@ -10,28 +10,28 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
     venue_product_symbol = SymbolMapping.to_poloniex(order.symbol)
 
     venue_product_symbol
-    |> send(order.price, order.size, venue_time_in_force, order.side)
-    |> parse_response(order.size, order.time_in_force)
+    |> send(order.price, order.qty, venue_time_in_force, order.side)
+    |> parse_response(order.qty, order.time_in_force)
   end
 
-  defp send(venue_product_symbol, price, size, venue_time_in_force, :buy) do
-    ExPoloniex.Trading.buy(venue_product_symbol, price, size, venue_time_in_force)
+  defp send(venue_product_symbol, price, qty, venue_time_in_force, :buy) do
+    ExPoloniex.Trading.buy(venue_product_symbol, price, qty, venue_time_in_force)
   end
 
-  defp send(venue_product_symbol, price, size, venue_time_in_force, :sell) do
-    ExPoloniex.Trading.sell(venue_product_symbol, price, size, venue_time_in_force)
+  defp send(venue_product_symbol, price, qty, venue_time_in_force, :sell) do
+    ExPoloniex.Trading.sell(venue_product_symbol, price, qty, venue_time_in_force)
   end
 
   defp parse_response(
          {:ok, %ExPoloniex.OrderResponse{} = poloniex_response},
-         original_size,
+         original_qty,
          time_in_force
        ) do
     response = %Tai.Trading.OrderResponse{
       id: poloniex_response.order_number,
       status: status(time_in_force),
       time_in_force: time_in_force,
-      original_size: original_size |> to_decimal,
+      original_size: original_qty |> to_decimal,
       cumulative_qty: cumulative_qty(poloniex_response.resulting_trades)
     }
 

@@ -20,7 +20,7 @@ defmodule Tai.Trading.Orders do
       time_in_force: order.time_in_force,
       status: order.status,
       price: order.price,
-      size: order.size,
+      qty: order.qty,
       error_reason: order.error_reason,
       cumulative_qty: order.cumulative_qty
     }

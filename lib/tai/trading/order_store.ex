@@ -121,7 +121,7 @@ defmodule Tai.Trading.OrderStore do
       type: submission |> type,
       price: submission.price |> Decimal.abs(),
       avg_price: @zero,
-      size: submission.qty |> Decimal.abs(),
+      qty: submission.qty |> Decimal.abs(),
       cumulative_qty: @zero,
       time_in_force: submission |> time_in_force,
       post_only: submission |> post_only,
@@ -188,7 +188,7 @@ defmodule Tai.Trading.OrderStore do
       :venue_order_id,
       :status,
       :price,
-      :size
+      :qty
     ]
 
     def apply(order, update_attrs) do

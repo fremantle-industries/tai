@@ -15,7 +15,7 @@ defmodule Tai.Events.OrderUpdated do
           time_in_force: time_in_force,
           status: status,
           price: Decimal.t(),
-          size: Decimal.t(),
+          qty: Decimal.t(),
           cumulative_qty: Decimal.t()
         }
 
@@ -29,7 +29,7 @@ defmodule Tai.Events.OrderUpdated do
     :time_in_force,
     :status,
     :price,
-    :size,
+    :qty,
     :cumulative_qty
   ]
   defstruct [
@@ -44,7 +44,7 @@ defmodule Tai.Events.OrderUpdated do
     :status,
     :error_reason,
     :price,
-    :size,
+    :qty,
     :cumulative_qty
   ]
 end
@@ -59,7 +59,7 @@ defimpl Tai.LogEvent, for: Tai.Events.OrderUpdated do
     event
     |> Map.take(keys)
     |> Map.put(:price, event.price |> Decimal.to_string(:normal))
-    |> Map.put(:size, event.size |> Decimal.to_string(:normal))
+    |> Map.put(:qty, event.qty |> Decimal.to_string(:normal))
     |> Map.put(:cumulative_qty, event.cumulative_qty |> Decimal.to_string(:normal))
   end
 end

@@ -8,7 +8,7 @@ defmodule Tai.ExchangeAdapters.Binance.Account.Orders do
     venue_product_symbol = Tai.ExchangeAdapters.Binance.SymbolMapping.to_binance(order.symbol)
 
     venue_product_symbol
-    |> send(order.price, order.size, venue_time_in_force, order.side)
+    |> send(order.price, order.qty, venue_time_in_force, order.side)
     |> parse_response(order.time_in_force)
   end
 

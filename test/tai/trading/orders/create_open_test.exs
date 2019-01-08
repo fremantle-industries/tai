@@ -29,7 +29,7 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
     assert order.side == :buy
     assert order.status == :enqueued
     assert order.price == submission.price
-    assert order.size == submission.qty
+    assert order.qty == submission.qty
     assert order.time_in_force == :gtc
   end
 

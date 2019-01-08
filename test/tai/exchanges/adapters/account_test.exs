@@ -48,7 +48,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
                      type: :limit,
                      symbol: :ltcbtc,
                      price: Decimal.new("0.0165"),
-                     size: Decimal.new("0.01"),
+                     qty: Decimal.new("0.01"),
                      time_in_force: :fok
                    })
                    |> Tai.Exchanges.Account.create_order()
@@ -72,7 +72,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
                      type: :limit,
                      symbol: :ltcbtc,
                      price: Decimal.new("0.001"),
-                     size: Decimal.new("10000.01"),
+                     qty: Decimal.new("10000.01"),
                      time_in_force: :fok
                    })
                    |> Tai.Exchanges.Account.create_order()
@@ -90,7 +90,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
                      type: :limit,
                      symbol: :ltcbtc,
                      price: Decimal.new("0.016"),
-                     size: Decimal.new("0.02"),
+                     qty: Decimal.new("0.02"),
                      time_in_force: :ioc
                    })
                    |> Tai.Exchanges.Account.create_order()
@@ -123,7 +123,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
                      type: :limit,
                      symbol: :ltcbtc,
                      price: Decimal.new("0.016"),
-                     size: Decimal.new("0.01"),
+                     qty: Decimal.new("0.01"),
                      time_in_force: :fok
                    })
                    |> Tai.Exchanges.Account.create_order()
@@ -147,7 +147,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
                      type: :limit,
                      symbol: :ltcbtc,
                      price: Decimal.new("0.16"),
-                     size: Decimal.new("0.02"),
+                     qty: Decimal.new("0.02"),
                      time_in_force: :ioc
                    })
                    |> Tai.Exchanges.Account.create_order()
