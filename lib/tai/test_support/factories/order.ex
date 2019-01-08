@@ -8,6 +8,7 @@ defmodule Tai.TestSupport.Factories.Order do
       exchange_id: :ignore,
       account_id: :ignore,
       price: :ignore,
+      avg_price: :ignore,
       size: :ignore,
       status: :enqueued,
       symbol: :ignore,

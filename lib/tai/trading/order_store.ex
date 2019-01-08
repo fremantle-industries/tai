@@ -110,6 +110,7 @@ defmodule Tai.Trading.OrderStore do
   def count, do: GenServer.call(__MODULE__, :count)
   def count(status: status), do: GenServer.call(__MODULE__, {:count, status: status})
 
+  @zero Decimal.new(0)
   defp build_order(submission) do
     %Trading.Order{
       client_id: UUID.uuid4(),
@@ -119,8 +120,9 @@ defmodule Tai.Trading.OrderStore do
       side: submission |> side,
       type: submission |> type,
       price: submission.price |> Decimal.abs(),
+      avg_price: @zero,
       size: submission.qty |> Decimal.abs(),
-      cumulative_qty: Decimal.new(0),
+      cumulative_qty: @zero,
       time_in_force: submission |> time_in_force,
       post_only: submission |> post_only,
       status: :enqueued,

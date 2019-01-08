@@ -30,6 +30,7 @@ defmodule Tai.Trading.Order do
           time_in_force: time_in_force,
           type: type,
           price: Decimal.t(),
+          avg_price: Decimal.t(),
           size: Decimal.t(),
           cumulative_qty: Decimal.t(),
           post_only: boolean
@@ -41,6 +42,7 @@ defmodule Tai.Trading.Order do
     :client_id,
     :enqueued_at,
     :price,
+    :avg_price,
     :side,
     :size,
     :status,
@@ -57,6 +59,7 @@ defmodule Tai.Trading.Order do
     :exchange_id,
     :account_id,
     :price,
+    :avg_price,
     :venue_order_id,
     :side,
     :size,
