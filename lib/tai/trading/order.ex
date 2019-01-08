@@ -45,6 +45,7 @@ defmodule Tai.Trading.Order do
     :avg_price,
     :side,
     :size,
+    :cumulative_qty,
     :status,
     :symbol,
     :time_in_force,
