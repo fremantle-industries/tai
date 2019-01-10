@@ -25,7 +25,12 @@ defmodule Tai.Trading.Orders.CreateExpiredTest do
     {:ok, _} = Tai.Trading.Orders.create(submission)
 
     assert_receive {Tai.Event, %Tai.Events.OrderUpdated{side: :buy, status: :enqueued}}
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{side: :buy, status: :expired}}
+
+    assert_receive {Tai.Event,
+                    %Tai.Events.OrderUpdated{side: :buy, status: :expired} = expired_event}
+
+    assert expired_event.venue_order_id == @venue_order_id
+    assert %DateTime{} = expired_event.venue_created_at
   end
 
   test "fires the callback when the status changes" do

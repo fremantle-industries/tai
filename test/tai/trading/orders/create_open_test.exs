@@ -49,6 +49,7 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
     assert enqueued_order.venue_order_id == nil
     assert open_order_event.venue_order_id == @venue_order_id
+    assert %DateTime{} = open_order_event.venue_created_at
   end
 
   test "fires the callback when the status changes" do

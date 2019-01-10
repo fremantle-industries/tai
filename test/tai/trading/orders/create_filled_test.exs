@@ -25,7 +25,10 @@ defmodule Tai.Trading.Orders.CreateFilledTest do
     {:ok, %Tai.Trading.Order{}} = Tai.Trading.Orders.create(submission)
 
     assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :enqueued}}
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :filled}}
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :filled} = filled_event}
+
+    assert filled_event.venue_order_id == @venue_order_id
+    assert %DateTime{} = filled_event.venue_created_at
   end
 
   test "fires the callback when the status changes" do
