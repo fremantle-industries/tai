@@ -75,6 +75,7 @@ defmodule Tai.Trading.Orders.Create do
     cid
     |> find_by_and_update(
       status: :expired,
+      venue_order_id: response.id,
       venue_created_at: response.timestamp
     )
   end
