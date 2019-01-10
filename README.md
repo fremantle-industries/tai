@@ -225,21 +225,18 @@ iex(5)> markets
 
 #### orders
 
-Displays the list of orders and their status.
+Displays the list of orders and their details.
 
-**[IN PROGRESS:](https://github.com/fremantle-capital/tai/tree/order-feed-spike)**
-
-As the lifecycle of the order changes i.e. partial fills, process events and 
-update in the background so that the information is available when you re-run 
-the `orders` command.
+As the lifecycle of the order changes it's details will be updated. You can 
+view these changes by running the `orders` command again.
 
 ```
 iex(6)> orders
-+---------+---------+-----------+-------+------+--------+--------------------------------------+----------------+----------------+------------+
-| Account |  Symbol |      Type | Price | Size | Status |                            Client ID | Venue Order ID |    Enqueued At | Created At |
-+---------+---------+-----------+-------+------+--------+--------------------------------------+----------------+----------------+------------+
-|    gdax | btc_usd | buy_limit | 100.1 |  0.1 |  error | a6aa15bc-b271-486f-ab40-f9b35b2cd223 |                | 20 minutes ago |            |
-+---------+---------+-----------+-------+------+--------+--------------------------------------+----------------+----------------+------------+
++----------+---------+--------+------+-------+--------+-----------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+--------------+
+| Exchange | Account | Symbol | Side |  Type |  Price | Avg Price | Qty | Leaves Qty | Cumulative Qty | Time in Force | Status | Client ID | Venue Order ID |    Enqueued At | Venue Created At | Error Reason |
++----------+---------+--------+------+-------+--------+-----------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+--------------+
+|   bitmex |    main | xbtm19 |  buy | limit | 3622.5 |         0 |  15 |         15 |              0 |           gtc |   open | 78f616... |      fe7486... | 11 seconds ago |   11 seconds ago |              |
++----------+---------+--------+------+-------+--------+-----------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+--------------+
 ```
 
 #### settings
