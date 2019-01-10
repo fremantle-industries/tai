@@ -20,7 +20,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
     @adapter adapter
 
     describe "#{adapter.id} cancel" do
-      test "returns the order response with a canceled status" do
+      test "returns an order response with a canceled status & final quantities" do
         enqueued_order = build_enqueued_order(@adapter.id)
 
         use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_ok" do
@@ -29,7 +29,11 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
           open_order = build_open_order(enqueued_order, order_response)
 
           assert {:ok, order_response} = Tai.Venue.cancel_order(open_order, @test_adapters)
+          assert order_response.time_in_force == :gtc
           assert order_response.status == :canceled
+          assert order_response.leaves_qty == Decimal.new(0)
+          assert order_response.original_size == qty(@adapter.id)
+          assert order_response.cumulative_qty == cumulative_qty(@adapter.id)
         end
       end
 
@@ -54,7 +58,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       symbol: venue_id |> product_symbol,
       side: :buy,
       price: venue_id |> price(),
-      size: venue_id |> size(),
+      qty: venue_id |> qty(),
       time_in_force: :gtc,
       post_only: true
     })
@@ -68,7 +72,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       symbol: order.exchange_id |> product_symbol,
       side: :buy,
       price: order.exchange_id |> price(),
-      size: order.exchange_id |> size(),
+      qty: order.exchange_id |> qty(),
       time_in_force: :gtc,
       post_only: true
     })
@@ -79,5 +83,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
 
   defp price(:bitmex), do: Decimal.new("100.5")
 
-  defp size(:bitmex), do: Decimal.new(1)
+  defp qty(:bitmex), do: Decimal.new(1)
+
+  defp cumulative_qty(:bitmex), do: Decimal.new(0)
 end

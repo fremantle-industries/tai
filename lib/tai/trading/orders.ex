@@ -22,8 +22,9 @@ defmodule Tai.Trading.Orders do
       status: order.status,
       price: order.price,
       qty: order.qty,
-      error_reason: order.error_reason,
-      cumulative_qty: order.cumulative_qty
+      leaves_qty: order.leaves_qty,
+      cumulative_qty: order.cumulative_qty,
+      error_reason: order.error_reason
     }
     |> Tai.Events.broadcast()
   end

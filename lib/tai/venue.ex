@@ -5,6 +5,7 @@ defmodule Tai.Venue do
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type order :: Tai.Trading.Order.t()
   @type order_response :: Tai.Trading.OrderResponse.t()
+  @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
   @type venue_order_id :: String.t()
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type shared_error_reason :: :timeout | Tai.CredentialError.t()
@@ -51,7 +52,7 @@ defmodule Tai.Venue do
   end
 
   @spec amend_order(order, amend_attrs) ::
-          {:ok, order_response} | {:error, amend_order_error_reason}
+          {:ok, amend_response} | {:error, amend_order_error_reason}
   def amend_order(
         %Tai.Trading.Order{} = order,
         attrs,

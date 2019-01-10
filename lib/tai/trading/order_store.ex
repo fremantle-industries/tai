@@ -112,6 +112,8 @@ defmodule Tai.Trading.OrderStore do
 
   @zero Decimal.new(0)
   defp build_order(submission) do
+    qty = Decimal.abs(submission.qty)
+
     %Trading.Order{
       client_id: UUID.uuid4(),
       exchange_id: submission.venue_id,
@@ -121,7 +123,8 @@ defmodule Tai.Trading.OrderStore do
       type: submission |> type,
       price: submission.price |> Decimal.abs(),
       avg_price: @zero,
-      qty: submission.qty |> Decimal.abs(),
+      qty: qty,
+      leaves_qty: qty,
       cumulative_qty: @zero,
       time_in_force: submission |> time_in_force,
       post_only: submission |> post_only,
@@ -188,7 +191,8 @@ defmodule Tai.Trading.OrderStore do
       :venue_order_id,
       :status,
       :price,
-      :qty
+      :qty,
+      :leaves_qty
     ]
 
     def apply(order, update_attrs) do

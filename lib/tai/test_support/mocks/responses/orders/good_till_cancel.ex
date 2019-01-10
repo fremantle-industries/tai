@@ -8,13 +8,25 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   @type venue_order_id :: String.t()
 
   @spec unfilled(venue_order_id, submission) :: :ok
+  @deprecated "use Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel.open/2 instead."
   def unfilled(venue_order_id, submission) do
+    open(venue_order_id, submission)
+  end
+
+  @spec open(venue_order_id, submission) :: :ok
+  def open(venue_order_id, submission) do
+    open(venue_order_id, submission, submission.qty, Decimal.new(0))
+  end
+
+  @spec open(venue_order_id, submission, Decimal.t(), Decimal.t()) :: :ok
+  def open(venue_order_id, submission, leaves_qty, cumulative_qty) do
     order_response = %Tai.Trading.OrderResponse{
       id: venue_order_id,
       time_in_force: :gtc,
       status: :open,
       original_size: submission.qty,
-      cumulative_qty: nil,
+      leaves_qty: leaves_qty,
+      cumulative_qty: cumulative_qty,
       timestamp: Timex.now()
     }
 

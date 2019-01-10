@@ -47,7 +47,7 @@ defmodule Tai.Trading.Orders.Amend do
   defp find_pending_amend_order_and_open(client_id, attrs) do
     update_attrs =
       attrs
-      |> Map.to_list()
+      |> to_order_attrs
       |> Keyword.put(:status, :open)
 
     Tai.Trading.OrderStore.find_by_and_update(
@@ -74,5 +74,27 @@ defmodule Tai.Trading.Orders.Amend do
     })
 
     {:error, :order_status_must_be_open}
+  end
+
+  defp to_order_attrs(attrs) when is_map(attrs) do
+    attrs
+    |> Map.to_list()
+    |> to_order_attrs
+  end
+
+  defp to_order_attrs(attrs) when is_list(attrs), do: [] |> to_order_attrs(attrs)
+
+  defp to_order_attrs(update_attrs, []), do: update_attrs
+
+  defp to_order_attrs(update_attrs, [{:price, price} | tail]) do
+    update_attrs
+    |> Keyword.put(:price, price)
+    |> to_order_attrs(tail)
+  end
+
+  defp to_order_attrs(update_attrs, [{:qty, leaves_qty} | tail]) do
+    update_attrs
+    |> Keyword.put(:leaves_qty, leaves_qty)
+    |> to_order_attrs(tail)
   end
 end

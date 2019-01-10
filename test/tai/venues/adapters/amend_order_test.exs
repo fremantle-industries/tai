@@ -21,43 +21,42 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
 
     test "#{adapter.id} can change price and qty" do
       enqueued_order = build_enqueued_order(@adapter.id, :buy)
-      price = amend_price(@adapter.id, enqueued_order.side)
+      amend_price = amend_price(@adapter.id, enqueued_order.side)
       amend_qty = amend_qty(@adapter.id, enqueued_order.side)
-      attrs = amend_attrs(@adapter.id, price: price, qty: amend_qty)
+      attrs = amend_attrs(@adapter.id, price: amend_price, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_price_and_qty_ok" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, amend_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
 
-        open_order = build_open_order(enqueued_order, order_response)
+        open_order = build_open_order(enqueued_order, amend_response)
 
-        assert {:ok, order_response} = Tai.Venue.amend_order(open_order, attrs, @test_adapters)
+        assert {:ok, amend_response} = Tai.Venue.amend_order(open_order, attrs, @test_adapters)
 
-        assert order_response.id == open_order.venue_order_id
-        assert order_response.status == :open
-        assert order_response.time_in_force == :gtc
-        assert order_response.cumulative_qty == Decimal.new(0)
-        assert order_response.remaining_qty == attrs.qty
+        assert amend_response.id == open_order.venue_order_id
+        assert amend_response.status == :open
+        assert amend_response.price == amend_price
+        assert amend_response.leaves_qty == amend_qty
+        assert amend_response.cumulative_qty == enqueued_order.cumulative_qty
       end
     end
 
     test "#{adapter.id} can change price" do
       enqueued_order = build_enqueued_order(@adapter.id, :buy)
-      original_qty = qty(@adapter.id, enqueued_order.side)
-      price = amend_price(@adapter.id, enqueued_order.side)
-      attrs = amend_attrs(@adapter.id, price: price)
+      amend_price = amend_price(@adapter.id, enqueued_order.side)
+      attrs = amend_attrs(@adapter.id, price: amend_price)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_price_ok" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, amend_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
 
-        open_order = build_open_order(enqueued_order, order_response)
+        open_order = build_open_order(enqueued_order, amend_response)
 
-        assert {:ok, order_response} = Tai.Venue.amend_order(open_order, attrs, @test_adapters)
+        assert {:ok, amend_response} = Tai.Venue.amend_order(open_order, attrs, @test_adapters)
 
-        assert order_response.id == open_order.venue_order_id
-        assert order_response.status == :open
-        assert order_response.time_in_force == :gtc
-        assert order_response.cumulative_qty == Decimal.new(0)
-        assert order_response.remaining_qty == original_qty
+        assert amend_response.id == open_order.venue_order_id
+        assert amend_response.status == :open
+        assert amend_response.price == amend_price
+        assert amend_response.leaves_qty == enqueued_order.qty
+        assert amend_response.cumulative_qty == enqueued_order.cumulative_qty
       end
     end
 
@@ -67,17 +66,17 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       attrs = amend_attrs(@adapter.id, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_qty_ok" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, amend_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
 
-        open_order = build_open_order(enqueued_order, order_response)
+        open_order = build_open_order(enqueued_order, amend_response)
 
-        assert {:ok, order_response} = Tai.Venue.amend_order(open_order, attrs, @test_adapters)
+        assert {:ok, amend_response} = Tai.Venue.amend_order(open_order, attrs, @test_adapters)
 
-        assert order_response.id == open_order.venue_order_id
-        assert order_response.status == :open
-        assert order_response.time_in_force == :gtc
-        assert order_response.cumulative_qty == Decimal.new(0)
-        assert order_response.remaining_qty == attrs.qty
+        assert amend_response.id == open_order.venue_order_id
+        assert amend_response.status == :open
+        assert amend_response.leaves_qty == amend_qty
+        assert amend_response.price == enqueued_order.price
+        assert amend_response.cumulative_qty == enqueued_order.cumulative_qty
       end
     end
   end)
@@ -90,20 +89,22 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       side: side,
       price: venue_id |> price(side),
       qty: venue_id |> qty(side),
+      cumulative_qty: Decimal.new(0),
       time_in_force: :gtc,
       post_only: true
     })
   end
 
-  defp build_open_order(order, order_response) do
+  defp build_open_order(order, amend_response) do
     struct(Tai.Trading.Order, %{
-      venue_order_id: order_response.id,
+      venue_order_id: amend_response.id,
       exchange_id: order.exchange_id,
       account_id: :main,
       symbol: order.exchange_id |> product_symbol,
       side: order.side,
       price: order.exchange_id |> price(order.side),
       qty: order.exchange_id |> qty(order.side),
+      cumulative_qty: Decimal.new(0),
       time_in_force: :gtc,
       post_only: true
     })

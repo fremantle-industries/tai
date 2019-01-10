@@ -1,4 +1,16 @@
 defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
+  @type credentials :: map
+  @type venue_order_id :: String.t()
+  @type attrs :: Tai.Trading.Orders.Amend.attrs()
+  @type response :: Tai.Trading.OrderResponses.Amend.t()
+  @type error_reason ::
+          :not_implemented
+          | :not_found
+          | :timeout
+          | Tai.CredentialError.t()
+
+  @spec amend_order(venue_order_id, attrs, credentials) ::
+          {:ok, response} | {:error, error_reason}
   def amend_order(venue_order_id, attrs, %{api_key: api_key, api_secret: api_secret}) do
     params = to_params(attrs, venue_order_id)
 
@@ -27,15 +39,17 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
     Map.put(params, :orderID, venue_order_id)
   end
 
-  defp parse_response({:ok, %ExBitmex.Order{} = order, %ExBitmex.RateLimit{} = _rate_limit}) do
-    response = %Tai.Trading.OrderResponse{
-      id: order.order_id,
-      status: order.ord_status |> from_venue_status(),
-      time_in_force: :gtc,
-      original_size: Decimal.new(order.order_qty),
-      # cumulative_qty: Decimal.new(order.cum_qty),
-      cumulative_qty: Decimal.new(0),
-      remaining_qty: Decimal.new(order.leaves_qty)
+  defp parse_response({
+         :ok,
+         %ExBitmex.Order{} = venue_order,
+         %ExBitmex.RateLimit{} = _rate_limit
+       }) do
+    response = %Tai.Trading.OrderResponses.Amend{
+      id: venue_order.order_id,
+      status: venue_order.ord_status |> from_venue_status(),
+      price: Tai.Utils.Decimal.from(venue_order.price),
+      leaves_qty: Decimal.new(venue_order.leaves_qty),
+      cumulative_qty: Decimal.new(venue_order.cum_qty)
     }
 
     {:ok, response}

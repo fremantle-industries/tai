@@ -20,7 +20,7 @@ defmodule Tai.Trading.Orders.CancelTest do
     @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
 
     setup do
-      Mocks.Responses.Orders.GoodTillCancel.unfilled(
+      Mocks.Responses.Orders.GoodTillCancel.open(
         @venue_order_id,
         %Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: :test_exchange_a,
@@ -48,7 +48,7 @@ defmodule Tai.Trading.Orders.CancelTest do
       {:ok, %{order: order}}
     end
 
-    test "executes the callback when the status is updated",
+    test "sets the leaves_qty to 0",
          %{order: order} do
       Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
 
@@ -57,17 +57,24 @@ defmodule Tai.Trading.Orders.CancelTest do
       assert_receive {
         :callback_fired,
         %Tai.Trading.Order{status: :open},
-        %Tai.Trading.Order{status: :canceling}
+        %Tai.Trading.Order{status: :canceling} = canceling_order
       }
 
       assert_receive {
         :callback_fired,
         %Tai.Trading.Order{status: :canceling},
-        %Tai.Trading.Order{status: :canceled}
+        %Tai.Trading.Order{status: :canceled} = canceled_order
       }
+
+      assert canceling_order.leaves_qty != Decimal.new(0)
+      assert canceling_order.qty == Decimal.new("0.1")
+      assert canceling_order.cumulative_qty == Decimal.new(0)
+      assert canceled_order.leaves_qty == Decimal.new(0)
+      assert canceled_order.qty == Decimal.new("0.1")
+      assert canceled_order.cumulative_qty == Decimal.new(0)
     end
 
-    test "broadcasts events when the status changes",
+    test "broadcasts canceling & canceled events",
          %{order: order} do
       Tai.Events.firehose_subscribe()
 
@@ -92,6 +99,8 @@ defmodule Tai.Trading.Orders.CancelTest do
 
       assert event_1.price == Decimal.new("100.1")
       assert event_1.qty == Decimal.new("0.1")
+      assert event_1.cumulative_qty == Decimal.new(0)
+      assert event_1.leaves_qty == Decimal.new("0.1")
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderUpdated{
@@ -108,25 +117,36 @@ defmodule Tai.Trading.Orders.CancelTest do
 
       assert event_2.price == Decimal.new("100.1")
       assert event_2.qty == Decimal.new("0.1")
+      assert event_2.cumulative_qty == Decimal.new(0)
+      assert event_2.leaves_qty == Decimal.new(0)
     end
   end
 
-  test "returns an error tuple and broadcasts an event when the status is not open" do
-    Tai.Events.firehose_subscribe()
-    submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-    {:ok, order} = Orders.create(submission)
+  describe "failure" do
+    test "returns an error tuple when the status is not open" do
+      Tai.Events.firehose_subscribe()
+      submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
+      {:ok, order} = Orders.create(submission)
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
+      assert Orders.cancel(order) == {:error, :order_status_must_be_open}
+    end
 
-    assert Orders.cancel(order) == {:error, :order_status_must_be_open}
+    test "broadcasts an event when the status is not open" do
+      Tai.Events.firehose_subscribe()
+      submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
+      {:ok, order} = Orders.create(submission)
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
 
-    client_id = order.client_id
+      Orders.cancel(order)
 
-    assert_receive {Tai.Event,
-                    %Tai.Events.CancelOrderInvalidStatus{
-                      client_id: ^client_id,
-                      was: :error,
-                      required: :open
-                    }}
+      assert_receive {Tai.Event,
+                      %Tai.Events.CancelOrderInvalidStatus{
+                        was: :error,
+                        required: :open
+                      } = cancel_error_event}
+
+      assert cancel_error_event.client_id == order.client_id
+    end
   end
 end

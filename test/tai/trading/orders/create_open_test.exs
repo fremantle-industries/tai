@@ -18,7 +18,7 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
   test "enqueues the order" do
     submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-    Mocks.Responses.Orders.GoodTillCancel.unfilled(@venue_order_id, submission)
+    Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 
     assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.Orders.create(submission)
     assert order.venue_order_id == nil
@@ -37,7 +37,7 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
   test "broadcasts events when the status changes" do
     Tai.Events.firehose_subscribe()
     submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-    Mocks.Responses.Orders.GoodTillCancel.unfilled(@venue_order_id, submission)
+    Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 
     assert {:ok, _} = Tai.Trading.Orders.create(submission)
 
@@ -58,7 +58,7 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
         order_updated_callback: fire_order_callback(self())
       })
 
-    Mocks.Responses.Orders.GoodTillCancel.unfilled(@venue_order_id, submission)
+    Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 
     {:ok, _} = Tai.Trading.Orders.create(submission)
 

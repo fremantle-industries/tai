@@ -42,7 +42,8 @@ defmodule Tai.Trading.Orders.Cancel do
   defp find_canceling_order_and_cancel(client_id) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id],
-      status: :canceled
+      status: :canceled,
+      leaves_qty: Decimal.new(0)
     )
   end
 

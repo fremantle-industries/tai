@@ -53,7 +53,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
   def mock_order_responses do
     venue_order_id = "e116de5f-8d14-491f-a794-0f94fbcdd7c1"
 
-    Mocks.Responses.Orders.GoodTillCancel.unfilled(
+    Mocks.Responses.Orders.GoodTillCancel.open(
       venue_order_id,
       %Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: :test_exchange_a,

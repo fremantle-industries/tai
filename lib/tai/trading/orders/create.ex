@@ -67,7 +67,8 @@ defmodule Tai.Trading.Orders.Create do
       status: :filled,
       venue_order_id: response.id,
       cumulative_qty: Decimal.new(response.cumulative_qty),
-      venue_created_at: response.timestamp
+      venue_created_at: response.timestamp,
+      leaves_qty: Decimal.new(0)
     )
   end
 
@@ -76,7 +77,9 @@ defmodule Tai.Trading.Orders.Create do
     |> find_by_and_update(
       status: :expired,
       venue_order_id: response.id,
-      venue_created_at: response.timestamp
+      venue_created_at: response.timestamp,
+      cumulative_qty: response.cumulative_qty,
+      leaves_qty: response.leaves_qty
     )
   end
 
@@ -93,13 +96,17 @@ defmodule Tai.Trading.Orders.Create do
     cid
     |> find_by_and_update(
       status: :error,
-      error_reason: reason
+      error_reason: reason,
+      leaves_qty: Decimal.new(0)
     )
   end
 
   defp skip!(cid) do
     cid
-    |> find_by_and_update(status: :skip)
+    |> find_by_and_update(
+      status: :skip,
+      leaves_qty: Decimal.new(0)
+    )
   end
 
   defp find_by_and_update(client_id, attrs) do

@@ -12,6 +12,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     status: :open,
     price: Decimal.new("0.1"),
     qty: Decimal.new("0.2"),
+    leaves_qty: Decimal.new("0.15"),
     cumulative_qty: Decimal.new("0.3"),
     error_reason: :my_error_reason
   }
@@ -34,6 +35,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert json.status == :open
     assert json.price == "0.1"
     assert json.qty == "0.2"
+    assert json.leaves_qty == "0.15"
     assert json.cumulative_qty == "0.3"
     assert json.error_reason == :my_error_reason
   end

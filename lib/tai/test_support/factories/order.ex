@@ -10,6 +10,7 @@ defmodule Tai.TestSupport.Factories.Order do
       price: :ignore,
       avg_price: :ignore,
       qty: :ignore,
+      leaves_qty: :ignore,
       cumulative_qty: :ignore,
       status: :enqueued,
       symbol: :ignore,

@@ -33,6 +33,8 @@ defmodule Tai.Trading.OrderStoreTest do
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
+        assert %Decimal{} = order.leaves_qty
+        assert order.qty == order.leaves_qty
         assert order.cumulative_qty == Decimal.new(0)
         assert order.status == :enqueued
         assert %DateTime{} = order.enqueued_at
@@ -53,6 +55,8 @@ defmodule Tai.Trading.OrderStoreTest do
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
+        assert %Decimal{} = order.leaves_qty
+        assert order.qty == order.leaves_qty
         assert order.cumulative_qty == Decimal.new(0)
         assert order.status == :enqueued
         assert %DateTime{} = order.enqueued_at
@@ -73,6 +77,8 @@ defmodule Tai.Trading.OrderStoreTest do
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
+        assert %Decimal{} = order.leaves_qty
+        assert order.qty == order.leaves_qty
         assert order.cumulative_qty == Decimal.new(0)
         assert order.status == :enqueued
         assert %DateTime{} = order.enqueued_at

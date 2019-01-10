@@ -7,14 +7,17 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
   @type venue_order_id :: Tai.Trading.Order.venue_order_id()
   @type insert_result :: :ok
 
-  @spec expired(venue_order_id, submission) :: insert_result
-  def expired(venue_order_id, submission) do
+  @spec expired(venue_order_id, submission, Decimal.t()) :: insert_result
+  def expired(venue_order_id, submission, cumulative_qty) do
+    qty = submission.qty
+
     order_response = %Tai.Trading.OrderResponse{
       id: venue_order_id,
       time_in_force: :fok,
       status: :expired,
-      original_size: submission.qty,
-      cumulative_qty: Decimal.new(0),
+      original_size: qty,
+      cumulative_qty: cumulative_qty,
+      leaves_qty: Decimal.new(0),
       timestamp: Timex.now()
     }
 
@@ -23,11 +26,16 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
        [
          symbol: submission.product_symbol,
          price: submission.price,
-         size: submission.qty,
+         size: qty,
          time_in_force: :fok
        ]}
 
     Mocks.Server.insert(key, order_response)
+  end
+
+  @spec expired(venue_order_id, submission) :: insert_result
+  def expired(venue_order_id, submission) do
+    expired(venue_order_id, submission, Decimal.new(0))
   end
 
   @spec expired(submission) :: insert_result

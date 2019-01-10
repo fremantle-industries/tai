@@ -56,6 +56,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
       status: venue_order.ord_status |> from_venue_status(order),
       time_in_force: order.time_in_force,
       original_size: Decimal.new(venue_order.order_qty),
+      leaves_qty: Decimal.new(venue_order.leaves_qty),
       cumulative_qty: Decimal.new(venue_order.cum_qty),
       timestamp: Timex.parse!(venue_order.timestamp, @format)
     }
