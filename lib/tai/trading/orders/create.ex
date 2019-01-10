@@ -65,6 +65,7 @@ defmodule Tai.Trading.Orders.Create do
     cid
     |> find_by_and_update(
       status: :filled,
+      venue_order_id: response.id,
       cumulative_qty: Decimal.new(response.cumulative_qty),
       venue_created_at: response.timestamp
     )
