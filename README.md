@@ -212,7 +212,7 @@ starting to fall behind as it updates it's order books.
 ```
 iex(5)> markets
 +---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
-|    Feed |   Symbol | Bid Price | Ask Price |   Bid Size |     Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
+|   Venue |   Symbol | Bid Price | Ask Price |   Bid Size |     Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
 +---------+----------+-----------+-----------+------------+--------------+------------------+-----------------------+------------------+-----------------------+
 | binance | btc_usdt |    8430.0 |   8439.91 |   0.349355 |     1.021896 |     1 second ago |          1 second ago |              now |                   now |
 | binance | ltc_usdt |    159.53 |    159.58 |   10.54534 |      1.02855 |    9 seconds ago |         9 seconds ago |    4 seconds ago |         4 seconds ago |
