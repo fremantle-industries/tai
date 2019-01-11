@@ -1,4 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
+  import Tai.VenueAdapters.Bitmex.OrderStatus
+
   @type credentials :: map
   @type venue_order_id :: String.t()
   @type attrs :: Tai.Trading.Orders.Amend.attrs()
@@ -46,7 +48,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
        }) do
     response = %Tai.Trading.OrderResponses.Amend{
       id: venue_order.order_id,
-      status: venue_order.ord_status |> from_venue_status(),
+      status: venue_order.ord_status |> from_venue_status(:ignore),
       price: Tai.Utils.Decimal.from(venue_order.price),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
       cumulative_qty: Decimal.new(venue_order.cum_qty)
@@ -54,6 +56,4 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
 
     {:ok, response}
   end
-
-  defp from_venue_status("New"), do: :open
 end

@@ -1,4 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
+  import Tai.VenueAdapters.Bitmex.OrderStatus
+
   def cancel_order(venue_order_id, credentials) do
     params = %{orderID: venue_order_id}
 
@@ -15,7 +17,7 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
   defp parse_response({:ok, [venue_order | _], %ExBitmex.RateLimit{}}) do
     response = %Tai.Trading.OrderResponse{
       id: venue_order.order_id,
-      status: venue_order.ord_status |> from_venue_status(),
+      status: venue_order.ord_status |> from_venue_status(:ignore),
       time_in_force: :gtc,
       original_size: Decimal.new(venue_order.order_qty),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
@@ -28,6 +30,4 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
   defp parse_response({:error, :timeout, nil}) do
     {:error, :timeout}
   end
-
-  defp from_venue_status("Canceled"), do: :canceled
 end

@@ -3,6 +3,8 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   Create orders for the Bitmex adapter
   """
 
+  import Tai.VenueAdapters.Bitmex.OrderStatus
+
   def create_order(%Tai.Trading.Order{} = order, credentials) do
     params = build_params(order)
 
@@ -71,21 +73,4 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   defp parse_response({:error, {:insufficient_balance, _msg}, _}, _) do
     {:error, :insufficient_balance}
   end
-
-  defp from_venue_status("New", _), do: :open
-  defp from_venue_status("PartiallyFilled", _), do: :open
-  defp from_venue_status("Filled", _), do: :filled
-  # https://www.bitmex.com/app/apiChangelog#Jul-5-2016
-  defp from_venue_status("Canceled", %Tai.Trading.Order{time_in_force: :gtc, post_only: true}),
-    do: :rejected
-
-  defp from_venue_status("Canceled", %Tai.Trading.Order{time_in_force: :ioc}), do: :expired
-  defp from_venue_status("Canceled", %Tai.Trading.Order{time_in_force: :fok}), do: :expired
-  defp from_venue_status("Canceled", _), do: :canceled
-  # TODO: Unhandled Bitmex order status
-  # defp from_venue_status("PendingNew"), do: :pending
-  # defp from_venue_status("DoneForDay"), do: :open
-  # defp from_venue_status("Stopped"), do: :open
-  # defp from_venue_status("PendingCancel"), do: :canceling
-  # defp from_venue_status("Expired"), do: :expired
 end
