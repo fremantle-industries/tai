@@ -13,37 +13,21 @@ We are working to make `tai` production quality software.
 [Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](#advisors) | [Configuration](#configuration) | [Commands](#commands) | [Logging](#logging)
 
 
-## Supported Exchanges
+## Supported Venues
 
-| Exchange       | Live Order Book  | Account Balance | Orders | Products | Fees |
-|----------------|:---:|:---:|:---:|:---:|:---:|
-| Bitmex         | [x] | [x] | [x] | [x] | [x] |
+| Venues | Live Order Book  | Account Balance | Orders | Products | Fees |
+|--------|:---:|:---:|:---:|:---:|:---:|
+| Bitmex | [x] | [x] | [x] | [x] | [x] |
 
-## Exchanges In Progress
+## Venues In Progress
 
-| Exchange       | Live Order Book  | Account Balance | Orders | Products | Fees |
-|----------------|:---:|:---:|:---:|:---:|:---:|
-| GDAX           | [x] | [x] | [ ] | [x] | [x] |
-| Binance        | [x] | [x] | [ ] | [x] | [x] |
-| Poloniex       | [x] | [x] | [ ] | [x] | [x] |
+| Venue    | Live Order Book  | Account Balance | Orders | Products | Fees |
+|----------|:---:|:---:|:---:|:---:|:---:|
+| GDAX     | [x] | [x] | [ ] | [x] | [x] |
+| Binance  | [x] | [x] | [ ] | [x] | [x] |
+| Poloniex | [x] | [x] | [ ] | [x] | [x] |
 
-## Planned Exchanges
-
-| Exchange       |
-|----------------|
-| Bitfinex       |
-| Bitflyer       |
-| Bithumb        |
-| Bitstamp       |
-| Bittrex        |
-| Gemini         |
-| HitBtc         |
-| Huobi          |
-| Kraken         |
-| OkCoin         |
-| ...            |
-
-[Full List...](./PLANNED_EXCHANGES.md)
+[Planned Venues...](./PLANNED_VENUES.md)
 
 ## Install
 

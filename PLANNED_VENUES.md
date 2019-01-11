@@ -1,6 +1,6 @@
-## Planned Exchanges
+## Planned Venues
 
-| Exchange           | Live Order Book  | Orders |
+| Venue              | Live Order Book  | Orders |
 |--------------------|:----:|:--------------:|
 | 1broker            | [ ] | [ ] |
 | 1btcxe             | [ ] | [ ] |
@@ -24,6 +24,7 @@
 | C-Cex              | [ ] | [ ] |
 | CoinCheck          | [ ] | [ ] |
 | Cryptopia          | [ ] | [ ] |
+| Crypto Facilities  | [ ] | [ ] |
 | Gemini             | [ ] | [ ] |
 | HitBtc             | [ ] | [ ] |
 | Kraken             | [ ] | [ ] |
@@ -64,7 +65,6 @@
 | Coinsecure         | [ ] | [ ] |
 | Coinspot           | [ ] | [ ] |
 | Coolcoin           | [ ] | [ ] |
-| Cryptopia          | [ ] | [ ] |
 | Dsx                | [ ] | [ ] |
 | Ethfinex           | [ ] | [ ] |
 | Exmo               | [ ] | [ ] |
