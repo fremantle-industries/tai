@@ -40,7 +40,7 @@ defmodule Tai.Commands.Helper.BalanceTest do
 
     assert capture_io(&Tai.Commands.Helper.balance/0) == """
            +-----------------+---------+-------+----------------------+----------------------+----------------------+
-           |        Exchange | Account | Asset |                 Free |               Locked |              Balance |
+           |           Venue | Account | Asset |                 Free |               Locked |              Balance |
            +-----------------+---------+-------+----------------------+----------------------+----------------------+
            | test_exchange_a |    main |   btc |           0.10000000 |           1.81227740 |           1.91227740 |
            | test_exchange_a |    main |   eth | 0.000000000000000000 | 0.000000000000200000 | 0.000000000000200000 |
@@ -54,11 +54,11 @@ defmodule Tai.Commands.Helper.BalanceTest do
 
   test "shows an empty table when there are no balances" do
     assert capture_io(&Tai.Commands.Helper.balance/0) == """
-           +----------+---------+-------+------+--------+---------+
-           | Exchange | Account | Asset | Free | Locked | Balance |
-           +----------+---------+-------+------+--------+---------+
-           |        - |       - |     - |    - |      - |       - |
-           +----------+---------+-------+------+--------+---------+\n
+           +-------+---------+-------+------+--------+---------+
+           | Venue | Account | Asset | Free | Locked | Balance |
+           +-------+---------+-------+------+--------+---------+
+           |     - |       - |     - |    - |      - |       - |
+           +-------+---------+-------+------+--------+---------+\n
            """
   end
 end

@@ -6,7 +6,7 @@ defmodule Tai.Commands.Balance do
   import Tai.Commands.Table, only: [render!: 2]
 
   @header [
-    "Exchange",
+    "Venue",
     "Account",
     "Asset",
     "Free",
