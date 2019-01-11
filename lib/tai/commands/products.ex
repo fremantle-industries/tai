@@ -8,7 +8,7 @@ defmodule Tai.Commands.Products do
   @header [
     "Venue",
     "Symbol",
-    "Exchange Symbol",
+    "Venue Symbol",
     "Status",
     "Maker Fee",
     "Taker Fee",
