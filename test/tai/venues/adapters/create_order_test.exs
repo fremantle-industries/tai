@@ -199,6 +199,17 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
         assert {:error, :insufficient_balance} = Tai.Venue.create_order(order, @test_adapters)
       end
     end
+
+    test "#{adapter.id} nonce not increasing" do
+      order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_nonce_not_increasing" do
+        assert {:error, {:nonce_not_increasing, msg}} =
+                 Tai.Venue.create_order(order, @test_adapters)
+
+        assert msg != nil
+      end
+    end
   end)
 
   defp build_order(venue_id, side, time_in_force, opts) do

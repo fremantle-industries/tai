@@ -73,4 +73,8 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   defp parse_response({:error, {:insufficient_balance, _msg}, _}, _) do
     {:error, :insufficient_balance}
   end
+
+  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _) do
+    {:error, reason}
+  end
 end
