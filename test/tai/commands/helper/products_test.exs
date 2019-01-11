@@ -46,7 +46,7 @@ defmodule Tai.Commands.Helper.ProductsTest do
 
     assert capture_io(&Tai.Commands.Helper.products/0) == """
            +-----------------+---------+-----------------+---------+-----------+-----------+-----------+-----------+-----------------+----------+----------+----------------+--------------+
-           |     Exchange ID |  Symbol | Exchange Symbol |  Status | Maker Fee | Taker Fee | Min Price | Max Price | Price Increment | Min Size | Max Size | Size Increment | Min Notional |
+           |           Venue |  Symbol | Exchange Symbol |  Status | Maker Fee | Taker Fee | Min Price | Max Price | Price Increment | Min Size | Max Size | Size Increment | Min Notional |
            +-----------------+---------+-----------------+---------+-----------+-----------+-----------+-----------+-----------------+----------+----------+----------------+--------------+
            | test_exchange_a | btc_usd |         BTC_USD | trading |      0.1% |      0.2% |   0.00001 |    100000 |        0.000001 |    0.001 |   100000 |          0.001 |         0.01 |
            | test_exchange_b | eth_usd |         ETH_USD | trading |           |           |   0.00001 |    100000 |        0.000001 |    0.001 |          |          0.001 |         0.01 |
@@ -56,11 +56,11 @@ defmodule Tai.Commands.Helper.ProductsTest do
 
   test "shows an empty table when there are no products" do
     assert capture_io(&Tai.Commands.Helper.products/0) == """
-           +-------------+--------+-----------------+--------+-----------+-----------+-----------+-----------+-----------------+----------+----------+----------------+--------------+
-           | Exchange ID | Symbol | Exchange Symbol | Status | Maker Fee | Taker Fee | Min Price | Max Price | Price Increment | Min Size | Max Size | Size Increment | Min Notional |
-           +-------------+--------+-----------------+--------+-----------+-----------+-----------+-----------+-----------------+----------+----------+----------------+--------------+
-           |           - |      - |               - |      - |         - |         - |         - |         - |               - |        - |        - |              - |            - |
-           +-------------+--------+-----------------+--------+-----------+-----------+-----------+-----------+-----------------+----------+----------+----------------+--------------+\n
+           +-------+--------+-----------------+--------+-----------+-----------+-----------+-----------+-----------------+----------+----------+----------------+--------------+
+           | Venue | Symbol | Exchange Symbol | Status | Maker Fee | Taker Fee | Min Price | Max Price | Price Increment | Min Size | Max Size | Size Increment | Min Notional |
+           +-------+--------+-----------------+--------+-----------+-----------+-----------+-----------+-----------------+----------+----------+----------------+--------------+
+           |     - |      - |               - |      - |         - |         - |         - |         - |               - |        - |        - |              - |            - |
+           +-------+--------+-----------------+--------+-----------+-----------+-----------+-----------+-----------------+----------+----------+----------------+--------------+\n
            """
   end
 end

@@ -6,7 +6,7 @@ defmodule Tai.Commands.Products do
   import Tai.Commands.Table, only: [render!: 2]
 
   @header [
-    "Exchange ID",
+    "Venue",
     "Symbol",
     "Exchange Symbol",
     "Status",
