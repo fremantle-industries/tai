@@ -6,7 +6,7 @@ defmodule Tai.Commands.Fees do
   import Tai.Commands.Table, only: [render!: 2]
 
   @header [
-    "Exchange ID",
+    "Venue",
     "Account ID",
     "Symbol",
     "Maker",

@@ -36,7 +36,7 @@ defmodule Tai.Commands.Helper.FeesTest do
 
     assert capture_io(&Tai.Commands.Helper.fees/0) == """
            +-----------------+------------+---------+--------+-------+
-           |     Exchange ID | Account ID |  Symbol |  Maker | Taker |
+           |           Venue | Account ID |  Symbol |  Maker | Taker |
            +-----------------+------------+---------+--------+-------+
            | test_exchange_a |       main | btc_usd | -0.05% |  0.2% |
            | test_exchange_b |       main | eth_usd |     0% |  0.1% |
@@ -46,11 +46,11 @@ defmodule Tai.Commands.Helper.FeesTest do
 
   test "shows an empty table when there are no fees" do
     assert capture_io(&Tai.Commands.Helper.fees/0) == """
-           +-------------+------------+--------+-------+-------+
-           | Exchange ID | Account ID | Symbol | Maker | Taker |
-           +-------------+------------+--------+-------+-------+
-           |           - |          - |      - |     - |     - |
-           +-------------+------------+--------+-------+-------+\n
+           +-------+------------+--------+-------+-------+
+           | Venue | Account ID | Symbol | Maker | Taker |
+           +-------+------------+--------+-------+-------+
+           |     - |          - |      - |     - |     - |
+           +-------+------------+--------+-------+-------+\n
            """
   end
 end

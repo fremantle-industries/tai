@@ -168,22 +168,22 @@ Display the maker/taker fees for the every product in the exchange accounts
 
 ```
 iex(4)> fees
-+-------------+------------+-----------+-------+-------+
-| Exchange ID | Account ID |    Symbol | Maker | Taker |
-+-------------+------------+-----------+-------+-------+
-|     binance |       main |   lsk_bnb |  0.1% |  0.1% |
-|     binance |       main |   rlc_eth |  0.1% |  0.1% |
-|     binance |       main |  aion_eth |  0.1% |  0.1% |
-|     binance |       main |   mft_bnb |  0.1% |  0.1% |
-|     binance |       main |  ardr_bnb |  0.1% |  0.1% |
-|     binance |       main |  iost_btc |  0.1% |  0.1% |
-|     binance |       main |   xlm_eth |  0.1% |  0.1% |
-|     binance |       main |   xem_eth |  0.1% |  0.1% |
-|     binance |       main |   kmd_btc |  0.1% |  0.1% |
-|     binance |       main | ncash_btc |  0.1% |  0.1% |
-|     binance |       main |   xrp_eth |  0.1% |  0.1% |
-|     binance |       main |   vet_bnb |  0.1% |  0.1% |
-+-------------+------------+-----------+-------+-------+
++---------+------------+-----------+-------+-------+
+|   Venue | Account ID |    Symbol | Maker | Taker |
++---------+------------+-----------+-------+-------+
+| binance |       main |   lsk_bnb |  0.1% |  0.1% |
+| binance |       main |   rlc_eth |  0.1% |  0.1% |
+| binance |       main |  aion_eth |  0.1% |  0.1% |
+| binance |       main |   mft_bnb |  0.1% |  0.1% |
+| binance |       main |  ardr_bnb |  0.1% |  0.1% |
+| binance |       main |  iost_btc |  0.1% |  0.1% |
+| binance |       main |   xlm_eth |  0.1% |  0.1% |
+| binance |       main |   xem_eth |  0.1% |  0.1% |
+| binance |       main |   kmd_btc |  0.1% |  0.1% |
+| binance |       main | ncash_btc |  0.1% |  0.1% |
+| binance |       main |   xrp_eth |  0.1% |  0.1% |
+| binance |       main |   vet_bnb |  0.1% |  0.1% |
++---------+------------+-----------+-------+-------+
 ```
 
 #### markets
