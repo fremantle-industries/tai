@@ -35,8 +35,10 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
     %ExBitmex.Credentials{api_key: api_key, api_secret: api_secret}
   end
 
-  defp to_venue_side(:buy), do: "Buy"
-  defp to_venue_side(:sell), do: "Sell"
+  @buy "Buy"
+  @sell "Sell"
+  defp to_venue_side(:buy), do: @buy
+  defp to_venue_side(:sell), do: @sell
 
   defp to_venue_symbol(symbol) do
     symbol
