@@ -31,9 +31,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
     end
   end
 
-  defp to_bitmex_credentials(%{api_key: api_key, api_secret: api_secret}) do
-    %ExBitmex.Credentials{api_key: api_key, api_secret: api_secret}
-  end
+  defp to_bitmex_credentials(attrs), do: struct!(ExBitmex.Credentials, attrs)
 
   @buy "Buy"
   @sell "Sell"
