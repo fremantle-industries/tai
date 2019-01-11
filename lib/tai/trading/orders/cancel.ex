@@ -22,8 +22,10 @@ defmodule Tai.Trading.Orders.Cancel do
 
   defp send_cancel_order(order), do: Tai.Venue.cancel_order(order)
 
-  defp parse_cancel_order_response({:ok, _order_id}, order) do
-    {:ok, {old_order, updated_order}} = find_canceling_order_and_cancel(order.client_id)
+  defp parse_cancel_order_response({:ok, order_response}, order) do
+    {:ok, {old_order, updated_order}} =
+      find_canceling_order_and_cancel(order.client_id, order_response)
+
     Orders.updated!(old_order, updated_order)
   end
 
@@ -39,11 +41,11 @@ defmodule Tai.Trading.Orders.Cancel do
     )
   end
 
-  defp find_canceling_order_and_cancel(client_id) do
+  defp find_canceling_order_and_cancel(client_id, order_response) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id],
       status: :canceled,
-      leaves_qty: Decimal.new(0)
+      leaves_qty: order_response.leaves_qty
     )
   end
 

@@ -75,8 +75,17 @@ defmodule Tai.VenueAdapters.Mock do
       venue_order_id
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
-        {:ok, :cancel_ok} -> {:ok, venue_order_id}
-        {:error, :not_found} -> {:error, :mock_not_found}
+        {:ok, :cancel_ok} ->
+          cancel_response = %Tai.Trading.OrderResponses.Cancel{
+            id: venue_order_id,
+            status: :canceled,
+            leaves_qty: Decimal.new(0)
+          }
+
+          {:ok, cancel_response}
+
+        {:error, :not_found} ->
+          {:error, :mock_not_found}
       end
     end)
   end

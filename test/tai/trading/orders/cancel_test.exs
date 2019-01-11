@@ -1,6 +1,5 @@
 defmodule Tai.Trading.Orders.CancelTest do
   use ExUnit.Case, async: false
-
   import Tai.TestSupport.Helpers
   alias Tai.Trading.Orders
   alias Tai.TestSupport.Mocks
@@ -12,7 +11,6 @@ defmodule Tai.Trading.Orders.CancelTest do
 
     start_supervised!(Mocks.Server)
     {:ok, _} = Application.ensure_all_started(:tai)
-
     :ok
   end
 
@@ -67,57 +65,22 @@ defmodule Tai.Trading.Orders.CancelTest do
       }
 
       assert canceling_order.leaves_qty != Decimal.new(0)
-      assert canceling_order.qty == Decimal.new("0.1")
-      assert canceling_order.cumulative_qty == Decimal.new(0)
       assert canceled_order.leaves_qty == Decimal.new(0)
-      assert canceled_order.qty == Decimal.new("0.1")
-      assert canceled_order.cumulative_qty == Decimal.new(0)
     end
 
     test "broadcasts canceling & canceled events",
          %{order: order} do
       Tai.Events.firehose_subscribe()
-
       Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
 
       assert {:ok, %Tai.Trading.Order{status: :canceling}} = Orders.cancel(order)
 
-      client_id = order.client_id
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :canceling} = event_1}
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :canceled} = event_2}
 
-      assert_receive {Tai.Event,
-                      %Tai.Events.OrderUpdated{
-                        client_id: ^client_id,
-                        venue_id: :test_exchange_a,
-                        account_id: :main,
-                        product_symbol: :btc_usd,
-                        side: :buy,
-                        type: :limit,
-                        time_in_force: :gtc,
-                        status: :canceling,
-                        error_reason: nil
-                      } = event_1}
-
-      assert event_1.price == Decimal.new("100.1")
-      assert event_1.qty == Decimal.new("0.1")
-      assert event_1.cumulative_qty == Decimal.new(0)
+      assert event_1.client_id == order.client_id
       assert event_1.leaves_qty == Decimal.new("0.1")
-
-      assert_receive {Tai.Event,
-                      %Tai.Events.OrderUpdated{
-                        client_id: ^client_id,
-                        venue_id: :test_exchange_a,
-                        account_id: :main,
-                        product_symbol: :btc_usd,
-                        side: :buy,
-                        type: :limit,
-                        time_in_force: :gtc,
-                        status: :canceled,
-                        error_reason: nil
-                      } = event_2}
-
-      assert event_2.price == Decimal.new("100.1")
-      assert event_2.qty == Decimal.new("0.1")
-      assert event_2.cumulative_qty == Decimal.new(0)
+      assert event_2.client_id == order.client_id
       assert event_2.leaves_qty == Decimal.new(0)
     end
   end

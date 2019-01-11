@@ -29,11 +29,9 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
           open_order = build_open_order(enqueued_order, order_response)
 
           assert {:ok, order_response} = Tai.Venue.cancel_order(open_order, @test_adapters)
-          assert order_response.time_in_force == :gtc
+          assert order_response.id != nil
           assert order_response.status == :canceled
           assert order_response.leaves_qty == Decimal.new(0)
-          assert order_response.original_size == qty(@adapter.id)
-          assert order_response.cumulative_qty == cumulative_qty(@adapter.id)
         end
       end
 
@@ -45,7 +43,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
 
           open_order = build_open_order(enqueued_order, order_response)
 
-          assert {:error, timeout} = Tai.Venue.cancel_order(open_order, @test_adapters)
+          assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :timeout}
         end
       end
     end
@@ -84,6 +82,4 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   defp price(:bitmex), do: Decimal.new("100.5")
 
   defp qty(:bitmex), do: Decimal.new(1)
-
-  defp cumulative_qty(:bitmex), do: Decimal.new(0)
 end
