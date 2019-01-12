@@ -63,8 +63,14 @@ defmodule Tai.Advisor do
     Map.get(advisor.inside_quotes, name)
   end
 
+  @deprecated "Use Tai.Advisor.cast_order_updated/3 instead."
   @spec order_updated(atom, order | nil, order) :: no_return
   def order_updated(name, old_order, updated_order) do
+    cast_order_updated(name, old_order, updated_order)
+  end
+
+  @spec cast_order_updated(atom, order | nil, order) :: no_return
+  def cast_order_updated(name, old_order, updated_order) do
     GenServer.cast(name, {:order_updated, old_order, updated_order})
   end
 

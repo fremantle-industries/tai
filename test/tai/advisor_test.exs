@@ -39,20 +39,20 @@ defmodule Tai.AdvisorTest do
     {:ok, %{advisor_name: advisor_name}}
   end
 
-  describe ".order_updated" do
+  describe ".cast_order_updated" do
     test "executes the 'handle_order_updated' callback", %{advisor_name: advisor_name} do
-      Tai.Advisor.order_updated(advisor_name, :old_order, :updated_order)
+      Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order)
 
       assert_receive {:fired_handle_order_updated, :old_order, :updated_order, _}
     end
 
     test "can update the run store map", %{advisor_name: advisor_name} do
-      Tai.Advisor.order_updated(advisor_name, :old_order, :updated_order)
+      Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order)
 
       assert_receive {:fired_handle_order_updated, :old_order, :updated_order, original_state}
       assert original_state.store == %{}
 
-      Tai.Advisor.order_updated(advisor_name, :old_order, :updated_order)
+      Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order)
 
       assert_receive {:fired_handle_order_updated, :old_order, :updated_order, updated_state}
       assert updated_state.store == %{counter: 1}
@@ -63,7 +63,7 @@ defmodule Tai.AdvisorTest do
     } do
       Tai.Events.firehose_subscribe()
 
-      Tai.Advisor.order_updated(advisor_name, :raise_error, :updated_order)
+      Tai.Advisor.cast_order_updated(advisor_name, :raise_error, :updated_order)
 
       assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{}}
     end
