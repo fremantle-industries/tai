@@ -37,7 +37,8 @@ defmodule Tai.Trading.Orders.Cancel do
   defp find_open_order_and_pre_cancel(client_id) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id, status: :open],
-      status: :canceling
+      status: :canceling,
+      updated_at: Timex.now()
     )
   end
 
@@ -45,7 +46,8 @@ defmodule Tai.Trading.Orders.Cancel do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id],
       status: :canceled,
-      leaves_qty: order_response.leaves_qty
+      leaves_qty: order_response.leaves_qty,
+      venue_updated_at: order_response.venue_updated_at
     )
   end
 

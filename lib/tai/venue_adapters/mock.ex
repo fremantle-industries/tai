@@ -79,7 +79,8 @@ defmodule Tai.VenueAdapters.Mock do
           cancel_response = %Tai.Trading.OrderResponses.Cancel{
             id: venue_order_id,
             status: :canceled,
-            leaves_qty: Decimal.new(0)
+            leaves_qty: Decimal.new(0),
+            venue_updated_at: Timex.now()
           }
 
           {:ok, cancel_response}

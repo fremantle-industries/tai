@@ -7,18 +7,19 @@ defmodule Tai.Trading.OrderResponses.Cancel do
           id: String.t(),
           status: atom,
           leaves_qty: Decimal.t(),
-          timestamp: DateTime.t() | nil
+          venue_updated_at: DateTime.t()
         }
 
   @enforce_keys [
     :id,
     :status,
-    :leaves_qty
+    :leaves_qty,
+    :venue_updated_at
   ]
   defstruct [
     :id,
     :status,
     :leaves_qty,
-    :timestamp
+    :venue_updated_at
   ]
 end
