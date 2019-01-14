@@ -15,11 +15,11 @@ defmodule Tai.Events.OrderUpdatedTest do
     qty: Decimal.new("0.2"),
     leaves_qty: Decimal.new("0.15"),
     cumulative_qty: Decimal.new("0.3"),
-    error_reason: :my_error_reason,
+    error_reason: {:my_error_reason, "my msg"},
     enqueued_at: Timex.now()
   }
 
-  test ".to_data/1 transforms decimal data to strings" do
+  test ".to_data/1 transforms decimal & error_reason data to strings" do
     attrs = Map.merge(@base_attrs, %{venue_order_id: "abc123"})
 
     event = struct!(Tai.Events.OrderUpdated, attrs)
@@ -40,7 +40,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert json.qty == "0.2"
     assert json.leaves_qty == "0.15"
     assert json.cumulative_qty == "0.3"
-    assert json.error_reason == :my_error_reason
+    assert json.error_reason == "{:my_error_reason, \"my msg\"}"
   end
 
   test ".to_data/1 transforms datetime data to a string" do
