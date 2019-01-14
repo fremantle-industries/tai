@@ -22,6 +22,8 @@ defmodule Tai.Commands.Orders do
     "Venue Order ID",
     "Enqueued At",
     "Venue Created At",
+    "Updated At",
+    "Venue Updated At",
     "Error Reason"
   ]
 
@@ -47,6 +49,8 @@ defmodule Tai.Commands.Orders do
         order.venue_order_id && order.venue_order_id |> trunc_id(),
         Timex.from_now(order.enqueued_at),
         order.venue_created_at && Timex.from_now(order.venue_created_at),
+        order.updated_at && Timex.from_now(order.updated_at),
+        order.venue_updated_at && Timex.from_now(order.venue_updated_at),
         order.error_reason
       ]
     end)
