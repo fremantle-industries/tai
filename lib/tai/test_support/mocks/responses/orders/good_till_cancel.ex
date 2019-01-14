@@ -55,7 +55,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       price: price,
       leaves_qty: order.leaves_qty,
       cumulative_qty: Decimal.new(0),
-      timestamp: Timex.now()
+      venue_updated_at: Timex.now()
     }
 
     key = {Tai.Trading.OrderResponse, :amend_order, order.venue_order_id}
@@ -70,7 +70,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       price: price,
       leaves_qty: qty,
       cumulative_qty: Decimal.new(0),
-      timestamp: Timex.now()
+      venue_updated_at: Timex.now()
     }
 
     key = {Tai.Trading.OrderResponse, :amend_order, order.venue_order_id}

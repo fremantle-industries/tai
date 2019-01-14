@@ -37,6 +37,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
         assert amend_response.price == amend_price
         assert amend_response.leaves_qty == amend_qty
         assert amend_response.cumulative_qty == enqueued_order.cumulative_qty
+        assert %DateTime{} = amend_response.venue_updated_at
       end
     end
 
@@ -57,6 +58,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
         assert amend_response.price == amend_price
         assert amend_response.leaves_qty == enqueued_order.qty
         assert amend_response.cumulative_qty == enqueued_order.cumulative_qty
+        assert %DateTime{} = amend_response.venue_updated_at
       end
     end
 
@@ -77,6 +79,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
         assert amend_response.leaves_qty == amend_qty
         assert amend_response.price == enqueued_order.price
         assert amend_response.cumulative_qty == enqueued_order.cumulative_qty
+        assert %DateTime{} = amend_response.venue_updated_at
       end
     end
   end)

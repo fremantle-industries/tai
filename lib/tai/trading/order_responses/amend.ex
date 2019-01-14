@@ -9,7 +9,7 @@ defmodule Tai.Trading.OrderResponses.Amend do
           price: Decimal.t(),
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
-          timestamp: DateTime.t() | nil
+          venue_updated_at: DateTime.t()
         }
 
   @enforce_keys [
@@ -17,7 +17,8 @@ defmodule Tai.Trading.OrderResponses.Amend do
     :status,
     :price,
     :leaves_qty,
-    :cumulative_qty
+    :cumulative_qty,
+    :venue_updated_at
   ]
   defstruct [
     :id,
@@ -25,6 +26,6 @@ defmodule Tai.Trading.OrderResponses.Amend do
     :price,
     :leaves_qty,
     :cumulative_qty,
-    :timestamp
+    :venue_updated_at
   ]
 end
