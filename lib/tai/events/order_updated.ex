@@ -10,6 +10,7 @@ defmodule Tai.Events.OrderUpdated do
           account_id: atom,
           venue_order_id: String.t() | nil,
           venue_created_at: DateTime.t() | nil,
+          enqueued_at: DateTime.t(),
           product_symbol: atom,
           side: side,
           type: type,
@@ -27,6 +28,7 @@ defmodule Tai.Events.OrderUpdated do
     :venue_id,
     :account_id,
     :product_symbol,
+    :enqueued_at,
     :side,
     :type,
     :time_in_force,
@@ -42,6 +44,7 @@ defmodule Tai.Events.OrderUpdated do
     :venue_id,
     :account_id,
     :product_symbol,
+    :enqueued_at,
     :venue_order_id,
     :venue_created_at,
     :side,
@@ -71,6 +74,10 @@ defimpl Tai.LogEvent, for: Tai.Events.OrderUpdated do
     |> Map.put(:qty, event.qty |> Decimal.to_string(:normal))
     |> Map.put(:leaves_qty, event.leaves_qty |> Decimal.to_string(:normal))
     |> Map.put(:cumulative_qty, event.cumulative_qty |> Decimal.to_string(:normal))
+    |> Map.put(
+      :enqueued_at,
+      event.enqueued_at && event.enqueued_at |> DateTime.to_iso8601()
+    )
     |> Map.put(
       :venue_created_at,
       event.venue_created_at && event.venue_created_at |> DateTime.to_iso8601()
