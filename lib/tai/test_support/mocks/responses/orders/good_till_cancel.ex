@@ -58,7 +58,13 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       venue_updated_at: Timex.now()
     }
 
-    key = {Tai.Trading.OrderResponse, :amend_order, order.venue_order_id}
+    key =
+      {Tai.Trading.OrderResponses.Amend,
+       %{
+         venue_order_id: order.venue_order_id,
+         price: price
+       }}
+
     Mocks.Server.insert(key, order_response)
   end
 
@@ -73,7 +79,14 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       venue_updated_at: Timex.now()
     }
 
-    key = {Tai.Trading.OrderResponse, :amend_order, order.venue_order_id}
+    key =
+      {Tai.Trading.OrderResponses.Amend,
+       %{
+         venue_order_id: order.venue_order_id,
+         price: price,
+         qty: qty
+       }}
+
     Mocks.Server.insert(key, order_response)
   end
 
