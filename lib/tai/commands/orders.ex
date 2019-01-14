@@ -51,7 +51,7 @@ defmodule Tai.Commands.Orders do
         order.venue_created_at && Timex.from_now(order.venue_created_at),
         order.updated_at && Timex.from_now(order.updated_at),
         order.venue_updated_at && Timex.from_now(order.venue_updated_at),
-        order.error_reason
+        order.error_reason && inspect(order.error_reason)
       ]
     end)
     |> render!(@header)
