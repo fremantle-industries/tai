@@ -3,7 +3,7 @@ defmodule Tai.Venues.Adapter do
   @type product :: Tai.Venues.Product.t()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type order :: Tai.Trading.Order.t()
-  @type order_response :: Tai.Trading.OrderResponse.t()
+  @type create_response :: Tai.Trading.OrderResponses.Create.t()
   @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
   @type venue_order_id :: String.t()
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
@@ -35,7 +35,7 @@ defmodule Tai.Venues.Adapter do
   @callback maker_taker_fees(exchange_id :: atom, account_id :: atom, credentials :: map) ::
               {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil} | {:error, reason :: term}
   @callback create_order(order, credentials) ::
-              {:ok, order_response} | {:error, create_order_error_reason}
+              {:ok, create_response} | {:error, create_order_error_reason}
   @callback amend_order(venue_order_id, amend_attrs, credentials) ::
               {:ok, amend_response} | {:error, amend_order_error_reason}
   @callback cancel_order(venue_order_id, credentials) ::
