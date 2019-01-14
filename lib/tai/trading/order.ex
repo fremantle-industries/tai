@@ -20,12 +20,13 @@ defmodule Tai.Trading.Order do
           | :error
   @type t :: %Order{
           client_id: client_id,
+          enqueued_at: DateTime.t(),
+          updated_at: DateTime.t() | nil,
           venue_order_id: venue_order_id | nil,
           venue_created_at: DateTime.t() | nil,
           venue_updated_at: DateTime.t() | nil,
           exchange_id: atom,
           account_id: atom,
-          enqueued_at: DateTime.t(),
           side: side,
           status: status,
           symbol: atom,
@@ -58,9 +59,10 @@ defmodule Tai.Trading.Order do
   ]
   defstruct [
     :client_id,
+    :enqueued_at,
+    :updated_at,
     :venue_created_at,
     :venue_updated_at,
-    :enqueued_at,
     :error_reason,
     :exchange_id,
     :account_id,
