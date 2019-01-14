@@ -18,7 +18,6 @@ defmodule Tai.Trading.OrderResponse do
     :status,
     :time_in_force,
     :original_size,
-    # :leaves_qty,
     :cumulative_qty
   ]
   defstruct [

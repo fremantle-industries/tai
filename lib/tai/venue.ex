@@ -4,7 +4,6 @@ defmodule Tai.Venue do
   @type product :: Tai.Venues.Product.t()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type order :: Tai.Trading.Order.t()
-  @type venue_order_id :: String.t()
   @type shared_error_reason ::
           :timeout | {:nonce_not_increasing, String.t()} | Tai.CredentialError.t()
 
@@ -32,13 +31,13 @@ defmodule Tai.Venue do
     adapter.maker_taker_fees(exchange_id, account_id, credentials)
   end
 
-  @type order_response :: Tai.Trading.OrderResponse.t()
+  @type create_response :: Tai.Trading.OrderResponses.Create.t()
   @type create_order_error_reason ::
           :not_implemented
           | shared_error_reason
           | Tai.Trading.InsufficientBalanceError.t()
 
-  @spec create_order(order) :: {:ok, order_response} | {:error, create_order_error_reason}
+  @spec create_order(order) :: {:ok, create_response} | {:error, create_order_error_reason}
   def create_order(
         %Tai.Trading.Order{} = order,
         adapters \\ Tai.Venues.Config.parse_adapters()

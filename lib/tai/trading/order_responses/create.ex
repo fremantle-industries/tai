@@ -6,8 +6,8 @@ defmodule Tai.Trading.OrderResponses.Create do
   @type t :: %Tai.Trading.OrderResponses.Create{
           id: String.t(),
           status: atom,
-          time_in_force: atom,
           original_size: Decimal.t(),
+          avg_price: Decimal.t(),
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
           timestamp: DateTime.t() | nil
@@ -16,7 +16,7 @@ defmodule Tai.Trading.OrderResponses.Create do
   @enforce_keys [
     :id,
     :status,
-    :time_in_force,
+    :avg_price,
     :original_size,
     :leaves_qty,
     :cumulative_qty
@@ -24,7 +24,7 @@ defmodule Tai.Trading.OrderResponses.Create do
   defstruct [
     :id,
     :status,
-    :time_in_force,
+    :avg_price,
     :original_size,
     :leaves_qty,
     :cumulative_qty,

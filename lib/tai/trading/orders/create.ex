@@ -1,5 +1,5 @@
 defmodule Tai.Trading.Orders.Create do
-  alias Tai.Trading.{OrderStore, OrderResponse, Order, Orders}
+  alias Tai.Trading.{OrderStore, OrderResponses, Order, Orders}
 
   @type order :: Order.t()
   @type submission :: OrderStore.submission()
@@ -37,21 +37,21 @@ defmodule Tai.Trading.Orders.Create do
   defp send(order), do: Tai.Venue.create_order(order)
 
   defp parse_response(
-         {:ok, %OrderResponse{status: :filled} = response},
+         {:ok, %OrderResponses.Create{status: :filled} = response},
          %Order{} = o
        ) do
     fill!(o.client_id, response)
   end
 
   defp parse_response(
-         {:ok, %OrderResponse{status: :expired} = response},
+         {:ok, %OrderResponses.Create{status: :expired} = response},
          %Order{client_id: cid}
        ) do
     expire!(cid, response)
   end
 
   defp parse_response(
-         {:ok, %OrderResponse{status: :open} = response},
+         {:ok, %OrderResponses.Create{status: :open} = response},
          %Order{client_id: cid}
        ) do
     open!(cid, response)
@@ -66,6 +66,7 @@ defmodule Tai.Trading.Orders.Create do
     |> find_by_and_update(
       status: :filled,
       venue_order_id: response.id,
+      avg_price: response.avg_price,
       cumulative_qty: Decimal.new(response.cumulative_qty),
       venue_created_at: response.timestamp,
       leaves_qty: Decimal.new(0)
@@ -78,6 +79,7 @@ defmodule Tai.Trading.Orders.Create do
       status: :expired,
       venue_order_id: response.id,
       venue_created_at: response.timestamp,
+      avg_price: response.avg_price,
       cumulative_qty: response.cumulative_qty,
       leaves_qty: response.leaves_qty
     )
@@ -88,7 +90,10 @@ defmodule Tai.Trading.Orders.Create do
     |> find_by_and_update(
       status: :open,
       venue_order_id: response.id,
-      venue_created_at: response.timestamp
+      venue_created_at: response.timestamp,
+      avg_price: response.avg_price,
+      leaves_qty: response.leaves_qty,
+      cumulative_qty: response.cumulative_qty
     )
   end
 

@@ -16,48 +16,39 @@ defmodule Tai.Trading.Orders.CreateSkipTest do
     :ok
   end
 
-  test "broadcasts events when the status changes" do
-    Tai.Events.firehose_subscribe()
+  @submission_types [
+    {:buy, Tai.Trading.OrderSubmissions.BuyLimitGtc},
+    {:sell, Tai.Trading.OrderSubmissions.SellLimitGtc}
+  ]
 
-    submission =
-      Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc, %{
-        qty: Decimal.new(10)
-      })
+  @submission_types
+  |> Enum.each(fn {side, submission_type} ->
+    @side side
+    @submission_type submission_type
 
-    {:ok, _} = Tai.Trading.Orders.create(submission)
+    test "#{side} updates the leaves qty" do
+      submission =
+        Support.OrderSubmissions.build(@submission_type, %{
+          qty: Decimal.new(1),
+          order_updated_callback: fire_order_callback(self())
+        })
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{side: :buy, status: :enqueued}}
+      {:ok, _} = Tai.Trading.Orders.create(submission)
 
-    assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{side: :buy, status: :skip} = skipped_event}
+      assert_receive {
+        :callback_fired,
+        nil,
+        %Tai.Trading.Order{status: :enqueued}
+      }
 
-    assert skipped_event.qty == Decimal.new(10)
-    assert skipped_event.leaves_qty == Decimal.new(0)
-    assert skipped_event.cumulative_qty == Decimal.new(0)
-  end
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{status: :enqueued},
+        %Tai.Trading.Order{status: :skip} = skipped_order
+      }
 
-  test "fires the callback when the status changes" do
-    submission =
-      Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.SellLimitGtc, %{
-        qty: Decimal.new(1),
-        order_updated_callback: fire_order_callback(self())
-      })
-
-    {:ok, _} = Tai.Trading.Orders.create(submission)
-
-    assert_receive {
-      :callback_fired,
-      nil,
-      %Tai.Trading.Order{side: :sell, status: :enqueued}
-    }
-
-    assert_receive {
-      :callback_fired,
-      %Tai.Trading.Order{side: :sell, status: :enqueued},
-      %Tai.Trading.Order{side: :sell, status: :skip} = skipped_order
-    }
-
-    assert skipped_order.leaves_qty == Decimal.new(0)
-    assert skipped_order.cumulative_qty == Decimal.new(0)
-  end
+      assert skipped_order.side == @side
+      assert skipped_order.leaves_qty == Decimal.new(0)
+    end
+  end)
 end

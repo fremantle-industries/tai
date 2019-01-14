@@ -15,16 +15,21 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
 
   @spec open(venue_order_id, submission) :: :ok
   def open(venue_order_id, submission) do
-    open(venue_order_id, submission, submission.qty, Decimal.new(0))
+    open(venue_order_id, submission, %{})
   end
 
-  @spec open(venue_order_id, submission, Decimal.t(), Decimal.t()) :: :ok
-  def open(venue_order_id, submission, leaves_qty, cumulative_qty) do
-    order_response = %Tai.Trading.OrderResponse{
+  @spec open(venue_order_id, submission, map) :: :ok
+  def open(venue_order_id, submission, attrs) do
+    qty = submission.qty
+    cumulative_qty = attrs |> Map.get(:cumulative_qty, Decimal.new(0))
+    leaves_qty = Decimal.sub(qty, cumulative_qty)
+    avg_price = attrs |> Map.get(:avg_price, Decimal.new(0))
+
+    order_response = %Tai.Trading.OrderResponses.Create{
       id: venue_order_id,
-      time_in_force: :gtc,
       status: :open,
-      original_size: submission.qty,
+      avg_price: avg_price,
+      original_size: qty,
       leaves_qty: leaves_qty,
       cumulative_qty: cumulative_qty,
       timestamp: Timex.now()
@@ -43,15 +48,14 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   end
 
   @spec amend_price(order, number) :: :ok
-  def amend_price(order, _price) do
-    order_response = %Tai.Trading.OrderResponse{
+  def amend_price(order, price) do
+    order_response = %Tai.Trading.OrderResponses.Amend{
       id: order.venue_order_id,
-      time_in_force: :gtc,
       status: :open,
-      original_size: order.qty,
+      price: price,
+      leaves_qty: order.leaves_qty,
       cumulative_qty: Decimal.new(0),
       timestamp: Timex.now()
-      # TODO: price
     }
 
     key = {Tai.Trading.OrderResponse, :amend_order, order.venue_order_id}
@@ -59,15 +63,14 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   end
 
   @spec amend_price_and_qty(order, number, number) :: :ok
-  def amend_price_and_qty(order, _price, qty) do
-    order_response = %Tai.Trading.OrderResponse{
+  def amend_price_and_qty(order, price, qty) do
+    order_response = %Tai.Trading.OrderResponses.Amend{
       id: order.venue_order_id,
-      time_in_force: :gtc,
       status: :open,
-      original_size: qty,
+      price: price,
+      leaves_qty: qty,
       cumulative_qty: Decimal.new(0),
       timestamp: Timex.now()
-      # TODO: price
     }
 
     key = {Tai.Trading.OrderResponse, :amend_order, order.venue_order_id}

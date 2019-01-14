@@ -185,14 +185,15 @@ defmodule Tai.Trading.OrderStore do
 
   defmodule AttributeWhitelist do
     @whitelist_attrs [
+      :venue_order_id,
       :venue_created_at,
       :error_reason,
-      :cumulative_qty,
-      :venue_order_id,
       :status,
       :price,
+      :avg_price,
       :qty,
-      :leaves_qty
+      :leaves_qty,
+      :cumulative_qty
     ]
 
     def apply(order, update_attrs) do

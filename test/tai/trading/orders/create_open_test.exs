@@ -15,67 +15,77 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
   end
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
+  @submission_types [
+    {:buy, Tai.Trading.OrderSubmissions.BuyLimitGtc},
+    {:sell, Tai.Trading.OrderSubmissions.SellLimitGtc}
+  ]
 
-  test "enqueues the order" do
-    submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-    Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
+  @submission_types
+  |> Enum.each(fn {side, submission_type} ->
+    @side side
+    @submission_type submission_type
 
-    assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.Orders.create(submission)
-    assert order.venue_order_id == nil
-    assert order.client_id != nil
-    assert order.exchange_id == submission.venue_id
-    assert order.account_id == submission.account_id
-    assert order.symbol == submission.product_symbol
-    assert order.side == :buy
-    assert order.status == :enqueued
-    assert order.price == submission.price
-    assert order.qty == submission.qty
-    assert order.time_in_force == :gtc
-    assert order.venue_created_at == nil
-  end
+    test "#{side} enqueues the order" do
+      submission = Support.OrderSubmissions.build(@submission_type)
+      Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 
-  test "broadcasts events when the status changes" do
-    Tai.Events.firehose_subscribe()
-    submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-    Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
+      assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.Orders.create(submission)
+      assert order.venue_order_id == nil
+      assert order.client_id != nil
+      assert order.exchange_id == submission.venue_id
+      assert order.account_id == submission.account_id
+      assert order.symbol == submission.product_symbol
+      assert order.side == @side
+      assert order.status == :enqueued
+      assert order.price == submission.price
+      assert order.qty == submission.qty
+      assert order.time_in_force == :gtc
+      assert order.venue_created_at == nil
+    end
 
-    assert {:ok, _} = Tai.Trading.Orders.create(submission)
+    test "#{side} updates the venue_order_id, venue_created_at, leaves_qty, cumulative_qty & avg price" do
+      original_price = Decimal.new(2000)
+      original_qty = Decimal.new(10)
 
-    assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{side: :buy, status: :enqueued} = enqueued_order}
+      submission =
+        Support.OrderSubmissions.build(@submission_type, %{
+          price: original_price,
+          qty: original_qty,
+          order_updated_callback: fire_order_callback(self())
+        })
 
-    assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{side: :buy, status: :open} = open_order_event}
+      cumulative_qty = Decimal.new(4)
+      avg_price = Decimal.new(2000)
 
-    assert enqueued_order.venue_order_id == nil
-    assert open_order_event.venue_order_id == @venue_order_id
-    assert %DateTime{} = open_order_event.venue_created_at
-  end
-
-  test "fires the callback when the status changes" do
-    submission =
-      Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.SellLimitGtc, %{
-        order_updated_callback: fire_order_callback(self())
+      Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission, %{
+        cumulative_qty: cumulative_qty,
+        avg_price: avg_price
       })
 
-    Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
+      {:ok, _} = Tai.Trading.Orders.create(submission)
 
-    {:ok, _} = Tai.Trading.Orders.create(submission)
+      assert_receive {
+        :callback_fired,
+        nil,
+        %Tai.Trading.Order{status: :enqueued}
+      }
 
-    assert_receive {
-      :callback_fired,
-      nil,
-      %Tai.Trading.Order{side: :sell, status: :enqueued}
-    }
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{status: :enqueued} = enqueued_order,
+        %Tai.Trading.Order{status: :open} = open_order
+      }
 
-    assert_receive {
-      :callback_fired,
-      %Tai.Trading.Order{side: :sell, status: :enqueued} = enqueued_order,
-      %Tai.Trading.Order{side: :sell, status: :open} = open_order
-    }
+      assert enqueued_order.venue_order_id == nil
+      assert enqueued_order.side == @side
 
-    assert enqueued_order.venue_order_id == nil
-    assert open_order.venue_order_id == @venue_order_id
-    assert %DateTime{} = open_order.venue_created_at
-  end
+      assert open_order.venue_order_id == @venue_order_id
+      assert open_order.side == @side
+      assert %DateTime{} = open_order.venue_created_at
+      assert open_order.avg_price == original_price
+      assert open_order.leaves_qty == Decimal.new(6)
+      assert open_order.cumulative_qty == cumulative_qty
+      assert open_order.qty == original_qty
+    end
+  end)
 end

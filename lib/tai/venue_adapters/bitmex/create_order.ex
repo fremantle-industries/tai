@@ -53,10 +53,13 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
          {:ok, %ExBitmex.Order{} = venue_order, %ExBitmex.RateLimit{}},
          order
        ) do
+    avg_price =
+      (venue_order.avg_px && Tai.Utils.Decimal.from(venue_order.avg_px)) || Decimal.new(0)
+
     response = %Tai.Trading.OrderResponses.Create{
       id: venue_order.order_id,
       status: venue_order.ord_status |> from_venue_status(order),
-      time_in_force: order.time_in_force,
+      avg_price: avg_price,
       original_size: Decimal.new(venue_order.order_qty),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
       cumulative_qty: Decimal.new(venue_order.cum_qty),

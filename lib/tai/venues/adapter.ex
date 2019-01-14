@@ -5,6 +5,7 @@ defmodule Tai.Venues.Adapter do
   @type order :: Tai.Trading.Order.t()
   @type create_response :: Tai.Trading.OrderResponses.Create.t()
   @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
+  @type cancel_response :: Tai.Trading.OrderResponses.Cancel.t()
   @type venue_order_id :: String.t()
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type shared_error_reason :: :timeout | Tai.CredentialError.t()
@@ -39,7 +40,7 @@ defmodule Tai.Venues.Adapter do
   @callback amend_order(venue_order_id, amend_attrs, credentials) ::
               {:ok, amend_response} | {:error, amend_order_error_reason}
   @callback cancel_order(venue_order_id, credentials) ::
-              {:ok, venue_order_id} | {:error, cancel_order_error_reason}
+              {:ok, cancel_response} | {:error, cancel_order_error_reason}
 
   @enforce_keys [
     :id,

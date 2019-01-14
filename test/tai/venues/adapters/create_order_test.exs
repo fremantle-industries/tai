@@ -37,7 +37,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.leaves_qty == Decimal.new(0)
             assert order_response.cumulative_qty == order_response.original_size
             assert order_response.status == :filled
-            assert order_response.time_in_force == :fok
+            assert order_response.avg_price != Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end
@@ -53,7 +53,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.leaves_qty == Decimal.new(0)
             assert order_response.cumulative_qty == Decimal.new(0)
             assert order_response.status == :expired
-            assert order_response.time_in_force == :fok
+            assert order_response.avg_price == Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end
@@ -72,7 +72,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.leaves_qty == Decimal.new(0)
             assert order_response.cumulative_qty == order_response.original_size
             assert order_response.status == :filled
-            assert order_response.time_in_force == :ioc
+            assert order_response.avg_price != Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end
@@ -90,7 +90,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.cumulative_qty != Decimal.new(0)
             assert order_response.cumulative_qty != order_response.original_size
             assert order_response.status == :expired
-            assert order_response.time_in_force == :ioc
+            assert order_response.avg_price != Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end
@@ -106,7 +106,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.leaves_qty == Decimal.new(0)
             assert order_response.cumulative_qty == Decimal.new(0)
             assert order_response.status == :expired
-            assert order_response.time_in_force == :ioc
+            assert order_response.avg_price == Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end
@@ -125,7 +125,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.leaves_qty == Decimal.new(0)
             assert order_response.cumulative_qty == order_response.original_size
             assert order_response.status == :filled
-            assert order_response.time_in_force == :gtc
+            assert order_response.avg_price != Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end
@@ -145,7 +145,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.leaves_qty != Decimal.new(0)
             assert order_response.leaves_qty != order_response.original_size
             assert order_response.status == :open
-            assert order_response.time_in_force == :gtc
+            assert order_response.avg_price != Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end
@@ -161,7 +161,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.leaves_qty == order_response.original_size
             assert order_response.cumulative_qty == Decimal.new(0)
             assert order_response.status == :open
-            assert order_response.time_in_force == :gtc
+            assert order_response.avg_price == Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end
@@ -177,7 +177,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
             assert order_response.leaves_qty == Decimal.new(0)
             assert order_response.cumulative_qty == Decimal.new(0)
             assert order_response.status == :rejected
-            assert order_response.time_in_force == :gtc
+            assert order_response.avg_price == Decimal.new(0)
             assert %DateTime{} = order_response.timestamp
           end
         end

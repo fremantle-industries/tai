@@ -15,56 +15,48 @@ defmodule Tai.Trading.Orders.CreateFilledTest do
   end
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
+  @submission_types [
+    {:buy, Tai.Trading.OrderSubmissions.BuyLimitFok},
+    {:sell, Tai.Trading.OrderSubmissions.SellLimitFok}
+  ]
 
-  test "broadcasts an event with a status of filled" do
-    Tai.Events.firehose_subscribe()
+  @submission_types
+  |> Enum.each(fn {side, submission_type} ->
+    @side side
+    @submission_type submission_type
 
-    submission =
-      Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitFok, %{
-        qty: Decimal.new(10)
-      })
+    test "#{side} updates the venue_order_id, venue_created_at, leaves_qty, cumulative qty & avg price" do
+      original_qty = Decimal.new(10)
 
-    Mocks.Responses.Orders.FillOrKill.filled(@venue_order_id, submission)
+      submission =
+        Support.OrderSubmissions.build(@submission_type, %{
+          qty: original_qty,
+          order_updated_callback: fire_order_callback(self())
+        })
 
-    {:ok, %Tai.Trading.Order{}} = Tai.Trading.Orders.create(submission)
+      Mocks.Responses.Orders.FillOrKill.filled(@venue_order_id, submission)
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :enqueued}}
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :filled} = filled_event}
+      {:ok, _} = Tai.Trading.Orders.create(submission)
 
-    assert filled_event.venue_order_id == @venue_order_id
-    assert %DateTime{} = filled_event.venue_created_at
-    assert filled_event.leaves_qty == Decimal.new(0)
-    assert filled_event.cumulative_qty == Decimal.new(10)
-    assert filled_event.qty == Decimal.new(10)
-  end
+      assert_receive {
+        :callback_fired,
+        nil,
+        %Tai.Trading.Order{status: :enqueued}
+      }
 
-  test "fires the callback when the status changes" do
-    submission =
-      Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.SellLimitFok, %{
-        qty: Decimal.new(10),
-        order_updated_callback: fire_order_callback(self())
-      })
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{status: :enqueued},
+        %Tai.Trading.Order{status: :filled} = filled_order
+      }
 
-    Mocks.Responses.Orders.FillOrKill.filled(@venue_order_id, submission)
-
-    {:ok, _} = Tai.Trading.Orders.create(submission)
-
-    assert_receive {
-      :callback_fired,
-      nil,
-      %Tai.Trading.Order{side: :sell, status: :enqueued}
-    }
-
-    assert_receive {
-      :callback_fired,
-      %Tai.Trading.Order{side: :sell, status: :enqueued},
-      %Tai.Trading.Order{side: :sell, status: :filled} = filled_order
-    }
-
-    assert filled_order.venue_order_id == @venue_order_id
-    assert %DateTime{} = filled_order.venue_created_at
-    assert filled_order.leaves_qty == Decimal.new(0)
-    assert filled_order.cumulative_qty == Decimal.new(10)
-    assert filled_order.qty == Decimal.new(10)
-  end
+      assert filled_order.venue_order_id == @venue_order_id
+      assert filled_order.side == @side
+      assert %DateTime{} = filled_order.venue_created_at
+      assert filled_order.avg_price != Decimal.new(0)
+      assert filled_order.leaves_qty == Decimal.new(0)
+      assert filled_order.cumulative_qty == original_qty
+      assert filled_order.qty == original_qty
+    end
+  end)
 end
