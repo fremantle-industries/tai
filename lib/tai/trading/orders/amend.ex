@@ -16,7 +16,7 @@ defmodule Tai.Trading.Orders.Amend do
       Task.start_link(fn ->
         updated_order
         |> send_amend_order(attrs)
-        |> parse_response(updated_order.client_id, attrs)
+        |> parse_response(updated_order.client_id)
       end)
 
       {:ok, updated_order}
@@ -27,12 +27,14 @@ defmodule Tai.Trading.Orders.Amend do
 
   defp send_amend_order(order, attrs), do: Tai.Venue.amend_order(order, attrs)
 
-  defp parse_response({:ok, _order_response}, client_id, attrs) do
-    {:ok, {old_order, updated_order}} = find_pending_amend_order_and_open(client_id, attrs)
+  defp parse_response({:ok, amend_response}, client_id) do
+    {:ok, {old_order, updated_order}} =
+      find_pending_amend_order_and_open(client_id, amend_response)
+
     Orders.updated!(old_order, updated_order)
   end
 
-  defp parse_response({:error, reason}, client_id, _attrs) do
+  defp parse_response({:error, reason}, client_id) do
     {:ok, {old_order, updated_order}} = find_pending_amend_order_and_error(client_id, reason)
     Orders.updated!(old_order, updated_order)
   end
@@ -40,15 +42,18 @@ defmodule Tai.Trading.Orders.Amend do
   defp find_open_order_and_pend_amend(client_id) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id, status: :open],
-      status: :pending_amend
+      status: :pending_amend,
+      updated_at: Timex.now()
     )
   end
 
-  defp find_pending_amend_order_and_open(client_id, attrs) do
-    update_attrs =
-      attrs
-      |> to_order_attrs
-      |> Keyword.put(:status, :open)
+  defp find_pending_amend_order_and_open(client_id, amend_response) do
+    update_attrs = [
+      status: :open,
+      price: amend_response.price,
+      leaves_qty: amend_response.leaves_qty,
+      venue_updated_at: amend_response.venue_updated_at
+    ]
 
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id, status: :pending_amend],
@@ -74,27 +79,5 @@ defmodule Tai.Trading.Orders.Amend do
     })
 
     {:error, :order_status_must_be_open}
-  end
-
-  defp to_order_attrs(attrs) when is_map(attrs) do
-    attrs
-    |> Map.to_list()
-    |> to_order_attrs
-  end
-
-  defp to_order_attrs(attrs) when is_list(attrs), do: [] |> to_order_attrs(attrs)
-
-  defp to_order_attrs(update_attrs, []), do: update_attrs
-
-  defp to_order_attrs(update_attrs, [{:price, price} | tail]) do
-    update_attrs
-    |> Keyword.put(:price, price)
-    |> to_order_attrs(tail)
-  end
-
-  defp to_order_attrs(update_attrs, [{:qty, leaves_qty} | tail]) do
-    update_attrs
-    |> Keyword.put(:leaves_qty, leaves_qty)
-    |> to_order_attrs(tail)
   end
 end

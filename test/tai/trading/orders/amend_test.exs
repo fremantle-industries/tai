@@ -76,32 +76,15 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert pending_amend_order.price == @original_price
         assert pending_amend_order.leaves_qty == @original_qty
         assert pending_amend_order.qty == @original_qty
+        assert %DateTime{} = pending_amend_order.updated_at
+        assert pending_amend_order.venue_updated_at == nil
 
         assert amended_order.price == amend_price
         assert amended_order.leaves_qty == amend_qty
         assert amended_order.qty == @original_qty
-      end
-
-      test "broadcasts order updated events", %{order: open_order} do
-        amend_price = Decimal.new("105.5")
-        Tai.Events.firehose_subscribe()
-        GoodTillCancel.amend_price(open_order, amend_price)
-
-        assert {:ok, %Tai.Trading.Order{} = pending_amend_order} =
-                 Tai.Trading.Orders.amend(
-                   open_order,
-                   %{price: amend_price}
-                 )
-
-        assert_receive {Tai.Event,
-                        %Tai.Events.OrderUpdated{status: :pending_amend} = pending_amend_event}
-
-        assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :open} = amended_order_event}
-
-        assert pending_amend_event.price == @original_price
-        assert pending_amend_event.leaves_qty == @original_qty
-        assert amended_order_event.price == amend_price
-        assert amended_order_event.leaves_qty == @original_qty
+        assert %DateTime{} = amended_order.updated_at
+        assert amended_order.updated_at == pending_amend_order.updated_at
+        assert %DateTime{} = amended_order.venue_updated_at
       end
     end
 
