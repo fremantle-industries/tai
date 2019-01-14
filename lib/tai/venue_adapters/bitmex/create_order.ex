@@ -63,7 +63,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
       original_size: Decimal.new(venue_order.order_qty),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
       cumulative_qty: Decimal.new(venue_order.cum_qty),
-      timestamp: Timex.parse!(venue_order.timestamp, @format)
+      venue_created_at: Timex.parse!(venue_order.timestamp, @format)
     }
 
     {:ok, response}

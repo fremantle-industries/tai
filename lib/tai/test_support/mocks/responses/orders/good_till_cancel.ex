@@ -32,7 +32,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       original_size: qty,
       leaves_qty: leaves_qty,
       cumulative_qty: cumulative_qty,
-      timestamp: Timex.now()
+      venue_created_at: Timex.now()
     }
 
     key =

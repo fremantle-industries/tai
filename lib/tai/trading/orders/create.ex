@@ -68,7 +68,7 @@ defmodule Tai.Trading.Orders.Create do
       venue_order_id: response.id,
       avg_price: response.avg_price,
       cumulative_qty: Decimal.new(response.cumulative_qty),
-      venue_created_at: response.timestamp,
+      venue_created_at: response.venue_created_at,
       leaves_qty: Decimal.new(0)
     )
   end
@@ -78,7 +78,7 @@ defmodule Tai.Trading.Orders.Create do
     |> find_by_and_update(
       status: :expired,
       venue_order_id: response.id,
-      venue_created_at: response.timestamp,
+      venue_created_at: response.venue_created_at,
       avg_price: response.avg_price,
       cumulative_qty: response.cumulative_qty,
       leaves_qty: response.leaves_qty
@@ -90,7 +90,7 @@ defmodule Tai.Trading.Orders.Create do
     |> find_by_and_update(
       status: :open,
       venue_order_id: response.id,
-      venue_created_at: response.timestamp,
+      venue_created_at: response.venue_created_at,
       avg_price: response.avg_price,
       leaves_qty: response.leaves_qty,
       cumulative_qty: response.cumulative_qty

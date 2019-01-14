@@ -10,7 +10,7 @@ defmodule Tai.Trading.OrderResponses.Create do
           avg_price: Decimal.t(),
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
-          timestamp: DateTime.t() | nil
+          venue_created_at: DateTime.t()
         }
 
   @enforce_keys [
@@ -19,7 +19,8 @@ defmodule Tai.Trading.OrderResponses.Create do
     :avg_price,
     :original_size,
     :leaves_qty,
-    :cumulative_qty
+    :cumulative_qty,
+    :venue_created_at
   ]
   defstruct [
     :id,
@@ -28,6 +29,6 @@ defmodule Tai.Trading.OrderResponses.Create do
     :original_size,
     :leaves_qty,
     :cumulative_qty,
-    :timestamp
+    :venue_created_at
   ]
 end
