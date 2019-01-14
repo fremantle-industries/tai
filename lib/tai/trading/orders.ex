@@ -16,6 +16,7 @@ defmodule Tai.Trading.Orders do
       enqueued_at: order.enqueued_at,
       venue_order_id: order.venue_order_id,
       venue_created_at: order.venue_created_at,
+      venue_updated_at: order.venue_updated_at,
       product_symbol: order.symbol,
       side: order.side,
       type: order.type,
