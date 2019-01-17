@@ -100,7 +100,7 @@ defmodule Tai.Trading.Orders.Create do
   defp error!(cid, reason) do
     cid
     |> find_by_and_update(
-      status: :error,
+      status: :create_error,
       error_reason: reason,
       leaves_qty: Decimal.new(0)
     )

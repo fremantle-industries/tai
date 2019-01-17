@@ -1,7 +1,6 @@
 defmodule Tai.Trading.Orders.CancelTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Helpers
-  alias Tai.Trading.Orders
   alias Tai.TestSupport.Mocks
 
   setup do
@@ -38,7 +37,7 @@ defmodule Tai.Trading.Orders.CancelTest do
           })
 
         Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
-        {:ok, order} = Orders.create(submission)
+        {:ok, order} = Tai.Trading.Orders.create(submission)
 
         assert_receive {
           :callback_fired,
@@ -53,7 +52,8 @@ defmodule Tai.Trading.Orders.CancelTest do
            %{order: order} do
         Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
 
-        assert {:ok, %Tai.Trading.Order{status: :pending_cancel}} = Orders.cancel(order)
+        assert {:ok, %Tai.Trading.Order{status: :pending_cancel}} =
+                 Tai.Trading.Orders.cancel(order)
 
         assert_receive {
           :callback_fired,
@@ -77,33 +77,32 @@ defmodule Tai.Trading.Orders.CancelTest do
         assert %DateTime{} = canceled_order.venue_updated_at
       end
     end
+
+    describe "#{side} failure" do
+      setup do
+        Tai.Events.firehose_subscribe()
+        submission = Support.OrderSubmissions.build(@submission_type)
+        {:ok, order} = Tai.Trading.Orders.create(submission)
+        assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :create_error}}
+
+        {:ok, %{order: order}}
+      end
+
+      test "returns an error tuple when the status is not open", %{order: order} do
+        assert Tai.Trading.Orders.cancel(order) == {:error, :order_status_must_be_open}
+      end
+
+      test "broadcasts an event when the status is not open", %{order: order} do
+        Tai.Trading.Orders.cancel(order)
+
+        assert_receive {Tai.Event,
+                        %Tai.Events.CancelOrderInvalidStatus{
+                          was: :create_error,
+                          required: :open
+                        } = cancel_error_event}
+
+        assert cancel_error_event.client_id == order.client_id
+      end
+    end
   end)
-
-  describe "failure" do
-    test "returns an error tuple when the status is not open" do
-      Tai.Events.firehose_subscribe()
-      submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-      {:ok, order} = Orders.create(submission)
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
-
-      assert Orders.cancel(order) == {:error, :order_status_must_be_open}
-    end
-
-    test "broadcasts an event when the status is not open" do
-      Tai.Events.firehose_subscribe()
-      submission = Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitGtc)
-      {:ok, order} = Orders.create(submission)
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :error}}
-
-      Orders.cancel(order)
-
-      assert_receive {Tai.Event,
-                      %Tai.Events.CancelOrderInvalidStatus{
-                        was: :error,
-                        required: :open
-                      } = cancel_error_event}
-
-      assert cancel_error_event.client_id == order.client_id
-    end
-  end
 end

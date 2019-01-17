@@ -1,6 +1,5 @@
 defmodule Tai.Trading.Orders.CreateErrorTest do
   use ExUnit.Case, async: false
-
   import Tai.TestSupport.Helpers
   alias Tai.TestSupport.Mocks
 
@@ -14,53 +13,59 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
     :ok
   end
 
-  test "assigns the error reason and broadcasts events when the status changes" do
-    Tai.Events.firehose_subscribe()
+  @submission_types [
+    {:buy, Tai.Trading.OrderSubmissions.BuyLimitGtc},
+    {:sell, Tai.Trading.OrderSubmissions.SellLimitGtc}
+  ]
 
-    submission =
-      Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.BuyLimitFok, %{
-        qty: Decimal.new(10)
-      })
+  @submission_types
+  |> Enum.each(fn {side, submission_type} ->
+    @side side
+    @submission_type submission_type
 
-    {:ok, _} = Tai.Trading.Orders.create(submission)
+    test "#{side} updates the error reason and sets leaves qty to 0" do
+      submission =
+        Support.OrderSubmissions.build(@submission_type, %{
+          qty: Decimal.new(10),
+          order_updated_callback: fire_order_callback(self())
+        })
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{side: :buy, status: :enqueued}}
+      {:ok, _} = Tai.Trading.Orders.create(submission)
 
-    assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{
-                      side: :buy,
-                      status: :error,
-                      error_reason: :mock_not_found
-                    } = error_event}
+      assert_receive {
+        :callback_fired,
+        nil,
+        %Tai.Trading.Order{status: :enqueued}
+      }
 
-    assert error_event.leaves_qty == Decimal.new(0)
-    assert error_event.qty == Decimal.new(10)
-    assert error_event.cumulative_qty == Decimal.new(0)
-  end
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{status: :enqueued},
+        %Tai.Trading.Order{status: :create_error} = error_order
+      }
 
-  test "fires the callback when the status changes" do
-    submission =
-      Support.OrderSubmissions.build(Tai.Trading.OrderSubmissions.SellLimitFok, %{
-        qty: Decimal.new(10),
-        order_updated_callback: fire_order_callback(self())
-      })
+      assert error_order.side == @side
+      assert error_order.error_reason == :mock_not_found
+      assert error_order.leaves_qty == Decimal.new(0)
+      assert error_order.qty == Decimal.new(10)
+      assert error_order.cumulative_qty == Decimal.new(0)
+    end
 
-    {:ok, _} = Tai.Trading.Orders.create(submission)
+    test "#{side} assigns the error reason in the updated event" do
+      Tai.Events.firehose_subscribe()
 
-    assert_receive {
-      :callback_fired,
-      nil,
-      %Tai.Trading.Order{side: :sell, status: :enqueued}
-    }
+      submission =
+        Support.OrderSubmissions.build(@submission_type, %{
+          qty: Decimal.new(10)
+        })
 
-    assert_receive {
-      :callback_fired,
-      %Tai.Trading.Order{side: :sell, status: :enqueued},
-      %Tai.Trading.Order{side: :sell, status: :error, error_reason: :mock_not_found} = error_order
-    }
+      {:ok, _} = Tai.Trading.Orders.create(submission)
 
-    assert error_order.leaves_qty == Decimal.new(0)
-    assert error_order.qty == Decimal.new(10)
-    assert error_order.cumulative_qty == Decimal.new(0)
-  end
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :enqueued}}
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :create_error} = error_event}
+
+      assert error_event.side == @side
+      assert error_event.error_reason == :mock_not_found
+    end
+  end)
 end
