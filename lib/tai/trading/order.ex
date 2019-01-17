@@ -18,6 +18,7 @@ defmodule Tai.Trading.Order do
           | :canceled
           | :rejected
           | :create_error
+          | :amend_error
           | :error
   @type t :: %Order{
           client_id: client_id,

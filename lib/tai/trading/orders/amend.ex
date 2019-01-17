@@ -64,7 +64,7 @@ defmodule Tai.Trading.Orders.Amend do
   defp find_pending_amend_order_and_error(client_id, reason) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id, status: :pending_amend],
-      status: :error,
+      status: :amend_error,
       error_reason: reason
     )
   end

@@ -115,7 +115,9 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert event.required == :open
       end
 
-      test "changes status to :error when the venue returns an error", %{submission: submission} do
+      test "changes status to :amend_error when the venue returns an error", %{
+        submission: submission
+      } do
         GoodTillCancel.open(@venue_order_id, submission)
         {:ok, _} = Tai.Trading.Orders.create(submission)
         assert_receive {:callback_fired, _, %Tai.Trading.Order{status: :open} = open_order}
@@ -125,7 +127,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert_receive {
           :callback_fired,
           %Tai.Trading.Order{status: :pending_amend},
-          %Tai.Trading.Order{status: :error} = error_order
+          %Tai.Trading.Order{status: :amend_error} = error_order
         }
 
         assert error_order.error_reason == :mock_not_found
