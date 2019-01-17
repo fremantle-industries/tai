@@ -64,14 +64,20 @@ defmodule Tai.Advisor do
   end
 
   @deprecated "Use Tai.Advisor.cast_order_updated/3 instead."
-  @spec order_updated(atom, order | nil, order) :: no_return
+  @spec order_updated(atom, order | nil, order) :: :ok
   def order_updated(name, old_order, updated_order) do
     cast_order_updated(name, old_order, updated_order)
   end
 
-  @spec cast_order_updated(atom, order | nil, order) :: no_return
+  # @deprecated "Use Tai.Advisor.cast_order_updated/4 instead."
+  @spec cast_order_updated(atom, order | nil, order) :: :ok
   def cast_order_updated(name, old_order, updated_order) do
     GenServer.cast(name, {:order_updated, old_order, updated_order})
+  end
+
+  @spec cast_order_updated(atom, order | nil, order, fun) :: :ok
+  def cast_order_updated(name, old_order, updated_order, callback) do
+    GenServer.cast(name, {:order_updated, old_order, updated_order, callback})
   end
 
   defmacro __using__(_) do
@@ -155,9 +161,28 @@ defmodule Tai.Advisor do
         end
       end
 
+      @doc false
       def handle_cast({:order_updated, old_order, updated_order}, state) do
         try do
           case handle_order_updated(old_order, updated_order, state) do
+            {:ok, new_store} -> {:noreply, state |> Map.put(:store, new_store)}
+            _ -> {:noreply, state}
+          end
+        rescue
+          e ->
+            Tai.Events.broadcast(%Tai.Events.AdvisorOrderUpdatedError{
+              error: e,
+              stacktrace: __STACKTRACE__
+            })
+
+            {:noreply, state}
+        end
+      end
+
+      @doc false
+      def handle_cast({:order_updated, old_order, updated_order, callback}, state) do
+        try do
+          case callback.(old_order, updated_order, state) do
             {:ok, new_store} -> {:noreply, state |> Map.put(:store, new_store)}
             _ -> {:noreply, state}
           end
