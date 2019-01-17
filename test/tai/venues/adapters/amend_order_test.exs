@@ -82,6 +82,37 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
         assert %DateTime{} = amend_response.venue_updated_at
       end
     end
+
+    test "#{adapter.id} timeout" do
+      enqueued_order = build_enqueued_order(@adapter.id, :buy)
+      amend_qty = amend_qty(@adapter.id, enqueued_order.side)
+      attrs = amend_attrs(@adapter.id, qty: amend_qty)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_timeout" do
+        assert {:ok, amend_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+
+        open_order = build_open_order(enqueued_order, amend_response)
+
+        assert {:error, :timeout} = Tai.Venue.amend_order(open_order, attrs, @test_adapters)
+      end
+    end
+
+    test "#{adapter.id} nonce not increasing" do
+      enqueued_order = build_enqueued_order(@adapter.id, :buy)
+      amend_qty = amend_qty(@adapter.id, enqueued_order.side)
+      attrs = amend_attrs(@adapter.id, qty: amend_qty)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_nonce_not_increasing" do
+        assert {:ok, amend_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+
+        open_order = build_open_order(enqueued_order, amend_response)
+
+        assert {:error, {:nonce_not_increasing, msg}} =
+                 Tai.Venue.amend_order(open_order, attrs, @test_adapters)
+
+        assert msg =~ ~r/Nonce is not increasing/
+      end
+    end
   end)
 
   defp build_enqueued_order(venue_id, side) do

@@ -6,9 +6,8 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
   @type attrs :: Tai.Trading.Orders.Amend.attrs()
   @type response :: Tai.Trading.OrderResponses.Amend.t()
   @type error_reason ::
-          :not_implemented
-          | :not_found
-          | :timeout
+          :timeout
+          | {:nonce_not_increasing, String.t()}
           | Tai.CredentialError.t()
 
   @spec amend_order(venue_order_id, attrs, credentials) ::
@@ -59,4 +58,6 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
 
     {:ok, response}
   end
+
+  defp parse_response({:error, reason, _}), do: {:error, reason}
 end

@@ -50,6 +50,7 @@ defmodule Tai.Venue do
   @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
   @type amend_order_error_reason ::
           :not_implemented
+          | :timeout
           | shared_error_reason
 
   @spec amend_order(order, amend_attrs) ::
