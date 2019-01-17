@@ -53,27 +53,27 @@ defmodule Tai.Trading.Orders.CancelTest do
            %{order: order} do
         Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
 
-        assert {:ok, %Tai.Trading.Order{status: :canceling}} = Orders.cancel(order)
+        assert {:ok, %Tai.Trading.Order{status: :pending_cancel}} = Orders.cancel(order)
 
         assert_receive {
           :callback_fired,
           %Tai.Trading.Order{status: :open},
-          %Tai.Trading.Order{status: :canceling} = canceling_order
+          %Tai.Trading.Order{status: :pending_cancel} = pending_cancel_order
         }
 
         assert_receive {
           :callback_fired,
-          %Tai.Trading.Order{status: :canceling},
+          %Tai.Trading.Order{status: :pending_cancel},
           %Tai.Trading.Order{status: :canceled} = canceled_order
         }
 
-        assert canceling_order.leaves_qty != Decimal.new(0)
-        assert %DateTime{} = canceling_order.updated_at
-        assert canceling_order.venue_updated_at == nil
+        assert pending_cancel_order.leaves_qty != Decimal.new(0)
+        assert %DateTime{} = pending_cancel_order.updated_at
+        assert pending_cancel_order.venue_updated_at == nil
 
         assert canceled_order.leaves_qty == Decimal.new(0)
         assert %DateTime{} = canceled_order.updated_at
-        assert canceled_order.updated_at == canceling_order.updated_at
+        assert canceled_order.updated_at == pending_cancel_order.updated_at
         assert %DateTime{} = canceled_order.venue_updated_at
       end
     end

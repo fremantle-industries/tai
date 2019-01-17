@@ -20,6 +20,6 @@ defmodule Tai.VenueAdapters.Bitmex.OrderStatus do
   # defp from_venue_status("PendingNew"), do: :pending
   # defp from_venue_status("DoneForDay"), do: :open
   # defp from_venue_status("Stopped"), do: :open
-  # defp from_venue_status("PendingCancel"), do: :canceling
+  # defp from_venue_status("PendingCancel"), do: :pending_cancel
   # defp from_venue_status("Expired"), do: :expired
 end

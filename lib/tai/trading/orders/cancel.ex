@@ -24,25 +24,27 @@ defmodule Tai.Trading.Orders.Cancel do
 
   defp parse_cancel_order_response({:ok, order_response}, order) do
     {:ok, {old_order, updated_order}} =
-      find_canceling_order_and_cancel(order.client_id, order_response)
+      find_pending_cancel_order_and_cancel(order.client_id, order_response)
 
     Orders.updated!(old_order, updated_order)
   end
 
   defp parse_cancel_order_response({:error, :not_found = reason}, order) do
-    {:ok, {old_order, updated_order}} = find_canceling_order_and_error(order.client_id, reason)
+    {:ok, {old_order, updated_order}} =
+      find_pending_cancel_order_and_error(order.client_id, reason)
+
     Orders.updated!(old_order, updated_order)
   end
 
   defp find_open_order_and_pre_cancel(client_id) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id, status: :open],
-      status: :canceling,
+      status: :pending_cancel,
       updated_at: Timex.now()
     )
   end
 
-  defp find_canceling_order_and_cancel(client_id, order_response) do
+  defp find_pending_cancel_order_and_cancel(client_id, order_response) do
     Tai.Trading.OrderStore.find_by_and_update(
       [client_id: client_id],
       status: :canceled,
@@ -51,9 +53,9 @@ defmodule Tai.Trading.Orders.Cancel do
     )
   end
 
-  defp find_canceling_order_and_error(client_id, reason) do
+  defp find_pending_cancel_order_and_error(client_id, reason) do
     Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: :canceling],
+      [client_id: client_id, status: :pending_cancel],
       status: :error,
       error_reason: reason
     )

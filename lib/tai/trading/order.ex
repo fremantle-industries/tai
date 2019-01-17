@@ -14,7 +14,7 @@ defmodule Tai.Trading.Order do
           | :pending_amend
           | :expired
           | :filled
-          | :canceling
+          | :pending_cancel
           | :canceled
           | :rejected
           | :error
