@@ -24,10 +24,10 @@ defmodule Tai.Exchanges.Account do
               {:ok, order_response} | {:error, create_order_error_reason}
 
   @callback cancel_order(venue_order_id, credentials) ::
-              {:ok, venue_order_id} | {:error, :not_implemented | reason :: term}
+              {:ok, venue_order_id} | {:error, :not_implemented | (reason :: term)}
 
   @callback order_status(venue_order_id, credentials) ::
-              {:ok, order_status} | {:error, :not_implemented | reason :: term}
+              {:ok, order_status} | {:error, :not_implemented | (reason :: term)}
 
   @enforce_keys [:exchange_id, :account_id, :credentials]
   defstruct [:exchange_id, :account_id, :credentials]
