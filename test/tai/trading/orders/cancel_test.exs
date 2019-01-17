@@ -78,7 +78,7 @@ defmodule Tai.Trading.Orders.CancelTest do
       end
     end
 
-    describe "#{side} failure" do
+    describe "#{side} invalid order status" do
       setup do
         Tai.Events.firehose_subscribe()
         submission = Support.OrderSubmissions.build(@submission_type)
@@ -102,6 +102,21 @@ defmodule Tai.Trading.Orders.CancelTest do
                         } = cancel_error_event}
 
         assert cancel_error_event.client_id == order.client_id
+      end
+    end
+
+    describe "#{side} venue error" do
+      test "changes the status to :cancel_error" do
+        Tai.Events.firehose_subscribe()
+        submission = Support.OrderSubmissions.build(@submission_type)
+        Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
+        {:ok, order} = Tai.Trading.Orders.create(submission)
+        assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :open}}
+
+        assert {:ok, _} = Tai.Trading.Orders.cancel(order)
+
+        assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :cancel_error} = error_event}
+        assert error_event.error_reason == :mock_not_found
       end
     end
   end)

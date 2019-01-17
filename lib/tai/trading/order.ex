@@ -19,7 +19,7 @@ defmodule Tai.Trading.Order do
           | :rejected
           | :create_error
           | :amend_error
-          | :error
+          | :cancel_error
   @type t :: %Order{
           client_id: client_id,
           enqueued_at: DateTime.t(),
