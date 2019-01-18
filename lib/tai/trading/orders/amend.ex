@@ -49,7 +49,11 @@ defmodule Tai.Trading.Orders.Amend do
 
   defp find_amendable_order_and_pend_amend(client_id, [status_to_check | unchecked_status]) do
     [client_id: client_id, status: status_to_check]
-    |> Tai.Trading.OrderStore.find_by_and_update(status: :pending_amend, updated_at: Timex.now())
+    |> Tai.Trading.OrderStore.find_by_and_update(
+      status: :pending_amend,
+      error_reason: nil,
+      updated_at: Timex.now()
+    )
     |> case do
       {:ok, _} = result -> result
       {:error, :not_found} -> find_amendable_order_and_pend_amend(client_id, unchecked_status)

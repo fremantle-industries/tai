@@ -107,7 +107,8 @@ defmodule Tai.Trading.Orders.AmendTest do
         {:ok, {_, amend_error_order}} =
           Tai.Trading.OrderStore.find_by_and_update(
             [client_id: enqueued_order.client_id],
-            status: :amend_error
+            status: :amend_error,
+            error_reason: "Invalid nonce"
           )
 
         {:ok, %{order: amend_error_order}}
@@ -131,6 +132,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert returned_order.price == @original_price
         assert returned_order.leaves_qty == @original_qty
         assert returned_order.qty == @original_qty
+        assert returned_order.error_reason == nil
 
         assert_receive {
           :callback_fired,
