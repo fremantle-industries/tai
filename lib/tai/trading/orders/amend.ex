@@ -7,10 +7,12 @@ defmodule Tai.Trading.Orders.Amend do
           optional(:qty) => Decimal.t()
         }
 
+  @amendable_status [:open, :amend_error]
+
   @spec amend(order, attrs) ::
-          {:ok, updated_order :: order} | {:error, :order_status_must_be_open}
+          {:ok, updated_order :: order} | {:error, {:invalid_order_status, String.t()}}
   def amend(order, attrs) when is_map(attrs) do
-    with {:ok, {old_order, updated_order}} <- find_open_order_and_pend_amend(order.client_id) do
+    with {:ok, {old_order, updated_order}} <- find_amendable_order_and_pend_amend(order.client_id) do
       Orders.updated!(old_order, updated_order)
 
       Task.start_link(fn ->
@@ -39,12 +41,19 @@ defmodule Tai.Trading.Orders.Amend do
     Orders.updated!(old_order, updated_order)
   end
 
-  defp find_open_order_and_pend_amend(client_id) do
-    Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: :open],
-      status: :pending_amend,
-      updated_at: Timex.now()
-    )
+  defp find_amendable_order_and_pend_amend(client_id) do
+    client_id |> find_amendable_order_and_pend_amend(@amendable_status)
+  end
+
+  defp find_amendable_order_and_pend_amend(_, []), do: {:error, :not_found}
+
+  defp find_amendable_order_and_pend_amend(client_id, [status_to_check | unchecked_status]) do
+    [client_id: client_id, status: status_to_check]
+    |> Tai.Trading.OrderStore.find_by_and_update(status: :pending_amend, updated_at: Timex.now())
+    |> case do
+      {:ok, _} = result -> result
+      {:error, :not_found} -> find_amendable_order_and_pend_amend(client_id, unchecked_status)
+    end
   end
 
   defp find_pending_amend_order_and_open(client_id, amend_response) do
@@ -71,13 +80,17 @@ defmodule Tai.Trading.Orders.Amend do
 
   defp handle_invalid_status(client_id) do
     {:ok, order} = Tai.Trading.OrderStore.find(client_id)
+    required = stringify_amendable_status()
 
     Tai.Events.broadcast(%Tai.Events.OrderErrorAmendHasInvalidStatus{
       client_id: client_id,
       was: order.status,
-      required: :open
+      required: required
     })
 
-    {:error, :order_status_must_be_open}
+    reason = {:invalid_order_status, "Must be #{required}, but it was #{order.status}"}
+    {:error, reason}
   end
+
+  defp stringify_amendable_status, do: Enum.join(@amendable_status, " | ")
 end
