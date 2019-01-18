@@ -11,6 +11,8 @@ jobs:
       - restore_cache:
           keys:
             - hex-packages-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - hex-packages-{{ arch }}-{{ .Branch }}
+            - hex-packages
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
@@ -21,21 +23,24 @@ jobs:
 
       - restore_cache:
           keys:
+            - test-build-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
             - test-build-{{ arch }}-{{ .Branch }}
+            - test-build
       - run: mix test
       - save_cache:
-          key: test-build-{{ arch }}-{{ .Branch }}
+          key: test-build-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/test
 
       - restore_cache:
           keys:
+            - dialyzer-plt-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
             - dialyzer-plt-{{ arch }}-{{ .Branch }}
+            - dialyzer-plt
       - run: mix dialyzer --halt-exit-status
       - save_cache:
-          key: dialyzer-plt-{{ arch }}-{{ .Branch }}
+          key: dialyzer-plt-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/dev
-
 
       - run: MIX_ENV=test mix coveralls.circle
