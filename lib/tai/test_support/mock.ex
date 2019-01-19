@@ -54,7 +54,7 @@ defmodule Tai.TestSupport.Mock do
   def push_market_feed_snapshot(location, bids, asks) do
     :ok =
       location.venue_id
-      |> whereis_market_data_feed
+      |> whereis_stream_connection
       |> send_json_msg(%{
         type: :snapshot,
         symbol: location.product_symbol,
@@ -63,7 +63,7 @@ defmodule Tai.TestSupport.Mock do
       })
   end
 
-  defp whereis_market_data_feed(venue_id) do
+  defp whereis_stream_connection(venue_id) do
     venue_id
     |> Tai.VenueAdapters.Mock.Stream.Connection.to_name()
     |> Process.whereis()
