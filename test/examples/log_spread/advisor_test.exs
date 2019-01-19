@@ -34,7 +34,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
   test "logs the bid/ask spread with a custom event" do
     Tai.Events.firehose_subscribe()
 
-    push_market_feed_snapshot(
+    push_market_data_snapshot(
       %Tai.Markets.Location{
         venue_id: :test_exchange_a,
         product_symbol: :btc_usd

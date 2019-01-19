@@ -76,6 +76,41 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     Tai.Markets.OrderBook.replace(snapshot)
   end
 
+  defp handle_msg(
+         %{
+           "venue_order_id" => venue_order_id,
+           "status" => raw_status,
+           "avg_price" => raw_avg_price,
+           "cumulative_qty" => raw_cumulative_qty
+         },
+         _venue_id
+       ) do
+    {:ok, {_, current_order}} =
+      Tai.Trading.OrderStore.find_by_and_update([venue_order_id: venue_order_id], [])
+
+    cumulative_qty = Tai.Utils.Decimal.from(raw_cumulative_qty)
+
+    attrs = [
+      status: String.to_atom(raw_status),
+      avg_price: Tai.Utils.Decimal.from(raw_avg_price),
+      cumulative_qty: cumulative_qty,
+      leaves_qty: Decimal.sub(current_order.leaves_qty, cumulative_qty)
+    ]
+
+    with {:ok, {prev_order, updated_order}} <-
+           Tai.Trading.OrderStore.find_by_and_update(
+             [venue_order_id: venue_order_id],
+             attrs
+           ) do
+      Tai.Trading.Orders.updated!(prev_order, updated_order)
+    else
+      {:error, :not_found} ->
+        Tai.Events.broadcast(%Tai.Events.OrderNotFound{
+          venue_order_id: venue_order_id
+        })
+    end
+  end
+
   defp handle_msg(msg, venue_id) do
     Logger.error(fn ->
       "Unhandled stream message - venue_id: #{inspect(venue_id)}, msg: #{inspect(msg)}"

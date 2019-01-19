@@ -36,7 +36,7 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
   test "creates a fill or kill order" do
     Tai.Events.firehose_subscribe()
 
-    push_market_feed_snapshot(
+    push_market_data_snapshot(
       %Tai.Markets.Location{
         venue_id: :test_exchange_a,
         product_symbol: :btc_usd

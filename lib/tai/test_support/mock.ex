@@ -44,14 +44,8 @@ defmodule Tai.TestSupport.Mock do
     })
   end
 
-  @spec push_market_feed_snapshot(location :: location, bids :: map, asks :: map) ::
-          :ok
-          | {:error,
-             %WebSockex.FrameEncodeError{}
-             | %WebSockex.ConnError{}
-             | %WebSockex.NotConnectedError{}
-             | %WebSockex.InvalidFrameError{}}
-  def push_market_feed_snapshot(location, bids, asks) do
+  @spec push_market_data_snapshot(location :: location, bids :: map, asks :: map) :: no_return
+  def push_market_data_snapshot(location, bids, asks) do
     :ok =
       location.venue_id
       |> whereis_stream_connection
@@ -61,6 +55,14 @@ defmodule Tai.TestSupport.Mock do
         bids: bids,
         asks: asks
       })
+  end
+
+  @spec push_order_update(atom, map) :: no_return
+  def push_order_update(venue_id, attrs) do
+    :ok =
+      venue_id
+      |> whereis_stream_connection()
+      |> send_json_msg(attrs)
   end
 
   defp whereis_stream_connection(venue_id) do
