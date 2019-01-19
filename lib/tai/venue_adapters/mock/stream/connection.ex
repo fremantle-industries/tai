@@ -4,7 +4,9 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   require Logger
 
   @type product :: Tai.Venues.Product.t()
+  @type msg :: map
   @type account_config :: map
+  @type venue_id :: atom
   @type account_id :: atom
 
   @enforce_keys [:venue_id]
@@ -12,7 +14,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   @spec start_link(
           url: String.t(),
-          venue_id: atom,
+          venue_id: venue_id,
           account: {account_id, account_config} | nil,
           products: [product]
         ) :: {:ok, pid}
@@ -49,7 +51,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   def handle_frame(_frame, state), do: {:ok, state}
 
-  @spec handle_msg(msg :: map, venue_id :: atom) :: no_return
+  @spec handle_msg(msg, venue_id) :: no_return
   defp handle_msg(msg, venue_id)
 
   defp handle_msg(
@@ -72,5 +74,11 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     }
 
     Tai.Markets.OrderBook.replace(snapshot)
+  end
+
+  defp handle_msg(msg, venue_id) do
+    Logger.error(fn ->
+      "Unhandled stream message - venue_id: #{inspect(venue_id)}, msg: #{inspect(msg)}"
+    end)
   end
 end
