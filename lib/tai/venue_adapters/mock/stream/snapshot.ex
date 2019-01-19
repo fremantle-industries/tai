@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Mock.OrderBookFeed.Snapshot do
+defmodule Tai.VenueAdapters.Mock.Stream.Snapshot do
   def normalize(snapshot_side, processed_at) do
     snapshot_side
     |> Enum.reduce(

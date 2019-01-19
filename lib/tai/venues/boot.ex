@@ -11,7 +11,7 @@ defmodule Tai.Venues.Boot do
 
   @type adapter :: Tai.Venues.Adapter.t()
 
-  @spec run(adapter :: adapter) :: {:ok, adapter} | {:error, [reasons :: term]}
+  @spec run(adapter :: adapter) :: {:ok, adapter} | {:error, {adapter, [reason :: term]}}
   def run(%Tai.Venues.Adapter{} = adapter) do
     adapter
     |> hydrate_products_and_balances

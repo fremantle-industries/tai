@@ -2,9 +2,9 @@ defmodule Tai.VenueAdapters.Mock do
   @behaviour Tai.Venues.Adapter
   import Tai.TestSupport.Mocks.Client
 
-  def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
+  def stream_supervisor, do: Tai.VenueAdapters.Mock.StreamSupervisor
 
-  def order_book_feed, do: Tai.VenueAdapters.Mock.OrderBookFeed
+  def order_book_feed, do: Tai.VenueAdapters.NullOrderBookFeed
 
   def products(venue_id) do
     with_mock_server(fn ->

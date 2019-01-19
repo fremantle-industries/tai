@@ -4,8 +4,8 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   @type product :: Tai.Venues.Product.t()
 
   @spec start_link(venue_id: atom, accounts: map, products: [product]) :: Supervisor.on_start()
-  def start_link([venue_id: _, accounts: _, products: _] = args) do
-    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
+  def start_link([venue_id: venue_id, accounts: _, products: _] = args) do
+    Supervisor.start_link(__MODULE__, args, name: :"#{__MODULE__}_#{venue_id}")
   end
 
   # TODO: Make this configurable

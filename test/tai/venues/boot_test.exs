@@ -107,8 +107,10 @@ defmodule Tai.Venues.BootTest do
         timeout: @timeout
       }
 
-      assert {:error, {^adapter, [products: :mock_response_not_found]}} =
-               Tai.Venues.Boot.run(adapter)
+      assert {:error, result} = Tai.Venues.Boot.run(adapter)
+      assert {result_adapter, reasons} = result
+      assert result_adapter == adapter
+      assert reasons == [products: :mock_response_not_found]
     end
   end
 
@@ -124,8 +126,10 @@ defmodule Tai.Venues.BootTest do
         timeout: @timeout
       }
 
-      assert {:error, {^adapter, [asset_balances: :mock_response_not_found]}} =
-               Tai.Venues.Boot.run(adapter)
+      assert {:error, result} = Tai.Venues.Boot.run(adapter)
+      assert {result_adapter, reasons} = result
+      assert result_adapter == adapter
+      assert reasons == [asset_balances: :mock_response_not_found]
     end
   end
 
@@ -141,8 +145,10 @@ defmodule Tai.Venues.BootTest do
         timeout: @timeout
       }
 
-      assert {:error, {^adapter, [fees: :mock_response_not_found]}} =
-               Tai.Venues.Boot.run(adapter)
+      assert {:error, result} = Tai.Venues.Boot.run(adapter)
+      assert {result_adapter, reasons} = result
+      assert result_adapter == adapter
+      assert reasons == [fees: :mock_response_not_found]
     end
   end
 

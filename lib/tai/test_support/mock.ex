@@ -65,7 +65,7 @@ defmodule Tai.TestSupport.Mock do
 
   defp whereis_market_data_feed(venue_id) do
     venue_id
-    |> Tai.Venues.OrderBookFeed.to_name()
+    |> Tai.VenueAdapters.Mock.Stream.Connection.to_name()
     |> Process.whereis()
   end
 

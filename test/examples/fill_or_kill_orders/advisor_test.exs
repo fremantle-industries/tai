@@ -6,7 +6,7 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
 
   setup do
     on_exit(fn ->
-      Application.stop(:tai)
+      :ok = Application.stop(:tai)
     end)
 
     start_supervised!(Mocks.Server)
