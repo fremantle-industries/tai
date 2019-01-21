@@ -1,11 +1,14 @@
 defmodule Tai.Trading.Orders.Cancel do
-  alias Tai.Trading.Orders
+  alias Tai.Trading.{Orders, NewOrderStore}
 
   @type order :: Tai.Trading.Order.t()
 
-  @spec cancel(order) :: {:ok, updated_order :: order} | {:error, :order_status_must_be_open}
+  @spec cancel(order) ::
+          {:ok, updated :: order}
+          | {:error, {:invalid_status, was :: term, required :: term}}
   def cancel(%Tai.Trading.Order{client_id: client_id}) do
-    with {:ok, {old_order, updated_order}} <- find_open_order_and_pre_cancel(client_id) do
+    with {:ok, {old_order, updated_order}} <-
+           NewOrderStore.pend_cancel(client_id, Timex.now()) do
       Orders.updated!(old_order, updated_order)
 
       Task.start_link(fn ->
@@ -16,7 +19,9 @@ defmodule Tai.Trading.Orders.Cancel do
 
       {:ok, updated_order}
     else
-      {:error, :not_found} -> handle_invalid_status(client_id)
+      {:error, {:invalid_status, was, required}} = error ->
+        broadcast_invalid_status(client_id, was, required)
+        error
     end
   end
 
@@ -24,52 +29,22 @@ defmodule Tai.Trading.Orders.Cancel do
 
   defp parse_cancel_order_response({:ok, order_response}, order) do
     {:ok, {old_order, updated_order}} =
-      find_pending_cancel_order_and_cancel(order.client_id, order_response)
+      NewOrderStore.cancel(order.client_id, order_response.venue_updated_at)
 
     Orders.updated!(old_order, updated_order)
   end
 
   defp parse_cancel_order_response({:error, reason}, order) do
-    {:ok, {old_order, updated_order}} =
-      find_pending_cancel_order_and_error(order.client_id, reason)
+    {:ok, {old_order, updated_order}} = NewOrderStore.cancel_error(order.client_id, reason)
 
     Orders.updated!(old_order, updated_order)
   end
 
-  defp find_open_order_and_pre_cancel(client_id) do
-    Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: :open],
-      status: :pending_cancel,
-      updated_at: Timex.now()
-    )
-  end
-
-  defp find_pending_cancel_order_and_cancel(client_id, order_response) do
-    Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id],
-      status: :canceled,
-      leaves_qty: order_response.leaves_qty,
-      venue_updated_at: order_response.venue_updated_at
-    )
-  end
-
-  defp find_pending_cancel_order_and_error(client_id, reason) do
-    Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: :pending_cancel],
-      status: :cancel_error,
-      error_reason: reason
-    )
-  end
-
-  defp handle_invalid_status(client_id) do
-    {:ok, order} = Tai.Trading.OrderStore.find(client_id)
-
-    Tai.Events.broadcast(%Tai.Events.CancelOrderInvalidStatus{
+  defp broadcast_invalid_status(client_id, was, required) do
+    Tai.Events.broadcast(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: client_id,
-      was: order.status,
-      required: :open
+      was: was,
+      required: required
     })
-
-    {:error, :order_status_must_be_open}
   end
 end

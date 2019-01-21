@@ -7,12 +7,12 @@ defmodule Tai.Trading.Orders.Amend do
           optional(:qty) => Decimal.t()
         }
 
-  @amendable_status [:open, :amend_error]
-
   @spec amend(order, attrs) ::
-          {:ok, updated_order :: order} | {:error, {:invalid_order_status, String.t()}}
+          {:ok, updated_order :: order}
+          | {:error, {:invalid_status, was :: term, required :: term}}
   def amend(order, attrs) when is_map(attrs) do
-    with {:ok, {old_order, updated_order}} <- find_amendable_order_and_pend_amend(order.client_id) do
+    with {:ok, {old_order, updated_order}} <-
+           Tai.Trading.NewOrderStore.pend_amend(order.client_id, Timex.now()) do
       Orders.updated!(old_order, updated_order)
 
       Task.start_link(fn ->
@@ -23,7 +23,9 @@ defmodule Tai.Trading.Orders.Amend do
 
       {:ok, updated_order}
     else
-      {:error, :not_found} -> handle_invalid_status(order.client_id)
+      {:error, {:invalid_status, was, required}} = error ->
+        broadcast_invalid_status(order.client_id, was, required)
+        error
     end
   end
 
@@ -31,70 +33,26 @@ defmodule Tai.Trading.Orders.Amend do
 
   defp parse_response({:ok, amend_response}, client_id) do
     {:ok, {old_order, updated_order}} =
-      find_pending_amend_order_and_open(client_id, amend_response)
+      Tai.Trading.NewOrderStore.amend(
+        client_id,
+        amend_response.venue_updated_at,
+        amend_response.price,
+        amend_response.leaves_qty
+      )
 
     Orders.updated!(old_order, updated_order)
   end
 
   defp parse_response({:error, reason}, client_id) do
-    {:ok, {old_order, updated_order}} = find_pending_amend_order_and_error(client_id, reason)
+    {:ok, {old_order, updated_order}} = Tai.Trading.NewOrderStore.amend_error(client_id, reason)
     Orders.updated!(old_order, updated_order)
   end
 
-  defp find_amendable_order_and_pend_amend(client_id) do
-    client_id |> find_amendable_order_and_pend_amend(@amendable_status)
-  end
-
-  defp find_amendable_order_and_pend_amend(_, []), do: {:error, :not_found}
-
-  defp find_amendable_order_and_pend_amend(client_id, [status_to_check | unchecked_status]) do
-    [client_id: client_id, status: status_to_check]
-    |> Tai.Trading.OrderStore.find_by_and_update(
-      status: :pending_amend,
-      error_reason: nil,
-      updated_at: Timex.now()
-    )
-    |> case do
-      {:ok, _} = result -> result
-      {:error, :not_found} -> find_amendable_order_and_pend_amend(client_id, unchecked_status)
-    end
-  end
-
-  defp find_pending_amend_order_and_open(client_id, amend_response) do
-    update_attrs = [
-      status: :open,
-      price: amend_response.price,
-      leaves_qty: amend_response.leaves_qty,
-      venue_updated_at: amend_response.venue_updated_at
-    ]
-
-    Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: :pending_amend],
-      update_attrs
-    )
-  end
-
-  defp find_pending_amend_order_and_error(client_id, reason) do
-    Tai.Trading.OrderStore.find_by_and_update(
-      [client_id: client_id, status: :pending_amend],
-      status: :amend_error,
-      error_reason: reason
-    )
-  end
-
-  defp handle_invalid_status(client_id) do
-    {:ok, order} = Tai.Trading.OrderStore.find(client_id)
-    required = stringify_amendable_status()
-
-    Tai.Events.broadcast(%Tai.Events.OrderErrorAmendHasInvalidStatus{
+  defp broadcast_invalid_status(client_id, was, required) do
+    Tai.Events.broadcast(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: client_id,
-      was: order.status,
+      was: was,
       required: required
     })
-
-    reason = {:invalid_order_status, "Must be #{required}, but it was #{order.status}"}
-    {:error, reason}
   end
-
-  defp stringify_amendable_status, do: Enum.join(@amendable_status, " | ")
 end

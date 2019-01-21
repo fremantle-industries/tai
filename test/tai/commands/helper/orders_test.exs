@@ -21,7 +21,7 @@ defmodule Tai.Commands.Helper.OrdersTest do
         price: Decimal.new("12999.99"),
         qty: Decimal.new("1.1")
       }
-      |> Tai.Trading.OrderStore.add()
+      |> Tai.Trading.NewOrderStore.add()
 
     btc_usd_order_client_id = "#{btc_usd_order.client_id |> String.slice(0..5)}..."
 
@@ -33,7 +33,7 @@ defmodule Tai.Commands.Helper.OrdersTest do
         price: Decimal.new("75.23"),
         qty: Decimal.new("1.0")
       }
-      |> Tai.Trading.OrderStore.add()
+      |> Tai.Trading.NewOrderStore.add()
 
     ltc_usd_order_client_id = "#{ltc_usd_order.client_id |> String.slice(0..5)}..."
 

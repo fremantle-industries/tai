@@ -9,7 +9,7 @@ defmodule Examples.Advisors.FillOrKillOrders.Advisor do
   require Logger
 
   def handle_inside_quote(venue_id, product_symbol, _inside_quote, _changes, _state) do
-    if Tai.Trading.OrderStore.count() == 0 do
+    if Tai.Trading.NewOrderStore.count() == 0 do
       Tai.Trading.Orders.create(%Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: venue_id,
         account_id: :main,
