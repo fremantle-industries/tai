@@ -77,7 +77,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages do
     orders
     |> Enum.each(fn
       %{"orderID" => venue_order_id, "ordStatus" => _} = venue_order ->
-        Task.async(fn -> Stream.UpdateOrder.update(venue_order_id, venue_order) end)
+        Task.async(fn -> Stream.UpdateGtcOrder.update(venue_order_id, venue_order) end)
 
       %{"orderID" => _venue_order_id} ->
         :ignore_changes_with_no_status

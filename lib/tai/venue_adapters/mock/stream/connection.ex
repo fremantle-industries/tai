@@ -103,11 +103,6 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
              attrs
            ) do
       Tai.Trading.Orders.updated!(prev_order, updated_order)
-    else
-      {:error, :not_found} ->
-        Tai.Events.broadcast(%Tai.Events.OrderNotFound{
-          venue_order_id: venue_order_id
-        })
     end
   end
 
