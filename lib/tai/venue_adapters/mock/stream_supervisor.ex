@@ -8,9 +8,6 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
     Supervisor.start_link(__MODULE__, args, name: :"#{__MODULE__}_#{venue_id}")
   end
 
-  # TODO: Make this configurable
-  @url "ws://localhost:#{EchoBoy.Config.port()}/ws"
-
   def init(venue_id: venue_id, accounts: accounts, products: products) do
     order_books =
       products
@@ -30,7 +27,7 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
     system = [
       {Tai.VenueAdapters.Mock.Stream.Connection,
        [
-         url: @url,
+         url: url(),
          venue_id: venue_id,
          account: accounts |> Map.to_list() |> List.first(),
          products: products
@@ -40,4 +37,7 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
     (order_books ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
+
+  # TODO: Make this configurable
+  defp url, do: "ws://localhost:#{EchoBoy.Config.port()}/ws"
 end
