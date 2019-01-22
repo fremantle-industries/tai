@@ -3,6 +3,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   Create orders for the Bitmex adapter
   """
 
+  alias Tai.VenueAdapters.Bitmex.ClientId
   import Tai.VenueAdapters.Bitmex.OrderStatus
 
   def create_order(%Tai.Trading.Order{} = order, credentials) do
@@ -16,6 +17,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
 
   defp build_params(order) do
     params = %{
+      clOrdID: order.client_id |> ClientId.to_venue(order.time_in_force),
       side: order.side |> to_venue_side,
       ordType: "Limit",
       symbol: order.symbol |> to_venue_symbol,

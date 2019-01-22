@@ -217,6 +217,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
     post_only = Keyword.get(opts, :post_only, false)
 
     struct(Tai.Trading.Order, %{
+      client_id: Ecto.UUID.generate(),
       exchange_id: venue_id,
       account_id: :main,
       symbol: venue_id |> product_symbol,

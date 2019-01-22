@@ -117,6 +117,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
 
   defp build_enqueued_order(venue_id, side) do
     struct(Tai.Trading.Order, %{
+      client_id: Ecto.UUID.generate(),
       exchange_id: venue_id,
       account_id: :main,
       symbol: venue_id |> product_symbol,
