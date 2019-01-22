@@ -115,7 +115,7 @@ defmodule Tai.Trading.OrderStore do
     qty = Decimal.abs(submission.qty)
 
     %Trading.Order{
-      client_id: UUID.uuid4(),
+      client_id: Ecto.UUID.generate(),
       exchange_id: submission.venue_id,
       account_id: submission.account_id,
       symbol: submission.product_symbol,

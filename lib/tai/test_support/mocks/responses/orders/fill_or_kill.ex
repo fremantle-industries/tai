@@ -34,7 +34,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
   end
 
   @spec expired(submission) :: insert_result
-  def expired(submission), do: expired(UUID.uuid4(), submission)
+  def expired(submission), do: expired(Ecto.UUID.generate(), submission)
 
   @spec filled(venue_order_id, submission) :: insert_result
   def filled(venue_order_id, submission) do
@@ -61,5 +61,5 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
   end
 
   @spec filled(submission) :: insert_result
-  def filled(submission), do: filled(UUID.uuid4(), submission)
+  def filled(submission), do: filled(Ecto.UUID.generate(), submission)
 end
