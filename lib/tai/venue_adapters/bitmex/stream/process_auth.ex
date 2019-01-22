@@ -76,10 +76,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages do
       ) do
     orders
     |> Enum.each(fn
-      %{"orderID" => venue_order_id, "ordStatus" => _} = venue_order ->
-        Task.async(fn -> Stream.UpdateGtcOrder.update(venue_order_id, venue_order) end)
+      %{"clOrdID" => "gtc-" <> venue_client_id, "ordStatus" => _} = venue_order ->
+        Task.async(fn ->
+          Stream.UpdateGtcOrder.update(venue_client_id, venue_order)
+        end)
 
-      %{"orderID" => _venue_order_id} ->
+      _ ->
         :ignore_changes_with_no_status
     end)
 

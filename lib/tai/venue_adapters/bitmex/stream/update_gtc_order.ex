@@ -1,10 +1,13 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
-  def update(venue_order_id, venue_order) do
+  alias Tai.VenueAdapters.Bitmex.ClientId
+
+  def update(venue_client_id, venue_order) do
+    client_id = venue_client_id |> ClientId.from_base64()
     attrs = build_attrs(venue_order)
 
     with {:ok, {prev_order, updated_order}} <-
            Tai.Trading.OrderStore.find_by_and_update(
-             [venue_order_id: venue_order_id, time_in_force: :gtc],
+             [client_id: client_id],
              attrs
            ) do
       Tai.Trading.Orders.updated!(prev_order, updated_order)

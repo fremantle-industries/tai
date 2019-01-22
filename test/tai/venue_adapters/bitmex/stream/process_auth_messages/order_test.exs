@@ -1,6 +1,7 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
   use ExUnit.Case, async: false
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages
+  alias Tai.VenueAdapters.Bitmex.ClientId
 
   setup do
     on_exit(fn ->
@@ -13,26 +14,31 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
   end
 
   describe "update" do
-    test "updates each order with a time in force = gtc" do
+    test "updates each gtc order with a status" do
       Tai.Events.firehose_subscribe()
       order_1 = enqueue_order(:buy, %{price: Decimal.new(100), qty: Decimal.new(5)})
       order_2 = enqueue_order(:sell, %{price: Decimal.new(1500), qty: Decimal.new(15)})
       order_3 = enqueue_order(:sell_ioc, %{price: Decimal.new(1200), qty: Decimal.new(45)})
-      venue_order_id_1 = "7cb830ba-81a2-459d-9b46-0f0889c76ad1"
-      venue_order_id_2 = "1748ac55-64af-4a4f-908f-156d1aabd947"
-      venue_order_id_3 = "12d0807a-f8a0-46a6-8d99-de69527dac9b"
+      order_4 = enqueue_order(:buy, %{price: Decimal.new(300), qty: Decimal.new(3)})
 
       bitmex_orders = [
         %{
-          "orderID" => venue_order_id_1,
-          "ordStatus" => "Filled",
-          "leavesQty" => 3,
-          "cumQty" => 2,
-          "avgPx" => 4265.5,
-          "timestamp" => "2018-12-27T05:33:50.795Z"
+          "clOrdID" => order_4.client_id |> ClientId.to_venue(order_4.time_in_force),
+          "leavesQty" => 30,
+          "cumQty" => 15,
+          "avgPx" => 1000,
+          "timestamp" => "2018-12-27T05:33:50.987Z"
         },
         %{
-          "orderID" => venue_order_id_2,
+          "clOrdID" => order_3.client_id |> ClientId.to_venue(order_3.time_in_force),
+          "ordStatus" => "Filled",
+          "leavesQty" => 30,
+          "cumQty" => 15,
+          "avgPx" => 1000,
+          "timestamp" => "2018-12-27T05:33:50.987Z"
+        },
+        %{
+          "clOrdID" => order_2.client_id |> ClientId.to_venue(order_2.time_in_force),
           "ordStatus" => "Filled",
           "leavesQty" => 10,
           "cumQty" => 5,
@@ -40,16 +46,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
           "timestamp" => "2018-12-27T05:33:50.832Z"
         },
         %{
-          "orderID" => venue_order_id_3,
+          "clOrdID" => order_1.client_id |> ClientId.to_venue(order_1.time_in_force),
           "ordStatus" => "Filled",
-          "leavesQty" => 30,
-          "cumQty" => 15,
-          "avgPx" => 1000,
-          "timestamp" => "2018-12-27T05:33:50.987Z"
+          "leavesQty" => 3,
+          "cumQty" => 2,
+          "avgPx" => 4265.5,
+          "timestamp" => "2018-12-27T05:33:50.795Z"
         }
       ]
-
-      [order_1, order_2, order_3] |> set_venue_order_ids(bitmex_orders)
 
       :my_venue
       |> ProcessAuthMessages.to_name()
@@ -66,8 +70,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
                         sell_updated_event}
 
       refute_receive {Tai.Event, %Tai.Events.OrderUpdated{time_in_force: :ioc}}
+      refute_receive {Tai.Event, %Tai.Events.OrderUpdated{time_in_force: :gtc}}
 
-      assert buy_updated_event.venue_order_id == venue_order_id_1
+      assert buy_updated_event.client_id == order_1.client_id
       assert buy_updated_event.status == :filled
       assert buy_updated_event.avg_price == Decimal.new("4265.5")
       assert buy_updated_event.leaves_qty == Decimal.new(3)
@@ -75,7 +80,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       assert buy_updated_event.qty == Decimal.new(5)
       assert %DateTime{} = buy_updated_event.venue_updated_at
 
-      assert sell_updated_event.venue_order_id == venue_order_id_2
+      assert sell_updated_event.client_id == order_2.client_id
       assert sell_updated_event.status == :filled
       assert sell_updated_event.avg_price == Decimal.new("2000")
       assert sell_updated_event.leaves_qty == Decimal.new(10)
@@ -86,19 +91,16 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
 
     test "updates leaves_qty for canceled orders" do
       Tai.Events.firehose_subscribe()
-      order_1 = enqueue_order(:buy, %{price: Decimal.new(100), qty: Decimal.new(5)})
-      venue_order_id = "059ce250-15a6-4d84-8623-779555cf086d"
+      order = enqueue_order(:buy, %{price: Decimal.new(100), qty: Decimal.new(5)})
 
       bitmex_orders = [
         %{
+          "clOrdID" => order.client_id |> ClientId.to_venue(order.time_in_force),
           "leavesQty" => 0,
           "ordStatus" => "Canceled",
-          "orderID" => venue_order_id,
           "timestamp" => "2019-01-11T02:03:06.309Z"
         }
       ]
-
-      [order_1] |> set_venue_order_ids(bitmex_orders)
 
       :my_venue
       |> ProcessAuthMessages.to_name()
@@ -106,13 +108,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
 
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{} = event_1}
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{} = event}
 
-      assert event_1.venue_order_id == venue_order_id
-      assert event_1.status == :canceled
-      assert event_1.leaves_qty == Decimal.new(0)
-      assert event_1.qty == Decimal.new(5)
-      assert %DateTime{} = event_1.venue_updated_at
+      assert event.status == :canceled
+      assert event.leaves_qty == Decimal.new(0)
+      assert event.qty == Decimal.new(5)
+      assert %DateTime{} = event.venue_updated_at
     end
   end
 
@@ -138,17 +139,5 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       |> Tai.Trading.OrderStore.add()
 
     order
-  end
-
-  defp set_venue_order_ids(orders, bitmex_orders) do
-    orders
-    |> Enum.zip(bitmex_orders)
-    |> Enum.each(fn {order, venue_order} ->
-      {:ok, {_prev_order, _updated_order}} =
-        Tai.Trading.OrderStore.find_by_and_update(
-          [client_id: order.client_id],
-          venue_order_id: Map.get(venue_order, "orderID")
-        )
-    end)
   end
 end
