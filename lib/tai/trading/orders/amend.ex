@@ -12,7 +12,7 @@ defmodule Tai.Trading.Orders.Amend do
           | {:error, {:invalid_status, was :: term, required :: term}}
   def amend(order, attrs) when is_map(attrs) do
     with {:ok, {old_order, updated_order}} <-
-           Tai.Trading.NewOrderStore.pend_amend(order.client_id, Timex.now()) do
+           Tai.Trading.OrderStore.pend_amend(order.client_id, Timex.now()) do
       Orders.updated!(old_order, updated_order)
 
       Task.start_link(fn ->
@@ -33,7 +33,7 @@ defmodule Tai.Trading.Orders.Amend do
 
   defp parse_response({:ok, amend_response}, client_id) do
     {:ok, {old_order, updated_order}} =
-      Tai.Trading.NewOrderStore.amend(
+      Tai.Trading.OrderStore.amend(
         client_id,
         amend_response.venue_updated_at,
         amend_response.price,
@@ -44,7 +44,7 @@ defmodule Tai.Trading.Orders.Amend do
   end
 
   defp parse_response({:error, reason}, client_id) do
-    {:ok, {old_order, updated_order}} = Tai.Trading.NewOrderStore.amend_error(client_id, reason)
+    {:ok, {old_order, updated_order}} = Tai.Trading.OrderStore.amend_error(client_id, reason)
     Orders.updated!(old_order, updated_order)
   end
 

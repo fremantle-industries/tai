@@ -36,10 +36,10 @@ defmodule Tai.Trading.Orders.AmendTest do
             qty: @original_qty,
             order_updated_callback: fire_order_callback(self())
           })
-          |> Tai.Trading.NewOrderStore.add()
+          |> Tai.Trading.OrderStore.add()
 
         {:ok, {_, open_order}} =
-          Tai.Trading.NewOrderStore.open(
+          Tai.Trading.OrderStore.open(
             enqueued_order.client_id,
             @venue_order_id,
             Timex.now(),
@@ -106,10 +106,10 @@ defmodule Tai.Trading.Orders.AmendTest do
             qty: @original_qty,
             order_updated_callback: fire_order_callback(self())
           })
-          |> Tai.Trading.NewOrderStore.add()
+          |> Tai.Trading.OrderStore.add()
 
         {:ok, {_, _}} =
-          Tai.Trading.NewOrderStore.open(
+          Tai.Trading.OrderStore.open(
             enqueued_order.client_id,
             @venue_order_id,
             Timex.now(),
@@ -119,10 +119,10 @@ defmodule Tai.Trading.Orders.AmendTest do
           )
 
         {:ok, {_, _}} =
-          Tai.Trading.NewOrderStore.pend_amend(enqueued_order.client_id, Timex.now())
+          Tai.Trading.OrderStore.pend_amend(enqueued_order.client_id, Timex.now())
 
         {:ok, {_, amend_error_order}} =
-          Tai.Trading.NewOrderStore.amend_error(enqueued_order.client_id, "Invalid nonce")
+          Tai.Trading.OrderStore.amend_error(enqueued_order.client_id, "Invalid nonce")
 
         {:ok, %{order: amend_error_order}}
       end
@@ -181,7 +181,7 @@ defmodule Tai.Trading.Orders.AmendTest do
             order_updated_callback: fire_order_callback(self())
           })
 
-        {:ok, enqueued_order} = Tai.Trading.NewOrderStore.add(submission)
+        {:ok, enqueued_order} = Tai.Trading.OrderStore.add(submission)
         {:ok, %{submission: submission, order: enqueued_order}}
       end
 

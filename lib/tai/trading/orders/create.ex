@@ -1,6 +1,6 @@
 defmodule Tai.Trading.Orders.Create do
   alias Tai.Trading.{
-    NewOrderStore,
+    OrderStore,
     OrderResponses,
     Order,
     Orders,
@@ -12,7 +12,7 @@ defmodule Tai.Trading.Orders.Create do
 
   @spec create(submission) :: {:ok, order}
   def create(submission) do
-    {:ok, order} = NewOrderStore.add(submission)
+    {:ok, order} = OrderStore.add(submission)
     notify_initial_updated_order(order)
 
     Task.async(fn ->
@@ -46,7 +46,7 @@ defmodule Tai.Trading.Orders.Create do
          {:ok, %OrderResponses.Create{status: :filled} = response},
          order
        ) do
-    NewOrderStore.fill(
+    OrderStore.fill(
       order.client_id,
       response.id,
       response.venue_created_at,
@@ -59,7 +59,7 @@ defmodule Tai.Trading.Orders.Create do
          {:ok, %OrderResponses.Create{status: :expired} = response},
          order
        ) do
-    NewOrderStore.expire(
+    OrderStore.expire(
       order.client_id,
       response.id,
       response.venue_created_at,
@@ -73,7 +73,7 @@ defmodule Tai.Trading.Orders.Create do
          {:ok, %OrderResponses.Create{status: :open} = response},
          order
        ) do
-    NewOrderStore.open(
+    OrderStore.open(
       order.client_id,
       response.id,
       response.venue_created_at,
@@ -84,8 +84,8 @@ defmodule Tai.Trading.Orders.Create do
   end
 
   defp parse_response({:error, reason}, order) do
-    NewOrderStore.create_error(order.client_id, reason)
+    OrderStore.create_error(order.client_id, reason)
   end
 
-  defp skip!(client_id), do: NewOrderStore.skip(client_id)
+  defp skip!(client_id), do: OrderStore.skip(client_id)
 end

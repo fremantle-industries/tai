@@ -1,210 +1,487 @@
 defmodule Tai.Trading.OrderStore do
   @moduledoc """
-  In memory store for the local state of orders
+  ETS backed store for the local state of orders
   """
 
   use GenServer
   alias Tai.Trading
 
+  @type client_id :: String.t()
+  @type venue_order_id :: Trading.Order.venue_order_id()
   @type order :: Trading.Order.t()
   @type order_status :: Trading.Order.status()
-  @type submission ::
-          Trading.OrderSubmissions.BuyLimitGtc.t()
-          | Trading.OrderSubmissions.SellLimitGtc.t()
-          | Trading.OrderSubmissions.BuyLimitFok.t()
-          | Trading.OrderSubmissions.SellLimitFok.t()
-          | Trading.OrderSubmissions.BuyLimitIoc.t()
-          | Trading.OrderSubmissions.SellLimitIoc.t()
+  @type submission :: Trading.BuildOrderFromSubmission.submission()
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+    {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+    :ok = GenServer.call(pid, :create_ets_table)
+    {:ok, pid}
   end
 
   def init(state), do: {:ok, state}
 
+  def handle_call(:create_ets_table, _from, state) do
+    create_ets_table()
+    {:reply, :ok, state}
+  end
+
   def handle_call({:add, submission}, _from, state) do
-    order = build_order(submission)
-    new_state = Map.put(state, order.client_id, order)
+    order = Trading.BuildOrderFromSubmission.build!(submission)
+    insert(order)
     response = {:ok, order}
-
-    {:reply, response, new_state}
+    {:reply, response, state}
   end
 
-  def handle_call({:find, client_id}, _from, state) do
-    result =
-      state
-      |> Map.fetch(client_id)
-      |> case do
-        {:ok, order} -> {:ok, order}
-        :error -> {:error, :not_found}
-      end
+  @zero Decimal.new(0)
 
-    {:reply, result, state}
+  @skip_required :enqueued
+  def handle_call({:skip, client_id}, _from, state) do
+    response =
+      update(client_id, @skip_required, %{
+        status: :skip,
+        leaves_qty: @zero
+      })
+
+    {:reply, response, state}
   end
 
-  def handle_call({:find_by_and_update, filters, update_attrs}, _from, state) do
-    with [current_order] <- state |> filter(filters) |> Map.values(),
-         updated_order <-
-           Trading.OrderStore.AttributeWhitelist.apply(
-             current_order,
-             update_attrs
-           ) do
-      new_state = Map.put(state, current_order.client_id, updated_order)
-      {:reply, {:ok, {current_order, updated_order}}, new_state}
+  @create_error_required :enqueued
+  def handle_call({:create_error, client_id, error_reason}, _from, state) do
+    response =
+      update(client_id, @create_error_required, %{
+        status: :create_error,
+        error_reason: error_reason,
+        leaves_qty: @zero
+      })
+
+    {:reply, response, state}
+  end
+
+  @expire_required :enqueued
+  def handle_call(
+        {
+          :expire,
+          client_id,
+          venue_order_id,
+          venue_created_at,
+          avg_price,
+          cumulative_qty,
+          leaves_qty
+        },
+        _from,
+        state
+      ) do
+    response =
+      update(client_id, @expire_required, %{
+        status: :expired,
+        venue_order_id: venue_order_id,
+        venue_created_at: venue_created_at,
+        avg_price: avg_price,
+        cumulative_qty: cumulative_qty,
+        leaves_qty: leaves_qty
+      })
+
+    {:reply, response, state}
+  end
+
+  @open_required :enqueued
+  def handle_call(
+        {
+          :open,
+          client_id,
+          venue_order_id,
+          venue_created_at,
+          avg_price,
+          cumulative_qty,
+          leaves_qty
+        },
+        _from,
+        state
+      ) do
+    response =
+      update(client_id, @open_required, %{
+        status: :open,
+        venue_order_id: venue_order_id,
+        venue_created_at: venue_created_at,
+        avg_price: avg_price,
+        cumulative_qty: cumulative_qty,
+        leaves_qty: leaves_qty
+      })
+
+    {:reply, response, state}
+  end
+
+  @amend_required :pending_amend
+  def handle_call(
+        {
+          :amend,
+          client_id,
+          venue_updated_at,
+          price,
+          leaves_qty
+        },
+        _from,
+        state
+      ) do
+    response =
+      update(client_id, @amend_required, %{
+        status: :open,
+        venue_updated_at: venue_updated_at,
+        price: price,
+        leaves_qty: leaves_qty
+      })
+
+    {:reply, response, state}
+  end
+
+  @pend_amend_required [:open, :amend_error]
+  def handle_call({:pend_amend, client_id, updated_at}, _from, state) do
+    response =
+      update(client_id, @pend_amend_required, %{
+        status: :pending_amend,
+        updated_at: updated_at,
+        error_reason: nil
+      })
+
+    {:reply, response, state}
+  end
+
+  @fill_required :enqueued
+  def handle_call(
+        {
+          :fill,
+          client_id,
+          venue_order_id,
+          venue_created_at,
+          avg_price,
+          cumulative_qty
+        },
+        _from,
+        state
+      ) do
+    response =
+      update(client_id, @fill_required, %{
+        status: :filled,
+        venue_order_id: venue_order_id,
+        venue_created_at: venue_created_at,
+        avg_price: avg_price,
+        cumulative_qty: cumulative_qty,
+        leaves_qty: Decimal.new(0)
+      })
+
+    {:reply, response, state}
+  end
+
+  @passive_fill_required [:open, :pending_amend, :pending_cancel, :amend_error, :cancel_error]
+  def handle_call(
+        {
+          :passive_fill,
+          client_id,
+          venue_updated_at,
+          avg_price,
+          cumulative_qty
+        },
+        _from,
+        state
+      ) do
+    response =
+      update(client_id, @passive_fill_required, %{
+        status: :filled,
+        venue_updated_at: venue_updated_at,
+        avg_price: avg_price,
+        cumulative_qty: cumulative_qty,
+        leaves_qty: Decimal.new(0)
+      })
+
+    {:reply, response, state}
+  end
+
+  @amend_error_required :pending_amend
+  def handle_call({:amend_error, client_id, reason}, _from, state) do
+    response =
+      update(client_id, @amend_error_required, %{
+        status: :amend_error,
+        error_reason: reason
+      })
+
+    {:reply, response, state}
+  end
+
+  @pend_cancel_required :open
+  def handle_call({:pend_cancel, client_id, updated_at}, _from, state) do
+    response =
+      update(client_id, @pend_cancel_required, %{
+        status: :pending_cancel,
+        updated_at: updated_at
+      })
+
+    {:reply, response, state}
+  end
+
+  @cancel_error_required :pending_cancel
+  def handle_call({:cancel_error, client_id, reason}, _from, state) do
+    response =
+      update(client_id, @cancel_error_required, %{
+        status: :cancel_error,
+        error_reason: reason
+      })
+
+    {:reply, response, state}
+  end
+
+  @passive_cancel_required [
+    :enqueued,
+    :open,
+    :expired,
+    :filled,
+    :pending_cancel,
+    :pending_amend,
+    :cancel,
+    :amend
+  ]
+  def handle_call({:passive_cancel, client_id, venue_updated_at}, _from, state) do
+    response =
+      update(client_id, @passive_cancel_required, %{
+        status: :canceled,
+        venue_updated_at: venue_updated_at,
+        leaves_qty: Decimal.new(0)
+      })
+
+    {:reply, response, state}
+  end
+
+  @cancel_required :pending_cancel
+  def handle_call({:cancel, client_id, venue_updated_at}, _from, state) do
+    response =
+      update(client_id, @cancel_required, %{
+        status: :canceled,
+        venue_updated_at: venue_updated_at,
+        leaves_qty: Decimal.new(0)
+      })
+
+    {:reply, response, state}
+  end
+
+  @spec add(submission) :: {:ok, order} | no_return
+  def add(submission), do: GenServer.call(__MODULE__, {:add, submission})
+
+  @spec skip(client_id) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
+  def skip(client_id), do: GenServer.call(__MODULE__, {:skip, client_id})
+
+  @spec create_error(client_id, term) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
+  def create_error(client_id, error_reason),
+    do: GenServer.call(__MODULE__, {:create_error, client_id, error_reason})
+
+  @spec expire(client_id, venue_order_id, DateTime.t(), Decimal.t(), Decimal.t(), Decimal.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
+  def expire(
+        client_id,
+        venue_order_id,
+        venue_created_at,
+        avg_price,
+        cumulative_qty,
+        leaves_qty
+      ) do
+    GenServer.call(
+      __MODULE__,
+      {
+        :expire,
+        client_id,
+        venue_order_id,
+        venue_created_at,
+        avg_price,
+        cumulative_qty,
+        leaves_qty
+      }
+    )
+  end
+
+  @spec fill(client_id, venue_order_id, DateTime.t(), Decimal.t(), Decimal.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
+  def fill(
+        client_id,
+        venue_order_id,
+        venue_created_at,
+        avg_price,
+        cumulative_qty
+      ) do
+    GenServer.call(
+      __MODULE__,
+      {
+        :fill,
+        client_id,
+        venue_order_id,
+        venue_created_at,
+        avg_price,
+        cumulative_qty
+      }
+    )
+  end
+
+  @type passive_fill_required ::
+          :open | :pending_amend | :pending_cancel | :amend_error | :cancel_error
+  @spec passive_fill(client_id, DateTime.t(), Decimal.t(), Decimal.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, passive_fill_required}}
+  def passive_fill(
+        client_id,
+        venue_updated_at,
+        avg_price,
+        cumulative_qty
+      ) do
+    GenServer.call(
+      __MODULE__,
+      {
+        :passive_fill,
+        client_id,
+        venue_updated_at,
+        avg_price,
+        cumulative_qty
+      }
+    )
+  end
+
+  @spec open(client_id, venue_order_id, DateTime.t(), Decimal.t(), Decimal.t(), Decimal.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
+  def open(
+        client_id,
+        venue_order_id,
+        venue_created_at,
+        avg_price,
+        cumulative_qty,
+        leaves_qty
+      ) do
+    GenServer.call(
+      __MODULE__,
+      {
+        :open,
+        client_id,
+        venue_order_id,
+        venue_created_at,
+        avg_price,
+        cumulative_qty,
+        leaves_qty
+      }
+    )
+  end
+
+  @spec amend(client_id, DateTime.t(), Decimal.t(), Decimal.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :pending_amend}}
+  def amend(
+        client_id,
+        venue_updated_at,
+        price,
+        leaves_qty
+      ) do
+    GenServer.call(
+      __MODULE__,
+      {
+        :amend,
+        client_id,
+        venue_updated_at,
+        price,
+        leaves_qty
+      }
+    )
+  end
+
+  @spec pend_amend(client_id, DateTime.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error,
+             :not_found | {:invalid_status, current :: atom, required :: :open | :amend_error}}
+  def pend_amend(client_id, updated_at),
+    do: GenServer.call(__MODULE__, {:pend_amend, client_id, updated_at})
+
+  @spec amend_error(client_id, term) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :pending_amend}}
+  def amend_error(client_id, reason),
+    do: GenServer.call(__MODULE__, {:amend_error, client_id, reason})
+
+  @spec pend_cancel(client_id, DateTime.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :open}}
+  def pend_cancel(client_id, updated_at),
+    do: GenServer.call(__MODULE__, {:pend_cancel, client_id, updated_at})
+
+  @spec cancel_error(client_id, term) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :pending_cancel}}
+  def cancel_error(client_id, reason),
+    do: GenServer.call(__MODULE__, {:cancel_error, client_id, reason})
+
+  @type passive_cancel_required ::
+          :enqueued
+          | :open
+          | :expired
+          | :filled
+          | :pending_cancel
+          | :pending_amend
+          | :cancel
+          | :amend
+  @spec passive_cancel(client_id, DateTime.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error,
+             :not_found
+             | {:invalid_status, current :: atom, passive_cancel_required}}
+  def passive_cancel(client_id, venue_updated_at),
+    do: GenServer.call(__MODULE__, {:passive_cancel, client_id, venue_updated_at})
+
+  @spec cancel(client_id, DateTime.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :pending_cancel}}
+  def cancel(client_id, venue_updated_at),
+    do: GenServer.call(__MODULE__, {:cancel, client_id, venue_updated_at})
+
+  @spec find_by_client_id(client_id) :: {:ok, order} | {:error, :not_found}
+  def find_by_client_id(client_id) do
+    with [{_, order}] <- :ets.lookup(__MODULE__, client_id) do
+      {:ok, order}
     else
-      [] -> {:reply, {:error, :not_found}, state}
-      [_head | _tail] -> {:reply, {:error, :multiple_orders_found}, state}
+      [] -> {:error, :not_found}
     end
   end
 
-  def handle_call(:all, _from, state) do
-    {:reply, state |> Map.values(), state}
-  end
-
-  def handle_call({:where, [_head | _tail] = filters}, _from, state) do
-    {:reply, state |> filter(filters) |> Map.values(), state}
-  end
-
-  def handle_call(:count, _from, state) do
-    {:reply, state |> Enum.count(), state}
-  end
-
-  def handle_call({:count, status: status}, _from, state) do
-    count =
-      state
-      |> filter(status: status)
-      |> Enum.count()
-
-    {:reply, count, state}
-  end
-
-  @spec add(submission) :: {:ok, order}
-  def add(submission) do
-    GenServer.call(__MODULE__, {:add, submission})
-  end
-
-  @spec find(client_id :: String.t()) :: {:ok, order} | {:error, :not_found}
-  def find(client_id) do
-    GenServer.call(__MODULE__, {:find, client_id})
-  end
-
-  @spec find_by_and_update(list, list) ::
-          {:ok, {previous_order :: order, updated_order :: order}}
-          | {:error, :not_found | :multiple_orders_found}
-  def find_by_and_update(query, update_attrs) do
-    GenServer.call(__MODULE__, {:find_by_and_update, query, update_attrs})
-  end
-
-  @spec all :: [order]
+  @spec all :: [] | [order]
   def all do
-    GenServer.call(__MODULE__, :all)
-  end
-
-  @spec where(list) :: [order]
-  def where([_head | _tail] = filters) do
-    GenServer.call(__MODULE__, {:where, filters})
+    __MODULE__
+    |> :ets.select([{{:_, :_}, [], [:"$_"]}])
+    |> Enum.map(fn {_, order} -> order end)
   end
 
   @spec count :: non_neg_integer
-  @spec count(status: order_status) :: non_neg_integer
-  def count, do: GenServer.call(__MODULE__, :count)
-  def count(status: status), do: GenServer.call(__MODULE__, {:count, status: status})
+  def count, do: all() |> Enum.count()
 
-  @zero Decimal.new(0)
-  defp build_order(submission) do
-    qty = Decimal.abs(submission.qty)
-
-    %Trading.Order{
-      client_id: Ecto.UUID.generate(),
-      exchange_id: submission.venue_id,
-      account_id: submission.account_id,
-      symbol: submission.product_symbol,
-      side: submission |> side,
-      type: submission |> type,
-      price: submission.price |> Decimal.abs(),
-      avg_price: @zero,
-      qty: qty,
-      leaves_qty: qty,
-      cumulative_qty: @zero,
-      time_in_force: submission |> time_in_force,
-      post_only: submission |> post_only,
-      status: :enqueued,
-      enqueued_at: Timex.now(),
-      order_updated_callback: submission.order_updated_callback
-    }
+  defp insert(order) do
+    record = {order.client_id, order}
+    :ets.insert(__MODULE__, record)
   end
 
-  defp type(%Trading.OrderSubmissions.BuyLimitGtc{}), do: :limit
-  defp type(%Trading.OrderSubmissions.BuyLimitFok{}), do: :limit
-  defp type(%Trading.OrderSubmissions.BuyLimitIoc{}), do: :limit
-  defp type(%Trading.OrderSubmissions.SellLimitGtc{}), do: :limit
-  defp type(%Trading.OrderSubmissions.SellLimitFok{}), do: :limit
-  defp type(%Trading.OrderSubmissions.SellLimitIoc{}), do: :limit
+  defp create_ets_table, do: :ets.new(__MODULE__, [:set, :protected, :named_table])
 
-  defp side(%Trading.OrderSubmissions.BuyLimitGtc{}), do: :buy
-  defp side(%Trading.OrderSubmissions.BuyLimitFok{}), do: :buy
-  defp side(%Trading.OrderSubmissions.BuyLimitIoc{}), do: :buy
-  defp side(%Trading.OrderSubmissions.SellLimitGtc{}), do: :sell
-  defp side(%Trading.OrderSubmissions.SellLimitFok{}), do: :sell
-  defp side(%Trading.OrderSubmissions.SellLimitIoc{}), do: :sell
-
-  defp time_in_force(%Trading.OrderSubmissions.BuyLimitGtc{}), do: :gtc
-  defp time_in_force(%Trading.OrderSubmissions.BuyLimitFok{}), do: :fok
-  defp time_in_force(%Trading.OrderSubmissions.BuyLimitIoc{}), do: :ioc
-  defp time_in_force(%Trading.OrderSubmissions.SellLimitGtc{}), do: :gtc
-  defp time_in_force(%Trading.OrderSubmissions.SellLimitFok{}), do: :fok
-  defp time_in_force(%Trading.OrderSubmissions.SellLimitIoc{}), do: :ioc
-
-  defp post_only(%Trading.OrderSubmissions.BuyLimitGtc{post_only: post_only}), do: post_only
-  defp post_only(%Trading.OrderSubmissions.BuyLimitFok{}), do: false
-  defp post_only(%Trading.OrderSubmissions.BuyLimitIoc{}), do: false
-  defp post_only(%Trading.OrderSubmissions.SellLimitGtc{post_only: post_only}), do: post_only
-  defp post_only(%Trading.OrderSubmissions.SellLimitFok{}), do: false
-  defp post_only(%Trading.OrderSubmissions.SellLimitIoc{}), do: false
-
-  defp filter(state, [{attr, [_head | _tail] = vals}]) do
-    state
-    |> Enum.filter(fn {_, order} ->
-      vals
-      |> Enum.any?(&(&1 == Map.get(order, attr)))
-    end)
-    |> Map.new()
-  end
-
-  defp filter(state, [{attr, val}]) do
-    state
-    |> Enum.filter(fn {_, order} -> Map.get(order, attr) == val end)
-    |> Map.new()
-  end
-
-  defp filter(state, [{_attr, _val} = head | tail]) do
-    state
-    |> filter([head])
-    |> filter(tail)
-  end
-
-  defmodule AttributeWhitelist do
-    @whitelist_attrs [
-      :updated_at,
-      :venue_order_id,
-      :venue_created_at,
-      :venue_updated_at,
-      :error_reason,
-      :status,
-      :price,
-      :avg_price,
-      :qty,
-      :leaves_qty,
-      :cumulative_qty
-    ]
-
-    def apply(order, update_attrs) do
-      accepted_attrs =
-        update_attrs
-        |> Keyword.take(@whitelist_attrs)
-        |> Map.new()
-
-      Map.merge(order, accepted_attrs)
+  defp update(client_id, required, attrs) when is_list(required) do
+    with {:ok, old_order} <- find_by_client_id(client_id) do
+      if required |> Enum.member?(old_order.status) do
+        updated_order = old_order |> Map.merge(attrs)
+        insert(updated_order)
+        {:ok, {old_order, updated_order}}
+      else
+        reason = {:invalid_status, old_order.status, required |> format_required}
+        {:error, reason}
+      end
     end
   end
+
+  defp update(client_id, required, attrs), do: update(client_id, [required], attrs)
+
+  defp format_required([required | []]), do: required
+  defp format_required(required), do: required
 end

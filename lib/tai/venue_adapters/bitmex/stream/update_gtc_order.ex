@@ -25,7 +25,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
     avg_price = avg_px |> Tai.Utils.Decimal.from()
     cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
 
-    Tai.Trading.NewOrderStore.passive_fill(
+    Tai.Trading.OrderStore.passive_fill(
       client_id,
       venue_updated_at,
       avg_price,
@@ -35,7 +35,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
 
   defp passive_update(:canceled, client_id, %{"timestamp" => timestamp}) do
     venue_updated_at = timestamp |> Timex.parse!(@date_format)
-    Tai.Trading.NewOrderStore.passive_cancel(client_id, venue_updated_at)
+    Tai.Trading.OrderStore.passive_cancel(client_id, venue_updated_at)
   end
 
   defp notify({:ok, {old, updated}}) do

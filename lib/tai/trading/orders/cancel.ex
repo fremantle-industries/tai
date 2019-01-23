@@ -1,5 +1,5 @@
 defmodule Tai.Trading.Orders.Cancel do
-  alias Tai.Trading.{Orders, NewOrderStore}
+  alias Tai.Trading.{Orders, OrderStore}
 
   @type order :: Tai.Trading.Order.t()
 
@@ -8,7 +8,7 @@ defmodule Tai.Trading.Orders.Cancel do
           | {:error, {:invalid_status, was :: term, required :: term}}
   def cancel(%Tai.Trading.Order{client_id: client_id}) do
     with {:ok, {old_order, updated_order}} <-
-           NewOrderStore.pend_cancel(client_id, Timex.now()) do
+           OrderStore.pend_cancel(client_id, Timex.now()) do
       Orders.updated!(old_order, updated_order)
 
       Task.start_link(fn ->
@@ -29,13 +29,13 @@ defmodule Tai.Trading.Orders.Cancel do
 
   defp parse_cancel_order_response({:ok, order_response}, order) do
     {:ok, {old_order, updated_order}} =
-      NewOrderStore.cancel(order.client_id, order_response.venue_updated_at)
+      OrderStore.cancel(order.client_id, order_response.venue_updated_at)
 
     Orders.updated!(old_order, updated_order)
   end
 
   defp parse_cancel_order_response({:error, reason}, order) do
-    {:ok, {old_order, updated_order}} = NewOrderStore.cancel_error(order.client_id, reason)
+    {:ok, {old_order, updated_order}} = OrderStore.cancel_error(order.client_id, reason)
 
     Orders.updated!(old_order, updated_order)
   end

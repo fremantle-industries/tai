@@ -136,7 +136,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
     {:ok, order} =
       submission_type
       |> struct(attrs)
-      |> Tai.Trading.NewOrderStore.add()
+      |> Tai.Trading.OrderStore.add()
 
     order
   end
@@ -144,7 +144,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
   defp open(order, venue_order_id \\ Ecto.UUID.generate()) do
     {:ok, {_, open_order}} =
       order.client_id
-      |> Tai.Trading.NewOrderStore.open(
+      |> Tai.Trading.OrderStore.open(
         venue_order_id,
         Timex.now(),
         order.price,
