@@ -1,8 +1,8 @@
 defmodule Tai.Advisor do
   @moduledoc """
-  A behavior for implementing a server that receives order book changes.
+  A behavior for implementing a process that receives changes in the order book.
 
-  It can be used to monitor multiple quote streams and create, update or cancel orders.
+  It can be used to monitor one or more quote streams and create, update or cancel orders.
   """
 
   @type advisor :: Tai.Advisor.t()
