@@ -1,8 +1,14 @@
 defmodule Tai.Trading.Orders.Create do
-  alias Tai.Trading.{OrderStore, OrderResponses, Order, Orders}
+  alias Tai.Trading.{
+    OrderStore,
+    OrderResponses,
+    Order,
+    Orders,
+    BuildOrderFromSubmission
+  }
 
   @type order :: Order.t()
-  @type submission :: OrderStore.submission()
+  @type submission :: BuildOrderFromSubmission.submission()
 
   @spec create(submission) :: {:ok, order}
   def create(submission) do
@@ -26,10 +32,10 @@ defmodule Tai.Trading.Orders.Create do
   end
 
   defp notify_initial_updated_order(order) do
-    notify_updated_order({nil, order})
+    notify_updated_order({:ok, {nil, order}})
   end
 
-  defp notify_updated_order({previous_order, order}) do
+  defp notify_updated_order({:ok, {previous_order, order}}) do
     Orders.updated!(previous_order, order)
     order
   end
@@ -38,89 +44,48 @@ defmodule Tai.Trading.Orders.Create do
 
   defp parse_response(
          {:ok, %OrderResponses.Create{status: :filled} = response},
-         %Order{} = o
+         order
        ) do
-    fill!(o.client_id, response)
+    OrderStore.fill(
+      order.client_id,
+      response.id,
+      response.venue_created_at,
+      response.avg_price,
+      response.cumulative_qty
+    )
   end
 
   defp parse_response(
          {:ok, %OrderResponses.Create{status: :expired} = response},
-         %Order{client_id: cid}
+         order
        ) do
-    expire!(cid, response)
+    OrderStore.expire(
+      order.client_id,
+      response.id,
+      response.venue_created_at,
+      response.avg_price,
+      response.cumulative_qty,
+      response.leaves_qty
+    )
   end
 
   defp parse_response(
          {:ok, %OrderResponses.Create{status: :open} = response},
-         %Order{client_id: cid}
+         order
        ) do
-    open!(cid, response)
-  end
-
-  defp parse_response({:error, reason}, %Order{client_id: cid}) do
-    error!(cid, reason)
-  end
-
-  defp fill!(cid, response) do
-    cid
-    |> find_by_and_update(
-      status: :filled,
-      venue_order_id: response.id,
-      avg_price: response.avg_price,
-      cumulative_qty: Decimal.new(response.cumulative_qty),
-      venue_created_at: response.venue_created_at,
-      leaves_qty: Decimal.new(0)
+    OrderStore.open(
+      order.client_id,
+      response.id,
+      response.venue_created_at,
+      response.avg_price,
+      response.cumulative_qty,
+      response.leaves_qty
     )
   end
 
-  defp expire!(cid, response) do
-    cid
-    |> find_by_and_update(
-      status: :expired,
-      venue_order_id: response.id,
-      venue_created_at: response.venue_created_at,
-      avg_price: response.avg_price,
-      cumulative_qty: response.cumulative_qty,
-      leaves_qty: response.leaves_qty
-    )
+  defp parse_response({:error, reason}, order) do
+    OrderStore.create_error(order.client_id, reason)
   end
 
-  defp open!(cid, response) do
-    cid
-    |> find_by_and_update(
-      status: :open,
-      venue_order_id: response.id,
-      venue_created_at: response.venue_created_at,
-      avg_price: response.avg_price,
-      leaves_qty: response.leaves_qty,
-      cumulative_qty: response.cumulative_qty
-    )
-  end
-
-  defp error!(cid, reason) do
-    cid
-    |> find_by_and_update(
-      status: :create_error,
-      error_reason: reason,
-      leaves_qty: Decimal.new(0)
-    )
-  end
-
-  defp skip!(cid) do
-    cid
-    |> find_by_and_update(
-      status: :skip,
-      leaves_qty: Decimal.new(0)
-    )
-  end
-
-  defp find_by_and_update(client_id, attrs) do
-    {:ok, {old_order, updated_order}} =
-      OrderStore.find_by_and_update(
-        [client_id: client_id],
-        attrs
-      )
-
-    {old_order, updated_order}
-  end
+  defp skip!(client_id), do: OrderStore.skip(client_id)
 end

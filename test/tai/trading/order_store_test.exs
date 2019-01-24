@@ -11,126 +11,759 @@ defmodule Tai.Trading.OrderStoreTest do
     :ok
   end
 
+  @venue_order_id "abc123"
+  @venue_created_at Timex.now()
+  @price Decimal.new(11)
+  @avg_price Decimal.new(10)
+  @cumulative_qty Decimal.new(1)
+  @leaves_qty Decimal.new(5)
+  @updated_at Timex.now()
+  @venue_updated_at Timex.now()
+
   describe ".add" do
-    @sides [:buy, :sell]
+    test "enqueues order submissions" do
+      submission = build_submission()
 
-    @sides
-    |> Enum.each(fn side ->
-      @side side
-
-      test "enqueues #{side} gtc orders" do
-        submission = build_submission(@side, :gtc, post_only: true)
-
-        assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.OrderStore.add(submission)
-
-        assert order.client_id != nil
-        assert order.side == @side
-        assert order.post_only == true
-        assert order.time_in_force == :gtc
-        assert order.exchange_id == :test_exchange_a
-        assert order.account_id == :main
-        assert order.symbol == :btc_usd
-        assert %Decimal{} = order.price
-        assert order.avg_price == Decimal.new(0)
-        assert %Decimal{} = order.qty
-        assert %Decimal{} = order.leaves_qty
-        assert order.qty == order.leaves_qty
-        assert order.cumulative_qty == Decimal.new(0)
-        assert order.status == :enqueued
-        assert %DateTime{} = order.enqueued_at
-      end
-
-      test "enqueues #{side} fok orders" do
-        submission = build_submission(@side, :fok)
-
-        assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.OrderStore.add(submission)
-
-        assert order.client_id != nil
-        assert order.side == @side
-        assert order.post_only == false
-        assert order.time_in_force == :fok
-        assert order.exchange_id == :test_exchange_a
-        assert order.account_id == :main
-        assert order.symbol == :btc_usd
-        assert %Decimal{} = order.price
-        assert order.avg_price == Decimal.new(0)
-        assert %Decimal{} = order.qty
-        assert %Decimal{} = order.leaves_qty
-        assert order.qty == order.leaves_qty
-        assert order.cumulative_qty == Decimal.new(0)
-        assert order.status == :enqueued
-        assert %DateTime{} = order.enqueued_at
-      end
-
-      test "enqueues #{side} ioc orders" do
-        submission = build_submission(@side, :ioc)
-
-        assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.OrderStore.add(submission)
-
-        assert order.client_id != nil
-        assert order.side == @side
-        assert order.time_in_force == :ioc
-        assert order.post_only == false
-        assert order.exchange_id == :test_exchange_a
-        assert order.account_id == :main
-        assert order.symbol == :btc_usd
-        assert %Decimal{} = order.price
-        assert order.avg_price == Decimal.new(0)
-        assert %Decimal{} = order.qty
-        assert %Decimal{} = order.leaves_qty
-        assert order.qty == order.leaves_qty
-        assert order.cumulative_qty == Decimal.new(0)
-        assert order.status == :enqueued
-        assert %DateTime{} = order.enqueued_at
-      end
-    end)
-  end
-
-  describe ".find" do
-    test "returns an ok tuple with the order " do
-      {:ok, order} = submit_order()
-
-      assert {:ok, ^order} = Tai.Trading.OrderStore.find(order.client_id)
-    end
-
-    test "returns an error tuple when no match was found" do
-      assert Tai.Trading.OrderStore.find("client_id_doesnt_exist") == {:error, :not_found}
+      assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.OrderStore.add(submission)
+      assert order.status == :enqueued
     end
   end
 
-  describe ".find_by_and_update" do
-    test "can change the whitelist of attributes" do
-      {:ok, order} = submit_order()
+  describe ".skip" do
+    test "updates the status & leaves qty" do
+      submission = build_submission()
 
-      assert {:ok, {old_order, updated_order}} =
-               Tai.Trading.OrderStore.find_by_and_update(
-                 [client_id: order.client_id],
-                 client_id: "changed_client_id",
-                 status: :error
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {old, updated}} = Tai.Trading.OrderStore.skip(order.client_id)
+
+      assert old.status == :enqueued
+      assert updated.status == :skip
+      assert updated.leaves_qty == Decimal.new(0)
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert Tai.Trading.OrderStore.skip("not found") == {:error, :not_found}
+    end
+
+    test "returns an error tuple when the current status is not enqueued" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
                )
 
-      assert old_order == order
-      assert updated_order.status == :error
-      assert updated_order.client_id == order.client_id
+      assert {:error, reason} = Tai.Trading.OrderStore.skip(order.client_id)
+      assert reason == {:invalid_status, :open, :enqueued}
+    end
+  end
+
+  describe ".create_error" do
+    test "updates the status, leaves qty & error reason" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.create_error(order.client_id, "nonce error")
+
+      assert old.status == :enqueued
+      assert updated.status == :create_error
+      assert updated.error_reason == "nonce error"
+      assert updated.leaves_qty == Decimal.new(0)
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert Tai.Trading.OrderStore.create_error("not found", "nonce error") ==
+               {:error, :not_found}
+    end
+
+    test "returns an error tuple when the current status is not enqueued" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.create_error(order.client_id, "nonce error")
+
+      assert reason == {:invalid_status, :skip, :enqueued}
+    end
+  end
+
+  describe ".expire" do
+    test "updates the status & expire attributes" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.expire(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert old.status == :enqueued
+      assert updated.status == :expired
+      assert updated.venue_order_id == @venue_order_id
+      assert updated.venue_created_at == @venue_created_at
+      assert updated.avg_price == @avg_price
+      assert updated.cumulative_qty == @cumulative_qty
+      assert updated.leaves_qty == @leaves_qty
     end
 
     test "returns an error tuple when the order can't be found" do
       assert {:error, :not_found} =
-               Tai.Trading.OrderStore.find_by_and_update(
-                 [client_id: "idontexist"],
-                 []
+               Tai.Trading.OrderStore.expire(
+                 "not found",
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
                )
     end
 
-    test "returns an error tuple when multiple orders are found" do
-      {:ok, _} = submit_order()
-      {:ok, _} = submit_order()
+    test "returns an error tuple when the current status is not enqueued" do
+      submission = build_submission()
 
-      assert {:error, :multiple_orders_found} =
-               Tai.Trading.OrderStore.find_by_and_update(
-                 [status: :enqueued],
-                 []
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.expire(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
                )
+
+      assert reason == {:invalid_status, :skip, :enqueued}
+    end
+  end
+
+  describe ".open" do
+    test "updates the status & open attributes" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert old.status == :enqueued
+      assert updated.status == :open
+      assert updated.venue_order_id == @venue_order_id
+      assert updated.venue_created_at == @venue_created_at
+      assert updated.avg_price == @avg_price
+      assert updated.cumulative_qty == @cumulative_qty
+      assert updated.leaves_qty == @leaves_qty
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert {:error, :not_found} =
+               Tai.Trading.OrderStore.open(
+                 "not found",
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+    end
+
+    test "returns an error tuple when the current status is not enqueued" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert reason == {:invalid_status, :open, :enqueued}
+    end
+  end
+
+  describe ".fill" do
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.fill(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty
+               )
+
+      assert old.status == :enqueued
+      assert updated.status == :filled
+      assert updated.venue_order_id == @venue_order_id
+      assert updated.venue_created_at == @venue_created_at
+      assert updated.avg_price == @avg_price
+      assert updated.cumulative_qty == @cumulative_qty
+      assert updated.leaves_qty == Decimal.new(0)
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert {:error, :not_found} =
+               Tai.Trading.OrderStore.fill(
+                 "not found",
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty
+               )
+    end
+
+    test "returns an error tuple when the current status is not enqueued" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.fill(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty
+               )
+
+      assert reason == {:invalid_status, :skip, :enqueued}
+    end
+  end
+
+  describe ".passsive_fill" do
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.passive_fill(
+                 order.client_id,
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty
+               )
+
+      assert old.status == :open
+      assert updated.status == :filled
+      assert updated.venue_updated_at == @venue_updated_at
+      assert updated.avg_price == @avg_price
+      assert updated.cumulative_qty == @cumulative_qty
+      assert updated.leaves_qty == Decimal.new(0)
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert {:error, :not_found} =
+               Tai.Trading.OrderStore.passive_fill(
+                 "not found",
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty
+               )
+    end
+
+    test "returns an error tuple when the current status can't be filled" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.passive_fill(
+                 order.client_id,
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty
+               )
+
+      assert reason ==
+               {:invalid_status, :skip,
+                [:open, :pending_amend, :pending_cancel, :amend_error, :cancel_error]}
+    end
+  end
+
+  describe ".passsive_partial_fill" do
+    @updated_leaves_qty Decimal.new(2)
+
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.passive_partial_fill(
+                 order.client_id,
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @updated_leaves_qty
+               )
+
+      assert old.status == :open
+      assert updated.status == :open
+      assert updated.venue_updated_at == @venue_updated_at
+      assert updated.avg_price == @avg_price
+      assert updated.cumulative_qty == @cumulative_qty
+      assert updated.leaves_qty == Decimal.new(2)
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert {:error, :not_found} =
+               Tai.Trading.OrderStore.passive_partial_fill(
+                 "not found",
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @updated_leaves_qty
+               )
+    end
+
+    test "returns an error tuple when the current status can't be filled" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.passive_partial_fill(
+                 order.client_id,
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @updated_leaves_qty
+               )
+
+      assert reason ==
+               {:invalid_status, :skip,
+                [:open, :pending_amend, :pending_cancel, :amend_error, :cancel_error]}
+    end
+  end
+
+  describe ".pend_amend" do
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
+
+      assert old.status == :open
+      assert updated.status == :pending_amend
+      assert updated.error_reason == nil
+      assert updated.updated_at == @updated_at
+    end
+
+    test "clears the error reason" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.amend_error(order.client_id, "server unavailable")
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
+
+      assert old.error_reason == "server unavailable"
+      assert updated.error_reason == nil
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert Tai.Trading.OrderStore.pend_amend("not found", @updated_at) ==
+               {:error, :not_found}
+    end
+
+    test "returns an error tuple when the current status is not open" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:error, reason} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
+      assert reason == {:invalid_status, :enqueued, [:open, :amend_error]}
+    end
+  end
+
+  describe ".amend_error" do
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.amend_error(order.client_id, "server unavailable")
+
+      assert old.status == :pending_amend
+      assert updated.status == :amend_error
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert Tai.Trading.OrderStore.amend_error("not found", "server unavailable") ==
+               {:error, :not_found}
+    end
+
+    test "returns an error tuple when the current status is not pending_amend" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.amend_error(order.client_id, "server unavailable")
+
+      assert reason == {:invalid_status, :enqueued, :pending_amend}
+    end
+  end
+
+  describe ".amend" do
+    test "updates the status & reopen attributes" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.amend(
+                 order.client_id,
+                 @venue_updated_at,
+                 @price,
+                 @leaves_qty
+               )
+
+      assert old.status == :pending_amend
+      assert updated.status == :open
+      assert updated.venue_updated_at == @venue_updated_at
+      assert updated.price == @price
+      assert updated.leaves_qty == @leaves_qty
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert {:error, :not_found} =
+               Tai.Trading.OrderStore.amend(
+                 "not found",
+                 @venue_updated_at,
+                 @price,
+                 @leaves_qty
+               )
+    end
+
+    test "returns an error tuple when the current status is not pending_amend" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.amend(
+                 order.client_id,
+                 @venue_updated_at,
+                 @price,
+                 @leaves_qty
+               )
+
+      assert reason == {:invalid_status, :enqueued, :pending_amend}
+    end
+  end
+
+  describe ".pend_cancel" do
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
+
+      assert old.status == :open
+      assert updated.status == :pending_cancel
+      assert updated.updated_at == @updated_at
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert Tai.Trading.OrderStore.pend_cancel("not found", @updated_at) ==
+               {:error, :not_found}
+    end
+
+    test "returns an error tuple when the current status is not open" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:error, reason} = Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
+
+      assert reason == {:invalid_status, :enqueued, :open}
+    end
+  end
+
+  describe ".cancel_error" do
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.cancel_error(order.client_id, "server unavailable")
+
+      assert old.status == :pending_cancel
+      assert updated.status == :cancel_error
+      assert updated.error_reason == "server unavailable"
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert Tai.Trading.OrderStore.cancel_error("not found", "server unavailable") ==
+               {:error, :not_found}
+    end
+
+    test "returns an error tuple when the current status is not pending_cancel" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.cancel_error(order.client_id, "server unavailable")
+
+      assert reason == {:invalid_status, :enqueued, :pending_cancel}
+    end
+  end
+
+  describe ".passive_cancel" do
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.passive_cancel(order.client_id, @venue_updated_at)
+
+      assert old.status == :open
+      assert updated.status == :canceled
+      assert updated.venue_updated_at == @venue_updated_at
+      assert updated.leaves_qty == Decimal.new(0)
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert Tai.Trading.OrderStore.passive_cancel("not found", @venue_updated_at) ==
+               {:error, :not_found}
+    end
+
+    test "returns an error tuple when the current status is cancel" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.passive_cancel(order.client_id, @venue_updated_at)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.passive_cancel(order.client_id, @venue_updated_at)
+
+      assert reason ==
+               {:invalid_status, :canceled,
+                [
+                  :enqueued,
+                  :open,
+                  :expired,
+                  :filled,
+                  :pending_cancel,
+                  :pending_amend,
+                  :cancel,
+                  :amend
+                ]}
+    end
+  end
+
+  describe ".cancel" do
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.cancel(order.client_id, @venue_updated_at)
+
+      assert old.status == :pending_cancel
+      assert updated.status == :canceled
+      assert updated.venue_updated_at == @venue_updated_at
+      assert updated.leaves_qty == Decimal.new(0)
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert Tai.Trading.OrderStore.cancel("not found", @venue_updated_at) ==
+               {:error, :not_found}
+    end
+
+    test "returns an error tuple when the current status is not pending_cancel" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:error, reason} = Tai.Trading.OrderStore.cancel(order.client_id, @venue_updated_at)
+
+      assert reason == {:invalid_status, :enqueued, :pending_cancel}
+    end
+  end
+
+  describe ".find_by_client_id" do
+    test "returns an ok tuple with the order " do
+      {:ok, order} = submit_order()
+
+      assert {:ok, ^order} = Tai.Trading.OrderStore.find_by_client_id(order.client_id)
+    end
+
+    test "returns an error tuple when no match was found" do
+      assert Tai.Trading.OrderStore.find_by_client_id("not found") == {:error, :not_found}
     end
   end
 
@@ -142,149 +775,15 @@ defmodule Tai.Trading.OrderStoreTest do
     assert Tai.Trading.OrderStore.all() == [order]
   end
 
-  describe ".count" do
-    test "count returns the total number of orders" do
-      assert Tai.Trading.OrderStore.count() == 0
+  test ".count returns the total number of orders" do
+    assert Tai.Trading.OrderStore.count() == 0
 
-      {:ok, _} = submit_order()
+    {:ok, _} = submit_order()
 
-      assert Tai.Trading.OrderStore.count() == 1
-    end
-
-    test "count can filter by status" do
-      assert Tai.Trading.OrderStore.count(status: :enqueued) == 0
-      assert Tai.Trading.OrderStore.count(status: :open) == 0
-
-      {:ok, _} = submit_order()
-
-      assert Tai.Trading.OrderStore.count(status: :enqueued) == 1
-      assert Tai.Trading.OrderStore.count(status: :open) == 0
-    end
-  end
-
-  describe ".where" do
-    test "can filter by a singular client_id" do
-      {:ok, _} = submit_order()
-      {:ok, order_2} = submit_order()
-      {:ok, _} = submit_order()
-
-      assert Tai.Trading.OrderStore.where(client_id: order_2.client_id) == [order_2]
-      assert Tai.Trading.OrderStore.where(client_id: "client_id_does_not_exist") == []
-    end
-
-    test "can filter by multiple client_ids" do
-      {:ok, _} = submit_order()
-      {:ok, order_2} = submit_order()
-      {:ok, order_3} = submit_order()
-
-      found_orders =
-        [client_id: [order_2.client_id, order_3.client_id]]
-        |> Tai.Trading.OrderStore.where()
-        |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
-
-      assert found_orders == [order_2, order_3]
-      assert Tai.Trading.OrderStore.where(client_id: []) == []
-      assert Tai.Trading.OrderStore.where(client_id: ["client_id_does_not_exist"]) == []
-    end
-
-    test "can filter by a single status" do
-      {:ok, order_1} = submit_order()
-      {:ok, order_2} = submit_order()
-
-      found_orders =
-        [status: :enqueued]
-        |> Tai.Trading.OrderStore.where()
-        |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
-
-      assert found_orders == [order_1, order_2]
-      assert Tai.Trading.OrderStore.where(status: :open) == []
-      assert Tai.Trading.OrderStore.where(status: :status_does_not_exist) == []
-    end
-
-    test "can filter by multiple status'" do
-      {:ok, order_1} = submit_order()
-      {:ok, order_2} = submit_order()
-      {:ok, order_3} = submit_order()
-
-      {:ok, {_, updated_order_2}} =
-        Tai.Trading.OrderStore.find_by_and_update(
-          [client_id: order_2.client_id],
-          status: :open
-        )
-
-      Tai.Trading.OrderStore.find_by_and_update(
-        [client_id: order_3.client_id],
-        status: :error
-      )
-
-      found_orders =
-        [status: [:enqueued, :open]]
-        |> Tai.Trading.OrderStore.where()
-        |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
-
-      assert found_orders == [order_1, updated_order_2]
-      assert Tai.Trading.OrderStore.where(status: []) == []
-      assert Tai.Trading.OrderStore.where(status: [:status_does_not_exist]) == []
-    end
-
-    test "can filter by client_ids and status" do
-      submit_order()
-      {:ok, order_2} = submit_order()
-      {:ok, order_3} = submit_order()
-
-      {:ok, {_, updated_order_2}} =
-        Tai.Trading.OrderStore.find_by_and_update(
-          [client_id: order_2.client_id],
-          status: :error
-        )
-
-      {:ok, {_, updated_order_3}} =
-        Tai.Trading.OrderStore.find_by_and_update(
-          [client_id: order_3.client_id],
-          status: :error
-        )
-
-      error_orders =
-        [
-          client_id: [updated_order_2.client_id, updated_order_3.client_id],
-          status: :error
-        ]
-        |> Tai.Trading.OrderStore.where()
-        |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
-
-      assert error_orders == [updated_order_2, updated_order_3]
-    end
+    assert Tai.Trading.OrderStore.count() == 1
   end
 
   defp submit_order do
-    :buy
-    |> build_submission(:fok)
-    |> Tai.Trading.OrderStore.add()
-  end
-
-  def build_submission(:buy, :gtc, post_only: post_only) do
-    %Tai.Trading.OrderSubmissions.BuyLimitGtc{
-      venue_id: :test_exchange_a,
-      account_id: :main,
-      product_symbol: :btc_usd,
-      price: Decimal.new("100.1"),
-      qty: Decimal.new("1.1"),
-      post_only: post_only
-    }
-  end
-
-  def build_submission(:sell, :gtc, post_only: post_only) do
-    %Tai.Trading.OrderSubmissions.SellLimitGtc{
-      venue_id: :test_exchange_a,
-      account_id: :main,
-      product_symbol: :btc_usd,
-      price: Decimal.new("50000.5"),
-      qty: Decimal.new("0.1"),
-      post_only: post_only
-    }
-  end
-
-  def build_submission(:buy, :fok) do
     %Tai.Trading.OrderSubmissions.BuyLimitFok{
       venue_id: :test_exchange_a,
       account_id: :main,
@@ -292,35 +791,13 @@ defmodule Tai.Trading.OrderStoreTest do
       price: Decimal.new("100.1"),
       qty: Decimal.new("1.1")
     }
+    |> Tai.Trading.OrderStore.add()
   end
 
-  def build_submission(:sell, :fok) do
-    %Tai.Trading.OrderSubmissions.SellLimitFok{
-      venue_id: :test_exchange_a,
-      account_id: :main,
-      product_symbol: :btc_usd,
-      price: Decimal.new("50000.5"),
-      qty: Decimal.new("0.1")
-    }
-  end
-
-  def build_submission(:buy, :ioc) do
-    %Tai.Trading.OrderSubmissions.BuyLimitIoc{
-      venue_id: :test_exchange_a,
-      account_id: :main,
-      product_symbol: :btc_usd,
-      price: Decimal.new("100.1"),
-      qty: Decimal.new("1.1")
-    }
-  end
-
-  def build_submission(:sell, :ioc) do
-    %Tai.Trading.OrderSubmissions.SellLimitIoc{
-      venue_id: :test_exchange_a,
-      account_id: :main,
-      product_symbol: :btc_usd,
-      price: Decimal.new("50000.5"),
-      qty: Decimal.new("0.1")
-    }
+  defp build_submission do
+    struct(Tai.Trading.OrderSubmissions.BuyLimitGtc, %{
+      price: Decimal.new(1000),
+      qty: Decimal.new(1)
+    })
   end
 end

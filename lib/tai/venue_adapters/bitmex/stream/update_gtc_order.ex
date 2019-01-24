@@ -1,54 +1,68 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
   alias Tai.VenueAdapters.Bitmex.ClientId
 
-  def update(venue_client_id, venue_order) do
-    client_id = venue_client_id |> ClientId.from_base64()
-    attrs = build_attrs(venue_order)
+  @date_format "{ISO:Extended}"
 
-    with {:ok, {prev_order, updated_order}} <-
-           Tai.Trading.OrderStore.find_by_and_update(
-             [client_id: client_id],
-             attrs
-           ) do
-      Tai.Trading.Orders.updated!(prev_order, updated_order)
-    end
+  def update(venue_client_id, %{"ordStatus" => venue_status} = venue_order) do
+    client_id = venue_client_id |> ClientId.from_base64()
+
+    venue_status
+    |> from_venue_status()
+    |> passive_update(client_id, venue_order)
+    |> notify
   end
 
-  @format "{ISO:Extended}"
-  defp build_attrs(venue_order) do
-    status =
-      venue_order
-      |> Map.fetch!("ordStatus")
-      |> Tai.VenueAdapters.Bitmex.OrderStatus.from_venue_status(:ignore)
+  defp from_venue_status(venue_status) do
+    Tai.VenueAdapters.Bitmex.OrderStatus.from_venue_status(venue_status, :ignore)
+  end
 
-    leaves_qty =
-      venue_order
-      |> Map.fetch!("leavesQty")
-      |> Decimal.new()
+  defp passive_update(
+         :filled,
+         client_id,
+         %{"timestamp" => timestamp, "avgPx" => avg_px, "cumQty" => cum_qty}
+       ) do
+    venue_updated_at = timestamp |> Timex.parse!(@date_format)
+    avg_price = avg_px |> Tai.Utils.Decimal.from()
+    cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
 
-    venue_updated_at =
-      venue_order
-      |> Map.fetch!("timestamp")
-      |> Timex.parse!(@format)
+    Tai.Trading.OrderStore.passive_fill(
+      client_id,
+      venue_updated_at,
+      avg_price,
+      cumulative_qty
+    )
+  end
 
-    attrs = [status: status, leaves_qty: leaves_qty, venue_updated_at: venue_updated_at]
+  defp passive_update(
+         :open,
+         client_id,
+         %{
+           "timestamp" => timestamp,
+           "avgPx" => avg_px,
+           "cumQty" => cum_qty,
+           "leavesQty" => lvs_qty
+         }
+       ) do
+    venue_updated_at = timestamp |> Timex.parse!(@date_format)
+    avg_price = avg_px |> Tai.Utils.Decimal.from()
+    cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
+    leaves_qty = lvs_qty |> Tai.Utils.Decimal.from()
 
-    if status != :canceled do
-      cumulative_qty =
-        venue_order
-        |> Map.fetch!("cumQty")
-        |> Decimal.new()
+    Tai.Trading.OrderStore.passive_partial_fill(
+      client_id,
+      venue_updated_at,
+      avg_price,
+      cumulative_qty,
+      leaves_qty
+    )
+  end
 
-      avg_price =
-        venue_order
-        |> Map.fetch!("avgPx")
-        |> Tai.Utils.Decimal.from()
+  defp passive_update(:canceled, client_id, %{"timestamp" => timestamp}) do
+    venue_updated_at = timestamp |> Timex.parse!(@date_format)
+    Tai.Trading.OrderStore.passive_cancel(client_id, venue_updated_at)
+  end
 
-      attrs
-      |> Keyword.put(:cumulative_qty, cumulative_qty)
-      |> Keyword.put(:avg_price, avg_price)
-    else
-      attrs
-    end
+  defp notify({:ok, {old, updated}}) do
+    Tai.Trading.Orders.updated!(old, updated)
   end
 end

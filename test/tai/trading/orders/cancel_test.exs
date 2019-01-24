@@ -89,14 +89,15 @@ defmodule Tai.Trading.Orders.CancelTest do
       end
 
       test "returns an error tuple when the status is not open", %{order: order} do
-        assert Tai.Trading.Orders.cancel(order) == {:error, :order_status_must_be_open}
+        assert {:error, reason} = Tai.Trading.Orders.cancel(order)
+        assert reason == {:invalid_status, :create_error, :open}
       end
 
       test "broadcasts an event when the status is not open", %{order: order} do
         Tai.Trading.Orders.cancel(order)
 
         assert_receive {Tai.Event,
-                        %Tai.Events.CancelOrderInvalidStatus{
+                        %Tai.Events.OrderUpdateInvalidStatus{
                           was: :create_error,
                           required: :open
                         } = cancel_error_event}

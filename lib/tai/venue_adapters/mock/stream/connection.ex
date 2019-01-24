@@ -78,32 +78,64 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   defp handle_msg(
          %{
-           "venue_order_id" => venue_order_id,
-           "status" => raw_status,
+           "status" => "open",
+           "client_id" => client_id,
+           "avg_price" => raw_avg_price,
+           "cumulative_qty" => raw_cumulative_qty,
+           "leaves_qty" => raw_leaves_qty
+         },
+         _venue_id
+       ) do
+    avg_price = raw_avg_price |> Tai.Utils.Decimal.from()
+    cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.from()
+    leaves_qty = raw_leaves_qty |> Tai.Utils.Decimal.from()
+
+    {:ok, {prev_order, updated_order}} =
+      Tai.Trading.OrderStore.passive_partial_fill(
+        client_id,
+        Timex.now(),
+        avg_price,
+        cumulative_qty,
+        leaves_qty
+      )
+
+    Tai.Trading.Orders.updated!(prev_order, updated_order)
+  end
+
+  defp handle_msg(
+         %{
+           "status" => "filled",
+           "client_id" => client_id,
            "avg_price" => raw_avg_price,
            "cumulative_qty" => raw_cumulative_qty
          },
          _venue_id
        ) do
-    {:ok, {_, current_order}} =
-      Tai.Trading.OrderStore.find_by_and_update([venue_order_id: venue_order_id], [])
+    avg_price = raw_avg_price |> Tai.Utils.Decimal.from()
+    cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.from()
 
-    cumulative_qty = Tai.Utils.Decimal.from(raw_cumulative_qty)
+    {:ok, {prev_order, updated_order}} =
+      Tai.Trading.OrderStore.passive_fill(
+        client_id,
+        Timex.now(),
+        avg_price,
+        cumulative_qty
+      )
 
-    attrs = [
-      status: String.to_atom(raw_status),
-      avg_price: Tai.Utils.Decimal.from(raw_avg_price),
-      cumulative_qty: cumulative_qty,
-      leaves_qty: Decimal.sub(current_order.leaves_qty, cumulative_qty)
-    ]
+    Tai.Trading.Orders.updated!(prev_order, updated_order)
+  end
 
-    with {:ok, {prev_order, updated_order}} <-
-           Tai.Trading.OrderStore.find_by_and_update(
-             [venue_order_id: venue_order_id],
-             attrs
-           ) do
-      Tai.Trading.Orders.updated!(prev_order, updated_order)
-    end
+  defp handle_msg(
+         %{
+           "status" => "canceled",
+           "client_id" => client_id
+         },
+         _venue_id
+       ) do
+    {:ok, {prev_order, updated_order}} =
+      Tai.Trading.OrderStore.passive_cancel(client_id, Timex.now())
+
+    Tai.Trading.Orders.updated!(prev_order, updated_order)
   end
 
   defp handle_msg(msg, venue_id) do

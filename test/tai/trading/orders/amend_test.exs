@@ -39,9 +39,13 @@ defmodule Tai.Trading.Orders.AmendTest do
           |> Tai.Trading.OrderStore.add()
 
         {:ok, {_, open_order}} =
-          Tai.Trading.OrderStore.find_by_and_update(
-            [client_id: enqueued_order.client_id],
-            status: :open
+          Tai.Trading.OrderStore.open(
+            enqueued_order.client_id,
+            @venue_order_id,
+            Timex.now(),
+            @original_price,
+            Decimal.new(0),
+            @original_qty
           )
 
         {:ok, %{order: open_order}}
@@ -104,12 +108,21 @@ defmodule Tai.Trading.Orders.AmendTest do
           })
           |> Tai.Trading.OrderStore.add()
 
-        {:ok, {_, amend_error_order}} =
-          Tai.Trading.OrderStore.find_by_and_update(
-            [client_id: enqueued_order.client_id],
-            status: :amend_error,
-            error_reason: "Invalid nonce"
+        {:ok, {_, _}} =
+          Tai.Trading.OrderStore.open(
+            enqueued_order.client_id,
+            @venue_order_id,
+            Timex.now(),
+            @original_price,
+            Decimal.new(0),
+            @original_qty
           )
+
+        {:ok, {_, _}} =
+          Tai.Trading.OrderStore.pend_amend(enqueued_order.client_id, Timex.now())
+
+        {:ok, {_, amend_error_order}} =
+          Tai.Trading.OrderStore.amend_error(enqueued_order.client_id, "Invalid nonce")
 
         {:ok, %{order: amend_error_order}}
       end
@@ -175,9 +188,10 @@ defmodule Tai.Trading.Orders.AmendTest do
       test "returns an error tuple when the order does not have an amendable status", %{
         order: enqueued_order
       } do
-        assert Tai.Trading.Orders.amend(enqueued_order, %{price: Decimal.new(1)}) ==
-                 {:error,
-                  {:invalid_order_status, "Must be open | amend_error, but it was enqueued"}}
+        assert {:error, reason} =
+                 Tai.Trading.Orders.amend(enqueued_order, %{price: Decimal.new(1)})
+
+        assert reason == {:invalid_status, :enqueued, [:open, :amend_error]}
       end
 
       test "broadcasts an event when the order does not have an amendable status", %{
@@ -187,10 +201,10 @@ defmodule Tai.Trading.Orders.AmendTest do
 
         Tai.Trading.Orders.amend(enqueued_order, %{price: Decimal.new(1)})
 
-        assert_receive {Tai.Event, %Tai.Events.OrderErrorAmendHasInvalidStatus{} = event}
+        assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = event}
         assert event.client_id != nil
         assert event.was == :enqueued
-        assert event.required == "open | amend_error"
+        assert event.required == [:open, :amend_error]
       end
 
       test "changes status to :amend_error when the venue returns an error", %{
