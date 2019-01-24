@@ -33,12 +33,6 @@ defmodule Tai.Advisor do
               state :: advisor
             ) :: :ok | {:ok, store} | term
 
-  @callback handle_order_updated(
-              old_order :: term,
-              updated_order :: term,
-              state :: advisor
-            ) :: :ok | {:ok, store} | term
-
   @enforce_keys [
     :group_id,
     :advisor_id,
@@ -150,24 +144,6 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def handle_cast({:order_updated, old_order, updated_order}, state) do
-        try do
-          case handle_order_updated(old_order, updated_order, state) do
-            {:ok, new_store} -> {:noreply, state |> Map.put(:store, new_store)}
-            _ -> {:noreply, state}
-          end
-        rescue
-          e ->
-            Tai.Events.broadcast(%Tai.Events.AdvisorOrderUpdatedError{
-              error: e,
-              stacktrace: __STACKTRACE__
-            })
-
-            {:noreply, state}
-        end
-      end
-
-      @doc false
       def handle_cast({:order_updated, old_order, updated_order, callback}, state) do
         try do
           case callback.(old_order, updated_order, state) do
@@ -189,8 +165,6 @@ defmodule Tai.Advisor do
       def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
       @doc false
       def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state), do: :ok
-      @doc false
-      def handle_order_updated(old_order, updated_order, state), do: :ok
 
       defp cache_inside_quote(state, venue_id, product_symbol) do
         with {:ok, current_inside_quote} <-
@@ -269,8 +243,7 @@ defmodule Tai.Advisor do
       end
 
       defoverridable handle_order_book_changes: 4,
-                     handle_inside_quote: 5,
-                     handle_order_updated: 3
+                     handle_inside_quote: 5
     end
   end
 end
