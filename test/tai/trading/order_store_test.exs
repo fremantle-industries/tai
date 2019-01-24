@@ -16,7 +16,7 @@ defmodule Tai.Trading.OrderStoreTest do
   @price Decimal.new(11)
   @avg_price Decimal.new(10)
   @cumulative_qty Decimal.new(1)
-  @leaves_qty Decimal.new(2)
+  @leaves_qty Decimal.new(5)
   @updated_at Timex.now()
   @venue_updated_at Timex.now()
 
@@ -338,6 +338,73 @@ defmodule Tai.Trading.OrderStoreTest do
     end
   end
 
+  describe ".passsive_partial_fill" do
+    @updated_leaves_qty Decimal.new(2)
+
+    test "returns on ok tuple with the old & updated order" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.passive_partial_fill(
+                 order.client_id,
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @updated_leaves_qty
+               )
+
+      assert old.status == :open
+      assert updated.status == :open
+      assert updated.venue_updated_at == @venue_updated_at
+      assert updated.avg_price == @avg_price
+      assert updated.cumulative_qty == @cumulative_qty
+      assert updated.leaves_qty == Decimal.new(2)
+    end
+
+    test "returns an error tuple when the order can't be found" do
+      assert {:error, :not_found} =
+               Tai.Trading.OrderStore.passive_partial_fill(
+                 "not found",
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @updated_leaves_qty
+               )
+    end
+
+    test "returns an error tuple when the current status can't be filled" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
+
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.passive_partial_fill(
+                 order.client_id,
+                 @venue_updated_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @updated_leaves_qty
+               )
+
+      assert reason ==
+               {:invalid_status, :skip,
+                [:open, :pending_amend, :pending_cancel, :amend_error, :cancel_error]}
+    end
+  end
+
   describe ".pend_amend" do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
@@ -540,8 +607,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
       assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
 
-      assert {:error, reason} =
-               Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
+      assert {:error, reason} = Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
 
       assert reason == {:invalid_status, :enqueued, :open}
     end
@@ -683,8 +749,7 @@ defmodule Tai.Trading.OrderStoreTest do
 
       assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
 
-      assert {:error, reason} =
-               Tai.Trading.OrderStore.cancel(order.client_id, @venue_updated_at)
+      assert {:error, reason} = Tai.Trading.OrderStore.cancel(order.client_id, @venue_updated_at)
 
       assert reason == {:invalid_status, :enqueued, :pending_cancel}
     end

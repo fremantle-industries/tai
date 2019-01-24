@@ -39,9 +39,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
         },
         %{
           "clOrdID" => order_2.client_id |> ClientId.to_venue(order_2.time_in_force),
-          "ordStatus" => "Filled",
-          "leavesQty" => 0,
-          "cumQty" => 10,
+          "ordStatus" => "PartiallyFilled",
+          "leavesQty" => 3,
+          "cumQty" => 7,
           "avgPx" => 2000,
           "timestamp" => "2018-12-27T05:33:50.832Z"
         },
@@ -81,10 +81,10 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       assert %DateTime{} = buy_updated_event.venue_updated_at
 
       assert sell_updated_event.client_id == order_2.client_id
-      assert sell_updated_event.status == :filled
+      assert sell_updated_event.status == :open
       assert sell_updated_event.avg_price == Decimal.new("2000")
-      assert sell_updated_event.leaves_qty == Decimal.new(0)
-      assert sell_updated_event.cumulative_qty == Decimal.new(10)
+      assert sell_updated_event.leaves_qty == Decimal.new(3)
+      assert sell_updated_event.cumulative_qty == Decimal.new(7)
       assert sell_updated_event.qty == Decimal.new(10)
       assert %DateTime{} = buy_updated_event.venue_updated_at
     end

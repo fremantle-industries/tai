@@ -11,6 +11,8 @@ defmodule Tai.Trading.OrderStore do
   @type order :: Trading.Order.t()
   @type order_status :: Trading.Order.status()
   @type submission :: Trading.BuildOrderFromSubmission.submission()
+  @type passive_fills_required ::
+          :open | :pending_amend | :pending_cancel | :amend_error | :cancel_error
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -172,7 +174,7 @@ defmodule Tai.Trading.OrderStore do
     {:reply, response, state}
   end
 
-  @passive_fill_required [:open, :pending_amend, :pending_cancel, :amend_error, :cancel_error]
+  @passive_fills_required [:open, :pending_amend, :pending_cancel, :amend_error, :cancel_error]
   def handle_call(
         {
           :passive_fill,
@@ -185,12 +187,36 @@ defmodule Tai.Trading.OrderStore do
         state
       ) do
     response =
-      update(client_id, @passive_fill_required, %{
+      update(client_id, @passive_fills_required, %{
         status: :filled,
         venue_updated_at: venue_updated_at,
         avg_price: avg_price,
         cumulative_qty: cumulative_qty,
         leaves_qty: Decimal.new(0)
+      })
+
+    {:reply, response, state}
+  end
+
+  def handle_call(
+        {
+          :passive_partial_fill,
+          client_id,
+          venue_updated_at,
+          avg_price,
+          cumulative_qty,
+          leaves_qty
+        },
+        _from,
+        state
+      ) do
+    response =
+      update(client_id, @passive_fills_required, %{
+        status: :open,
+        venue_updated_at: venue_updated_at,
+        avg_price: avg_price,
+        cumulative_qty: cumulative_qty,
+        leaves_qty: leaves_qty
       })
 
     {:reply, response, state}
@@ -324,11 +350,9 @@ defmodule Tai.Trading.OrderStore do
     )
   end
 
-  @type passive_fill_required ::
-          :open | :pending_amend | :pending_cancel | :amend_error | :cancel_error
   @spec passive_fill(client_id, DateTime.t(), Decimal.t(), Decimal.t()) ::
           {:ok, {old :: order, updated :: order}}
-          | {:error, :not_found | {:invalid_status, current :: atom, passive_fill_required}}
+          | {:error, :not_found | {:invalid_status, current :: atom, passive_fills_required}}
   def passive_fill(
         client_id,
         venue_updated_at,
@@ -343,6 +367,29 @@ defmodule Tai.Trading.OrderStore do
         venue_updated_at,
         avg_price,
         cumulative_qty
+      }
+    )
+  end
+
+  @spec passive_partial_fill(client_id, DateTime.t(), Decimal.t(), Decimal.t(), Decimal.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, passive_fills_required}}
+  def passive_partial_fill(
+        client_id,
+        venue_updated_at,
+        avg_price,
+        cumulative_qty,
+        leaves_qty
+      ) do
+    GenServer.call(
+      __MODULE__,
+      {
+        :passive_partial_fill,
+        client_id,
+        venue_updated_at,
+        avg_price,
+        cumulative_qty,
+        leaves_qty
       }
     )
   end
