@@ -23,7 +23,7 @@ defmodule Tai.Trading.OrderStore do
   def init(state), do: {:ok, state}
 
   def handle_call(:create_ets_table, _from, state) do
-    create_ets_table()
+    :ets.new(__MODULE__, [:set, :protected, :named_table])
     {:reply, :ok, state}
   end
 
@@ -511,8 +511,6 @@ defmodule Tai.Trading.OrderStore do
     record = {order.client_id, order}
     :ets.insert(__MODULE__, record)
   end
-
-  defp create_ets_table, do: :ets.new(__MODULE__, [:set, :protected, :named_table])
 
   defp update(client_id, required, attrs) when is_list(required) do
     with {:ok, old_order} <- find_by_client_id(client_id) do
