@@ -10,9 +10,10 @@ defmodule Tai.Venues.Product do
           | :settled
           | :unlisted
 
+  @type symbol :: atom
   @type t :: %Tai.Venues.Product{
           exchange_id: atom,
-          symbol: atom,
+          symbol: symbol,
           exchange_symbol: String.t(),
           status: status,
           min_size: Decimal.t(),
