@@ -37,6 +37,7 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
       symbol: symbol,
       exchange_symbol: bitmex_symbol,
       status: status,
+      margin: true,
       min_size: lot_size && lot_size |> to_decimal,
       price_increment: tick_size |> to_decimal,
       max_price: max_price && max_price |> to_decimal,

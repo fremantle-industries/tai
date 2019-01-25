@@ -9,19 +9,11 @@ defmodule Tai.Venues.ProductStoreTest do
 
     {:ok, _} = Application.ensure_all_started(:tai)
 
-    product = %Tai.Venues.Product{
-      exchange_id: :my_exchange,
-      symbol: :btc_usdt,
-      exchange_symbol: "BTC_USDT",
-      status: :trading,
-      min_price: Decimal.new("0.00100000"),
-      max_price: Decimal.new("100000.00000000"),
-      price_increment: Decimal.new("0.00100000"),
-      min_size: Decimal.new("0.00100000"),
-      max_size: Decimal.new("10000.00000000"),
-      size_increment: Decimal.new("0.00100000"),
-      min_notional: Decimal.new("0.01000000")
-    }
+    product =
+      struct(Tai.Venues.Product, %{
+        exchange_id: :my_exchange,
+        symbol: :btc_usdt
+      })
 
     {:ok, %{product: product}}
   end

@@ -54,6 +54,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
       symbol: symbol,
       exchange_symbol: id,
       status: status,
+      margin: false,
       min_notional: min_notional,
       min_price: quote_increment,
       min_size: base_min_size,

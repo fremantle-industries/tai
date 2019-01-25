@@ -16,6 +16,7 @@ defmodule Tai.Venues.Product do
           symbol: symbol,
           exchange_symbol: String.t(),
           status: status,
+          margin: boolean,
           min_size: Decimal.t(),
           size_increment: Decimal.t(),
           min_notional: Decimal.t() | nil,
@@ -32,6 +33,7 @@ defmodule Tai.Venues.Product do
     :symbol,
     :exchange_symbol,
     :status,
+    :margin,
     :min_size,
     :size_increment
   ]
@@ -40,6 +42,7 @@ defmodule Tai.Venues.Product do
     :symbol,
     :exchange_symbol,
     :status,
+    :margin,
     :min_notional,
     :min_price,
     :min_size,

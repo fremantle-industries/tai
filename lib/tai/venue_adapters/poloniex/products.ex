@@ -60,6 +60,7 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
       symbol: symbol,
       exchange_symbol: exchange_symbol,
       status: status,
+      margin: false,
       min_notional: min_notional,
       min_size: @min_size,
       min_price: @min_price,
