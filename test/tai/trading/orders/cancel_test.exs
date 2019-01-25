@@ -96,13 +96,12 @@ defmodule Tai.Trading.Orders.CancelTest do
       test "broadcasts an event when the status is not open", %{order: order} do
         Tai.Trading.Orders.cancel(order)
 
-        assert_receive {Tai.Event,
-                        %Tai.Events.OrderUpdateInvalidStatus{
-                          was: :create_error,
-                          required: :open
-                        } = cancel_error_event}
+        assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = cancel_error_event}
 
         assert cancel_error_event.client_id == order.client_id
+        assert cancel_error_event.action == :pend_cancel
+        assert cancel_error_event.was == :create_error
+        assert cancel_error_event.required == :open
       end
     end
 

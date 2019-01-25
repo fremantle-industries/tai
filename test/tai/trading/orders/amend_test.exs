@@ -118,8 +118,7 @@ defmodule Tai.Trading.Orders.AmendTest do
             @original_qty
           )
 
-        {:ok, {_, _}} =
-          Tai.Trading.OrderStore.pend_amend(enqueued_order.client_id, Timex.now())
+        {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(enqueued_order.client_id, Timex.now())
 
         {:ok, {_, amend_error_order}} =
           Tai.Trading.OrderStore.amend_error(enqueued_order.client_id, "Invalid nonce")
@@ -203,6 +202,7 @@ defmodule Tai.Trading.Orders.AmendTest do
 
         assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = event}
         assert event.client_id != nil
+        assert event.action == :pend_amend
         assert event.was == :enqueued
         assert event.required == [:open, :amend_error]
       end

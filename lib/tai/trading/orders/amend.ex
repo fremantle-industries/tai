@@ -24,7 +24,7 @@ defmodule Tai.Trading.Orders.Amend do
       {:ok, updated_order}
     else
       {:error, {:invalid_status, was, required}} = error ->
-        broadcast_invalid_status(order.client_id, was, required)
+        broadcast_invalid_status(order.client_id, :pend_amend, was, required)
         error
     end
   end
@@ -48,9 +48,10 @@ defmodule Tai.Trading.Orders.Amend do
     Orders.updated!(old_order, updated_order)
   end
 
-  defp broadcast_invalid_status(client_id, was, required) do
+  defp broadcast_invalid_status(client_id, action, was, required) do
     Tai.Events.broadcast(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: client_id,
+      action: action,
       was: was,
       required: required
     })
