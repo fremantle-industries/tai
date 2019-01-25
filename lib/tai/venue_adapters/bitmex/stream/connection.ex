@@ -100,11 +100,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
       "op" => "subscribe",
       "args" => [
         "connected",
-        "funding",
-        "insurance",
         "liquidation",
-        "settlement",
         "publicNotifications"
+        # NOTE:  These aren't required for now. It would be nice if the channels could be configured
+        # "funding",
+        # "insurance",
+        # "settlement",
       ]
     }
 
@@ -115,12 +116,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     msg = %{
       "op" => "subscribe",
       "args" => [
-        "execution",
-        "order",
-        "margin",
-        "position",
-        "transact",
-        "wallet"
+        "order"
+        # NOTE:  These aren't required for now. It would be nice if the channels could be configured
+        # "execution",
+        # "margin",
+        # "position",
+        # "transact",
+        # "wallet"
       ]
     }
 
