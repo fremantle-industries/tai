@@ -31,8 +31,14 @@ defmodule Tai.Venues.Adapters.PositionsTest do
         assert [%Tai.Trading.Position{} = position | _] = positions
         assert position.venue_id == @adapter.id
         assert position.account_id == @account_id
-        assert %Decimal{} = position.cost
+        assert position.open == false
         assert %Decimal{} = position.qty
+        assert %Decimal{} = position.init_margin
+        assert %Decimal{} = position.init_margin_req
+        assert %Decimal{} = position.maint_margin
+        assert %Decimal{} = position.maint_margin_req
+        assert %Decimal{} = position.realised_pnl
+        assert %Decimal{} = position.unrealised_pnl
       end
     end
   end)

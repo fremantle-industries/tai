@@ -4,22 +4,42 @@ defmodule Tai.Trading.Position do
           venue_id: atom,
           account_id: atom,
           product_symbol: product_symbol,
-          cost: Decimal.t(),
-          qty: Decimal.t()
+          open: boolean,
+          avg_entry_price: Decimal.t() | nil,
+          qty: Decimal.t(),
+          init_margin: Decimal.t(),
+          init_margin_req: Decimal.t(),
+          maint_margin: Decimal.t(),
+          maint_margin_req: Decimal.t(),
+          realised_pnl: Decimal.t(),
+          unrealised_pnl: Decimal.t()
         }
 
   @enforce_keys [
     :venue_id,
     :account_id,
     :product_symbol,
-    :cost,
-    :qty
+    :open,
+    :qty,
+    :init_margin,
+    :init_margin_req,
+    :maint_margin,
+    :maint_margin_req,
+    :realised_pnl,
+    :unrealised_pnl
   ]
   defstruct [
     :venue_id,
     :account_id,
     :product_symbol,
-    :cost,
-    :qty
+    :open,
+    :avg_entry_price,
+    :qty,
+    :init_margin,
+    :init_margin_req,
+    :maint_margin,
+    :maint_margin_req,
+    :realised_pnl,
+    :unrealised_pnl
   ]
 end
