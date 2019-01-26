@@ -12,15 +12,20 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
 
   @spec amend_order(venue_order_id, attrs, credentials) ::
           {:ok, response} | {:error, error_reason}
-  def amend_order(venue_order_id, attrs, %{api_key: api_key, api_secret: api_secret}) do
+  def amend_order(venue_order_id, attrs, credentials) do
     params = to_params(attrs, venue_order_id)
 
-    %ExBitmex.Credentials{api_key: api_key, api_secret: api_secret}
+    credentials
+    |> to_venue_credentials
     |> ExBitmex.Rest.Orders.amend(params)
     |> parse_response()
   end
 
-  def to_params(attrs, venue_order_id) do
+  defdelegate to_venue_credentials(credentials),
+    to: Tai.VenueAdapters.Bitmex.Credentials,
+    as: :from
+
+  defp to_params(attrs, venue_order_id) do
     params = %{}
 
     params =

@@ -3,6 +3,7 @@ defmodule Tai.Venue do
   @type adapter :: Tai.Venues.Adapter.t()
   @type product :: Tai.Venues.Product.t()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
+  @type position :: Tai.Trading.Position.t()
   @type order :: Tai.Trading.Order.t()
   @type shared_error_reason ::
           :timeout | {:nonce_not_increasing, String.t()} | Tai.CredentialError.t()
@@ -19,6 +20,16 @@ defmodule Tai.Venue do
       ) do
     {:ok, credentials} = Map.fetch(accounts, account_id)
     adapter.asset_balances(exchange_id, account_id, credentials)
+  end
+
+  @spec positions(adapter :: adapter, account_id :: atom) ::
+          {:ok, [position]} | {:error, :not_supported | shared_error_reason}
+  def positions(
+        %Tai.Venues.Adapter{adapter: adapter, id: exchange_id, accounts: accounts},
+        account_id
+      ) do
+    {:ok, credentials} = Map.fetch(accounts, account_id)
+    adapter.positions(exchange_id, account_id, credentials)
   end
 
   @spec maker_taker_fees(adapter :: adapter, account_id :: atom) ::

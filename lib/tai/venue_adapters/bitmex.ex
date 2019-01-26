@@ -12,6 +12,8 @@ defmodule Tai.VenueAdapters.Bitmex do
 
   def maker_taker_fees(_, _, _), do: {:ok, nil}
 
+  defdelegate positions(venue_id, account_id, credentials), to: Tai.VenueAdapters.Bitmex.Positions
+
   defdelegate create_order(order, credentials), to: Tai.VenueAdapters.Bitmex.CreateOrder
 
   defdelegate amend_order(venue_order_id, attrs, credentials),

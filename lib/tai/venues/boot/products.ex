@@ -2,8 +2,7 @@ defmodule Tai.Venues.Boot.Products do
   @type adapter :: Tai.Venues.Adapter.t()
   @type product :: Tai.Venues.Product.t()
 
-  @spec hydrate(adapter :: adapter) ::
-          {:ok, filtered_products :: [product]} | {:error, reason :: term}
+  @spec hydrate(adapter) :: {:ok, [product]} | {:error, reason :: term}
   def hydrate(adapter) do
     with {:ok, all_products} <- Tai.Venue.products(adapter) do
       filtered_products = filter(all_products, adapter.products)
@@ -21,7 +20,7 @@ defmodule Tai.Venues.Boot.Products do
     end
   end
 
-  def filter(all_products, filters) do
+  defp filter(all_products, filters) do
     all_products
     |> Enum.reduce(
       %{},

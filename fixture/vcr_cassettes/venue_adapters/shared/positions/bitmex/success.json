@@ -1,0 +1,35 @@
+[
+  {
+    "request": {
+      "body": "{}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "***",
+        "api-key": "***",
+        "api-signature": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/position"
+    },
+    "response": {
+      "binary": false,
+      "body": "[{\"account\":158677,\"symbol\":\"XBTH19\",\"currency\":\"XBt\",\"underlying\":\"XBT\",\"quoteCurrency\":\"USD\",\"commission\":0.00075,\"initMarginReq\":0.01,\"maintMarginReq\":0.005,\"riskLimit\":20000000000,\"leverage\":100,\"crossMargin\":true,\"deleveragePercentile\":null,\"rebalancedPnl\":0,\"prevRealisedPnl\":-972,\"prevUnrealisedPnl\":0,\"prevClosePrice\":3656.45,\"openingTimestamp\":\"2019-01-26T00:00:00.000Z\",\"openingQty\":0,\"openingCost\":0,\"openingComm\":0,\"openOrderBuyQty\":0,\"openOrderBuyCost\":0,\"openOrderBuyPremium\":0,\"openOrderSellQty\":0,\"openOrderSellCost\":0,\"openOrderSellPremium\":0,\"execBuyQty\":0,\"execBuyCost\":0,\"execSellQty\":0,\"execSellCost\":0,\"execQty\":0,\"execCost\":0,\"execComm\":0,\"currentTimestamp\":\"2019-01-26T00:00:00.263Z\",\"currentQty\":0,\"currentCost\":0,\"currentComm\":0,\"realisedCost\":0,\"unrealisedCost\":0,\"grossOpenCost\":0,\"grossOpenPremium\":0,\"grossExecCost\":0,\"isOpen\":false,\"markPrice\":null,\"markValue\":0,\"riskValue\":0,\"homeNotional\":0,\"foreignNotional\":0,\"posState\":\"\",\"posCost\":0,\"posCost2\":0,\"posCross\":0,\"posInit\":0,\"posComm\":0,\"posLoss\":0,\"posMargin\":0,\"posMaint\":0,\"posAllowance\":0,\"taxableMargin\":0,\"initMargin\":0,\"maintMargin\":0,\"sessionMargin\":0,\"targetExcessMargin\":0,\"varMargin\":0,\"realisedGrossPnl\":0,\"realisedTax\":0,\"realisedPnl\":0,\"unrealisedGrossPnl\":0,\"longBankrupt\":0,\"shortBankrupt\":0,\"taxBase\":0,\"indicativeTaxRate\":0,\"indicativeTax\":0,\"unrealisedTax\":0,\"unrealisedPnl\":0,\"unrealisedPnlPcnt\":0,\"unrealisedRoePcnt\":0,\"simpleQty\":null,\"simpleCost\":null,\"simpleValue\":null,\"simplePnl\":null,\"simplePnlPcnt\":null,\"avgCostPrice\":null,\"avgEntryPrice\":null,\"breakEvenPrice\":null,\"marginCallPrice\":null,\"liquidationPrice\":null,\"bankruptPrice\":null,\"timestamp\":\"2019-01-26T00:00:00.263Z\",\"lastPrice\":null,\"lastValue\":0},{\"account\":158677,\"symbol\":\"XBTM19\",\"currency\":\"XBt\",\"underlying\":\"XBT\",\"quoteCurrency\":\"USD\",\"commission\":0.00075,\"initMarginReq\":0.01,\"maintMarginReq\":0.005,\"riskLimit\":5000000000,\"leverage\":100,\"crossMargin\":true,\"deleveragePercentile\":null,\"rebalancedPnl\":0,\"prevRealisedPnl\":-42,\"prevUnrealisedPnl\":0,\"prevClosePrice\":3832.69,\"openingTimestamp\":\"2019-01-26T00:00:00.000Z\",\"openingQty\":0,\"openingCost\":0,\"openingComm\":0,\"openOrderBuyQty\":0,\"openOrderBuyCost\":0,\"openOrderBuyPremium\":0,\"openOrderSellQty\":0,\"openOrderSellCost\":0,\"openOrderSellPremium\":0,\"execBuyQty\":0,\"execBuyCost\":0,\"execSellQty\":0,\"execSellCost\":0,\"execQty\":0,\"execCost\":0,\"execComm\":0,\"currentTimestamp\":\"2019-01-26T00:00:00.263Z\",\"currentQty\":0,\"currentCost\":0,\"currentComm\":0,\"realisedCost\":0,\"unrealisedCost\":0,\"grossOpenCost\":0,\"grossOpenPremium\":0,\"grossExecCost\":0,\"isOpen\":false,\"markPrice\":null,\"markValue\":0,\"riskValue\":0,\"homeNotional\":0,\"foreignNotional\":0,\"posState\":\"\",\"posCost\":0,\"posCost2\":0,\"posCross\":0,\"posInit\":0,\"posComm\":0,\"posLoss\":0,\"posMargin\":0,\"posMaint\":0,\"posAllowance\":0,\"taxableMargin\":0,\"initMargin\":0,\"maintMargin\":0,\"sessionMargin\":0,\"targetExcessMargin\":0,\"varMargin\":0,\"realisedGrossPnl\":0,\"realisedTax\":0,\"realisedPnl\":0,\"unrealisedGrossPnl\":0,\"longBankrupt\":0,\"shortBankrupt\":0,\"taxBase\":0,\"indicativeTaxRate\":0,\"indicativeTax\":0,\"unrealisedTax\":0,\"unrealisedPnl\":0,\"unrealisedPnlPcnt\":0,\"unrealisedRoePcnt\":0,\"simpleQty\":null,\"simpleCost\":null,\"simpleValue\":null,\"simplePnl\":null,\"simplePnlPcnt\":null,\"avgCostPrice\":null,\"avgEntryPrice\":null,\"breakEvenPrice\":null,\"marginCallPrice\":null,\"liquidationPrice\":null,\"bankruptPrice\":null,\"timestamp\":\"2019-01-26T00:00:00.263Z\",\"lastPrice\":null,\"lastValue\":0}]",
+      "headers": {
+        "Date": "Sat, 26 Jan 2019 00:45:47 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "3433",
+        "Connection": "keep-alive",
+        "X-RateLimit-Limit": "300",
+        "X-RateLimit-Remaining": "299",
+        "X-RateLimit-Reset": "1548463548",
+        "X-Powered-By": "Profit",
+        "ETag": "W/\"d69-W4TDbYVo3l9XqXXk+McBTXCzFWQ\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

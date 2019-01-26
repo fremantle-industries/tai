@@ -1,6 +1,4 @@
 defmodule Tai.VenueAdapters.Bitmex.Products do
-  require Logger
-
   def products(venue_id) do
     with {:ok, instruments, _rate_limit} <-
            ExBitmex.Rest.HTTPClient.non_auth_get("/instrument", %{start: 0, count: 500}) do

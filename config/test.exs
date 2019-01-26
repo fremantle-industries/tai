@@ -59,6 +59,8 @@ config(:tai,
   }
 )
 
+config(:tai, :test_venue_adapters_with_positions, [:bitmex])
+
 config :tai,
   venues: %{
     test_exchange_a: [

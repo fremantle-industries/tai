@@ -13,6 +13,10 @@ defmodule Tai.VenueAdapters.Gdax do
   defdelegate maker_taker_fees(venue_id, account_id, credentials),
     to: Tai.VenueAdapters.Gdax.MakerTakerFees
 
+  def positions(_venue_id, _account_id, _credentials) do
+    {:error, :not_supported}
+  end
+
   def create_order(%Tai.Trading.Order{} = _order, _credentials) do
     {:error, :not_implemented}
   end

@@ -20,6 +20,9 @@ defmodule Tai.Commands.Helper do
   @spec markets :: no_return
   defdelegate markets, to: Tai.Commands.Markets
 
+  @spec positions :: no_return
+  defdelegate positions, to: Tai.Commands.Positions
+
   @spec orders :: no_return
   defdelegate orders, to: Tai.Commands.Orders
 

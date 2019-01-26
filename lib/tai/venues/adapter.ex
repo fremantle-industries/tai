@@ -1,7 +1,10 @@
 defmodule Tai.Venues.Adapter do
+  @type venue_id :: atom
+  @type account_id :: atom
   @type credentials :: map
   @type product :: Tai.Venues.Product.t()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
+  @type position :: Tai.Trading.Position.t()
   @type order :: Tai.Trading.Order.t()
   @type create_response :: Tai.Trading.OrderResponses.Create.t()
   @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
@@ -30,10 +33,12 @@ defmodule Tai.Venues.Adapter do
 
   @callback stream_supervisor :: atom
   @callback order_book_feed :: atom
-  @callback products(exchange_id :: atom) :: {:ok, [product]} | {:error, reason :: term}
-  @callback asset_balances(exchange_id :: atom, account_id :: atom, credentials :: map) ::
+  @callback products(venue_id) :: {:ok, [product]} | {:error, reason :: term}
+  @callback asset_balances(venue_id :: atom, account_id, credentials) ::
               {:ok, [asset_balance]} | {:error, reason :: term}
-  @callback maker_taker_fees(exchange_id :: atom, account_id :: atom, credentials :: map) ::
+  @callback positions(venue_id, account_id, credentials) ::
+              {:ok, [position]} | {:error, :not_supported | shared_error_reason}
+  @callback maker_taker_fees(venue_id, account_id, credentials) ::
               {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil} | {:error, reason :: term}
   @callback create_order(order, credentials) ::
               {:ok, create_response} | {:error, create_order_error_reason}

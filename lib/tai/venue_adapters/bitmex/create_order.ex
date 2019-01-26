@@ -10,7 +10,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
     params = build_params(order)
 
     credentials
-    |> to_bitmex_credentials
+    |> to_venue_credentials
     |> ExBitmex.Rest.Orders.create(params)
     |> parse_response(order)
   end
@@ -33,7 +33,9 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
     end
   end
 
-  defp to_bitmex_credentials(attrs), do: struct!(ExBitmex.Credentials, attrs)
+  defdelegate to_venue_credentials(credentials),
+    to: Tai.VenueAdapters.Bitmex.Credentials,
+    as: :from
 
   @buy "Buy"
   @sell "Sell"

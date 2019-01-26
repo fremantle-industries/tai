@@ -17,6 +17,7 @@ defmodule Tai do
       {Tai.Events, config.event_registry_partitions},
       Tai.EventsLogger,
       {Tai.Settings, settings},
+      Tai.Trading.PositionStore,
       Tai.Trading.OrderStore,
       Tai.Venues.ProductStore,
       Tai.Venues.FeeStore,

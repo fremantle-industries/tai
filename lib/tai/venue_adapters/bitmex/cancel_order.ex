@@ -15,14 +15,14 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
     params = %{orderID: venue_order_id}
 
     credentials
-    |> to_bitmex_credentials
+    |> to_venue_credentials
     |> ExBitmex.Rest.Orders.cancel(params)
     |> parse_response()
   end
 
-  defp to_bitmex_credentials(%{api_key: api_key, api_secret: api_secret}) do
-    %ExBitmex.Credentials{api_key: api_key, api_secret: api_secret}
-  end
+  defdelegate to_venue_credentials(credentials),
+    to: Tai.VenueAdapters.Bitmex.Credentials,
+    as: :from
 
   defp parse_response({:ok, [venue_order | _], %ExBitmex.RateLimit{}}) do
     {:ok, venue_updated_at, 0} = DateTime.from_iso8601(venue_order.timestamp)
