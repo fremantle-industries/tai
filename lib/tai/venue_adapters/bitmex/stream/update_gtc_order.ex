@@ -25,12 +25,15 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
     avg_price = avg_px |> Tai.Utils.Decimal.from()
     cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
 
-    Tai.Trading.OrderStore.passive_fill(
-      client_id,
-      venue_updated_at,
-      avg_price,
-      cumulative_qty
-    )
+    result =
+      Tai.Trading.OrderStore.passive_fill(
+        client_id,
+        venue_updated_at,
+        avg_price,
+        cumulative_qty
+      )
+
+    {client_id, :passive_fill, result}
   end
 
   defp passive_update(
@@ -48,21 +51,34 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
     cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
     leaves_qty = lvs_qty |> Tai.Utils.Decimal.from()
 
-    Tai.Trading.OrderStore.passive_partial_fill(
-      client_id,
-      venue_updated_at,
-      avg_price,
-      cumulative_qty,
-      leaves_qty
-    )
+    result =
+      Tai.Trading.OrderStore.passive_partial_fill(
+        client_id,
+        venue_updated_at,
+        avg_price,
+        cumulative_qty,
+        leaves_qty
+      )
+
+    {client_id, :passive_partial_fill, result}
   end
 
   defp passive_update(:canceled, client_id, %{"timestamp" => timestamp}) do
     venue_updated_at = timestamp |> Timex.parse!(@date_format)
-    Tai.Trading.OrderStore.passive_cancel(client_id, venue_updated_at)
+    result = Tai.Trading.OrderStore.passive_cancel(client_id, venue_updated_at)
+    {client_id, :passive_cancel, result}
   end
 
-  defp notify({:ok, {old, updated}}) do
+  defp notify({_, _, {:ok, {old, updated}}}) do
     Tai.Trading.Orders.updated!(old, updated)
+  end
+
+  defp notify({client_id, action, {:error, {:invalid_status, was, required}}}) do
+    Tai.Events.broadcast(%Tai.Events.OrderUpdateInvalidStatus{
+      client_id: client_id,
+      action: action,
+      was: was,
+      required: required
+    })
   end
 end

@@ -686,10 +686,20 @@ defmodule Tai.Trading.OrderStoreTest do
                {:error, :not_found}
     end
 
-    test "returns an error tuple when the current status is cancel" do
+    test "returns an error tuple when the current status is invalid" do
       submission = build_submission()
 
       assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {_, _}} =
+               Tai.Trading.OrderStore.open(
+                 order.client_id,
+                 @venue_order_id,
+                 @venue_created_at,
+                 @avg_price,
+                 @cumulative_qty,
+                 @leaves_qty
+               )
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.passive_cancel(order.client_id, @venue_updated_at)
@@ -700,7 +710,6 @@ defmodule Tai.Trading.OrderStoreTest do
       assert reason ==
                {:invalid_status, :canceled,
                 [
-                  :enqueued,
                   :open,
                   :expired,
                   :filled,

@@ -91,7 +91,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
 
     test "updates leaves_qty for canceled orders" do
       Tai.Events.firehose_subscribe()
-      order = :buy |> enqueue(%{price: Decimal.new(100), qty: Decimal.new(5)})
+      order = :buy |> enqueue(%{price: Decimal.new(100), qty: Decimal.new(5)}) |> open()
 
       bitmex_orders = [
         %{
@@ -114,6 +114,93 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       assert event.leaves_qty == Decimal.new(0)
       assert event.qty == Decimal.new(5)
       assert %DateTime{} = event.venue_updated_at
+    end
+
+    test "broadcasts an event when the status is invalid" do
+      Tai.Events.firehose_subscribe()
+      order_1 = :buy |> enqueue(%{price: Decimal.new(100), qty: Decimal.new(5)})
+      order_2 = :sell |> enqueue(%{price: Decimal.new(1500), qty: Decimal.new(10)})
+      order_3 = :buy |> enqueue(%{price: Decimal.new(100), qty: Decimal.new(5)})
+
+      bitmex_orders = [
+        %{
+          "clOrdID" => order_3.client_id |> ClientId.to_venue(order_3.time_in_force),
+          "leavesQty" => 0,
+          "ordStatus" => "Canceled",
+          "timestamp" => "2019-01-11T02:03:06.309Z"
+        },
+        %{
+          "clOrdID" => order_2.client_id |> ClientId.to_venue(order_2.time_in_force),
+          "ordStatus" => "PartiallyFilled",
+          "leavesQty" => 3,
+          "cumQty" => 7,
+          "avgPx" => 2000,
+          "timestamp" => "2018-12-27T05:33:50.832Z"
+        },
+        %{
+          "clOrdID" => order_1.client_id |> ClientId.to_venue(order_1.time_in_force),
+          "ordStatus" => "Filled",
+          "leavesQty" => 0,
+          "cumQty" => 5,
+          "avgPx" => 4265.5,
+          "timestamp" => "2018-12-27T05:33:50.795Z"
+        }
+      ]
+
+      :my_venue
+      |> ProcessAuthMessages.to_name()
+      |> GenServer.cast(
+        {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
+      )
+
+      assert_receive {Tai.Event,
+                      %Tai.Events.OrderUpdateInvalidStatus{action: :passive_fill} =
+                        passive_fill_invalid_event}
+
+      assert_receive {Tai.Event,
+                      %Tai.Events.OrderUpdateInvalidStatus{action: :passive_partial_fill} =
+                        passive_partial_fill_invalid_event}
+
+      assert_receive {Tai.Event,
+                      %Tai.Events.OrderUpdateInvalidStatus{action: :passive_cancel} =
+                        passive_cancel_invalid_event}
+
+      assert passive_fill_invalid_event.client_id == order_1.client_id
+      assert passive_fill_invalid_event.action == :passive_fill
+      assert passive_fill_invalid_event.was == :enqueued
+
+      assert passive_fill_invalid_event.required == [
+               :open,
+               :pending_amend,
+               :pending_cancel,
+               :amend_error,
+               :cancel_error
+             ]
+
+      assert passive_partial_fill_invalid_event.client_id == order_2.client_id
+      assert passive_partial_fill_invalid_event.action == :passive_partial_fill
+      assert passive_partial_fill_invalid_event.was == :enqueued
+
+      assert passive_partial_fill_invalid_event.required == [
+               :open,
+               :pending_amend,
+               :pending_cancel,
+               :amend_error,
+               :cancel_error
+             ]
+
+      assert passive_cancel_invalid_event.client_id == order_3.client_id
+      assert passive_cancel_invalid_event.action == :passive_cancel
+      assert passive_cancel_invalid_event.was == :enqueued
+
+      assert passive_cancel_invalid_event.required == [
+               :open,
+               :expired,
+               :filled,
+               :pending_cancel,
+               :pending_amend,
+               :amend
+             ]
     end
   end
 

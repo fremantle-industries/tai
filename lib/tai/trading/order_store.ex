@@ -256,7 +256,6 @@ defmodule Tai.Trading.OrderStore do
   end
 
   @passive_cancel_required [
-    :enqueued,
     :open,
     :expired,
     :filled,
@@ -465,8 +464,7 @@ defmodule Tai.Trading.OrderStore do
     do: GenServer.call(__MODULE__, {:cancel_error, client_id, reason})
 
   @type passive_cancel_required ::
-          :enqueued
-          | :open
+          :open
           | :expired
           | :filled
           | :pending_cancel
