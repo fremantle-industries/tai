@@ -262,7 +262,6 @@ defmodule Tai.Trading.OrderStore do
     :filled,
     :pending_cancel,
     :pending_amend,
-    :cancel,
     :amend
   ]
   def handle_call({:passive_cancel, client_id, venue_updated_at}, _from, state) do
@@ -472,7 +471,7 @@ defmodule Tai.Trading.OrderStore do
           | :filled
           | :pending_cancel
           | :pending_amend
-          | :cancel
+          | :canceled
           | :amend
   @spec passive_cancel(client_id, DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}

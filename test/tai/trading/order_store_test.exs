@@ -706,7 +706,6 @@ defmodule Tai.Trading.OrderStoreTest do
                   :filled,
                   :pending_cancel,
                   :pending_amend,
-                  :cancel,
                   :amend
                 ]}
     end
