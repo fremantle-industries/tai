@@ -28,10 +28,15 @@ defmodule Tai.Trading.Orders.Cancel do
   defp send_cancel_order(order), do: Tai.Venue.cancel_order(order)
 
   defp parse_cancel_order_response({:ok, order_response}, order) do
-    {:ok, {old_order, updated_order}} =
-      OrderStore.cancel(order.client_id, order_response.venue_updated_at)
+    order.client_id
+    |> OrderStore.cancel(order_response.venue_updated_at)
+    |> case do
+      {:ok, {old_order, updated_order}} ->
+        Orders.updated!(old_order, updated_order)
 
-    Orders.updated!(old_order, updated_order)
+      {:error, {:invalid_status, was, required}} ->
+        broadcast_invalid_status(order.client_id, :cancel, was, required)
+    end
   end
 
   defp parse_cancel_order_response({:error, reason}, order) do
