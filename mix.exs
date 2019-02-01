@@ -46,6 +46,7 @@ defmodule Tai.Mixfile do
       {:confex, "~> 3.4.0"},
       {:ecto, "~> 3.0"},
       {:jason, "~> 1.1"},
+      {:scribe, "~> 0.8"},
       {:logger_file_backend, "~> 0.0.10", only: [:dev, :test]},
       {:logger_json, "~> 3.0.0", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},

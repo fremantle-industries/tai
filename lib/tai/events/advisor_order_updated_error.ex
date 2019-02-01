@@ -12,7 +12,7 @@ defimpl Tai.LogEvent, for: Tai.Events.AdvisorOrderUpdatedError do
 
     event
     |> Map.take(keys)
-    |> Map.put(:error, event.error |> inspect)
+    |> Map.put(:error, event.error |> Scribe.format())
     |> Map.put(:stacktrace, event.stacktrace |> inspect)
   end
 end
