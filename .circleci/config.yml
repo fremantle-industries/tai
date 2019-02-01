@@ -1,6 +1,7 @@
-version: 2
+version: 2.0
+
 jobs:
-  build:
+  "elixir-1.7":
     docker:
       - image: circleci/elixir:1.7
 
@@ -10,37 +11,89 @@ jobs:
 
       - restore_cache:
           keys:
-            - hex-packages-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - hex-packages-{{ arch }}-{{ .Branch }}
-            - hex-packages
+            - hex-packages-elixir-1.7-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - hex-packages-elixir-1.7-{{ arch }}-{{ .Branch }}
+            - hex-packages-elixir-1.7
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
       - save_cache:
-          key: hex-packages-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: hex-packages-elixir-1.7-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - deps
 
       - restore_cache:
           keys:
-            - test-build-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - test-build-{{ arch }}-{{ .Branch }}
-            - test-build
+            - test-build-elixir-1.7-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - test-build-elixir-1.7-{{ arch }}-{{ .Branch }}
+            - test-build-elixir-1.7
       - run: mix test
       - save_cache:
-          key: test-build-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: test-build-elixir-1.7-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/test
 
       - restore_cache:
           keys:
-            - dialyzer-plt-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - dialyzer-plt-{{ arch }}-{{ .Branch }}
-            - dialyzer-plt
+            - dialyzer-plt-elixir-1.7-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - dialyzer-plt-elixir-1.7-{{ arch }}-{{ .Branch }}
+            - dialyzer-plt-elixir-1.7
       - run: mix dialyzer --halt-exit-status
       - save_cache:
-          key: dialyzer-plt-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: dialyzer-plt-elixir-1.7-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/dev
 
       - run: MIX_ENV=test mix coveralls.circle
+
+  "elixir-1.8":
+    docker:
+      - image: circleci/elixir:1.8
+
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - hex-packages-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - hex-packages-elixir-1.8-{{ arch }}-{{ .Branch }}
+            - hex-packages-elixir-1.8
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get
+      - save_cache:
+          key: hex-packages-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - deps
+
+      - restore_cache:
+          keys:
+            - test-build-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - test-build-elixir-1.8-{{ arch }}-{{ .Branch }}
+            - test-build-elixir-1.8
+      - run: mix test
+      - save_cache:
+          key: test-build-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build/test
+
+      - restore_cache:
+          keys:
+            - dialyzer-plt-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - dialyzer-plt-elixir-1.8-{{ arch }}-{{ .Branch }}
+            - dialyzer-plt-elixir-1.8
+      - run: mix dialyzer --halt-exit-status
+      - save_cache:
+          key: dialyzer-plt-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build/dev
+
+      - run: MIX_ENV=test mix coveralls.circle
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "elixir-1.7"
+      - "elixir-1.8"
