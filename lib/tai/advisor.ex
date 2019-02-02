@@ -62,6 +62,11 @@ defmodule Tai.Advisor do
     GenServer.cast(name, {:order_updated, old_order, updated_order, callback})
   end
 
+  @spec cast_order_updated(atom, order | nil, order, fun, term) :: :ok
+  def cast_order_updated(name, old_order, updated_order, callback, opts) do
+    GenServer.cast(name, {:order_updated, old_order, updated_order, callback, opts})
+  end
+
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
@@ -147,6 +152,24 @@ defmodule Tai.Advisor do
       def handle_cast({:order_updated, old_order, updated_order, callback}, state) do
         try do
           case callback.(old_order, updated_order, state) do
+            {:ok, new_store} -> {:noreply, state |> Map.put(:store, new_store)}
+            _ -> {:noreply, state}
+          end
+        rescue
+          e ->
+            Tai.Events.broadcast(%Tai.Events.AdvisorOrderUpdatedError{
+              error: e,
+              stacktrace: __STACKTRACE__
+            })
+
+            {:noreply, state}
+        end
+      end
+
+      @doc false
+      def handle_cast({:order_updated, old_order, updated_order, callback, opts}, state) do
+        try do
+          case callback.(old_order, updated_order, opts, state) do
             {:ok, new_store} -> {:noreply, state |> Map.put(:store, new_store)}
             _ -> {:noreply, state}
           end

@@ -25,7 +25,7 @@ defmodule Tai.AdvisorTest do
     {:ok, %{advisor_name: advisor_name}}
   end
 
-  describe ".cast_order_updated/3" do
+  describe ".cast_order_updated/4" do
     test "executes the given callback function", %{advisor_name: advisor_name} do
       callback = fn old_order, updated_order, state ->
         send(:test, {:fired_order_updated_callback, old_order, updated_order, state})
@@ -67,7 +67,60 @@ defmodule Tai.AdvisorTest do
 
       Tai.Advisor.cast_order_updated(advisor_name, :raise_error, :updated_order, callback)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{}}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{} = event}
+      assert event.error == %RuntimeError{message: "Callback Error!!!"}
+    end
+  end
+
+  describe ".cast_order_updated/5" do
+    test "executes the given callback function", %{advisor_name: advisor_name} do
+      callback = fn old_order, updated_order, opts, state ->
+        send(:test, {:fired_order_updated_callback, old_order, updated_order, opts, state})
+        :ok
+      end
+
+      Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order, callback, :opts)
+
+      assert_receive {:fired_order_updated_callback, :old_order, :updated_order, :opts,
+                      %Tai.Advisor{}}
+    end
+
+    test "can update the run store map with the return value of the callback", %{
+      advisor_name: advisor_name
+    } do
+      callback = fn old_order, updated_order, opts, state ->
+        send(:test, {:fired_order_updated_callback, old_order, updated_order, opts, state})
+        counter = state.store |> Map.get(:counter, 0)
+        new_store = state.store |> Map.put(:counter, counter + 1)
+
+        {:ok, new_store}
+      end
+
+      Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order, callback, :opts)
+
+      assert_receive {:fired_order_updated_callback, :old_order, :updated_order, :opts,
+                      original_state}
+
+      assert original_state.store == %{}
+
+      Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order, callback, :opts)
+
+      assert_receive {:fired_order_updated_callback, :old_order, :updated_order, :opts,
+                      updated_state}
+
+      assert updated_state.store == %{counter: 1}
+    end
+
+    test "broadcasts an event when an error is raised in the callback", %{
+      advisor_name: advisor_name
+    } do
+      Tai.Events.firehose_subscribe()
+      callback = fn _, _, _, _ -> raise "Callback Error!!!" end
+
+      Tai.Advisor.cast_order_updated(advisor_name, :raise_error, :updated_order, callback, :opts)
+
+      assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{} = event}
+      assert event.error == %RuntimeError{message: "Callback Error!!!"}
     end
   end
 end
