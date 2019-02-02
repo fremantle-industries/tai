@@ -63,12 +63,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
       Tai.Markets.OrderBook.update(changes)
 
-      assert_receive {
-        :my_venue,
-        :btc_usd,
-        ^changes,
-        %Tai.Advisor{}
-      }
+      assert_receive {:my_venue, :btc_usd, ^changes, %Tai.Advisor{}}
     end
   end
 
@@ -85,26 +80,26 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
       Tai.Markets.OrderBook.replace(snapshot)
 
-      assert_receive {
-        :my_venue,
-        :btc_usd,
-        %Tai.Markets.Quote{
-          bid: %Tai.Markets.PriceLevel{
-            price: 101.2,
-            size: 1.0,
-            processed_at: nil,
-            server_changed_at: nil
-          },
-          ask: %Tai.Markets.PriceLevel{
-            price: 101.3,
-            size: 0.1,
-            processed_at: nil,
-            server_changed_at: nil
-          }
-        },
-        ^snapshot,
-        %Tai.Advisor{}
-      }
+      assert_receive {:my_venue, :btc_usd, received_market_quote, received_snapshot,
+                      %Tai.Advisor{}}
+
+      assert %Tai.Markets.Quote{} = received_market_quote
+
+      assert %Tai.Markets.PriceLevel{
+               price: 101.2,
+               size: 1.0,
+               processed_at: nil,
+               server_changed_at: nil
+             } = received_market_quote.bid
+
+      assert %Tai.Markets.PriceLevel{
+               price: 101.3,
+               size: 0.1,
+               processed_at: nil,
+               server_changed_at: nil
+             } = received_market_quote.ask
+
+      assert received_snapshot == snapshot
     end
 
     test "is called on broadcast changes when the inside bid price is >= to the previous bid or != size" do

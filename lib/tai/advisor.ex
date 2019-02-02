@@ -52,9 +52,10 @@ defmodule Tai.Advisor do
     :"advisor_#{group_id}_#{advisor_id}"
   end
 
+  @spec cached_inside_quote(advisor, Tai.Venues.Adapter.venue_id(), Tai.Venues.Product.symbol()) ::
+          map | nil
   def cached_inside_quote(%Tai.Advisor{} = advisor, venue_id, product_symbol) do
-    name = Tai.Markets.OrderBook.to_name(venue_id, product_symbol)
-    Map.get(advisor.inside_quotes, name)
+    Map.get(advisor.inside_quotes, {venue_id, product_symbol})
   end
 
   @spec cast_order_updated(atom, order | nil, order, fun) :: :ok
@@ -190,13 +191,12 @@ defmodule Tai.Advisor do
       def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state), do: :ok
 
       defp cache_inside_quote(state, venue_id, product_symbol) do
-        with {:ok, current_inside_quote} <-
-               Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol),
-             key <- Tai.Markets.OrderBook.to_name(venue_id, product_symbol),
-             old <- state.inside_quotes,
-             updated <- Map.put(old, key, current_inside_quote) do
-          Map.put(state, :inside_quotes, updated)
-        end
+        {:ok, current_inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol)
+        key = {venue_id, product_symbol}
+        old = state.inside_quotes
+        updated = Map.put(old, key, current_inside_quote)
+
+        Map.put(state, :inside_quotes, updated)
       end
 
       defp inside_quote_is_stale?(
