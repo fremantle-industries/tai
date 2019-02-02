@@ -16,20 +16,33 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
     Tai.VenueAdapters.Bitmex.OrderStatus.from_venue_status(venue_status, :ignore)
   end
 
+  # passive_update(
+  #   :filled,
+  #   "82e61f65-7bc0-4ae5-ba58-86e69dda6856",
+  #   %{
+  #     "account" => 158_677,
+  #     "clOrdID" => "gtc-guYfZXvASuW6WIbmndpoVg==",
+  #     "cumQty" => 5,
+  #     "leavesQty" => 0,
+  #     "ordStatus" => "Filled",
+  #     "orderID" => "80c3b145-0c23-936f-7271-9b9a40a983d8",
+  #     "symbol" => "XBTH19",
+  #     "timestamp" => "2019-02-02T02:10:35.054Z",
+  #     "workingIndicator" => false
+  #   }
+  # )
   defp passive_update(
          :filled,
          client_id,
-         %{"timestamp" => timestamp, "avgPx" => avg_px, "cumQty" => cum_qty}
+         %{"timestamp" => timestamp, "cumQty" => cum_qty}
        ) do
     venue_updated_at = timestamp |> Timex.parse!(@date_format)
-    avg_price = avg_px |> Tai.Utils.Decimal.from()
     cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
 
     result =
       Tai.Trading.OrderStore.passive_fill(
         client_id,
         venue_updated_at,
-        avg_price,
         cumulative_qty
       )
 

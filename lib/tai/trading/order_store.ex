@@ -180,7 +180,6 @@ defmodule Tai.Trading.OrderStore do
           :passive_fill,
           client_id,
           venue_updated_at,
-          avg_price,
           cumulative_qty
         },
         _from,
@@ -190,7 +189,6 @@ defmodule Tai.Trading.OrderStore do
       update(client_id, @passive_fills_required, %{
         status: :filled,
         venue_updated_at: venue_updated_at,
-        avg_price: avg_price,
         cumulative_qty: cumulative_qty,
         leaves_qty: Decimal.new(0)
       })
@@ -348,13 +346,12 @@ defmodule Tai.Trading.OrderStore do
     )
   end
 
-  @spec passive_fill(client_id, DateTime.t(), Decimal.t(), Decimal.t()) ::
+  @spec passive_fill(client_id, DateTime.t(), Decimal.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, passive_fills_required}}
   def passive_fill(
         client_id,
         venue_updated_at,
-        avg_price,
         cumulative_qty
       ) do
     GenServer.call(
@@ -363,7 +360,6 @@ defmodule Tai.Trading.OrderStore do
         :passive_fill,
         client_id,
         venue_updated_at,
-        avg_price,
         cumulative_qty
       }
     )

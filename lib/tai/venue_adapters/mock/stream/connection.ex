@@ -106,19 +106,16 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          %{
            "status" => "filled",
            "client_id" => client_id,
-           "avg_price" => raw_avg_price,
            "cumulative_qty" => raw_cumulative_qty
          },
          _venue_id
        ) do
-    avg_price = raw_avg_price |> Tai.Utils.Decimal.from()
     cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.from()
 
     {:ok, {prev_order, updated_order}} =
       Tai.Trading.OrderStore.passive_fill(
         client_id,
         Timex.now(),
-        avg_price,
         cumulative_qty
       )
 

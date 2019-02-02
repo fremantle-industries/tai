@@ -34,7 +34,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
           "ordStatus" => "Filled",
           "leavesQty" => 30,
           "cumQty" => 15,
-          "avgPx" => 1000,
           "timestamp" => "2018-12-27T05:33:50.987Z"
         },
         %{
@@ -50,7 +49,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
           "ordStatus" => "Filled",
           "leavesQty" => 0,
           "cumQty" => 5,
-          "avgPx" => 4265.5,
           "timestamp" => "2018-12-27T05:33:50.795Z"
         }
       ]
@@ -74,7 +72,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
 
       assert buy_updated_event.client_id == order_1.client_id
       assert buy_updated_event.status == :filled
-      assert buy_updated_event.avg_price == Decimal.new("4265.5")
       assert buy_updated_event.leaves_qty == Decimal.new(0)
       assert buy_updated_event.cumulative_qty == Decimal.new(5)
       assert buy_updated_event.qty == Decimal.new(5)

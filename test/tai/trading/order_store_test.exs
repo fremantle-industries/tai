@@ -296,7 +296,6 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.passive_fill(
                  order.client_id,
                  @venue_updated_at,
-                 @avg_price,
                  @cumulative_qty
                )
 
@@ -313,7 +312,6 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.passive_fill(
                  "not found",
                  @venue_updated_at,
-                 @avg_price,
                  @cumulative_qty
                )
     end
@@ -328,7 +326,6 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.passive_fill(
                  order.client_id,
                  @venue_updated_at,
-                 @avg_price,
                  @cumulative_qty
                )
 
