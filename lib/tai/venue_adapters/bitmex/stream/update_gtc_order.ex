@@ -16,21 +16,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
     Tai.VenueAdapters.Bitmex.OrderStatus.from_venue_status(venue_status, :ignore)
   end
 
-  # passive_update(
-  #   :filled,
-  #   "82e61f65-7bc0-4ae5-ba58-86e69dda6856",
-  #   %{
-  #     "account" => 158_677,
-  #     "clOrdID" => "gtc-guYfZXvASuW6WIbmndpoVg==",
-  #     "cumQty" => 5,
-  #     "leavesQty" => 0,
-  #     "ordStatus" => "Filled",
-  #     "orderID" => "80c3b145-0c23-936f-7271-9b9a40a983d8",
-  #     "symbol" => "XBTH19",
-  #     "timestamp" => "2019-02-02T02:10:35.054Z",
-  #     "workingIndicator" => false
-  #   }
-  # )
   defp passive_update(
          :filled,
          client_id,
@@ -92,6 +77,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
       action: action,
       was: was,
       required: required
+    })
+  end
+
+  defp notify({client_id, action, {:error, :not_found}}) do
+    Tai.Events.broadcast(%Tai.Events.OrderUpdateNotFound{
+      client_id: client_id,
+      action: action
     })
   end
 end

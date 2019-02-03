@@ -199,6 +199,30 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
                :amend
              ]
     end
+
+    test "broadcasts an event when the order can't be found" do
+      Tai.Events.firehose_subscribe()
+      client_id = Ecto.UUID.generate()
+
+      bitmex_orders = [
+        %{
+          "clOrdID" => client_id |> ClientId.to_venue(:gtc),
+          "leavesQty" => 0,
+          "ordStatus" => "Canceled",
+          "timestamp" => "2019-01-11T02:03:06.309Z"
+        }
+      ]
+
+      :my_venue
+      |> ProcessAuthMessages.to_name()
+      |> GenServer.cast(
+        {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
+      )
+
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdateNotFound{} = not_found_event}
+      assert not_found_event.client_id == client_id
+      assert not_found_event.action == :passive_cancel
+    end
   end
 
   defp enqueue(:buy, attrs) do
