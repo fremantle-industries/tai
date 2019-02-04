@@ -4,7 +4,7 @@ defmodule Tai.Mixfile do
   def project do
     [
       app: :tai,
-      version: "0.0.12",
+      version: "0.0.13",
       elixir: "~> 1.7",
       package: package(),
       start_permanent: Mix.env() == :prod,
@@ -33,8 +33,7 @@ defmodule Tai.Mixfile do
   defp deps do
     [
       {:binance, "~> 0.6.0"},
-      # {:ex_bitmex, "~> 0.0.5"},
-      {:ex_bitmex, github: "fremantle-capital/ex_bitmex"},
+      {:ex_bitmex, "~> 0.0.6"},
       {:decimal, "~> 1.6.0"},
       {:ex_gdax, "~> 0.1.4"},
       {:ex_poloniex, "~> 0.0.2"},
