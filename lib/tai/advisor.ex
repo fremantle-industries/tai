@@ -33,19 +33,22 @@ defmodule Tai.Advisor do
               state :: advisor
             ) :: :ok | {:ok, store} | term
 
-  @enforce_keys [
-    :group_id,
-    :advisor_id,
-    :inside_quotes,
-    :config,
-    :store
-  ]
-  defstruct group_id: nil,
-            advisor_id: nil,
-            products: [],
-            inside_quotes: %{},
-            config: %{},
-            store: %{}
+  @enforce_keys ~w(
+    advisor_id
+    config
+    group_id
+    inside_quotes
+    products
+    store
+  )a
+  defstruct ~w(
+    advisor_id
+    config
+    group_id
+    inside_quotes
+    products
+    store
+  )a
 
   @spec to_name(atom, atom) :: atom
   def to_name(group_id, advisor_id) do
