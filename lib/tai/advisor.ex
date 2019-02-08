@@ -7,55 +7,42 @@ defmodule Tai.Advisor do
 
   @type advisor :: Tai.Advisor.t()
   @type store :: map
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type product :: Tai.Venues.Product.t()
+  @type product_symbol :: Tai.Venues.Product.symbol()
   @type order :: Tai.Trading.Order.t()
+  @type market_quote :: Tai.Markets.Quote.t()
   @type t :: %Tai.Advisor{
           group_id: atom,
           advisor_id: atom,
           products: [product],
-          inside_quotes: map,
           config: map,
           store: map
         }
 
-  @callback handle_order_book_changes(
-              order_book_feed_id :: atom,
-              symbol :: atom,
-              changes :: term,
-              state :: advisor
-            ) :: :ok
+  @callback handle_order_book_changes(venue_id, product_symbol, changes :: term, advisor) :: :ok
+  @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes :: term, advisor) ::
+              :ok | {:ok, store} | term
 
-  @callback handle_inside_quote(
-              order_book_feed_id :: atom,
-              symbol :: atom,
-              inside_quote :: Tai.Markets.Quote.t(),
-              changes :: map | list,
-              state :: advisor
-            ) :: :ok | {:ok, store} | term
-
-  @enforce_keys [
-    :group_id,
-    :advisor_id,
-    :inside_quotes,
-    :config,
-    :store
-  ]
-  defstruct group_id: nil,
-            advisor_id: nil,
-            products: [],
-            inside_quotes: %{},
-            config: %{},
-            store: %{}
+  @enforce_keys ~w(
+    advisor_id
+    config
+    group_id
+    products
+    store
+  )a
+  defstruct ~w(
+    advisor_id
+    config
+    group_id
+    market_quotes
+    products
+    store
+  )a
 
   @spec to_name(atom, atom) :: atom
   def to_name(group_id, advisor_id) do
     :"advisor_#{group_id}_#{advisor_id}"
-  end
-
-  @spec cached_inside_quote(advisor, Tai.Venues.Adapter.venue_id(), Tai.Venues.Product.symbol()) ::
-          map | nil
-  def cached_inside_quote(%Tai.Advisor{} = advisor, venue_id, product_symbol) do
-    Map.get(advisor.inside_quotes, {venue_id, product_symbol})
   end
 
   @spec cast_order_updated(atom, order | nil, order, fun) :: :ok
@@ -82,6 +69,7 @@ defmodule Tai.Advisor do
             config: config
           ) do
         name = Tai.Advisor.to_name(group_id, advisor_id)
+        market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
 
         GenServer.start_link(
           __MODULE__,
@@ -89,7 +77,7 @@ defmodule Tai.Advisor do
             group_id: group_id,
             advisor_id: advisor_id,
             products: products,
-            inside_quotes: %{},
+            market_quotes: market_quotes,
             config: config,
             store: %{}
           },
@@ -117,28 +105,29 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def handle_info({:order_book_snapshot, feed_id, symbol, snapshot}, state) do
+      def handle_info({:order_book_snapshot, venue_id, product_symbol, snapshot}, state) do
         new_state =
           state
-          |> cache_inside_quote(feed_id, symbol)
-          |> execute_handle_inside_quote(feed_id, symbol, snapshot)
+          |> cache_inside_quote(venue_id, product_symbol)
+          |> execute_handle_inside_quote(venue_id, product_symbol, snapshot)
 
         {:noreply, new_state}
       end
 
       @doc false
-      def handle_info({:order_book_changes, feed_id, symbol, changes}, state) do
-        handle_order_book_changes(feed_id, symbol, changes, state)
+      def handle_info({:order_book_changes, venue_id, product_symbol, changes}, state) do
+        handle_order_book_changes(venue_id, product_symbol, changes, state)
 
-        previous_inside_quote = state |> Tai.Advisor.cached_inside_quote(feed_id, symbol)
+        previous_inside_quote =
+          state.market_quotes |> Tai.Advisors.MarketQuotes.for(venue_id, product_symbol)
 
         if inside_quote_is_stale?(previous_inside_quote, changes) do
           new_state =
             state
-            |> cache_inside_quote(feed_id, symbol)
+            |> cache_inside_quote(venue_id, product_symbol)
             |> execute_handle_inside_quote(
-              feed_id,
-              symbol,
+              venue_id,
+              product_symbol,
               changes,
               previous_inside_quote
             )
@@ -186,17 +175,19 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def handle_order_book_changes(order_book_feed_id, symbol, changes, state), do: :ok
+      def handle_order_book_changes(venue_id, product_symbol, changes, state), do: :ok
       @doc false
-      def handle_inside_quote(order_book_feed_id, symbol, inside_quote, changes, state), do: :ok
+      def handle_inside_quote(venue_id, product_symbol, inside_quote, changes, state), do: :ok
 
       defp cache_inside_quote(state, venue_id, product_symbol) do
         {:ok, current_inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol)
         key = {venue_id, product_symbol}
-        old = state.inside_quotes
-        updated = Map.put(old, key, current_inside_quote)
+        old_market_quotes = state.market_quotes
+        updated_market_quotes_data = Map.put(old_market_quotes.data, key, current_inside_quote)
+        updated_market_quotes = Map.put(old_market_quotes, :data, updated_market_quotes_data)
 
-        Map.put(state, :inside_quotes, updated)
+        state
+        |> Map.put(:market_quotes, updated_market_quotes)
       end
 
       defp inside_quote_is_stale?(
@@ -229,19 +220,20 @@ defmodule Tai.Advisor do
 
       defp execute_handle_inside_quote(
              state,
-             order_book_feed_id,
-             symbol,
+             venue_id,
+             product_symbol,
              changes,
              previous_inside_quote \\ nil
            ) do
-        current_inside_quote = Tai.Advisor.cached_inside_quote(state, order_book_feed_id, symbol)
+        current_inside_quote =
+          state.market_quotes |> Tai.Advisors.MarketQuotes.for(venue_id, product_symbol)
 
         if current_inside_quote == previous_inside_quote do
           state
         else
           try do
-            order_book_feed_id
-            |> handle_inside_quote(symbol, current_inside_quote, changes, state)
+            venue_id
+            |> handle_inside_quote(product_symbol, current_inside_quote, changes, state)
             |> case do
               {:ok, new_store} ->
                 Map.put(state, :store, new_store)
