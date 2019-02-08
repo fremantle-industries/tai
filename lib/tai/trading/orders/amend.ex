@@ -2,14 +2,17 @@ defmodule Tai.Trading.Orders.Amend do
   alias Tai.Trading.Orders
 
   @type order :: Tai.Trading.Order.t()
+  @type status :: Tai.Trading.Order.status()
+  @type status_was :: status
+  @type status_required :: status | [status]
   @type attrs :: %{
           optional(:price) => Decimal.t(),
           optional(:qty) => Decimal.t()
         }
 
   @spec amend(order, attrs) ::
-          {:ok, updated_order :: order}
-          | {:error, {:invalid_status, was :: term, required :: term}}
+          {:ok, updated :: order}
+          | {:error, {:invalid_status, status_was, status_required}}
   def amend(order, attrs) when is_map(attrs) do
     with {:ok, {old_order, updated_order}} <-
            Tai.Trading.OrderStore.pend_amend(order.client_id, Timex.now()) do

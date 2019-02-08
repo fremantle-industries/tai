@@ -9,7 +9,6 @@ defmodule Tai.Trading.OrderStore do
   @type client_id :: String.t()
   @type venue_order_id :: Trading.Order.venue_order_id()
   @type order :: Trading.Order.t()
-  @type order_status :: Trading.Order.status()
   @type submission :: Trading.BuildOrderFromSubmission.submission()
   @type passive_fills_required ::
           :open | :pending_amend | :pending_cancel | :amend_error | :cancel_error

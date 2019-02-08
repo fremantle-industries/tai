@@ -1,10 +1,24 @@
 defmodule Tai.Trading.Orders do
   alias Tai.Trading.Orders
 
+  @type submission :: Tai.Trading.BuildOrderFromSubmission.submission()
   @type order :: Tai.Trading.Order.t()
+  @type status :: Tai.Trading.Order.status()
+  @type status_was :: status
+  @type status_required :: status | [status]
+  @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
 
+  @spec create(submission) :: {:ok, order}
   defdelegate create(submission), to: Orders.Create
+
+  @spec amend(order, amend_attrs) ::
+          {:ok, updated :: order}
+          | {:error, {:invalid_status, status_was, status_required}}
   defdelegate amend(order, attrs), to: Orders.Amend
+
+  @spec cancel(order) ::
+          {:ok, updated :: order}
+          | {:error, {:invalid_status, status_was, status_required}}
   defdelegate cancel(order), to: Orders.Cancel
 
   @spec broadcast(order) :: :ok
