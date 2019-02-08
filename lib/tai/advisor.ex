@@ -16,7 +16,6 @@ defmodule Tai.Advisor do
           group_id: atom,
           advisor_id: atom,
           products: [product],
-          inside_quotes: map,
           config: map,
           store: map
         }
@@ -29,7 +28,6 @@ defmodule Tai.Advisor do
     advisor_id
     config
     group_id
-    inside_quotes
     products
     store
   )a
@@ -37,7 +35,6 @@ defmodule Tai.Advisor do
     advisor_id
     config
     group_id
-    inside_quotes
     market_quotes
     products
     store
@@ -46,12 +43,6 @@ defmodule Tai.Advisor do
   @spec to_name(atom, atom) :: atom
   def to_name(group_id, advisor_id) do
     :"advisor_#{group_id}_#{advisor_id}"
-  end
-
-  @deprecated "Use Tai.Advisors.MarketQuotes.for/2 instead"
-  @spec cached_inside_quote(advisor, venue_id, product_symbol) :: map | nil
-  def cached_inside_quote(%Tai.Advisor{} = advisor, venue_id, product_symbol) do
-    Map.get(advisor.inside_quotes, {venue_id, product_symbol})
   end
 
   @spec cast_order_updated(atom, order | nil, order, fun) :: :ok
@@ -87,7 +78,6 @@ defmodule Tai.Advisor do
             advisor_id: advisor_id,
             products: products,
             market_quotes: market_quotes,
-            inside_quotes: %{},
             config: config,
             store: %{}
           },
@@ -192,14 +182,11 @@ defmodule Tai.Advisor do
       defp cache_inside_quote(state, venue_id, product_symbol) do
         {:ok, current_inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol)
         key = {venue_id, product_symbol}
-        old_inside_quotes = state.inside_quotes
-        updated_inside_quotes = Map.put(old_inside_quotes, key, current_inside_quote)
         old_market_quotes = state.market_quotes
         updated_market_quotes_data = Map.put(old_market_quotes.data, key, current_inside_quote)
         updated_market_quotes = Map.put(old_market_quotes, :data, updated_market_quotes_data)
 
         state
-        |> Map.put(:inside_quotes, updated_inside_quotes)
         |> Map.put(:market_quotes, updated_market_quotes)
       end
 
