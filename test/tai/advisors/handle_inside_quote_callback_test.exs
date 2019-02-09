@@ -1,4 +1,4 @@
-defmodule Tai.Advisors.OrderBookCallbacksTest do
+defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
   use ExUnit.Case
 
   import ExUnit.CaptureLog
@@ -46,7 +46,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     {:ok, %{book_pid: book_pid}}
   end
 
-  describe "#handle_inside_quote" do
+  describe ".handle_inside_quote" do
     test "is called after the snapshot broadcast message" do
       start_advisor!(MyAdvisor)
 
@@ -209,24 +209,25 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       }
     end
 
-    test "logs a warning message when it returns an unknown type" do
+    test "broadcasts a warning when it doesn't return an {:ok, run_store} tuple" do
       start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
+      Tai.Events.firehose_subscribe()
 
-      log_msg =
-        capture_log(fn ->
-          snapshot = %Tai.Markets.OrderBook{
-            venue_id: :my_venue,
-            product_symbol: :btc_usd,
-            bids: %{101.2 => {1.0, nil, nil}},
-            asks: %{}
-          }
+      snapshot = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
+        bids: %{101.2 => {1.0, nil, nil}},
+        asks: %{}
+      }
 
-          Tai.Markets.OrderBook.replace(snapshot)
-          :timer.sleep(100)
-        end)
+      Tai.Markets.OrderBook.replace(snapshot)
 
-      assert log_msg =~
-               "[warn]  handle_inside_quote returned an invalid value: '{:unknown, :return_val}'"
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{} = event}
+      assert event.advisor_id == :my_advisor
+      assert event.group_id == :group_a
+      assert event.venue_id == :my_venue
+      assert event.product_symbol == :btc_usd
+      assert event.return_value == {:unknown, :return_val}
     end
 
     test "can store data in state by returning an {:ok, run_store} tuple" do
@@ -285,7 +286,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
 
       assert log_msg =~
                "[warn]  handle_inside_quote raised an error: '%RuntimeError{message: \"!!!This is an ERROR!!!\"}', " <>
-                 "stacktrace: [{Tai.Advisors.OrderBookCallbacksTest.MyAdvisor, :handle_inside_quote, 5, [file: 'test/tai/advisors/order_book_callbacks_test.exs', line:"
+                 "stacktrace: [{Tai.Advisors.HandleInsideQuoteCallbackTest.MyAdvisor, :handle_inside_quote, 5, [file: 'test/tai/advisors/handle_inside_quote_callback_test.exs', line:"
     end
   end
 end

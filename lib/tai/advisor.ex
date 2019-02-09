@@ -41,9 +41,7 @@ defmodule Tai.Advisor do
   )a
 
   @spec to_name(atom, atom) :: atom
-  def to_name(group_id, advisor_id) do
-    :"advisor_#{group_id}_#{advisor_id}"
-  end
+  def to_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
 
   @spec cast_order_updated(atom, order | nil, order, fun) :: :ok
   def cast_order_updated(name, old_order, updated_order, callback) do
@@ -236,9 +234,13 @@ defmodule Tai.Advisor do
               Map.put(state, :store, new_store)
             else
               unhandled ->
-                Logger.warn(
-                  "handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'"
-                )
+                Tai.Events.broadcast(%Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{
+                  advisor_id: state.advisor_id,
+                  group_id: state.group_id,
+                  venue_id: venue_id,
+                  product_symbol: product_symbol,
+                  return_value: unhandled
+                })
             end
           rescue
             e ->
