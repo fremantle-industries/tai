@@ -12,6 +12,7 @@ defmodule Tai.Advisor do
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type order :: Tai.Trading.Order.t()
   @type market_quote :: Tai.Markets.Quote.t()
+  @type changes :: term
   @type t :: %Tai.Advisor{
           group_id: atom,
           advisor_id: atom,
@@ -20,9 +21,9 @@ defmodule Tai.Advisor do
           store: map
         }
 
-  @callback handle_order_book_changes(venue_id, product_symbol, changes :: term, advisor) :: :ok
-  @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes :: term, advisor) ::
-              :ok | {:ok, store} | term
+  @callback handle_order_book_changes(venue_id, product_symbol, changes, advisor) :: :ok
+  @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, advisor) ::
+              {:ok, store}
 
   @enforce_keys ~w(
     advisor_id
@@ -176,8 +177,6 @@ defmodule Tai.Advisor do
 
       @doc false
       def handle_order_book_changes(venue_id, product_symbol, changes, state), do: :ok
-      @doc false
-      def handle_inside_quote(venue_id, product_symbol, inside_quote, changes, state), do: :ok
 
       defp cache_inside_quote(state, venue_id, product_symbol) do
         {:ok, current_inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol)
@@ -232,15 +231,16 @@ defmodule Tai.Advisor do
           state
         else
           try do
-            venue_id
-            |> handle_inside_quote(product_symbol, current_inside_quote, changes, state)
-            |> case do
-              {:ok, new_store} ->
-                Map.put(state, :store, new_store)
-
-              :ok ->
-                state
-
+            with {:ok, new_store} <-
+                   handle_inside_quote(
+                     venue_id,
+                     product_symbol,
+                     current_inside_quote,
+                     changes,
+                     state
+                   ) do
+              Map.put(state, :store, new_store)
+            else
               unhandled ->
                 Logger.warn(
                   "handle_inside_quote returned an invalid value: '#{inspect(unhandled)}'"
@@ -257,8 +257,7 @@ defmodule Tai.Advisor do
         end
       end
 
-      defoverridable handle_order_book_changes: 4,
-                     handle_inside_quote: 5
+      defoverridable handle_order_book_changes: 4
     end
   end
 end

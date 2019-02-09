@@ -4,6 +4,7 @@ defmodule Tai.AdvisorsTest do
 
   defmodule TestAdvisor do
     use Tai.Advisor
+    def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
   end
 
   test ".info returns the pid of each spec if it's running" do

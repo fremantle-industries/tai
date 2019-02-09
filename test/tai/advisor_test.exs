@@ -4,6 +4,7 @@ defmodule Tai.AdvisorTest do
 
   defmodule MyAdvisor do
     use Tai.Advisor
+    def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
   end
 
   setup do

@@ -16,7 +16,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
       end
 
       send(:test, {feed_id, symbol, inside_quote, changes, state})
-      state.config[:return_val] || :ok
+      state.config[:return_val] || {:ok, state.store}
     end
   end
 
@@ -250,7 +250,7 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
                "[warn]  handle_inside_quote returned an invalid value: '{:unknown, :return_val}'"
     end
 
-    test "can store data in state by returning an ok tuple" do
+    test "can store data in state by returning an {:ok, run_store} tuple" do
       start_advisor!(MyAdvisor, %{return_val: {:ok, %{hello: "world"}}})
 
       snapshot = %Tai.Markets.OrderBook{
@@ -285,44 +285,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
         %Tai.Markets.Quote{},
         ^changes,
         %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
-      }
-    end
-
-    test "doesn't change store data state with an ok atom" do
-      start_advisor!(MyAdvisor, %{return_val: :ok})
-
-      snapshot = %Tai.Markets.OrderBook{
-        venue_id: :my_venue,
-        product_symbol: :btc_usd,
-        bids: %{101.2 => {1.0, nil, nil}},
-        asks: %{101.3 => {0.1, nil, nil}}
-      }
-
-      Tai.Markets.OrderBook.replace(snapshot)
-
-      assert_receive {
-        :my_venue,
-        :btc_usd,
-        %Tai.Markets.Quote{},
-        ^snapshot,
-        %Tai.Advisor{advisor_id: :my_advisor, store: %{}}
-      }
-
-      changes = %Tai.Markets.OrderBook{
-        venue_id: :my_venue,
-        product_symbol: :btc_usd,
-        bids: %{},
-        asks: %{101.3 => {0.2, nil, nil}}
-      }
-
-      Tai.Markets.OrderBook.update(changes)
-
-      assert_receive {
-        :my_venue,
-        :btc_usd,
-        %Tai.Markets.Quote{},
-        ^changes,
-        %Tai.Advisor{advisor_id: :my_advisor, store: %{}}
       }
     end
 
