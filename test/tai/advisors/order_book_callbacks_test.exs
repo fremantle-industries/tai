@@ -6,10 +6,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
   defmodule MyAdvisor do
     use Tai.Advisor
 
-    def handle_order_book_changes(feed_id, symbol, changes, state) do
-      send(:test, {feed_id, symbol, changes, state})
-    end
-
     def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
       if Map.has_key?(state.config, :error) do
         raise state.config.error
@@ -48,23 +44,6 @@ defmodule Tai.Advisors.OrderBookCallbacksTest do
     )
 
     {:ok, %{book_pid: book_pid}}
-  end
-
-  describe "#handle_order_book_changes" do
-    test "is called when it receives a broadcast message" do
-      start_advisor!(MyAdvisor)
-
-      changes = %Tai.Markets.OrderBook{
-        venue_id: :my_venue,
-        product_symbol: :btc_usd,
-        bids: %{101.2 => {1.1, nil, nil}},
-        asks: %{}
-      }
-
-      Tai.Markets.OrderBook.update(changes)
-
-      assert_receive {:my_venue, :btc_usd, ^changes, %Tai.Advisor{}}
-    end
   end
 
   describe "#handle_inside_quote" do

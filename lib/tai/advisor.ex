@@ -21,7 +21,6 @@ defmodule Tai.Advisor do
           store: map
         }
 
-  @callback handle_order_book_changes(venue_id, product_symbol, changes, advisor) :: :ok
   @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, advisor) ::
               {:ok, store}
 
@@ -117,8 +116,6 @@ defmodule Tai.Advisor do
 
       @doc false
       def handle_info({:order_book_changes, venue_id, product_symbol, changes}, state) do
-        handle_order_book_changes(venue_id, product_symbol, changes, state)
-
         previous_inside_quote =
           state.market_quotes |> Tai.Advisors.MarketQuotes.for(venue_id, product_symbol)
 
@@ -174,9 +171,6 @@ defmodule Tai.Advisor do
             {:noreply, state}
         end
       end
-
-      @doc false
-      def handle_order_book_changes(venue_id, product_symbol, changes, state), do: :ok
 
       defp cache_inside_quote(state, venue_id, product_symbol) do
         {:ok, current_inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol)
@@ -256,8 +250,6 @@ defmodule Tai.Advisor do
           end
         end
       end
-
-      defoverridable handle_order_book_changes: 4
     end
   end
 end
