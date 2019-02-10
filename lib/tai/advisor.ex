@@ -240,6 +240,8 @@ defmodule Tai.Advisor do
                   product_symbol: product_symbol,
                   return_value: unhandled
                 })
+
+                state
             end
           rescue
             e ->
