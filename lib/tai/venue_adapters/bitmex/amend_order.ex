@@ -29,23 +29,16 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
     as: :from
 
   defp to_params(attrs, venue_order_id) do
-    params = %{}
-
-    params =
-      if price = Map.get(attrs, :price) do
-        params |> Map.put(:price, price)
-      else
-        params
+    attrs
+    |> Enum.reduce(
+      %{},
+      fn
+        {:price, v}, p -> p |> Map.put(:price, v)
+        {:qty, v}, p -> p |> Map.put(:leavesQty, v)
+        _, p -> p
       end
-
-    params =
-      if qty = Map.get(attrs, :qty) do
-        params |> Map.put(:leavesQty, qty)
-      else
-        params
-      end
-
-    Map.put(params, :orderID, venue_order_id)
+    )
+    |> Map.put(:orderID, venue_order_id)
   end
 
   defp parse_response({
