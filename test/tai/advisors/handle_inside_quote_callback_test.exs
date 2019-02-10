@@ -10,7 +10,16 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       end
 
       send(:test, {feed_id, symbol, inside_quote, changes, state})
-      state.config[:return_val] || {:ok, state.store}
+      {:ok, state.store}
+    end
+  end
+
+  defmodule ReturnAdvisor do
+    use Tai.Advisor
+
+    def handle_inside_quote(venue_id, product_symbol, inside_quote, changes, state) do
+      send(:test, {venue_id, product_symbol, inside_quote, changes, state})
+      state.config[:return_val]
     end
   end
 
@@ -206,7 +215,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
   end
 
   test "can store data in state by returning an {:ok, run_store} tuple" do
-    start_advisor!(MyAdvisor, %{return_val: {:ok, %{hello: "world"}}})
+    start_advisor!(ReturnAdvisor, %{return_val: {:ok, %{hello: "world"}}})
 
     snapshot = %Tai.Markets.OrderBook{
       venue_id: :my_venue,
@@ -244,15 +253,6 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
   end
 
   describe "with invalid return" do
-    defmodule ReturnAdvisor do
-      use Tai.Advisor
-
-      def handle_inside_quote(venue_id, product_symbol, inside_quote, changes, state) do
-        send(:test, {venue_id, product_symbol, inside_quote, changes, state})
-        state.config[:return_val]
-      end
-    end
-
     setup do
       Tai.Events.firehose_subscribe()
       start_advisor!(ReturnAdvisor, %{return_val: {:unknown, :return_val}})
