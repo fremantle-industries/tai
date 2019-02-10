@@ -211,10 +211,10 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
       end
     end
 
-    test "#{adapter.id} unhandled" do
+    test "#{adapter.id} unhandled error" do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_unhandled" do
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_unhandled_error" do
         assert {:error, {:unhandled, reason}} = Tai.Venue.create_order(order, @test_adapters)
         assert reason != nil
       end
