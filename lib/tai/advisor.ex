@@ -253,6 +253,8 @@ defmodule Tai.Advisor do
                 error: e,
                 stacktrace: __STACKTRACE__
               })
+
+              state
           end
         end
       end

@@ -303,15 +303,21 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       :ok
     end
 
-    test "broadcasts an event" do
-      snapshot = %Tai.Markets.OrderBook{
-        venue_id: :my_venue,
-        product_symbol: :btc_usd,
-        bids: %{101.2 => {1.0, nil, nil}},
-        asks: %{}
-      }
+    @snapshot %Tai.Markets.OrderBook{
+      venue_id: :my_venue,
+      product_symbol: :btc_usd,
+      bids: %{101.2 => {1.0, nil, nil}},
+      asks: %{101.3 => {0.2, nil, nil}}
+    }
+    @changes %Tai.Markets.OrderBook{
+      venue_id: :my_venue,
+      product_symbol: :btc_usd,
+      bids: %{},
+      asks: %{101.3 => {0.7, nil, nil}}
+    }
 
-      Tai.Markets.OrderBook.replace(snapshot)
+    test "broadcasts an event" do
+      Tai.Markets.OrderBook.replace(@snapshot)
 
       assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event}
       assert event.advisor_id == :my_advisor
@@ -323,6 +329,18 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
 
       assert {Tai.Advisors.HandleInsideQuoteCallbackTest.MyAdvisor, :handle_inside_quote, 5,
               [file: _, line: _]} = stack_1
+    end
+
+    test "maintains state between callbacks" do
+      Tai.Markets.OrderBook.replace(@snapshot)
+
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event_1}
+      assert event_1.error == %RuntimeError{message: "!!!This is an ERROR!!!"}
+
+      Tai.Markets.OrderBook.update(@changes)
+
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event_2}
+      assert event_2.error == %RuntimeError{message: "!!!This is an ERROR!!!"}
     end
   end
 end
