@@ -10,12 +10,12 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   @type order :: Tai.Trading.Order.t()
   @type response :: Tai.Trading.OrderResponses.Create.t()
   @type reason ::
-          :timeout | :insufficient_balance | {:nonce_not_increasing, msg :: String.t()} | term
+          :timeout
+          | :insufficient_balance
+          | {:nonce_not_increasing, msg :: String.t()}
+          | {:unhandled, term}
 
-  @spec create_order(order, credentials) ::
-          {:ok, response}
-          | {:error, reason}
-
+  @spec create_order(order, credentials) :: {:ok, response} | {:error, reason}
   def create_order(%Tai.Trading.Order{} = order, credentials) do
     params = build_params(order)
 
@@ -90,4 +90,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
 
   defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _),
     do: {:error, reason}
+
+  defp parse_response({:error, reason, _}, _),
+    do: {:error, {:unhandled, reason}}
 end
