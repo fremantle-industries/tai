@@ -19,33 +19,60 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   |> Enum.map(fn {_, adapter} ->
     @adapter adapter
 
-    describe "#{adapter.id} cancel" do
-      test "returns an order response with a canceled status & final quantities" do
-        enqueued_order = build_enqueued_order(@adapter.id)
+    test "#{adapter.id} returns an order response with a canceled status & final quantities" do
+      enqueued_order = build_enqueued_order(@adapter.id)
 
-        use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_ok" do
-          assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_ok" do
+        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
 
-          open_order = build_open_order(enqueued_order, order_response)
+        open_order = build_open_order(enqueued_order, order_response)
 
-          assert {:ok, order_response} = Tai.Venue.cancel_order(open_order, @test_adapters)
-          assert order_response.id != nil
-          assert order_response.status == :canceled
-          assert order_response.leaves_qty == Decimal.new(0)
-          assert %DateTime{} = order_response.venue_updated_at
-        end
+        assert {:ok, order_response} = Tai.Venue.cancel_order(open_order, @test_adapters)
+        assert order_response.id != nil
+        assert order_response.status == :canceled
+        assert order_response.leaves_qty == Decimal.new(0)
+        assert %DateTime{} = order_response.venue_updated_at
       end
+    end
 
-      test "timeout returns an error tuple" do
-        enqueued_order = build_enqueued_order(@adapter.id)
+    test "#{adapter.id} timeout returns an error tuple" do
+      enqueued_order = build_enqueued_order(@adapter.id)
 
-        use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_timeout" do
-          assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_timeout" do
+        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
 
-          open_order = build_open_order(enqueued_order, order_response)
+        open_order = build_open_order(enqueued_order, order_response)
 
-          assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :timeout}
-        end
+        assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :timeout}
+      end
+    end
+
+    test "#{adapter.id} nonce not increasing error" do
+      enqueued_order = build_enqueued_order(@adapter.id)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_nonce_not_increasing_error" do
+        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+
+        open_order = build_open_order(enqueued_order, order_response)
+
+        assert {:error, {:nonce_not_increasing, msg}} =
+                 Tai.Venue.cancel_order(open_order, @test_adapters)
+
+        assert msg != nil
+      end
+    end
+
+    test "#{adapter.id} unhandled error" do
+      enqueued_order = build_enqueued_order(@adapter.id)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_unhandled_error" do
+        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+
+        open_order = build_open_order(enqueued_order, order_response)
+
+        assert {:error, {:unhandled, error}} = Tai.Venue.cancel_order(open_order, @test_adapters)
+
+        assert error != nil
       end
     end
   end)

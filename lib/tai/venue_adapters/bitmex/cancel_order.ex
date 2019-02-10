@@ -4,25 +4,25 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
   @type venue_order_id :: String.t()
   @type credentials :: map
   @type response :: Tai.Trading.OrderResponses.Cancel.t()
-  @type error_reason ::
-          :not_implemented
-          | :not_found
-          | :timeout
-          | Tai.CredentialError.t()
+  @type reason :: :timeout | {:unhandled, term}
 
-  @spec cancel_order(venue_order_id, credentials) :: {:ok, response} | {:error, error_reason}
+  @spec cancel_order(venue_order_id, credentials) :: {:ok, response} | {:error, reason}
   def cancel_order(venue_order_id, credentials) do
     params = %{orderID: venue_order_id}
 
     credentials
     |> to_venue_credentials
-    |> ExBitmex.Rest.Orders.cancel(params)
+    |> cancel_on_venue(params)
     |> parse_response()
   end
 
   defdelegate to_venue_credentials(credentials),
     to: Tai.VenueAdapters.Bitmex.Credentials,
     as: :from
+
+  defdelegate cancel_on_venue(credentials, params),
+    to: ExBitmex.Rest.Orders,
+    as: :cancel
 
   defp parse_response({:ok, [venue_order | _], %ExBitmex.RateLimit{}}) do
     {:ok, venue_updated_at, 0} = DateTime.from_iso8601(venue_order.timestamp)
@@ -37,7 +37,7 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
     {:ok, response}
   end
 
-  defp parse_response({:error, :timeout, nil}) do
-    {:error, :timeout}
-  end
+  defp parse_response({:error, :timeout, nil}), do: {:error, :timeout}
+  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}), do: {:error, reason}
+  defp parse_response({:error, reason, _}), do: {:error, {:unhandled, reason}}
 end
