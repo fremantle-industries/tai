@@ -1,8 +1,6 @@
 defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
   use ExUnit.Case
 
-  import ExUnit.CaptureLog
-
   defmodule MyAdvisor do
     use Tai.Advisor
 
@@ -210,8 +208,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     end
 
     test "broadcasts a warning when it doesn't return an {:ok, run_store} tuple" do
-      start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
       Tai.Events.firehose_subscribe()
+      start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
 
       snapshot = %Tai.Markets.OrderBook{
         venue_id: :my_venue,
@@ -268,25 +266,29 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       }
     end
 
-    test "logs a warning message when an error is raised" do
+    test "broadcasts a warning when an error is raised" do
+      Tai.Events.firehose_subscribe()
       start_advisor!(MyAdvisor, %{error: "!!!This is an ERROR!!!"})
 
-      log_msg =
-        capture_log(fn ->
-          snapshot = %Tai.Markets.OrderBook{
-            venue_id: :my_venue,
-            product_symbol: :btc_usd,
-            bids: %{101.2 => {1.0, nil, nil}},
-            asks: %{}
-          }
+      snapshot = %Tai.Markets.OrderBook{
+        venue_id: :my_venue,
+        product_symbol: :btc_usd,
+        bids: %{101.2 => {1.0, nil, nil}},
+        asks: %{}
+      }
 
-          Tai.Markets.OrderBook.replace(snapshot)
-          :timer.sleep(100)
-        end)
+      Tai.Markets.OrderBook.replace(snapshot)
 
-      assert log_msg =~
-               "[warn]  handle_inside_quote raised an error: '%RuntimeError{message: \"!!!This is an ERROR!!!\"}', " <>
-                 "stacktrace: [{Tai.Advisors.HandleInsideQuoteCallbackTest.MyAdvisor, :handle_inside_quote, 5, [file: 'test/tai/advisors/handle_inside_quote_callback_test.exs', line:"
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event}
+      assert event.advisor_id == :my_advisor
+      assert event.group_id == :group_a
+      assert event.venue_id == :my_venue
+      assert event.product_symbol == :btc_usd
+      assert event.error == %RuntimeError{message: "!!!This is an ERROR!!!"}
+      assert [stack_1 | _] = event.stacktrace
+
+      assert {Tai.Advisors.HandleInsideQuoteCallbackTest.MyAdvisor, :handle_inside_quote, 5,
+              [file: _, line: _]} = stack_1
     end
   end
 end

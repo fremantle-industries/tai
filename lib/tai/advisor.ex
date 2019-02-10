@@ -56,7 +56,6 @@ defmodule Tai.Advisor do
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
-      require Logger
 
       @behaviour Tai.Advisor
 
@@ -244,11 +243,14 @@ defmodule Tai.Advisor do
             end
           rescue
             e ->
-              Logger.warn(
-                "handle_inside_quote raised an error: '#{inspect(e)}', stacktrace: #{
-                  inspect(__STACKTRACE__)
-                }"
-              )
+              Tai.Events.broadcast(%Tai.Events.AdvisorHandleInsideQuoteError{
+                advisor_id: state.advisor_id,
+                group_id: state.group_id,
+                venue_id: venue_id,
+                product_symbol: product_symbol,
+                error: e,
+                stacktrace: __STACKTRACE__
+              })
           end
         end
       end
