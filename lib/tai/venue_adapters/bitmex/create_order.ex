@@ -6,12 +6,22 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   alias Tai.VenueAdapters.Bitmex.ClientId
   import Tai.VenueAdapters.Bitmex.OrderStatus
 
+  @type credentials :: Tai.Venues.Adapter.credentials()
+  @type order :: Tai.Trading.Order.t()
+  @type response :: Tai.Trading.OrderResponses.Create.t()
+  @type reason ::
+          :timeout | :insufficient_balance | {:nonce_not_increasing, msg :: String.t()} | term
+
+  @spec create_order(order, credentials) ::
+          {:ok, response}
+          | {:error, reason}
+
   def create_order(%Tai.Trading.Order{} = order, credentials) do
     params = build_params(order)
 
     credentials
     |> to_venue_credentials
-    |> ExBitmex.Rest.Orders.create(params)
+    |> create_on_venue(params)
     |> parse_response(order)
   end
 
@@ -27,11 +37,15 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
     }
 
     if order.post_only do
-      Map.put(params, "execInst", "ParticipateDoNotInitiate")
+      params |> Map.put("execInst", "ParticipateDoNotInitiate")
     else
       params
     end
   end
+
+  defdelegate create_on_venue(credentials, params),
+    to: ExBitmex.Rest.Orders,
+    as: :create
 
   defdelegate to_venue_credentials(credentials),
     to: Tai.VenueAdapters.Bitmex.Credentials,
@@ -42,11 +56,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   defp to_venue_side(:buy), do: @buy
   defp to_venue_side(:sell), do: @sell
 
-  defp to_venue_symbol(symbol) do
-    symbol
-    |> Atom.to_string()
-    |> String.upcase()
-  end
+  defp to_venue_symbol(symbol), do: symbol |> Atom.to_string() |> String.upcase()
 
   defp to_venue_time_in_force(:gtc), do: "GoodTillCancel"
   defp to_venue_time_in_force(:ioc), do: "ImmediateOrCancel"
@@ -78,5 +88,6 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   defp parse_response({:error, {:insufficient_balance, _msg}, _}, _),
     do: {:error, :insufficient_balance}
 
-  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _), do: {:error, reason}
+  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _),
+    do: {:error, reason}
 end

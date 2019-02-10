@@ -11,7 +11,8 @@ defmodule Tai.Venues.Adapter do
   @type cancel_response :: Tai.Trading.OrderResponses.Cancel.t()
   @type venue_order_id :: String.t()
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
-  @type shared_error_reason :: :timeout | Tai.CredentialError.t()
+  @type shared_error_reason ::
+          :timeout | {:nonce_not_increasing, msg :: String.t()} | Tai.CredentialError.t()
   @type create_order_error_reason ::
           :not_implemented
           | shared_error_reason
