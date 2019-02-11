@@ -53,6 +53,7 @@ defmodule Tai.VenueAdapters.Mock do
        ]}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
+        {:ok, {:raise, reason}} -> raise reason
         {:ok, _response} = result -> result
         {:error, :not_found} -> {:error, :mock_not_found}
       end
