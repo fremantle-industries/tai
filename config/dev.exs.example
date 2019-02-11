@@ -60,8 +60,6 @@ config :tai,
 
 config :echo_boy, port: 4200
 
-config :logger, backends: [{LoggerFileBackend, :file_log}]
-
 config :ex_poloniex,
   api_key: {:system_file, "POLONIEX_API_KEY"},
   api_secret: {:system_file, "POLONIEX_API_SECRET"}

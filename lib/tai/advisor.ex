@@ -84,7 +84,6 @@ defmodule Tai.Advisor do
 
       @doc false
       def init(state) do
-        Tai.MetaLogger.init_tid()
         {:ok, state, {:continue, :subscribe_to_products}}
       end
 

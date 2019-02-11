@@ -100,8 +100,6 @@ config :exvcr,
     [pattern: "signature=[A-Z0-9]+", placeholder: "signature=***"]
   ]
 
-config :logger, backends: [{LoggerFileBackend, :file_log}]
-
 config(:echo_boy, port: 4100)
 
 config :ex_bitmex, domain: "testnet.bitmex.com"

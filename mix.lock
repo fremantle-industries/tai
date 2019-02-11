@@ -36,6 +36,8 @@
   "jsx": {:hex, :jsx, "2.8.3", "a05252d381885240744d955fbe3cf810504eb2567164824e19303ea59eef62cf", [:mix, :rebar3], [], "hexpm"},
   "juice": {:hex, :juice, "0.0.3", "a7cb03a05ecd860eef19864e6a3c1776f0e6611eec589ee812911868a4ea6874", [:mix], [], "hexpm"},
   "logger_file_backend": {:hex, :logger_file_backend, "0.0.10", "876f9f84ae110781207c54321ffbb62bebe02946fe3c13f0d7c5f5d8ad4fa910", [:mix], [], "hexpm"},
+  "logger_file_backend_with_formatters": {:hex, :logger_file_backend_with_formatters, "0.0.1", "4a7b25c086981c09f8d14846869f992029686ae65a32aefc18712a822582f822", [:mix], [], "hexpm"},
+  "logger_file_backend_with_formatters_stackdriver": {:hex, :logger_file_backend_with_formatters_stackdriver, "0.0.1", "f245f29f19a1205ace300e4b6330c2d278e7342628b9a7ef64f13bf562266d23", [:mix], [{:jason, "~> 1.1", [hex: :jason, repo: "hexpm", optional: false]}, {:logger_file_backend_with_formatters, "~> 0.0.1", [hex: :logger_file_backend_with_formatters, repo: "hexpm", optional: false]}], "hexpm"},
   "logger_json": {:hex, :logger_json, "3.0.0", "e43f86f5fbf799d055e93a461e023f073aaf8e2ae87cf686c2dafc46d2fdaaad", [:mix], [{:ecto, "~> 2.1 or ~> 3.0", [hex: :ecto, repo: "hexpm", optional: true]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}, {:plug, "~> 1.0", [hex: :plug, repo: "hexpm", optional: true]}], "hexpm"},
   "makeup": {:hex, :makeup, "0.8.0", "9cf32aea71c7fe0a4b2e9246c2c4978f9070257e5c9ce6d4a28ec450a839b55f", [:mix], [{:nimble_parsec, "~> 0.5.0", [hex: :nimble_parsec, repo: "hexpm", optional: false]}], "hexpm"},
   "makeup_elixir": {:hex, :makeup_elixir, "0.13.0", "be7a477997dcac2e48a9d695ec730b2d22418292675c75aa2d34ba0909dcdeda", [:mix], [{:makeup, "~> 0.8", [hex: :makeup, repo: "hexpm", optional: false]}], "hexpm"},

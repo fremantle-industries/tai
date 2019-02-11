@@ -18,10 +18,7 @@ defmodule Tai.Venues.AssetBalances do
     {:ok, pid}
   end
 
-  def init(state) do
-    Tai.MetaLogger.init_tid()
-    {:ok, state}
-  end
+  def init(state), do: {:ok, state}
 
   def handle_call(:create_ets_table, _from, state) do
     create_ets_table()

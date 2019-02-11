@@ -14,7 +14,7 @@ defmodule Tai.EventsLogger do
   def handle_info({Tai.Event, event}, state) do
     event
     |> Tai.Event.encode!()
-    |> Logger.info(tid: __MODULE__)
+    |> Logger.info()
 
     {:noreply, state}
   end

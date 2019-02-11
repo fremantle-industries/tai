@@ -359,12 +359,12 @@ And configure it's log location:
 # config/config.exs
 use Mix.Config
 
-config :logger, :file_log, path: "./log/#{Mix.env()}.log", metadata: [:tid]
+config :logger, :file_log, path: "./log/#{Mix.env()}.log"
 config :logger, backends: [{LoggerFileBackend, :file_log}]
 ```
 
-If you intend to deploy `tai` on Docker you will need to configure log output 
-in a supported JSON format:
+If you intend to deploy `tai` to a service that ingests structured logs, you 
+will need to use a supported backed. For Google Cloud Stackdriver you can use `logger_json`
 
 ```elixir
 # mix.exs
