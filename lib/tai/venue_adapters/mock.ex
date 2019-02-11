@@ -53,6 +53,7 @@ defmodule Tai.VenueAdapters.Mock do
        ]}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
+        {:ok, {:raise, reason}} -> raise reason
         {:ok, _response} = result -> result
         {:error, :not_found} -> {:error, :mock_not_found}
       end
@@ -64,6 +65,7 @@ defmodule Tai.VenueAdapters.Mock do
       {Tai.Trading.OrderResponses.Amend, attrs |> Map.merge(%{venue_order_id: venue_order_id})}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
+        {:ok, {:raise, reason}} -> raise reason
         {:ok, _} = response -> response
         {:error, :not_found} -> {:error, :mock_not_found}
       end
@@ -75,6 +77,9 @@ defmodule Tai.VenueAdapters.Mock do
       venue_order_id
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
+        {:ok, {:raise, reason}} ->
+          raise reason
+
         {:ok, :cancel_ok} ->
           cancel_response = %Tai.Trading.OrderResponses.Cancel{
             id: venue_order_id,

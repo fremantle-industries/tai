@@ -7,19 +7,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   @type submission :: buy_limit | sell_limit
   @type venue_order_id :: String.t()
 
-  @spec unfilled(venue_order_id, submission) :: :ok
-  @deprecated "use Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel.open/2 instead."
-  def unfilled(venue_order_id, submission) do
-    open(venue_order_id, submission)
-  end
-
-  @spec open(venue_order_id, submission) :: :ok
-  def open(venue_order_id, submission) do
-    open(venue_order_id, submission, %{})
-  end
-
   @spec open(venue_order_id, submission, map) :: :ok
-  def open(venue_order_id, submission, attrs) do
+  def open(venue_order_id, submission, attrs \\ %{}) do
     qty = submission.qty
     cumulative_qty = attrs |> Map.get(:cumulative_qty, Decimal.new(0))
     leaves_qty = Decimal.sub(qty, cumulative_qty)

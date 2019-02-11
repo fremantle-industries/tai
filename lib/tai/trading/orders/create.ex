@@ -17,10 +17,17 @@ defmodule Tai.Trading.Orders.Create do
 
     Task.async(fn ->
       if Tai.Settings.send_orders?() do
-        order
-        |> send
-        |> parse_response(order)
-        |> notify_updated_order()
+        try do
+          order
+          |> send
+          |> parse_response(order)
+          |> notify_updated_order()
+        rescue
+          e ->
+            {e, __STACKTRACE__}
+            |> rescue_venue_adapter_error(order)
+            |> notify_updated_order()
+        end
       else
         order.client_id
         |> skip!
@@ -31,16 +38,14 @@ defmodule Tai.Trading.Orders.Create do
     {:ok, order}
   end
 
-  defp notify_initial_updated_order(order) do
-    notify_updated_order({:ok, {nil, order}})
-  end
+  defp notify_initial_updated_order(order), do: notify_updated_order({:ok, {nil, order}})
 
   defp notify_updated_order({:ok, {previous_order, order}}) do
     Orders.updated!(previous_order, order)
     order
   end
 
-  defp send(order), do: Tai.Venue.create_order(order)
+  defdelegate send(order), to: Tai.Venue, as: :create_order
 
   defp parse_response(
          {:ok, %OrderResponses.Create{status: :filled} = response},
@@ -87,5 +92,9 @@ defmodule Tai.Trading.Orders.Create do
     OrderStore.create_error(order.client_id, reason)
   end
 
-  defp skip!(client_id), do: OrderStore.skip(client_id)
+  defp rescue_venue_adapter_error(reason, order) do
+    OrderStore.create_error(order.client_id, {:unhandled, reason})
+  end
+
+  defdelegate skip!(client_id), to: OrderStore, as: :skip
 end

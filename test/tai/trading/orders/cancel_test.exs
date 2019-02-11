@@ -119,5 +119,46 @@ defmodule Tai.Trading.Orders.CancelTest do
         assert error_event.error_reason == :mock_not_found
       end
     end
+
+    describe "#{side} adapter error" do
+      test "rescues adapter errors" do
+        submission =
+          struct(@submission_type, %{
+            venue_id: :test_exchange_a,
+            account_id: :main,
+            product_symbol: :btc_usd,
+            price: Decimal.new("100.1"),
+            qty: Decimal.new("0.1"),
+            post_only: true,
+            order_updated_callback: fire_order_callback(self())
+          })
+
+        Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
+        {:ok, order} = Tai.Trading.Orders.create(submission)
+
+        assert_receive {
+          :callback_fired,
+          %Tai.Trading.Order{status: :enqueued},
+          %Tai.Trading.Order{status: :open}
+        }
+
+        Mocks.Responses.Orders.Error.cancel_raise(
+          @venue_order_id,
+          "Venue Adapter Cancel Raised Error"
+        )
+
+        assert {:ok, _} = Tai.Trading.Orders.cancel(order)
+
+        assert_receive {
+          :callback_fired,
+          %Tai.Trading.Order{status: :pending_cancel},
+          %Tai.Trading.Order{status: :cancel_error} = error_order
+        }
+
+        assert {:unhandled, {error, [stack_1 | _]}} = error_order.error_reason
+        assert error == %RuntimeError{message: "Venue Adapter Cancel Raised Error"}
+        assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1
+      end
+    end
   end)
 end

@@ -67,5 +67,34 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
       assert error_event.side == @side
       assert error_event.error_reason == :mock_not_found
     end
+
+    test "#{side} rescues adapter errors" do
+      submission =
+        Support.OrderSubmissions.build(@submission_type, %{
+          qty: Decimal.new(10),
+          order_updated_callback: fire_order_callback(self())
+        })
+
+      Mocks.Responses.Orders.Error.create_raise(submission, "Venue Adapter Create Raised Error")
+
+      {:ok, _} = Tai.Trading.Orders.create(submission)
+
+      assert_receive {
+        :callback_fired,
+        nil,
+        %Tai.Trading.Order{status: :enqueued}
+      }
+
+      assert_receive {
+        :callback_fired,
+        %Tai.Trading.Order{status: :enqueued},
+        %Tai.Trading.Order{status: :create_error} = error_order
+      }
+
+      assert error_order.side == @side
+      assert {:unhandled, {error, [stack_1 | _]}} = error_order.error_reason
+      assert error == %RuntimeError{message: "Venue Adapter Create Raised Error"}
+      assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1
+    end
   end)
 end
