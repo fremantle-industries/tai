@@ -46,7 +46,7 @@ defmodule Tai.Mixfile do
       {:ecto, "~> 3.0"},
       {:jason, "~> 1.1"},
       {:logger_file_backend_with_formatters, "~> 0.0.1", only: [:dev, :test]},
-      {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.1", only: [:dev, :test]},
+      {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.2", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.1.2", only: [:dev, :test]},
       {:plug_cowboy, "~> 1.0.0", only: [:dev, :test]},
