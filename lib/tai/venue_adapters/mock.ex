@@ -65,6 +65,7 @@ defmodule Tai.VenueAdapters.Mock do
       {Tai.Trading.OrderResponses.Amend, attrs |> Map.merge(%{venue_order_id: venue_order_id})}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
+        {:ok, {:raise, reason}} -> raise reason
         {:ok, _} = response -> response
         {:error, :not_found} -> {:error, :mock_not_found}
       end

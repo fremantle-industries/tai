@@ -75,7 +75,7 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
           order_updated_callback: fire_order_callback(self())
         })
 
-      Mocks.Responses.Orders.Error.raise(submission, "Venue Adapter Raised Error")
+      Mocks.Responses.Orders.Error.create_raise(submission, "Venue Adapter Create Raised Error")
 
       {:ok, _} = Tai.Trading.Orders.create(submission)
 
@@ -93,7 +93,7 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
 
       assert error_order.side == @side
       assert {:unhandled, {error, [stack_1 | _]}} = error_order.error_reason
-      assert error == %RuntimeError{message: "Venue Adapter Raised Error"}
+      assert error == %RuntimeError{message: "Venue Adapter Create Raised Error"}
       assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1
     end
   end)

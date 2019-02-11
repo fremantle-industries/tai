@@ -224,6 +224,32 @@ defmodule Tai.Trading.Orders.AmendTest do
 
         assert error_order.error_reason == :mock_not_found
       end
+
+      test "rescues adapter errors", %{submission: submission} do
+        GoodTillCancel.open(@venue_order_id, submission)
+        {:ok, _} = Tai.Trading.Orders.create(submission)
+        assert_receive {:callback_fired, _, %Tai.Trading.Order{status: :open} = open_order}
+
+        amend_attrs = %{price: Decimal.new(1)}
+
+        Mocks.Responses.Orders.Error.amend_raise(
+          open_order,
+          amend_attrs,
+          "Venue Adapter Amend Raised Error"
+        )
+
+        Tai.Trading.Orders.amend(open_order, amend_attrs)
+
+        assert_receive {
+          :callback_fired,
+          %Tai.Trading.Order{status: :pending_amend},
+          %Tai.Trading.Order{status: :amend_error} = error_order
+        }
+
+        assert {:unhandled, {error, [stack_1 | _]}} = error_order.error_reason
+        assert error == %RuntimeError{message: "Venue Adapter Amend Raised Error"}
+        assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1
+      end
     end
   end)
 end
