@@ -7,17 +7,23 @@ defmodule Tai.Trading.Orders.Cancel do
           {:ok, updated :: order}
           | {:error, {:invalid_status, was :: term, required :: term}}
   def cancel(%Tai.Trading.Order{client_id: client_id}) do
-    with {:ok, {old_order, updated_order}} <-
-           OrderStore.pend_cancel(client_id, Timex.now()) do
-      Orders.updated!(old_order, updated_order)
+    with {:ok, {old, updated}} <- OrderStore.pend_cancel(client_id, Timex.now()) do
+      Orders.updated!(old, updated)
 
       Task.start_link(fn ->
-        updated_order
-        |> send_cancel_order
-        |> parse_cancel_order_response(updated_order)
+        try do
+          updated
+          |> send_cancel_order
+          |> parse_cancel_order_response(updated)
+        rescue
+          e ->
+            {e, __STACKTRACE__}
+            |> rescue_venue_adapter_error(updated)
+            |> notify_updated_order()
+        end
       end)
 
-      {:ok, updated_order}
+      {:ok, updated}
     else
       {:error, {:invalid_status, was, required}} = error ->
         broadcast_invalid_status(client_id, :pend_cancel, was, required)
@@ -25,14 +31,19 @@ defmodule Tai.Trading.Orders.Cancel do
     end
   end
 
-  defp send_cancel_order(order), do: Tai.Venue.cancel_order(order)
+  defdelegate send_cancel_order(order), to: Tai.Venue, as: :cancel_order
+
+  defp notify_updated_order({:ok, {previous_order, order}}) do
+    Orders.updated!(previous_order, order)
+    order
+  end
 
   defp parse_cancel_order_response({:ok, order_response}, order) do
     order.client_id
     |> OrderStore.cancel(order_response.venue_updated_at)
     |> case do
-      {:ok, {old_order, updated_order}} ->
-        Orders.updated!(old_order, updated_order)
+      {:ok, {_, _}} = result ->
+        result |> notify_updated_order
 
       {:error, {:invalid_status, was, required}} ->
         broadcast_invalid_status(order.client_id, :cancel, was, required)
@@ -40,9 +51,13 @@ defmodule Tai.Trading.Orders.Cancel do
   end
 
   defp parse_cancel_order_response({:error, reason}, order) do
-    {:ok, {old_order, updated_order}} = OrderStore.cancel_error(order.client_id, reason)
+    order.client_id
+    |> OrderStore.cancel_error(reason)
+    |> notify_updated_order()
+  end
 
-    Orders.updated!(old_order, updated_order)
+  defp rescue_venue_adapter_error(reason, order) do
+    OrderStore.cancel_error(order.client_id, {:unhandled, reason})
   end
 
   defp broadcast_invalid_status(client_id, action, was, required) do

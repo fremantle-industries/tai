@@ -77,6 +77,9 @@ defmodule Tai.VenueAdapters.Mock do
       venue_order_id
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
+        {:ok, {:raise, reason}} ->
+          raise reason
+
         {:ok, :cancel_ok} ->
           cancel_response = %Tai.Trading.OrderResponses.Cancel{
             id: venue_order_id,

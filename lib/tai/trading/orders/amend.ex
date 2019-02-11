@@ -14,24 +14,24 @@ defmodule Tai.Trading.Orders.Amend do
           {:ok, updated :: order}
           | {:error, {:invalid_status, status_was, status_required}}
   def amend(order, attrs) when is_map(attrs) do
-    with {:ok, {old_order, updated_order}} <- OrderStore.pend_amend(order.client_id, Timex.now()) do
-      Orders.updated!(old_order, updated_order)
+    with {:ok, {old, updated}} <- OrderStore.pend_amend(order.client_id, Timex.now()) do
+      Orders.updated!(old, updated)
 
       Task.start_link(fn ->
         try do
-          updated_order
+          updated
           |> send_amend_order(attrs)
-          |> parse_response(updated_order.client_id)
+          |> parse_response(updated.client_id)
           |> notify_updated_order()
         rescue
           e ->
             {e, __STACKTRACE__}
-            |> rescue_venue_adapter_error(order)
+            |> rescue_venue_adapter_error(updated)
             |> notify_updated_order()
         end
       end)
 
-      {:ok, updated_order}
+      {:ok, updated}
     else
       {:error, {:invalid_status, was, required}} = error ->
         broadcast_invalid_status(order.client_id, :pend_amend, was, required)
