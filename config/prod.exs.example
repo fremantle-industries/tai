@@ -1,5 +1,6 @@
 use Mix.Config
 
+config :logger, :file_log, formatter: LoggerFileBackendWithFormattersStackdriver
 config :tai, send_orders: true
 
 config :tai,

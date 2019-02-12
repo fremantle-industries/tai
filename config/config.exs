@@ -1,10 +1,10 @@
 use Mix.Config
 
-config :logger, backends: [{LoggerFileBackendWithFormatters, :file_log}]
+config :logger,
+  backends: [{LoggerFileBackendWithFormatters, :file_log}],
+  utc_log: true
 
-config :logger, :file_log,
-  path: "./log/#{Mix.env()}.log",
-  formatter: LoggerFileBackendWithFormattersStackdriver
+config :logger, :file_log, path: "./log/#{Mix.env()}.log"
 
 if System.get_env("DEBUG") == "true" do
   config :logger, :file_log, level: :debug
