@@ -7,26 +7,33 @@ defmodule Tai.AdvisorTest do
     def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
   end
 
-  setup do
-    Process.register(self(), :test)
-    advisor_name = Tai.Advisor.to_name(:group_a, :my_advisor)
+  describe ".start_link" do
+    test "can initialize the run store" do
+      start_supervised!(
+        {MyAdvisor,
+         [
+           group_id: :init_run_store,
+           advisor_id: :my_advisor,
+           products: [],
+           config: %{},
+           store: %{initialized: true}
+         ]}
+      )
 
-    start_supervised!({Tai.Events, 1})
+      advisor_name = Tai.Advisor.to_name(:init_run_store, :my_advisor)
+      state = :sys.get_state(advisor_name)
 
-    start_supervised!(
-      {MyAdvisor,
-       [
-         group_id: :group_a,
-         advisor_id: :my_advisor,
-         products: [],
-         config: %{}
-       ]}
-    )
-
-    {:ok, %{advisor_name: advisor_name}}
+      assert state.store.initialized == true
+    end
   end
 
   describe ".cast_order_updated/4" do
+    setup do
+      Process.register(self(), :test)
+      advisor_name = start!(:group_a, :my_advisor)
+      {:ok, %{advisor_name: advisor_name}}
+    end
+
     test "executes the given callback function", %{advisor_name: advisor_name} do
       callback = fn old_order, updated_order, state ->
         send(:test, {:fired_order_updated_callback, old_order, updated_order, state})
@@ -74,6 +81,12 @@ defmodule Tai.AdvisorTest do
   end
 
   describe ".cast_order_updated/5" do
+    setup do
+      Process.register(self(), :test)
+      advisor_name = start!(:group_a, :my_advisor)
+      {:ok, %{advisor_name: advisor_name}}
+    end
+
     test "executes the given callback function", %{advisor_name: advisor_name} do
       callback = fn old_order, updated_order, opts, state ->
         send(:test, {:fired_order_updated_callback, old_order, updated_order, opts, state})
@@ -123,5 +136,21 @@ defmodule Tai.AdvisorTest do
       assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{} = event}
       assert event.error == %RuntimeError{message: "Callback Error!!!"}
     end
+  end
+
+  defp start!(group_id, advisor_id) do
+    start_supervised!({Tai.Events, 1})
+
+    start_supervised!(
+      {MyAdvisor,
+       [
+         group_id: group_id,
+         advisor_id: advisor_id,
+         products: [],
+         config: %{}
+       ]}
+    )
+
+    Tai.Advisor.to_name(group_id, advisor_id)
   end
 end

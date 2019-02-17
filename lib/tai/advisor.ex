@@ -65,6 +65,22 @@ defmodule Tai.Advisor do
             products: products,
             config: config
           ) do
+        start_link(
+          group_id: group_id,
+          advisor_id: advisor_id,
+          products: products,
+          config: config,
+          store: %{}
+        )
+      end
+
+      def start_link(
+            group_id: group_id,
+            advisor_id: advisor_id,
+            products: products,
+            config: config,
+            store: store
+          ) do
         name = Tai.Advisor.to_name(group_id, advisor_id)
         market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
 
@@ -76,7 +92,7 @@ defmodule Tai.Advisor do
             products: products,
             market_quotes: market_quotes,
             config: config,
-            store: %{}
+            store: store
           },
           name: name
         )
