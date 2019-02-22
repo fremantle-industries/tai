@@ -46,8 +46,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
     {:error, :timeout}
   end
 
-  defp parse_response({:error, %ExPoloniex.AuthenticationError{} = error}, _, _) do
-    {:error, %Tai.CredentialError{reason: error}}
+  defp parse_response({:error, %ExPoloniex.AuthenticationError{} = reason}, _, _) do
+    {:error, {:credentials, reason}}
   end
 
   defp parse_response({:error, %ExPoloniex.NotEnoughError{} = error}, _, _) do

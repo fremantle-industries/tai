@@ -12,11 +12,11 @@ defmodule Tai.Venues.Adapter do
   @type venue_order_id :: String.t()
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type shared_error_reason ::
-          :timeout
-          | :not_implemented
+          :not_implemented
+          | :timeout
+          | {:credentials, reason :: term}
           | {:nonce_not_increasing, msg :: String.t()}
           | {:unhandled, reason :: term}
-          | Tai.CredentialError.t()
   @type create_order_error_reason :: shared_error_reason | :insufficient_balance
   @type amend_order_error_reason :: shared_error_reason | :not_found
   @type cancel_order_error_reason :: shared_error_reason | :not_found

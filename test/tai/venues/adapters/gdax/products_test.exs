@@ -25,19 +25,15 @@ defmodule Tai.VenueAdapters.Gdax.ProductsTest do
 
   test "returns an error tuple when the passphrase is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/gdax/error_invalid_passphrase" do
-      assert Tai.Venue.products(adapter) == {
-               :error,
-               %Tai.CredentialError{reason: "Invalid Passphrase"}
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.products(adapter)
+      assert reason == "Invalid Passphrase"
     end
   end
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/gdax/error_invalid_api_key" do
-      assert Tai.Venue.products(adapter) == {
-               :error,
-               %Tai.CredentialError{reason: "Invalid API Key"}
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.products(adapter)
+      assert reason == "Invalid API Key"
     end
   end
 

@@ -7,7 +7,7 @@ defmodule Tai.VenueAdapters.Poloniex.MakerTakerFees do
       {:ok, {maker, taker}}
     else
       {:error, %ExPoloniex.AuthenticationError{} = reason} ->
-        {:error, %Tai.CredentialError{reason: reason}}
+        {:error, {:credentials, reason}}
 
       {:error, %HTTPoison.Error{reason: "timeout"}} ->
         {:error, :timeout}

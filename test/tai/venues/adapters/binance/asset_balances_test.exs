@@ -12,19 +12,15 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
 
   test "returns an error tuple when the secret is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/binance/error_invalid_secret" do
-      assert Tai.Venue.asset_balances(adapter, :main) == {
-               :error,
-               %Tai.CredentialError{reason: "API-key format invalid."}
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.asset_balances(adapter, :main)
+      assert reason == "API-key format invalid."
     end
   end
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/binance/error_invalid_api_key" do
-      assert Tai.Venue.asset_balances(adapter, :main) == {
-               :error,
-               %Tai.CredentialError{reason: "API-key format invalid."}
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.asset_balances(adapter, :main)
+      assert reason == "API-key format invalid."
     end
   end
 

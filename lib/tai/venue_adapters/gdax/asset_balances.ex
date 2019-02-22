@@ -10,10 +10,10 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalances do
       {:ok, accounts}
     else
       {:error, "Invalid Passphrase" = reason, _status} ->
-        {:error, %Tai.CredentialError{reason: reason}}
+        {:error, {:credentials, reason}}
 
       {:error, "Invalid API Key" = reason, _status} ->
-        {:error, %Tai.CredentialError{reason: reason}}
+        {:error, {:credentials, reason}}
 
       {:error, reason, 503} ->
         {:error, %Tai.ServiceUnavailableError{reason: reason}}

@@ -26,19 +26,15 @@ defmodule Tai.VenueAdapters.Binance.ProductsTest do
 
   test "returns an error tuple when the secret is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/binance/error_invalid_secret" do
-      assert Tai.Venue.products(adapter) == {
-               :error,
-               %Tai.CredentialError{reason: "API-key format invalid."}
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.products(adapter)
+      assert reason == "API-key format invalid."
     end
   end
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/products/binance/error_invalid_api_key" do
-      assert Tai.Venue.products(adapter) == {
-               :error,
-               %Tai.CredentialError{reason: "API-key format invalid."}
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.products(adapter)
+      assert reason = "API-key format invalid."
     end
   end
 

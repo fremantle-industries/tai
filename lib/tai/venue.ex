@@ -6,7 +6,9 @@ defmodule Tai.Venue do
   @type position :: Tai.Trading.Position.t()
   @type order :: Tai.Trading.Order.t()
   @type shared_error_reason ::
-          :timeout | {:nonce_not_increasing, String.t()} | Tai.CredentialError.t()
+          {:credentials, reason :: term}
+          | :timeout
+          | {:nonce_not_increasing, String.t()}
 
   @spec products(adapter :: adapter) :: {:ok, [product]}
   def products(%Tai.Venues.Adapter{adapter: adapter, id: exchange_id}) do

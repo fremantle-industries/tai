@@ -5,8 +5,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
 
   @type error_reason ::
           :timeout
-          | Tai.CredentialError.t()
-          | Tai.CredentialError.t()
+          | {:credentials, reason :: term}
           | Tai.ServiceUnavailableError.t()
   @type products :: Tai.Venues.Product.t()
 
@@ -17,10 +16,10 @@ defmodule Tai.VenueAdapters.Gdax.Products do
       {:ok, products}
     else
       {:error, "Invalid Passphrase" = reason, _status} ->
-        {:error, %Tai.CredentialError{reason: reason}}
+        {:error, {:credentials, reason}}
 
       {:error, "Invalid API Key" = reason, _status} ->
-        {:error, %Tai.CredentialError{reason: reason}}
+        {:error, {:credentials, reason}}
 
       {:error, reason, 503} ->
         {:error, %Tai.ServiceUnavailableError{reason: reason}}

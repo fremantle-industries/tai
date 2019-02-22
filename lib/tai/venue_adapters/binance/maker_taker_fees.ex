@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.Binance.MakerTakerFees do
         {:error, %Tai.ApiError{reason: reason}}
 
       {:error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}} ->
-        {:error, %Tai.CredentialError{reason: reason}}
+        {:error, {:credentials, reason}}
 
       {:error, {:http_error, %HTTPoison.Error{reason: "timeout"}}} ->
         {:error, :timeout}

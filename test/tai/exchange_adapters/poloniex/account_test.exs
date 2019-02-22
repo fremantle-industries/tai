@@ -54,14 +54,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
 
     test "returns an error tuple when the api key is invalid", %{order: order} do
       use_cassette "exchange_adapters/poloniex/account/buy_limit_error_invalid_api_key" do
-        assert Tai.Exchanges.Account.create_order(order) == {
-                 :error,
-                 %Tai.CredentialError{
-                   reason: %ExPoloniex.AuthenticationError{
-                     message: "Invalid API key/secret pair."
-                   }
-                 }
-               }
+        assert {:error, {:credentials, reason}} = Tai.Exchanges.Account.create_order(order)
+        assert reason == %ExPoloniex.AuthenticationError{message: "Invalid API key/secret pair."}
       end
     end
 

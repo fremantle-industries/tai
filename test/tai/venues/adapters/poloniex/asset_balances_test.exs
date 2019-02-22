@@ -12,27 +12,15 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalancesTest do
 
   test "returns an error tuple when the secret is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/poloniex/error_invalid_secret" do
-      assert Tai.Venue.asset_balances(adapter, :main) == {
-               :error,
-               %Tai.CredentialError{
-                 reason: %ExPoloniex.AuthenticationError{
-                   message: "Invalid API key/secret pair."
-                 }
-               }
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.asset_balances(adapter, :main)
+      assert reason == %ExPoloniex.AuthenticationError{message: "Invalid API key/secret pair."}
     end
   end
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/asset_balances/poloniex/error_invalid_api_key" do
-      assert Tai.Venue.asset_balances(adapter, :main) == {
-               :error,
-               %Tai.CredentialError{
-                 reason: %ExPoloniex.AuthenticationError{
-                   message: "Invalid API key/secret pair."
-                 }
-               }
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.asset_balances(adapter, :main)
+      assert reason == %ExPoloniex.AuthenticationError{message: "Invalid API key/secret pair."}
     end
   end
 

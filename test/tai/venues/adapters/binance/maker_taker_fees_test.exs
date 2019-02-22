@@ -12,19 +12,15 @@ defmodule Tai.VenueAdapters.Binance.MakerTakerFeesTest do
 
   test "returns an error tuple when the secret is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/maker_taker_fees/binance/error_invalid_secret" do
-      assert Tai.Venue.maker_taker_fees(adapter, :main) == {
-               :error,
-               %Tai.CredentialError{reason: "API-key format invalid."}
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.maker_taker_fees(adapter, :main)
+      assert reason == "API-key format invalid."
     end
   end
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
     use_cassette "exchange_adapters/shared/maker_taker_fees/binance/error_invalid_api_key" do
-      assert Tai.Venue.maker_taker_fees(adapter, :main) == {
-               :error,
-               %Tai.CredentialError{reason: "API-key format invalid."}
-             }
+      assert {:error, {:credentials, reason}} = Tai.Venue.maker_taker_fees(adapter, :main)
+      assert reason == "API-key format invalid."
     end
   end
 
