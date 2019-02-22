@@ -27,3 +27,6 @@ config/dev.exs
 
 # Ignore secrets
 secrets/*
+
+# Ignore elixir-ls
+.elixir_ls/*
