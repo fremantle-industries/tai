@@ -36,7 +36,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     Mocks.Server.insert(key, order_response)
   end
 
-  @spec amend_price(order, number) :: :ok
+  @spec amend_price(order, Decimal.t()) :: :ok
   def amend_price(order, price) do
     order_response = %Tai.Trading.OrderResponses.Amend{
       id: order.venue_order_id,
@@ -57,7 +57,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     Mocks.Server.insert(key, order_response)
   end
 
-  @spec amend_price_and_qty(order, number, number) :: :ok
+  @spec amend_price_and_qty(order, Decimal.t(), Decimal.t()) :: :ok
   def amend_price_and_qty(order, price, qty) do
     order_response = %Tai.Trading.OrderResponses.Amend{
       id: order.venue_order_id,
