@@ -211,6 +211,14 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
       end
     end
 
+    test "#{adapter.id} overloaded error" do
+      order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_overloaded" do
+        assert Tai.Venue.create_order(order, @test_adapters) == {:error, :overloaded}
+      end
+    end
+
     test "#{adapter.id} unhandled error" do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 

@@ -7,7 +7,8 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
   @type response :: Tai.Trading.OrderResponses.Amend.t()
   @type reason ::
           :timeout
-          | {:nonce_not_increasing, String.t()}
+          | :overloaded
+          | {:nonce_not_increasing, msg :: String.t()}
           | {:unhandled, term}
 
   @spec amend_order(venue_order_id, attrs, credentials) :: {:ok, response} | {:error, reason}
@@ -62,5 +63,6 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
 
   defp parse_response({:error, :timeout, nil}), do: {:error, :timeout}
   defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}), do: {:error, reason}
+  defp parse_response({:error, :overloaded = reason, _}), do: {:error, reason}
   defp parse_response({:error, reason, _}), do: {:error, {:unhandled, reason}}
 end

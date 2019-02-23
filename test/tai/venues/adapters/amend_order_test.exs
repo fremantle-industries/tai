@@ -83,7 +83,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       end
     end
 
-    test "#{adapter.id} timeout" do
+    test "#{adapter.id} timeout error" do
       enqueued_order = build_enqueued_order(@adapter.id, :buy)
       amend_qty = amend_qty(@adapter.id, enqueued_order.side)
       attrs = amend_attrs(@adapter.id, qty: amend_qty)
@@ -97,7 +97,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       end
     end
 
-    test "#{adapter.id} nonce not increasing" do
+    test "#{adapter.id} nonce not increasing error" do
       enqueued_order = build_enqueued_order(@adapter.id, :buy)
       amend_qty = amend_qty(@adapter.id, enqueued_order.side)
       attrs = amend_attrs(@adapter.id, qty: amend_qty)
@@ -111,6 +111,20 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
                  Tai.Venue.amend_order(open_order, attrs, @test_adapters)
 
         assert msg =~ ~r/Nonce is not increasing/
+      end
+    end
+
+    test "#{adapter.id} overloaded error" do
+      enqueued_order = build_enqueued_order(@adapter.id, :buy)
+      amend_qty = amend_qty(@adapter.id, enqueued_order.side)
+      attrs = amend_attrs(@adapter.id, qty: amend_qty)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_overloaded_error" do
+        assert {:ok, amend_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+
+        open_order = build_open_order(enqueued_order, amend_response)
+
+        assert Tai.Venue.amend_order(open_order, attrs, @test_adapters) == {:error, :overloaded}
       end
     end
 

@@ -47,6 +47,18 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       end
     end
 
+    test "#{adapter.id} overloaded error" do
+      enqueued_order = build_enqueued_order(@adapter.id)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_overloaded_error" do
+        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+
+        open_order = build_open_order(enqueued_order, order_response)
+
+        assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :overloaded}
+      end
+    end
+
     test "#{adapter.id} nonce not increasing error" do
       enqueued_order = build_enqueued_order(@adapter.id)
 

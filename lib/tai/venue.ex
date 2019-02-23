@@ -6,8 +6,9 @@ defmodule Tai.Venue do
   @type position :: Tai.Trading.Position.t()
   @type order :: Tai.Trading.Order.t()
   @type shared_error_reason ::
-          {:credentials, reason :: term}
-          | :timeout
+          :timeout
+          | :overloaded
+          | {:credentials, reason :: term}
           | {:nonce_not_increasing, String.t()}
 
   @spec products(adapter :: adapter) :: {:ok, [product]}
@@ -63,7 +64,6 @@ defmodule Tai.Venue do
   @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
   @type amend_order_error_reason ::
           :not_implemented
-          | :timeout
           | shared_error_reason
 
   @spec amend_order(order, amend_attrs) ::

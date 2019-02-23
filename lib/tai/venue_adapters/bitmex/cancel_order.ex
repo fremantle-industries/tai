@@ -4,7 +4,11 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
   @type venue_order_id :: String.t()
   @type credentials :: map
   @type response :: Tai.Trading.OrderResponses.Cancel.t()
-  @type reason :: :timeout | {:unhandled, term}
+  @type reason ::
+          :timeout
+          | :overloaded
+          | {:nonce_not_increasing, msg :: String.t()}
+          | {:unhandled, term}
 
   @spec cancel_order(venue_order_id, credentials) :: {:ok, response} | {:error, reason}
   def cancel_order(venue_order_id, credentials) do
@@ -39,5 +43,6 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
 
   defp parse_response({:error, :timeout, nil}), do: {:error, :timeout}
   defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}), do: {:error, reason}
+  defp parse_response({:error, :overloaded = reason, _}), do: {:error, reason}
   defp parse_response({:error, reason, _}), do: {:error, {:unhandled, reason}}
 end
