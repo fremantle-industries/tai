@@ -1,7 +1,7 @@
 defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
   use Tai.Advisor
 
-  def handle_inside_quote(venue_id, product_symbol, _inside_quote, _changes, _state) do
+  def handle_inside_quote(venue_id, product_symbol, _inside_quote, _changes, state) do
     if Tai.Trading.OrderStore.count() == 0 do
       Tai.Trading.Orders.create(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: venue_id,
@@ -14,7 +14,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
       })
     end
 
-    :ok
+    {:ok, state.store}
   end
 
   def order_updated(
