@@ -46,7 +46,7 @@ defmodule Tai.ExchangeAdapters.Gdax.Account.Orders do
   end
 
   defp parse_response({:error, "Insufficient funds" = reason, _status_code}, _time_in_force) do
-    {:error, %Tai.Trading.InsufficientBalanceError{reason: reason}}
+    {:error, {:insufficient_balance, reason}}
   end
 
   defp parse_response({:error, reason, _status_code}, _time_in_force) do

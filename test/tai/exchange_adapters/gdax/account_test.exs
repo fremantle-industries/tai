@@ -49,7 +49,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
     test "returns an insufficient funds error tuple" do
       use_cassette "exchange_adapters/shared/account/gdax/buy_limit_error_insufficient_funds" do
-        assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
+        assert {:error, {:insufficient_balance, reason}} =
                  Tai.Trading.Order
                  |> struct(%{
                    exchange_id: :my_gdax_exchange,
@@ -62,6 +62,8 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    time_in_force: :gtc
                  })
                  |> Tai.Exchanges.Account.create_order()
+
+        assert reason != nil
       end
     end
   end
@@ -93,7 +95,7 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
 
     test "returns an insufficient funds error tuple" do
       use_cassette "exchange_adapters/shared/account/gdax/sell_limit_error_insufficient_funds" do
-        assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
+        assert {:error, {:insufficient_balance, reason}} =
                  Tai.Trading.Order
                  |> struct(%{
                    exchange_id: :my_gdax_exchange,
@@ -106,6 +108,8 @@ defmodule Tai.ExchangeAdapters.Gdax.AccountTest do
                    time_in_force: :gtc
                  })
                  |> Tai.Exchanges.Account.create_order()
+
+        assert reason != nil
       end
     end
   end

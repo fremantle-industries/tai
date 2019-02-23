@@ -63,7 +63,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
 
       test "#{exchange_id} adapter returns an insufficient funds error tuple" do
         use_cassette "exchange_adapters/shared/account/#{@exchange_id}/buy_limit_fill_or_kill_error_insufficient_funds" do
-          assert {:error, %Tai.Trading.InsufficientBalanceError{}} =
+          assert {:error, {:insufficient_balance, reason}} =
                    Tai.Trading.Order
                    |> struct(%{
                      exchange_id: @exchange_id,
@@ -76,6 +76,8 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
                      time_in_force: :fok
                    })
                    |> Tai.Exchanges.Account.create_order()
+
+          assert reason != nil
         end
       end
 

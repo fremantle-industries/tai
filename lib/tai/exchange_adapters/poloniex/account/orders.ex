@@ -50,8 +50,8 @@ defmodule Tai.ExchangeAdapters.Poloniex.Account.Orders do
     {:error, {:credentials, reason}}
   end
 
-  defp parse_response({:error, %ExPoloniex.NotEnoughError{} = error}, _, _) do
-    {:error, %Tai.Trading.InsufficientBalanceError{reason: error}}
+  defp parse_response({:error, %ExPoloniex.NotEnoughError{} = reason}, _, _) do
+    {:error, {:insufficient_balance, reason}}
   end
 
   defp to_venue_time_in_force(:fok), do: %ExPoloniex.OrderDurations.FillOrKill{}

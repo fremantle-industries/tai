@@ -73,12 +73,10 @@ defmodule Tai.ExchangeAdapters.Poloniex.AccountTest do
             time_in_force: :fok
           })
 
-        assert Tai.Exchanges.Account.create_order(order) == {
-                 :error,
-                 %Tai.Trading.InsufficientBalanceError{
-                   reason: %ExPoloniex.NotEnoughError{message: "Not enough BTC."}
-                 }
-               }
+        assert {:error, {:insufficient_balance, reason}} =
+                 Tai.Exchanges.Account.create_order(order)
+
+        assert reason == %ExPoloniex.NotEnoughError{message: "Not enough BTC."}
       end
     end
   end

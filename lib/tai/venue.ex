@@ -47,8 +47,8 @@ defmodule Tai.Venue do
   @type create_response :: Tai.Trading.OrderResponses.Create.t()
   @type create_order_error_reason ::
           :not_implemented
+          | {:insufficient_balance, reason :: term}
           | shared_error_reason
-          | Tai.Trading.InsufficientBalanceError.t()
 
   @spec create_order(order) :: {:ok, create_response} | {:error, create_order_error_reason}
   def create_order(

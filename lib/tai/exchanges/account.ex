@@ -13,14 +13,13 @@ defmodule Tai.Exchanges.Account do
   @type order_response :: Tai.Trading.OrderResponse.t()
   @type credentials :: map
   @type time_in_force :: Tai.Trading.Order.time_in_force()
-  @type insufficient_balance_error :: Tai.Trading.InsufficientBalanceError.t()
   @type shared_error_reason ::
           :timeout
           | {:credentials, reason :: term}
   @type create_order_error_reason ::
           :not_implemented
+          | {:insufficient_balance, reason :: term}
           | shared_error_reason
-          | Tai.Trading.InsufficientBalanceError.t()
 
   @callback create_order(order, credentials) ::
               {:ok, order_response} | {:error, create_order_error_reason}

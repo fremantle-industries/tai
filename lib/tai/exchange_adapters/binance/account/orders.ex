@@ -34,7 +34,7 @@ defmodule Tai.ExchangeAdapters.Binance.Account.Orders do
   end
 
   defp parse_response({:error, %Binance.InsufficientBalanceError{} = reason}, _time_in_force) do
-    {:error, %Tai.Trading.InsufficientBalanceError{reason: reason}}
+    {:error, {:insufficient_balance, reason}}
   end
 
   defp parse_response({:error, _reason} = response, _time_in_force), do: response
