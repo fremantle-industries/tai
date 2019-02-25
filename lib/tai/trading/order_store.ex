@@ -235,11 +235,12 @@ defmodule Tai.Trading.OrderStore do
   end
 
   @amend_error_required :pending_amend
-  def handle_call({:amend_error, client_id, reason}, _from, state) do
+  def handle_call({:amend_error, client_id, reason, last_received_at}, _from, state) do
     response =
       update(client_id, @amend_error_required, %{
         status: :amend_error,
-        error_reason: reason
+        error_reason: reason,
+        last_received_at: last_received_at
       })
 
     {:reply, response, state}
@@ -529,11 +530,11 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Change the order status to amend_error after an amend attempt
   """
-  @spec amend_error(client_id, term) ::
+  @spec amend_error(client_id, term, DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, required :: :pending_amend}}
-  def amend_error(client_id, reason),
-    do: GenServer.call(__MODULE__, {:amend_error, client_id, reason})
+  def amend_error(client_id, reason, last_received_at),
+    do: GenServer.call(__MODULE__, {:amend_error, client_id, reason, last_received_at})
 
   @doc """
   Change the order status to pending_cancel

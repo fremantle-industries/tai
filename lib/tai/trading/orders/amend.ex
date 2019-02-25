@@ -57,11 +57,11 @@ defmodule Tai.Trading.Orders.Amend do
   end
 
   defp parse_response({:error, reason}, client_id) do
-    OrderStore.amend_error(client_id, reason)
+    OrderStore.amend_error(client_id, reason, Timex.now())
   end
 
   defp rescue_venue_adapter_error(reason, order) do
-    OrderStore.amend_error(order.client_id, {:unhandled, reason})
+    OrderStore.amend_error(order.client_id, {:unhandled, reason}, Timex.now())
   end
 
   defp broadcast_invalid_status(client_id, action, was, required) do

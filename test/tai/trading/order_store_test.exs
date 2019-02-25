@@ -471,14 +471,18 @@ defmodule Tai.Trading.OrderStoreTest do
                  @avg_price,
                  @cumulative_qty,
                  @leaves_qty,
-                 @last_received_at,
-                 @last_venue_timestamp
+                 Timex.now(),
+                 Timex.now()
                )
 
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
 
       assert {:ok, {_, _}} =
-               Tai.Trading.OrderStore.amend_error(order.client_id, "server unavailable")
+               Tai.Trading.OrderStore.amend_error(
+                 order.client_id,
+                 "server unavailable",
+                 @last_received_at
+               )
 
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
@@ -514,21 +518,30 @@ defmodule Tai.Trading.OrderStoreTest do
                  @avg_price,
                  @cumulative_qty,
                  @leaves_qty,
-                 @last_received_at,
-                 @last_venue_timestamp
+                 Timex.now(),
+                 Timex.now()
                )
 
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
 
       assert {:ok, {old, updated}} =
-               Tai.Trading.OrderStore.amend_error(order.client_id, "server unavailable")
+               Tai.Trading.OrderStore.amend_error(
+                 order.client_id,
+                 "server unavailable",
+                 @last_received_at
+               )
 
       assert old.status == :pending_amend
       assert updated.status == :amend_error
+      assert updated.last_received_at == @last_received_at
     end
 
     test "returns an error tuple when the order can't be found" do
-      assert Tai.Trading.OrderStore.amend_error("not found", "server unavailable") ==
+      assert Tai.Trading.OrderStore.amend_error(
+               "not found",
+               "server unavailable",
+               @last_received_at
+             ) ==
                {:error, :not_found}
     end
 
@@ -538,7 +551,11 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
 
       assert {:error, reason} =
-               Tai.Trading.OrderStore.amend_error(order.client_id, "server unavailable")
+               Tai.Trading.OrderStore.amend_error(
+                 order.client_id,
+                 "server unavailable",
+                 @last_received_at
+               )
 
       assert reason == {:invalid_status, :enqueued, :pending_amend}
     end

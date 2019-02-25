@@ -125,7 +125,11 @@ defmodule Tai.Trading.Orders.AmendTest do
         {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(enqueued_order.client_id, Timex.now())
 
         {:ok, {_, amend_error_order}} =
-          Tai.Trading.OrderStore.amend_error(enqueued_order.client_id, "Invalid nonce")
+          Tai.Trading.OrderStore.amend_error(
+            enqueued_order.client_id,
+            "Invalid nonce",
+            Timex.now()
+          )
 
         {:ok, %{order: amend_error_order}}
       end
@@ -229,6 +233,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         }
 
         assert error_order.error_reason == :mock_not_found
+        assert error_order.last_received_at != open_order.last_received_at
       end
 
       test "rescues adapter errors", %{submission: submission} do
@@ -253,6 +258,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         }
 
         assert {:unhandled, {error, [stack_1 | _]}} = error_order.error_reason
+        assert %DateTime{} = error_order.last_received_at
         assert error == %RuntimeError{message: "Venue Adapter Amend Raised Error"}
         assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1
       end
