@@ -13,7 +13,14 @@ defmodule Tai.Trading.OrderStore do
   @type passive_fills_required ::
           :open | :pending_amend | :pending_cancel | :amend_error | :cancel_error
   @type passive_cancel_required ::
-          :open | :expired | :filled | :pending_cancel | :pending_amend | :canceled | :amend
+          :open
+          | :expired
+          | :filled
+          | :pending_cancel
+          | :pending_amend
+          | :canceled
+          | :amend
+          | :amend_error
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -275,7 +282,8 @@ defmodule Tai.Trading.OrderStore do
     :filled,
     :pending_cancel,
     :pending_amend,
-    :amend
+    :amend,
+    :amend_error
   ]
   def handle_call(
         {:passive_cancel, client_id, last_received_at, last_venue_timestamp},

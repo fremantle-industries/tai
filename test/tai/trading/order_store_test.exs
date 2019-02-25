@@ -802,7 +802,8 @@ defmodule Tai.Trading.OrderStoreTest do
                   :filled,
                   :pending_cancel,
                   :pending_amend,
-                  :amend
+                  :amend,
+                  :amend_error
                 ]}
     end
   end

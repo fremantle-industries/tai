@@ -199,7 +199,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
                :filled,
                :pending_cancel,
                :pending_amend,
-               :amend
+               :amend,
+               :amend_error
              ]
     end
 
