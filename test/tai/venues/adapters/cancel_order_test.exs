@@ -1,6 +1,7 @@
 defmodule Tai.Venues.Adapters.CancelOrderTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
+  import Mock
 
   setup_all do
     on_exit(fn ->
@@ -43,7 +44,9 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :timeout}
+        with_mock HTTPoison, request: fn _url -> {:error, %HTTPoison.Error{reason: :timeout}} end do
+          assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :timeout}
+        end
       end
     end
 

@@ -1,6 +1,7 @@
 defmodule Tai.Venues.Adapters.AmendOrderTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
+  import Mock
 
   setup_all do
     on_exit(fn ->
@@ -96,7 +97,9 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
 
         open_order = build_open_order(enqueued_order, amend_response)
 
-        assert {:error, :timeout} = Tai.Venue.amend_order(open_order, attrs, @test_adapters)
+        with_mock HTTPoison, request: fn _url -> {:error, %HTTPoison.Error{reason: :timeout}} end do
+          assert Tai.Venue.amend_order(open_order, attrs, @test_adapters) == {:error, :timeout}
+        end
       end
     end
 

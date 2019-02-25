@@ -1,6 +1,7 @@
 defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
+  import Mock
 
   @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
 
@@ -24,8 +25,8 @@ defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
     end
   end
 
-  test "returns an error tuple on timeout", %{adapter: adapter} do
-    use_cassette "exchange_adapters/shared/products/bitmex/error_timeout" do
+  test "bubbles errors without the rate limit", %{adapter: adapter} do
+    with_mock HTTPoison, request: fn _url -> {:error, %HTTPoison.Error{reason: :timeout}} end do
       assert Tai.Venue.products(adapter) == {:error, :timeout}
     end
   end

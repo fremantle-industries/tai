@@ -33,7 +33,7 @@ defmodule Tai.Mixfile do
   defp deps do
     [
       {:binance, "~> 0.6.0"},
-      {:ex_bitmex, "~> 0.0.6"},
+      {:ex_bitmex, "~> 0.0.7"},
       {:decimal, "~> 1.7.0"},
       {:ex_gdax, "~> 0.1.4"},
       {:ex_poloniex, "~> 0.0.2"},
@@ -53,6 +53,7 @@ defmodule Tai.Mixfile do
       {:plug, "~> 1.7.0", only: [:dev, :test]},
       {:echo_boy, github: "rupurt/echo_boy", only: [:dev, :test]},
       {:exvcr, "~> 0.10.2", only: [:dev, :test]},
+      {:mock, "~> 0.3.3", only: :test},
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_unit_notifier, "~> 0.1", only: :test},
       {:dialyxir, "~> 1.0.0-rc.4", only: :dev, runtime: false},

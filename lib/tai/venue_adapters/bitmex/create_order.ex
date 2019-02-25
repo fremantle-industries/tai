@@ -88,16 +88,11 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   end
 
   defp parse_response({:error, :timeout, nil}, _), do: {:error, :timeout}
+  defp parse_response({:error, :overloaded, _}, _), do: {:error, :overloaded}
+  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _), do: {:error, reason}
 
-  defp parse_response({:error, {:insufficient_balance, _msg}, _}, _),
+  defp parse_response({:error, {:insufficient_balance, _}, _}, _),
     do: {:error, :insufficient_balance}
 
-  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _),
-    do: {:error, reason}
-
-  defp parse_response({:error, :overloaded = reason, _}, _),
-    do: {:error, reason}
-
-  defp parse_response({:error, reason, _}, _),
-    do: {:error, {:unhandled, reason}}
+  defp parse_response({:error, reason, _}, _), do: {:error, {:unhandled, reason}}
 end

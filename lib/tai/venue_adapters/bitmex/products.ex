@@ -6,9 +6,6 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
 
       {:ok, products}
     else
-      {:error, :timeout, nil} ->
-        {:error, :timeout}
-
       {:error, reason, _} ->
         {:error, reason}
     end

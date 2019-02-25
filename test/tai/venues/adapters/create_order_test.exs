@@ -1,6 +1,7 @@
 defmodule Tai.Venues.Adapters.CreateOrderTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
+  import Mock
 
   setup_all do
     on_exit(fn ->
@@ -187,8 +188,8 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
     test "#{adapter.id} timeout" do
       order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_timeout" do
-        assert {:error, :timeout} = Tai.Venue.create_order(order, @test_adapters)
+      with_mock HTTPoison, request: fn _url -> {:error, %HTTPoison.Error{reason: :timeout}} end do
+        assert Tai.Venue.create_order(order, @test_adapters) == {:error, :timeout}
       end
     end
 
