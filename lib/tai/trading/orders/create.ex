@@ -54,9 +54,10 @@ defmodule Tai.Trading.Orders.Create do
     OrderStore.fill(
       order.client_id,
       response.id,
-      response.venue_created_at,
       response.avg_price,
-      response.cumulative_qty
+      response.cumulative_qty,
+      response.received_at,
+      response.venue_timestamp
     )
   end
 
@@ -67,10 +68,11 @@ defmodule Tai.Trading.Orders.Create do
     OrderStore.expire(
       order.client_id,
       response.id,
-      response.venue_created_at,
       response.avg_price,
       response.cumulative_qty,
-      response.leaves_qty
+      response.leaves_qty,
+      response.received_at,
+      response.venue_timestamp
     )
   end
 
@@ -81,19 +83,20 @@ defmodule Tai.Trading.Orders.Create do
     OrderStore.open(
       order.client_id,
       response.id,
-      response.venue_created_at,
       response.avg_price,
       response.cumulative_qty,
-      response.leaves_qty
+      response.leaves_qty,
+      response.received_at,
+      response.venue_timestamp
     )
   end
 
   defp parse_response({:error, reason}, order) do
-    OrderStore.create_error(order.client_id, reason)
+    OrderStore.create_error(order.client_id, reason, Timex.now())
   end
 
   defp rescue_venue_adapter_error(reason, order) do
-    OrderStore.create_error(order.client_id, {:unhandled, reason})
+    OrderStore.create_error(order.client_id, {:unhandled, reason}, Timex.now())
   end
 
   defdelegate skip!(client_id), to: OrderStore, as: :skip

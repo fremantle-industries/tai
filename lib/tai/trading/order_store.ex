@@ -49,12 +49,13 @@ defmodule Tai.Trading.OrderStore do
   end
 
   @create_error_required :enqueued
-  def handle_call({:create_error, client_id, error_reason}, _from, state) do
+  def handle_call({:create_error, client_id, error_reason, last_received_at}, _from, state) do
     response =
       update(client_id, @create_error_required, %{
         status: :create_error,
         error_reason: error_reason,
-        leaves_qty: @zero
+        leaves_qty: @zero,
+        last_received_at: last_received_at
       })
 
     {:reply, response, state}
@@ -66,10 +67,11 @@ defmodule Tai.Trading.OrderStore do
           :expire,
           client_id,
           venue_order_id,
-          venue_created_at,
           avg_price,
           cumulative_qty,
-          leaves_qty
+          leaves_qty,
+          last_received_at,
+          last_venue_timestamp
         },
         _from,
         state
@@ -78,10 +80,11 @@ defmodule Tai.Trading.OrderStore do
       update(client_id, @expire_required, %{
         status: :expired,
         venue_order_id: venue_order_id,
-        venue_created_at: venue_created_at,
         avg_price: avg_price,
         cumulative_qty: cumulative_qty,
-        leaves_qty: leaves_qty
+        leaves_qty: leaves_qty,
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
       })
 
     {:reply, response, state}
@@ -93,10 +96,11 @@ defmodule Tai.Trading.OrderStore do
           :open,
           client_id,
           venue_order_id,
-          venue_created_at,
           avg_price,
           cumulative_qty,
-          leaves_qty
+          leaves_qty,
+          last_received_at,
+          last_venue_timestamp
         },
         _from,
         state
@@ -105,10 +109,11 @@ defmodule Tai.Trading.OrderStore do
       update(client_id, @open_required, %{
         status: :open,
         venue_order_id: venue_order_id,
-        venue_created_at: venue_created_at,
         avg_price: avg_price,
         cumulative_qty: cumulative_qty,
-        leaves_qty: leaves_qty
+        leaves_qty: leaves_qty,
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
       })
 
     {:reply, response, state}
@@ -119,9 +124,10 @@ defmodule Tai.Trading.OrderStore do
         {
           :amend,
           client_id,
-          venue_updated_at,
           price,
-          leaves_qty
+          leaves_qty,
+          last_received_at,
+          last_venue_timestamp
         },
         _from,
         state
@@ -129,9 +135,10 @@ defmodule Tai.Trading.OrderStore do
     response =
       update(client_id, @amend_required, %{
         status: :open,
-        venue_updated_at: venue_updated_at,
         price: price,
-        leaves_qty: leaves_qty
+        leaves_qty: leaves_qty,
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
       })
 
     {:reply, response, state}
@@ -155,9 +162,10 @@ defmodule Tai.Trading.OrderStore do
           :fill,
           client_id,
           venue_order_id,
-          venue_created_at,
           avg_price,
-          cumulative_qty
+          cumulative_qty,
+          last_received_at,
+          last_venue_timestamp
         },
         _from,
         state
@@ -166,10 +174,11 @@ defmodule Tai.Trading.OrderStore do
       update(client_id, @fill_required, %{
         status: :filled,
         venue_order_id: venue_order_id,
-        venue_created_at: venue_created_at,
         avg_price: avg_price,
         cumulative_qty: cumulative_qty,
-        leaves_qty: Decimal.new(0)
+        leaves_qty: Decimal.new(0),
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
       })
 
     {:reply, response, state}
@@ -180,8 +189,9 @@ defmodule Tai.Trading.OrderStore do
         {
           :passive_fill,
           client_id,
-          venue_updated_at,
-          cumulative_qty
+          cumulative_qty,
+          last_received_at,
+          last_venue_timestamp
         },
         _from,
         state
@@ -189,9 +199,10 @@ defmodule Tai.Trading.OrderStore do
     response =
       update(client_id, @passive_fills_required, %{
         status: :filled,
-        venue_updated_at: venue_updated_at,
         cumulative_qty: cumulative_qty,
-        leaves_qty: Decimal.new(0)
+        leaves_qty: Decimal.new(0),
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
       })
 
     {:reply, response, state}
@@ -201,10 +212,11 @@ defmodule Tai.Trading.OrderStore do
         {
           :passive_partial_fill,
           client_id,
-          venue_updated_at,
           avg_price,
           cumulative_qty,
-          leaves_qty
+          leaves_qty,
+          last_received_at,
+          last_venue_timestamp
         },
         _from,
         state
@@ -212,10 +224,11 @@ defmodule Tai.Trading.OrderStore do
     response =
       update(client_id, @passive_fills_required, %{
         status: :open,
-        venue_updated_at: venue_updated_at,
         avg_price: avg_price,
         cumulative_qty: cumulative_qty,
-        leaves_qty: leaves_qty
+        leaves_qty: leaves_qty,
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
       })
 
     {:reply, response, state}
@@ -244,11 +257,12 @@ defmodule Tai.Trading.OrderStore do
   end
 
   @cancel_error_required :pending_cancel
-  def handle_call({:cancel_error, client_id, reason}, _from, state) do
+  def handle_call({:cancel_error, client_id, reason, last_received_at}, _from, state) do
     response =
       update(client_id, @cancel_error_required, %{
         status: :cancel_error,
-        error_reason: reason
+        error_reason: reason,
+        last_received_at: last_received_at
       })
 
     {:reply, response, state}
@@ -262,23 +276,28 @@ defmodule Tai.Trading.OrderStore do
     :pending_amend,
     :amend
   ]
-  def handle_call({:passive_cancel, client_id, venue_updated_at}, _from, state) do
+  def handle_call(
+        {:passive_cancel, client_id, last_received_at, last_venue_timestamp},
+        _from,
+        state
+      ) do
     response =
       update(client_id, @passive_cancel_required, %{
         status: :canceled,
-        venue_updated_at: venue_updated_at,
-        leaves_qty: Decimal.new(0)
+        leaves_qty: Decimal.new(0),
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
       })
 
     {:reply, response, state}
   end
 
   @cancel_required :pending_cancel
-  def handle_call({:cancel, client_id, venue_updated_at}, _from, state) do
+  def handle_call({:cancel, client_id, last_venue_timestamp}, _from, state) do
     response =
       update(client_id, @cancel_required, %{
         status: :canceled,
-        venue_updated_at: venue_updated_at,
+        last_venue_timestamp: last_venue_timestamp,
         leaves_qty: Decimal.new(0)
       })
 
@@ -302,25 +321,34 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Change the order status to create_error when it failed on the venue
   """
-  @spec create_error(client_id, term) ::
+  @spec create_error(client_id, term, DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
-  def create_error(client_id, error_reason),
-    do: GenServer.call(__MODULE__, {:create_error, client_id, error_reason})
+  def create_error(client_id, error_reason, last_received_at),
+    do: GenServer.call(__MODULE__, {:create_error, client_id, error_reason, last_received_at})
 
   @doc """
   Change the order status to expired 
   """
-  @spec expire(client_id, venue_order_id, DateTime.t(), Decimal.t(), Decimal.t(), Decimal.t()) ::
+  @spec expire(
+          client_id,
+          venue_order_id,
+          Decimal.t(),
+          Decimal.t(),
+          Decimal.t(),
+          DateTime.t(),
+          DateTime.t()
+        ) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
   def expire(
         client_id,
         venue_order_id,
-        venue_created_at,
         avg_price,
         cumulative_qty,
-        leaves_qty
+        leaves_qty,
+        last_received_at,
+        last_venue_timestamp
       ) do
     GenServer.call(
       __MODULE__,
@@ -328,10 +356,11 @@ defmodule Tai.Trading.OrderStore do
         :expire,
         client_id,
         venue_order_id,
-        venue_created_at,
         avg_price,
         cumulative_qty,
-        leaves_qty
+        leaves_qty,
+        last_received_at,
+        last_venue_timestamp
       }
     )
   end
@@ -339,15 +368,16 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Update the cumulative_qty & price for a fully filled order
   """
-  @spec fill(client_id, venue_order_id, DateTime.t(), Decimal.t(), Decimal.t()) ::
+  @spec fill(client_id, venue_order_id, Decimal.t(), Decimal.t(), DateTime.t(), DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
   def fill(
         client_id,
         venue_order_id,
-        venue_created_at,
         avg_price,
-        cumulative_qty
+        cumulative_qty,
+        last_received_at,
+        last_venue_timestamp
       ) do
     GenServer.call(
       __MODULE__,
@@ -355,9 +385,10 @@ defmodule Tai.Trading.OrderStore do
         :fill,
         client_id,
         venue_order_id,
-        venue_created_at,
         avg_price,
-        cumulative_qty
+        cumulative_qty,
+        last_received_at,
+        last_venue_timestamp
       }
     )
   end
@@ -365,21 +396,23 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Update the cumulative_qty & price for a fully filled passive order
   """
-  @spec passive_fill(client_id, DateTime.t(), Decimal.t()) ::
+  @spec passive_fill(client_id, Decimal.t(), DateTime.t(), DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, passive_fills_required}}
   def passive_fill(
         client_id,
-        venue_updated_at,
-        cumulative_qty
+        cumulative_qty,
+        last_received_at,
+        last_venue_timestamp
       ) do
     GenServer.call(
       __MODULE__,
       {
         :passive_fill,
         client_id,
-        venue_updated_at,
-        cumulative_qty
+        cumulative_qty,
+        last_received_at,
+        last_venue_timestamp
       }
     )
   end
@@ -387,25 +420,34 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Update the cumulative_qty & price for a partially filled passive order
   """
-  @spec passive_partial_fill(client_id, DateTime.t(), Decimal.t(), Decimal.t(), Decimal.t()) ::
+  @spec passive_partial_fill(
+          client_id,
+          Decimal.t(),
+          Decimal.t(),
+          Decimal.t(),
+          DateTime.t(),
+          DateTime.t()
+        ) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, passive_fills_required}}
   def passive_partial_fill(
         client_id,
-        venue_updated_at,
         avg_price,
         cumulative_qty,
-        leaves_qty
+        leaves_qty,
+        last_received_at,
+        last_venue_timestamp
       ) do
     GenServer.call(
       __MODULE__,
       {
         :passive_partial_fill,
         client_id,
-        venue_updated_at,
         avg_price,
         cumulative_qty,
-        leaves_qty
+        leaves_qty,
+        last_received_at,
+        last_venue_timestamp
       }
     )
   end
@@ -413,16 +455,25 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Change the order status to open after it was enqueued
   """
-  @spec open(client_id, venue_order_id, DateTime.t(), Decimal.t(), Decimal.t(), Decimal.t()) ::
+  @spec open(
+          client_id,
+          venue_order_id,
+          Decimal.t(),
+          Decimal.t(),
+          Decimal.t(),
+          DateTime.t(),
+          DateTime.t()
+        ) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
   def open(
         client_id,
         venue_order_id,
-        venue_created_at,
         avg_price,
         cumulative_qty,
-        leaves_qty
+        leaves_qty,
+        last_received_at,
+        last_venue_timestamp
       ) do
     GenServer.call(
       __MODULE__,
@@ -430,10 +481,11 @@ defmodule Tai.Trading.OrderStore do
         :open,
         client_id,
         venue_order_id,
-        venue_created_at,
         avg_price,
         cumulative_qty,
-        leaves_qty
+        leaves_qty,
+        last_received_at,
+        last_venue_timestamp
       }
     )
   end
@@ -441,23 +493,25 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Change the order status to open after an amend attempt
   """
-  @spec amend(client_id, DateTime.t(), Decimal.t(), Decimal.t()) ::
+  @spec amend(client_id, Decimal.t(), Decimal.t(), DateTime.t(), DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, required :: :pending_amend}}
   def amend(
         client_id,
-        venue_updated_at,
         price,
-        leaves_qty
+        leaves_qty,
+        last_received_at,
+        last_venue_timestamp
       ) do
     GenServer.call(
       __MODULE__,
       {
         :amend,
         client_id,
-        venue_updated_at,
         price,
-        leaves_qty
+        leaves_qty,
+        last_received_at,
+        last_venue_timestamp
       }
     )
   end
@@ -493,22 +547,26 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Change the order status to cancel_error after a cancel attempt
   """
-  @spec cancel_error(client_id, term) ::
+  @spec cancel_error(client_id, term, DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, required :: :pending_cancel}}
-  def cancel_error(client_id, reason),
-    do: GenServer.call(__MODULE__, {:cancel_error, client_id, reason})
+  def cancel_error(client_id, reason, last_received_at),
+    do: GenServer.call(__MODULE__, {:cancel_error, client_id, reason, last_received_at})
 
   @doc """
   Change the order status to canceled from an external passive source
   """
-  @spec passive_cancel(client_id, DateTime.t()) ::
+  @spec passive_cancel(client_id, DateTime.t(), DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error,
              :not_found
              | {:invalid_status, current :: atom, passive_cancel_required}}
-  def passive_cancel(client_id, venue_updated_at),
-    do: GenServer.call(__MODULE__, {:passive_cancel, client_id, venue_updated_at})
+  def passive_cancel(client_id, last_received_at, last_venue_timestamp),
+    do:
+      GenServer.call(
+        __MODULE__,
+        {:passive_cancel, client_id, last_received_at, last_venue_timestamp}
+      )
 
   @doc """
   Change the order status to canceled after a cancel attempt
@@ -516,8 +574,8 @@ defmodule Tai.Trading.OrderStore do
   @spec cancel(client_id, DateTime.t()) ::
           {:ok, {old :: order, updated :: order}}
           | {:error, :not_found | {:invalid_status, current :: atom, required :: :pending_cancel}}
-  def cancel(client_id, venue_updated_at),
-    do: GenServer.call(__MODULE__, {:cancel, client_id, venue_updated_at})
+  def cancel(client_id, last_venue_timestamp),
+    do: GenServer.call(__MODULE__, {:cancel, client_id, last_venue_timestamp})
 
   @doc """
   Return the order in the ETS table that matches the given client_id

@@ -49,6 +49,7 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
       assert error_order.leaves_qty == Decimal.new(0)
       assert error_order.qty == Decimal.new(10)
       assert error_order.cumulative_qty == Decimal.new(0)
+      assert %DateTime{} = error_order.last_received_at
     end
 
     test "#{side} assigns the error reason in the updated event" do
@@ -92,6 +93,7 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
       }
 
       assert error_order.side == @side
+      assert %DateTime{} = error_order.last_received_at
       assert {:unhandled, {error, [stack_1 | _]}} = error_order.error_reason
       assert error == %RuntimeError{message: "Venue Adapter Create Raised Error"}
       assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1

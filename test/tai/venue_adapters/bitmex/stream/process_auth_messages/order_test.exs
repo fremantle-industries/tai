@@ -75,7 +75,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       assert buy_updated_event.leaves_qty == Decimal.new(0)
       assert buy_updated_event.cumulative_qty == Decimal.new(5)
       assert buy_updated_event.qty == Decimal.new(5)
-      assert %DateTime{} = buy_updated_event.venue_updated_at
+      assert %DateTime{} = buy_updated_event.last_received_at
+      assert %DateTime{} = buy_updated_event.last_venue_timestamp
 
       assert sell_updated_event.client_id == order_2.client_id
       assert sell_updated_event.status == :open
@@ -83,7 +84,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       assert sell_updated_event.leaves_qty == Decimal.new(3)
       assert sell_updated_event.cumulative_qty == Decimal.new(7)
       assert sell_updated_event.qty == Decimal.new(10)
-      assert %DateTime{} = buy_updated_event.venue_updated_at
+      assert %DateTime{} = buy_updated_event.last_received_at
+      assert %DateTime{} = buy_updated_event.last_venue_timestamp
     end
 
     test "updates leaves_qty for canceled orders" do
@@ -110,7 +112,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       assert event.status == :canceled
       assert event.leaves_qty == Decimal.new(0)
       assert event.qty == Decimal.new(5)
-      assert %DateTime{} = event.venue_updated_at
+      assert %DateTime{} = event.last_received_at
+      assert %DateTime{} = event.last_venue_timestamp
     end
 
     test "broadcasts an event when the status is invalid" do
@@ -254,10 +257,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       order.client_id
       |> Tai.Trading.OrderStore.open(
         venue_order_id,
-        Timex.now(),
         order.price,
         Decimal.new(0),
-        order.qty
+        order.qty,
+        Timex.now(),
+        Timex.now()
       )
 
     open_order

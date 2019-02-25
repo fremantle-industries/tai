@@ -21,7 +21,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       original_size: qty,
       leaves_qty: leaves_qty,
       cumulative_qty: cumulative_qty,
-      venue_created_at: Timex.now()
+      venue_timestamp: Timex.now(),
+      received_at: Timex.now()
     }
 
     key =
@@ -44,7 +45,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       price: price,
       leaves_qty: order.leaves_qty,
       cumulative_qty: Decimal.new(0),
-      venue_updated_at: Timex.now()
+      venue_timestamp: Timex.now(),
+      received_at: Timex.now()
     }
 
     key =
@@ -65,7 +67,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       price: price,
       leaves_qty: qty,
       cumulative_qty: Decimal.new(0),
-      venue_updated_at: Timex.now()
+      venue_timestamp: Timex.now(),
+      received_at: Timex.now()
     }
 
     key =

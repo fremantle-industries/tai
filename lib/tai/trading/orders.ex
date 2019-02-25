@@ -27,11 +27,7 @@ defmodule Tai.Trading.Orders do
       client_id: order.client_id,
       venue_id: order.exchange_id,
       account_id: order.account_id,
-      enqueued_at: order.enqueued_at,
-      updated_at: order.updated_at,
       venue_order_id: order.venue_order_id,
-      venue_created_at: order.venue_created_at,
-      venue_updated_at: order.venue_updated_at,
       product_symbol: order.symbol,
       side: order.side,
       type: order.type,
@@ -42,7 +38,11 @@ defmodule Tai.Trading.Orders do
       qty: order.qty,
       leaves_qty: order.leaves_qty,
       cumulative_qty: order.cumulative_qty,
-      error_reason: order.error_reason
+      error_reason: order.error_reason,
+      enqueued_at: order.enqueued_at,
+      last_received_at: order.last_received_at,
+      last_venue_timestamp: order.last_venue_timestamp,
+      updated_at: order.updated_at
     }
     |> Tai.Events.broadcast()
   end

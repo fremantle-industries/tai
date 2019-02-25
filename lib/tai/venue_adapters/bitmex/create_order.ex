@@ -68,6 +68,8 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
          {:ok, %ExBitmex.Order{} = venue_order, %ExBitmex.RateLimit{}},
          order
        ) do
+    received_at = Timex.now()
+
     avg_price =
       (venue_order.avg_px && Tai.Utils.Decimal.from(venue_order.avg_px)) || Decimal.new(0)
 
@@ -78,7 +80,8 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
       original_size: Decimal.new(venue_order.order_qty),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
       cumulative_qty: Decimal.new(venue_order.cum_qty),
-      venue_created_at: Timex.parse!(venue_order.timestamp, @format)
+      venue_timestamp: Timex.parse!(venue_order.timestamp, @format),
+      received_at: received_at
     }
 
     {:ok, response}

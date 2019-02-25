@@ -42,10 +42,11 @@ defmodule Tai.Trading.Orders.AmendTest do
           Tai.Trading.OrderStore.open(
             enqueued_order.client_id,
             @venue_order_id,
-            Timex.now(),
             @original_price,
             Decimal.new(0),
-            @original_qty
+            @original_qty,
+            Timex.now(),
+            Timex.now()
           )
 
         {:ok, %{order: open_order}}
@@ -86,14 +87,16 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert pending_amend_order.leaves_qty == @original_qty
         assert pending_amend_order.qty == @original_qty
         assert %DateTime{} = pending_amend_order.updated_at
-        assert pending_amend_order.venue_updated_at == nil
 
         assert amended_order.price == amend_price
         assert amended_order.leaves_qty == amend_qty
         assert amended_order.qty == @original_qty
         assert %DateTime{} = amended_order.updated_at
         assert amended_order.updated_at == pending_amend_order.updated_at
-        assert %DateTime{} = amended_order.venue_updated_at
+        assert %DateTime{} = amended_order.last_received_at
+        assert %DateTime{} = amended_order.last_venue_timestamp
+        assert amended_order.last_venue_timestamp != pending_amend_order.last_venue_timestamp
+        assert amended_order.last_received_at != pending_amend_order.last_received_at
       end
     end
 
@@ -112,10 +115,11 @@ defmodule Tai.Trading.Orders.AmendTest do
           Tai.Trading.OrderStore.open(
             enqueued_order.client_id,
             @venue_order_id,
-            Timex.now(),
             @original_price,
             Decimal.new(0),
-            @original_qty
+            @original_qty,
+            Timex.now(),
+            Timex.now()
           )
 
         {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(enqueued_order.client_id, Timex.now())
@@ -162,14 +166,16 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert pending_amend_order.leaves_qty == @original_qty
         assert pending_amend_order.qty == @original_qty
         assert %DateTime{} = pending_amend_order.updated_at
-        assert pending_amend_order.venue_updated_at == nil
 
         assert amended_order.price == amend_price
         assert amended_order.leaves_qty == amend_qty
         assert amended_order.qty == @original_qty
         assert %DateTime{} = amended_order.updated_at
         assert amended_order.updated_at == pending_amend_order.updated_at
-        assert %DateTime{} = amended_order.venue_updated_at
+        assert %DateTime{} = amended_order.last_received_at
+        assert %DateTime{} = amended_order.last_venue_timestamp
+        assert amended_order.last_venue_timestamp != pending_amend_order.last_venue_timestamp
+        assert amended_order.last_received_at != pending_amend_order.last_received_at
       end
     end
 

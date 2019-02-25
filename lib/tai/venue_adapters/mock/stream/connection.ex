@@ -93,10 +93,11 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     {:ok, {prev_order, updated_order}} =
       Tai.Trading.OrderStore.passive_partial_fill(
         client_id,
-        Timex.now(),
         avg_price,
         cumulative_qty,
-        leaves_qty
+        leaves_qty,
+        Timex.now(),
+        Timex.now()
       )
 
     Tai.Trading.Orders.updated!(prev_order, updated_order)
@@ -115,8 +116,9 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     {:ok, {prev_order, updated_order}} =
       Tai.Trading.OrderStore.passive_fill(
         client_id,
+        cumulative_qty,
         Timex.now(),
-        cumulative_qty
+        Timex.now()
       )
 
     Tai.Trading.Orders.updated!(prev_order, updated_order)
@@ -130,7 +132,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          _venue_id
        ) do
     {:ok, {prev_order, updated_order}} =
-      Tai.Trading.OrderStore.passive_cancel(client_id, Timex.now())
+      Tai.Trading.OrderStore.passive_cancel(client_id, Timex.now(), Timex.now())
 
     Tai.Trading.Orders.updated!(prev_order, updated_order)
   end

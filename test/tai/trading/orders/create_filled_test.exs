@@ -25,7 +25,7 @@ defmodule Tai.Trading.Orders.CreateFilledTest do
     @side side
     @submission_type submission_type
 
-    test "#{side} updates the venue_order_id, venue_created_at, leaves_qty, cumulative qty & avg price" do
+    test "#{side} updates the venue_order_id, timestamps, leaves_qty, cumulative qty & avg price" do
       original_qty = Decimal.new(10)
 
       submission =
@@ -52,11 +52,12 @@ defmodule Tai.Trading.Orders.CreateFilledTest do
 
       assert filled_order.venue_order_id == @venue_order_id
       assert filled_order.side == @side
-      assert %DateTime{} = filled_order.venue_created_at
       assert filled_order.avg_price != Decimal.new(0)
       assert filled_order.leaves_qty == Decimal.new(0)
       assert filled_order.cumulative_qty == original_qty
       assert filled_order.qty == original_qty
+      assert %DateTime{} = filled_order.last_received_at
+      assert %DateTime{} = filled_order.last_venue_timestamp
     end
   end)
 end

@@ -29,7 +29,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert json.venue_id == :my_venue
     assert json.account_id == :my_account
     assert json.venue_order_id == "abc123"
-    assert json.venue_created_at == nil
+    assert json.last_received_at == nil
     assert json.product_symbol == :btc
     assert json.side == :buy
     assert json.type == :limit
@@ -45,16 +45,16 @@ defmodule Tai.Events.OrderUpdatedTest do
 
   test ".to_data/1 transforms datetime data to a string" do
     {:ok, enqueued_at, _} = DateTime.from_iso8601("2013-01-23T23:50:07.123+00:00")
-    {:ok, venue_created_at, _} = DateTime.from_iso8601("2014-01-23T23:50:07.123+00:00")
+    {:ok, last_received_at, _} = DateTime.from_iso8601("2014-01-23T23:50:07.123+00:00")
+    {:ok, last_venue_timestamp, _} = DateTime.from_iso8601("2016-01-23T23:50:07.123+00:00")
     {:ok, updated_at, _} = DateTime.from_iso8601("2015-01-23T23:50:07.123+00:00")
-    {:ok, venue_updated_at, _} = DateTime.from_iso8601("2016-01-23T23:50:07.123+00:00")
 
     attrs =
       Map.merge(@base_attrs, %{
         enqueued_at: enqueued_at,
         updated_at: updated_at,
-        venue_created_at: venue_created_at,
-        venue_updated_at: venue_updated_at
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
       })
 
     event = struct!(Tai.Events.OrderUpdated, attrs)
@@ -62,8 +62,8 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert %{} = json = Tai.LogEvent.to_data(event)
     assert json.venue_order_id == nil
     assert json.enqueued_at == "2013-01-23T23:50:07.123Z"
-    assert json.venue_created_at == "2014-01-23T23:50:07.123Z"
+    assert json.last_received_at == "2014-01-23T23:50:07.123Z"
     assert json.updated_at == "2015-01-23T23:50:07.123Z"
-    assert json.venue_updated_at == "2016-01-23T23:50:07.123Z"
+    assert json.last_venue_timestamp == "2016-01-23T23:50:07.123Z"
   end
 end

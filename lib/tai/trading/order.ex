@@ -22,11 +22,7 @@ defmodule Tai.Trading.Order do
           | :cancel_error
   @type t :: %Order{
           client_id: client_id,
-          enqueued_at: DateTime.t(),
-          updated_at: DateTime.t() | nil,
           venue_order_id: venue_order_id | nil,
-          venue_created_at: DateTime.t() | nil,
-          venue_updated_at: DateTime.t() | nil,
           exchange_id: atom,
           account_id: atom,
           side: side,
@@ -39,7 +35,12 @@ defmodule Tai.Trading.Order do
           qty: Decimal.t(),
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
-          post_only: boolean
+          post_only: boolean,
+          enqueued_at: DateTime.t(),
+          last_received_at: DateTime.t() | nil,
+          last_venue_timestamp: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil,
+          order_updated_callback: fun | nil
         }
 
   @enforce_keys [
@@ -61,10 +62,6 @@ defmodule Tai.Trading.Order do
   ]
   defstruct [
     :client_id,
-    :enqueued_at,
-    :updated_at,
-    :venue_created_at,
-    :venue_updated_at,
     :error_reason,
     :exchange_id,
     :account_id,
@@ -80,6 +77,10 @@ defmodule Tai.Trading.Order do
     :time_in_force,
     :type,
     :post_only,
+    :enqueued_at,
+    :last_received_at,
+    :last_venue_timestamp,
+    :updated_at,
     :order_updated_callback
   ]
 end

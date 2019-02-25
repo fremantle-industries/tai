@@ -8,11 +8,7 @@ defmodule Tai.Events.OrderUpdated do
           client_id: client_id,
           venue_id: atom,
           account_id: atom,
-          enqueued_at: DateTime.t(),
-          updated_at: DateTime.t() | nil,
           venue_order_id: String.t() | nil,
-          venue_created_at: DateTime.t() | nil,
-          venue_updated_at: DateTime.t() | nil,
           product_symbol: atom,
           side: side,
           type: type,
@@ -22,7 +18,11 @@ defmodule Tai.Events.OrderUpdated do
           avg_price: Decimal.t(),
           qty: Decimal.t(),
           leaves_qty: Decimal.t(),
-          cumulative_qty: Decimal.t()
+          cumulative_qty: Decimal.t(),
+          enqueued_at: DateTime.t(),
+          last_received_at: DateTime.t() | nil,
+          last_venue_timestamp: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
         }
 
   @enforce_keys [
@@ -30,7 +30,6 @@ defmodule Tai.Events.OrderUpdated do
     :venue_id,
     :account_id,
     :product_symbol,
-    :enqueued_at,
     :side,
     :type,
     :time_in_force,
@@ -39,18 +38,15 @@ defmodule Tai.Events.OrderUpdated do
     :avg_price,
     :qty,
     :leaves_qty,
-    :cumulative_qty
+    :cumulative_qty,
+    :enqueued_at
   ]
   defstruct [
     :client_id,
     :venue_id,
     :account_id,
     :product_symbol,
-    :enqueued_at,
-    :updated_at,
     :venue_order_id,
-    :venue_created_at,
-    :venue_updated_at,
     :side,
     :type,
     :time_in_force,
@@ -60,7 +56,11 @@ defmodule Tai.Events.OrderUpdated do
     :avg_price,
     :qty,
     :leaves_qty,
-    :cumulative_qty
+    :cumulative_qty,
+    :enqueued_at,
+    :last_received_at,
+    :last_venue_timestamp,
+    :updated_at
   ]
 end
 
@@ -84,16 +84,16 @@ defimpl Tai.LogEvent, for: Tai.Events.OrderUpdated do
       event.enqueued_at && event.enqueued_at |> DateTime.to_iso8601()
     )
     |> Map.put(
+      :last_received_at,
+      event.last_received_at && event.last_received_at |> DateTime.to_iso8601()
+    )
+    |> Map.put(
+      :last_venue_timestamp,
+      event.last_venue_timestamp && event.last_venue_timestamp |> DateTime.to_iso8601()
+    )
+    |> Map.put(
       :updated_at,
       event.updated_at && event.updated_at |> DateTime.to_iso8601()
-    )
-    |> Map.put(
-      :venue_created_at,
-      event.venue_created_at && event.venue_created_at |> DateTime.to_iso8601()
-    )
-    |> Map.put(
-      :venue_updated_at,
-      event.venue_updated_at && event.venue_updated_at |> DateTime.to_iso8601()
     )
   end
 end

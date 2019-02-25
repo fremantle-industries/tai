@@ -40,10 +40,11 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
       assert order.price == submission.price
       assert order.qty == submission.qty
       assert order.time_in_force == :gtc
-      assert order.venue_created_at == nil
+      assert order.last_received_at == nil
+      assert order.last_venue_timestamp == nil
     end
 
-    test "#{side} updates the venue_order_id, venue_created_at, leaves_qty, cumulative_qty & avg price" do
+    test "#{side} updates the venue_order_id, timestamps, leaves_qty, cumulative_qty & avg price" do
       original_price = Decimal.new(2000)
       original_qty = Decimal.new(10)
 
@@ -81,11 +82,12 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
       assert open_order.venue_order_id == @venue_order_id
       assert open_order.side == @side
-      assert %DateTime{} = open_order.venue_created_at
       assert open_order.avg_price == original_price
       assert open_order.leaves_qty == Decimal.new(6)
       assert open_order.cumulative_qty == cumulative_qty
       assert open_order.qty == original_qty
+      assert %DateTime{} = open_order.last_received_at
+      assert %DateTime{} = open_order.last_venue_timestamp
     end
   end)
 end

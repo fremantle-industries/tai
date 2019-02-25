@@ -24,7 +24,7 @@ defmodule Tai.Trading.Orders.CreateExpiredTest do
     @side side
     @submission_type submission_type
 
-    test "#{side} updates the venue_order_id, venue_created_at, leaves_qty, cumulative qty & avg price" do
+    test "#{side} updates the venue_order_id, last_venue_timestamp, leaves_qty, cumulative qty & avg price" do
       original_qty = Decimal.new(10)
       cumulative_qty = Decimal.new(3)
       avg_price = Decimal.new("1000.5")
@@ -56,11 +56,11 @@ defmodule Tai.Trading.Orders.CreateExpiredTest do
 
       assert expired_order.venue_order_id == @venue_order_id
       assert expired_order.side == @side
-      assert %DateTime{} = expired_order.venue_created_at
       assert expired_order.avg_price == avg_price
       assert expired_order.leaves_qty == Decimal.new(0)
       assert expired_order.cumulative_qty == cumulative_qty
       assert expired_order.qty == original_qty
+      assert %DateTime{} = expired_order.last_venue_timestamp
     end
   end)
 end

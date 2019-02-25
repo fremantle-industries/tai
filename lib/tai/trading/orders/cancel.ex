@@ -52,12 +52,12 @@ defmodule Tai.Trading.Orders.Cancel do
 
   defp parse_cancel_order_response({:error, reason}, order) do
     order.client_id
-    |> OrderStore.cancel_error(reason)
+    |> OrderStore.cancel_error(reason, Timex.now())
     |> notify_updated_order()
   end
 
   defp rescue_venue_adapter_error(reason, order) do
-    OrderStore.cancel_error(order.client_id, {:unhandled, reason})
+    OrderStore.cancel_error(order.client_id, {:unhandled, reason}, Timex.now())
   end
 
   defp broadcast_invalid_status(client_id, action, was, required) do

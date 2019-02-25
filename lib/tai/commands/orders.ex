@@ -21,9 +21,9 @@ defmodule Tai.Commands.Orders do
     "Client ID",
     "Venue Order ID",
     "Enqueued At",
-    "Venue Created At",
+    "Last Received At",
+    "Last Venue Timestamp",
     "Updated At",
-    "Venue Updated At",
     "Error Reason"
   ]
 
@@ -48,9 +48,9 @@ defmodule Tai.Commands.Orders do
         order.client_id |> trunc_id(),
         order.venue_order_id && order.venue_order_id |> trunc_id(),
         Timex.from_now(order.enqueued_at),
-        order.venue_created_at && Timex.from_now(order.venue_created_at),
+        order.last_received_at && Timex.from_now(order.last_received_at),
+        order.last_venue_timestamp && Timex.from_now(order.last_venue_timestamp),
         order.updated_at && Timex.from_now(order.updated_at),
-        order.venue_updated_at && Timex.from_now(order.venue_updated_at),
         order.error_reason && inspect(order.error_reason)
       ]
     end)

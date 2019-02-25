@@ -69,12 +69,12 @@ defmodule Tai.Trading.Orders.CancelTest do
 
         assert pending_cancel_order.leaves_qty != Decimal.new(0)
         assert %DateTime{} = pending_cancel_order.updated_at
-        assert pending_cancel_order.venue_updated_at == nil
 
         assert canceled_order.leaves_qty == Decimal.new(0)
         assert %DateTime{} = canceled_order.updated_at
         assert canceled_order.updated_at == pending_cancel_order.updated_at
-        assert %DateTime{} = canceled_order.venue_updated_at
+        assert %DateTime{} = canceled_order.last_venue_timestamp
+        assert canceled_order.last_venue_timestamp != pending_cancel_order.last_venue_timestamp
       end
     end
 
@@ -111,11 +111,12 @@ defmodule Tai.Trading.Orders.CancelTest do
         submission = Support.OrderSubmissions.build(@submission_type)
         Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
         {:ok, order} = Tai.Trading.Orders.create(submission)
-        assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :open}}
+        assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :open} = open_event}
 
         assert {:ok, _} = Tai.Trading.Orders.cancel(order)
 
         assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :cancel_error} = error_event}
+        assert error_event.last_received_at != open_event.last_received_at
         assert error_event.error_reason == :mock_not_found
       end
     end
@@ -139,7 +140,7 @@ defmodule Tai.Trading.Orders.CancelTest do
         assert_receive {
           :callback_fired,
           %Tai.Trading.Order{status: :enqueued},
-          %Tai.Trading.Order{status: :open}
+          %Tai.Trading.Order{status: :open} = open_order
         }
 
         Mocks.Responses.Orders.Error.cancel_raise(
@@ -156,6 +157,7 @@ defmodule Tai.Trading.Orders.CancelTest do
         }
 
         assert {:unhandled, {error, [stack_1 | _]}} = error_order.error_reason
+        assert error_order.last_received_at != open_order.last_received_at
         assert error == %RuntimeError{message: "Venue Adapter Cancel Raised Error"}
         assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1
       end

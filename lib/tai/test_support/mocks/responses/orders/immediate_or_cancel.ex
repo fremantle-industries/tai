@@ -20,7 +20,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.ImmediateOrCancel do
       original_size: qty,
       cumulative_qty: cumulative_qty,
       leaves_qty: Decimal.new(0),
-      venue_created_at: Timex.now()
+      venue_timestamp: Timex.now(),
+      received_at: Timex.now()
     }
 
     key =
@@ -52,7 +53,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.ImmediateOrCancel do
       original_size: submission.qty,
       leaves_qty: Decimal.new(0),
       cumulative_qty: submission.qty,
-      venue_created_at: Timex.now()
+      venue_timestamp: Timex.now(),
+      received_at: Timex.now()
     }
 
     key =

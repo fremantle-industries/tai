@@ -49,9 +49,10 @@ defmodule Tai.Trading.Orders.Amend do
   defp parse_response({:ok, amend_response}, client_id) do
     OrderStore.amend(
       client_id,
-      amend_response.venue_updated_at,
       amend_response.price,
-      amend_response.leaves_qty
+      amend_response.leaves_qty,
+      Timex.now(),
+      amend_response.venue_timestamp
     )
   end
 

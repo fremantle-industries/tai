@@ -12,13 +12,13 @@ defmodule Tai.Trading.OrderStoreTest do
   end
 
   @venue_order_id "abc123"
-  @venue_created_at Timex.now()
   @price Decimal.new(11)
   @avg_price Decimal.new(10)
   @cumulative_qty Decimal.new(1)
   @leaves_qty Decimal.new(5)
   @updated_at Timex.now()
-  @venue_updated_at Timex.now()
+  @last_received_at Timex.now()
+  @last_venue_timestamp Timex.now()
 
   describe ".add" do
     test "enqueues order submissions" do
@@ -55,10 +55,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:error, reason} = Tai.Trading.OrderStore.skip(order.client_id)
@@ -73,16 +74,21 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
 
       assert {:ok, {old, updated}} =
-               Tai.Trading.OrderStore.create_error(order.client_id, "nonce error")
+               Tai.Trading.OrderStore.create_error(
+                 order.client_id,
+                 "nonce error",
+                 @last_received_at
+               )
 
       assert old.status == :enqueued
       assert updated.status == :create_error
       assert updated.error_reason == "nonce error"
       assert updated.leaves_qty == Decimal.new(0)
+      assert updated.last_received_at == @last_received_at
     end
 
     test "returns an error tuple when the order can't be found" do
-      assert Tai.Trading.OrderStore.create_error("not found", "nonce error") ==
+      assert Tai.Trading.OrderStore.create_error("not found", "nonce error", @last_received_at) ==
                {:error, :not_found}
     end
 
@@ -93,7 +99,11 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
 
       assert {:error, reason} =
-               Tai.Trading.OrderStore.create_error(order.client_id, "nonce error")
+               Tai.Trading.OrderStore.create_error(
+                 order.client_id,
+                 "nonce error",
+                 @last_received_at
+               )
 
       assert reason == {:invalid_status, :skip, :enqueued}
     end
@@ -109,19 +119,21 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.expire(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert old.status == :enqueued
       assert updated.status == :expired
       assert updated.venue_order_id == @venue_order_id
-      assert updated.venue_created_at == @venue_created_at
       assert updated.avg_price == @avg_price
       assert updated.cumulative_qty == @cumulative_qty
       assert updated.leaves_qty == @leaves_qty
+      assert updated.last_received_at == @last_received_at
+      assert updated.last_venue_timestamp == @last_venue_timestamp
     end
 
     test "returns an error tuple when the order can't be found" do
@@ -129,10 +141,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.expire(
                  "not found",
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
     end
 
@@ -146,10 +159,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.expire(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert reason == {:invalid_status, :skip, :enqueued}
@@ -166,19 +180,21 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert old.status == :enqueued
       assert updated.status == :open
       assert updated.venue_order_id == @venue_order_id
-      assert updated.venue_created_at == @venue_created_at
       assert updated.avg_price == @avg_price
       assert updated.cumulative_qty == @cumulative_qty
       assert updated.leaves_qty == @leaves_qty
+      assert updated.last_received_at == @last_received_at
+      assert updated.last_venue_timestamp == @last_venue_timestamp
     end
 
     test "returns an error tuple when the order can't be found" do
@@ -186,10 +202,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  "not found",
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
     end
 
@@ -202,20 +219,22 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:error, reason} =
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert reason == {:invalid_status, :open, :enqueued}
@@ -232,18 +251,19 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.fill(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
-                 @cumulative_qty
+                 @cumulative_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert old.status == :enqueued
       assert updated.status == :filled
       assert updated.venue_order_id == @venue_order_id
-      assert updated.venue_created_at == @venue_created_at
       assert updated.avg_price == @avg_price
       assert updated.cumulative_qty == @cumulative_qty
       assert updated.leaves_qty == Decimal.new(0)
+      assert updated.last_venue_timestamp == @last_venue_timestamp
     end
 
     test "returns an error tuple when the order can't be found" do
@@ -251,9 +271,10 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.fill(
                  "not found",
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
-                 @cumulative_qty
+                 @cumulative_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
     end
 
@@ -267,9 +288,10 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.fill(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
-                 @cumulative_qty
+                 @cumulative_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert reason == {:invalid_status, :skip, :enqueued}
@@ -286,33 +308,37 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 Timex.now(),
+                 Timex.now()
                )
 
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.passive_fill(
                  order.client_id,
-                 @venue_updated_at,
-                 @cumulative_qty
+                 @cumulative_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert old.status == :open
       assert updated.status == :filled
-      assert updated.venue_updated_at == @venue_updated_at
       assert updated.avg_price == @avg_price
       assert updated.cumulative_qty == @cumulative_qty
       assert updated.leaves_qty == Decimal.new(0)
+      assert updated.last_received_at == @last_received_at
+      assert updated.last_venue_timestamp == @last_venue_timestamp
     end
 
     test "returns an error tuple when the order can't be found" do
       assert {:error, :not_found} =
                Tai.Trading.OrderStore.passive_fill(
                  "not found",
-                 @venue_updated_at,
-                 @cumulative_qty
+                 @cumulative_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
     end
 
@@ -325,8 +351,9 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:error, reason} =
                Tai.Trading.OrderStore.passive_fill(
                  order.client_id,
-                 @venue_updated_at,
-                 @cumulative_qty
+                 @cumulative_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert reason ==
@@ -347,24 +374,26 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.passive_partial_fill(
                  order.client_id,
-                 @venue_updated_at,
                  @avg_price,
                  @cumulative_qty,
-                 @updated_leaves_qty
+                 @updated_leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert old.status == :open
       assert updated.status == :open
-      assert updated.venue_updated_at == @venue_updated_at
+      assert updated.last_venue_timestamp == @last_venue_timestamp
       assert updated.avg_price == @avg_price
       assert updated.cumulative_qty == @cumulative_qty
       assert updated.leaves_qty == Decimal.new(2)
@@ -374,10 +403,11 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:error, :not_found} =
                Tai.Trading.OrderStore.passive_partial_fill(
                  "not found",
-                 @venue_updated_at,
                  @avg_price,
                  @cumulative_qty,
-                 @updated_leaves_qty
+                 @updated_leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
     end
 
@@ -390,10 +420,11 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:error, reason} =
                Tai.Trading.OrderStore.passive_partial_fill(
                  order.client_id,
-                 @venue_updated_at,
                  @avg_price,
                  @cumulative_qty,
-                 @updated_leaves_qty
+                 @updated_leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert reason ==
@@ -412,10 +443,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:ok, {old, updated}} =
@@ -436,10 +468,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
@@ -478,10 +511,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
@@ -520,10 +554,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
@@ -531,25 +566,28 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.amend(
                  order.client_id,
-                 @venue_updated_at,
                  @price,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert old.status == :pending_amend
       assert updated.status == :open
-      assert updated.venue_updated_at == @venue_updated_at
       assert updated.price == @price
       assert updated.leaves_qty == @leaves_qty
+      assert updated.last_received_at == @last_received_at
+      assert updated.last_venue_timestamp == @last_venue_timestamp
     end
 
     test "returns an error tuple when the order can't be found" do
       assert {:error, :not_found} =
                Tai.Trading.OrderStore.amend(
                  "not found",
-                 @venue_updated_at,
                  @price,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
     end
 
@@ -561,9 +599,10 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:error, reason} =
                Tai.Trading.OrderStore.amend(
                  order.client_id,
-                 @venue_updated_at,
                  @price,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert reason == {:invalid_status, :enqueued, :pending_amend}
@@ -580,10 +619,11 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:ok, {old, updated}} =
@@ -620,24 +660,34 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 Timex.now(),
+                 Timex.now()
                )
 
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
 
       assert {:ok, {old, updated}} =
-               Tai.Trading.OrderStore.cancel_error(order.client_id, "server unavailable")
+               Tai.Trading.OrderStore.cancel_error(
+                 order.client_id,
+                 "server unavailable",
+                 @last_received_at
+               )
 
       assert old.status == :pending_cancel
       assert updated.status == :cancel_error
       assert updated.error_reason == "server unavailable"
+      assert updated.last_received_at == @last_received_at
     end
 
     test "returns an error tuple when the order can't be found" do
-      assert Tai.Trading.OrderStore.cancel_error("not found", "server unavailable") ==
+      assert Tai.Trading.OrderStore.cancel_error(
+               "not found",
+               "server unavailable",
+               @last_received_at
+             ) ==
                {:error, :not_found}
     end
 
@@ -647,7 +697,11 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
 
       assert {:error, reason} =
-               Tai.Trading.OrderStore.cancel_error(order.client_id, "server unavailable")
+               Tai.Trading.OrderStore.cancel_error(
+                 order.client_id,
+                 "server unavailable",
+                 @last_received_at
+               )
 
       assert reason == {:invalid_status, :enqueued, :pending_cancel}
     end
@@ -663,23 +717,33 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 Timex.now(),
+                 Timex.now()
                )
 
       assert {:ok, {old, updated}} =
-               Tai.Trading.OrderStore.passive_cancel(order.client_id, @venue_updated_at)
+               Tai.Trading.OrderStore.passive_cancel(
+                 order.client_id,
+                 @last_received_at,
+                 @last_venue_timestamp
+               )
 
       assert old.status == :open
       assert updated.status == :canceled
-      assert updated.venue_updated_at == @venue_updated_at
       assert updated.leaves_qty == Decimal.new(0)
+      assert updated.last_received_at == @last_received_at
+      assert updated.last_venue_timestamp == @last_venue_timestamp
     end
 
     test "returns an error tuple when the order can't be found" do
-      assert Tai.Trading.OrderStore.passive_cancel("not found", @venue_updated_at) ==
+      assert Tai.Trading.OrderStore.passive_cancel(
+               "not found",
+               @last_received_at,
+               @last_venue_timestamp
+             ) ==
                {:error, :not_found}
     end
 
@@ -692,17 +756,26 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 Timex.now(),
+                 Timex.now()
                )
 
       assert {:ok, {_, _}} =
-               Tai.Trading.OrderStore.passive_cancel(order.client_id, @venue_updated_at)
+               Tai.Trading.OrderStore.passive_cancel(
+                 order.client_id,
+                 @last_received_at,
+                 @last_venue_timestamp
+               )
 
       assert {:error, reason} =
-               Tai.Trading.OrderStore.passive_cancel(order.client_id, @venue_updated_at)
+               Tai.Trading.OrderStore.passive_cancel(
+                 order.client_id,
+                 @last_received_at,
+                 @last_venue_timestamp
+               )
 
       assert reason ==
                {:invalid_status, :canceled,
@@ -727,25 +800,26 @@ defmodule Tai.Trading.OrderStoreTest do
                Tai.Trading.OrderStore.open(
                  order.client_id,
                  @venue_order_id,
-                 @venue_created_at,
                  @avg_price,
                  @cumulative_qty,
-                 @leaves_qty
+                 @leaves_qty,
+                 @last_received_at,
+                 @last_venue_timestamp
                )
 
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
 
       assert {:ok, {old, updated}} =
-               Tai.Trading.OrderStore.cancel(order.client_id, @venue_updated_at)
+               Tai.Trading.OrderStore.cancel(order.client_id, @last_venue_timestamp)
 
       assert old.status == :pending_cancel
       assert updated.status == :canceled
-      assert updated.venue_updated_at == @venue_updated_at
+      assert updated.last_venue_timestamp == @last_venue_timestamp
       assert updated.leaves_qty == Decimal.new(0)
     end
 
     test "returns an error tuple when the order can't be found" do
-      assert Tai.Trading.OrderStore.cancel("not found", @venue_updated_at) ==
+      assert Tai.Trading.OrderStore.cancel("not found", @last_venue_timestamp) ==
                {:error, :not_found}
     end
 
@@ -754,7 +828,8 @@ defmodule Tai.Trading.OrderStoreTest do
 
       assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
 
-      assert {:error, reason} = Tai.Trading.OrderStore.cancel(order.client_id, @venue_updated_at)
+      assert {:error, reason} =
+               Tai.Trading.OrderStore.cancel(order.client_id, @last_venue_timestamp)
 
       assert reason == {:invalid_status, :enqueued, :pending_cancel}
     end

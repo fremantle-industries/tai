@@ -21,15 +21,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
          client_id,
          %{"timestamp" => timestamp, "cumQty" => cum_qty}
        ) do
-    venue_updated_at = timestamp |> Timex.parse!(@date_format)
+    received_at = Timex.now()
+    venue_timestamp = timestamp |> Timex.parse!(@date_format)
     cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
 
     result =
-      Tai.Trading.OrderStore.passive_fill(
-        client_id,
-        venue_updated_at,
-        cumulative_qty
-      )
+      Tai.Trading.OrderStore.passive_fill(client_id, cumulative_qty, received_at, venue_timestamp)
 
     {client_id, :passive_fill, result}
   end
@@ -44,6 +41,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
            "leavesQty" => lvs_qty
          }
        ) do
+    received_at = Timex.now()
     venue_updated_at = timestamp |> Timex.parse!(@date_format)
     avg_price = avg_px |> Tai.Utils.Decimal.from()
     cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
@@ -52,18 +50,20 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
     result =
       Tai.Trading.OrderStore.passive_partial_fill(
         client_id,
-        venue_updated_at,
         avg_price,
         cumulative_qty,
-        leaves_qty
+        leaves_qty,
+        received_at,
+        venue_updated_at
       )
 
     {client_id, :passive_partial_fill, result}
   end
 
   defp passive_update(:canceled, client_id, %{"timestamp" => timestamp}) do
+    received_at = Timex.now()
     venue_updated_at = timestamp |> Timex.parse!(@date_format)
-    result = Tai.Trading.OrderStore.passive_cancel(client_id, venue_updated_at)
+    result = Tai.Trading.OrderStore.passive_cancel(client_id, received_at, venue_updated_at)
     {client_id, :passive_cancel, result}
   end
 
