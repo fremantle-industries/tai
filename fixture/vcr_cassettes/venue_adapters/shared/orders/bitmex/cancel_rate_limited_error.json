@@ -1,0 +1,67 @@
+[
+  {
+    "request": {
+      "body": "{\"ordType\":\"Limit\",\"orderQty\":\"1\",\"price\":\"100.5\",\"side\":\"Buy\",\"symbol\":\"XBTH19\",\"timeInForce\":\"GoodTillCancel\",\"execInst\":\"ParticipateDoNotInitiate\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "***",
+        "api-key": "***",
+        "api-signature": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"orderID\":\"8dca984e-430f-d211-924e-789bd17d454e\",\"clOrdID\":\"\",\"clOrdLinkID\":\"\",\"account\":158677,\"symbol\":\"XBTH19\",\"side\":\"Buy\",\"simpleOrderQty\":null,\"orderQty\":1,\"price\":100.5,\"displayQty\":null,\"stopPx\":null,\"pegOffsetValue\":null,\"pegPriceType\":\"\",\"currency\":\"USD\",\"settlCurrency\":\"XBt\",\"ordType\":\"Limit\",\"timeInForce\":\"GoodTillCancel\",\"execInst\":\"ParticipateDoNotInitiate\",\"contingencyType\":\"\",\"exDestination\":\"XBME\",\"ordStatus\":\"New\",\"triggered\":\"\",\"workingIndicator\":true,\"ordRejReason\":\"\",\"simpleLeavesQty\":null,\"leavesQty\":1,\"simpleCumQty\":null,\"cumQty\":0,\"avgPx\":null,\"multiLegReportingType\":\"SingleSecurity\",\"text\":\"Submitted via API.\",\"transactTime\":\"2018-12-14T12:26:33.476Z\",\"timestamp\":\"2018-12-14T12:26:33.476Z\"}",
+      "headers": {
+        "Date": "Fri, 14 Dec 2018 12:26:33 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "725",
+        "Connection": "keep-alive",
+        "X-RateLimit-Limit": "300",
+        "X-RateLimit-Remaining": "299",
+        "X-RateLimit-Reset": "1544790394",
+        "X-Powered-By": "Profit",
+        "ETag": "W/\"2d5-8Xd7gh5gGzyEP0Ynfaoeq6FxE34\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "{\"orderID\":\"8dca984e-430f-d211-924e-789bd17d454e\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "api-nonce": "***",
+        "api-key": "***",
+        "api-signature": "***"
+      },
+      "method": "delete",
+      "options": [],
+      "request_body": "",
+      "url": "https://testnet.bitmex.com/api/v1/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"error\":{\"message\":\"Rate limit exceeded, retry in 1 seconds.\",\"name\":\"RateLimitError\"}}",
+      "headers": {
+        "Date": "Thu, 07 Feb 2019 10:42:12 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "138",
+        "Connection": "keep-alive",
+        "Set-Cookie": "AWSALB=56IuvWmpgu9/UTCwZNa4dft7ksz67vjznPq+xhvHSElSlbKDsDjdkKGarp0xjyk7fZOK/6lxSAQ4a4xwH7n9CU6uUkuPyifl60i0LvFUH85FxFKOU4sUdfF/0kHd; Expires=Fri, 07 Dec 2018 05:51:50 GMT; Path=/",
+        "X-RateLimit-Limit": "300",
+        "X-RateLimit-Remaining": "0",
+        "X-RateLimit-Reset": "1551300384",
+        "Retry-After": "1"
+      },
+      "status_code": 429,
+      "type": "ok"
+    }
+  }
+]

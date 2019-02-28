@@ -8,6 +8,7 @@ defmodule Tai.Venue do
   @type shared_error_reason ::
           :timeout
           | :overloaded
+          | :rate_limited
           | {:credentials, reason :: term}
           | {:nonce_not_increasing, String.t()}
 

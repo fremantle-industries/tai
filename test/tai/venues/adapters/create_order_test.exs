@@ -197,7 +197,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_insufficient_balance" do
-        assert {:error, :insufficient_balance} = Tai.Venue.create_order(order, @test_adapters)
+        assert Tai.Venue.create_order(order, @test_adapters) == {:error, :insufficient_balance}
       end
     end
 
@@ -217,6 +217,14 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_overloaded" do
         assert Tai.Venue.create_order(order, @test_adapters) == {:error, :overloaded}
+      end
+    end
+
+    test "#{adapter.id} rate limited error" do
+      order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_rate_limited" do
+        assert Tai.Venue.create_order(order, @test_adapters) == {:error, :rate_limited}
       end
     end
 
