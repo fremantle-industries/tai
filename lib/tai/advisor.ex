@@ -6,7 +6,7 @@ defmodule Tai.Advisor do
   """
 
   @type advisor :: Tai.Advisor.t()
-  @type store :: map
+  @type run_store :: map
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type product :: Tai.Venues.Product.t()
   @type product_symbol :: Tai.Venues.Product.symbol()
@@ -22,23 +22,10 @@ defmodule Tai.Advisor do
         }
 
   @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, advisor) ::
-              {:ok, store}
+              {:ok, run_store}
 
-  @enforce_keys ~w(
-    advisor_id
-    config
-    group_id
-    products
-    store
-  )a
-  defstruct ~w(
-    advisor_id
-    config
-    group_id
-    market_quotes
-    products
-    store
-  )a
+  @enforce_keys ~w(advisor_id config group_id products store)a
+  defstruct ~w(advisor_id config group_id market_quotes products store)a
 
   @spec to_name(atom, atom) :: atom
   def to_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
