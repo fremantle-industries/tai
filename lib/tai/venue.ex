@@ -7,6 +7,7 @@ defmodule Tai.Venue do
   @type order :: Tai.Trading.Order.t()
   @type shared_error_reason ::
           :timeout
+          | :connect_timeout
           | :overloaded
           | :rate_limited
           | {:credentials, reason :: term}

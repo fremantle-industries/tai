@@ -185,15 +185,22 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
       end
     end)
 
-    test "#{adapter.id} timeout" do
-      order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
+    [:timeout, :connect_timeout]
+    |> Enum.map(fn error_reason ->
+      @error_reason error_reason
 
-      with_mock HTTPoison, request: fn _url -> {:error, %HTTPoison.Error{reason: :timeout}} end do
-        assert Tai.Venue.create_order(order, @test_adapters) == {:error, :timeout}
+      test "#{adapter.id} #{error_reason} error" do
+        order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
+
+        with_mock HTTPoison,
+          request: fn _url -> {:error, %HTTPoison.Error{reason: @error_reason}} end do
+          assert {:error, reason} = Tai.Venue.create_order(order, @test_adapters)
+          assert reason == @error_reason
+        end
       end
-    end
+    end)
 
-    test "#{adapter.id} insufficient balance" do
+    test "#{adapter.id} insufficient balance error" do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_insufficient_balance" do
@@ -201,7 +208,7 @@ defmodule Tai.Venues.Adapters.CreateOrderTest do
       end
     end
 
-    test "#{adapter.id} nonce not increasing" do
+    test "#{adapter.id} nonce not increasing error" do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_nonce_not_increasing" do

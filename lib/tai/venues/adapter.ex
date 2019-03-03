@@ -14,6 +14,8 @@ defmodule Tai.Venues.Adapter do
   @type shared_error_reason ::
           :not_implemented
           | :timeout
+          | :connect_timeout
+          | :overloaded
           | {:credentials, reason :: term}
           | {:nonce_not_increasing, msg :: String.t()}
           | {:unhandled, reason :: term}

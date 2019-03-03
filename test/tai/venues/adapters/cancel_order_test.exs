@@ -36,19 +36,26 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       end
     end
 
-    test "#{adapter.id} timeout returns an error tuple" do
-      enqueued_order = build_enqueued_order(@adapter.id)
+    [:timeout, :connect_timeout]
+    |> Enum.map(fn error_reason ->
+      @error_reason error_reason
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_timeout" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+      test "#{adapter.id} #{error_reason} error" do
+        enqueued_order = build_enqueued_order(@adapter.id)
 
-        open_order = build_open_order(enqueued_order, order_response)
+        use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_#{@error_reason}" do
+          assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
 
-        with_mock HTTPoison, request: fn _url -> {:error, %HTTPoison.Error{reason: :timeout}} end do
-          assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :timeout}
+          open_order = build_open_order(enqueued_order, order_response)
+
+          with_mock HTTPoison,
+            request: fn _url -> {:error, %HTTPoison.Error{reason: @error_reason}} end do
+            assert {:error, reason} = Tai.Venue.cancel_order(open_order, @test_adapters)
+            assert reason == @error_reason
+          end
         end
       end
-    end
+    end)
 
     test "#{adapter.id} overloaded error" do
       enqueued_order = build_enqueued_order(@adapter.id)

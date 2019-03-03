@@ -63,6 +63,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
   end
 
   defp parse_response({:error, :timeout, nil}), do: {:error, :timeout}
+  defp parse_response({:error, :connect_timeout, nil}), do: {:error, :connect_timeout}
   defp parse_response({:error, :overloaded, _}), do: {:error, :overloaded}
   defp parse_response({:error, :rate_limited, _}), do: {:error, :rate_limited}
   defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}), do: {:error, reason}

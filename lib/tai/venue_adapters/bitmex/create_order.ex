@@ -11,6 +11,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   @type response :: Tai.Trading.OrderResponses.Create.t()
   @type reason ::
           :timeout
+          | :connect_timeout
           | :overloaded
           | :insufficient_balance
           | {:nonce_not_increasing, msg :: String.t()}
@@ -88,6 +89,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   end
 
   defp parse_response({:error, :timeout, nil}, _), do: {:error, :timeout}
+  defp parse_response({:error, :connect_timeout, nil}, _), do: {:error, :connect_timeout}
   defp parse_response({:error, :overloaded, _}, _), do: {:error, :overloaded}
   defp parse_response({:error, :rate_limited, _}, _), do: {:error, :rate_limited}
   defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _), do: {:error, reason}
