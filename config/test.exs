@@ -25,10 +25,12 @@ config :tai,
 config(:tai,
   test_venue_adapters: %{
     mock: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Mock,
       accounts: %{main: %{}}
     ],
     bitmex: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Bitmex,
       accounts: %{
         main: %{
@@ -38,14 +40,17 @@ config(:tai,
       }
     ],
     binance: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Binance,
       accounts: %{main: %{}}
     ],
     poloniex: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Poloniex,
       accounts: %{main: %{}}
     ],
     gdax: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Gdax,
       accounts: %{
         main: %{
@@ -64,11 +69,13 @@ config(:tai, :test_venue_adapters_with_positions, [:bitmex])
 config :tai,
   venues: %{
     test_exchange_a: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Mock,
       products: "btc_usd ltc_usd",
       accounts: %{main: %{}}
     ],
     test_exchange_b: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Mock,
       products: "eth_usd ltc_usd",
       accounts: %{main: %{}}

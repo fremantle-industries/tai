@@ -26,7 +26,8 @@ defmodule Tai.Venues.Adapter do
           id: :atom,
           adapter: :atom,
           products: String.t(),
-          accounts: map
+          accounts: map,
+          timeout: non_neg_integer
         }
 
   @callback stream_supervisor :: atom
@@ -45,18 +46,6 @@ defmodule Tai.Venues.Adapter do
   @callback cancel_order(venue_order_id, credentials) ::
               {:ok, cancel_response} | {:error, cancel_order_error_reason}
 
-  @enforce_keys [
-    :id,
-    :adapter,
-    :products,
-    :accounts,
-    :timeout
-  ]
-  defstruct [
-    :id,
-    :adapter,
-    :products,
-    :accounts,
-    :timeout
-  ]
+  @enforce_keys ~w(id adapter products accounts timeout)a
+  defstruct ~w(id adapter products accounts timeout)a
 end

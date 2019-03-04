@@ -7,8 +7,9 @@ defmodule Tai.Venues.ConfigTest do
       config =
         Tai.Config.parse(
           venues: %{
-            venue_a: [adapter: MyAdapterA],
-            venue_b: [adapter: MyAdapterB]
+            venue_a: [enabled: true, adapter: MyAdapterA],
+            venue_b: [enabled: true, adapter: MyAdapterB],
+            venue_c: [enabled: false, adapter: MyAdapterC]
           },
           adapter_timeout: 100
         )
@@ -32,9 +33,9 @@ defmodule Tai.Venues.ConfigTest do
     end
 
     test "raises an KeyError when there is no adapter specified" do
-      config = Tai.Config.parse(venues: %{invalid_exchange_a: []})
+      config = Tai.Config.parse(venues: %{invalid_exchange_a: [enabled: true]})
 
-      assert_raise KeyError, "key :adapter not found in: []", fn ->
+      assert_raise KeyError, "key :adapter not found in: [enabled: true]", fn ->
         Tai.Venues.Config.parse_adapters(config)
       end
     end
@@ -44,6 +45,7 @@ defmodule Tai.Venues.ConfigTest do
         Tai.Config.parse(
           venues: %{
             venue_a: [
+              enabled: true,
               adapter: MyAdapterA,
               timeout: 10
             ]
@@ -64,6 +66,7 @@ defmodule Tai.Venues.ConfigTest do
         Tai.Config.parse(
           venues: %{
             venue_a: [
+              enabled: true,
               adapter: MyAdapterA,
               products: "-btc_usd"
             ]
@@ -84,6 +87,7 @@ defmodule Tai.Venues.ConfigTest do
         Tai.Config.parse(
           venues: %{
             venue_a: [
+              enabled: true,
               adapter: MyAdapterA,
               accounts: %{main: %{}}
             ]

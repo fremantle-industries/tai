@@ -25,7 +25,14 @@ defmodule Tai.Venues.Boot.PositionsTest do
   test ".hydrate broadcasts a summary event" do
     config =
       Tai.Config.parse(
-        venues: %{my_venue: [adapter: MyAdapter, accounts: %{main: %{}}, products: "btc_usd"]}
+        venues: %{
+          my_venue: [
+            enabled: true,
+            adapter: MyAdapter,
+            accounts: %{main: %{}},
+            products: "btc_usd"
+          ]
+        }
       )
 
     %{my_venue: adapter} = Tai.Venues.Config.parse_adapters(config)

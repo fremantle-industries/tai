@@ -25,6 +25,7 @@ config :tai,
 config :tai,
   venues: %{
     bitmex: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Bitmex,
       products: "xbth19 xbtm19",
       accounts: %{
@@ -36,16 +37,19 @@ config :tai,
       timeout: 60_000
     ],
     binance: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Binance,
       products: "btc_usdt ltc_usdt eth_usdt",
       accounts: %{main: %{}}
     ],
     poloniex: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Poloniex,
       products: "btc_usdt ltc_usdt eth_usdt",
       accounts: %{main: %{}}
     ],
     gdax: [
+      enabled: true,
       adapter: Tai.VenueAdapters.Gdax,
       products: "btc_usd ltc_usd eth_usd",
       accounts: %{

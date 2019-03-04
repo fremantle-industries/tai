@@ -42,10 +42,12 @@ defmodule Tai.Venues.Boot.FeesTest do
   @config Tai.Config.parse(
             venues: %{
               venue_a: [
+                enabled: true,
                 adapter: AdapterWithFeeSchedule,
                 accounts: %{} |> Map.put(@account_a, %{})
               ],
               venue_b: [
+                enabled: true,
                 adapter: AdapterWithoutFeeSchedule,
                 accounts: %{} |> Map.put(@account_b, %{})
               ]

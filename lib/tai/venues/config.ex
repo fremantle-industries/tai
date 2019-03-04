@@ -7,16 +7,21 @@ defmodule Tai.Venues.Config do
     config.venues
     |> Enum.reduce(
       %{},
-      fn {id, params}, acc ->
-        adapter = %Tai.Venues.Adapter{
-          id: id,
-          adapter: Keyword.fetch!(params, :adapter),
-          products: Keyword.get(params, :products, "*"),
-          accounts: Keyword.get(params, :accounts, %{}),
-          timeout: Keyword.get(params, :timeout, config.adapter_timeout)
-        }
+      fn
+        {id, params}, acc ->
+          if Keyword.get(params, :enabled, false) do
+            adapter = %Tai.Venues.Adapter{
+              id: id,
+              adapter: Keyword.fetch!(params, :adapter),
+              products: Keyword.get(params, :products, "*"),
+              accounts: Keyword.get(params, :accounts, %{}),
+              timeout: Keyword.get(params, :timeout, config.adapter_timeout)
+            }
 
-        Map.put(acc, id, adapter)
+            Map.put(acc, id, adapter)
+          else
+            acc
+          end
       end
     )
   end
