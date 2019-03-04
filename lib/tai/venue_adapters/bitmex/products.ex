@@ -2,7 +2,10 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
   def products(venue_id) do
     with {:ok, instruments, _rate_limit} <-
            ExBitmex.Rest.HTTPClient.non_auth_get("/instrument", %{start: 0, count: 500}) do
-      products = Enum.map(instruments, &build(&1, venue_id))
+      products =
+        instruments
+        |> Enum.map(&build(&1, venue_id))
+        |> Enum.filter(& &1)
 
       {:ok, products}
     else
@@ -10,6 +13,8 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
         {:error, reason}
     end
   end
+
+  defp build(%{"lotSize" => nil}, _), do: nil
 
   defp build(
          %{
@@ -33,11 +38,11 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
       exchange_symbol: bitmex_symbol,
       status: status,
       margin: true,
-      min_size: lot_size && lot_size |> to_decimal,
       price_increment: tick_size |> to_decimal,
       max_price: max_price && max_price |> to_decimal,
       max_size: max_order_qty && max_order_qty |> to_decimal,
-      size_increment: tick_size |> to_decimal,
+      min_size: lot_size |> to_decimal,
+      size_increment: lot_size |> to_decimal,
       maker_fee: maker_fee && maker_fee |> to_decimal,
       taker_fee: maker_fee && taker_fee |> to_decimal
     }
