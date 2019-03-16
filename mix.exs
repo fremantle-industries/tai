@@ -32,14 +32,10 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
-      # Outstanding PR's to improve error handling
-      # {:binance, "~> 0.6.0"},
-      {:binance,
-       github: "fremantle-capital/binance.ex", branch: "improve-http-client-error-handling"},
+      # {:ex_binance, "~> 0.0.2"},
+      {:ex_binance, github: "fremantle-capital/ex_binance"},
       {:ex_bitmex, "~> 0.1.0"},
       {:decimal, "~> 1.7.0"},
-      # Outstanding PR to bump Poison
-      # {:ex_gdax, "~> 0.1.4"},
       {:ex_gdax, "~> 0.1.6"},
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},

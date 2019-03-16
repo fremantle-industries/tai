@@ -39,7 +39,12 @@ config :tai,
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,
       products: "btc_usdt ltc_usdt eth_usdt",
-      accounts: %{main: %{}}
+      accounts: %{
+        main: %{
+          api_key: {:system_file, "BINANCE_API_KEY"},
+          secret_key: {:system_file, "BINANCE_API_SECRET"}
+        }
+      }
     ],
     poloniex: [
       enabled: true,
@@ -67,7 +72,3 @@ config :echo_boy, port: 4200
 config :ex_poloniex,
   api_key: {:system_file, "POLONIEX_API_KEY"},
   api_secret: {:system_file, "POLONIEX_API_SECRET"}
-
-config :binance,
-  api_key: {:system_file, "BINANCE_API_KEY"},
-  secret_key: {:system_file, "BINANCE_API_SECRET"}

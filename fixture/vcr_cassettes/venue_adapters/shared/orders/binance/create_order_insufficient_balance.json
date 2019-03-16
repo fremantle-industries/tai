@@ -1,22 +1,25 @@
 [
   {
     "request": {
-      "body": "",
-      "headers": [],
-      "method": "get",
+      "body": "price=0.007&quantity=1000&recvWindow=1000&side=BUY&symbol=LTCBTC&timeInForce=GTC&timestamp=1523576376467&type=LIMIT&signature=***",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "post",
       "options": [],
       "request_body": "",
-      "url": "https://api.binance.com/api/v1/exchangeInfo?"
+      "url": "https://api.binance.com/api/v3/order"
     },
     "response": {
       "binary": false,
-      "body": "{\"code\":-2014,\"msg\":\"API-key format invalid.\"}",
+      "body": "{\"code\":-2010,\"msg\":\"Account has insufficient balance for requested action.\"}",
       "headers": {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json;charset=utf-8",
         "Transfer-Encoding": "chunked",
         "Connection": "keep-alive",
-        "Date": "Sun, 20 May 2018 23:36:02 GMT",
+        "Date": "Sat, 24 Mar 2018 04:59:36 GMT",
         "Server": "nginx",
+        "X-MBX-USED-WEIGHT": "1",
         "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
         "X-Frame-Options": "SAMEORIGIN",
         "X-Xss-Protection": "1; mode=block",
@@ -28,10 +31,10 @@
         "Pragma": "no-cache",
         "Expires": "0",
         "X-Cache": "Error from cloudfront",
-        "Via": "1.1 8f6be4b7e4756846b1fd5d03929beeb6.cloudfront.net (CloudFront)",
-        "X-Amz-Cf-Id": "27WMzLdU8_hRXklUUGLMf3yTQ-gRiC2V-RrhfVdhNXlJFbetf-B8Mg=="
+        "Via": "1.1 2d8af5cc5befc5d35bb54b4a5b6494c9.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "X-U62_U0uaHqLsX87xSDvTsSoyjyjXUVP0ny1kKI4CoKYl3I0PnorQ=="
       },
-      "status_code": 401,
+      "status_code": 400,
       "type": "ok"
     }
   }

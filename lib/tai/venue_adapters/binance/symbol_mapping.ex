@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Binance.SymbolMapping do
+defmodule Tai.VenueAdapters.Binance.SymbolMapping do
   @spec to_binance(atom) :: String.t()
   def to_binance(symbol) do
     symbol

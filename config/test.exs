@@ -42,7 +42,12 @@ config(:tai,
     binance: [
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,
-      accounts: %{main: %{}}
+      accounts: %{
+        main: %{
+          api_key: {:system_file, "BINANCE_API_KEY"},
+          secret_key: {:system_file, "BINANCE_API_SECRET"}
+        }
+      }
     ],
     poloniex: [
       enabled: true,
@@ -64,6 +69,7 @@ config(:tai,
   }
 )
 
+config(:tai, :test_venue_adapters_create_order, [:bitmex])
 config(:tai, :test_venue_adapters_with_positions, [:bitmex])
 
 config :tai,
@@ -114,7 +120,3 @@ config :ex_bitmex, domain: "testnet.bitmex.com"
 config :ex_poloniex,
   api_key: {:system_file, "POLONIEX_API_KEY"},
   api_secret: {:system_file, "POLONIEX_API_SECRET"}
-
-config :binance,
-  api_key: {:system_file, "BINANCE_API_KEY"},
-  secret_key: {:system_file, "BINANCE_API_SECRET"}

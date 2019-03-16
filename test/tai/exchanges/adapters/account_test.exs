@@ -10,13 +10,12 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
   }
   @gdax_adapter {Tai.ExchangeAdapters.Gdax.Account, :gdax, :main, @gdax_credentials}
 
-  @binance_adapter {Tai.ExchangeAdapters.Binance.Account, :binance, :main, %{}}
   @poloniex_adapter {Tai.ExchangeAdapters.Poloniex.Account, :poloniex, :main, %{}}
 
   # Test adapter would need to make HTTP requests for the shared test cases to 
   # work. This may be a good reason to use EchoBoy instead of matching on 
   # special symbols
-  @adapters [@binance_adapter, @gdax_adapter, @poloniex_adapter]
+  @adapters [@gdax_adapter, @poloniex_adapter]
 
   setup_all do
     HTTPoison.start()
@@ -30,7 +29,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
     :ok
   end
 
-  @adapters [@binance_adapter, @poloniex_adapter]
+  @adapters [@poloniex_adapter]
   describe "buy limit" do
     @adapters
     |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->
@@ -107,7 +106,7 @@ defmodule Tai.Exchanges.Adapters.AccountTest do
     end)
   end
 
-  @adapters [@binance_adapter, @poloniex_adapter]
+  @adapters [@poloniex_adapter]
   describe "sell limit" do
     @adapters
     |> Enum.map(fn {_, exchange_id, account_id, _credentials} ->

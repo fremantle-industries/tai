@@ -17,9 +17,7 @@ defmodule Tai.VenueAdapters.Binance do
     {:error, :not_supported}
   end
 
-  def create_order(%Tai.Trading.Order{} = _order, _credentials) do
-    {:error, :not_implemented}
-  end
+  defdelegate create_order(order, credentials), to: Tai.VenueAdapters.Binance.CreateOrder
 
   def amend_order(_venue_order_id, _attrs, _credentials) do
     {:error, :not_implemented}

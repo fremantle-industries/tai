@@ -15,17 +15,17 @@ We are working to make `tai` production quality software.
 
 ## Supported Venues
 
-| Venues | Live Order Book  | Account Balance | Orders | Products | Fees |
-|--------|:---:|:---:|:---:|:---:|:---:|
-| Bitmex | [x] | [x] | [x] | [x] | [x] |
+| Venues | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
+|--------|:---:|:---:|:---:|:---:|:---:|:---:|
+| Bitmex | [x] | [x] | [x] | [x] | [x] | [x] |
 
 ## Venues In Progress
 
-| Venue    | Live Order Book  | Account Balance | Orders | Products | Fees |
-|----------|:---:|:---:|:---:|:---:|:---:|
-| GDAX     | [x] | [x] | [ ] | [x] | [x] |
-| Binance  | [x] | [x] | [ ] | [x] | [x] |
-| Poloniex | [x] | [x] | [ ] | [x] | [x] |
+| Venue    | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
+|----------|:---:|:---:|:---:|:---:|:---:|:---:|
+| Binance  | [x] | [x] | [ ] | [ ] | [x] | [x] |
+| GDAX     | [x] | [x] | [ ] | [ ] | [x] | [x] |
+| Poloniex | [x] | [x] | [ ] | [ ] | [x] | [x] |
 
 [Planned Venues...](./PLANNED_VENUES.md)
 

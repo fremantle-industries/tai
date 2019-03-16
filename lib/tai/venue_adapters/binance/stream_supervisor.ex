@@ -50,7 +50,7 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
     streams =
       products
       |> Enum.map(& &1.symbol)
-      |> Enum.map(&Tai.ExchangeAdapters.Binance.SymbolMapping.to_binance/1)
+      |> Enum.map(&Tai.VenueAdapters.Binance.SymbolMapping.to_binance/1)
       |> Enum.map(&String.downcase/1)
       |> Enum.map(&"#{&1}@depth")
       |> Enum.join("/")

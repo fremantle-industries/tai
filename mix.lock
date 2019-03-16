@@ -1,5 +1,5 @@
 %{
-  "binance": {:git, "https://github.com/fremantle-capital/binance.ex.git", "2b883b856cd0d2020c11656682c05c71df811e78", [branch: "improve-http-client-error-handling"]},
+  "binance": {:git, "https://github.com/fremantle-capital/binance.ex.git", "878cb59ce2680bce0fc908c97a8aa6c83306f2c9", [branch: "patches"]},
   "bitmex": {:hex, :bitmex, "0.2.3", "8dd6d63da81b6f08f38a97918cf5429ebdc3846283348cc986ca2f00e81191a7", [:mix], [{:httpoison, "~> 1.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 3.1.0", [hex: :poison, repo: "hexpm", optional: false]}, {:websocket_client, "~> 1.2.1", [hex: :websocket_client, repo: "hexpm", optional: false]}, {:websockex, "~> 0.4.0", [hex: :websockex, repo: "hexpm", optional: false]}], "hexpm"},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
   "certifi": {:hex, :certifi, "2.5.1", "867ce347f7c7d78563450a18a6a28a8090331e77fa02380b4a21962a65d36ee5", [:rebar3], [{:parse_trans, "~>3.3", [hex: :parse_trans, repo: "hexpm", optional: false]}], "hexpm"},
@@ -14,6 +14,7 @@
   "echo_boy": {:git, "https://github.com/rupurt/echo_boy.git", "1b599fa2c9865e7cfdea3cb76cb71b7b12df9d9b", []},
   "ecto": {:git, "https://github.com/elixir-ecto/ecto.git", "e8eaa9145bc924de1f2fbb0ee295fe4e802e71fc", []},
   "erlex": {:hex, :erlex, "0.1.5", "fca8568751216266b343e182c9f494654e93c8adce3a0189c86ea45b632e8c55", [:mix], [], "hexpm"},
+  "ex_binance": {:git, "https://github.com/fremantle-capital/ex_binance.git", "e44e8242ddb618bf80e81b2e6d4b4dce1929b645", []},
   "ex_bitmex": {:hex, :ex_bitmex, "0.1.0", "987ca59bd033849feb8d4ff61d0f9a9e32b4dd1dcb51f722d48802e500a425a5", [:mix], [{:httpoison, "~> 1.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:jason, "~> 1.1.0", [hex: :jason, repo: "hexpm", optional: false]}, {:mapail, "~> 1.0.2", [hex: :mapail, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_doc": {:hex, :ex_doc, "0.19.3", "3c7b0f02851f5fc13b040e8e925051452e41248f685e40250d7e40b07b9f8c10", [:mix], [{:earmark, "~> 1.2", [hex: :earmark, repo: "hexpm", optional: false]}, {:makeup_elixir, "~> 0.10", [hex: :makeup_elixir, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_gdax": {:hex, :ex_gdax, "0.1.6", "4bd3bdb3058282f1445e98e43ecacf65ae5502b637fd539351a6d4c42e16ca12", [:mix], [{:httpoison, "~> 1.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 4.0", [hex: :poison, repo: "hexpm", optional: false]}], "hexpm"},

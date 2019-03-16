@@ -6,7 +6,7 @@
       "method": "get",
       "options": [],
       "request_body": "",
-      "url": "https://api.binance.com/api/v1/exchangeInfo"
+      "url": "https://api.binance.com/api/v1/exchangeInfo?"
     },
     "response": {
       "binary": false,

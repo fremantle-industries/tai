@@ -1,12 +1,9 @@
 defmodule Tai.VenueAdapters.Binance.AssetBalances do
-  def asset_balances(venue_id, account_id, _credentials) do
-    with {:ok, %Binance.Account{balances: raw_balances}} <- Binance.get_account() do
-      balances =
-        Enum.map(
-          raw_balances,
-          &build(&1, venue_id, account_id)
-        )
+  def asset_balances(venue_id, account_id, credentials) do
+    venue_credentials = struct!(ExBinance.Credentials, credentials)
 
+    with {:ok, account} <- ExBinance.Private.account(venue_credentials) do
+      balances = account.balances |> Enum.map(&build(&1, venue_id, account_id))
       {:ok, balances}
     else
       {:error,

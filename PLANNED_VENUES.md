@@ -1,121 +1,121 @@
 ## Planned Venues
 
-| Venue              | Live Order Book  | Orders |
-|--------------------|:----:|:--------------:|
-| 1broker            | [ ] | [ ] |
-| 1btcxe             | [ ] | [ ] |
-| Acx                | [ ] | [ ] |
-| Allcoin            | [ ] | [ ] |
-| Anxpro             | [ ] | [ ] |
-| Bibox              | [ ] | [ ] |
-| Bit2c              | [ ] | [ ] |
-| Bitbank            | [ ] | [ ] |
-| Bitbay             | [ ] | [ ] |
-| Bitfinex           | [ ] | [ ] |
-| Bitflyer           | [ ] | [ ] |
-| Bithumb            | [ ] | [ ] |
-| Bitkk              | [ ] | [ ] |
-| Bitlish            | [ ] | [ ] |
-| Bitmarket          | [ ] | [ ] |
-| Bitmex             | [ ] | [ ] |
-| Bitstamp           | [ ] | [ ] |
-| Bittrex            | [ ] | [ ] |
-| Bter               | [ ] | [ ] |
-| C-Cex              | [ ] | [ ] |
-| CoinCheck          | [ ] | [ ] |
-| Cryptopia          | [ ] | [ ] |
-| Crypto Facilities  | [ ] | [ ] |
-| Gemini             | [ ] | [ ] |
-| HitBtc             | [ ] | [ ] |
-| Kraken             | [ ] | [ ] |
-| OkCoin             | [ ] | [ ] |
-| QuadrigaCX         | [ ] | [ ] |
-| Quoine             | [ ] | [ ] |
-| TheRockTrading     | [ ] | [ ] |
-| Vaultoro           | [ ] | [ ] |
-| Yunbi              | [ ] | [ ] |
-| Bitso              | [ ] | [ ] |
-| Bitz               | [ ] | [ ] |
-| Bl3p               | [ ] | [ ] |
-| Bleutrade          | [ ] | [ ] |
-| Braziliex          | [ ] | [ ] |
-| Btcbox             | [ ] | [ ] |
-| Btcchina           | [ ] | [ ] |
-| Btcexchange        | [ ] | [ ] |
-| Btcmarkets         | [ ] | [ ] |
-| Btctradeim         | [ ] | [ ] |
-| Btctradeua         | [ ] | [ ] |
-| Btcturk            | [ ] | [ ] |
-| Btcx               | [ ] | [ ] |
-| Bxinth             | [ ] | [ ] |
-| Cex                | [ ] | [ ] |
-| Chbtc              | [ ] | [ ] |
-| Chilebit           | [ ] | [ ] |
-| Cobinhood          | [ ] | [ ] |
-| Coincheck          | [ ] | [ ] |
-| Coinegg            | [ ] | [ ] |
-| Coinex             | [ ] | [ ] |
-| Coinexchange       | [ ] | [ ] |
-| Coinfloor          | [ ] | [ ] |
-| Coingi             | [ ] | [ ] |
-| Coinmarketcap      | [ ] | [ ] |
-| Coinmate           | [ ] | [ ] |
-| Coinnest           | [ ] | [ ] |
-| Coinone            | [ ] | [ ] |
-| Coinsecure         | [ ] | [ ] |
-| Coinspot           | [ ] | [ ] |
-| Coolcoin           | [ ] | [ ] |
-| Dsx                | [ ] | [ ] |
-| Ethfinex           | [ ] | [ ] |
-| Exmo               | [ ] | [ ] |
-| Exx                | [ ] | [ ] |
-| Flowbtc            | [ ] | [ ] |
-| Foxbit             | [ ] | [ ] |
-| Fybse              | [ ] | [ ] |
-| Fybsg              | [ ] | [ ] |
-| Gatecoin           | [ ] | [ ] |
-| Gateio             | [ ] | [ ] |
-| Getbtc             | [ ] | [ ] |
-| Hadax              | [ ] | [ ] |
-| Hitbtc             | [ ] | [ ] |
-| Huobi              | [ ] | [ ] |
-| Huobicny           | [ ] | [ ] |
-| Huobipro           | [ ] | [ ] |
-| Ice3x              | [ ] | [ ] |
-| Independentreserve | [ ] | [ ] |
-| Indodax            | [ ] | [ ] |
-| ItBit              | [ ] | [ ] |
-| Itbit              | [ ] | [ ] |
-| Jubi               | [ ] | [ ] |
-| Kucoin             | [ ] | [ ] |
-| Kuna               | [ ] | [ ] |
-| Lakebtc            | [ ] | [ ] |
-| Lbank              | [ ] | [ ] |
-| Liqui              | [ ] | [ ] |
-| Livecoin           | [ ] | [ ] |
-| Luno               | [ ] | [ ] |
-| Lykke              | [ ] | [ ] |
-| Mercado            | [ ] | [ ] |
-| Mixcoins           | [ ] | [ ] |
-| Negociecoins       | [ ] | [ ] |
-| Nova               | [ ] | [ ] |
-| Okcoincny          | [ ] | [ ] |
-| Okcoinusd          | [ ] | [ ] |
-| Paymium            | [ ] | [ ] |
-| Qryptos            | [ ] | [ ] |
-| Quadrigacx         | [ ] | [ ] |
-| Quoinex            | [ ] | [ ] |
-| Southxchange       | [ ] | [ ] |
-| Surbitcoin         | [ ] | [ ] |
-| Therock            | [ ] | [ ] |
-| Tidex              | [ ] | [ ] |
-| Urdubit            | [ ] | [ ] |
-| Vaultoro           | [ ] | [ ] |
-| Vbtc               | [ ] | [ ] |
-| Virwox             | [ ] | [ ] |
-| Wex                | [ ] | [ ] |
-| Xbtce              | [ ] | [ ] |
-| Yobit              | [ ] | [ ] |
-| Yunbi              | [ ] | [ ] |
-| Zaif               | [ ] | [ ] |
-| Zb                 | [ ] | [ ] |
+| Venue              
+|--------------------
+| 1broker            
+| 1btcxe             
+| Acx                
+| Allcoin            
+| Anxpro             
+| Bibox              
+| Bit2c              
+| Bitbank            
+| Bitbay             
+| Bitfinex           
+| Bitflyer           
+| Bithumb            
+| Bitkk              
+| Bitlish            
+| Bitmarket          
+| Bitmex             
+| Bitstamp           
+| Bittrex            
+| Bter               
+| C-Cex              
+| CoinCheck          
+| Cryptopia          
+| Crypto Facilities  
+| Gemini             
+| HitBtc             
+| Kraken             
+| OkCoin             
+| QuadrigaCX         
+| Quoine             
+| TheRockTrading     
+| Vaultoro           
+| Yunbi              
+| Bitso              
+| Bitz               
+| Bl3p               
+| Bleutrade          
+| Braziliex          
+| Btcbox             
+| Btcchina           
+| Btcexchange        
+| Btcmarkets         
+| Btctradeim         
+| Btctradeua         
+| Btcturk            
+| Btcx               
+| Bxinth             
+| Cex                
+| Chbtc              
+| Chilebit           
+| Cobinhood          
+| Coincheck          
+| Coinegg            
+| Coinex             
+| Coinexchange       
+| Coinfloor          
+| Coingi             
+| Coinmarketcap      
+| Coinmate           
+| Coinnest           
+| Coinone            
+| Coinsecure         
+| Coinspot           
+| Coolcoin           
+| Dsx                
+| Ethfinex           
+| Exmo               
+| Exx                
+| Flowbtc            
+| Foxbit             
+| Fybse              
+| Fybsg              
+| Gatecoin           
+| Gateio             
+| Getbtc             
+| Hadax              
+| Hitbtc             
+| Huobi              
+| Huobicny           
+| Huobipro           
+| Ice3x              
+| Independentreserve 
+| Indodax            
+| ItBit              
+| Itbit              
+| Jubi               
+| Kucoin             
+| Kuna               
+| Lakebtc            
+| Lbank              
+| Liqui              
+| Livecoin           
+| Luno               
+| Lykke              
+| Mercado            
+| Mixcoins           
+| Negociecoins       
+| Nova               
+| Okcoincny          
+| Okcoinusd          
+| Paymium            
+| Qryptos            
+| Quadrigacx         
+| Quoinex            
+| Southxchange       
+| Surbitcoin         
+| Therock            
+| Tidex              
+| Urdubit            
+| Vaultoro           
+| Vbtc               
+| Virwox             
+| Wex                
+| Xbtce              
+| Yobit              
+| Yunbi              
+| Zaif               
+| Zb                 
