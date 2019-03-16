@@ -17,7 +17,7 @@ defmodule Tai.Event do
       type: event |> extract_type,
       data: event |> Tai.LogEvent.to_data()
     }
-    |> Poison.encode!()
+    |> Jason.encode!()
   end
 
   defp extract_type(event) do

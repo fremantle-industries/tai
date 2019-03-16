@@ -4,7 +4,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
       products = Enum.map(exchange_products, &build(&1, venue_id))
       {:ok, products}
     else
-      {:error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}} ->
+      {:error, {:binance_error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}}} ->
         {:error, {:credentials, reason}}
 
       {:error, {:http_error, %HTTPoison.Error{reason: "timeout"}}} ->

@@ -126,7 +126,7 @@ defmodule Tai.Venues.OrderBookFeed do
         Logger.debug(fn -> "received msg: #{msg}" end)
 
         msg
-        |> Poison.decode!()
+        |> Jason.decode!()
         |> handle_msg(state)
         |> case do
           {:ok, new_state} -> {:ok, new_state}

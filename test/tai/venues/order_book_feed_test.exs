@@ -129,7 +129,7 @@ defmodule Tai.Venues.OrderBookFeedTest do
 
     WebSocket.send_msg(pid, "not-json")
 
-    assert_receive({:EXIT, ^pid, {%Poison.SyntaxError{}, _}})
+    assert_receive({:EXIT, ^pid, {%Jason.DecodeError{}, _}})
   end
 
   test "logs a debug message for each frame received with a :text msg" do

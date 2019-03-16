@@ -18,6 +18,6 @@ defmodule Tai.WebSocket do
              | %WebSockex.NotConnectedError{}
              | %WebSockex.InvalidFrameError{}}
   def(send_json_msg(pid, msg)) do
-    send_msg(pid, msg |> Poison.encode!())
+    send_msg(pid, msg |> Jason.encode!())
   end
 end

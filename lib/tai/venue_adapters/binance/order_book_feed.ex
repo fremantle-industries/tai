@@ -43,7 +43,7 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed do
           :ok = Tai.Markets.OrderBook.replace(snapshot)
           :ok
         else
-          {:error, :invalid_symbol} ->
+          {:error, :bad_symbol} ->
             {:error, symbol}
         end
       end)

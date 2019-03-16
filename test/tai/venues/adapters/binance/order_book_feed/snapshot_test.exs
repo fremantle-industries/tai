@@ -48,7 +48,7 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed.SnapshotTest do
 
   test "fetch returns an error tuple when the symbol is invalid" do
     use_cassette "exchange_adapters/binance/snapshot_invalid_symbol_error" do
-      assert {:error, :invalid_symbol} = OrderBookFeed.Snapshot.fetch(:my_venue, :idontexist, 5)
+      assert {:error, :bad_symbol} = OrderBookFeed.Snapshot.fetch(:my_venue, :idontexist, 5)
     end
   end
 end

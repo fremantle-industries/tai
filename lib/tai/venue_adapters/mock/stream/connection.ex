@@ -43,7 +43,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     Logger.debug(fn -> "Received raw msg: #{msg}" end)
 
     msg
-    |> Poison.decode!()
+    |> Jason.decode!()
     |> handle_msg(state.venue_id)
 
     {:ok, state}

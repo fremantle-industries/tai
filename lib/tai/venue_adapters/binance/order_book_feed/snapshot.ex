@@ -13,9 +13,6 @@ defmodule Tai.VenueAdapters.Binance.OrderBookFeed.Snapshot do
       }
 
       {:ok, book}
-    else
-      {:error, %{"code" => -1121, "msg" => "Invalid symbol."}} ->
-        {:error, :invalid_symbol}
     end
   end
 

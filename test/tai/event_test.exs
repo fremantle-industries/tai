@@ -18,7 +18,7 @@ defmodule Tai.EventTest do
                    field_b: "Field B"
                  }
                }
-               |> Poison.encode!()
+               |> Jason.encode!()
     end
 
     test "uses the struct name for non-system events" do
@@ -29,7 +29,7 @@ defmodule Tai.EventTest do
                  type: "MyCustomEvent",
                  data: %{}
                }
-               |> Poison.encode!()
+               |> Jason.encode!()
     end
 
     test "can provide a custom data transformation" do
@@ -44,7 +44,7 @@ defmodule Tai.EventTest do
                    hello: "custom"
                  }
                }
-               |> Poison.encode!()
+               |> Jason.encode!()
     end
   end
 end

@@ -32,10 +32,15 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
-      {:binance, "~> 0.6.0"},
+      # Outstanding PR's to improve error handling
+      # {:binance, "~> 0.6.0"},
+      {:binance,
+       github: "fremantle-capital/binance.ex", branch: "improve-http-client-error-handling"},
       {:ex_bitmex, "~> 0.1.0"},
       {:decimal, "~> 1.7.0"},
-      {:ex_gdax, "~> 0.1.4"},
+      # Outstanding PR to bump Poison
+      # {:ex_gdax, "~> 0.1.4"},
+      {:ex_gdax, github: "fremantle-capital/ex_gdax", branch: "add-dialyzer"},
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},
@@ -43,7 +48,9 @@ defmodule Tai.Mixfile do
       {:timex, "~> 3.1"},
       {:websockex, "~> 0.4.0"},
       {:confex, "~> 3.4.0"},
-      {:ecto, "~> 3.0"},
+      # 3.1-dev removes dependency on Poison
+      # {:ecto, "~> 3.0"},
+      {:ecto, github: "elixir-ecto/ecto"},
       {:jason, "~> 1.1"},
       {:logger_file_backend_with_formatters, "~> 0.0.1", only: [:dev, :test]},
       {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.3", only: [:dev, :test]},
