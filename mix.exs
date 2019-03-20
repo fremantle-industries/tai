@@ -40,7 +40,7 @@ defmodule Tai.Mixfile do
       {:decimal, "~> 1.7.0"},
       # Outstanding PR to bump Poison
       # {:ex_gdax, "~> 0.1.4"},
-      {:ex_gdax, github: "fremantle-capital/ex_gdax", branch: "add-dialyzer"},
+      {:ex_gdax, "~> 0.1.6"},
       {:ex_poloniex, "~> 0.0.2"},
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},
