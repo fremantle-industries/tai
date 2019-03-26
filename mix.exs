@@ -46,7 +46,9 @@ defmodule Tai.Mixfile do
       {:juice, "~> 0.0.3"},
       {:table_rex, "~> 2.0"},
       {:timex, "~> 3.1"},
-      {:websockex, "~> 0.4.0"},
+      # Fixes deprecation warnings
+      # {:websockex, "~> 0.4.0"},
+      {:websockex, github: "Azolo/websockex"},
       {:confex, "~> 3.4.0"},
       # 3.1-dev removes dependency on Poison
       # {:ecto, "~> 3.0"},
