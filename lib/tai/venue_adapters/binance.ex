@@ -1,9 +1,9 @@
 defmodule Tai.VenueAdapters.Binance do
   @behaviour Tai.Venues.Adapter
 
-  def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
+  def stream_supervisor, do: Tai.VenueAdapters.Binance.StreamSupervisor
 
-  def order_book_feed, do: Tai.VenueAdapters.Binance.OrderBookFeed
+  def order_book_feed, do: Tai.VenueAdapters.NullOrderBookFeed
 
   defdelegate products(venue_id), to: Tai.VenueAdapters.Binance.Products
 

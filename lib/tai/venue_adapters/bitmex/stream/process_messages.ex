@@ -1,7 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
   use GenServer
   alias Tai.VenueAdapters.Bitmex.Stream
-  require Logger
 
   @type t :: %Stream.ProcessMessages{
           venue_id: atom
