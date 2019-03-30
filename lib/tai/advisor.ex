@@ -6,19 +6,22 @@ defmodule Tai.Advisor do
   """
 
   @type advisor :: Tai.Advisor.t()
-  @type run_store :: map
+  @type id :: atom
+  @type group_id :: atom
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type product :: Tai.Venues.Product.t()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type order :: Tai.Trading.Order.t()
   @type market_quote :: Tai.Markets.Quote.t()
   @type changes :: term
+  @type config :: map
+  @type run_store :: map
   @type t :: %Tai.Advisor{
-          group_id: atom,
-          advisor_id: atom,
+          group_id: group_id,
+          advisor_id: id,
           products: [product],
-          config: map,
-          store: map
+          config: config,
+          store: run_store
         }
 
   @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, advisor) ::
