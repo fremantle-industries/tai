@@ -77,8 +77,8 @@ defmodule Tai.AdvisorGroupsTest do
           }
         )
 
-      assert Tai.AdvisorGroups.parse_config(config) ==
-               {:error, %{group_a: [:advisor_not_present]}}
+      assert {:error, errors} = Tai.AdvisorGroups.parse_config(config)
+      assert errors.group_a == [:advisor_not_present]
     end
 
     test "returns an error tuple when factory is not present" do
@@ -97,8 +97,8 @@ defmodule Tai.AdvisorGroupsTest do
           }
         )
 
-      assert Tai.AdvisorGroups.parse_config(config) ==
-               {:error, %{group_a: [:factory_not_present]}}
+      assert {:error, errors} = Tai.AdvisorGroups.parse_config(config)
+      assert errors.group_a == [:factory_not_present]
     end
 
     test "returns an error tuple when products are not present" do
@@ -117,8 +117,8 @@ defmodule Tai.AdvisorGroupsTest do
           }
         )
 
-      assert Tai.AdvisorGroups.parse_config(config) ==
-               {:error, %{group_b: [:products_not_present]}}
+      assert {:error, errors} = Tai.AdvisorGroups.parse_config(config)
+      assert errors.group_b == [:products_not_present]
     end
   end
 
@@ -185,8 +185,8 @@ defmodule Tai.AdvisorGroupsTest do
           advisor_groups: %{group_a: [advisor: TestAdvisorA, factory: TestFactoryA]}
         )
 
-      assert Tai.AdvisorGroups.build_specs(config, %{}) ==
-               {:error, %{group_a: [:products_not_present]}}
+      assert {:error, errors} = Tai.AdvisorGroups.build_specs(config, %{})
+      assert errors.group_a == [:products_not_present]
     end
   end
 
@@ -266,8 +266,8 @@ defmodule Tai.AdvisorGroupsTest do
           advisor_groups: %{group_a: [advisor: TestAdvisorA, factory: TestFactoryA]}
         )
 
-      assert Tai.AdvisorGroups.build_specs_for_group(config, :group_a, %{}) ==
-               {:error, %{group_a: [:products_not_present]}}
+      assert {:error, errors} = Tai.AdvisorGroups.build_specs_for_group(config, :group_a, %{})
+      assert errors.group_a == [:products_not_present]
     end
   end
 
@@ -331,8 +331,10 @@ defmodule Tai.AdvisorGroupsTest do
           advisor_groups: %{group_a: [advisor: TestAdvisorA, factory: TestFactoryA]}
         )
 
-      assert Tai.AdvisorGroups.build_specs_for_advisor(config, :group_a, :advisor_a, %{}) ==
-               {:error, %{group_a: [:products_not_present]}}
+      assert {:error, errors} =
+               Tai.AdvisorGroups.build_specs_for_advisor(config, :group_a, :advisor_a, %{})
+
+      assert errors.group_a == [:products_not_present]
     end
   end
 end
