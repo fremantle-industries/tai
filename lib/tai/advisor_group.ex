@@ -7,6 +7,6 @@ defmodule Tai.AdvisorGroup do
           config: map
         }
 
-  @enforce_keys [:id, :factory, :products, :config]
-  defstruct [:id, :advisor, :factory, :products, :config]
+  @enforce_keys ~w(id factory products config)a
+  defstruct ~w(id advisor factory products config)a
 end
