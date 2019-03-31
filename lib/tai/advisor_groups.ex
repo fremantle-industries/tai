@@ -11,33 +11,23 @@ defmodule Tai.AdvisorGroups do
       |> Enum.reduce(
         {[], %{}},
         fn {id, config}, {groups, errors} ->
-          group_errors = []
-          advisor = Keyword.get(config, :advisor)
-          factory = Keyword.get(config, :factory)
-          products = Keyword.get(config, :products)
-          per_advisor_config = Keyword.get(config, :config, %{})
+          group = %Tai.AdvisorGroup{
+            id: id,
+            advisor: config |> Keyword.get(:advisor),
+            factory: config |> Keyword.get(:factory),
+            products: config |> Keyword.get(:products),
+            config: config |> Keyword.get(:config, %{})
+          }
 
-          group_errors =
-            if advisor == nil, do: [:advisor_not_present | group_errors], else: group_errors
-
-          group_errors =
-            if factory == nil, do: [:factory_not_present | group_errors], else: group_errors
-
-          group_errors =
-            if products == nil, do: [:products_not_present | group_errors], else: group_errors
-
-          if Enum.empty?(group_errors) do
-            group = %Tai.AdvisorGroup{
-              id: id,
-              advisor: advisor,
-              factory: factory,
-              products: products,
-              config: per_advisor_config
-            }
-
+          if Vex.valid?(group) do
             new_groups = groups ++ [group]
             {new_groups, errors}
           else
+            group_errors =
+              group
+              |> Vex.errors()
+              |> Enum.map(fn {:error, k, _, m} -> {k, m} end)
+
             new_errors = Map.put(errors, id, group_errors)
             {groups, new_errors}
           end

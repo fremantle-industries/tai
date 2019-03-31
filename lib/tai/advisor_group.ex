@@ -9,4 +9,10 @@ defmodule Tai.AdvisorGroup do
 
   @enforce_keys ~w(id factory products config)a
   defstruct ~w(id advisor factory products config)a
+  use Vex.Struct
+
+  validates(:id, presence: true)
+  validates(:advisor, presence: true)
+  validates(:factory, presence: true)
+  validates(:products, presence: true)
 end
