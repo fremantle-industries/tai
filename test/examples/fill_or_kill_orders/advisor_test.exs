@@ -71,7 +71,7 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
   end
 
   def mock_product_responses do
-    Mocks.Responses.Products.for_exchange(
+    Mocks.Responses.Products.for_venue(
       :test_exchange_a,
       [
         %{symbol: :btc_usd},
@@ -79,7 +79,7 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
       ]
     )
 
-    Mocks.Responses.Products.for_exchange(
+    Mocks.Responses.Products.for_venue(
       :test_exchange_b,
       [
         %{symbol: :eth_usd},

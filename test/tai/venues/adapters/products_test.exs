@@ -35,7 +35,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
   end)
 
   def setup_adapter(:mock) do
-    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+    Tai.TestSupport.Mocks.Responses.Products.for_venue(
       :mock,
       [
         %{
