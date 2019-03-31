@@ -12,7 +12,7 @@ defmodule Tai.Venues.Product do
 
   @type symbol :: atom
   @type t :: %Tai.Venues.Product{
-          exchange_id: atom,
+          exchange_id: Tai.Venues.Adapter.venue_id(),
           symbol: symbol,
           exchange_symbol: String.t(),
           status: status,
