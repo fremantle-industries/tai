@@ -28,29 +28,29 @@ defmodule Tai.Venues.Product do
           taker_fee: Decimal.t() | nil
         }
 
-  @enforce_keys [
-    :exchange_id,
-    :symbol,
-    :exchange_symbol,
-    :status,
-    :margin,
-    :min_size,
-    :size_increment
-  ]
-  defstruct [
-    :exchange_id,
-    :symbol,
-    :exchange_symbol,
-    :status,
-    :margin,
-    :min_notional,
-    :min_price,
-    :min_size,
-    :max_size,
-    :max_price,
-    :price_increment,
-    :size_increment,
-    :maker_fee,
-    :taker_fee
-  ]
+  @enforce_keys ~w(
+    exchange_id
+    symbol
+    exchange_symbol
+    status
+    margin
+    min_size
+    size_increment
+  )a
+  defstruct ~w(
+    exchange_id
+    symbol
+    exchange_symbol
+    status
+    margin
+    min_notional
+    min_price
+    min_size
+    max_size
+    max_price
+    price_increment
+    size_increment
+    maker_fee
+    taker_fee
+  )a
 end
