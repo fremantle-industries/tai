@@ -6,25 +6,27 @@ defmodule Tai.AdvisorGroups do
 
   @spec parse_config(config :: config) :: {:ok, [advisor_group]} | {:error, map}
   def parse_config(%Tai.Config{advisor_groups: advisor_groups}) do
-    results =
+    {groups, errors} =
       advisor_groups
       |> Enum.reduce(
-        %{groups: [], errors: %{}},
-        fn {id, config}, acc ->
-          errors = []
-
+        {[], %{}},
+        fn {id, config}, {groups, errors} ->
+          group_errors = []
           advisor = Keyword.get(config, :advisor)
-          errors = if advisor == nil, do: [:advisor_not_present | errors], else: errors
-
           factory = Keyword.get(config, :factory)
-          errors = if factory == nil, do: [:factory_not_present | errors], else: errors
-
           products = Keyword.get(config, :products)
-          errors = if products == nil, do: [:products_not_present | errors], else: errors
-
           per_advisor_config = Keyword.get(config, :config, %{})
 
-          if Enum.empty?(errors) do
+          group_errors =
+            if advisor == nil, do: [:advisor_not_present | group_errors], else: group_errors
+
+          group_errors =
+            if factory == nil, do: [:factory_not_present | group_errors], else: group_errors
+
+          group_errors =
+            if products == nil, do: [:products_not_present | group_errors], else: group_errors
+
+          if Enum.empty?(group_errors) do
             group = %Tai.AdvisorGroup{
               id: id,
               advisor: advisor,
@@ -33,16 +35,16 @@ defmodule Tai.AdvisorGroups do
               config: per_advisor_config
             }
 
-            new_groups = acc.groups ++ [group]
-            Map.put(acc, :groups, new_groups)
+            new_groups = groups ++ [group]
+            {new_groups, errors}
           else
-            group_errors = Map.put(acc.errors, id, errors)
-            Map.put(acc, :errors, group_errors)
+            new_errors = Map.put(errors, id, group_errors)
+            {groups, new_errors}
           end
         end
       )
 
-    if Enum.empty?(results.errors), do: {:ok, results.groups}, else: {:error, results.errors}
+    if Enum.empty?(errors), do: {:ok, groups}, else: {:error, errors}
   end
 
   @spec build_specs(config :: config, products :: [product]) ::
