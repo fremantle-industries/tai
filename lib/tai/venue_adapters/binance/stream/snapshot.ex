@@ -8,7 +8,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Snapshot do
       processed_at = Timex.now()
 
       book = %Tai.Markets.OrderBook{
-        venue_id: product.exchange_id,
+        venue_id: product.venue_id,
         product_symbol: product.symbol,
         bids: binance_book.bids |> to_price_points(processed_at),
         asks: binance_book.asks |> to_price_points(processed_at)

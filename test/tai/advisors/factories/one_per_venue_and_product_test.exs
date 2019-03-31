@@ -13,8 +13,8 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
 
     assert Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(group, []) == []
 
-    product_1 = struct(Tai.Venues.Product, %{exchange_id: :exchange_a, symbol: :btc_usdt})
-    product_2 = struct(Tai.Venues.Product, %{exchange_id: :exchange_b, symbol: :ltc_usdt})
+    product_1 = struct(Tai.Venues.Product, %{venue_id: :venue_a, symbol: :btc_usdt})
+    product_2 = struct(Tai.Venues.Product, %{venue_id: :venue_b, symbol: :ltc_usdt})
     products = [product_1, product_2]
 
     assert [advisor_1, advisor_2] =
@@ -24,7 +24,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
              MyAdvisor,
              [
                group_id: :group_a,
-               advisor_id: :exchange_a_btc_usdt,
+               advisor_id: :venue_a_btc_usdt,
                products: [^product_1],
                config: %{hello: :world}
              ]
@@ -34,7 +34,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
              MyAdvisor,
              [
                group_id: :group_a,
-               advisor_id: :exchange_b_ltc_usdt,
+               advisor_id: :venue_b_ltc_usdt,
                products: [^product_2],
                config: %{hello: :world}
              ]

@@ -21,7 +21,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
         products: [
           struct(
             Tai.Venues.Product,
-            %{exchange_id: :test_exchange_a, symbol: :btc_usd}
+            %{venue_id: :test_exchange_a, symbol: :btc_usd}
           )
         ],
         config: %{}

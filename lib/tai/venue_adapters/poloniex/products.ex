@@ -56,7 +56,7 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
     min_notional = Map.get(@min_notional, quote_asset)
 
     %Tai.Venues.Product{
-      exchange_id: venue_id,
+      venue_id: venue_id,
       symbol: symbol,
       exchange_symbol: exchange_symbol,
       status: status,

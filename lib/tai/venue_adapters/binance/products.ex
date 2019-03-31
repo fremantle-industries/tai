@@ -1,8 +1,8 @@
 defmodule Tai.VenueAdapters.Binance.Products do
   def products(venue_id) do
-    with {:ok, %ExBinance.ExchangeInfo{symbols: exchange_products}} <-
+    with {:ok, %ExBinance.ExchangeInfo{symbols: venue_products}} <-
            ExBinance.Public.exchange_info() do
-      products = Enum.map(exchange_products, &build(&1, venue_id))
+      products = Enum.map(venue_products, &build(&1, venue_id))
       {:ok, products}
     else
       {:error, {:binance_error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}}} ->
@@ -29,7 +29,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
     %Decimal{} = min_notional = filters |> notional_filter
 
     %Tai.Venues.Product{
-      exchange_id: venue_id,
+      venue_id: venue_id,
       symbol: Tai.Symbol.build(base_asset, quote_asset),
       exchange_symbol: exchange_symbol,
       status: status,

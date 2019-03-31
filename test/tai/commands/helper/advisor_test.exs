@@ -14,8 +14,8 @@ defmodule Tai.Commands.Helper.AdvisorTest do
   end
 
   test "shows detailed information about the advisor" do
-    mock_product(%{exchange_id: :exchange_a, symbol: :btc_usdt})
-    mock_product(%{exchange_id: :exchange_b, symbol: :eth_usdt})
+    mock_product(%{venue_id: :exchange_a, symbol: :btc_usdt})
+    mock_product(%{venue_id: :exchange_b, symbol: :eth_usdt})
 
     assert capture_io(fn ->
              Tai.Commands.Helper.advisor(:log_spread, :exchange_a_btc_usdt)
@@ -44,12 +44,12 @@ defmodule Tai.Commands.Helper.AdvisorTest do
 
   test "can start and stop a single advisor in a group" do
     mock_product(%{
-      exchange_id: :test_exchange_a,
+      venue_id: :test_exchange_a,
       symbol: :btc_usdt
     })
 
     mock_product(%{
-      exchange_id: :test_exchange_b,
+      venue_id: :test_exchange_b,
       symbol: :eth_usdt
     })
 

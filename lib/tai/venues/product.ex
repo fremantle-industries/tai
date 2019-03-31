@@ -12,7 +12,7 @@ defmodule Tai.Venues.Product do
 
   @type symbol :: atom
   @type t :: %Tai.Venues.Product{
-          exchange_id: Tai.Venues.Adapter.venue_id(),
+          venue_id: Tai.Venues.Adapter.venue_id(),
           symbol: symbol,
           exchange_symbol: String.t(),
           status: status,
@@ -29,7 +29,7 @@ defmodule Tai.Venues.Product do
         }
 
   @enforce_keys ~w(
-    exchange_id
+    venue_id
     symbol
     exchange_symbol
     status
@@ -38,7 +38,7 @@ defmodule Tai.Venues.Product do
     size_increment
   )a
   defstruct ~w(
-    exchange_id
+    venue_id
     symbol
     exchange_symbol
     status

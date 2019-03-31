@@ -98,8 +98,8 @@ defmodule Tai.Advisor do
         state.products
         |> Enum.each(fn p ->
           Tai.PubSub.subscribe([
-            {:order_book_snapshot, p.exchange_id, p.symbol},
-            {:order_book_changes, p.exchange_id, p.symbol}
+            {:order_book_snapshot, p.venue_id, p.symbol},
+            {:order_book_changes, p.venue_id, p.symbol}
           ])
         end)
 

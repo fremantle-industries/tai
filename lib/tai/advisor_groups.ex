@@ -71,7 +71,7 @@ defmodule Tai.AdvisorGroups do
               |> Enum.flat_map(fn {venue_id, product_symbols} ->
                 products
                 |> Enum.filter(fn p ->
-                  p.exchange_id == venue_id && Enum.member?(product_symbols, p.symbol)
+                  p.venue_id == venue_id && Enum.member?(product_symbols, p.symbol)
                 end)
               end)
 

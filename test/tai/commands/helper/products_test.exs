@@ -15,7 +15,7 @@ defmodule Tai.Commands.Helper.ProductsTest do
 
   test "show products and their trade restrictions for configured exchanges" do
     mock_product(%Tai.Venues.Product{
-      exchange_id: :test_exchange_a,
+      venue_id: :test_exchange_a,
       symbol: :btc_usd,
       exchange_symbol: "BTC_USD",
       status: :trading,
@@ -32,7 +32,7 @@ defmodule Tai.Commands.Helper.ProductsTest do
     })
 
     mock_product(%Tai.Venues.Product{
-      exchange_id: :test_exchange_b,
+      venue_id: :test_exchange_b,
       symbol: :eth_usd,
       exchange_symbol: "ETH_USD",
       status: :trading,
