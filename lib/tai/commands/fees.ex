@@ -16,7 +16,7 @@ defmodule Tai.Commands.Fees do
   @spec fees :: no_return
   def fees do
     Tai.Venues.FeeStore.all()
-    |> Enum.sort(&(&1.exchange_id < &2.exchange_id))
+    |> Enum.sort(&(&1.venue_id < &2.venue_id))
     |> format_rows
     |> render!(@header)
   end
@@ -25,7 +25,7 @@ defmodule Tai.Commands.Fees do
     fees
     |> Enum.map(fn fee_info ->
       [
-        fee_info.exchange_id,
+        fee_info.venue_id,
         fee_info.account_id,
         fee_info.symbol,
         {fee_info.maker, fee_info.maker_type},

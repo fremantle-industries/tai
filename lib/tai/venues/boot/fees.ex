@@ -14,10 +14,10 @@ defmodule Tai.Venues.Boot.Fees do
     {schedule_result, account_id}
   end
 
-  defp upsert_for_account({{:ok, schedule}, account_id}, :ok, adapter_id, products) do
+  defp upsert_for_account({{:ok, schedule}, account_id}, :ok, venue_id, products) do
     Enum.each(
       products,
-      &upsert_product(&1, adapter_id, account_id, schedule)
+      &upsert_product(&1, venue_id, account_id, schedule)
     )
 
     :ok
@@ -25,19 +25,19 @@ defmodule Tai.Venues.Boot.Fees do
 
   defp upsert_for_account({{:error, _} = error, _}, _, _, _), do: error
 
-  defp upsert_product(product, adapter_id, account_id, {maker, taker}) do
+  defp upsert_product(product, venue_id, account_id, {maker, taker}) do
     lowest_maker = lowest_fee(product.maker_fee, maker)
     lowest_taker = lowest_fee(product.taker_fee, taker)
-    upsert_product(product, adapter_id, account_id, lowest_maker, lowest_taker)
+    upsert_product(product, venue_id, account_id, lowest_maker, lowest_taker)
   end
 
-  defp upsert_product(product, adapter_id, account_id, nil) do
-    upsert_product(product, adapter_id, account_id, product.maker_fee, product.taker_fee)
+  defp upsert_product(product, venue_id, account_id, nil) do
+    upsert_product(product, venue_id, account_id, product.maker_fee, product.taker_fee)
   end
 
-  defp upsert_product(product, adapter_id, account_id, maker, taker) do
+  defp upsert_product(product, venue_id, account_id, maker, taker) do
     %Tai.Venues.FeeInfo{
-      exchange_id: adapter_id,
+      venue_id: venue_id,
       account_id: account_id,
       symbol: product.symbol,
       maker: maker,

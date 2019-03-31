@@ -1,6 +1,9 @@
 defmodule Tai.Venues.FeeStore do
   use GenServer
 
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type product_symbol :: Tai.Venues.Product.symbol()
   @type fee_info :: Tai.Venues.FeeInfo.t()
 
   def start_link(_) do
@@ -19,7 +22,7 @@ defmodule Tai.Venues.FeeStore do
   end
 
   def handle_call({:upsert, fee_info}, _from, state) do
-    key = {fee_info.exchange_id, fee_info.account_id, fee_info.symbol}
+    key = {fee_info.venue_id, fee_info.account_id, fee_info.symbol}
     record = {key, fee_info}
     :ets.insert(__MODULE__, record)
     {:reply, :ok, state}
@@ -41,10 +44,10 @@ defmodule Tai.Venues.FeeStore do
     GenServer.call(__MODULE__, :clear)
   end
 
-  @spec find_by(exchange_id: atom, account_id: atom, symbol: atom) ::
+  @spec find_by(venue_id: venue_id, account_id: account_id, symbol: product_symbol) ::
           {:ok, fee_info} | {:error, :not_found}
-  def find_by(exchange_id: exchange_id, account_id: account_id, symbol: symbol) do
-    with key <- {exchange_id, account_id, symbol},
+  def find_by(venue_id: venue_id, account_id: account_id, symbol: symbol) do
+    with key <- {venue_id, account_id, symbol},
          [[%Tai.Venues.FeeInfo{} = fee_info]] <- :ets.match(__MODULE__, {key, :"$1"}) do
       {:ok, fee_info}
     else

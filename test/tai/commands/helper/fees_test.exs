@@ -15,7 +15,7 @@ defmodule Tai.Commands.Helper.FeesTest do
 
   test "show the accounts maker/taker fees for every product on each exchange" do
     mock_fee_info(%{
-      exchange_id: :test_exchange_a,
+      venue_id: :test_exchange_a,
       account_id: :main,
       symbol: :btc_usd,
       maker: Decimal.new("-0.0005"),
@@ -25,7 +25,7 @@ defmodule Tai.Commands.Helper.FeesTest do
     })
 
     mock_fee_info(%{
-      exchange_id: :test_exchange_b,
+      venue_id: :test_exchange_b,
       account_id: :main,
       symbol: :eth_usd,
       maker: Decimal.new(0),

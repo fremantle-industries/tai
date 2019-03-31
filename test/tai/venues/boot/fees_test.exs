@@ -24,17 +24,17 @@ defmodule Tai.Venues.Boot.FeesTest do
   @account_a :account_a
   @account_b :account_b
   @btc_usd_product struct(Tai.Venues.Product, %{
-                     exchange_id: @venue_a,
+                     venue_id: @venue_a,
                      symbol: :btc_usd,
                      maker_fee: Decimal.new("0.001"),
                      taker_fee: Decimal.new("0.002")
                    })
   @eth_usd_product struct(Tai.Venues.Product, %{
-                     exchange_id: @venue_a,
+                     venue_id: @venue_a,
                      symbol: :eth_usd
                    })
   @ltc_usd_product struct(Tai.Venues.Product, %{
-                     exchange_id: @venue_b,
+                     venue_id: @venue_b,
                      symbol: :ltc_usd,
                      maker_fee: Decimal.new("0.003"),
                      taker_fee: Decimal.new("0.004")
@@ -62,7 +62,7 @@ defmodule Tai.Venues.Boot.FeesTest do
 
       assert {:ok, btc_usd_fee} =
                Tai.Venues.FeeStore.find_by(
-                 exchange_id: @venue_a,
+                 venue_id: @venue_a,
                  account_id: @account_a,
                  symbol: @btc_usd_product.symbol
                )
@@ -78,7 +78,7 @@ defmodule Tai.Venues.Boot.FeesTest do
 
       assert {:ok, eth_usd_fee} =
                Tai.Venues.FeeStore.find_by(
-                 exchange_id: @venue_a,
+                 venue_id: @venue_a,
                  account_id: @account_a,
                  symbol: @eth_usd_product.symbol
                )
@@ -94,7 +94,7 @@ defmodule Tai.Venues.Boot.FeesTest do
 
       assert {:ok, ltc_usd_fee} =
                Tai.Venues.FeeStore.find_by(
-                 exchange_id: @venue_b,
+                 venue_id: @venue_b,
                  account_id: @account_b,
                  symbol: :ltc_usd
                )
