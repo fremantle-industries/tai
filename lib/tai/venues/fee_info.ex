@@ -10,24 +10,24 @@ defmodule Tai.Venues.FeeInfo do
           taker_type: fee_type
         }
 
-  @enforce_keys [
-    :exchange_id,
-    :account_id,
-    :symbol,
-    :maker,
-    :maker_type,
-    :taker,
-    :taker_type
-  ]
-  defstruct [
-    :exchange_id,
-    :account_id,
-    :symbol,
-    :maker,
-    :maker_type,
-    :taker,
-    :taker_type
-  ]
+  @enforce_keys ~w(
+    exchange_id
+    account_id
+    symbol
+    maker
+    maker_type
+    taker
+    taker_type
+  )a
+  defstruct ~w(
+    exchange_id
+    account_id
+    symbol
+    maker
+    maker_type
+    taker
+    taker_type
+  )a
 
   def percent, do: :percent
 end
