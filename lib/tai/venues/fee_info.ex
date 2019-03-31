@@ -1,9 +1,9 @@
 defmodule Tai.Venues.FeeInfo do
   @type fee_type :: :percent
   @type t :: %Tai.Venues.FeeInfo{
-          exchange_id: atom,
-          account_id: atom,
-          symbol: atom,
+          exchange_id: Tai.Venues.Adapter.venue_id(),
+          account_id: Tai.Venues.Adapter.account_id(),
+          symbol: Tai.Venues.Product.symbol(),
           maker: Decimal.t(),
           maker_type: fee_type,
           taker: Decimal.t(),
