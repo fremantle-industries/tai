@@ -17,7 +17,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
          %{
            "baseAsset" => base_asset,
            "quoteAsset" => quote_asset,
-           "symbol" => exchange_symbol,
+           "symbol" => venue_symbol,
            "status" => exchange_status,
            "filters" => filters
          },
@@ -31,7 +31,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
     %Tai.Venues.Product{
       venue_id: venue_id,
       symbol: Tai.Symbol.build(base_asset, quote_asset),
-      exchange_symbol: exchange_symbol,
+      venue_symbol: venue_symbol,
       status: status,
       margin: false,
       min_notional: min_notional,

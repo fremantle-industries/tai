@@ -49,7 +49,7 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   defp url(products) do
     streams =
       products
-      |> Enum.map(& &1.exchange_symbol)
+      |> Enum.map(& &1.venue_symbol)
       |> Enum.map(&String.downcase/1)
       |> Enum.map(&"#{&1}@depth")
       |> Enum.join("/")

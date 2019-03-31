@@ -14,7 +14,7 @@ defmodule Tai.Venues.Product do
   @type t :: %Tai.Venues.Product{
           venue_id: Tai.Venues.Adapter.venue_id(),
           symbol: symbol,
-          exchange_symbol: String.t(),
+          venue_symbol: String.t(),
           status: status,
           margin: boolean,
           min_size: Decimal.t(),
@@ -31,7 +31,7 @@ defmodule Tai.Venues.Product do
   @enforce_keys ~w(
     venue_id
     symbol
-    exchange_symbol
+    venue_symbol
     status
     margin
     min_size
@@ -40,7 +40,7 @@ defmodule Tai.Venues.Product do
   defstruct ~w(
     venue_id
     symbol
-    exchange_symbol
+    venue_symbol
     status
     margin
     min_notional

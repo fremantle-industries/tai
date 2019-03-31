@@ -51,7 +51,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
     %Tai.Venues.Product{
       venue_id: venue_id,
       symbol: symbol,
-      exchange_symbol: id,
+      venue_symbol: id,
       status: status,
       margin: false,
       min_notional: min_notional,

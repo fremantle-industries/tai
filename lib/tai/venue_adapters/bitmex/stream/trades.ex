@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.Trades do
   def broadcast(
         %{
-          "symbol" => exchange_symbol,
+          "symbol" => venue_symbol,
           "timestamp" => timestamp,
           "price" => price,
           "size" => qty,
@@ -15,7 +15,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Trades do
       # TODO: 
       # The list of products or a map of exchange symbol to symbol should be 
       # passed in. This currently doesn't support _ within the symbol
-      symbol: exchange_symbol |> String.downcase() |> String.to_atom(),
+      symbol: venue_symbol |> String.downcase() |> String.to_atom(),
       received_at: received_at,
       timestamp: timestamp,
       price: price,

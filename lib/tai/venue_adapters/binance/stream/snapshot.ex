@@ -4,7 +4,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Snapshot do
 
   @spec fetch(product, pos_integer) :: {:ok, order_book}
   def fetch(product, depth) do
-    with {:ok, binance_book} <- ExBinance.Public.depth(product.exchange_symbol, depth) do
+    with {:ok, binance_book} <- ExBinance.Public.depth(product.venue_symbol, depth) do
       processed_at = Timex.now()
 
       book = %Tai.Markets.OrderBook{

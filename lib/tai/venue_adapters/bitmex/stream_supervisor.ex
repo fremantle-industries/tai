@@ -33,11 +33,11 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
       products
       |> Enum.map(fn p ->
         %{
-          id: Tai.VenueAdapters.Bitmex.Stream.OrderBookStore.to_name(venue_id, p.exchange_symbol),
+          id: Tai.VenueAdapters.Bitmex.Stream.OrderBookStore.to_name(venue_id, p.venue_symbol),
           start: {
             Tai.VenueAdapters.Bitmex.Stream.OrderBookStore,
             :start_link,
-            [[venue_id: venue_id, symbol: p.symbol, exchange_symbol: p.exchange_symbol]]
+            [[venue_id: venue_id, symbol: p.symbol, venue_symbol: p.venue_symbol]]
           }
         }
       end)

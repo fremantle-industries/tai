@@ -48,8 +48,8 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
   @min_size Decimal.new("0.000001")
   @min_price Decimal.new("0.00000001")
   @max_price Decimal.new("100000.0")
-  defp build({exchange_symbol, %{"isFrozen" => is_frozen}}, venue_id) do
-    [exchange_quote_asset, exchange_base_asset] = String.split(exchange_symbol, "_")
+  defp build({venue_symbol, %{"isFrozen" => is_frozen}}, venue_id) do
+    [exchange_quote_asset, exchange_base_asset] = String.split(venue_symbol, "_")
     symbol = Tai.Symbol.build(exchange_base_asset, exchange_quote_asset)
     {:ok, status} = Tai.VenueAdapters.Poloniex.ProductStatus.normalize(is_frozen)
     {:ok, {_, quote_asset}} = Tai.Symbol.base_and_quote(symbol)
@@ -58,7 +58,7 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
     %Tai.Venues.Product{
       venue_id: venue_id,
       symbol: symbol,
-      exchange_symbol: exchange_symbol,
+      venue_symbol: venue_symbol,
       status: status,
       margin: false,
       min_notional: min_notional,

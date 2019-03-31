@@ -15,7 +15,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBooks do
       products
       |> Enum.reduce(
         %{},
-        fn p, acc -> Map.put(acc, p.exchange_symbol, p.symbol) end
+        fn p, acc -> Map.put(acc, p.venue_symbol, p.symbol) end
       )
 
     state = %Stream.ProcessOrderBooks{
