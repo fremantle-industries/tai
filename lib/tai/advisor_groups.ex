@@ -42,11 +42,7 @@ defmodule Tai.AdvisorGroups do
         end
       )
 
-    if Enum.empty?(results.errors) do
-      {:ok, results.groups}
-    else
-      {:error, results.errors}
-    end
+    if Enum.empty?(results.errors), do: {:ok, results.groups}, else: {:error, results.errors}
   end
 
   @spec build_specs(config :: config, products :: [product]) ::
