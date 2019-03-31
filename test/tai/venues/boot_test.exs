@@ -16,7 +16,7 @@ defmodule Tai.Venues.BootTest do
     :ok
   end
 
-  @exchange_id :mock_boot
+  @venue_id :mock_boot
   @account_id :main
   @timeout 5000
 
@@ -24,7 +24,7 @@ defmodule Tai.Venues.BootTest do
     setup [:mock_products, :mock_asset_balances, :mock_maker_taker_fees]
 
     @adapter %Tai.Venues.Adapter{
-      id: @exchange_id,
+      id: @venue_id,
       adapter: Tai.VenueAdapters.Mock,
       products: "* -ltc_usdt",
       accounts: %{main: %{}},
@@ -34,9 +34,9 @@ defmodule Tai.Venues.BootTest do
     test "hydrates filtered products" do
       assert {:ok, %Tai.Venues.Adapter{}} = Tai.Venues.Boot.run(@adapter)
 
-      assert {:ok, btc_usdt_product} = Tai.Venues.ProductStore.find({@exchange_id, :btc_usdt})
-      assert {:ok, eth_usdt_product} = Tai.Venues.ProductStore.find({@exchange_id, :eth_usdt})
-      assert {:error, :not_found} = Tai.Venues.ProductStore.find({@exchange_id, :ltc_usdt})
+      assert {:ok, btc_usdt_product} = Tai.Venues.ProductStore.find({@venue_id, :btc_usdt})
+      assert {:ok, eth_usdt_product} = Tai.Venues.ProductStore.find({@venue_id, :eth_usdt})
+      assert {:error, :not_found} = Tai.Venues.ProductStore.find({@venue_id, :ltc_usdt})
     end
 
     test "hydrates asset balances" do
@@ -44,28 +44,28 @@ defmodule Tai.Venues.BootTest do
 
       assert {:ok, btc_balance} =
                Tai.Venues.AssetBalances.find_by(
-                 exchange_id: @exchange_id,
+                 exchange_id: @venue_id,
                  account_id: @account_id,
                  asset: :btc
                )
 
       assert {:ok, eth_balance} =
                Tai.Venues.AssetBalances.find_by(
-                 exchange_id: @exchange_id,
+                 exchange_id: @venue_id,
                  account_id: @account_id,
                  asset: :eth
                )
 
       assert {:ok, ltc_balance} =
                Tai.Venues.AssetBalances.find_by(
-                 exchange_id: @exchange_id,
+                 exchange_id: @venue_id,
                  account_id: @account_id,
                  asset: :ltc
                )
 
       assert {:ok, usdt_balance} =
                Tai.Venues.AssetBalances.find_by(
-                 exchange_id: @exchange_id,
+                 exchange_id: @venue_id,
                  account_id: :main,
                  asset: :usdt
                )
@@ -76,21 +76,21 @@ defmodule Tai.Venues.BootTest do
 
       assert {:ok, btc_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
-                 exchange_id: @exchange_id,
+                 venue_id: @venue_id,
                  account_id: @account_id,
                  symbol: :btc_usdt
                )
 
       assert {:ok, eth_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
-                 exchange_id: @exchange_id,
+                 venue_id: @venue_id,
                  account_id: @account_id,
                  symbol: :eth_usdt
                )
 
       assert {:error, :not_found} =
                Tai.Venues.FeeStore.find_by(
-                 exchange_id: @exchange_id,
+                 venue_id: @venue_id,
                  account_id: @account_id,
                  symbol: :ltc_usdt
                )
@@ -154,7 +154,7 @@ defmodule Tai.Venues.BootTest do
 
   def mock_products(_) do
     Tai.TestSupport.Mocks.Responses.Products.for_venue(
-      @exchange_id,
+      @venue_id,
       [
         %{symbol: :btc_usdt},
         %{symbol: :eth_usdt},
@@ -167,7 +167,7 @@ defmodule Tai.Venues.BootTest do
 
   def mock_maker_taker_fees(_) do
     Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_exchange_and_account(
-      @exchange_id,
+      @venue_id,
       @account_id,
       {Decimal.new("0.001"), Decimal.new("0.001")}
     )
@@ -175,7 +175,7 @@ defmodule Tai.Venues.BootTest do
 
   def mock_asset_balances(_) do
     Tai.TestSupport.Mocks.Responses.AssetBalances.for_exchange_and_account(
-      @exchange_id,
+      @venue_id,
       @account_id,
       [
         %{asset: :btc, free: Decimal.new("0.1"), locked: Decimal.new("0.2")},
