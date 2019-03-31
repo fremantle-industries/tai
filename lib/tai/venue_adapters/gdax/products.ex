@@ -49,9 +49,9 @@ defmodule Tai.VenueAdapters.Gdax.Products do
     min_notional = Decimal.mult(base_min_size, quote_increment)
 
     %Tai.Venues.Product{
-      exchange_id: venue_id,
+      venue_id: venue_id,
       symbol: symbol,
-      exchange_symbol: id,
+      venue_symbol: id,
       status: status,
       margin: false,
       min_notional: min_notional,

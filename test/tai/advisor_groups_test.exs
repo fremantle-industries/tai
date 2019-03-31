@@ -6,13 +6,13 @@ defmodule Tai.AdvisorGroupsTest do
     def advisor_specs(group, products) do
       products
       |> Enum.map(fn p ->
-        order_books = %{} |> Map.put(p.exchange_id, [p.symbol])
+        order_books = %{} |> Map.put(p.venue_id, [p.symbol])
 
         {
           TestAdvisor,
           [
             group_id: group.id,
-            advisor_id: :"advisor_#{p.exchange_id}_#{p.symbol}",
+            advisor_id: :"advisor_#{p.venue_id}_#{p.symbol}",
             order_books: order_books,
             config: %{}
           ]
@@ -126,10 +126,10 @@ defmodule Tai.AdvisorGroupsTest do
     test "returns advisor specs with filtered products from the groups factory" do
       config_without_groups = Tai.Config.parse(advisor_groups: %{})
 
-      product_1 = struct(Tai.Venues.Product, %{exchange_id: :exchange_a, symbol: :btc_usd})
-      product_2 = struct(Tai.Venues.Product, %{exchange_id: :exchange_a, symbol: :eth_usd})
-      product_3 = struct(Tai.Venues.Product, %{exchange_id: :exchange_b, symbol: :btc_usd})
-      product_4 = struct(Tai.Venues.Product, %{exchange_id: :exchange_b, symbol: :ltc_usd})
+      product_1 = struct(Tai.Venues.Product, %{venue_id: :exchange_a, symbol: :btc_usd})
+      product_2 = struct(Tai.Venues.Product, %{venue_id: :exchange_a, symbol: :eth_usd})
+      product_3 = struct(Tai.Venues.Product, %{venue_id: :exchange_b, symbol: :btc_usd})
+      product_4 = struct(Tai.Venues.Product, %{venue_id: :exchange_b, symbol: :ltc_usd})
       products = [product_1, product_2, product_3, product_4]
 
       assert Tai.AdvisorGroups.build_specs(config_without_groups, products) == {:ok, []}
@@ -194,10 +194,10 @@ defmodule Tai.AdvisorGroupsTest do
     test "returns advisor specs with filtered products from the factory of the given group" do
       config_without_groups = Tai.Config.parse(advisor_groups: %{})
 
-      product_1 = struct(Tai.Venues.Product, %{exchange_id: :exchange_a, symbol: :btc_usd})
-      product_2 = struct(Tai.Venues.Product, %{exchange_id: :exchange_a, symbol: :eth_usd})
-      product_3 = struct(Tai.Venues.Product, %{exchange_id: :exchange_b, symbol: :btc_usd})
-      product_4 = struct(Tai.Venues.Product, %{exchange_id: :exchange_b, symbol: :ltc_usd})
+      product_1 = struct(Tai.Venues.Product, %{venue_id: :exchange_a, symbol: :btc_usd})
+      product_2 = struct(Tai.Venues.Product, %{venue_id: :exchange_a, symbol: :eth_usd})
+      product_3 = struct(Tai.Venues.Product, %{venue_id: :exchange_b, symbol: :btc_usd})
+      product_4 = struct(Tai.Venues.Product, %{venue_id: :exchange_b, symbol: :ltc_usd})
       products = [product_1, product_2, product_3, product_4]
 
       assert Tai.AdvisorGroups.build_specs_for_group(
@@ -275,10 +275,10 @@ defmodule Tai.AdvisorGroupsTest do
     test "returns advisor specs with filtered products from the factory of the given advisor & group" do
       config_without_groups = Tai.Config.parse(advisor_groups: %{})
 
-      product_1 = struct(Tai.Venues.Product, %{exchange_id: :exchange_a, symbol: :btc_usd})
-      product_2 = struct(Tai.Venues.Product, %{exchange_id: :exchange_a, symbol: :eth_usd})
-      product_3 = struct(Tai.Venues.Product, %{exchange_id: :exchange_b, symbol: :btc_usd})
-      product_4 = struct(Tai.Venues.Product, %{exchange_id: :exchange_b, symbol: :ltc_usd})
+      product_1 = struct(Tai.Venues.Product, %{venue_id: :exchange_a, symbol: :btc_usd})
+      product_2 = struct(Tai.Venues.Product, %{venue_id: :exchange_a, symbol: :eth_usd})
+      product_3 = struct(Tai.Venues.Product, %{venue_id: :exchange_b, symbol: :btc_usd})
+      product_4 = struct(Tai.Venues.Product, %{venue_id: :exchange_b, symbol: :ltc_usd})
       products = [product_1, product_2, product_3, product_4]
 
       assert Tai.AdvisorGroups.build_specs_for_advisor(

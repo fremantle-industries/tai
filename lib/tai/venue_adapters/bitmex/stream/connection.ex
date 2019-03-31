@@ -84,13 +84,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   defp subscribe_order_books(pid, products) do
-    args = Enum.map(products, fn p -> "orderBookL2_25:#{p.exchange_symbol}" end)
+    args = Enum.map(products, fn p -> "orderBookL2_25:#{p.venue_symbol}" end)
     msg = %{"op" => "subscribe", "args" => args}
     Tai.WebSocket.send_json_msg(pid, msg)
   end
 
   defp subscribe_trades(pid, products) do
-    args = Enum.map(products, fn p -> "trade:#{p.exchange_symbol}" end)
+    args = Enum.map(products, fn p -> "trade:#{p.venue_symbol}" end)
     msg = %{"op" => "subscribe", "args" => args}
     Tai.WebSocket.send_json_msg(pid, msg)
   end

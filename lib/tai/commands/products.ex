@@ -34,9 +34,9 @@ defmodule Tai.Commands.Products do
     products
     |> Enum.map(fn product ->
       [
-        product.exchange_id,
+        product.venue_id,
         product.symbol,
-        product.exchange_symbol,
+        product.venue_symbol,
         product.status,
         product.margin,
         product.maker_fee && product.maker_fee |> to_percent,

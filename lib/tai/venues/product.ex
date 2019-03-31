@@ -12,9 +12,9 @@ defmodule Tai.Venues.Product do
 
   @type symbol :: atom
   @type t :: %Tai.Venues.Product{
-          exchange_id: atom,
+          venue_id: Tai.Venues.Adapter.venue_id(),
           symbol: symbol,
-          exchange_symbol: String.t(),
+          venue_symbol: String.t(),
           status: status,
           margin: boolean,
           min_size: Decimal.t(),
@@ -28,29 +28,29 @@ defmodule Tai.Venues.Product do
           taker_fee: Decimal.t() | nil
         }
 
-  @enforce_keys [
-    :exchange_id,
-    :symbol,
-    :exchange_symbol,
-    :status,
-    :margin,
-    :min_size,
-    :size_increment
-  ]
-  defstruct [
-    :exchange_id,
-    :symbol,
-    :exchange_symbol,
-    :status,
-    :margin,
-    :min_notional,
-    :min_price,
-    :min_size,
-    :max_size,
-    :max_price,
-    :price_increment,
-    :size_increment,
-    :maker_fee,
-    :taker_fee
-  ]
+  @enforce_keys ~w(
+    venue_id
+    symbol
+    venue_symbol
+    status
+    margin
+    min_size
+    size_increment
+  )a
+  defstruct ~w(
+    venue_id
+    symbol
+    venue_symbol
+    status
+    margin
+    min_notional
+    min_price
+    min_size
+    max_size
+    max_price
+    price_increment
+    size_increment
+    maker_fee
+    taker_fee
+  )a
 end

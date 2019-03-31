@@ -4,7 +4,7 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProduct do
   def advisor_specs(%Tai.AdvisorGroup{} = group, products) when is_list(products) do
     products
     |> Enum.map(fn product ->
-      advisor_id = :"#{product.exchange_id}_#{product.symbol}"
+      advisor_id = :"#{product.venue_id}_#{product.symbol}"
 
       opts = [
         group_id: group.id,

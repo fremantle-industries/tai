@@ -14,8 +14,8 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
   end
 
   test "shows all advisors and their run status" do
-    mock_product(%{exchange_id: :exchange_a, symbol: :btc_usdt})
-    mock_product(%{exchange_id: :exchange_b, symbol: :eth_usdt})
+    mock_product(%{venue_id: :exchange_a, symbol: :btc_usdt})
+    mock_product(%{venue_id: :exchange_b, symbol: :eth_usdt})
 
     assert capture_io(&Tai.Commands.Helper.advisors/0) == """
            +------------+---------------------+-----------+-----+
@@ -39,12 +39,12 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
 
   test "can start and stop all advisors in all groups" do
     mock_product(%{
-      exchange_id: :test_exchange_a,
+      venue_id: :test_exchange_a,
       symbol: :btc_usdt
     })
 
     mock_product(%{
-      exchange_id: :test_exchange_b,
+      venue_id: :test_exchange_b,
       symbol: :eth_usdt
     })
 
@@ -81,12 +81,12 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
 
   test "starts and stops all advisors in a single group" do
     mock_product(%{
-      exchange_id: :test_exchange_a,
+      venue_id: :test_exchange_a,
       symbol: :btc_usdt
     })
 
     mock_product(%{
-      exchange_id: :test_exchange_b,
+      venue_id: :test_exchange_b,
       symbol: :eth_usdt
     })
 

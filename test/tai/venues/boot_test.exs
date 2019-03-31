@@ -153,7 +153,7 @@ defmodule Tai.Venues.BootTest do
   end
 
   def mock_products(_) do
-    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+    Tai.TestSupport.Mocks.Responses.Products.for_venue(
       @exchange_id,
       [
         %{symbol: :btc_usdt},

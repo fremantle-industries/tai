@@ -43,7 +43,7 @@ defmodule Tai.Commands.Helper.MarketsTest do
   end
 
   def mock_products() do
-    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+    Tai.TestSupport.Mocks.Responses.Products.for_venue(
       :test_exchange_a,
       [
         %{symbol: :btc_usd},
@@ -51,7 +51,7 @@ defmodule Tai.Commands.Helper.MarketsTest do
       ]
     )
 
-    Tai.TestSupport.Mocks.Responses.Products.for_exchange(
+    Tai.TestSupport.Mocks.Responses.Products.for_venue(
       :test_exchange_b,
       [
         %{symbol: :eth_usd},

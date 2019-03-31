@@ -33,9 +33,9 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
     status = Tai.VenueAdapters.Bitmex.ProductStatus.normalize(state)
 
     %Tai.Venues.Product{
-      exchange_id: venue_id,
+      venue_id: venue_id,
       symbol: symbol,
-      exchange_symbol: bitmex_symbol,
+      venue_symbol: bitmex_symbol,
       status: status,
       margin: true,
       price_increment: tick_size |> to_decimal,

@@ -11,14 +11,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
   @enforce_keys [:venue_id, :symbol, :table]
   defstruct [:venue_id, :symbol, :table]
 
-  def start_link(venue_id: venue_id, symbol: symbol, exchange_symbol: exchange_symbol) do
+  def start_link(venue_id: venue_id, symbol: symbol, venue_symbol: venue_symbol) do
     store = %Tai.VenueAdapters.Bitmex.Stream.OrderBookStore{
       venue_id: venue_id,
       symbol: symbol,
       table: %{}
     }
 
-    GenServer.start_link(__MODULE__, store, name: to_name(venue_id, exchange_symbol))
+    GenServer.start_link(__MODULE__, store, name: to_name(venue_id, venue_symbol))
   end
 
   @spec init(t) :: {:ok, t}
@@ -26,8 +26,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
     {:ok, state}
   end
 
-  @spec to_name(venue_id :: atom, exchange_symbol :: String.t()) :: atom
-  def to_name(venue_id, exchange_symbol), do: :"#{__MODULE__}_#{venue_id}_#{exchange_symbol}"
+  @spec to_name(venue_id :: atom, venue_symbol :: String.t()) :: atom
+  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
 
   def handle_cast({:snapshot, data, received_at}, state) do
     normalized =

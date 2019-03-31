@@ -14,8 +14,8 @@ defmodule Tai.Commands.Helper.AdvisorGroupsTest do
   end
 
   test "shows all advisor groups and the status of their advisors" do
-    mock_product(%{exchange_id: :test_exchange_a, symbol: :btc_usdt})
-    mock_product(%{exchange_id: :test_exchange_b, symbol: :eth_usdt})
+    mock_product(%{venue_id: :test_exchange_a, symbol: :btc_usdt})
+    mock_product(%{venue_id: :test_exchange_b, symbol: :eth_usdt})
 
     assert capture_io(&Tai.Commands.Helper.advisor_groups/0) == """
            +---------------------+---------+-----------+-------+

@@ -29,7 +29,7 @@ defmodule Tai.Commands.Markets do
 
   defp fetch_inside_quotes(products) when is_list(products) do
     products
-    |> Enum.map(fn p -> {p.exchange_id, p.symbol} end)
+    |> Enum.map(fn p -> {p.venue_id, p.symbol} end)
     |> Enum.map(fn {venue_id, symbol} ->
       {:ok, inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, symbol)
       {venue_id, symbol, inside_quote}

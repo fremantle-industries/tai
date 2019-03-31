@@ -19,7 +19,7 @@ defmodule Tai.Venues.ProductStore do
   end
 
   def handle_call({:upsert, product}, _from, state) do
-    record = {{product.exchange_id, product.symbol}, product}
+    record = {{product.venue_id, product.symbol}, product}
     :ets.insert(__MODULE__, record)
     {:reply, :ok, state}
   end

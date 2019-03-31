@@ -15,8 +15,8 @@ defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
     use_cassette "exchange_adapters/shared/products/bitmex/success" do
       assert {:ok, products} = Tai.Venue.products(adapter)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :xbtusd)
-      assert product.exchange_id == :bitmex
-      assert product.exchange_symbol == "XBTUSD"
+      assert product.venue_id == :bitmex
+      assert product.venue_symbol == "XBTUSD"
       assert product.status == :trading
       assert %Decimal{} = product.price_increment
       assert %Decimal{} = product.size_increment
