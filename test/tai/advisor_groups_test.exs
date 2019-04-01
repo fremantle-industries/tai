@@ -60,6 +60,22 @@ defmodule Tai.AdvisorGroupsTest do
              }
     end
 
+    test "assigns an empty config map when not present" do
+      config =
+        Tai.Config.parse(
+          advisor_groups: %{
+            group_a: [
+              advisor: AdvisorA,
+              factory: TestFactoryA,
+              products: "btc_usdt"
+            ]
+          }
+        )
+
+      assert {:ok, [group | _]} = Tai.AdvisorGroups.parse_config(config)
+      assert group.config == %{}
+    end
+
     test "returns an error tuple when advisor is not present" do
       config =
         Tai.Config.parse(
