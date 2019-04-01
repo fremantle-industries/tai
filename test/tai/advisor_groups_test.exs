@@ -68,11 +68,6 @@ defmodule Tai.AdvisorGroupsTest do
             group_a: [
               factory: TestFactoryA,
               products: "*"
-            ],
-            group_b: [
-              advisor: TestAdvisorB,
-              factory: TestFactoryB,
-              products: "btc_usdt"
             ]
           }
         )
@@ -88,11 +83,6 @@ defmodule Tai.AdvisorGroupsTest do
             group_a: [
               advisor: TestAdvisorA,
               products: "*"
-            ],
-            group_b: [
-              advisor: TestAdvisorB,
-              factory: TestFactoryB,
-              products: "btc_usdt"
             ]
           }
         )
@@ -105,11 +95,6 @@ defmodule Tai.AdvisorGroupsTest do
       config =
         Tai.Config.parse(
           advisor_groups: %{
-            group_a: [
-              advisor: TestAdvisorA,
-              factory: TestFactoryA,
-              products: "*"
-            ],
             group_b: [
               advisor: TestAdvisorB,
               factory: TestFactoryB
