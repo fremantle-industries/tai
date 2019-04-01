@@ -40,24 +40,23 @@ defmodule Tai.AdvisorGroupsTest do
           }
         )
 
-      assert Tai.AdvisorGroups.parse_config(config) == {
-               :ok,
-               [
-                 %Tai.AdvisorGroup{
-                   id: :group_a,
-                   advisor: AdvisorA,
-                   factory: TestFactoryA,
-                   products: "*",
-                   config: %{min_profit: 0.1}
-                 },
-                 %Tai.AdvisorGroup{
-                   id: :group_b,
-                   advisor: AdvisorB,
-                   factory: TestFactoryB,
-                   products: "btc_usdt",
-                   config: %{}
-                 }
-               ]
+      assert {:ok, groups} = Tai.AdvisorGroups.parse_config(config)
+      assert Enum.count(groups) == 2
+
+      assert groups |> List.first() == %Tai.AdvisorGroup{
+               id: :group_a,
+               advisor: AdvisorA,
+               factory: TestFactoryA,
+               products: "*",
+               config: %{min_profit: 0.1}
+             }
+
+      assert groups |> List.last() == %Tai.AdvisorGroup{
+               id: :group_b,
+               advisor: AdvisorB,
+               factory: TestFactoryB,
+               products: "btc_usdt",
+               config: %{}
              }
     end
 
