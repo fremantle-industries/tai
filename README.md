@@ -31,7 +31,7 @@ We are working to make `tai` production quality software.
 
 ## Install
 
-`tai` requires Elixir 1.7+ & Erlang/OTP 21+. Add `tai` to your list of dependencies in `mix.exs`
+`tai` requires Elixir 1.8+ & Erlang/OTP 21+. Add `tai` to your list of dependencies in `mix.exs`
 
 ```elixir
 def deps do
