@@ -12,7 +12,7 @@
   "dialyxir": {:hex, :dialyxir, "1.0.0-rc.5", "c9c2379c59cf2dfc74690f48866e33ffb55ff660e5e02405c14614d204efdc4f", [:mix], [{:erlex, "~> 0.2.1", [hex: :erlex, repo: "hexpm", optional: false]}], "hexpm"},
   "earmark": {:hex, :earmark, "1.3.1", "73812f447f7a42358d3ba79283cfa3075a7580a3a2ed457616d6517ac3738cb9", [:mix], [], "hexpm"},
   "echo_boy": {:git, "https://github.com/rupurt/echo_boy.git", "1b599fa2c9865e7cfdea3cb76cb71b7b12df9d9b", []},
-  "ecto": {:git, "https://github.com/elixir-ecto/ecto.git", "e8eaa9145bc924de1f2fbb0ee295fe4e802e71fc", []},
+  "ecto": {:hex, :ecto, "3.1.1", "d6677f95f1e0bd39bc3db3db6b23a59977cb154ed2cceec69a56becd805128be", [:mix], [{:decimal, "~> 1.6", [hex: :decimal, repo: "hexpm", optional: false]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: true]}], "hexpm"},
   "erlex": {:hex, :erlex, "0.2.1", "cee02918660807cbba9a7229cae9b42d1c6143b768c781fa6cee1eaf03ad860b", [:mix], [], "hexpm"},
   "ex_binance": {:git, "https://github.com/fremantle-capital/ex_binance.git", "e44e8242ddb618bf80e81b2e6d4b4dce1929b645", []},
   "ex_bitmex": {:hex, :ex_bitmex, "0.1.0", "987ca59bd033849feb8d4ff61d0f9a9e32b4dd1dcb51f722d48802e500a425a5", [:mix], [{:httpoison, "~> 1.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:jason, "~> 1.1.0", [hex: :jason, repo: "hexpm", optional: false]}, {:mapail, "~> 1.0.2", [hex: :mapail, repo: "hexpm", optional: false]}], "hexpm"},

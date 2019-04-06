@@ -47,8 +47,7 @@ defmodule Tai.Mixfile do
       {:websockex, github: "Azolo/websockex"},
       {:confex, "~> 3.4.0"},
       # 3.1-dev removes dependency on Poison
-      # {:ecto, "~> 3.0"},
-      {:ecto, github: "elixir-ecto/ecto"},
+      {:ecto, "~> 3.1"},
       {:jason, "~> 1.1"},
       {:vex, "~> 0.7"},
       {:logger_file_backend_with_formatters, "~> 0.0.1", only: [:dev, :test]},
