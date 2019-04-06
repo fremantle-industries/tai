@@ -4,7 +4,7 @@ defmodule Tai.Mixfile do
   def project do
     [
       app: :tai,
-      version: "0.0.14",
+      version: "0.0.15",
       elixir: "~> 1.8",
       package: package(),
       start_permanent: Mix.env() == :prod,
@@ -32,8 +32,7 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
-      # {:ex_binance, "~> 0.0.2"},
-      {:ex_binance, github: "fremantle-capital/ex_binance"},
+      {:ex_binance, "~> 0.0.2"},
       {:ex_bitmex, "~> 0.1.0"},
       {:decimal, "~> 1.7.0"},
       {:ex_gdax, "~> 0.1.6"},
@@ -43,10 +42,9 @@ defmodule Tai.Mixfile do
       {:table_rex, "~> 2.0"},
       {:timex, "~> 3.1"},
       # Fixes deprecation warnings
-      # {:websockex, "~> 0.4.0"},
-      {:websockex, github: "Azolo/websockex"},
+      # {:websockex, github: "Azolo/websockex"},
+      {:websockex, "~> 0.4.0"},
       {:confex, "~> 3.4.0"},
-      # 3.1-dev removes dependency on Poison
       {:ecto, "~> 3.1"},
       {:jason, "~> 1.1"},
       {:vex, "~> 0.7"},
