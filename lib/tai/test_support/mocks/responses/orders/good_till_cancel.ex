@@ -37,6 +37,33 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     Mocks.Server.insert(key, order_response)
   end
 
+  @spec rejected(venue_order_id, submission) :: :ok
+  def rejected(venue_order_id, submission) do
+    qty = submission.qty
+
+    order_response = %Tai.Trading.OrderResponses.Create{
+      id: venue_order_id,
+      status: :rejected,
+      avg_price: Decimal.new(0),
+      original_size: qty,
+      leaves_qty: Decimal.new(0),
+      cumulative_qty: Decimal.new(0),
+      venue_timestamp: Timex.now(),
+      received_at: Timex.now()
+    }
+
+    key =
+      {Tai.Trading.OrderResponse,
+       [
+         symbol: submission.product_symbol,
+         price: submission.price,
+         size: submission.qty,
+         time_in_force: :gtc
+       ]}
+
+    Mocks.Server.insert(key, order_response)
+  end
+
   @spec amend_price(order, Decimal.t()) :: :ok
   def amend_price(order, price) do
     order_response = %Tai.Trading.OrderResponses.Amend{

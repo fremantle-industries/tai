@@ -126,6 +126,30 @@ defmodule Tai.Trading.OrderStore do
     {:reply, response, state}
   end
 
+  @reject_required :enqueued
+  def handle_call(
+        {
+          :reject,
+          client_id,
+          venue_order_id,
+          last_received_at,
+          last_venue_timestamp
+        },
+        _from,
+        state
+      ) do
+    response =
+      update(client_id, @reject_required, %{
+        status: :rejected,
+        venue_order_id: venue_order_id,
+        leaves_qty: Decimal.new(0),
+        last_received_at: last_received_at,
+        last_venue_timestamp: last_venue_timestamp
+      })
+
+    {:reply, response, state}
+  end
+
   @amend_required :pending_amend
   def handle_call(
         {
@@ -493,6 +517,27 @@ defmodule Tai.Trading.OrderStore do
         avg_price,
         cumulative_qty,
         leaves_qty,
+        last_received_at,
+        last_venue_timestamp
+      }
+    )
+  end
+
+  @spec reject(client_id, venue_order_id, DateTime.t(), DateTime.t()) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error, :not_found | {:invalid_status, current :: atom, required :: :enqueued}}
+  def reject(
+        client_id,
+        venue_order_id,
+        last_received_at,
+        last_venue_timestamp
+      ) do
+    GenServer.call(
+      __MODULE__,
+      {
+        :reject,
+        client_id,
+        venue_order_id,
         last_received_at,
         last_venue_timestamp
       }

@@ -91,6 +91,18 @@ defmodule Tai.Trading.Orders.Create do
     )
   end
 
+  defp parse_response(
+         {:ok, %OrderResponses.Create{status: :rejected} = response},
+         order
+       ) do
+    OrderStore.reject(
+      order.client_id,
+      response.id,
+      response.received_at,
+      response.venue_timestamp
+    )
+  end
+
   defp parse_response({:error, reason}, order) do
     OrderStore.create_error(order.client_id, reason, Timex.now())
   end

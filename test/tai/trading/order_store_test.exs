@@ -433,6 +433,29 @@ defmodule Tai.Trading.OrderStoreTest do
     end
   end
 
+  describe ".reject" do
+    test "updates the status & reject attributes" do
+      submission = build_submission()
+
+      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+
+      assert {:ok, {old, updated}} =
+               Tai.Trading.OrderStore.reject(
+                 order.client_id,
+                 @venue_order_id,
+                 @last_received_at,
+                 @last_venue_timestamp
+               )
+
+      assert old.status == :enqueued
+      assert updated.status == :rejected
+      assert updated.venue_order_id == @venue_order_id
+      assert updated.leaves_qty == Decimal.new(0)
+      assert updated.last_received_at == @last_received_at
+      assert updated.last_venue_timestamp == @last_venue_timestamp
+    end
+  end
+
   describe ".pend_amend" do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
