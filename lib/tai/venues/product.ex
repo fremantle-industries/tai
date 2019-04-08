@@ -17,11 +17,11 @@ defmodule Tai.Venues.Product do
           venue_symbol: String.t(),
           status: status,
           margin: boolean,
-          min_size: Decimal.t(),
+          price_increment: Decimal.t() | nil,
           size_increment: Decimal.t(),
+          min_size: Decimal.t(),
           min_notional: Decimal.t() | nil,
           min_price: Decimal.t() | nil,
-          price_increment: Decimal.t() | nil,
           max_price: Decimal.t() | nil,
           max_size: Decimal.t() | nil,
           maker_fee: Decimal.t() | nil,
@@ -33,9 +33,9 @@ defmodule Tai.Venues.Product do
     symbol
     venue_symbol
     status
+    size_increment
     margin
     min_size
-    size_increment
   )a
   defstruct ~w(
     venue_id
@@ -43,13 +43,13 @@ defmodule Tai.Venues.Product do
     venue_symbol
     status
     margin
+    price_increment
+    size_increment
     min_notional
     min_price
     min_size
     max_size
     max_price
-    price_increment
-    size_increment
     maker_fee
     taker_fee
   )a
