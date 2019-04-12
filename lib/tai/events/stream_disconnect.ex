@@ -1,6 +1,7 @@
 defmodule Tai.Events.StreamDisconnect do
-  @type t :: %Tai.Events.StreamDisconnect{venue_id: atom, reason: term}
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type t :: %Tai.Events.StreamDisconnect{venue: venue_id, reason: term}
 
-  @enforce_keys [:venue_id, :reason]
-  defstruct [:venue_id, :reason]
+  @enforce_keys ~w(venue reason)a
+  defstruct ~w(venue reason)a
 end

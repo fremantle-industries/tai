@@ -32,7 +32,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   def handle_disconnect(conn_status, state) do
     Tai.Events.broadcast(%Tai.Events.StreamDisconnect{
-      venue_id: state.venue_id,
+      venue: state.venue_id,
       reason: conn_status.reason
     })
 
