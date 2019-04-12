@@ -58,7 +58,7 @@ defmodule Tai.Markets.OrderBook do
       {:order_book_snapshot, snapshot.venue_id, snapshot.product_symbol, snapshot}
     )
 
-    Tai.Events.info(%Tai.Events.OrderBookSnapshot{
+    Tai.Events.debug(%Tai.Events.OrderBookSnapshot{
       venue_id: snapshot.venue_id,
       symbol: snapshot.product_symbol,
       snapshot: snapshot
