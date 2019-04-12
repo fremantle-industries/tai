@@ -13,12 +13,12 @@ defmodule Tai.Commands.Products do
     "Margin",
     "Maker Fee",
     "Taker Fee",
+    "Price Increment",
+    "Size Increment",
     "Min Price",
     "Max Price",
-    "Price Increment",
     "Min Size",
     "Max Size",
-    "Size Increment",
     "Min Notional"
   ]
 
@@ -41,12 +41,12 @@ defmodule Tai.Commands.Products do
         product.margin,
         product.maker_fee && product.maker_fee |> to_percent,
         product.taker_fee && product.taker_fee |> to_percent,
+        product.price_increment,
+        product.size_increment,
         product.min_price,
         product.max_price,
-        product.price_increment,
         product.min_size,
         product.max_size,
-        product.size_increment,
         product.min_notional
       ]
       |> Enum.map(&format_col/1)
