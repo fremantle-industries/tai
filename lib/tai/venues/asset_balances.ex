@@ -28,7 +28,7 @@ defmodule Tai.Venues.AssetBalances do
   def handle_call({:upsert, balance}, _from, state) do
     upsert_ets_table(balance)
 
-    Tai.Events.broadcast(%Tai.Events.UpsertAssetBalance{
+    Tai.Events.info(%Tai.Events.UpsertAssetBalance{
       venue_id: balance.exchange_id,
       account_id: balance.account_id,
       asset: balance.asset,
@@ -43,7 +43,7 @@ defmodule Tai.Venues.AssetBalances do
     with {:ok, {with_locked_balance, locked_qty}} <- AssetBalances.Lock.from_request(lock_request) do
       upsert_ets_table(with_locked_balance)
 
-      Tai.Events.broadcast(%Tai.Events.LockAssetBalanceOk{
+      Tai.Events.info(%Tai.Events.LockAssetBalanceOk{
         venue_id: lock_request.exchange_id,
         account_id: lock_request.account_id,
         asset: lock_request.asset,
@@ -55,7 +55,7 @@ defmodule Tai.Venues.AssetBalances do
       {:reply, {:ok, locked_qty}, state}
     else
       {:error, {:insufficient_balance, free}} = error ->
-        Tai.Events.broadcast(%Tai.Events.LockAssetBalanceInsufficientFunds{
+        Tai.Events.info(%Tai.Events.LockAssetBalanceInsufficientFunds{
           venue_id: lock_request.exchange_id,
           account_id: lock_request.account_id,
           asset: lock_request.asset,
@@ -75,7 +75,7 @@ defmodule Tai.Venues.AssetBalances do
     with {:ok, with_unlocked_balance} <- AssetBalances.Unlock.from_request(unlock_request) do
       upsert_ets_table(with_unlocked_balance)
 
-      Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceOk{
+      Tai.Events.info(%Tai.Events.UnlockAssetBalanceOk{
         venue_id: unlock_request.exchange_id,
         account_id: unlock_request.account_id,
         asset: unlock_request.asset,
@@ -85,7 +85,7 @@ defmodule Tai.Venues.AssetBalances do
       {:reply, :ok, state}
     else
       {:error, {:insufficient_balance, locked}} = error ->
-        Tai.Events.broadcast(%Tai.Events.UnlockAssetBalanceInsufficientFunds{
+        Tai.Events.info(%Tai.Events.UnlockAssetBalanceInsufficientFunds{
           venue_id: unlock_request.exchange_id,
           account_id: unlock_request.account_id,
           asset: unlock_request.asset,
@@ -144,7 +144,7 @@ defmodule Tai.Venues.AssetBalances do
   end
 
   def handle_continue({:add, venue_id, account_id, asset, val, balance}, state) do
-    Tai.Events.broadcast(%Tai.Events.AddFreeAssetBalance{
+    Tai.Events.info(%Tai.Events.AddFreeAssetBalance{
       venue_id: venue_id,
       account_id: account_id,
       asset: asset,
@@ -157,7 +157,7 @@ defmodule Tai.Venues.AssetBalances do
   end
 
   def handle_continue({:sub, venue_id, account_id, asset, val, balance}, state) do
-    Tai.Events.broadcast(%Tai.Events.SubFreeAssetBalance{
+    Tai.Events.info(%Tai.Events.SubFreeAssetBalance{
       venue_id: venue_id,
       account_id: account_id,
       asset: asset,

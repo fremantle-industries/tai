@@ -45,12 +45,13 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
       %{100.11 => 1.2}
     )
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :open, time_in_force: :gtc}}
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :open, time_in_force: :gtc}, _}
 
     assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{status: :pending_cancel, time_in_force: :gtc}}
+                    %Tai.Events.OrderUpdated{status: :pending_cancel, time_in_force: :gtc}, _}
 
-    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :canceled, time_in_force: :gtc}}
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :canceled, time_in_force: :gtc},
+                    _}
   end
 
   def mock_order_responses do

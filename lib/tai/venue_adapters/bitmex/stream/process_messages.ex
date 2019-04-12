@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
         {%{"table" => "publicNotifications", "data" => data, "action" => action}, _received_at},
         state
       ) do
-    Tai.Events.broadcast(%Tai.Events.Bitmex.PublicNotifications{
+    Tai.Events.info(%Tai.Events.Bitmex.PublicNotifications{
       venue_id: state.venue_id,
       action: action,
       data: data
@@ -84,7 +84,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
   end
 
   def handle_cast({msg, _received_at}, state) do
-    Tai.Events.broadcast(%Tai.Events.StreamMessageUnhandled{
+    Tai.Events.info(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue_id,
       msg: msg
     })

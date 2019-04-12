@@ -147,7 +147,7 @@ defmodule Tai.Advisor do
           end
         rescue
           e ->
-            Tai.Events.broadcast(%Tai.Events.AdvisorOrderUpdatedError{
+            Tai.Events.info(%Tai.Events.AdvisorOrderUpdatedError{
               error: e,
               stacktrace: __STACKTRACE__
             })
@@ -165,7 +165,7 @@ defmodule Tai.Advisor do
           end
         rescue
           e ->
-            Tai.Events.broadcast(%Tai.Events.AdvisorOrderUpdatedError{
+            Tai.Events.info(%Tai.Events.AdvisorOrderUpdatedError{
               error: e,
               stacktrace: __STACKTRACE__
             })
@@ -238,7 +238,7 @@ defmodule Tai.Advisor do
               Map.put(state, :store, new_store)
             else
               unhandled ->
-                Tai.Events.broadcast(%Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{
+                Tai.Events.info(%Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{
                   advisor_id: state.advisor_id,
                   group_id: state.group_id,
                   venue_id: venue_id,
@@ -250,7 +250,7 @@ defmodule Tai.Advisor do
             end
           rescue
             e ->
-              Tai.Events.broadcast(%Tai.Events.AdvisorHandleInsideQuoteError{
+              Tai.Events.info(%Tai.Events.AdvisorHandleInsideQuoteError{
                 advisor_id: state.advisor_id,
                 group_id: state.group_id,
                 venue_id: venue_id,

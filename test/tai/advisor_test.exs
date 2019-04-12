@@ -75,7 +75,7 @@ defmodule Tai.AdvisorTest do
 
       Tai.Advisor.cast_order_updated(advisor_name, :raise_error, :updated_order, callback)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{} = event}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{} = event, _}
       assert event.error == %RuntimeError{message: "Callback Error!!!"}
     end
   end
@@ -133,7 +133,7 @@ defmodule Tai.AdvisorTest do
 
       Tai.Advisor.cast_order_updated(advisor_name, :raise_error, :updated_order, callback, :opts)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{} = event}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorOrderUpdatedError{} = event, _}
       assert event.error == %RuntimeError{message: "Callback Error!!!"}
     end
   end

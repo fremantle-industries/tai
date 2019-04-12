@@ -38,6 +38,6 @@ defmodule Tai.Venues.Boot.ProductsTest do
                       venue_id: :my_venue,
                       total: 2,
                       filtered: 1
-                    }}
+                    }, _}
   end
 end

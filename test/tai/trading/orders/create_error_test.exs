@@ -62,8 +62,8 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
 
       {:ok, _} = Tai.Trading.Orders.create(submission)
 
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :enqueued}}
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :create_error} = error_event}
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :enqueued}, _}
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :create_error} = error_event, _}
 
       assert error_event.side == @side
       assert error_event.error_reason == :mock_not_found

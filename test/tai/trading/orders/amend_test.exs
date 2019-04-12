@@ -210,7 +210,7 @@ defmodule Tai.Trading.Orders.AmendTest do
 
         Tai.Trading.Orders.amend(enqueued_order, %{price: Decimal.new(1)})
 
-        assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = event}
+        assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = event, _}
         assert event.client_id != nil
         assert event.action == :pend_amend
         assert event.was == :enqueued

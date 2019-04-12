@@ -10,7 +10,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Trades do
         venue_id,
         received_at
       ) do
-    Tai.Events.broadcast(%Tai.Events.Trade{
+    Tai.Events.info(%Tai.Events.Trade{
       venue_id: venue_id,
       # TODO: 
       # The list of products or a map of exchange symbol to symbol should be 

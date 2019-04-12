@@ -1,5 +1,6 @@
 defmodule Tai.Events do
   @type event :: Tai.Event.t()
+  @type level :: :debug | :info | :warn | :error
 
   @spec child_spec(opts :: term) :: Supervisor.child_spec()
   def child_spec(opts) do
@@ -31,10 +32,23 @@ defmodule Tai.Events do
     Registry.register(__MODULE__, event_type, [])
   end
 
+  @spec error(event) :: :ok
+  def error(event), do: event |> broadcast(:error)
+  @spec warn(event) :: :ok
+  def warn(event), do: event |> broadcast(:warn)
+  @spec info(event) :: :ok
+  def info(event), do: event |> broadcast(:info)
+  @spec debug(event) :: :ok
+  def debug(event), do: event |> broadcast(:debug)
+
+  @deprecated "Use Tai.Events.info/1 instead."
   @spec broadcast(event) :: :ok
-  def broadcast(event) do
+  def broadcast(event), do: event |> info()
+
+  @spec broadcast(event, level) :: :ok
+  def broadcast(event, level) do
     event_type = Map.fetch!(event, :__struct__)
-    msg = {Tai.Event, event}
+    msg = {Tai.Event, event, level}
 
     Registry.dispatch(__MODULE__, event_type, fn entries ->
       for {pid, _} <- entries, do: send(pid, msg)

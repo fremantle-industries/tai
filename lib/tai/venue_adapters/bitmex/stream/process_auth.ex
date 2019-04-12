@@ -107,7 +107,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages do
   end
 
   def handle_cast({msg, _received_at}, state) do
-    Tai.Events.broadcast(%Tai.Events.StreamMessageUnhandled{
+    Tai.Events.info(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue_id,
       msg: msg
     })

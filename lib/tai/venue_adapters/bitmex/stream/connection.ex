@@ -52,12 +52,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   def handle_connect(_conn, state) do
-    Tai.Events.broadcast(%Tai.Events.StreamConnect{venue: state.venue_id})
+    Tai.Events.info(%Tai.Events.StreamConnect{venue: state.venue_id})
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    Tai.Events.broadcast(%Tai.Events.StreamDisconnect{
+    Tai.Events.info(%Tai.Events.StreamDisconnect{
       venue: state.venue_id,
       reason: conn_status.reason
     })
@@ -133,7 +133,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   defp handle_msg(msg, venue_id)
 
   defp handle_msg(%{"limit" => %{"remaining" => remaining}, "version" => _}, venue_id) do
-    Tai.Events.broadcast(%Tai.Events.BitmexStreamConnectionLimitDetails{
+    Tai.Events.info(%Tai.Events.BitmexStreamConnectionLimitDetails{
       venue_id: venue_id,
       remaining: remaining
     })

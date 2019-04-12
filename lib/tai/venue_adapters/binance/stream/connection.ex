@@ -25,12 +25,12 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   end
 
   def handle_connect(_conn, state) do
-    Tai.Events.broadcast(%Tai.Events.StreamConnect{venue: state.venue_id})
+    Tai.Events.info(%Tai.Events.StreamConnect{venue: state.venue_id})
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    Tai.Events.broadcast(%Tai.Events.StreamDisconnect{
+    Tai.Events.info(%Tai.Events.StreamDisconnect{
       venue: state.venue_id,
       reason: conn_status.reason
     })

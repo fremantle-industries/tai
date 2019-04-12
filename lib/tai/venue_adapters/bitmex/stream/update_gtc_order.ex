@@ -72,7 +72,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
   end
 
   defp notify({client_id, action, {:error, {:invalid_status, was, required}}}) do
-    Tai.Events.broadcast(%Tai.Events.OrderUpdateInvalidStatus{
+    Tai.Events.info(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: client_id,
       action: action,
       was: was,
@@ -81,7 +81,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
   end
 
   defp notify({client_id, action, {:error, :not_found}}) do
-    Tai.Events.broadcast(%Tai.Events.OrderUpdateNotFound{
+    Tai.Events.info(%Tai.Events.OrderUpdateNotFound{
       client_id: client_id,
       action: action
     })

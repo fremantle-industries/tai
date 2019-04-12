@@ -61,14 +61,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderUpdated{side: :buy, time_in_force: :gtc} =
-                        buy_updated_event}
+                        buy_updated_event, _}
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderUpdated{side: :sell, time_in_force: :gtc} =
-                        sell_updated_event}
+                        sell_updated_event, _}
 
-      refute_receive {Tai.Event, %Tai.Events.OrderUpdated{time_in_force: :ioc}}
-      refute_receive {Tai.Event, %Tai.Events.OrderUpdated{time_in_force: :gtc}}
+      refute_receive {Tai.Event, %Tai.Events.OrderUpdated{time_in_force: :ioc}, _}
+      refute_receive {Tai.Event, %Tai.Events.OrderUpdated{time_in_force: :gtc}, _}
 
       assert buy_updated_event.client_id == order_1.client_id
       assert buy_updated_event.status == :filled
@@ -107,7 +107,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
 
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{} = event}
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{} = event, _}
 
       assert event.status == :canceled
       assert event.leaves_qty == Decimal.new(0)
@@ -155,15 +155,15 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderUpdateInvalidStatus{action: :passive_fill} =
-                        passive_fill_invalid_event}
+                        passive_fill_invalid_event, _}
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderUpdateInvalidStatus{action: :passive_partial_fill} =
-                        passive_partial_fill_invalid_event}
+                        passive_partial_fill_invalid_event, _}
 
       assert_receive {Tai.Event,
                       %Tai.Events.OrderUpdateInvalidStatus{action: :passive_cancel} =
-                        passive_cancel_invalid_event}
+                        passive_cancel_invalid_event, _}
 
       assert passive_fill_invalid_event.client_id == order_1.client_id
       assert passive_fill_invalid_event.action == :passive_fill
@@ -223,7 +223,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
 
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdateNotFound{} = not_found_event}
+      assert_receive {Tai.Event, %Tai.Events.OrderUpdateNotFound{} = not_found_event, _}
       assert not_found_event.client_id == client_id
       assert not_found_event.action == :passive_cancel
     end

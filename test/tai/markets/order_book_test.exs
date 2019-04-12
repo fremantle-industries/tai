@@ -139,7 +139,7 @@ defmodule Tai.Markets.OrderBookTest do
                         venue_id: :my_test_feed,
                         symbol: :btc_usd,
                         snapshot: ^snapshot
-                      }}
+                      }, _}
     end
   end
 

@@ -275,7 +275,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     test "broadcasts an event" do
       Tai.Markets.OrderBook.replace(@snapshot)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{} = event}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{} = event, _}
       assert event.advisor_id == :my_advisor
       assert event.group_id == :group_a
       assert event.venue_id == :my_venue
@@ -286,12 +286,12 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     test "maintains state between callbacks" do
       Tai.Markets.OrderBook.replace(@snapshot)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{} = event_1}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{} = event_1, _}
       assert event_1.return_value == {:unknown, :return_val}
 
       Tai.Markets.OrderBook.update(@changes)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{} = event_2}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{} = event_2, _}
       assert event_2.return_value == {:unknown, :return_val}
     end
   end
@@ -319,7 +319,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     test "broadcasts an event" do
       Tai.Markets.OrderBook.replace(@snapshot)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event, _}
       assert event.advisor_id == :my_advisor
       assert event.group_id == :group_a
       assert event.venue_id == :my_venue
@@ -334,12 +334,12 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     test "maintains state between callbacks" do
       Tai.Markets.OrderBook.replace(@snapshot)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event_1}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event_1, _}
       assert event_1.error == %RuntimeError{message: "!!!This is an ERROR!!!"}
 
       Tai.Markets.OrderBook.update(@changes)
 
-      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event_2}
+      assert_receive {Tai.Event, %Tai.Events.AdvisorHandleInsideQuoteError{} = event_2, _}
       assert event_2.error == %RuntimeError{message: "!!!This is an ERROR!!!"}
     end
   end

@@ -40,7 +40,7 @@ defmodule Tai.Venues.Boot.PositionsTest do
 
     Tai.Venues.Boot.Positions.hydrate(adapter)
 
-    assert_receive {Tai.Event, %Tai.Events.HydratePositions{} = event}
+    assert_receive {Tai.Event, %Tai.Events.HydratePositions{} = event, _}
     assert event.venue_id == :my_venue
     assert event.total == 2
   end

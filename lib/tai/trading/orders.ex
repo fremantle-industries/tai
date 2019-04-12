@@ -42,7 +42,7 @@ defmodule Tai.Trading.Orders do
       last_venue_timestamp: order.last_venue_timestamp,
       updated_at: order.updated_at
     }
-    |> Tai.Events.broadcast()
+    |> Tai.Events.info()
   end
 
   @spec updated!(order | nil, order) :: :ok

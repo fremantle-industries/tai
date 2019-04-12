@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessMessages do
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   def handle_cast({msg, _received_at}, state) do
-    Tai.Events.broadcast(%Tai.Events.StreamMessageUnhandled{
+    Tai.Events.info(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue_id,
       msg: msg
     })

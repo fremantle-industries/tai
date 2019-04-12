@@ -6,13 +6,13 @@ defmodule Tai.Venues.BootHandler do
 
   @spec parse_response({:ok, adapter} | {:error, {adapter, error_reason}}) :: no_return
   def parse_response({:ok, adapter}) do
-    Events.broadcast(%Events.VenueBoot{
+    Events.info(%Events.VenueBoot{
       venue: adapter.id
     })
   end
 
   def parse_response({:error, {adapter, reason}}) do
-    Events.broadcast(%Events.VenueBootError{
+    Events.info(%Events.VenueBootError{
       venue: adapter.id,
       reason: reason
     })

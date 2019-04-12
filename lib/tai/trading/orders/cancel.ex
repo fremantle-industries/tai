@@ -61,7 +61,7 @@ defmodule Tai.Trading.Orders.Cancel do
   end
 
   defp broadcast_invalid_status(client_id, action, was, required) do
-    Tai.Events.broadcast(%Tai.Events.OrderUpdateInvalidStatus{
+    Tai.Events.info(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: client_id,
       action: action,
       was: was,

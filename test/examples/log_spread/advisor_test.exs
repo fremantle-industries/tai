@@ -50,7 +50,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
                       bid_price: "6500.1",
                       ask_price: "6500.11",
                       spread: "0.01"
-                    }}
+                    }, _}
   end
 
   def mock_product_responses do

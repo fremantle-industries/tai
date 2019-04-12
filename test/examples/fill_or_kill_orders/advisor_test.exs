@@ -48,14 +48,14 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
     assert_receive {Tai.Event,
                     %Tai.Events.OrderUpdated{
                       status: :enqueued
-                    } = enqueued_event}
+                    } = enqueued_event, _}
 
     assert enqueued_event.cumulative_qty == Decimal.new(0)
 
     assert_receive {Tai.Event,
                     %Tai.Events.OrderUpdated{
                       status: :filled
-                    } = filled_event}
+                    } = filled_event, _}
 
     assert filled_event.cumulative_qty == Decimal.new("0.1")
   end

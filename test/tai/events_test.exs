@@ -44,33 +44,40 @@ defmodule Tai.EventsTest do
     end
   end
 
-  describe ".broadcast/1" do
-    test "sends the event to all subscribers of the event type" do
-      event = %MyEvent{}
-      other_event = %MyOtherEvent{}
-      start_supervised!({Tai.Events, 1})
+  [:debug, :info, :warn, :error]
+  |> Enum.each(fn level ->
+    describe ".#{level}/1" do
+      @level level
 
-      Registry.register(Tai.Events, MyEvent, [])
+      test "sends the event to all subscribers of the event type" do
+        level = @level
+        event = %MyEvent{}
+        other_event = %MyOtherEvent{}
+        start_supervised!({Tai.Events, 1})
 
-      Tai.Events.broadcast(event)
-      Tai.Events.broadcast(other_event)
+        Registry.register(Tai.Events, MyEvent, [])
 
-      assert_receive {Tai.Event, %MyEvent{}}
-      refute_receive {Tai.Event, %MyOtherEvent{}}
+        apply(Tai.Events, @level, [event])
+        apply(Tai.Events, @level, [other_event])
+
+        assert_receive {Tai.Event, %MyEvent{}, ^level}
+        refute_receive {Tai.Event, %MyOtherEvent{}, ^level}
+      end
+
+      test "sends the event to firehose subscribers" do
+        level = @level
+        event = %MyEvent{}
+        other_event = %MyOtherEvent{}
+        start_supervised!({Tai.Events, 1})
+
+        Registry.register(Tai.Events, :firehose, [])
+
+        apply(Tai.Events, level, [event])
+        apply(Tai.Events, level, [other_event])
+
+        assert_receive {Tai.Event, %MyEvent{}, ^level}
+        assert_receive {Tai.Event, %MyOtherEvent{}, ^level}
+      end
     end
-
-    test "sends the event to firehose subscribers" do
-      event = %MyEvent{}
-      other_event = %MyOtherEvent{}
-      start_supervised!({Tai.Events, 1})
-
-      Registry.register(Tai.Events, :firehose, [])
-
-      Tai.Events.broadcast(event)
-      Tai.Events.broadcast(other_event)
-
-      assert_receive {Tai.Event, %MyEvent{}}
-      assert_receive {Tai.Event, %MyOtherEvent{}}
-    end
-  end
+  end)
 end
