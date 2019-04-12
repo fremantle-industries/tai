@@ -16,22 +16,22 @@ defmodule Tai.EventsLogger do
 
   @spec handle_info({Tai.Event, event, level}, state) :: {:noreply, state}
   def handle_info({Tai.Event, event, :error}, state) do
-    json = event |> Tai.Event.encode!() |> Logger.error()
+    event |> Tai.Event.encode!() |> Logger.error()
     {:noreply, state}
   end
 
   def handle_info({Tai.Event, event, :warn}, state) do
-    json = event |> Tai.Event.encode!() |> Logger.warn()
+    event |> Tai.Event.encode!() |> Logger.warn()
     {:noreply, state}
   end
 
   def handle_info({Tai.Event, event, :info}, state) do
-    json = event |> Tai.Event.encode!() |> Logger.info()
+    event |> Tai.Event.encode!() |> Logger.info()
     {:noreply, state}
   end
 
   def handle_info({Tai.Event, event, :debug}, state) do
-    json = event |> Tai.Event.encode!() |> Logger.debug()
+    event |> Tai.Event.encode!() |> Logger.debug()
     {:noreply, state}
   end
 end

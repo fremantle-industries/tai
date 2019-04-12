@@ -12,7 +12,7 @@ defmodule Tai.Venues.BootHandler do
   end
 
   def parse_response({:error, {adapter, reason}}) do
-    Events.info(%Events.VenueBootError{
+    Events.error(%Events.VenueBootError{
       venue: adapter.id,
       reason: reason
     })
