@@ -26,7 +26,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   def handle_connect(_conn, state) do
-    Tai.Events.broadcast(%Tai.Events.StreamConnectionOk{venue_id: state.venue_id})
+    Tai.Events.broadcast(%Tai.Events.StreamConnect{venue: state.venue_id})
     {:ok, state}
   end
 
