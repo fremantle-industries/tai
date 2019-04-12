@@ -60,12 +60,12 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
       symbol: symbol,
       venue_symbol: venue_symbol,
       status: status,
-      margin: false,
-      min_notional: min_notional,
-      min_size: @min_size,
+      type: :spot,
+      size_increment: @min_size,
       min_price: @min_price,
+      min_size: @min_size,
       max_price: @max_price,
-      size_increment: @min_size
+      min_notional: min_notional
     }
   end
 end

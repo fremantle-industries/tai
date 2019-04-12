@@ -37,7 +37,7 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
       symbol: symbol,
       venue_symbol: bitmex_symbol,
       status: status,
-      margin: true,
+      type: :future,
       price_increment: tick_size |> to_decimal,
       max_price: max_price && max_price |> to_decimal,
       max_size: max_order_qty && max_order_qty |> to_decimal,

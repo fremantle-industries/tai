@@ -11,12 +11,13 @@ defmodule Tai.Venues.Product do
           | :unlisted
 
   @type symbol :: atom
+  @type type :: :spot | :future | :swap | :option
   @type t :: %Tai.Venues.Product{
           venue_id: Tai.Venues.Adapter.venue_id(),
           symbol: symbol,
           venue_symbol: String.t(),
           status: status,
-          margin: boolean,
+          type: type,
           price_increment: Decimal.t() | nil,
           size_increment: Decimal.t(),
           min_size: Decimal.t(),
@@ -34,7 +35,7 @@ defmodule Tai.Venues.Product do
     venue_symbol
     status
     size_increment
-    margin
+    type
     min_size
   )a
   defstruct ~w(
@@ -42,7 +43,7 @@ defmodule Tai.Venues.Product do
     symbol
     venue_symbol
     status
-    margin
+    type
     price_increment
     size_increment
     min_notional

@@ -33,7 +33,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
       symbol: Tai.Symbol.build(base_asset, quote_asset),
       venue_symbol: venue_symbol,
       status: status,
-      margin: false,
+      type: :spot,
       min_notional: min_notional,
       min_price: min_price,
       min_size: min_size,
