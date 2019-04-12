@@ -1,11 +1,20 @@
 defmodule Tai.Venues.BootHandler do
-  require Logger
+  alias Tai.Events
 
+  @type adapter :: Tai.Venues.Adapter.t()
+  @type error_reason :: term
+
+  @spec parse_response({:ok, adapter} | {:error, {adapter, error_reason}}) :: no_return
   def parse_response({:ok, adapter}) do
-    Logger.info("exchange boot success #{inspect(adapter.id)}")
+    Events.broadcast(%Events.VenueBoot{
+      venue: adapter.id
+    })
   end
 
-  def parse_response({:error, {adapter, reasons}}) do
-    Logger.error("exchange boot error #{inspect(adapter.id)}, reasons: #{inspect(reasons)}")
+  def parse_response({:error, {adapter, reason}}) do
+    Events.broadcast(%Events.VenueBootError{
+      venue: adapter.id,
+      reason: reason
+    })
   end
 end
