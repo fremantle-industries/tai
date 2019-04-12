@@ -28,7 +28,6 @@
 | Gemini             
 | HitBtc             
 | Kraken             
-| OkCoin             
 | QuadrigaCX         
 | Quoine             
 | TheRockTrading     
@@ -99,8 +98,6 @@
 | Mixcoins           
 | Negociecoins       
 | Nova               
-| Okcoincny          
-| Okcoinusd          
 | Paymium            
 | Qryptos            
 | Quadrigacx         

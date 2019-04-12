@@ -1,0 +1,40 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.okex.com/api/futures/v3/instruments"
+    },
+    "response": {
+      "binary": false,
+      "body": "[{\"instrument_id\":\"BTC-USD-190419\",\"underlying_index\":\"BTC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"100\",\"listing\":\"2019-04-05\",\"delivery\":\"2019-04-19\",\"trade_increment\":\"1\",\"alias\":\"this_week\"},{\"instrument_id\":\"BTC-USD-190426\",\"underlying_index\":\"BTC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"100\",\"listing\":\"2019-04-12\",\"delivery\":\"2019-04-26\",\"trade_increment\":\"1\",\"alias\":\"next_week\"},{\"instrument_id\":\"BTC-USD-190628\",\"underlying_index\":\"BTC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"100\",\"listing\":\"2019-03-15\",\"delivery\":\"2019-06-28\",\"trade_increment\":\"1\",\"alias\":\"quarter\"},{\"instrument_id\":\"LTC-USD-190419\",\"underlying_index\":\"LTC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-04-05\",\"delivery\":\"2019-04-19\",\"trade_increment\":\"1\",\"alias\":\"this_week\"},{\"instrument_id\":\"LTC-USD-190426\",\"underlying_index\":\"LTC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-04-12\",\"delivery\":\"2019-04-26\",\"trade_increment\":\"1\",\"alias\":\"next_week\"},{\"instrument_id\":\"LTC-USD-190628\",\"underlying_index\":\"LTC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-03-15\",\"delivery\":\"2019-06-28\",\"trade_increment\":\"1\",\"alias\":\"quarter\"},{\"instrument_id\":\"ETH-USD-190419\",\"underlying_index\":\"ETH\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-04-05\",\"delivery\":\"2019-04-19\",\"trade_increment\":\"1\",\"alias\":\"this_week\"},{\"instrument_id\":\"ETH-USD-190426\",\"underlying_index\":\"ETH\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-04-12\",\"delivery\":\"2019-04-26\",\"trade_increment\":\"1\",\"alias\":\"next_week\"},{\"instrument_id\":\"ETH-USD-190628\",\"underlying_index\":\"ETH\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-03-15\",\"delivery\":\"2019-06-28\",\"trade_increment\":\"1\",\"alias\":\"quarter\"},{\"instrument_id\":\"ETC-USD-190419\",\"underlying_index\":\"ETC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-04-05\",\"delivery\":\"2019-04-19\",\"trade_increment\":\"1\",\"alias\":\"this_week\"},{\"instrument_id\":\"ETC-USD-190426\",\"underlying_index\":\"ETC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-04-12\",\"delivery\":\"2019-04-26\",\"trade_increment\":\"1\",\"alias\":\"next_week\"},{\"instrument_id\":\"ETC-USD-190628\",\"underlying_index\":\"ETC\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-03-15\",\"delivery\":\"2019-06-28\",\"trade_increment\":\"1\",\"alias\":\"quarter\"},{\"instrument_id\":\"XRP-USD-190419\",\"underlying_index\":\"XRP\",\"quote_currency\":\"USD\",\"tick_size\":\"0.0001\",\"contract_val\":\"10\",\"listing\":\"2019-04-05\",\"delivery\":\"2019-04-19\",\"trade_increment\":\"1\",\"alias\":\"this_week\"},{\"instrument_id\":\"XRP-USD-190426\",\"underlying_index\":\"XRP\",\"quote_currency\":\"USD\",\"tick_size\":\"0.0001\",\"contract_val\":\"10\",\"listing\":\"2019-04-12\",\"delivery\":\"2019-04-26\",\"trade_increment\":\"1\",\"alias\":\"next_week\"},{\"instrument_id\":\"XRP-USD-190628\",\"underlying_index\":\"XRP\",\"quote_currency\":\"USD\",\"tick_size\":\"0.0001\",\"contract_val\":\"10\",\"listing\":\"2019-03-15\",\"delivery\":\"2019-06-28\",\"trade_increment\":\"1\",\"alias\":\"quarter\"},{\"instrument_id\":\"BCH-USD-190419\",\"underlying_index\":\"BCH\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"10\",\"listing\":\"2019-04-05\",\"delivery\":\"2019-04-19\",\"trade_increment\":\"1\",\"alias\":\"this_week\"},{\"instrument_id\":\"BCH-USD-190426\",\"underlying_index\":\"BCH\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"10\",\"listing\":\"2019-04-12\",\"delivery\":\"2019-04-26\",\"trade_increment\":\"1\",\"alias\":\"next_week\"},{\"instrument_id\":\"BCH-USD-190628\",\"underlying_index\":\"BCH\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"10\",\"listing\":\"2019-03-15\",\"delivery\":\"2019-06-28\",\"trade_increment\":\"1\",\"alias\":\"quarter\"},{\"instrument_id\":\"BSV-USD-190419\",\"underlying_index\":\"BSV\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"10\",\"listing\":\"2019-04-05\",\"delivery\":\"2019-04-19\",\"trade_increment\":\"1\",\"alias\":\"this_week\"},{\"instrument_id\":\"BSV-USD-190426\",\"underlying_index\":\"BSV\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"10\",\"listing\":\"2019-04-12\",\"delivery\":\"2019-04-26\",\"trade_increment\":\"1\",\"alias\":\"next_week\"},{\"instrument_id\":\"BSV-USD-190628\",\"underlying_index\":\"BSV\",\"quote_currency\":\"USD\",\"tick_size\":\"0.01\",\"contract_val\":\"10\",\"listing\":\"2019-03-15\",\"delivery\":\"2019-06-28\",\"trade_increment\":\"1\",\"alias\":\"quarter\"},{\"instrument_id\":\"EOS-USD-190419\",\"underlying_index\":\"EOS\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-04-05\",\"delivery\":\"2019-04-19\",\"trade_increment\":\"1\",\"alias\":\"this_week\"},{\"instrument_id\":\"EOS-USD-190426\",\"underlying_index\":\"EOS\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-04-12\",\"delivery\":\"2019-04-26\",\"trade_increment\":\"1\",\"alias\":\"next_week\"},{\"instrument_id\":\"EOS-USD-190628\",\"underlying_index\":\"EOS\",\"quote_currency\":\"USD\",\"tick_size\":\"0.001\",\"contract_val\":\"10\",\"listing\":\"2019-03-15\",\"delivery\":\"2019-06-28\",\"trade_increment\":\"1\",\"alias\":\"quarter\"}]",
+      "headers": {
+        "Date": "Fri, 12 Apr 2019 22:29:20 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=dd2a0b09ccf9dd67f9c0bd45e5ae8433b1555108160; expires=Sat, 11-Apr-20 22:29:20 GMT; path=/; domain=.okex.com; HttpOnly",
+        "Vary": "Accept-Encoding",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Frame-Options": "DENY",
+        "X-Kong-Upstream-Latency": "4",
+        "X-Kong-Proxy-Latency": "0",
+        "Via": "kong/0.12.3",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "4c68a3731b593ad8-YVR"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

@@ -8,10 +8,9 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
     :ok
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
+  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_maker_taker_fees()
 
   @test_adapters
-  |> Enum.filter(fn {adapter_id, _} -> adapter_id != :bitmex end)
   |> Enum.map(fn {_, adapter} ->
     @adapter adapter
     @account_id adapter.accounts |> Map.keys() |> List.first()

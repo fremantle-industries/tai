@@ -1,0 +1,44 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "OK-ACCESS-KEY": "***",
+        "OK-ACCESS-SIGN": "***",
+        "OK-ACCESS-TIMESTAMP": "***",
+        "OK-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.okex.com/api/futures/v3/accounts"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"info\":{\"btc\":{\"equity\":\"0.00070432\",\"margin\":\"0\",\"margin_for_unfilled\":\"0\",\"margin_frozen\":\"0\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"realized_pnl\":\"0\",\"total_avail_balance\":\"0.00070432\",\"unrealized_pnl\":\"0\"},\"eth\":{\"equity\":\"48.77455302\",\"margin\":\"0\",\"margin_for_unfilled\":\"0\",\"margin_frozen\":\"0\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"realized_pnl\":\"0\",\"total_avail_balance\":\"48.77455302\",\"unrealized_pnl\":\"0\"}}}",
+      "headers": {
+        "Date": "Fri, 12 Apr 2019 22:29:32 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d3019b9e594ab976ef2ca20c29bc69afa1555108172; expires=Sat, 11-Apr-20 22:29:32 GMT; path=/; domain=.okex.com; HttpOnly",
+        "Vary": "Accept-Encoding",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Frame-Options": "DENY",
+        "X-Kong-Upstream-Latency": "176",
+        "X-Kong-Proxy-Latency": "0",
+        "Via": "kong/0.12.3",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "4c68a3bc6a0b3ad8-YVR"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

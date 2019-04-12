@@ -1,23 +1,13 @@
 defmodule Tai.WebSocket do
-  @spec send_msg(pid, binary) ::
-          :ok
-          | {:error,
-             %WebSockex.FrameEncodeError{}
-             | %WebSockex.ConnError{}
-             | %WebSockex.NotConnectedError{}
-             | %WebSockex.InvalidFrameError{}}
-  def send_msg(pid, msg) do
-    WebSockex.send_frame(pid, {:text, msg})
-  end
+  @type errors ::
+          %WebSockex.FrameEncodeError{}
+          | %WebSockex.ConnError{}
+          | %WebSockex.NotConnectedError{}
+          | %WebSockex.InvalidFrameError{}
 
-  @spec send_json_msg(pid, map) ::
-          :ok
-          | {:error,
-             %WebSockex.FrameEncodeError{}
-             | %WebSockex.ConnError{}
-             | %WebSockex.NotConnectedError{}
-             | %WebSockex.InvalidFrameError{}}
-  def(send_json_msg(pid, msg)) do
-    send_msg(pid, msg |> Jason.encode!())
-  end
+  @spec send_msg(pid, binary) :: :ok | {:error, errors}
+  def send_msg(pid, msg), do: WebSockex.send_frame(pid, {:text, msg})
+
+  @spec send_json_msg(pid, map) :: :ok | {:error, errors}
+  def send_json_msg(pid, msg), do: send_msg(pid, msg |> Jason.encode!())
 end

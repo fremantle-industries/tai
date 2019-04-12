@@ -39,6 +39,17 @@ config(:tai,
         }
       }
     ],
+    okex: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.OkEx,
+      accounts: %{
+        main: %{
+          api_key: {:system_file, "OKEX_API_KEY"},
+          api_secret: {:system_file, "OKEX_API_SECRET"},
+          api_passphrase: {:system_file, "OKEX_API_PASSPHRASE"}
+        }
+      }
+    ],
     binance: [
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,
@@ -69,6 +80,7 @@ config(:tai,
   }
 )
 
+config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :poloniex, :gdax, :okex])
 config(:tai, :test_venue_adapters_create_order, [:bitmex])
 config(:tai, :test_venue_adapters_with_positions, [:bitmex])
 
@@ -103,7 +115,12 @@ config :exvcr,
     # Bitmex
     "api-key",
     "api-nonce",
-    "api-signature"
+    "api-signature",
+    # OkEx
+    "OK-ACCESS-KEY",
+    "OK-ACCESS-SIGN",
+    "OK-ACCESS-TIMESTAMP",
+    "OK-ACCESS-PASSPHRASE"
   ],
   filter_sensitive_data: [
     # GDAX

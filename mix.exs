@@ -34,6 +34,10 @@ defmodule Tai.Mixfile do
     [
       {:ex_binance, "~> 0.0.2"},
       {:ex_bitmex, "~> 0.1.0"},
+      # {:ex_okex, "~> 0.1"},
+      # {:ex_okex, git: "~/workspace/fremantle_capital/ex_okex", branch: "patches"},
+      # {:ex_okex, github: "fremantle-capital/ex_okex", branch: "patches"},
+      {:ex_okex, github: "acuityinnovations/ex_okex"},
       {:decimal, "~> 1.7.0"},
       {:ex_gdax, "~> 0.1.6"},
       {:ex_poloniex, "~> 0.0.2"},
