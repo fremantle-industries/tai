@@ -8,7 +8,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
         info
         |> Enum.map(fn {asset, %{"equity" => equity}} ->
           free = Decimal.new(0)
-          locked = Decimal.new(equity)
+          locked = equity |> Decimal.new() |> Decimal.reduce()
 
           %Tai.Venues.AssetBalance{
             exchange_id: venue_id,
