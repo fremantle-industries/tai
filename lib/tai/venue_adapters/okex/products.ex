@@ -28,6 +28,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       type: :future,
       price_increment: price_increment,
       size_increment: size_increment,
+      min_price: price_increment,
       min_size: size_increment
     }
   end

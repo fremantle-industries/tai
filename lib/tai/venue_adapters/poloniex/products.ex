@@ -39,14 +39,14 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
     end
   end
 
+  @price_increment Decimal.new("0.00000001")
+  @size_increment Decimal.new("0.000001")
   @min_notional %{
     btc: Decimal.new("0.0001"),
     eth: Decimal.new("0.0001"),
     xmr: Decimal.new("0.0001"),
     usdt: Decimal.new("1.0")
   }
-  @min_size Decimal.new("0.000001")
-  @min_price Decimal.new("0.00000001")
   @max_price Decimal.new("100000.0")
   defp build({venue_symbol, %{"isFrozen" => is_frozen}}, venue_id) do
     [exchange_quote_asset, exchange_base_asset] = String.split(venue_symbol, "_")
@@ -61,9 +61,10 @@ defmodule Tai.VenueAdapters.Poloniex.Products do
       venue_symbol: venue_symbol,
       status: status,
       type: :spot,
-      size_increment: @min_size,
-      min_price: @min_price,
-      min_size: @min_size,
+      price_increment: @price_increment,
+      size_increment: @size_increment,
+      min_price: @price_increment,
+      min_size: @size_increment,
       max_price: @max_price,
       min_notional: min_notional
     }

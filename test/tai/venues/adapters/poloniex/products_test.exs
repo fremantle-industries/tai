@@ -14,13 +14,13 @@ defmodule Tai.VenueAdapters.Poloniex.ProductsTest do
     use_cassette "exchange_adapters/shared/products/poloniex/success" do
       assert {:ok, products} = Tai.Venue.products(adapter)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :ltc_btc)
-      assert product.min_notional == Decimal.new("0.0001")
+      assert product.price_increment == Decimal.new("0.00000001")
+      assert product.size_increment == Decimal.new("0.000001")
       assert product.min_price == Decimal.new("0.00000001")
       assert product.min_size == Decimal.new("0.000001")
+      assert product.min_notional == Decimal.new("0.0001")
       assert product.max_price == Decimal.new("100000.0")
       assert product.max_size == nil
-      assert product.price_increment == nil
-      assert product.size_increment == Decimal.new("0.000001")
     end
   end
 
