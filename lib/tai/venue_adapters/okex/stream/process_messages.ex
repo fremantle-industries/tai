@@ -1,6 +1,6 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.ProcessMessages do
   use GenServer
-  alias Tai.Events
+  alias Tai.{Events, VenueAdapters.OkEx.Stream}
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -27,6 +27,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessMessages do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   def handle_cast({%{"event" => "subscribe"}, _}, state), do: {:noreply, state}
+
+  def handle_cast(
+        {%{"table" => "futures/trade", "data" => data}, received_at},
+        state
+      ) do
+    data |> Enum.each(&Stream.Trades.broadcast(&1, state.venue, received_at))
+    {:noreply, state}
+  end
 
   def handle_cast({msg, _received_at}, state) do
     Events.info(%Events.StreamMessageUnhandled{
