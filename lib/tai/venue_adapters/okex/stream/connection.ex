@@ -62,17 +62,27 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   def handle_frame({:text, _}, state), do: {:ok, state}
 
   defp subscribe_shared(pid, products) do
-    subscribe_order_books(pid, products)
+    subscribe_depth(pid, products)
+    subscribe_trade(pid, products)
   end
 
-  defp subscribe_order_books(pid, products) do
+  defp subscribe_depth(pid, products) do
     channels = products |> Enum.map(&depth_channel/1)
+    msg = %{"op" => "subscribe", "args" => channels}
+    Tai.WebSocket.send_json_msg(pid, msg)
+  end
+
+  defp subscribe_trade(pid, products) do
+    channels = products |> Enum.map(&trade_channel/1)
     msg = %{"op" => "subscribe", "args" => channels}
     Tai.WebSocket.send_json_msg(pid, msg)
   end
 
   @futures_depth "futures/depth"
   defp depth_channel(product), do: [@futures_depth, product.venue_symbol] |> Enum.join(":")
+
+  @futures_trade "futures/trade"
+  defp trade_channel(product), do: [@futures_trade, product.venue_symbol] |> Enum.join(":")
 
   @spec handle_msg(msg, venue_id) :: no_return
   defp handle_msg(msg, venue)
