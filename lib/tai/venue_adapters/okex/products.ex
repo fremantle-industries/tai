@@ -16,7 +16,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
          },
          venue_id
        ) do
-    symbol = instrument_id |> String.downcase() |> String.to_atom()
+    symbol = instrument_id |> to_symbol()
     size_increment = trade_increment |> Utils.Decimal.from()
     price_increment = tick_size |> Utils.Decimal.from()
 
@@ -32,4 +32,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       min_size: size_increment
     }
   end
+
+  def to_symbol(instrument_id),
+    do: instrument_id |> String.replace("-", "_") |> String.downcase() |> String.to_atom()
 end

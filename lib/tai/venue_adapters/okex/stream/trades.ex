@@ -1,9 +1,10 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
   alias Tai.Events
+  import Tai.VenueAdapters.OkEx.Products, only: [to_symbol: 1]
 
   def broadcast(
         %{
-          "instrument_id" => venue_symbol,
+          "instrument_id" => instrument_id,
           "price" => price,
           "qty" => qty,
           "side" => side,
@@ -14,10 +15,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       ) do
     Events.info(%Events.Trade{
       venue_id: venue_id,
-      # TODO: 
-      # The list of products or a map of exchange symbol to symbol should be 
-      # passed in. This currently doesn't support _ within the symbol
-      symbol: venue_symbol |> String.downcase() |> String.to_atom(),
+      symbol: instrument_id |> to_symbol,
       received_at: received_at,
       timestamp: timestamp,
       price: price,
