@@ -14,13 +14,37 @@ defmodule Tai.TestSupport.Helpers do
   def test_venue_adapters_maker_taker_fees,
     do: test_venue_adapters() |> Map.take(@test_venue_adapters_maker_taker_fees)
 
-  @test_venue_adapters_create_order Application.get_env(
-                                      :tai,
-                                      :test_venue_adapters_create_order,
-                                      []
-                                    )
-  def test_venue_adapters_create_order,
-    do: test_venue_adapters() |> Map.take(@test_venue_adapters_create_order)
+  @test_venue_adapters_create_order_error Application.get_env(
+                                            :tai,
+                                            :test_venue_adapters_create_order_error,
+                                            []
+                                          )
+  def test_venue_adapters_create_order_error,
+    do: test_venue_adapters() |> Map.take(@test_venue_adapters_create_order_error)
+
+  @test_venue_adapters_create_order_gtc Application.get_env(
+                                          :tai,
+                                          :test_venue_adapters_create_order_gtc,
+                                          []
+                                        )
+  def test_venue_adapters_create_order_gtc,
+    do: test_venue_adapters() |> Map.take(@test_venue_adapters_create_order_gtc)
+
+  @test_venue_adapters_create_order_fok Application.get_env(
+                                          :tai,
+                                          :test_venue_adapters_create_order_fok,
+                                          []
+                                        )
+  def test_venue_adapters_create_order_fok,
+    do: test_venue_adapters() |> Map.take(@test_venue_adapters_create_order_fok)
+
+  @test_venue_adapters_create_order_ioc Application.get_env(
+                                          :tai,
+                                          :test_venue_adapters_create_order_ioc,
+                                          []
+                                        )
+  def test_venue_adapters_create_order_ioc,
+    do: test_venue_adapters() |> Map.take(@test_venue_adapters_create_order_ioc)
 
   @test_venue_adapters_with_positions Application.get_env(
                                         :tai,

@@ -18,13 +18,13 @@ We are working to make `tai` production quality software.
 | Venues | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|
 | Bitmex | [x] | [x] | [x] | [x] | [x] | [x] |
-| OkEx   | [x] | [x] | [ ] | [ ] | [x] | [x] |
 
 ## Venues In Progress
 
 | Venue    | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
 |----------|:---:|:---:|:---:|:---:|:---:|:---:|
 | Binance  | [x] | [x] | [ ] | [ ] | [x] | [x] |
+| OkEx     | [x] | [x] | [ ] | [ ] | [x] | [x] |
 | GDAX     | [x] | [x] | [ ] | [ ] | [x] | [x] |
 | Poloniex | [x] | [x] | [ ] | [ ] | [x] | [x] |
 

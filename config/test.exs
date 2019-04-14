@@ -81,7 +81,10 @@ config(:tai,
 )
 
 config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :poloniex, :gdax, :okex])
-config(:tai, :test_venue_adapters_create_order, [:bitmex])
+config(:tai, :test_venue_adapters_create_order_gtc, [:bitmex])
+config(:tai, :test_venue_adapters_create_order_fok, [:bitmex])
+config(:tai, :test_venue_adapters_create_order_ioc, [:bitmex])
+config(:tai, :test_venue_adapters_create_order_error, [:bitmex])
 config(:tai, :test_venue_adapters_with_positions, [:bitmex])
 
 config :tai,
