@@ -8,7 +8,7 @@ defmodule Tai.ConfigTest do
 
       assert %Tai.Config{
                send_orders: false,
-               exchange_boot_handler: Tai.Venues.BootHandler,
+               venue_boot_handler: Tai.Venues.BootHandler,
                venues: %{},
                advisor_groups: %{},
                adapter_timeout: 10_000,
@@ -31,9 +31,9 @@ defmodule Tai.ConfigTest do
       assert config.event_registry_partitions == 1
     end
 
-    test "can set exchange_boot_handler" do
-      assert config = Tai.Config.parse(exchange_boot_handler: MyBootHandler)
-      assert config.exchange_boot_handler == MyBootHandler
+    test "can set venue_boot_handler" do
+      assert config = Tai.Config.parse(venue_boot_handler: MyBootHandler)
+      assert config.venue_boot_handler == MyBootHandler
     end
 
     test "can set venues" do

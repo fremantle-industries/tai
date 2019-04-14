@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :tai, send_orders: true
-config :tai, exchange_boot_handler: Tai.TestSupport.ExchangeBootHandler
+config :tai, venue_boot_handler: Tai.TestSupport.ExchangeBootHandler
 
 config :tai,
   advisor_groups: %{

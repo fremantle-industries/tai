@@ -49,6 +49,6 @@ defmodule Tai do
       {task, adapter}
     end)
     |> Enum.map(fn {task, adapter} -> Task.await(task, adapter.timeout) end)
-    |> Enum.each(&config.exchange_boot_handler.parse_response/1)
+    |> Enum.each(&config.venue_boot_handler.parse_response/1)
   end
 end
