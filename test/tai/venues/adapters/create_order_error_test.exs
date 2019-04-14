@@ -9,7 +9,6 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)
-    start_supervised!(Tai.TestSupport.Mocks.Server)
     HTTPoison.start()
   end
 
@@ -23,7 +22,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
     |> Enum.map(fn error_reason ->
       @error_reason error_reason
 
-      test "#{adapter.id} #{error_reason} error" do
+      test "#{adapter.id} #{error_reason}" do
         order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
         error = {:error, %HTTPoison.Error{reason: @error_reason}}
 
@@ -36,7 +35,23 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       end
     end)
 
-    test "#{adapter.id} insufficient balance error" do
+    test "#{adapter.id} rejected" do
+      order = build_order(@adapter.id, :buy, :gtc, post_only: true, action: :rejected)
+
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/rejected" do
+        assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
+
+        assert order_response.id != nil
+        assert %Decimal{} = order_response.original_size
+        assert order_response.leaves_qty == Decimal.new(0)
+        assert order_response.cumulative_qty == Decimal.new(0)
+        assert order_response.status == :rejected
+        assert order_response.avg_price == Decimal.new(0)
+        assert %DateTime{} = order_response.venue_timestamp
+      end
+    end
+
+    test "#{adapter.id} insufficient balance" do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_insufficient_balance" do
@@ -44,7 +59,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       end
     end
 
-    test "#{adapter.id} rate limited error" do
+    test "#{adapter.id} rate limited" do
       order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_rate_limited" do
@@ -52,7 +67,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       end
     end
 
-    test "#{adapter.id} unhandled error" do
+    test "#{adapter.id} unhandled" do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_unhandled_error" do
@@ -61,7 +76,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       end
     end
 
-    test "#{adapter.id} nonce not increasing error" do
+    test "#{adapter.id} nonce not increasing" do
       order = build_order(@adapter.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_nonce_not_increasing" do
@@ -72,7 +87,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       end
     end
 
-    test "#{adapter.id} overloaded error" do
+    test "#{adapter.id} overloaded" do
       order = build_order(@adapter.id, :buy, :gtc, action: :unfilled)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/create_order_overloaded" do

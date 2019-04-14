@@ -75,22 +75,6 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
             assert %DateTime{} = order_response.venue_timestamp
           end
         end
-
-        test "rejected" do
-          order = build_order(@adapter.id, @side, :gtc, post_only: true, action: :rejected)
-
-          use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_rejected" do
-            assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
-
-            assert order_response.id != nil
-            assert %Decimal{} = order_response.original_size
-            assert order_response.leaves_qty == Decimal.new(0)
-            assert order_response.cumulative_qty == Decimal.new(0)
-            assert order_response.status == :rejected
-            assert order_response.avg_price == Decimal.new(0)
-            assert %DateTime{} = order_response.venue_timestamp
-          end
-        end
       end
     end)
   end)
