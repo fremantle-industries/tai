@@ -1,6 +1,6 @@
 defmodule Tai.Trading.OrderResponses.Create do
   @moduledoc """
-  Return from venue adapters when creating an order
+  Returned from venue adapters for a created order
   """
 
   @type t :: %Tai.Trading.OrderResponses.Create{
@@ -11,27 +11,26 @@ defmodule Tai.Trading.OrderResponses.Create do
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
           received_at: DateTime.t(),
-          venue_timestamp: DateTime.t()
+          venue_timestamp: DateTime.t() | nil
         }
 
-  @enforce_keys [
-    :id,
-    :status,
-    :avg_price,
-    :original_size,
-    :leaves_qty,
-    :cumulative_qty,
-    :received_at,
-    :venue_timestamp
-  ]
-  defstruct [
-    :id,
-    :status,
-    :avg_price,
-    :original_size,
-    :leaves_qty,
-    :cumulative_qty,
-    :received_at,
-    :venue_timestamp
-  ]
+  @enforce_keys ~w(
+    id
+    status
+    avg_price
+    original_size
+    leaves_qty
+    cumulative_qty
+    received_at
+  )a
+  defstruct ~w(
+    id
+    status
+    avg_price
+    original_size
+    leaves_qty
+    cumulative_qty
+    received_at
+    venue_timestamp
+  )a
 end

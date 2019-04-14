@@ -35,4 +35,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
 
   def to_symbol(instrument_id),
     do: instrument_id |> String.replace("-", "_") |> String.downcase() |> String.to_atom()
+
+  def from_symbol(symbol),
+    do: symbol |> Atom.to_string() |> String.replace("_", "-") |> String.upcase()
 end

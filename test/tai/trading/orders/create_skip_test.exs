@@ -1,8 +1,7 @@
 defmodule Tai.Trading.Orders.CreateSkipTest do
   use ExUnit.Case, async: false
-
-  import Tai.TestSupport.Helpers
   alias Tai.TestSupport.Mocks
+  alias Tai.Trading.{Order, Orders, OrderSubmissions}
 
   setup do
     on_exit(fn ->
@@ -16,38 +15,27 @@ defmodule Tai.Trading.Orders.CreateSkipTest do
     :ok
   end
 
-  @submission_types [
-    {:buy, Tai.Trading.OrderSubmissions.BuyLimitGtc},
-    {:sell, Tai.Trading.OrderSubmissions.SellLimitGtc}
-  ]
-
-  @submission_types
+  [{:buy, OrderSubmissions.BuyLimitGtc}, {:sell, OrderSubmissions.SellLimitGtc}]
   |> Enum.each(fn {side, submission_type} ->
-    @side side
     @submission_type submission_type
 
     test "#{side} updates the leaves qty" do
-      submission =
-        Support.OrderSubmissions.build(@submission_type, %{
-          qty: Decimal.new(1),
-          order_updated_callback: fire_order_callback(self())
-        })
+      submission = Support.OrderSubmissions.build_with_callback(@submission_type)
 
-      {:ok, _} = Tai.Trading.Orders.create(submission)
+      {:ok, _} = Orders.create(submission)
 
       assert_receive {
         :callback_fired,
         nil,
-        %Tai.Trading.Order{status: :enqueued}
+        %Order{status: :enqueued}
       }
 
       assert_receive {
         :callback_fired,
-        %Tai.Trading.Order{status: :enqueued},
-        %Tai.Trading.Order{status: :skip} = skipped_order
+        %Order{status: :enqueued},
+        %Order{status: :skip} = skipped_order
       }
 
-      assert skipped_order.side == @side
       assert skipped_order.leaves_qty == Decimal.new(0)
     end
   end)

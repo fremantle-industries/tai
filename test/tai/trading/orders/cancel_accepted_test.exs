@@ -1,4 +1,4 @@
-defmodule Tai.Trading.Orders.CancelTest do
+defmodule Tai.Trading.Orders.CancelAcceptedTest do
   use ExUnit.Case, async: false
   alias Tai.Trading.{Order, Orders, OrderSubmissions}
   alias Tai.TestSupport.Mocks
@@ -19,7 +19,7 @@ defmodule Tai.Trading.Orders.CancelTest do
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
 
-    test "cancels #{side} order on venue and mirrors changes on the order" do
+    test "cancels #{side} order on venue and locally records that it was accepted" do
       submission = Support.OrderSubmissions.build_with_callback(@submission_type)
       Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
       {:ok, order} = Orders.create(submission)
@@ -30,7 +30,7 @@ defmodule Tai.Trading.Orders.CancelTest do
         %Order{status: :open}
       }
 
-      Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
+      Mocks.Responses.Orders.GoodTillCancel.cancel_accepted(@venue_order_id)
       assert {:ok, %Order{status: :pending_cancel}} = Orders.cancel(order)
 
       assert_receive {
@@ -42,7 +42,7 @@ defmodule Tai.Trading.Orders.CancelTest do
       assert_receive {
         :callback_fired,
         %Order{status: :pending_cancel},
-        %Order{status: :canceled} = canceled_order
+        %Order{status: :cancel_accepted} = cancel_accepted_order
       }
     end
   end)

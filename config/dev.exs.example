@@ -32,8 +32,19 @@ config :tai,
           api_key: {:system_file, "BITMEX_API_KEY"},
           api_secret: {:system_file, "BITMEX_SECRET"}
         }
-      },
-      timeout: 60_000
+      }
+    ],
+    okex: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.OkEx,
+      products: "eth_usd_190419 eth_usd_190426 eth_usd_190628",
+      accounts: %{
+        main: %{
+          api_key: {:system_file, "OKEX_API_KEY"},
+          api_secret: {:system_file, "OKEX_API_SECRET"},
+          api_passphrase: {:system_file, "OKEX_API_PASSPHRASE"}
+        }
+      }
     ],
     binance: [
       enabled: true,

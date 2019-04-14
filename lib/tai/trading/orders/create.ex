@@ -19,7 +19,7 @@ defmodule Tai.Trading.Orders.Create do
       if Tai.Settings.send_orders?() do
         try do
           order
-          |> send
+          |> send_to_venue
           |> parse_response(order)
           |> notify_updated_order()
         rescue
@@ -45,7 +45,34 @@ defmodule Tai.Trading.Orders.Create do
     order
   end
 
-  defdelegate send(order), to: Tai.Venue, as: :create_order
+  defdelegate send_to_venue(order), to: Tai.Venue, as: :create_order
+
+  defp parse_response(
+         {:ok, %OrderResponses.CreateAccepted{} = response},
+         order
+       ) do
+    OrderStore.accept_create(
+      order.client_id,
+      response.id,
+      response.received_at,
+      response.venue_timestamp
+    )
+  end
+
+  defp parse_response(
+         {:ok, %OrderResponses.Create{status: :open} = response},
+         order
+       ) do
+    OrderStore.open(
+      order.client_id,
+      response.id,
+      response.avg_price,
+      response.cumulative_qty,
+      response.leaves_qty,
+      response.received_at,
+      response.venue_timestamp
+    )
+  end
 
   defp parse_response(
          {:ok, %OrderResponses.Create{status: :filled} = response},
@@ -66,21 +93,6 @@ defmodule Tai.Trading.Orders.Create do
          order
        ) do
     OrderStore.expire(
-      order.client_id,
-      response.id,
-      response.avg_price,
-      response.cumulative_qty,
-      response.leaves_qty,
-      response.received_at,
-      response.venue_timestamp
-    )
-  end
-
-  defp parse_response(
-         {:ok, %OrderResponses.Create{status: :open} = response},
-         order
-       ) do
-    OrderStore.open(
       order.client_id,
       response.id,
       response.avg_price,

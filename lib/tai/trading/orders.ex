@@ -1,12 +1,13 @@
 defmodule Tai.Trading.Orders do
-  alias Tai.Trading.Orders
+  alias Tai.Trading.{Order, Orders, BuildOrderFromSubmission}
+  alias Tai.Events
 
-  @type submission :: Tai.Trading.BuildOrderFromSubmission.submission()
-  @type order :: Tai.Trading.Order.t()
-  @type status :: Tai.Trading.Order.status()
+  @type submission :: BuildOrderFromSubmission.submission()
+  @type order :: Order.t()
+  @type status :: Order.status()
   @type status_was :: status
   @type status_required :: status | [status]
-  @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
+  @type amend_attrs :: Orders.Amend.attrs()
   @type amend_error_reason :: {:invalid_status, status_was, status_required}
   @type cancel_error_reason :: {:invalid_status, status_was, status_required}
 
@@ -20,8 +21,8 @@ defmodule Tai.Trading.Orders do
   defdelegate cancel(order), to: Orders.Cancel
 
   @spec broadcast(order) :: :ok
-  def broadcast(%Tai.Trading.Order{} = order) do
-    %Tai.Events.OrderUpdated{
+  def broadcast(%Order{} = order) do
+    %Events.OrderUpdated{
       client_id: order.client_id,
       venue_id: order.exchange_id,
       account_id: order.account_id,
@@ -42,11 +43,11 @@ defmodule Tai.Trading.Orders do
       last_venue_timestamp: order.last_venue_timestamp,
       updated_at: order.updated_at
     }
-    |> Tai.Events.info()
+    |> Events.info()
   end
 
   @spec updated!(order | nil, order) :: :ok
-  def updated!(previous, %Tai.Trading.Order{} = updated) do
+  def updated!(previous, %Order{} = updated) do
     broadcast(updated)
 
     if updated.order_updated_callback do

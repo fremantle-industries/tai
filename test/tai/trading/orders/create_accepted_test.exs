@@ -1,4 +1,4 @@
-defmodule Tai.Trading.Orders.CreateRejectedTest do
+defmodule Tai.Trading.Orders.CreateAcceptedTest do
   use ExUnit.Case, async: false
   alias Tai.TestSupport.Mocks
   alias Tai.Trading.{Order, Orders, OrderSubmissions}
@@ -19,9 +19,9 @@ defmodule Tai.Trading.Orders.CreateRejectedTest do
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
 
-    test "#{side} updates the relevant attributes" do
+    test "#{side} records the venue order id & timestamp" do
       submission = Support.OrderSubmissions.build_with_callback(@submission_type)
-      Mocks.Responses.Orders.GoodTillCancel.rejected(@venue_order_id, submission)
+      Mocks.Responses.Orders.GoodTillCancel.create_accepted(@venue_order_id, submission)
       {:ok, _} = Orders.create(submission)
 
       assert_receive {
@@ -32,12 +32,13 @@ defmodule Tai.Trading.Orders.CreateRejectedTest do
 
       assert_receive {
         :callback_fired,
-        %Order{status: :enqueued},
-        %Order{status: :rejected} = rejected_order
+        %Order{status: :enqueued} = enqueued_order,
+        %Order{status: :create_accepted} = accepted_order
       }
 
-      assert rejected_order.venue_order_id == @venue_order_id
-      assert %DateTime{} = rejected_order.last_venue_timestamp
+      assert accepted_order.venue_order_id == @venue_order_id
+      assert %DateTime{} = accepted_order.last_received_at
+      assert %DateTime{} = accepted_order.last_venue_timestamp
     end
   end)
 end

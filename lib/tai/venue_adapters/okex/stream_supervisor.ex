@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
   # TODO: Make this configurable
   @endpoint "wss://real.okex.com:10442/ws/v3"
 
-  def init(venue_id: venue_id, accounts: _accounts, products: products) do
+  def init(venue_id: venue_id, accounts: accounts, products: products) do
     # TODO: Potentially this could use new order books? Send the change quote 
     # event to subscribing advisors?
     order_books =
@@ -46,12 +46,13 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
 
     system = [
       {Stream.ProcessOrderBooks, [venue: venue_id, products: products]},
-      {Tai.VenueAdapters.OkEx.Stream.ProcessMessages, [venue: venue_id]},
+      {Stream.ProcessAuth, [venue: venue_id]},
+      {Stream.ProcessMessages, [venue: venue_id]},
       {Stream.Connection,
        [
          endpoint: @endpoint,
          venue: venue_id,
-         account: nil,
+         account: accounts |> Map.to_list() |> List.first(),
          products: products
        ]}
     ]

@@ -1,4 +1,6 @@
 defmodule Tai.Venues.Adapter do
+  alias Tai.Trading.OrderResponses
+
   @type venue_id :: atom
   @type account_id :: atom
   @type credentials :: map
@@ -6,9 +8,9 @@ defmodule Tai.Venues.Adapter do
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type position :: Tai.Trading.Position.t()
   @type order :: Tai.Trading.Order.t()
-  @type create_response :: Tai.Trading.OrderResponses.Create.t()
-  @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
-  @type cancel_response :: Tai.Trading.OrderResponses.Cancel.t()
+  @type create_response :: OrderResponses.Create.t() | OrderResponses.CreateAccepted.t()
+  @type amend_response :: OrderResponses.Amend.t()
+  @type cancel_response :: OrderResponses.Cancel.t() | OrderResponses.CancelAccepted.t()
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type shared_error_reason ::
           :not_implemented

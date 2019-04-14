@@ -1,6 +1,7 @@
 defmodule Tai.VenueAdapters.Mock do
   @behaviour Tai.Venues.Adapter
   import Tai.TestSupport.Mocks.Client
+  alias Tai.Trading.OrderResponses
 
   def stream_supervisor, do: Tai.VenueAdapters.Mock.StreamSupervisor
 
@@ -62,8 +63,7 @@ defmodule Tai.VenueAdapters.Mock do
 
   def amend_order(order, attrs, _credentials) do
     with_mock_server(fn ->
-      {Tai.Trading.OrderResponses.Amend,
-       attrs |> Map.merge(%{venue_order_id: order.venue_order_id})}
+      {OrderResponses.Amend, attrs |> Map.merge(%{venue_order_id: order.venue_order_id})}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} -> raise reason
@@ -78,21 +78,10 @@ defmodule Tai.VenueAdapters.Mock do
       order.venue_order_id
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
-        {:ok, {:raise, reason}} ->
-          raise reason
-
-        {:ok, :cancel_ok} ->
-          cancel_response = %Tai.Trading.OrderResponses.Cancel{
-            id: order.venue_order_id,
-            status: :canceled,
-            leaves_qty: Decimal.new(0),
-            venue_timestamp: Timex.now()
-          }
-
-          {:ok, cancel_response}
-
-        {:error, :not_found} ->
-          {:error, :mock_not_found}
+        {:ok, %OrderResponses.Cancel{}} = response -> response
+        {:ok, %OrderResponses.CancelAccepted{}} = response -> response
+        {:ok, {:raise, reason}} -> raise reason
+        {:error, :not_found} -> {:error, :mock_not_found}
       end
     end)
   end

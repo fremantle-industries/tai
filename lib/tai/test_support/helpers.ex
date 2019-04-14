@@ -2,17 +2,26 @@ defmodule Tai.TestSupport.Helpers do
   def test_venue_adapters_maker_taker_fees,
     do: :test_venue_adapters_maker_taker_fees |> filter()
 
-  def test_venue_adapters_create_order_error,
-    do: :test_venue_adapters_create_order_error |> filter()
+  def test_venue_adapters_create_order_gtc_open,
+    do: :test_venue_adapters_create_order_gtc_open |> filter()
 
-  def test_venue_adapters_create_order_gtc,
-    do: :test_venue_adapters_create_order_gtc |> filter()
+  def test_venue_adapters_create_order_gtc_accepted,
+    do: :test_venue_adapters_create_order_gtc_accepted |> filter()
 
   def test_venue_adapters_create_order_fok,
     do: :test_venue_adapters_create_order_fok |> filter()
 
   def test_venue_adapters_create_order_ioc,
     do: :test_venue_adapters_create_order_ioc |> filter()
+
+  def test_venue_adapters_create_order_error,
+    do: :test_venue_adapters_create_order_error |> filter()
+
+  def test_venue_adapters_cancel_order,
+    do: :test_venue_adapters_cancel_order |> filter()
+
+  def test_venue_adapters_cancel_order_accepted,
+    do: :test_venue_adapters_cancel_order_accepted |> filter()
 
   def test_venue_adapters_with_positions,
     do: :test_venue_adapters_with_positions |> filter()
