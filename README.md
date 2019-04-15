@@ -14,7 +14,9 @@ We are working to make `tai` production quality software.
 
 ## What Can I Do? TLDR;
 
-Log the spread between multiple products on BitMEX
+Stream market data, create & manage orders.
+
+Here's an example of an advisor that logs the spread between multiple products on BitMEX
 
 ```elixir
 # config/config.exs
