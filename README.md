@@ -12,6 +12,43 @@ We are working to make `tai` production quality software.
 
 [Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](#advisors) | [Configuration](#configuration) | [Commands](#commands) | [Logging](#logging)
 
+## What Can I Do? TLDR;
+
+Log the spread between multiple products on BitMEX
+
+```elixir
+# config/config.exs
+use Mix.Config
+
+config :tai, send_orders: false
+
+config :tai,
+  advisor_groups: %{
+    log_spread: [
+      advisor: Examples.Advisors.LogSpread.Advisor,
+      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
+      products: "*"
+    ]
+  }
+
+config :tai,
+  venues: %{
+    bitmex: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.Bitmex,
+      products: "xbtusd ethusd",
+      accounts: %{}
+    ]
+  }
+
+config :echo_boy, port: 4200
+```
+
+```
+# log/dev.log
+09:41:35.950 [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"bitmex","spread":"0.01","product_symbol":"xbtusd","bid_price":"5491.05","ask_price":"5491.06"}}
+09:41:37.211 [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"bitmex","spread":"0.05","product_symbol":"ethusd","bid_price":"202.64","ask_price":"202.69"}}
+```
 
 ## Supported Venues
 
