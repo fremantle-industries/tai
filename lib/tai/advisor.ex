@@ -5,31 +5,37 @@ defmodule Tai.Advisor do
   It can be used to monitor one or more quote streams and create, update or cancel orders.
   """
 
-  @type advisor :: Tai.Advisor.t()
-  @type id :: atom
+  defmodule State do
+    @type group_id :: atom
+    @type id :: atom
+    @type product :: Tai.Venues.Product.t()
+    @type config :: map
+    @type run_store :: map
+    @type t :: %State{
+            group_id: group_id,
+            advisor_id: id,
+            products: [product],
+            config: config,
+            store: run_store,
+            trades: list
+          }
+
+    @enforce_keys ~w(advisor_id config group_id products store trades)a
+    defstruct ~w(advisor_id config group_id market_quotes products store trades)a
+  end
+
   @type group_id :: atom
+  @type id :: atom
   @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type product :: Tai.Venues.Product.t()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type order :: Tai.Trading.Order.t()
   @type market_quote :: Tai.Markets.Quote.t()
   @type changes :: term
-  @type config :: map
   @type run_store :: map
-  @type t :: %Tai.Advisor{
-          group_id: group_id,
-          advisor_id: id,
-          products: [product],
-          config: config,
-          store: run_store,
-          trades: list
-        }
+  @type state :: State.t()
 
-  @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, advisor) ::
+  @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, state) ::
               {:ok, run_store}
-
-  @enforce_keys ~w(advisor_id config group_id products store trades)a
-  defstruct ~w(advisor_id config group_id market_quotes products store trades)a
 
   @spec to_name(group_id, id) :: atom
   def to_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
@@ -93,7 +99,7 @@ defmodule Tai.Advisor do
         name = Tai.Advisor.to_name(group_id, advisor_id)
         market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
 
-        state = %Tai.Advisor{
+        state = %State{
           group_id: group_id,
           advisor_id: advisor_id,
           products: products,

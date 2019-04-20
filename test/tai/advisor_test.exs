@@ -61,7 +61,8 @@ defmodule Tai.AdvisorTest do
 
       Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order, callback)
 
-      assert_receive {:fired_order_updated_callback, :old_order, :updated_order, %Tai.Advisor{}}
+      assert_receive {:fired_order_updated_callback, :old_order, :updated_order,
+                      %Tai.Advisor.State{}}
     end
 
     test "can update the run store map with the return value of the callback", %{
@@ -115,7 +116,7 @@ defmodule Tai.AdvisorTest do
       Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order, callback, :opts)
 
       assert_receive {:fired_order_updated_callback, :old_order, :updated_order, :opts,
-                      %Tai.Advisor{}}
+                      %Tai.Advisor.State{}}
     end
 
     test "can update the run store map with the return value of the callback", %{

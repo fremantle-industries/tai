@@ -65,7 +65,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
 
     Tai.Markets.OrderBook.replace(snapshot)
 
-    assert_receive {:my_venue, :btc_usd, received_market_quote, received_snapshot, %Tai.Advisor{}}
+    assert_receive {:my_venue, :btc_usd, received_market_quote, received_snapshot,
+                    %Tai.Advisor.State{}}
 
     assert %Tai.Markets.Quote{} = received_market_quote
 
@@ -116,7 +117,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
         }
       },
       ^changes_1,
-      %Tai.Advisor{}
+      %Tai.Advisor.State{}
     }
 
     changes_2 = %Tai.Markets.OrderBook{
@@ -146,7 +147,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
         }
       },
       ^changes_2,
-      %Tai.Advisor{}
+      %Tai.Advisor.State{}
     }
   end
 
@@ -180,7 +181,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
         }
       },
       ^changes_1,
-      %Tai.Advisor{}
+      %Tai.Advisor.State{}
     }
 
     changes_2 = %Tai.Markets.OrderBook{
@@ -210,7 +211,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
         }
       },
       ^changes_2,
-      %Tai.Advisor{}
+      %Tai.Advisor.State{}
     }
   end
 
@@ -231,7 +232,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       :btc_usd,
       %Tai.Markets.Quote{},
       ^snapshot,
-      %Tai.Advisor{advisor_id: :my_advisor, store: %{}}
+      %Tai.Advisor.State{advisor_id: :my_advisor, store: %{}}
     }
 
     changes = %Tai.Markets.OrderBook{
@@ -248,7 +249,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       :btc_usd,
       %Tai.Markets.Quote{},
       ^changes,
-      %Tai.Advisor{advisor_id: :my_advisor, store: %{hello: "world"}}
+      %Tai.Advisor.State{advisor_id: :my_advisor, store: %{hello: "world"}}
     }
   end
 
