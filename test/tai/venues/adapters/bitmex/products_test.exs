@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
   end
 
   test "retrieves the trade rules for each product", %{adapter: adapter} do
-    use_cassette "exchange_adapters/shared/products/bitmex/success" do
+    use_cassette "venue_adapters/shared/products/bitmex/success" do
       assert {:ok, products} = Tai.Venue.products(adapter)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :xbtusd)
       assert product.venue_id == :bitmex

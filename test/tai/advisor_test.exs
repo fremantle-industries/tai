@@ -8,7 +8,7 @@ defmodule Tai.AdvisorTest do
   end
 
   describe ".start_link" do
-    test "can initialize the run store" do
+    test "can initialize run store" do
       start_supervised!(
         {MyAdvisor,
          [
@@ -24,6 +24,25 @@ defmodule Tai.AdvisorTest do
       state = :sys.get_state(advisor_name)
 
       assert state.store.initialized == true
+    end
+
+    test "can initialize trades" do
+      start_supervised!(
+        {MyAdvisor,
+         [
+           group_id: :init_trades,
+           advisor_id: :my_advisor,
+           products: [],
+           config: %{},
+           store: %{},
+           trades: [:a]
+         ]}
+      )
+
+      advisor_name = Tai.Advisor.to_name(:init_trades, :my_advisor)
+      state = :sys.get_state(advisor_name)
+
+      assert state.trades == [:a]
     end
   end
 
@@ -42,7 +61,8 @@ defmodule Tai.AdvisorTest do
 
       Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order, callback)
 
-      assert_receive {:fired_order_updated_callback, :old_order, :updated_order, %Tai.Advisor{}}
+      assert_receive {:fired_order_updated_callback, :old_order, :updated_order,
+                      %Tai.Advisor.State{}}
     end
 
     test "can update the run store map with the return value of the callback", %{
@@ -96,7 +116,7 @@ defmodule Tai.AdvisorTest do
       Tai.Advisor.cast_order_updated(advisor_name, :old_order, :updated_order, callback, :opts)
 
       assert_receive {:fired_order_updated_callback, :old_order, :updated_order, :opts,
-                      %Tai.Advisor{}}
+                      %Tai.Advisor.State{}}
     end
 
     test "can update the run store map with the return value of the callback", %{

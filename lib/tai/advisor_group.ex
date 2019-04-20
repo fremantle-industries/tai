@@ -4,11 +4,12 @@ defmodule Tai.AdvisorGroup do
           advisor: atom,
           factory: atom,
           products: String.t(),
-          config: map
+          config: map,
+          trades: list
         }
 
-  @enforce_keys ~w(id factory products config)a
-  defstruct ~w(id advisor factory products config)a
+  @enforce_keys ~w(id factory products config trades)a
+  defstruct ~w(id advisor factory products config trades)a
   use Vex.Struct
 
   validates(:id, presence: true)
