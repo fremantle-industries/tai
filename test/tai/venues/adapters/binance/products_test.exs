@@ -11,7 +11,7 @@ defmodule Tai.VenueAdapters.Binance.ProductsTest do
   end
 
   test "retrieves the trade rules for each product", %{adapter: adapter} do
-    use_cassette "exchange_adapters/shared/products/binance/success" do
+    use_cassette "venue_adapters/shared/products/binance/success" do
       assert {:ok, products} = Tai.Venue.products(adapter)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :ltc_btc)
       assert Decimal.cmp(product.min_notional, Decimal.new("0.001")) == :eq
@@ -25,21 +25,21 @@ defmodule Tai.VenueAdapters.Binance.ProductsTest do
   end
 
   test "returns an error tuple when the secret is invalid", %{adapter: adapter} do
-    use_cassette "exchange_adapters/shared/products/binance/error_invalid_secret" do
+    use_cassette "venue_adapters/shared/products/binance/error_invalid_secret" do
       assert {:error, {:credentials, reason}} = Tai.Venue.products(adapter)
       assert reason == "API-key format invalid."
     end
   end
 
   test "returns an error tuple when the api key is invalid", %{adapter: adapter} do
-    use_cassette "exchange_adapters/shared/products/binance/error_invalid_api_key" do
+    use_cassette "venue_adapters/shared/products/binance/error_invalid_api_key" do
       assert {:error, {:credentials, reason}} = Tai.Venue.products(adapter)
       assert reason = "API-key format invalid."
     end
   end
 
   test "returns an error tuple when the request times out", %{adapter: adapter} do
-    use_cassette "exchange_adapters/shared/products/binance/error_timeout" do
+    use_cassette "venue_adapters/shared/products/binance/error_timeout" do
       assert Tai.Venue.products(adapter) == {:error, :timeout}
     end
   end
