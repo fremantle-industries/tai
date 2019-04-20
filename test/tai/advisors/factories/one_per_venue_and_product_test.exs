@@ -8,7 +8,8 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
       factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       id: :group_a,
       products: "*",
-      config: %{hello: :world}
+      config: %{hello: :world},
+      trades: []
     }
 
     assert Tai.Advisors.Factories.OnePerVenueAndProduct.advisor_specs(group, []) == []

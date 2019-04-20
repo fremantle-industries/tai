@@ -15,7 +15,8 @@ defmodule Tai.AdvisorGroups.ParseConfig do
       advisor: config |> Keyword.get(:advisor),
       factory: config |> Keyword.get(:factory),
       products: config |> Keyword.get(:products),
-      config: config |> Keyword.get(:config, %{})
+      config: config |> Keyword.get(:config, %{}),
+      trades: config |> Keyword.get(:trades, [])
     }
 
     if Vex.valid?(group) do
