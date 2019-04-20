@@ -8,7 +8,7 @@ defmodule Tai.AdvisorTest do
   end
 
   describe ".start_link" do
-    test "can initialize the run store" do
+    test "can initialize run store" do
       start_supervised!(
         {MyAdvisor,
          [
@@ -24,6 +24,25 @@ defmodule Tai.AdvisorTest do
       state = :sys.get_state(advisor_name)
 
       assert state.store.initialized == true
+    end
+
+    test "can initialize trades" do
+      start_supervised!(
+        {MyAdvisor,
+         [
+           group_id: :init_trades,
+           advisor_id: :my_advisor,
+           products: [],
+           config: %{},
+           store: %{},
+           trades: [:a]
+         ]}
+      )
+
+      advisor_name = Tai.Advisor.to_name(:init_trades, :my_advisor)
+      state = :sys.get_state(advisor_name)
+
+      assert state.trades == [:a]
     end
   end
 

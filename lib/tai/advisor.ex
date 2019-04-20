@@ -21,16 +21,17 @@ defmodule Tai.Advisor do
           advisor_id: id,
           products: [product],
           config: config,
-          store: run_store
+          store: run_store,
+          trades: list
         }
 
   @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, advisor) ::
               {:ok, run_store}
 
-  @enforce_keys ~w(advisor_id config group_id products store)a
-  defstruct ~w(advisor_id config group_id market_quotes products store)a
+  @enforce_keys ~w(advisor_id config group_id products store trades)a
+  defstruct ~w(advisor_id config group_id market_quotes products store trades)a
 
-  @spec to_name(atom, atom) :: atom
+  @spec to_name(group_id, id) :: atom
   def to_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
 
   @spec cast_order_updated(atom, order | nil, order, fun) :: :ok
@@ -71,21 +72,38 @@ defmodule Tai.Advisor do
             config: config,
             store: store
           ) do
-        name = Tai.Advisor.to_name(group_id, advisor_id)
-        market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
+        start_link(
+          group_id: group_id,
+          advisor_id: advisor_id,
+          products: products,
+          config: config,
+          store: store,
+          trades: []
+        )
+      end
 
-        GenServer.start_link(
-          __MODULE__,
-          %Tai.Advisor{
+      def start_link(
             group_id: group_id,
             advisor_id: advisor_id,
             products: products,
-            market_quotes: market_quotes,
             config: config,
-            store: store
-          },
-          name: name
-        )
+            store: store,
+            trades: trades
+          ) do
+        name = Tai.Advisor.to_name(group_id, advisor_id)
+        market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
+
+        state = %Tai.Advisor{
+          group_id: group_id,
+          advisor_id: advisor_id,
+          products: products,
+          market_quotes: market_quotes,
+          config: config,
+          store: store,
+          trades: trades
+        }
+
+        GenServer.start_link(__MODULE__, state, name: name)
       end
 
       @doc false
