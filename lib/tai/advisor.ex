@@ -9,7 +9,7 @@ defmodule Tai.Advisor do
     @type group_id :: atom
     @type id :: atom
     @type product :: Tai.Venues.Product.t()
-    @type config :: map
+    @type config :: struct | map
     @type run_store :: map
     @type t :: %State{
             group_id: group_id,
