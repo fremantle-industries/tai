@@ -24,14 +24,14 @@ defmodule Tai.Advisor do
     defstruct ~w(advisor_id config group_id market_quotes products store trades)a
   end
 
-  @type group_id :: atom
-  @type id :: atom
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type order :: Tai.Trading.Order.t()
   @type market_quote :: Tai.Markets.Quote.t()
   @type changes :: term
-  @type run_store :: map
+  @type group_id :: State.group_id()
+  @type id :: State.id()
+  @type run_store :: State.run_store()
   @type state :: State.t()
 
   @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, state) ::
