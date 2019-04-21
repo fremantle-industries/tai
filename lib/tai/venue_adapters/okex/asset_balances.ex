@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
     with {:ok, %{"info" => info}} <-
            credentials
            |> to_venue_credentials
-           |> ExOkex.Futures.list_accounts() do
+           |> ExOkex.Futures.Private.list_accounts() do
       balances =
         info
         |> Enum.map(fn {asset, %{"equity" => equity}} ->
