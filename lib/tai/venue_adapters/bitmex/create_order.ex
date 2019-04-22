@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
 
     credentials
     |> to_venue_credentials
-    |> create_on_venue(params)
+    |> send_to_venue(params)
     |> parse_response(order)
   end
 
@@ -45,7 +45,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
     end
   end
 
-  defdelegate create_on_venue(credentials, params),
+  defdelegate send_to_venue(credentials, params),
     to: ExBitmex.Rest.Orders,
     as: :create
 

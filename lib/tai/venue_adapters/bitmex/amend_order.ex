@@ -17,11 +17,11 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
 
     credentials
     |> to_venue_credentials
-    |> amend_on_venue(params)
+    |> send_to_venue(params)
     |> parse_response()
   end
 
-  defdelegate amend_on_venue(credentials, params),
+  defdelegate send_to_venue(credentials, params),
     to: ExBitmex.Rest.Orders,
     as: :amend
 

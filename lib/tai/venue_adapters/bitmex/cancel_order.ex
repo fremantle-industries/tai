@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
   def cancel_order(order, credentials) do
     credentials
     |> to_venue_credentials
-    |> cancel_on_venue(%{orderID: order.venue_order_id})
+    |> send_to_venue(%{orderID: order.venue_order_id})
     |> parse_response()
   end
 
@@ -22,7 +22,7 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
     to: Tai.VenueAdapters.Bitmex.Credentials,
     as: :from
 
-  defdelegate cancel_on_venue(credentials, params),
+  defdelegate send_to_venue(credentials, params),
     to: ExBitmex.Rest.Orders,
     as: :cancel
 
