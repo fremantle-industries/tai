@@ -12,11 +12,9 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
 
   @spec cancel_order(venue_order_id, credentials) :: {:ok, response} | {:error, reason}
   def cancel_order(venue_order_id, credentials) do
-    params = %{orderID: venue_order_id}
-
     credentials
     |> to_venue_credentials
-    |> cancel_on_venue(params)
+    |> cancel_on_venue(%{orderID: venue_order_id})
     |> parse_response()
   end
 
