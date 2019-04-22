@@ -2,7 +2,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
   import Tai.VenueAdapters.Bitmex.OrderStatus
 
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type venue_order_id :: Tai.Trading.Order.venue_order_id()
+  @type order :: Tai.Trading.Order.t()
   @type attrs :: Tai.Trading.Orders.Amend.attrs()
   @type response :: Tai.Trading.OrderResponses.Amend.t()
   @type reason ::
@@ -11,9 +11,9 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
           | {:nonce_not_increasing, msg :: String.t()}
           | {:unhandled, term}
 
-  @spec amend_order(venue_order_id, attrs, credentials) :: {:ok, response} | {:error, reason}
-  def amend_order(venue_order_id, attrs, credentials) do
-    params = to_params(attrs, venue_order_id)
+  @spec amend_order(order, attrs, credentials) :: {:ok, response} | {:error, reason}
+  def amend_order(order, attrs, credentials) do
+    params = to_params(attrs, order.venue_order_id)
 
     credentials
     |> to_venue_credentials

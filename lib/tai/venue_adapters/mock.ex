@@ -60,9 +60,10 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def amend_order(venue_order_id, attrs, _credentials) do
+  def amend_order(order, attrs, _credentials) do
     with_mock_server(fn ->
-      {Tai.Trading.OrderResponses.Amend, attrs |> Map.merge(%{venue_order_id: venue_order_id})}
+      {Tai.Trading.OrderResponses.Amend,
+       attrs |> Map.merge(%{venue_order_id: order.venue_order_id})}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} -> raise reason
@@ -72,9 +73,9 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def cancel_order(venue_order_id, _credentials) do
+  def cancel_order(order, _credentials) do
     with_mock_server(fn ->
-      venue_order_id
+      order.venue_order_id
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} ->
@@ -82,7 +83,7 @@ defmodule Tai.VenueAdapters.Mock do
 
         {:ok, :cancel_ok} ->
           cancel_response = %Tai.Trading.OrderResponses.Cancel{
-            id: venue_order_id,
+            id: order.venue_order_id,
             status: :canceled,
             leaves_qty: Decimal.new(0),
             venue_updated_at: Timex.now()
