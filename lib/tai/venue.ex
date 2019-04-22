@@ -91,7 +91,7 @@ defmodule Tai.Venue do
         adapters \\ Tai.Venues.Config.parse_adapters()
       ) do
     {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
-    venue_adapter.adapter.cancel_order(order.venue_order_id, credentials)
+    venue_adapter.adapter.cancel_order(order, credentials)
   end
 
   defp find_venue_adapter_and_credentials(order, adapters) do

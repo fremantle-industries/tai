@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
   import Tai.VenueAdapters.Bitmex.OrderStatus
 
-  @type venue_order_id :: String.t()
+  @type order :: Tai.Trading.Order.t()
   @type credentials :: map
   @type response :: Tai.Trading.OrderResponses.Cancel.t()
   @type reason ::
@@ -10,11 +10,11 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
           | {:nonce_not_increasing, msg :: String.t()}
           | {:unhandled, term}
 
-  @spec cancel_order(venue_order_id, credentials) :: {:ok, response} | {:error, reason}
-  def cancel_order(venue_order_id, credentials) do
+  @spec cancel_order(order, credentials) :: {:ok, response} | {:error, reason}
+  def cancel_order(order, credentials) do
     credentials
     |> to_venue_credentials
-    |> cancel_on_venue(%{orderID: venue_order_id})
+    |> cancel_on_venue(%{orderID: order.venue_order_id})
     |> parse_response()
   end
 

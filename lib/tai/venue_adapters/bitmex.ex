@@ -19,5 +19,5 @@ defmodule Tai.VenueAdapters.Bitmex do
   defdelegate amend_order(venue_order_id, attrs, credentials),
     to: Tai.VenueAdapters.Bitmex.AmendOrder
 
-  defdelegate cancel_order(venue_order_id, credentials), to: Tai.VenueAdapters.Bitmex.CancelOrder
+  defdelegate cancel_order(order, credentials), to: Tai.VenueAdapters.Bitmex.CancelOrder
 end
