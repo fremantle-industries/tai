@@ -9,7 +9,6 @@ defmodule Tai.Venues.Adapter do
   @type create_response :: Tai.Trading.OrderResponses.Create.t()
   @type amend_response :: Tai.Trading.OrderResponses.Amend.t()
   @type cancel_response :: Tai.Trading.OrderResponses.Cancel.t()
-  @type venue_order_id :: String.t()
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type shared_error_reason ::
           :not_implemented
@@ -41,7 +40,7 @@ defmodule Tai.Venues.Adapter do
               {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil} | {:error, reason :: term}
   @callback create_order(order, credentials) ::
               {:ok, create_response} | {:error, create_order_error_reason}
-  @callback amend_order(venue_order_id, amend_attrs, credentials) ::
+  @callback amend_order(order, amend_attrs, credentials) ::
               {:ok, amend_response} | {:error, amend_order_error_reason}
   @callback cancel_order(order, credentials) ::
               {:ok, cancel_response} | {:error, cancel_order_error_reason}
