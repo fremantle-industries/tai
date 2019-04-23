@@ -1,7 +1,7 @@
 defmodule Tai.Trading.Order do
   alias Tai.Trading.Order
 
-  @type client_id :: String.t()
+  @type client_id :: Ecto.UUID.t()
   @type venue_order_id :: String.t()
   @type side :: :buy | :sell
   @type time_in_force :: :gtc | :fok | :ioc

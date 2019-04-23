@@ -4,12 +4,12 @@ defmodule Tai.Trading.OrderStore do
   """
 
   use GenServer
-  alias Tai.Trading
+  alias Tai.Trading.{Order, BuildOrderFromSubmission}
 
-  @type client_id :: String.t()
-  @type venue_order_id :: Trading.Order.venue_order_id()
-  @type order :: Trading.Order.t()
-  @type submission :: Trading.BuildOrderFromSubmission.submission()
+  @type submission :: BuildOrderFromSubmission.submission()
+  @type order :: Order.t()
+  @type client_id :: Order.client_id()
+  @type venue_order_id :: Order.venue_order_id()
   @type passive_fills_required ::
           :open | :pending_amend | :pending_cancel | :amend_error | :cancel_error
   @type passive_cancel_required ::
@@ -36,7 +36,7 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:enqueue, submission}, _from, state) do
-    order = Trading.BuildOrderFromSubmission.build!(submission)
+    order = BuildOrderFromSubmission.build!(submission)
     insert(order)
     response = {:ok, order}
     {:reply, response, state}
