@@ -1,6 +1,5 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   use WebSockex
-  require Logger
 
   @type product :: Tai.Venues.Product.t()
   @type t :: %Tai.VenueAdapters.Bitmex.Stream.Connection{
@@ -66,8 +65,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   def handle_frame({:text, msg}, state) do
-    Logger.debug(fn -> "Received raw msg: #{msg}" end)
-
     msg
     |> Jason.decode!()
     |> handle_msg(state.venue_id)
@@ -183,7 +180,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   defp process_auth_messages(venue_id, msg) do
     venue_id
-    |> Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.to_name()
+    |> Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.to_name()
     |> GenServer.cast({msg, Timex.now()})
   end
 

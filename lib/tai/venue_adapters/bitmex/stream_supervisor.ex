@@ -45,7 +45,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     system = [
       {Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBooks,
        [venue_id: venue_id, products: products]},
-      {Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages, [venue_id: venue_id]},
+      {Tai.VenueAdapters.Bitmex.Stream.ProcessAuth, [venue_id: venue_id]},
       {Tai.VenueAdapters.Bitmex.Stream.ProcessMessages, [venue_id: venue_id]},
       {Tai.VenueAdapters.Bitmex.Stream.Connection,
        [

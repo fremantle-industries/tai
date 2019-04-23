@@ -1,17 +1,14 @@
-defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages do
+defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
   use GenServer
   alias Tai.VenueAdapters.Bitmex.Stream
-  require Logger
 
-  @type t :: %Stream.ProcessAuthMessages{
-          venue_id: atom
-        }
+  @type t :: %Stream.ProcessAuth{venue_id: atom}
 
   @enforce_keys [:venue_id]
   defstruct [:venue_id]
 
   def start_link(venue_id: venue_id) do
-    state = %Stream.ProcessAuthMessages{venue_id: venue_id}
+    state = %Stream.ProcessAuth{venue_id: venue_id}
     GenServer.start_link(__MODULE__, state, name: venue_id |> to_name())
   end
 

@@ -1,6 +1,6 @@
-defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
+defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
   use ExUnit.Case, async: false
-  alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages
+  alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
   alias Tai.VenueAdapters.Bitmex.ClientId
 
   setup do
@@ -9,7 +9,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)
-    start_supervised!({ProcessAuthMessages, [venue_id: :my_venue]})
+    start_supervised!({ProcessAuth, [venue_id: :my_venue]})
     :ok
   end
 
@@ -54,7 +54,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       ]
 
       :my_venue
-      |> ProcessAuthMessages.to_name()
+      |> ProcessAuth.to_name()
       |> GenServer.cast(
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
@@ -102,7 +102,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       ]
 
       :my_venue
-      |> ProcessAuthMessages.to_name()
+      |> ProcessAuth.to_name()
       |> GenServer.cast(
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
@@ -148,7 +148,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       ]
 
       :my_venue
-      |> ProcessAuthMessages.to_name()
+      |> ProcessAuth.to_name()
       |> GenServer.cast(
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
@@ -218,7 +218,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
       ]
 
       :my_venue
-      |> ProcessAuthMessages.to_name()
+      |> ProcessAuth.to_name()
       |> GenServer.cast(
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
