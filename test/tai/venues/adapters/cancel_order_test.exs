@@ -32,7 +32,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
         assert order_response.id != nil
         assert order_response.status == :canceled
         assert order_response.leaves_qty == Decimal.new(0)
-        assert %DateTime{} = order_response.venue_updated_at
+        assert %DateTime{} = order_response.venue_timestamp
       end
     end
 

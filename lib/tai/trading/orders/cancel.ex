@@ -40,7 +40,7 @@ defmodule Tai.Trading.Orders.Cancel do
 
   defp parse_cancel_order_response({:ok, order_response}, order) do
     order.client_id
-    |> OrderStore.cancel(order_response.venue_updated_at)
+    |> OrderStore.cancel(order_response.venue_timestamp)
     |> case do
       {:ok, {_, _}} = result ->
         result |> notify_updated_order

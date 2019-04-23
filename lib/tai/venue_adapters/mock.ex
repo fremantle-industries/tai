@@ -86,7 +86,7 @@ defmodule Tai.VenueAdapters.Mock do
             id: order.venue_order_id,
             status: :canceled,
             leaves_qty: Decimal.new(0),
-            venue_updated_at: Timex.now()
+            venue_timestamp: Timex.now()
           }
 
           {:ok, cancel_response}
