@@ -18,7 +18,7 @@
   "ex_bitmex": {:hex, :ex_bitmex, "0.1.0", "987ca59bd033849feb8d4ff61d0f9a9e32b4dd1dcb51f722d48802e500a425a5", [:mix], [{:httpoison, "~> 1.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:jason, "~> 1.1.0", [hex: :jason, repo: "hexpm", optional: false]}, {:mapail, "~> 1.0.2", [hex: :mapail, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_doc": {:hex, :ex_doc, "0.20.2", "1bd0dfb0304bade58beb77f20f21ee3558cc3c753743ae0ddbb0fd7ba2912331", [:mix], [{:earmark, "~> 1.3", [hex: :earmark, repo: "hexpm", optional: false]}, {:makeup_elixir, "~> 0.10", [hex: :makeup_elixir, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_gdax": {:hex, :ex_gdax, "0.1.6", "4bd3bdb3058282f1445e98e43ecacf65ae5502b637fd539351a6d4c42e16ca12", [:mix], [{:httpoison, "~> 1.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 4.0", [hex: :poison, repo: "hexpm", optional: false]}], "hexpm"},
-  "ex_okex": {:git, "https://github.com/fremantle-capital/ex_okex.git", "d8691dba2f7bcfea0f78dbc2c6a32d536ba7a550", [branch: "patches"]},
+  "ex_okex": {:git, "https://github.com/fremantle-capital/ex_okex.git", "d2803907059fe387b62ec7f17677f516ea4cea02", [branch: "patches"]},
   "ex_poloniex": {:hex, :ex_poloniex, "0.0.4", "c40555b1c0f4cde22b40013a91d065208e701604d614a7c0861cda1b99424f97", [:mix], [{:httpoison, "~> 1.1", [hex: :httpoison, repo: "hexpm", optional: false]}, {:timex, "~> 3.1", [hex: :timex, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_unit_notifier": {:hex, :ex_unit_notifier, "0.1.4", "36a2dcab829f506e01bf17816590680dd1474407926d43e64c1263e627c364b8", [:mix], [], "hexpm"},
   "exactor": {:hex, :exactor, "2.2.4", "5efb4ddeb2c48d9a1d7c9b465a6fffdd82300eb9618ece5d34c3334d5d7245b1", [:mix], [], "hexpm"},

@@ -74,16 +74,18 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   @method "GET"
   @path "/users/self/verify"
-  defp auth_args({_account_id, %{api_key: key, api_secret: secret, api_passphrase: passphrase}}) do
-    timestamp = Float.to_string(:os.system_time(:millisecond) / 1000)
-    sign_data = "#{timestamp}#{@method}#{@path}"
-    sign = :sha256 |> :crypto.hmac(secret, sign_data) |> Base.encode64()
+  defp auth_args({
+         _account_id,
+         %{api_key: api_key, api_secret: api_secret, api_passphrase: api_passphrase}
+       }) do
+    timestamp = ExOkex.Auth.timestamp()
+    signed = ExOkex.Auth.sign(timestamp, @method, @path, %{}, api_secret)
 
     [
-      key,
-      passphrase,
+      api_key,
+      api_passphrase,
       timestamp,
-      sign
+      signed
     ]
   end
 
