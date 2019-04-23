@@ -12,7 +12,7 @@ defmodule Tai.Trading.Orders.Create do
 
   @spec create(submission) :: {:ok, order}
   def create(submission) do
-    {:ok, order} = OrderStore.add(submission)
+    {:ok, order} = OrderStore.enqueue(submission)
     notify_initial_updated_order(order)
 
     Task.async(fn ->

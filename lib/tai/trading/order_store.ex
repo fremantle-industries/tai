@@ -35,7 +35,7 @@ defmodule Tai.Trading.OrderStore do
     {:reply, :ok, state}
   end
 
-  def handle_call({:add, submission}, _from, state) do
+  def handle_call({:enqueue, submission}, _from, state) do
     order = Trading.BuildOrderFromSubmission.build!(submission)
     insert(order)
     response = {:ok, order}
@@ -340,8 +340,15 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Build an enqueued order from the submission and insert it into the ETS table
   """
+  @deprecated "Use Tai.Trading.OrderStore.enqueue/1 instead."
   @spec add(submission) :: {:ok, order} | no_return
-  def add(submission), do: GenServer.call(__MODULE__, {:add, submission})
+  def add(submission), do: enqueue(submission)
+
+  @doc """
+  Enqueue and order from the submission and insert it into the ETS table
+  """
+  @spec enqueue(submission) :: {:ok, order} | no_return
+  def enqueue(submission), do: GenServer.call(__MODULE__, {:enqueue, submission})
 
   @doc """
   Change the ordertatus to skip when orders aren't sent to the venue

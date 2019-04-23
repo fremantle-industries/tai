@@ -36,7 +36,7 @@ defmodule Tai.Trading.Orders.AmendTest do
             qty: @original_qty,
             order_updated_callback: fire_order_callback(self())
           })
-          |> Tai.Trading.OrderStore.add()
+          |> Tai.Trading.OrderStore.enqueue()
 
         {:ok, {_, open_order}} =
           Tai.Trading.OrderStore.open(
@@ -109,7 +109,7 @@ defmodule Tai.Trading.Orders.AmendTest do
             qty: @original_qty,
             order_updated_callback: fire_order_callback(self())
           })
-          |> Tai.Trading.OrderStore.add()
+          |> Tai.Trading.OrderStore.enqueue()
 
         {:ok, {_, _}} =
           Tai.Trading.OrderStore.open(
@@ -190,7 +190,7 @@ defmodule Tai.Trading.Orders.AmendTest do
             order_updated_callback: fire_order_callback(self())
           })
 
-        {:ok, enqueued_order} = Tai.Trading.OrderStore.add(submission)
+        {:ok, enqueued_order} = Tai.Trading.OrderStore.enqueue(submission)
         {:ok, %{submission: submission, order: enqueued_order}}
       end
 

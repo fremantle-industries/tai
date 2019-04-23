@@ -248,7 +248,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthMessages.OrderTest do
     {:ok, order} =
       submission_type
       |> struct(attrs)
-      |> Tai.Trading.OrderStore.add()
+      |> Tai.Trading.OrderStore.enqueue()
 
     order
   end

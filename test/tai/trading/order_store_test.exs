@@ -20,20 +20,18 @@ defmodule Tai.Trading.OrderStoreTest do
   @last_received_at Timex.now()
   @last_venue_timestamp Timex.now()
 
-  describe ".add" do
-    test "enqueues order submissions" do
-      submission = build_submission()
+  test ".enqueue creates an order from the submission" do
+    submission = build_submission()
 
-      assert {:ok, %Tai.Trading.Order{} = order} = Tai.Trading.OrderStore.add(submission)
-      assert order.status == :enqueued
-    end
+    assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
+    assert order.status == :enqueued
   end
 
   describe ".skip" do
     test "updates the status & leaves qty" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {old, updated}} = Tai.Trading.OrderStore.skip(order.client_id)
 
@@ -49,7 +47,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not enqueued" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -71,7 +69,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "updates the status, leaves qty & error reason" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.create_error(
@@ -95,7 +93,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not enqueued" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
 
       assert {:error, reason} =
@@ -113,7 +111,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "updates the status & expire attributes" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.expire(
@@ -152,7 +150,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not enqueued" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
 
       assert {:error, reason} =
@@ -174,7 +172,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "updates the status & open attributes" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.open(
@@ -213,7 +211,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not enqueued" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -245,7 +243,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.fill(
@@ -281,7 +279,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not enqueued" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
 
       assert {:error, reason} =
@@ -302,7 +300,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -345,7 +343,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status can't be filled" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
 
       assert {:error, reason} =
@@ -368,7 +366,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -414,7 +412,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status can't be filled" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
       assert {:ok, {_, _}} = Tai.Trading.OrderStore.skip(order.client_id)
 
       assert {:error, reason} =
@@ -437,7 +435,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "updates the status & reject attributes" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {old, updated}} =
                Tai.Trading.OrderStore.reject(
@@ -460,7 +458,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -485,7 +483,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "clears the error reason" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -522,7 +520,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not open" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
       assert {:error, reason} = Tai.Trading.OrderStore.pend_amend(order.client_id, @updated_at)
       assert reason == {:invalid_status, :enqueued, [:open, :amend_error]}
     end
@@ -532,7 +530,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -571,7 +569,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not pending_amend" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:error, reason} =
                Tai.Trading.OrderStore.amend_error(
@@ -588,7 +586,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "updates the status & reopen attributes" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -634,7 +632,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not pending_amend" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:error, reason} =
                Tai.Trading.OrderStore.amend(
@@ -653,7 +651,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -682,7 +680,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not open" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:error, reason} = Tai.Trading.OrderStore.pend_cancel(order.client_id, @updated_at)
 
@@ -694,7 +692,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -734,7 +732,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not pending_cancel" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:error, reason} =
                Tai.Trading.OrderStore.cancel_error(
@@ -751,7 +749,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -790,7 +788,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is invalid" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -835,7 +833,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns on ok tuple with the old & updated order" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:ok, {_, _}} =
                Tai.Trading.OrderStore.open(
@@ -867,7 +865,7 @@ defmodule Tai.Trading.OrderStoreTest do
     test "returns an error tuple when the current status is not pending_cancel" do
       submission = build_submission()
 
-      assert {:ok, order} = Tai.Trading.OrderStore.add(submission)
+      assert {:ok, order} = Tai.Trading.OrderStore.enqueue(submission)
 
       assert {:error, reason} =
                Tai.Trading.OrderStore.cancel(order.client_id, @last_venue_timestamp)
@@ -912,7 +910,7 @@ defmodule Tai.Trading.OrderStoreTest do
       price: Decimal.new("100.1"),
       qty: Decimal.new("1.1")
     }
-    |> Tai.Trading.OrderStore.add()
+    |> Tai.Trading.OrderStore.enqueue()
   end
 
   defp build_submission do
