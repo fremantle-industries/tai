@@ -9,16 +9,17 @@ defmodule Tai.Trading.Order do
   @type status ::
           :enqueued
           | :skip
-          | :pending
+          | :create_accepted
           | :open
-          | :pending_amend
           | :expired
           | :filled
-          | :pending_cancel
-          | :canceled
           | :rejected
           | :create_error
+          | :pending_amend
           | :amend_error
+          | :pending_cancel
+          | :cancel_accepted
+          | :canceled
           | :cancel_error
   @type t :: %Order{
           client_id: client_id,
@@ -43,44 +44,44 @@ defmodule Tai.Trading.Order do
           order_updated_callback: fun | nil
         }
 
-  @enforce_keys [
-    :exchange_id,
-    :account_id,
-    :client_id,
-    :enqueued_at,
-    :price,
-    :avg_price,
-    :side,
-    :qty,
-    :leaves_qty,
-    :cumulative_qty,
-    :status,
-    :symbol,
-    :time_in_force,
-    :type,
-    :post_only
-  ]
-  defstruct [
-    :client_id,
-    :error_reason,
-    :exchange_id,
-    :account_id,
-    :price,
-    :avg_price,
-    :venue_order_id,
-    :side,
-    :qty,
-    :leaves_qty,
-    :cumulative_qty,
-    :status,
-    :symbol,
-    :time_in_force,
-    :type,
-    :post_only,
-    :enqueued_at,
-    :last_received_at,
-    :last_venue_timestamp,
-    :updated_at,
-    :order_updated_callback
-  ]
+  @enforce_keys ~w(
+    exchange_id
+    account_id
+    client_id
+    enqueued_at
+    price
+    avg_price
+    side
+    qty
+    leaves_qty
+    cumulative_qty
+    status
+    symbol
+    time_in_force
+    type
+    post_only
+  )a
+  defstruct ~w(
+    client_id
+    error_reason
+    exchange_id
+    account_id
+    price
+    avg_price
+    venue_order_id
+    side
+    qty
+    leaves_qty
+    cumulative_qty
+    status
+    symbol
+    time_in_force
+    type
+    post_only
+    enqueued_at
+    last_received_at
+    last_venue_timestamp
+    updated_at
+    order_updated_callback
+  )a
 end
