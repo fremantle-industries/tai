@@ -23,9 +23,9 @@ defmodule Tai.Commands.Helper.AdvisorTest do
              """
              Group ID: log_spread
              Advisor ID: exchange_a_btc_usdt
-             Config: %{}
              Status: unstarted
              PID: -
+             Config: %{}
              """
   end
 
@@ -36,9 +36,9 @@ defmodule Tai.Commands.Helper.AdvisorTest do
              """
              Group ID: -
              Advisor ID: -
-             Config: -
              Status: -
              PID: -
+             Config: -
              """
   end
 

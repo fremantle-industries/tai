@@ -13,17 +13,17 @@ defmodule Tai.Commands.Advisor do
       |> Enum.each(fn {{_, opts}, pid} ->
         IO.puts("Group ID: #{opts |> Keyword.fetch!(:group_id)}")
         IO.puts("Advisor ID: #{opts |> Keyword.fetch!(:advisor_id)}")
-        IO.puts("Config: #{opts |> Keyword.fetch!(:config) |> format_col}")
         IO.puts("Status: #{pid |> format_status_col}")
         IO.puts("PID: #{pid |> format_col}")
+        IO.puts("Config: #{opts |> Keyword.fetch!(:config) |> format_col}")
       end)
     else
       {:ok, []} ->
         IO.puts("Group ID: -")
         IO.puts("Advisor ID: -")
-        IO.puts("Config: -")
         IO.puts("Status: -")
         IO.puts("PID: -")
+        IO.puts("Config: -")
     end
 
     IEx.dont_display_result()
