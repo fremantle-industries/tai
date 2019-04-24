@@ -41,10 +41,6 @@ defmodule Tai.Events do
   @spec debug(event) :: :ok
   def debug(event), do: event |> broadcast(:debug)
 
-  @deprecated "Use Tai.Events.info/1 instead."
-  @spec broadcast(event) :: :ok
-  def broadcast(event), do: event |> info()
-
   @spec broadcast(event, level) :: :ok
   def broadcast(event, level) do
     event_type = Map.fetch!(event, :__struct__)

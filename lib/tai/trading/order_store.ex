@@ -368,13 +368,6 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Enqueue an order from the submission and insert it into the ETS table
   """
-  @deprecated "Use Tai.Trading.OrderStore.enqueue/1 instead."
-  @spec add(submission) :: {:ok, order} | no_return
-  def add(submission), do: enqueue(submission)
-
-  @doc """
-  Enqueue an order from the submission and insert it into the ETS table
-  """
   @spec enqueue(submission) :: {:ok, order} | no_return
   def enqueue(submission), do: GenServer.call(__MODULE__, {:enqueue, submission})
 

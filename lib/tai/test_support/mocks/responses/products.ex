@@ -14,9 +14,4 @@ defmodule Tai.TestSupport.Mocks.Responses.Products do
 
     :ok
   end
-
-  @deprecated "Use Tai.TestSupport.Mocks.Responses.Product.for_venue/2 instead"
-  def for_exchange(venue_id, products_attrs) do
-    for_venue(venue_id, products_attrs)
-  end
 end

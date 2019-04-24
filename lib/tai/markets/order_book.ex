@@ -121,11 +121,6 @@ defmodule Tai.Markets.OrderBook do
     |> GenServer.call({:replace, replacement})
   end
 
-  @deprecated "use Tai.Markets.OrderBook.update/1 instead"
-  def update(name, %Markets.OrderBook{} = changes) do
-    GenServer.call(name, {:update, changes})
-  end
-
   @spec update(t) :: :ok
   def update(%Markets.OrderBook{} = changes) do
     changes.venue_id
