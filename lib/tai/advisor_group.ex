@@ -1,10 +1,11 @@
 defmodule Tai.AdvisorGroup do
+  @type id :: atom
   @type t :: %Tai.AdvisorGroup{
-          id: atom,
+          id: id,
           advisor: atom,
           factory: atom,
           products: String.t(),
-          config: map,
+          config: map | struct,
           trades: list
         }
 

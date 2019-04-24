@@ -6,7 +6,7 @@ defmodule Tai.Advisor do
   """
 
   defmodule State do
-    @type group_id :: atom
+    @type group_id :: Tai.AdvisorGroup.id()
     @type id :: atom
     @type product :: Tai.Venues.Product.t()
     @type config :: struct | map
@@ -29,7 +29,7 @@ defmodule Tai.Advisor do
   @type order :: Tai.Trading.Order.t()
   @type market_quote :: Tai.Markets.Quote.t()
   @type changes :: term
-  @type group_id :: State.group_id()
+  @type group_id :: Tai.AdvisorGroup.id()
   @type id :: State.id()
   @type run_store :: State.run_store()
   @type state :: State.t()
