@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Poloniex.SymbolMapping do
+defmodule Tai.VenueAdapters.Poloniex.SymbolMapping do
   @moduledoc """
   Mappings between tai symbol format and Poloniex currency pair format
   """

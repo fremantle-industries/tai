@@ -5,7 +5,7 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
 
   use Tai.Venues.OrderBookFeed
   alias Tai.VenueAdapters.Gdax.OrderBookFeed
-  alias Tai.ExchangeAdapters.Gdax.{Product}
+  alias Tai.VenueAdapters.Gdax.Product
   require Logger
 
   @doc """

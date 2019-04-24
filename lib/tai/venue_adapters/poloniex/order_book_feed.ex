@@ -4,8 +4,7 @@ defmodule Tai.VenueAdapters.Poloniex.OrderBookFeed do
   """
 
   use Tai.Venues.OrderBookFeed
-  alias Tai.ExchangeAdapters.Poloniex.{SymbolMapping}
-  alias Tai.VenueAdapters.Poloniex.OrderBookFeed
+  alias Tai.VenueAdapters.Poloniex.{OrderBookFeed, SymbolMapping}
 
   @doc """
   Secure production Poloniex WebSocket url.

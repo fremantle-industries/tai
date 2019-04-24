@@ -1,8 +1,8 @@
-defmodule Tai.ExchangeAdapters.Poloniex.SymbolMappingTest do
+defmodule Tai.VenueAdapters.Poloniex.SymbolMappingTest do
   use ExUnit.Case, async: true
-  doctest Tai.ExchangeAdapters.Poloniex.SymbolMapping
+  doctest Tai.VenueAdapters.Poloniex.SymbolMapping
 
-  alias Tai.ExchangeAdapters.Poloniex.SymbolMapping
+  alias Tai.VenueAdapters.Poloniex.SymbolMapping
 
   test "to_poloniex returns a valid string for the symbol on Poloniex" do
     assert SymbolMapping.to_poloniex(:amp_btc) == "BTC_AMP"

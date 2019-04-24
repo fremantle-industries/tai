@@ -63,7 +63,7 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
       )
 
     {:ok, my_gdax_feed_pid} =
-      use_cassette "exchange_adapters/gdax/order_book_feed" do
+      use_cassette "venue_adapters/gdax/order_book_feed" do
         Tai.VenueAdapters.Gdax.OrderBookFeed.start_link(
           "ws://localhost:#{EchoBoy.Config.port()}/ws",
           feed_id: :my_gdax_feed,

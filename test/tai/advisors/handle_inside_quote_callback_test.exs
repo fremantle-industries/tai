@@ -45,11 +45,6 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     {:ok, _} = Application.ensure_all_started(:tai)
     book_pid = start_supervised!({Tai.Markets.OrderBook, feed_id: :my_venue, symbol: :btc_usd})
 
-    start_supervised!(
-      {Tai.ExchangeAdapters.Mock.Account,
-       [exchange_id: :my_test_exchange, account_id: :my_test_account, credentials: %{}]}
-    )
-
     {:ok, %{book_pid: book_pid}}
   end
 

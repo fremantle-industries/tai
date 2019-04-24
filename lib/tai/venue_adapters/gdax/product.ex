@@ -1,4 +1,4 @@
-defmodule Tai.ExchangeAdapters.Gdax.Product do
+defmodule Tai.VenueAdapters.Gdax.Product do
   def to_symbol(product_id) do
     product_id
     |> strip_and_downcase
