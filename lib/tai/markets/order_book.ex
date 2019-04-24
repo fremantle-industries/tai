@@ -6,25 +6,27 @@ defmodule Tai.Markets.OrderBook do
   use GenServer
   alias Tai.{Markets, PubSub}
 
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type product_symbol :: Tai.Venues.Product.symbol()
   @type t :: %Markets.OrderBook{
-          venue_id: atom,
-          product_symbol: atom,
+          venue_id: venue_id,
+          product_symbol: product_symbol,
           bids: map,
           asks: map
         }
 
-  @enforce_keys [
-    :venue_id,
-    :product_symbol,
-    :bids,
-    :asks
-  ]
-  defstruct [
-    :venue_id,
-    :product_symbol,
-    :bids,
-    :asks
-  ]
+  @enforce_keys ~w(
+    venue_id
+    product_symbol
+    bids
+    asks
+  )a
+  defstruct ~w(
+    venue_id
+    product_symbol
+    bids
+    asks
+  )a
 
   def start_link(feed_id: venue_id, symbol: product_symbol) do
     name = to_name(venue_id, product_symbol)
