@@ -1,6 +1,7 @@
 defmodule Tai.Events do
   @type event :: Tai.Event.t()
   @type level :: :debug | :info | :warn | :error
+  @type subscribe_error_reasons :: {:already_registered, pid} | :event_not_registered
 
   @spec child_spec(opts :: term) :: Supervisor.child_spec()
   def child_spec(opts) do
@@ -18,16 +19,12 @@ defmodule Tai.Events do
     Registry.start_link(keys: :duplicate, name: __MODULE__, partitions: partitions)
   end
 
-  @spec firehose_subscribe ::
-          {:ok, pid}
-          | {:error, {:already_registered, pid} | :event_not_registered}
+  @spec firehose_subscribe :: {:ok, pid} | {:error, subscribe_error_reasons}
   def firehose_subscribe do
     Registry.register(__MODULE__, :firehose, [])
   end
 
-  @spec subscribe(event_type :: atom) ::
-          {:ok, pid}
-          | {:error, {:already_registered, pid} | :event_not_registered}
+  @spec subscribe(event_type :: atom) :: {:ok, pid} | {:error, :subscribe_error_reasons}
   def subscribe(event_type) when is_atom(event_type) do
     Registry.register(__MODULE__, event_type, [])
   end
