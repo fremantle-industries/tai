@@ -35,7 +35,7 @@ defmodule Tai.VenueAdapters.Binance.MakerTakerFeesTest do
     use_cassette "venue_adapters/shared/maker_taker_fees/binance/error_timestamp_outside_recv_window" do
       assert Tai.Venue.maker_taker_fees(adapter, :main) == {
                :error,
-               %Tai.ApiError{reason: "Timestamp for this request is outside of the recvWindow."}
+               "Timestamp for this request is outside of the recvWindow."
              }
     end
   end

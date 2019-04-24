@@ -35,7 +35,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
     use_cassette "venue_adapters/shared/asset_balances/binance/error_timestamp_outside_recv_window" do
       assert Tai.Venue.asset_balances(adapter, :main) == {
                :error,
-               %Tai.ApiError{reason: "Timestamp for this request is outside of the recvWindow."}
+               "Timestamp for this request is outside of the recvWindow."
              }
     end
   end

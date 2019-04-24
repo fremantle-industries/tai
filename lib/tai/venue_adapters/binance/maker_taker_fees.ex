@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.Binance.MakerTakerFees do
           "code" => -1021,
           "msg" => "Timestamp for this request is outside of the recvWindow." = reason
         }}} ->
-        {:error, %Tai.ApiError{reason: reason}}
+        {:error, reason}
 
       {:error, {:binance_error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}}} ->
         {:error, {:credentials, reason}}
