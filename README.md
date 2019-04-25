@@ -14,7 +14,7 @@ We are working to make `tai` production quality software.
 
 ## What Can I Do? TLDR;
 
-Stream market data, create & manage orders.
+Stream market data to create and manage orders
 
 Here's an example of an advisor that logs the spread between multiple products on BitMEX
 
@@ -56,7 +56,7 @@ config :echo_boy, port: 4200
 
 | Venues | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|
-| Bitmex | [x] | [x] | [x] | [x] | [x] | [x] |
+| BitMEX | [x] | [x] | [x] | [x] | [x] | [x] |
 | OkEx   | [x] | [x] | [x] | [x] | [x] | [x] |
 
 ## Venues In Progress
@@ -122,14 +122,13 @@ This gives you an interactive elixir shell with a set of `tai` helper [commands]
 ## Advisors
 
 Advisors are the brains of any `tai` application, they subscribe to changes in
-order books and process these events to record and analyze data or execute
-automated trading strategies.
+market data to record and analyze data or execute automated trading strategies.
 
-Orders can be created and managed through a uniform API across exchanges, with 
+Orders are created and managed through a uniform API across exchanges, with 
 fast execution and reliability.
 
 Take a look at some of the [examples](./examples/advisors) to understand what 
-you can create with advisors in just a few lines of code.
+you can create with advisors.
 
 ## Configuration
 
@@ -138,9 +137,7 @@ for available options.
 
 ## Commands
 
-You can monitor your [account balances](#balance), list the tradeable 
-[products](#products) and their [fees](#fees), view [live markets](#markets) 
-and inspect the [state of orders](#orders).
+To monitor your advisors, accounts and markets `tai` provides the following set of IEx commands.
 
 #### help
 
