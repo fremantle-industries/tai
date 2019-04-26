@@ -21,7 +21,7 @@ defmodule Tai.Venues.Adapter do
           | {:nonce_not_increasing, msg :: String.t()}
           | {:unhandled, reason :: term}
   @type create_order_error_reason :: shared_error_reason | :insufficient_balance
-  @type amend_order_error_reason :: shared_error_reason | :not_found
+  @type amend_order_error_reason :: shared_error_reason | :not_found | :not_supported
   @type cancel_order_error_reason :: shared_error_reason | :not_found
   @type t :: %Tai.Venues.Adapter{
           id: :atom,
