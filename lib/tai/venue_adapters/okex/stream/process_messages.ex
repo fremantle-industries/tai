@@ -28,10 +28,13 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessMessages do
 
   def handle_cast({%{"event" => "subscribe"}, _}, state), do: {:noreply, state}
 
+  @futures_trade "futures/trade"
+  @swap_trade "swap/trade"
   def handle_cast(
-        {%{"table" => "futures/trade", "data" => data}, received_at},
+        {%{"table" => table, "data" => data}, received_at},
         state
-      ) do
+      )
+      when table == @futures_trade or table == @swap_trade do
     data |> Enum.each(&Stream.Trades.broadcast(&1, state.venue, received_at))
     {:noreply, state}
   end
