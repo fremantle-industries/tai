@@ -3,10 +3,13 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.Advisor do
 
   def handle_inside_quote(venue_id, product_symbol, _inside_quote, _changes, state) do
     if Tai.Trading.OrderStore.count() == 0 do
+      {:ok, product} = Tai.Venues.ProductStore.find({venue_id, product_symbol})
+
       Tai.Trading.Orders.create(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: venue_id,
         account_id: :main,
         product_symbol: product_symbol,
+        product_type: product.type,
         price: Decimal.new("100.1"),
         qty: Decimal.new("0.1"),
         post_only: false,

@@ -32,7 +32,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
       clOrdID: order.client_id |> ClientId.to_venue(order.time_in_force),
       side: order.side |> to_venue_side,
       ordType: "Limit",
-      symbol: order.symbol |> to_venue_symbol,
+      symbol: order.product_symbol |> to_venue_symbol,
       orderQty: order.qty,
       price: order.price,
       timeInForce: order.time_in_force |> to_venue_time_in_force

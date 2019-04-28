@@ -16,7 +16,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
     key =
       {Tai.Trading.OrderResponse,
        [
-         symbol: order.symbol,
+         symbol: order.product_symbol,
          price: order.price,
          size: order.qty,
          time_in_force: order.time_in_force

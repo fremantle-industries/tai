@@ -21,7 +21,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     venue_side = side |> Atom.to_string() |> String.upcase()
     credentials = struct!(ExBinance.Credentials, credentials)
 
-    order.symbol
+    order.product_symbol
     |> to_venue_symbol
     |> ExBinance.Rest.Orders.create_order(
       venue_side,

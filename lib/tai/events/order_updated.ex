@@ -4,12 +4,14 @@ defmodule Tai.Events.OrderUpdated do
   @type type :: Tai.Trading.Order.type()
   @type time_in_force :: Tai.Trading.Order.time_in_force()
   @type status :: Tai.Trading.Order.status()
+  @type product_type :: Tai.Venues.Product.type()
   @type t :: %Tai.Events.OrderUpdated{
           client_id: client_id,
           venue_id: atom,
           account_id: atom,
           venue_order_id: String.t() | nil,
           product_symbol: atom,
+          product_type: product_type,
           side: side,
           type: type,
           time_in_force: time_in_force,
@@ -30,6 +32,7 @@ defmodule Tai.Events.OrderUpdated do
     :venue_id,
     :account_id,
     :product_symbol,
+    :product_type,
     :side,
     :type,
     :time_in_force,
@@ -46,6 +49,7 @@ defmodule Tai.Events.OrderUpdated do
     :venue_id,
     :account_id,
     :product_symbol,
+    :product_type,
     :venue_order_id,
     :side,
     :type,

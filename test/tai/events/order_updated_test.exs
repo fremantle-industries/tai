@@ -6,6 +6,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     venue_id: :my_venue,
     account_id: :my_account,
     product_symbol: :btc,
+    product_type: :spot,
     side: :buy,
     type: :limit,
     time_in_force: :gtc,
@@ -31,6 +32,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert json.venue_order_id == "abc123"
     assert json.last_received_at == nil
     assert json.product_symbol == :btc
+    assert json.product_type == :spot
     assert json.side == :buy
     assert json.type == :limit
     assert json.time_in_force == :gtc

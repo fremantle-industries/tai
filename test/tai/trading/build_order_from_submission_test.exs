@@ -19,7 +19,8 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.time_in_force == :gtc
         assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
-        assert order.symbol == :btc_usd
+        assert order.product_symbol == :btc_usd
+        assert order.product_type == :spot
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
@@ -42,7 +43,8 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.time_in_force == :fok
         assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
-        assert order.symbol == :btc_usd
+        assert order.product_symbol == :btc_usd
+        assert order.product_type == :spot
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
@@ -65,7 +67,8 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.post_only == false
         assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
-        assert order.symbol == :btc_usd
+        assert order.product_symbol == :btc_usd
+        assert order.product_type == :spot
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
@@ -83,6 +86,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       venue_id: :test_exchange_a,
       account_id: :main,
       product_symbol: :btc_usd,
+      product_type: :spot,
       price: Decimal.new("100.1"),
       qty: Decimal.new("1.1"),
       post_only: post_only
@@ -94,6 +98,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       venue_id: :test_exchange_a,
       account_id: :main,
       product_symbol: :btc_usd,
+      product_type: :spot,
       price: Decimal.new("50000.5"),
       qty: Decimal.new("0.1"),
       post_only: post_only
@@ -105,6 +110,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       venue_id: :test_exchange_a,
       account_id: :main,
       product_symbol: :btc_usd,
+      product_type: :spot,
       price: Decimal.new("100.1"),
       qty: Decimal.new("1.1")
     }
@@ -115,6 +121,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       venue_id: :test_exchange_a,
       account_id: :main,
       product_symbol: :btc_usd,
+      product_type: :spot,
       price: Decimal.new("50000.5"),
       qty: Decimal.new("0.1")
     }
@@ -125,6 +132,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       venue_id: :test_exchange_a,
       account_id: :main,
       product_symbol: :btc_usd,
+      product_type: :spot,
       price: Decimal.new("100.1"),
       qty: Decimal.new("1.1")
     }
@@ -135,6 +143,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       venue_id: :test_exchange_a,
       account_id: :main,
       product_symbol: :btc_usd,
+      product_type: :spot,
       price: Decimal.new("50000.5"),
       qty: Decimal.new("0.1")
     }

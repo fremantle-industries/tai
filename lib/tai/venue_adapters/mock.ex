@@ -47,7 +47,7 @@ defmodule Tai.VenueAdapters.Mock do
     with_mock_server(fn ->
       {Tai.Trading.OrderResponse,
        [
-         symbol: order.symbol,
+         symbol: order.product_symbol,
          price: order.price,
          size: order.qty,
          time_in_force: order.time_in_force
