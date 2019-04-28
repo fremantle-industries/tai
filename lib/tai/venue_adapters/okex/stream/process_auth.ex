@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   @futures_order "futures/order"
-  @swap_order "futures/order"
+  @swap_order "swap/order"
   def handle_cast(
         {%{"table" => table, "data" => orders}, received_at},
         state
@@ -65,6 +65,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
     new_state = state |> Map.put(:tasks, new_tasks)
     {:noreply, new_state}
   end
+
+  defp notify(:ok), do: nil
 
   defp notify({_, _, {:ok, {old, updated}}}) do
     Tai.Trading.Orders.updated!(old, updated)

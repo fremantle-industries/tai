@@ -50,6 +50,28 @@ config(:tai,
         }
       }
     ],
+    okex_futures: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.OkEx,
+      accounts: %{
+        main: %{
+          api_key: {:system_file, "OKEX_API_KEY"},
+          api_secret: {:system_file, "OKEX_API_SECRET"},
+          api_passphrase: {:system_file, "OKEX_API_PASSPHRASE"}
+        }
+      }
+    ],
+    okex_swap: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.OkEx,
+      accounts: %{
+        main: %{
+          api_key: {:system_file, "OKEX_API_KEY"},
+          api_secret: {:system_file, "OKEX_API_SECRET"},
+          api_passphrase: {:system_file, "OKEX_API_PASSPHRASE"}
+        }
+      }
+    ],
     binance: [
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,
@@ -80,14 +102,23 @@ config(:tai,
   }
 )
 
+config(:tai, :test_venue_adapters_products, [:mock, :binance, :poloniex, :gdax, :okex])
+config(:tai, :test_venue_adapters_asset_balances, [:mock, :binance, :poloniex, :gdax, :okex])
 config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :poloniex, :gdax, :okex])
 config(:tai, :test_venue_adapters_create_order_gtc_open, [:bitmex])
-config(:tai, :test_venue_adapters_create_order_gtc_accepted, [:okex])
+config(:tai, :test_venue_adapters_create_order_gtc_accepted, [:okex_futures, :okex_swap])
 config(:tai, :test_venue_adapters_create_order_fok, [:bitmex])
 config(:tai, :test_venue_adapters_create_order_ioc, [:bitmex])
+
+config(:tai, :test_venue_adapters_create_order_error_insufficient_balance, [
+  :bitmex,
+  :okex_futures,
+  :okex_swap
+])
+
 config(:tai, :test_venue_adapters_create_order_error, [:bitmex])
 config(:tai, :test_venue_adapters_cancel_order, [:bitmex])
-config(:tai, :test_venue_adapters_cancel_order_accepted, [:okex])
+config(:tai, :test_venue_adapters_cancel_order_accepted, [:okex_futures, :okex_swap])
 config(:tai, :test_venue_adapters_with_positions, [:bitmex])
 
 config :tai,

@@ -17,7 +17,7 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
     :ok
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
+  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_asset_balances()
 
   @test_adapters
   |> Enum.map(fn {_, adapter} ->

@@ -16,11 +16,10 @@ defmodule Tai.Trading.OrderStore do
           :open
           | :expired
           | :filled
-          | :pending_cancel
           | :pending_amend
-          | :canceled
           | :amend
           | :amend_error
+          | :pending_cancel
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -344,10 +343,11 @@ defmodule Tai.Trading.OrderStore do
     :open,
     :expired,
     :filled,
-    :pending_cancel,
     :pending_amend,
     :amend,
-    :amend_error
+    :amend_error,
+    :pending_cancel,
+    :cancel_accepted
   ]
   def handle_call(
         {:passive_cancel, client_id, last_received_at, last_venue_timestamp},

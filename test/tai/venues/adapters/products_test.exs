@@ -12,7 +12,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
     HTTPoison.start()
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
+  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_products()
 
   @test_adapters
   |> Enum.map(fn {_, adapter} ->

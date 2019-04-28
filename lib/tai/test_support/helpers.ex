@@ -1,4 +1,10 @@
 defmodule Tai.TestSupport.Helpers do
+  def test_venue_adapters_products,
+    do: :test_venue_adapters_products |> filter()
+
+  def test_venue_adapters_asset_balances,
+    do: :test_venue_adapters_asset_balances |> filter()
+
   def test_venue_adapters_maker_taker_fees,
     do: :test_venue_adapters_maker_taker_fees |> filter()
 
@@ -16,6 +22,9 @@ defmodule Tai.TestSupport.Helpers do
 
   def test_venue_adapters_create_order_error,
     do: :test_venue_adapters_create_order_error |> filter()
+
+  def test_venue_adapters_create_order_error_insufficient_balance,
+    do: :test_venue_adapters_create_order_error_insufficient_balance |> filter()
 
   def test_venue_adapters_cancel_order,
     do: :test_venue_adapters_cancel_order |> filter()

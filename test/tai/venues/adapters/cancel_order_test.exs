@@ -63,6 +63,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       venue_id: venue_id,
       account_id: :main,
       product_symbol: venue_id |> product_symbol,
+      product_type: venue_id |> product_type,
       side: :buy,
       price: venue_id |> price(),
       qty: venue_id |> qty(),
@@ -77,6 +78,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       venue_id: order.venue_id,
       account_id: :main,
       product_symbol: order.venue_id |> product_symbol,
+      product_type: order.venue_id |> product_type,
       side: :buy,
       price: order.venue_id |> price(),
       qty: order.venue_id |> qty(),
@@ -86,12 +88,18 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   end
 
   defp product_symbol(:bitmex), do: :xbth19
-  defp product_symbol(:okex), do: :eth_usd_190426
+  defp product_symbol(:okex_swap), do: :eth_usd_swap
+  defp product_symbol(:okex_futures), do: :eth_usd_190426
   defp product_symbol(_), do: :btc_usd
 
+  defp product_type(:okex_swap), do: :swap
+  defp product_type(_), do: :future
+
   defp price(:bitmex), do: Decimal.new("100.5")
-  defp price(:okex), do: Decimal.new("100.5")
+  defp price(:okex_swap), do: Decimal.new("100.5")
+  defp price(:okex_futures), do: Decimal.new("100.5")
 
   defp qty(:bitmex), do: Decimal.new(1)
-  defp qty(:okex), do: Decimal.new(1)
+  defp qty(:okex_swap), do: Decimal.new(5)
+  defp qty(:okex_futures), do: Decimal.new(5)
 end

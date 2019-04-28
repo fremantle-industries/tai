@@ -1,0 +1,44 @@
+[
+  {
+    "request": {
+      "body": "{\"instrument_id\":\"ETH-USD-190510\",\"leverage\":20,\"orders_data\":[{\"client_oid\":\"5AXZWG7MTVDAJPWUBYXLJAFZ5A\",\"match_price\":0,\"order_type\":0,\"price\":\"140.5\",\"size\":\"5\",\"type\":1}]}",
+      "headers": {
+        "Content-Type": "application/json",
+        "OK-ACCESS-KEY": "***",
+        "OK-ACCESS-SIGN": "***",
+        "OK-ACCESS-TIMESTAMP": "***",
+        "OK-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.okex.com/api/futures/v3/orders"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"result\":false,\"order_info\":[{\"error_message\":\"Risk rate lower than 100% before opening position\",\"error_code\":\"32015\",\"client_oid\":\"5AXZWG7MTVDAJPWUBYXLJAFZ5A\",\"order_id\":\"-1\"}]}",
+      "headers": {
+        "Date": "Mon, 29 Apr 2019 02:15:58 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "180",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d1f3ac172e5f295e5ea2f49a03930be8e1556504158; expires=Tue, 28-Apr-20 02:15:58 GMT; path=/; domain=.okex.com; HttpOnly",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Frame-Options": "DENY",
+        "X-Kong-Upstream-Latency": "21",
+        "X-Kong-Proxy-Latency": "0",
+        "Via": "kong/0.12.3",
+        "Accept-Ranges": "bytes",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "4cedc56d295f3b32-YVR"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

@@ -99,7 +99,8 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       account_id: :main,
-      symbol: venue_id |> product_symbol,
+      product_symbol: venue_id |> product_symbol,
+      product_type: venue_id |> product_type,
       side: :buy,
       price: venue_id |> price(),
       qty: venue_id |> qty(),
@@ -113,7 +114,8 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
       venue_order_id: order_response.id,
       venue_id: order.venue_id,
       account_id: :main,
-      symbol: order.venue_id |> product_symbol,
+      product_symbol: order.venue_id |> product_symbol,
+      product_type: order.venue_id |> product_type,
       side: :buy,
       price: order.venue_id |> price(),
       qty: order.venue_id |> qty(),
@@ -123,12 +125,14 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   end
 
   defp product_symbol(:bitmex), do: :xbth19
-  defp product_symbol(:okex), do: :eth_usd_190426
+  defp product_symbol(:okex_futures), do: :eth_usd_190426
   defp product_symbol(_), do: :btc_usd
 
+  defp product_type(_), do: :future
+
   defp price(:bitmex), do: Decimal.new("100.5")
-  defp price(:okex), do: Decimal.new("100.5")
+  defp price(:okex_futures), do: Decimal.new("100.5")
 
   defp qty(:bitmex), do: Decimal.new(1)
-  defp qty(:okex), do: Decimal.new(1)
+  defp qty(:okex_futures), do: Decimal.new(1)
 end
