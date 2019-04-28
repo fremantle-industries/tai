@@ -17,7 +17,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "inserts the balance into the ETS table" do
       balance =
         struct(Tai.Venues.AssetBalance, %{
-          exchange_id: :my_test_exchange,
+          venue_id: :my_test_exchange,
           account_id: :my_test_account,
           asset: :btc
         })
@@ -35,7 +35,7 @@ defmodule Tai.Venues.AssetBalancesTest do
       Tai.Events.firehose_subscribe()
 
       balance = %Tai.Venues.AssetBalance{
-        exchange_id: :my_test_exchange,
+        venue_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: :btc,
         free: Decimal.new("0.00000001"),
@@ -58,7 +58,7 @@ defmodule Tai.Venues.AssetBalancesTest do
       assert AssetBalances.all() == []
 
       balance = %Tai.Venues.AssetBalance{
-        exchange_id: :my_test_exchange,
+        venue_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: :btc,
         free: Decimal.new("1.1"),
@@ -75,7 +75,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns a list of the matching balances" do
       balance_1 =
         struct(Tai.Venues.AssetBalance, %{
-          exchange_id: :my_test_exchange,
+          venue_id: :my_test_exchange,
           account_id: :my_test_account_a,
           asset: :btc,
           free: Decimal.new("1.1")
@@ -83,7 +83,7 @@ defmodule Tai.Venues.AssetBalancesTest do
 
       balance_2 =
         struct(Tai.Venues.AssetBalance, %{
-          exchange_id: :my_test_exchange,
+          venue_id: :my_test_exchange,
           account_id: :my_test_account_b,
           asset: :btc,
           free: Decimal.new("2.1")
@@ -94,14 +94,14 @@ defmodule Tai.Venues.AssetBalancesTest do
 
       assert [^balance_1, ^balance_2] =
                AssetBalances.where(
-                 exchange_id: :my_test_exchange,
+                 venue_id: :my_test_exchange,
                  asset: :btc
                )
                |> Enum.sort(&(Decimal.cmp(&1.free, &2.free) == :lt))
 
       assert [^balance_1] =
                AssetBalances.where(
-                 exchange_id: :my_test_exchange,
+                 venue_id: :my_test_exchange,
                  account_id: :my_test_account_a
                )
     end
@@ -111,7 +111,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns an ok tuple with the balance" do
       balance =
         struct(Tai.Venues.AssetBalance, %{
-          exchange_id: :my_test_exchange,
+          venue_id: :my_test_exchange,
           account_id: :my_test_account_a,
           asset: :btc
         })
@@ -120,7 +120,7 @@ defmodule Tai.Venues.AssetBalancesTest do
 
       assert {:ok, ^balance} =
                AssetBalances.find_by(
-                 exchange_id: :my_test_exchange,
+                 venue_id: :my_test_exchange,
                  account_id: :my_test_account_a
                )
     end
@@ -128,7 +128,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns an error tuple when not found" do
       assert {:error, :not_found} =
                AssetBalances.find_by(
-                 exchange_id: :my_test_exchange,
+                 venue_id: :my_test_exchange,
                  account_id: :my_test_account_a
                )
     end
@@ -139,7 +139,7 @@ defmodule Tai.Venues.AssetBalancesTest do
 
     defp lock(asset, min, max) do
       AssetBalances.lock(%AssetBalances.LockRequest{
-        exchange_id: :my_test_exchange,
+        venue_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: asset,
         min: min |> to_decimal,
@@ -245,7 +245,7 @@ defmodule Tai.Venues.AssetBalancesTest do
 
     defp unlock(asset, qty) do
       AssetBalances.unlock(%AssetBalances.UnlockRequest{
-        exchange_id: :my_test_exchange,
+        venue_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: asset,
         qty: qty |> to_decimal
@@ -431,7 +431,7 @@ defmodule Tai.Venues.AssetBalancesTest do
   @locked Decimal.new("2.1")
   defp init_asset_balance(_context) do
     balance = %Tai.Venues.AssetBalance{
-      exchange_id: :my_test_exchange,
+      venue_id: :my_test_exchange,
       account_id: :my_test_account,
       asset: :btc,
       free: @free,

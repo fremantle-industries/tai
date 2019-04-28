@@ -5,7 +5,7 @@ defmodule Tai.Venues.AssetBalanceTest do
   describe "#total" do
     test "returns the sum of free and locked balances" do
       detail = %Tai.Venues.AssetBalance{
-        exchange_id: :mock,
+        venue_id: :mock,
         account_id: :mock,
         asset: :mock,
         free: Decimal.new("0.1"),

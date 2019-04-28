@@ -8,7 +8,7 @@ defmodule Tai.Venues.AssetBalances.Lock do
           | {:error, :min_less_than_zero | :min_greater_than_max | :not_found}
           | {:error, {:insufficient_balance, free :: Decimal.t()}}
   def from_request(%AssetBalances.LockRequest{
-        exchange_id: exchange_id,
+        venue_id: venue_id,
         account_id: account_id,
         asset: asset,
         min: min,
@@ -16,7 +16,7 @@ defmodule Tai.Venues.AssetBalances.Lock do
       }) do
     with :ok <- validate(min, max),
          {:ok, balance} <-
-           AssetBalances.find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
+           AssetBalances.find_by(venue_id: venue_id, account_id: account_id, asset: asset) do
       lock_qty =
         cond do
           Decimal.cmp(max, balance.free) != :gt -> max

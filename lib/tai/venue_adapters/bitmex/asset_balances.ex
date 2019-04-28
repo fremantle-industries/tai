@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.Bitmex.AssetBalances do
         account_id
       ) do
     %Tai.Venues.AssetBalance{
-      exchange_id: venue_id,
+      venue_id: venue_id,
       account_id: account_id,
       asset: :btc,
       free: amount |> Decimal.new() |> Decimal.reduce(),

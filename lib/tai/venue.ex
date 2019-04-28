@@ -21,11 +21,11 @@ defmodule Tai.Venue do
 
   @spec asset_balances(adapter, account_id) :: {:ok, [asset_balance]}
   def asset_balances(
-        %Adapter{adapter: adapter, id: exchange_id, accounts: accounts},
+        %Adapter{adapter: adapter, id: venue_id, accounts: accounts},
         account_id
       ) do
     {:ok, credentials} = Map.fetch(accounts, account_id)
-    adapter.asset_balances(exchange_id, account_id, credentials)
+    adapter.asset_balances(venue_id, account_id, credentials)
   end
 
   @spec positions(adapter, account_id) ::

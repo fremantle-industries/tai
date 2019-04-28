@@ -25,12 +25,12 @@ defmodule Tai.Commands.Balance do
   defp fetch_balances do
     Tai.Venues.AssetBalances.all()
     |> Enum.sort(&(&1.asset >= &2.asset))
-    |> Enum.sort(&(&1.exchange_id >= &2.exchange_id))
+    |> Enum.sort(&(&1.venue_id >= &2.venue_id))
     |> Enum.reduce(
       [],
       fn balance, acc ->
         row = {
-          balance.exchange_id,
+          balance.venue_id,
           balance.account_id,
           balance.asset,
           balance.free,
@@ -52,11 +52,11 @@ defmodule Tai.Commands.Balance do
 
   defp format_rows(balances) do
     balances
-    |> Enum.map(fn {exchange_id, account_id, symbol, free, locked, total} ->
+    |> Enum.map(fn {venue_id, account_id, symbol, free, locked, total} ->
       formatted_free = Tai.Markets.Asset.new(free, symbol)
       formatted_locked = Tai.Markets.Asset.new(locked, symbol)
       formatted_total = Tai.Markets.Asset.new(total, symbol)
-      [exchange_id, account_id, symbol, formatted_free, formatted_locked, formatted_total]
+      [venue_id, account_id, symbol, formatted_free, formatted_locked, formatted_total]
     end)
   end
 end

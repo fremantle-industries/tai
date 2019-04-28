@@ -34,7 +34,7 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalances do
       |> String.to_atom()
 
     %Tai.Venues.AssetBalance{
-      exchange_id: venue_id,
+      venue_id: venue_id,
       account_id: account_id,
       asset: asset,
       free: available |> Decimal.new() |> Decimal.reduce(),

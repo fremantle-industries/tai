@@ -28,15 +28,15 @@ defmodule Tai.TestSupport.Mock do
   end
 
   @spec mock_asset_balance(
-          exchange_id :: atom,
+          venue_id :: atom,
           account_id :: atom,
           asset :: atom,
           free :: number | Decimal.t() | String.t(),
           locked :: number | Decimal.t() | String.t()
         ) :: :ok
-  def mock_asset_balance(exchange_id, account_id, asset, free, locked) do
+  def mock_asset_balance(venue_id, account_id, asset, free, locked) do
     Tai.Venues.AssetBalances.upsert(%Tai.Venues.AssetBalance{
-      exchange_id: exchange_id,
+      venue_id: venue_id,
       account_id: account_id,
       asset: asset,
       free: free |> to_decimal,
