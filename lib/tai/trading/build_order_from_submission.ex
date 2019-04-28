@@ -18,7 +18,7 @@ defmodule Tai.Trading.BuildOrderFromSubmission do
 
     %Order{
       client_id: Ecto.UUID.generate(),
-      exchange_id: submission.venue_id,
+      venue_id: submission.venue_id,
       account_id: submission.account_id,
       symbol: submission.product_symbol,
       side: submission |> side,

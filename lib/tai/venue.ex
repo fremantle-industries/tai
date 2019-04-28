@@ -83,7 +83,7 @@ defmodule Tai.Venue do
   end
 
   defp find_venue_adapter_and_credentials(order, adapters) do
-    venue_adapter = adapters |> Map.fetch!(order.exchange_id)
+    venue_adapter = adapters |> Map.fetch!(order.venue_id)
     credentials = Map.fetch!(venue_adapter.accounts, order.account_id)
 
     {venue_adapter, credentials}

@@ -27,7 +27,7 @@ defmodule Tai.Trading.Order do
   @type t :: %Order{
           client_id: client_id,
           venue_order_id: venue_order_id | nil,
-          exchange_id: venue_id,
+          venue_id: venue_id,
           account_id: account_id,
           side: side,
           status: status,
@@ -48,7 +48,7 @@ defmodule Tai.Trading.Order do
         }
 
   @enforce_keys ~w(
-    exchange_id
+    venue_id
     account_id
     client_id
     enqueued_at
@@ -67,7 +67,7 @@ defmodule Tai.Trading.Order do
   defstruct ~w(
     client_id
     error_reason
-    exchange_id
+    venue_id
     account_id
     price
     avg_price
