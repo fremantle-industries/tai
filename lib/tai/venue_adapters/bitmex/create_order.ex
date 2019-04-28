@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   Create orders for the Bitmex adapter
   """
 
-  alias Tai.VenueAdapters.Bitmex.ClientId
+  alias Tai.VenueAdapters.Bitmex.{ClientId, Products}
   import Tai.VenueAdapters.Bitmex.OrderStatus
 
   @type credentials :: Tai.Venues.Adapter.credentials()
@@ -58,7 +58,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   defp to_venue_side(:buy), do: @buy
   defp to_venue_side(:sell), do: @sell
 
-  defp to_venue_symbol(symbol), do: symbol |> Atom.to_string() |> String.upcase()
+  defdelegate to_venue_symbol(symbol), to: Products, as: :from_symbol
 
   defp to_venue_time_in_force(:gtc), do: "GoodTillCancel"
   defp to_venue_time_in_force(:ioc), do: "ImmediateOrCancel"

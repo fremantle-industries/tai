@@ -1,4 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.Products do
+  alias Tai.Utils
+
   def products(venue_id) do
     with {:ok, instruments, _rate_limit} <-
            ExBitmex.Rest.HTTPClient.non_auth_get("/instrument", %{start: 0, count: 500}) do
@@ -18,7 +20,7 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
 
   defp build(
          %{
-           "symbol" => bitmex_symbol,
+           "symbol" => venue_symbol,
            "state" => state,
            "lotSize" => lot_size,
            "tickSize" => tick_size,
@@ -29,26 +31,25 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
          },
          venue_id
        ) do
-    symbol = bitmex_symbol |> String.downcase() |> String.to_atom()
     status = Tai.VenueAdapters.Bitmex.ProductStatus.normalize(state)
 
     %Tai.Venues.Product{
       venue_id: venue_id,
-      symbol: symbol,
-      venue_symbol: bitmex_symbol,
+      symbol: venue_symbol |> to_symbol,
+      venue_symbol: venue_symbol,
       status: status,
       type: :future,
-      price_increment: tick_size |> to_decimal,
-      size_increment: lot_size |> to_decimal,
-      min_price: tick_size |> to_decimal,
-      min_size: lot_size |> to_decimal,
-      max_price: max_price && max_price |> to_decimal,
-      max_size: max_order_qty && max_order_qty |> to_decimal,
-      maker_fee: maker_fee && maker_fee |> to_decimal,
-      taker_fee: maker_fee && taker_fee |> to_decimal
+      price_increment: tick_size |> Utils.Decimal.from(),
+      size_increment: lot_size |> Utils.Decimal.from(),
+      min_price: tick_size |> Utils.Decimal.from(),
+      min_size: lot_size |> Utils.Decimal.from(),
+      max_price: max_price && max_price |> Utils.Decimal.from(),
+      max_size: max_order_qty && max_order_qty |> Utils.Decimal.from(),
+      maker_fee: maker_fee && maker_fee |> Utils.Decimal.from(),
+      taker_fee: maker_fee && taker_fee |> Utils.Decimal.from()
     }
   end
 
-  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
-  defp to_decimal(val), do: val |> Decimal.new()
+  def to_symbol(venue_symbol), do: venue_symbol |> String.downcase() |> String.to_atom()
+  def from_symbol(symbol), do: symbol |> Atom.to_string() |> String.upcase()
 end
