@@ -6,6 +6,7 @@ defmodule Tai.Trading.Order do
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type account_id :: Tai.Venues.Adapter.account_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
+  @type product_type :: Tai.Venues.Product.type()
   @type side :: :buy | :sell
   @type time_in_force :: :gtc | :fok | :ioc
   @type type :: :limit
@@ -32,6 +33,7 @@ defmodule Tai.Trading.Order do
           side: side,
           status: status,
           symbol: product_symbol,
+          product_type: product_type,
           time_in_force: time_in_force,
           type: type,
           price: Decimal.t(),
@@ -60,6 +62,7 @@ defmodule Tai.Trading.Order do
     cumulative_qty
     status
     symbol
+    product_type
     time_in_force
     type
     post_only
@@ -78,6 +81,7 @@ defmodule Tai.Trading.Order do
     cumulative_qty
     status
     symbol
+    product_type
     time_in_force
     type
     post_only

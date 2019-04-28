@@ -21,6 +21,7 @@ defmodule Tai.Trading.BuildOrderFromSubmission do
       venue_id: submission.venue_id,
       account_id: submission.account_id,
       symbol: submission.product_symbol,
+      product_type: submission.product_type,
       side: submission |> side,
       type: submission |> type,
       price: submission.price |> Decimal.abs(),

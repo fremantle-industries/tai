@@ -28,6 +28,7 @@ defmodule Tai.Trading.Orders do
       account_id: order.account_id,
       venue_order_id: order.venue_order_id,
       product_symbol: order.symbol,
+      product_type: order.product_type,
       side: order.side,
       type: order.type,
       time_in_force: order.time_in_force,

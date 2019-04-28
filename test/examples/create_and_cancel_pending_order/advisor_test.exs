@@ -63,6 +63,7 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
         venue_id: :test_exchange_a,
         account_id: :mock_account,
         product_symbol: :btc_usd,
+        product_type: :spot,
         price: Decimal.new("100.1"),
         qty: Decimal.new("0.1"),
         post_only: true

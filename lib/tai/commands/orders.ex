@@ -8,7 +8,8 @@ defmodule Tai.Commands.Orders do
   @header [
     "Venue",
     "Account",
-    "Symbol",
+    "Product Symbol",
+    "Product Type",
     "Side",
     "Type",
     "Price",
@@ -36,6 +37,7 @@ defmodule Tai.Commands.Orders do
         order.venue_id,
         order.account_id,
         order.symbol,
+        order.product_type,
         order.side,
         order.type,
         order.price,
