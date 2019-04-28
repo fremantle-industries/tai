@@ -19,41 +19,31 @@ defmodule Tai.VenueAdapters.OkEx.Products do
          },
          venue_id
        ) do
-    symbol = instrument_id |> to_symbol()
-    size_increment = trade_increment |> Utils.Decimal.from()
-    price_increment = tick_size |> Utils.Decimal.from()
-
-    %Tai.Venues.Product{
-      venue_id: venue_id,
-      symbol: symbol,
-      venue_symbol: instrument_id,
-      status: :trading,
-      type: :future,
-      price_increment: price_increment,
-      size_increment: size_increment,
-      min_price: price_increment,
-      min_size: size_increment
-    }
+    build(instrument_id, tick_size, trade_increment, :future, venue_id)
   end
 
   defp build_swap(
          %{
            "instrument_id" => instrument_id,
            "tick_size" => tick_size,
-           "size_increment" => raw_size_increment
+           "size_increment" => size_increment
          },
          venue_id
        ) do
+    build(instrument_id, tick_size, size_increment, :swap, venue_id)
+  end
+
+  defp build(instrument_id, raw_price_increment, raw_size_increment, type, venue_id) do
     symbol = instrument_id |> to_symbol()
+    price_increment = raw_price_increment |> Utils.Decimal.from()
     size_increment = raw_size_increment |> Utils.Decimal.from()
-    price_increment = tick_size |> Utils.Decimal.from()
 
     %Tai.Venues.Product{
       venue_id: venue_id,
       symbol: symbol,
       venue_symbol: instrument_id,
       status: :trading,
-      type: :swap,
+      type: type,
       price_increment: price_increment,
       size_increment: size_increment,
       min_price: price_increment,

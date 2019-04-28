@@ -34,7 +34,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       subscribe_orders(pid, products)
     end
 
-    subscribe_shared(pid, products)
+    subscribe_depth(pid, products)
+    subscribe_trade(pid, products)
     {:ok, pid}
   end
 
@@ -89,49 +90,50 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     ]
   end
 
-  defp subscribe_orders(pid, products) do
-    channels =
-      products
-      |> Enum.filter(&(&1.type == :future))
-      |> Enum.map(&futures_order_channel/1)
+  @depth "depth"
+  @trade "trade"
+  @order "order"
 
+  defp subscribe_orders(pid, products) do
+    channels = products |> Enum.map(&channel(&1, @order))
     msg = %{"op" => "subscribe", "args" => channels}
     Tai.WebSocket.send_json_msg(pid, msg)
   end
 
-  defp subscribe_shared(pid, products) do
-    subscribe_depth(pid, products)
-    subscribe_trade(pid, products)
-  end
-
   defp subscribe_depth(pid, products) do
-    channels = products |> Enum.map(&depth_channel/1)
+    channels = products |> Enum.map(&channel(&1, @depth))
     msg = %{"op" => "subscribe", "args" => channels}
     Tai.WebSocket.send_json_msg(pid, msg)
   end
 
   defp subscribe_trade(pid, products) do
-    channels = products |> Enum.map(&trade_channel/1)
+    channels = products |> Enum.map(&channel(&1, @trade))
     msg = %{"op" => "subscribe", "args" => channels}
     Tai.WebSocket.send_json_msg(pid, msg)
   end
 
-  @futures_depth "futures/depth"
-  @futures_trade "futures/trade"
-  @futures_order "futures/order"
-  defp depth_channel(product), do: build_channel(@futures_depth, product.venue_symbol)
-  defp trade_channel(product), do: build_channel(@futures_trade, product.venue_symbol)
-  defp futures_order_channel(product), do: build_channel(@futures_order, product.venue_symbol)
-  defp build_channel(name, instrument_id), do: [name, instrument_id] |> Enum.join(":")
+  defp channel(product, name) do
+    prefix = product |> channel_prefix()
+    "#{prefix}/#{name}:#{product.venue_symbol}"
+  end
+
+  defp channel_prefix(%Tai.Venues.Product{type: :future}), do: :futures
+  defp channel_prefix(product), do: product.type
 
   @spec handle_msg(msg, venue_id) :: no_return
   defp handle_msg(msg, venue)
 
-  defp handle_msg(%{"table" => "futures/depth"} = msg, venue),
-    do: venue |> process_order_books(msg)
+  @futures_depth "futures/depth"
+  @swap_depth "swap/depth"
+  defp handle_msg(%{"table" => table} = msg, venue)
+       when table == @futures_depth or table == @swap_depth,
+       do: venue |> process_order_books(msg)
 
-  defp handle_msg(%{"table" => "futures/order"} = msg, venue),
-    do: venue |> process_auth(msg)
+  @futures_order "futures/order"
+  @swap_order "swap/order"
+  defp handle_msg(%{"table" => table} = msg, venue)
+       when table == @futures_order or table == @swap_order,
+       do: venue |> process_auth(msg)
 
   defp handle_msg(msg, venue), do: venue |> process_messages(msg)
 

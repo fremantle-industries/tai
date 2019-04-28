@@ -26,10 +26,13 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
+  @futures_order "futures/order"
+  @swap_order "futures/order"
   def handle_cast(
-        {%{"table" => "futures/order", "data" => orders}, received_at},
+        {%{"table" => table, "data" => orders}, received_at},
         state
-      ) do
+      )
+      when table == @futures_order or table == @swap_order do
     new_tasks =
       orders
       |> Enum.map(fn %{"client_oid" => venue_client_id} = venue_order ->

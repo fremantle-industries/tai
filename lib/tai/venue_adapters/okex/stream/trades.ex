@@ -24,6 +24,28 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
     })
   end
 
+  def broadcast(
+        %{
+          "instrument_id" => instrument_id,
+          "price" => price,
+          "size" => size,
+          "side" => side,
+          "timestamp" => timestamp
+        },
+        venue_id,
+        received_at
+      ) do
+    Events.info(%Events.Trade{
+      venue_id: venue_id,
+      symbol: instrument_id |> to_symbol,
+      received_at: received_at,
+      timestamp: timestamp,
+      price: price,
+      qty: size,
+      side: side |> normalize_side
+    })
+  end
+
   defp normalize_side("buy"), do: :buy
   defp normalize_side("sell"), do: :sell
 end
