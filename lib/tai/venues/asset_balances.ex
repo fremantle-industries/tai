@@ -2,6 +2,9 @@ defmodule Tai.Venues.AssetBalances do
   alias Tai.Venues.AssetBalances
   use GenServer
 
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type asset :: Tai.Venues.AssetBalance.asset()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type lock_request :: AssetBalances.LockRequest.t()
   @type lock_result ::
@@ -179,17 +182,13 @@ defmodule Tai.Venues.AssetBalances do
     GenServer.call(__MODULE__, {:unlock, unlock_request})
   end
 
-  @spec upsert(balance :: asset_balance) :: :ok
+  @spec upsert(asset_balance) :: :ok
   def upsert(balance) do
     GenServer.call(__MODULE__, {:upsert, balance})
   end
 
-  @spec add(
-          venue_id :: atom,
-          account_id :: atom,
-          asset :: atom,
-          val :: number | String.t() | Decimal.t()
-        ) :: modify_result
+  @spec add(venue_id, account_id, asset, val :: number | String.t() | Decimal.t()) ::
+          modify_result
   def add(venue_id, account_id, asset, val)
 
   def add(venue_id, account_id, asset, %Decimal{} = val) do
@@ -203,12 +202,8 @@ defmodule Tai.Venues.AssetBalances do
     add(venue_id, account_id, asset, to_decimal(val))
   end
 
-  @spec sub(
-          venue_id :: atom,
-          account_id :: atom,
-          asset :: atom,
-          val :: number | String.t() | Decimal.t()
-        ) :: modify_result
+  @spec sub(venue_id, account_id, asset, val :: number | String.t() | Decimal.t()) ::
+          modify_result
   def sub(venue_id, account_id, asset, val)
 
   def sub(venue_id, account_id, asset, %Decimal{} = val) do

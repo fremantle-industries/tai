@@ -1,10 +1,11 @@
 defmodule Tai.Venues.AssetBalance do
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type account_id :: Tai.Venues.Adapter.account_id()
+  @type asset :: atom
   @type t :: %Tai.Venues.AssetBalance{
           venue_id: venue_id,
           account_id: account_id,
-          asset: atom,
+          asset: asset,
           free: Decimal.t(),
           locked: Decimal.t()
         }

@@ -2,6 +2,9 @@ defmodule Tai.TestSupport.Mock do
   @type location :: Tai.Markets.Location.t()
   @type product :: Tai.Venues.Product.t()
   @type fee_info :: Tai.Venues.FeeInfo.t()
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type asset :: Tai.Venues.AssetBalance.asset()
 
   @spec mock_product(product | map) :: :ok
   def mock_product(%Tai.Venues.Product{} = product) do
@@ -28,9 +31,9 @@ defmodule Tai.TestSupport.Mock do
   end
 
   @spec mock_asset_balance(
-          venue_id :: atom,
-          account_id :: atom,
-          asset :: atom,
+          venue_id,
+          account_id,
+          asset,
           free :: number | Decimal.t() | String.t(),
           locked :: number | Decimal.t() | String.t()
         ) :: :ok
@@ -57,7 +60,7 @@ defmodule Tai.TestSupport.Mock do
       })
   end
 
-  @spec push_order_update(atom, map) :: no_return
+  @spec push_order_update(venue_id, map) :: no_return
   def push_order_update(venue_id, attrs) do
     :ok =
       venue_id
