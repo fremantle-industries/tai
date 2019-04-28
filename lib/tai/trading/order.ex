@@ -32,7 +32,7 @@ defmodule Tai.Trading.Order do
           account_id: account_id,
           side: side,
           status: status,
-          symbol: product_symbol,
+          product_symbol: product_symbol,
           product_type: product_type,
           time_in_force: time_in_force,
           type: type,
@@ -61,7 +61,7 @@ defmodule Tai.Trading.Order do
     leaves_qty
     cumulative_qty
     status
-    symbol
+    product_symbol
     product_type
     time_in_force
     type
@@ -80,7 +80,7 @@ defmodule Tai.Trading.Order do
     leaves_qty
     cumulative_qty
     status
-    symbol
+    product_symbol
     product_type
     time_in_force
     type

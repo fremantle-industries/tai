@@ -27,7 +27,7 @@ defmodule Tai.Trading.Orders do
       venue_id: order.venue_id,
       account_id: order.account_id,
       venue_order_id: order.venue_order_id,
-      product_symbol: order.symbol,
+      product_symbol: order.product_symbol,
       product_type: order.product_type,
       side: order.side,
       type: order.type,

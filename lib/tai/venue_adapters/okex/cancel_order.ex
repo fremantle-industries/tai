@@ -7,7 +7,7 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
   def cancel_order(order, credentials) do
     venue_config = credentials |> to_venue_credentials
 
-    order.symbol
+    order.product_symbol
     |> Products.from_symbol()
     |> send_to_venue([order.venue_order_id], %{}, venue_config)
     |> parse_response()

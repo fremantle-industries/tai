@@ -36,7 +36,7 @@ defmodule Tai.Commands.Orders do
       [
         order.venue_id,
         order.account_id,
-        order.symbol,
+        order.product_symbol,
         order.product_type,
         order.side,
         order.type,

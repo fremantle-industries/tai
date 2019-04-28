@@ -28,7 +28,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
 
   defp build_params(order) do
     %{
-      instrument_id: order.symbol |> to_venue_symbol,
+      instrument_id: order.product_symbol |> to_venue_symbol,
       leverage: 20,
       orders_data: [
         %{

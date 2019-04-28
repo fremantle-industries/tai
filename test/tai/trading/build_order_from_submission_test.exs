@@ -19,7 +19,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.time_in_force == :gtc
         assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
-        assert order.symbol == :btc_usd
+        assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
@@ -43,7 +43,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.time_in_force == :fok
         assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
-        assert order.symbol == :btc_usd
+        assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
@@ -67,7 +67,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.post_only == false
         assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
-        assert order.symbol == :btc_usd
+        assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
         assert order.avg_price == Decimal.new(0)
