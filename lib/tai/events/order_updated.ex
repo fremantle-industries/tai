@@ -27,45 +27,45 @@ defmodule Tai.Events.OrderUpdated do
           updated_at: DateTime.t() | nil
         }
 
-  @enforce_keys [
-    :client_id,
-    :venue_id,
-    :account_id,
-    :product_symbol,
-    :product_type,
-    :side,
-    :type,
-    :time_in_force,
-    :status,
-    :price,
-    :avg_price,
-    :qty,
-    :leaves_qty,
-    :cumulative_qty,
-    :enqueued_at
-  ]
-  defstruct [
-    :client_id,
-    :venue_id,
-    :account_id,
-    :product_symbol,
-    :product_type,
-    :venue_order_id,
-    :side,
-    :type,
-    :time_in_force,
-    :status,
-    :error_reason,
-    :price,
-    :avg_price,
-    :qty,
-    :leaves_qty,
-    :cumulative_qty,
-    :enqueued_at,
-    :last_received_at,
-    :last_venue_timestamp,
-    :updated_at
-  ]
+  @enforce_keys ~w(
+    client_id
+    venue_id
+    account_id
+    product_symbol
+    product_type
+    side
+    type
+    time_in_force
+    status
+    price
+    avg_price
+    qty
+    leaves_qty
+    cumulative_qty
+    enqueued_at
+  )a
+  defstruct ~w(
+    client_id
+    venue_id
+    account_id
+    product_symbol
+    product_type
+    venue_order_id
+    side
+    type
+    time_in_force
+    status
+    error_reason
+    price
+    avg_price
+    qty
+    leaves_qty
+    cumulative_qty
+    enqueued_at
+    last_received_at
+    last_venue_timestamp
+    updated_at
+  )a
 end
 
 defimpl Tai.LogEvent, for: Tai.Events.OrderUpdated do
