@@ -33,7 +33,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalances do
       |> String.to_atom()
 
     %Tai.Venues.AssetBalance{
-      exchange_id: venue_id,
+      venue_id: venue_id,
       account_id: account_id,
       asset: asset,
       free: free |> Decimal.new() |> Decimal.reduce(),

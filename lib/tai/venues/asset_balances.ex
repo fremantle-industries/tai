@@ -2,6 +2,9 @@ defmodule Tai.Venues.AssetBalances do
   alias Tai.Venues.AssetBalances
   use GenServer
 
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type asset :: Tai.Venues.AssetBalance.asset()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type lock_request :: AssetBalances.LockRequest.t()
   @type lock_result ::
@@ -29,7 +32,7 @@ defmodule Tai.Venues.AssetBalances do
     upsert_ets_table(balance)
 
     Tai.Events.info(%Tai.Events.UpsertAssetBalance{
-      venue_id: balance.exchange_id,
+      venue_id: balance.venue_id,
       account_id: balance.account_id,
       asset: balance.asset,
       free: balance.free,
@@ -44,7 +47,7 @@ defmodule Tai.Venues.AssetBalances do
       upsert_ets_table(with_locked_balance)
 
       Tai.Events.info(%Tai.Events.LockAssetBalanceOk{
-        venue_id: lock_request.exchange_id,
+        venue_id: lock_request.venue_id,
         account_id: lock_request.account_id,
         asset: lock_request.asset,
         qty: locked_qty,
@@ -56,7 +59,7 @@ defmodule Tai.Venues.AssetBalances do
     else
       {:error, {:insufficient_balance, free}} = error ->
         Tai.Events.info(%Tai.Events.LockAssetBalanceInsufficientFunds{
-          venue_id: lock_request.exchange_id,
+          venue_id: lock_request.venue_id,
           account_id: lock_request.account_id,
           asset: lock_request.asset,
           min: lock_request.min,
@@ -76,7 +79,7 @@ defmodule Tai.Venues.AssetBalances do
       upsert_ets_table(with_unlocked_balance)
 
       Tai.Events.info(%Tai.Events.UnlockAssetBalanceOk{
-        venue_id: unlock_request.exchange_id,
+        venue_id: unlock_request.venue_id,
         account_id: unlock_request.account_id,
         asset: unlock_request.asset,
         qty: unlock_request.qty
@@ -86,7 +89,7 @@ defmodule Tai.Venues.AssetBalances do
     else
       {:error, {:insufficient_balance, locked}} = error ->
         Tai.Events.info(%Tai.Events.UnlockAssetBalanceInsufficientFunds{
-          venue_id: unlock_request.exchange_id,
+          venue_id: unlock_request.venue_id,
           account_id: unlock_request.account_id,
           asset: unlock_request.asset,
           qty: unlock_request.qty,
@@ -100,14 +103,14 @@ defmodule Tai.Venues.AssetBalances do
     end
   end
 
-  def handle_call({:add, exchange_id, account_id, asset, val}, _from, state) do
+  def handle_call({:add, venue_id, account_id, asset, val}, _from, state) do
     if Decimal.cmp(val, Decimal.new(0)) == :gt do
-      case find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
+      case find_by(venue_id: venue_id, account_id: account_id, asset: asset) do
         {:ok, balance} ->
           new_free = Decimal.add(balance.free, val)
           new_balance = Map.put(balance, :free, new_free)
           upsert_ets_table(new_balance)
-          continue = {:add, exchange_id, account_id, asset, val, new_balance}
+          continue = {:add, venue_id, account_id, asset, val, new_balance}
 
           {:reply, {:ok, new_balance}, state, {:continue, continue}}
 
@@ -119,9 +122,9 @@ defmodule Tai.Venues.AssetBalances do
     end
   end
 
-  def handle_call({:sub, exchange_id, account_id, asset, val}, _from, state) do
+  def handle_call({:sub, venue_id, account_id, asset, val}, _from, state) do
     if Decimal.cmp(val, Decimal.new(0)) == :gt do
-      case find_by(exchange_id: exchange_id, account_id: account_id, asset: asset) do
+      case find_by(venue_id: venue_id, account_id: account_id, asset: asset) do
         {:ok, balance} ->
           new_free = Decimal.sub(balance.free, val)
 
@@ -130,7 +133,7 @@ defmodule Tai.Venues.AssetBalances do
           else
             new_balance = Map.put(balance, :free, new_free)
             upsert_ets_table(new_balance)
-            continue = {:sub, exchange_id, account_id, asset, val, new_balance}
+            continue = {:sub, venue_id, account_id, asset, val, new_balance}
 
             {:reply, {:ok, new_balance}, state, {:continue, continue}}
           end
@@ -179,45 +182,37 @@ defmodule Tai.Venues.AssetBalances do
     GenServer.call(__MODULE__, {:unlock, unlock_request})
   end
 
-  @spec upsert(balance :: asset_balance) :: :ok
+  @spec upsert(asset_balance) :: :ok
   def upsert(balance) do
     GenServer.call(__MODULE__, {:upsert, balance})
   end
 
-  @spec add(
-          exchange_id :: atom,
-          account_id :: atom,
-          asset :: atom,
-          val :: number | String.t() | Decimal.t()
-        ) :: modify_result
-  def add(exchange_id, account_id, asset, val)
+  @spec add(venue_id, account_id, asset, val :: number | String.t() | Decimal.t()) ::
+          modify_result
+  def add(venue_id, account_id, asset, val)
 
-  def add(exchange_id, account_id, asset, %Decimal{} = val) do
+  def add(venue_id, account_id, asset, %Decimal{} = val) do
     GenServer.call(
       __MODULE__,
-      {:add, exchange_id, account_id, asset, val}
+      {:add, venue_id, account_id, asset, val}
     )
   end
 
-  def add(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
-    add(exchange_id, account_id, asset, to_decimal(val))
+  def add(venue_id, account_id, asset, val) when is_number(val) or is_binary(val) do
+    add(venue_id, account_id, asset, to_decimal(val))
   end
 
-  @spec sub(
-          exchange_id :: atom,
-          account_id :: atom,
-          asset :: atom,
-          val :: number | String.t() | Decimal.t()
-        ) :: modify_result
-  def sub(exchange_id, account_id, asset, val)
+  @spec sub(venue_id, account_id, asset, val :: number | String.t() | Decimal.t()) ::
+          modify_result
+  def sub(venue_id, account_id, asset, val)
 
-  def sub(exchange_id, account_id, asset, %Decimal{} = val) do
+  def sub(venue_id, account_id, asset, %Decimal{} = val) do
     __MODULE__
-    |> GenServer.call({:sub, exchange_id, account_id, asset, val})
+    |> GenServer.call({:sub, venue_id, account_id, asset, val})
   end
 
-  def sub(exchange_id, account_id, asset, val) when is_number(val) or is_binary(val) do
-    sub(exchange_id, account_id, asset, to_decimal(val))
+  def sub(venue_id, account_id, asset, val) when is_number(val) or is_binary(val) do
+    sub(venue_id, account_id, asset, to_decimal(val))
   end
 
   @spec all :: [asset_balance]
@@ -241,8 +236,8 @@ defmodule Tai.Venues.AssetBalances do
           |> Keyword.keys()
           |> Enum.all?(fn filter ->
             case filter do
-              :exchange_id ->
-                balance.exchange_id == Keyword.get(filters, filter)
+              :venue_id ->
+                balance.venue_id == Keyword.get(filters, filter)
 
               :account_id ->
                 balance.account_id == Keyword.get(filters, filter)
@@ -275,7 +270,7 @@ defmodule Tai.Venues.AssetBalances do
   end
 
   defp upsert_ets_table(balance) do
-    record = {{balance.exchange_id, balance.account_id, balance.asset}, balance}
+    record = {{balance.venue_id, balance.account_id, balance.asset}, balance}
     :ets.insert(__MODULE__, record)
   end
 

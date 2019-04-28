@@ -17,7 +17,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.side == @side
         assert order.post_only == true
         assert order.time_in_force == :gtc
-        assert order.exchange_id == :test_exchange_a
+        assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
         assert order.symbol == :btc_usd
         assert %Decimal{} = order.price
@@ -40,7 +40,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.side == @side
         assert order.post_only == false
         assert order.time_in_force == :fok
-        assert order.exchange_id == :test_exchange_a
+        assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
         assert order.symbol == :btc_usd
         assert %Decimal{} = order.price
@@ -63,7 +63,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
         assert order.side == @side
         assert order.time_in_force == :ioc
         assert order.post_only == false
-        assert order.exchange_id == :test_exchange_a
+        assert order.venue_id == :test_exchange_a
         assert order.account_id == :main
         assert order.symbol == :btc_usd
         assert %Decimal{} = order.price

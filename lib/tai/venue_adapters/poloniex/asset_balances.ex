@@ -33,7 +33,7 @@ defmodule Tai.VenueAdapters.Poloniex.AssetBalances do
       |> String.to_atom()
 
     %Tai.Venues.AssetBalance{
-      exchange_id: venue_id,
+      venue_id: venue_id,
       account_id: account_id,
       asset: asset,
       free: raw_available |> Decimal.new() |> Decimal.reduce(),

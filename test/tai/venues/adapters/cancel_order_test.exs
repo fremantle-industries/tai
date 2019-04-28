@@ -60,7 +60,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   defp build_enqueued_order(venue_id) do
     struct(Tai.Trading.Order, %{
       client_id: Ecto.UUID.generate(),
-      exchange_id: venue_id,
+      venue_id: venue_id,
       account_id: :main,
       symbol: venue_id |> product_symbol,
       side: :buy,
@@ -74,12 +74,12 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   defp build_open_order(order, order_response) do
     struct(Tai.Trading.Order, %{
       venue_order_id: order_response.id,
-      exchange_id: order.exchange_id,
+      venue_id: order.venue_id,
       account_id: :main,
-      symbol: order.exchange_id |> product_symbol,
+      symbol: order.venue_id |> product_symbol,
       side: :buy,
-      price: order.exchange_id |> price(),
-      qty: order.exchange_id |> qty(),
+      price: order.venue_id |> price(),
+      qty: order.venue_id |> qty(),
       time_in_force: :gtc,
       post_only: true
     })

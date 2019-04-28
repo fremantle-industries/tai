@@ -176,7 +176,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
   defp build_enqueued_order(venue_id, side) do
     struct(Tai.Trading.Order, %{
       client_id: Ecto.UUID.generate(),
-      exchange_id: venue_id,
+      venue_id: venue_id,
       account_id: :main,
       symbol: venue_id |> product_symbol,
       side: side,
@@ -191,12 +191,12 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
   defp build_open_order(order, amend_response) do
     struct(Tai.Trading.Order, %{
       venue_order_id: amend_response.id,
-      exchange_id: order.exchange_id,
+      venue_id: order.venue_id,
       account_id: :main,
-      symbol: order.exchange_id |> product_symbol,
+      symbol: order.venue_id |> product_symbol,
       side: order.side,
-      price: order.exchange_id |> price(order.side),
-      qty: order.exchange_id |> qty(order.side),
+      price: order.venue_id |> price(order.side),
+      qty: order.venue_id |> qty(order.side),
       cumulative_qty: Decimal.new(0),
       time_in_force: :gtc,
       post_only: true

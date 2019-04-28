@@ -11,7 +11,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
           locked = equity |> Decimal.new() |> Decimal.reduce()
 
           %Tai.Venues.AssetBalance{
-            exchange_id: venue_id,
+            venue_id: venue_id,
             account_id: account_id,
             asset: asset |> String.to_atom(),
             free: free,

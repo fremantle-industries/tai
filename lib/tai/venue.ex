@@ -17,32 +17,32 @@ defmodule Tai.Venue do
           | {:nonce_not_increasing, String.t()}
 
   @spec products(adapter) :: {:ok, [product]}
-  def products(%Adapter{adapter: adapter, id: exchange_id}), do: adapter.products(exchange_id)
+  def products(%Adapter{adapter: adapter, id: venue_id}), do: adapter.products(venue_id)
 
   @spec asset_balances(adapter, account_id) :: {:ok, [asset_balance]}
   def asset_balances(
-        %Adapter{adapter: adapter, id: exchange_id, accounts: accounts},
+        %Adapter{adapter: adapter, id: venue_id, accounts: accounts},
         account_id
       ) do
     {:ok, credentials} = Map.fetch(accounts, account_id)
-    adapter.asset_balances(exchange_id, account_id, credentials)
+    adapter.asset_balances(venue_id, account_id, credentials)
   end
 
   @spec positions(adapter, account_id) ::
           {:ok, [position]} | {:error, :not_supported | shared_error_reason}
-  def positions(%Adapter{adapter: adapter, id: exchange_id, accounts: accounts}, account_id) do
+  def positions(%Adapter{adapter: adapter, id: venue_id, accounts: accounts}, account_id) do
     {:ok, credentials} = Map.fetch(accounts, account_id)
-    adapter.positions(exchange_id, account_id, credentials)
+    adapter.positions(venue_id, account_id, credentials)
   end
 
   @spec maker_taker_fees(adapter :: adapter, account_id) ::
           {:ok, {maker :: Decimal.t(), taker :: Decimal.t()}}
   def maker_taker_fees(
-        %Adapter{adapter: adapter, id: exchange_id, accounts: accounts},
+        %Adapter{adapter: adapter, id: venue_id, accounts: accounts},
         account_id
       ) do
     {:ok, credentials} = Map.fetch(accounts, account_id)
-    adapter.maker_taker_fees(exchange_id, account_id, credentials)
+    adapter.maker_taker_fees(venue_id, account_id, credentials)
   end
 
   @type create_response :: OrderResponses.Create.t() | OrderResponses.CreateAccepted.t()
@@ -83,7 +83,7 @@ defmodule Tai.Venue do
   end
 
   defp find_venue_adapter_and_credentials(order, adapters) do
-    venue_adapter = adapters |> Map.fetch!(order.exchange_id)
+    venue_adapter = adapters |> Map.fetch!(order.venue_id)
     credentials = Map.fetch!(venue_adapter.accounts, order.account_id)
 
     {venue_adapter, credentials}

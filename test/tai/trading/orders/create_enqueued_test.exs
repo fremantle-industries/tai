@@ -27,7 +27,7 @@ defmodule Tai.Trading.Orders.CreateEnqueuedTest do
       assert {:ok, order} = Orders.create(submission)
       assert order.client_id != nil
       assert order.venue_order_id == nil
-      assert order.exchange_id == submission.venue_id
+      assert order.venue_id == submission.venue_id
       assert order.account_id == submission.account_id
       assert order.symbol == submission.product_symbol
       assert order.side == @side

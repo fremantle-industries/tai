@@ -24,7 +24,7 @@ defmodule Tai.Trading.Orders do
   def broadcast(%Order{} = order) do
     %Events.OrderUpdated{
       client_id: order.client_id,
-      venue_id: order.exchange_id,
+      venue_id: order.venue_id,
       account_id: order.account_id,
       venue_order_id: order.venue_order_id,
       product_symbol: order.symbol,
