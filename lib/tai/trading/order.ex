@@ -3,6 +3,9 @@ defmodule Tai.Trading.Order do
 
   @type client_id :: Ecto.UUID.t()
   @type venue_order_id :: String.t()
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type product_symbol :: Tai.Venues.Product.symbol()
   @type side :: :buy | :sell
   @type time_in_force :: :gtc | :fok | :ioc
   @type type :: :limit
@@ -24,11 +27,11 @@ defmodule Tai.Trading.Order do
   @type t :: %Order{
           client_id: client_id,
           venue_order_id: venue_order_id | nil,
-          exchange_id: atom,
-          account_id: atom,
+          exchange_id: venue_id,
+          account_id: account_id,
           side: side,
           status: status,
-          symbol: atom,
+          symbol: product_symbol,
           time_in_force: time_in_force,
           type: type,
           price: Decimal.t(),
