@@ -18,7 +18,29 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
     {client_id, :passive_cancel, result}
   end
 
-  # TODO: For some reason swap seems to use status = 3 for open???
+  def update(
+        client_id,
+        %{
+          "status" => status,
+          "order_id" => venue_order_id,
+          "timestamp" => timestamp
+        },
+        received_at
+      )
+      when status == @submitting do
+    {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
+
+    result =
+      Tai.Trading.OrderStore.accept_create(
+        client_id,
+        venue_order_id,
+        received_at,
+        venue_timestamp
+      )
+
+    {client_id, :accept_create, result}
+  end
+
   def update(
         client_id,
         %{
@@ -31,7 +53,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         },
         received_at
       )
-      when status == @pending or status == @submitting do
+      when status == @pending do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     avg_price = price_avg |> Decimal.new()
     cumulative_qty = filled_qty |> Decimal.new()
@@ -104,10 +126,4 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
 
     {client_id, :passive_partial_fill, result}
   end
-
-  # def update(_, %{"status" => status} = response, _) when status == @submitting do
-  #   IO.puts("======== RESPONSE")
-  #   IO.inspect(response)
-  #   :ok
-  # end
 end
