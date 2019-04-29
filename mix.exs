@@ -57,7 +57,7 @@ defmodule Tai.Mixfile do
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:cowboy, "~> 1.1.2", only: [:dev, :test]},
       {:plug_cowboy, "~> 1.0.0", only: [:dev, :test]},
-      {:plug, "~> 1.7.0", only: [:dev, :test]},
+      {:plug, "~> 1.8.0", only: [:dev, :test]},
       {:echo_boy, github: "rupurt/echo_boy", only: [:dev, :test]},
       {:exvcr, "~> 0.10.2", only: [:dev, :test]},
       {:mock, "~> 0.3.3", only: :test},
