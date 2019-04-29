@@ -11,7 +11,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
 
   @spec create_raise(submission, reason) :: :ok
   def create_raise(submission, reason) do
-    order = Tai.Trading.BuildOrderFromSubmission.build!(submission)
+    order = Tai.Trading.OrderSubmissions.Factory.build!(submission)
 
     key =
       {Tai.Trading.OrderResponse,

@@ -1,8 +1,8 @@
 defmodule Tai.Trading.Orders do
-  alias Tai.Trading.{Order, Orders, BuildOrderFromSubmission}
+  alias Tai.Trading.{Order, Orders, OrderSubmissions}
   alias Tai.Events
 
-  @type submission :: BuildOrderFromSubmission.submission()
+  @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
   @type status :: Order.status()
   @type status_was :: status

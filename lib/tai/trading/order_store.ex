@@ -4,9 +4,9 @@ defmodule Tai.Trading.OrderStore do
   """
 
   use GenServer
-  alias Tai.Trading.{Order, BuildOrderFromSubmission}
+  alias Tai.Trading.{Order, OrderSubmissions}
 
-  @type submission :: BuildOrderFromSubmission.submission()
+  @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
   @type client_id :: Order.client_id()
   @type venue_order_id :: Order.venue_order_id()
@@ -35,7 +35,7 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:enqueue, submission}, _from, state) do
-    order = BuildOrderFromSubmission.build!(submission)
+    order = OrderSubmissions.Factory.build!(submission)
     insert(order)
     response = {:ok, order}
     {:reply, response, state}

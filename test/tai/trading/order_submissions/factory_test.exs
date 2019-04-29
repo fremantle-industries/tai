@@ -1,6 +1,7 @@
-defmodule Tai.Trading.BuildOrderFromSubmissionTest do
+defmodule Tai.Trading.OrderSubmissions.FactoryTest do
   use ExUnit.Case, async: true
-  doctest Tai.Trading.BuildOrderFromSubmission
+  doctest Tai.Trading.OrderSubmissions.Factory
+  alias Tai.Trading.OrderSubmissions.Factory
 
   describe ".build!" do
     [:buy, :sell]
@@ -10,8 +11,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       test "#{side} gtc orders" do
         submission = build_submission(@side, :gtc, post_only: true)
 
-        assert %Tai.Trading.Order{} =
-                 order = Tai.Trading.BuildOrderFromSubmission.build!(submission)
+        assert %Tai.Trading.Order{} = order = Factory.build!(submission)
 
         assert order.client_id != nil
         assert order.side == @side
@@ -34,8 +34,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       test "#{side} fok orders" do
         submission = build_submission(@side, :fok)
 
-        assert %Tai.Trading.Order{} =
-                 order = Tai.Trading.BuildOrderFromSubmission.build!(submission)
+        assert %Tai.Trading.Order{} = order = Factory.build!(submission)
 
         assert order.client_id != nil
         assert order.side == @side
@@ -58,8 +57,7 @@ defmodule Tai.Trading.BuildOrderFromSubmissionTest do
       test "#{side} ioc orders" do
         submission = build_submission(@side, :ioc)
 
-        assert %Tai.Trading.Order{} =
-                 order = Tai.Trading.BuildOrderFromSubmission.build!(submission)
+        assert %Tai.Trading.Order{} = order = Factory.build!(submission)
 
         assert order.client_id != nil
         assert order.side == @side

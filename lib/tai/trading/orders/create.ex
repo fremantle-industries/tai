@@ -4,11 +4,11 @@ defmodule Tai.Trading.Orders.Create do
     OrderResponses,
     Order,
     Orders,
-    BuildOrderFromSubmission
+    OrderSubmissions
   }
 
   @type order :: Order.t()
-  @type submission :: BuildOrderFromSubmission.submission()
+  @type submission :: OrderSubmissions.Factory.submission()
 
   @spec create(submission) :: {:ok, order}
   def create(submission) do
