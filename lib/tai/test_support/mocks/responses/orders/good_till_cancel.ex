@@ -7,6 +7,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   @type sell_limit :: OrderSubmissions.SellLimitGtc.t()
   @type submission :: buy_limit | sell_limit
   @type venue_order_id :: String.t()
+  @type insert_result :: :ok
 
   @spec create_accepted(venue_order_id, submission) :: :ok
   def create_accepted(venue_order_id, submission) do
@@ -84,6 +85,34 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
 
     Mocks.Server.insert(key, order_response)
   end
+
+  @spec filled(venue_order_id, submission) :: insert_result
+  def filled(venue_order_id, submission) do
+    order_response = %Tai.Trading.OrderResponses.Create{
+      id: venue_order_id,
+      status: :filled,
+      avg_price: submission.price,
+      original_size: submission.qty,
+      leaves_qty: Decimal.new(0),
+      cumulative_qty: submission.qty,
+      venue_timestamp: Timex.now(),
+      received_at: Timex.now()
+    }
+
+    key =
+      {Tai.Trading.OrderResponse,
+       [
+         symbol: submission.product_symbol,
+         price: submission.price,
+         size: submission.qty,
+         time_in_force: :gtc
+       ]}
+
+    Mocks.Server.insert(key, order_response)
+  end
+
+  @spec filled(submission) :: insert_result
+  def filled(submission), do: filled(Ecto.UUID.generate(), submission)
 
   @spec amend_price(order, Decimal.t()) :: :ok
   def amend_price(order, price) do
