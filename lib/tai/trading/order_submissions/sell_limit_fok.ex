@@ -10,6 +10,7 @@ defmodule Tai.Trading.OrderSubmissions.SellLimitFok do
           product_type: product_type,
           price: Decimal.t(),
           qty: Decimal.t(),
+          close: boolean | nil,
           order_updated_callback: function | nil
         }
 
@@ -28,6 +29,7 @@ defmodule Tai.Trading.OrderSubmissions.SellLimitFok do
     product_type
     price
     qty
+    close
     order_updated_callback
   )a
 end

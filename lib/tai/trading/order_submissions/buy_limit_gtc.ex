@@ -10,6 +10,7 @@ defmodule Tai.Trading.OrderSubmissions.BuyLimitGtc do
           product_type: product_type,
           price: Decimal.t(),
           qty: Decimal.t(),
+          close: boolean | nil,
           post_only: boolean,
           order_updated_callback: function | nil
         }
@@ -31,6 +32,7 @@ defmodule Tai.Trading.OrderSubmissions.BuyLimitGtc do
     price
     qty
     post_only
+    close
     order_updated_callback
   )a
 end

@@ -41,6 +41,7 @@ defmodule Tai.Trading.OrderSubmissions.Factory do
       time_in_force: submission |> time_in_force,
       post_only: submission |> post_only,
       status: :enqueued,
+      close: submission.close,
       enqueued_at: Timex.now(),
       order_updated_callback: submission.order_updated_callback
     }
