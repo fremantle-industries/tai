@@ -28,6 +28,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.qty == order.leaves_qty
         assert order.cumulative_qty == Decimal.new(0)
         assert order.status == :enqueued
+        assert order.close == true
         assert %DateTime{} = order.enqueued_at
       end
 
@@ -51,6 +52,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.qty == order.leaves_qty
         assert order.cumulative_qty == Decimal.new(0)
         assert order.status == :enqueued
+        assert order.close == true
         assert %DateTime{} = order.enqueued_at
       end
 
@@ -74,6 +76,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.qty == order.leaves_qty
         assert order.cumulative_qty == Decimal.new(0)
         assert order.status == :enqueued
+        assert order.close == true
         assert %DateTime{} = order.enqueued_at
       end
     end)
@@ -87,7 +90,8 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
       product_type: :spot,
       price: Decimal.new("100.1"),
       qty: Decimal.new("1.1"),
-      post_only: post_only
+      post_only: post_only,
+      close: true
     }
   end
 
@@ -99,7 +103,8 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
       product_type: :spot,
       price: Decimal.new("50000.5"),
       qty: Decimal.new("0.1"),
-      post_only: post_only
+      post_only: post_only,
+      close: true
     }
   end
 
@@ -110,7 +115,8 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("100.1"),
-      qty: Decimal.new("1.1")
+      qty: Decimal.new("1.1"),
+      close: true
     }
   end
 
@@ -121,7 +127,8 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("50000.5"),
-      qty: Decimal.new("0.1")
+      qty: Decimal.new("0.1"),
+      close: true
     }
   end
 
@@ -132,7 +139,8 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("100.1"),
-      qty: Decimal.new("1.1")
+      qty: Decimal.new("1.1"),
+      close: true
     }
   end
 
@@ -143,7 +151,8 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("50000.5"),
-      qty: Decimal.new("0.1")
+      qty: Decimal.new("0.1"),
+      close: true
     }
   end
 end

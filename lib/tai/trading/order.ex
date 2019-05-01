@@ -42,6 +42,7 @@ defmodule Tai.Trading.Order do
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
           post_only: boolean,
+          close: boolean | nil,
           enqueued_at: DateTime.t(),
           last_received_at: DateTime.t() | nil,
           last_venue_timestamp: DateTime.t() | nil,
@@ -85,6 +86,7 @@ defmodule Tai.Trading.Order do
     time_in_force
     type
     post_only
+    close
     enqueued_at
     last_received_at
     last_venue_timestamp

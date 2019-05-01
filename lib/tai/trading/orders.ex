@@ -42,7 +42,8 @@ defmodule Tai.Trading.Orders do
       enqueued_at: order.enqueued_at,
       last_received_at: order.last_received_at,
       last_venue_timestamp: order.last_venue_timestamp,
-      updated_at: order.updated_at
+      updated_at: order.updated_at,
+      close: order.close
     }
     |> Events.info()
   end

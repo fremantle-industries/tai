@@ -17,6 +17,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     leaves_qty: Decimal.new("0.15"),
     cumulative_qty: Decimal.new("0.3"),
     error_reason: {:my_error_reason, "my msg"},
+    close: true,
     enqueued_at: Timex.now()
   }
 
@@ -43,6 +44,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert json.leaves_qty == "0.15"
     assert json.cumulative_qty == "0.3"
     assert json.error_reason == "{:my_error_reason, \"my msg\"}"
+    assert json.close == true
   end
 
   test ".to_data/1 transforms datetime data to a string" do

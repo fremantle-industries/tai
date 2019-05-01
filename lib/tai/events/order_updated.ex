@@ -24,7 +24,8 @@ defmodule Tai.Events.OrderUpdated do
           enqueued_at: DateTime.t(),
           last_received_at: DateTime.t() | nil,
           last_venue_timestamp: DateTime.t() | nil,
-          updated_at: DateTime.t() | nil
+          updated_at: DateTime.t() | nil,
+          close: boolean | nil
         }
 
   @enforce_keys ~w(
@@ -65,6 +66,7 @@ defmodule Tai.Events.OrderUpdated do
     last_received_at
     last_venue_timestamp
     updated_at
+    close
   )a
 end
 
