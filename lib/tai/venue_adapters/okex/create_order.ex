@@ -19,7 +19,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
   end
 
   def send_to_venue({order, credentials}) do
-    venue_config = credentials |> to_venue_credentials
+    venue_config = credentials |> to_venue_config
     params = order |> build_params()
     mod = order |> module_for()
     {mod.create_order(params, venue_config), order}
@@ -59,7 +59,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
     }
   end
 
-  defdelegate to_venue_credentials(credentials),
+  defdelegate to_venue_config(credentials),
     to: Tai.VenueAdapters.OkEx.Credentials,
     as: :from
 
