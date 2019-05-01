@@ -33,14 +33,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
       instrument_id: order.product_symbol |> to_venue_symbol,
       leverage: 20,
       orders_data: [
-        %{
-          client_oid: order.client_id |> ClientId.to_venue(),
-          price: order.price |> to_decimal_string,
-          size: order.qty |> to_decimal_string,
-          type: order |> to_venue_type,
-          order_type: order |> to_venue_order_type,
-          match_price: 0
-        }
+        order |> build_order_params()
       ]
     }
   end
@@ -50,15 +43,19 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
       instrument_id: order.product_symbol |> to_venue_symbol,
       leverage: 20,
       order_data: [
-        %{
-          client_oid: order.client_id |> ClientId.to_venue(),
-          price: order.price |> to_decimal_string,
-          size: order.qty |> to_decimal_string,
-          type: order |> to_venue_type,
-          order_type: order |> to_venue_order_type,
-          match_price: 0
-        }
+        order |> build_order_params()
       ]
+    }
+  end
+
+  defp build_order_params(order) do
+    %{
+      client_oid: order.client_id |> ClientId.to_venue(),
+      price: order.price |> to_decimal_string,
+      size: order.qty |> to_decimal_string,
+      type: order |> to_venue_type,
+      order_type: order |> to_venue_order_type,
+      match_price: 0
     }
   end
 
