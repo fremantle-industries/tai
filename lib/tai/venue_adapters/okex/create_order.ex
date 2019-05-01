@@ -69,8 +69,14 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
 
   defp to_decimal_string(price), do: price |> Decimal.to_string(:normal)
 
-  defp to_venue_type(%Tai.Trading.Order{side: :buy}), do: 1
-  defp to_venue_type(%Tai.Trading.Order{side: :sell}), do: 2
+  @open_long 1
+  @open_short 2
+  @close_long 3
+  @close_short 4
+  defp to_venue_type(%Tai.Trading.Order{side: :buy, close: true}), do: @close_long
+  defp to_venue_type(%Tai.Trading.Order{side: :sell, close: true}), do: @close_short
+  defp to_venue_type(%Tai.Trading.Order{side: :buy}), do: @open_long
+  defp to_venue_type(%Tai.Trading.Order{side: :sell}), do: @open_short
 
   defp to_venue_order_type(%Tai.Trading.Order{post_only: true}), do: 1
   defp to_venue_order_type(_), do: 0
@@ -82,23 +88,29 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
        do: {:error, :insufficient_balance}
 
   defp parse_response({
+         {:ok, %{"order_info" => [%{"error_code" => "35010", "error_message" => _} | _]}},
+         %Tai.Trading.Order{product_type: :swap}
+       }),
+       do: {:error, :insufficient_position}
+
+  defp parse_response({
          {:ok, %{"order_info" => [%{"error_code" => "32015", "error_message" => _} | _]}},
          %Tai.Trading.Order{product_type: :future}
        }),
        do: {:error, :insufficient_balance}
 
   defp parse_response({
-         {:ok, %{"order_info" => [%{"order_id" => venue_order_id} | _]}},
+         {:ok, %{"order_info" => [%{"error_code" => "32019", "error_message" => _} | _]}},
          %Tai.Trading.Order{product_type: :future}
-       }) do
-    response = %CreateAccepted{id: venue_order_id, received_at: Timex.now()}
-    {:ok, response}
-  end
+       }),
+       do: {:error, :insufficient_position}
 
+  @invalid_venue_order_id "-1"
   defp parse_response({
          {:ok, %{"order_info" => [%{"order_id" => venue_order_id} | _]}},
-         %Tai.Trading.Order{product_type: :swap}
-       }) do
+         _
+       })
+       when venue_order_id != @invalid_venue_order_id do
     response = %CreateAccepted{id: venue_order_id, received_at: Timex.now()}
     {:ok, response}
   end
