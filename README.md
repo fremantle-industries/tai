@@ -76,7 +76,7 @@ config :echo_boy, port: 4200
 ```elixir
 def deps do
   [
-    {:tai, "~> 0.0.15"}
+    {:tai, "~> 0.0.16"}
   ]
 end
 ```

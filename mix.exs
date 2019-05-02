@@ -4,7 +4,7 @@ defmodule Tai.Mixfile do
   def project do
     [
       app: :tai,
-      version: "0.0.15",
+      version: "0.0.16",
       elixir: "~> 1.8",
       package: package(),
       start_permanent: Mix.env() == :prod,
@@ -34,10 +34,7 @@ defmodule Tai.Mixfile do
     [
       {:ex_binance, "~> 0.0.2"},
       {:ex_bitmex, "~> 0.1.0"},
-      # Adding features required by tai
-      # {:ex_okex, "~> 0.1"},
-      # {:ex_okex, github: "fremantle-capital/ex_okex", branch: "patches"},
-      {:ex_okex, github: "acuityinnovations/ex_okex"},
+      {:ex_okex, "~> 0.1"},
       {:ex_gdax, "~> 0.1.6"},
       {:ex_poloniex, "~> 0.0.2"},
       {:decimal, "~> 1.7.0"},
