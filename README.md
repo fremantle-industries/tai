@@ -42,8 +42,6 @@ config :tai,
       accounts: %{}
     ]
   }
-
-config :echo_boy, port: 4200
 ```
 
 ```
