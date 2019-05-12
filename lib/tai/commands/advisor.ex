@@ -3,22 +3,20 @@ defmodule Tai.Commands.Advisor do
   @type advisor_id :: Tai.Advisor.id()
   @type config :: Tai.Config.t()
 
-  @spec advisor(group_id, advisor_id) :: no_return
   @spec advisor(group_id, advisor_id, config) :: no_return
   def advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
-    with {:ok, [spec | _]} <-
-           Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
-      [spec]
-      |> Tai.Advisors.info()
-      |> Enum.each(fn {{_, opts}, pid} ->
+    config
+    |> Tai.Advisors.specs(group_id: group_id, advisor_id: advisor_id)
+    |> case do
+      [_ | _] = specs ->
+        [{{_, opts}, pid} | []] = specs |> Tai.Advisors.info()
         IO.puts("Group ID: #{opts |> Keyword.fetch!(:group_id)}")
         IO.puts("Advisor ID: #{opts |> Keyword.fetch!(:advisor_id)}")
         IO.puts("Status: #{pid |> format_status_col}")
         IO.puts("PID: #{pid |> format_col}")
         IO.puts("Config: #{opts |> Keyword.fetch!(:config) |> format_col}")
-      end)
-    else
-      {:ok, []} ->
+
+      _ ->
         IO.puts("Group ID: -")
         IO.puts("Advisor ID: -")
         IO.puts("Status: -")
@@ -29,25 +27,25 @@ defmodule Tai.Commands.Advisor do
     IEx.dont_display_result()
   end
 
-  @spec start_advisor(group_id, advisor_id) :: no_return
   @spec start_advisor(group_id, advisor_id, config) :: no_return
   def start_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
-    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
-      {:ok, {new, old}} = Tai.Advisors.start(specs)
-      IO.puts("Started advisors: #{new} new, #{old} already running")
-    end
+    {:ok, {new, old}} =
+      config
+      |> Tai.Advisors.specs(group_id: group_id, advisor_id: advisor_id)
+      |> Tai.Advisors.start()
 
+    IO.puts("Started advisors: #{new} new, #{old} already running")
     IEx.dont_display_result()
   end
 
-  @spec stop_advisor(group_id, advisor_id) :: no_return
   @spec stop_advisor(group_id, advisor_id, config) :: no_return
   def stop_advisor(group_id, advisor_id, config \\ Tai.Config.parse()) do
-    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_advisor(config, group_id, advisor_id) do
-      {:ok, {new, old}} = Tai.Advisors.stop(specs)
-      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
-    end
+    {:ok, {new, old}} =
+      config
+      |> Tai.Advisors.specs(group_id: group_id, advisor_id: advisor_id)
+      |> Tai.Advisors.stop()
 
+    IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     IEx.dont_display_result()
   end
 

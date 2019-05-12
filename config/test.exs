@@ -18,7 +18,7 @@ config :tai,
     create_and_cancel_pending_order: [
       advisor: Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
       factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
-      products: "test_feed_a test_feed_b.eth_usd"
+      products: "test_exchange_a test_exchange_a.eth_usd"
     ]
   }
 

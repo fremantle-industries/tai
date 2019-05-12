@@ -14,34 +14,36 @@ defmodule Tai.Commands.Advisors do
   @spec advisors(config) :: no_return
   def advisors(config \\ Tai.Config.parse()) do
     config
-    |> Tai.AdvisorGroups.build_specs()
+    |> Tai.Advisors.specs([])
     |> format_rows
     |> render!(@header)
   end
 
   @spec start() :: no_return
-  @spec start(config :: config) :: no_return
+  @spec start(config) :: no_return
   def start(config \\ Tai.Config.parse()) do
-    with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
-      {:ok, {new, old}} = Tai.Advisors.start(specs)
-      IO.puts("Started advisors: #{new} new, #{old} already running")
-    end
+    {:ok, {new, old}} =
+      config
+      |> Tai.Advisors.specs([])
+      |> Tai.Advisors.start()
 
+    IO.puts("Started advisors: #{new} new, #{old} already running")
     IEx.dont_display_result()
   end
 
   @spec stop() :: no_return
   @spec stop(config) :: no_return
   def stop(config \\ Tai.Config.parse()) do
-    with {:ok, specs} <- Tai.AdvisorGroups.build_specs(config) do
-      {:ok, {new, old}} = Tai.Advisors.stop(specs)
-      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
-    end
+    {:ok, {new, old}} =
+      config
+      |> Tai.Advisors.specs([])
+      |> Tai.Advisors.stop()
 
+    IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     IEx.dont_display_result()
   end
 
-  defp format_rows({:ok, specs}) do
+  defp format_rows(specs) do
     specs
     |> Tai.Advisors.info()
     |> Enum.map(fn {{_, opts}, pid} ->

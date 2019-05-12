@@ -1,11 +1,12 @@
 defmodule Tai.AdvisorGroup do
   @type id :: atom
+  @type product :: Tai.Venues.Product.t()
   @type t :: %Tai.AdvisorGroup{
           id: id,
           start_on_boot: boolean,
           advisor: atom,
           factory: atom,
-          products: String.t(),
+          products: [product],
           config: map | struct,
           trades: list
         }
@@ -19,5 +20,4 @@ defmodule Tai.AdvisorGroup do
   validates(:start_on_boot, inclusion: [true, false])
   validates(:advisor, presence: true)
   validates(:factory, presence: true)
-  validates(:products, presence: true)
 end
