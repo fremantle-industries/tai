@@ -4,9 +4,10 @@ defmodule Tai.Advisors.Factories.OnePerVenueAndProductTest do
 
   test "returns an advisor spec for each product on the given venues" do
     group = %Tai.AdvisorGroup{
+      id: :group_a,
+      start_on_boot: false,
       advisor: MyAdvisor,
       factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
-      id: :group_a,
       products: "*",
       config: %{hello: :world},
       trades: []

@@ -6,6 +6,7 @@ defmodule Tai.AdvisorGroups.ParseConfigTest do
       Tai.Config.parse(
         advisor_groups: %{
           group_a: [
+            start_on_boot: true,
             advisor: AdvisorA,
             factory: TestFactoryA,
             products: "*",
@@ -27,6 +28,7 @@ defmodule Tai.AdvisorGroups.ParseConfigTest do
     assert group_a.id == :group_a
     assert group_a.advisor == AdvisorA
     assert group_a.factory == TestFactoryA
+    assert group_a.start_on_boot == true
     assert group_a.products == "*"
     assert group_a.config == %{min_profit: 0.1}
     assert group_a.trades == [:a, :b]
@@ -35,7 +37,24 @@ defmodule Tai.AdvisorGroups.ParseConfigTest do
     assert group_b.id == :group_b
     assert group_b.advisor == AdvisorB
     assert group_b.factory == TestFactoryB
+    assert group_b.start_on_boot == false
     assert group_b.products == "btc_usdt"
+  end
+
+  test "does not start on boot by default" do
+    config =
+      Tai.Config.parse(
+        advisor_groups: %{
+          group_a: [
+            advisor: AdvisorA,
+            factory: TestFactoryA,
+            products: "btc_usdt"
+          ]
+        }
+      )
+
+    assert {:ok, [group | _]} = Tai.AdvisorGroups.parse_config(config)
+    assert group.start_on_boot == false
   end
 
   test "assigns an empty config map when not present" do

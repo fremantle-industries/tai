@@ -12,6 +12,7 @@ defmodule Tai.AdvisorGroups.ParseConfig do
   defp build_group({id, config}, {groups, errors}) do
     group = %Tai.AdvisorGroup{
       id: id,
+      start_on_boot: !!(config |> Keyword.get(:start_on_boot)),
       advisor: config |> Keyword.get(:advisor),
       factory: config |> Keyword.get(:factory),
       products: config |> Keyword.get(:products),
