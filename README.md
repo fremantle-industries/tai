@@ -27,6 +27,7 @@ config :tai, send_orders: false
 config :tai,
   advisor_groups: %{
     log_spread: [
+      start_on_boot: true,
       advisor: Examples.Advisors.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
       products: "*"
