@@ -2,6 +2,7 @@ defmodule Tai.Commands.AdvisorGroups do
   import Tai.Commands.Table, only: [render!: 2]
 
   @type config :: Tai.Config.t()
+  @type group_id :: Tai.AdvisorGroup.id()
 
   @header [
     "Group ID",
@@ -11,38 +12,38 @@ defmodule Tai.Commands.AdvisorGroups do
   ]
 
   @spec advisor_groups() :: no_return
-  @spec advisor_groups(config :: config) :: no_return
+  @spec advisor_groups(config) :: no_return
   def advisor_groups(config \\ Tai.Config.parse()) do
     config
-    |> Tai.AdvisorGroups.build_specs()
+    |> Tai.Advisors.specs([])
     |> agg_status_by_group
     |> format_rows
     |> render!(@header)
   end
 
-  @spec start(group_id :: atom) :: no_return
-  @spec start(group_id :: atom, config :: config) :: no_return
+  @spec start(group_id, config) :: no_return
   def start(group_id, config \\ Tai.Config.parse()) do
-    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_group(config, group_id) do
-      {:ok, {new, old}} = Tai.Advisors.start(specs)
-      IO.puts("Started advisors: #{new} new, #{old} already running")
-    end
+    {:ok, {new, old}} =
+      config
+      |> Tai.Advisors.specs(group_id: group_id)
+      |> Tai.Advisors.start()
 
+    IO.puts("Started advisors: #{new} new, #{old} already running")
     IEx.dont_display_result()
   end
 
-  @spec stop(group_id :: atom) :: no_return
-  @spec stop(group_id :: atom, config :: config) :: no_return
+  @spec stop(group_id, config) :: no_return
   def stop(group_id, config \\ Tai.Config.parse()) do
-    with {:ok, specs} <- Tai.AdvisorGroups.build_specs_for_group(config, group_id) do
-      {:ok, {new, old}} = Tai.Advisors.stop(specs)
-      IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
-    end
+    {:ok, {new, old}} =
+      config
+      |> Tai.Advisors.specs(group_id: group_id)
+      |> Tai.Advisors.stop()
 
+    IO.puts("Stopped advisors: #{new} new, #{old} already stopped")
     IEx.dont_display_result()
   end
 
-  defp agg_status_by_group({:ok, specs}) do
+  defp agg_status_by_group(specs) do
     specs
     |> Tai.Advisors.info()
     |> Enum.map(fn {{_, opts}, pid} -> {Keyword.fetch!(opts, :group_id), pid} end)

@@ -1,8 +1,12 @@
 defmodule Tai.Advisors.Factories.OnePerVenueAndProduct do
   @behaviour Tai.Advisors.Factory
 
-  def advisor_specs(%Tai.AdvisorGroup{} = group, products) when is_list(products) do
-    products
+  @type group :: Tai.AdvisorGroup.t()
+  @type spec :: Tai.Advisor.spec()
+
+  @spec advisor_specs(group) :: [spec]
+  def advisor_specs(group) do
+    group.products
     |> Enum.map(fn product ->
       advisor_id = :"#{product.venue_id}_#{product.symbol}"
 

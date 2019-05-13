@@ -1,5 +1,21 @@
 defmodule Tai.Advisors do
-  @type advisor_spec :: {atom, [group_id: atom, advisor_id: atom, order_books: map, store: map]}
+  @type config :: Tai.Config.t()
+  @type product :: Tai.Venues.Product.t()
+  @type advisor_spec :: Tai.Advisor.spec()
+
+  @spec specs(config, list, [product]) :: [advisor_spec]
+  def specs(config, filters, products \\ Tai.Venues.ProductStore.all()) do
+    advisor_id_filter = filters |> Keyword.get(:advisor_id)
+    {:ok, groups} = config |> Tai.AdvisorGroups.Config.parse_groups(products)
+
+    groups
+    |> Enum.map(&Tai.AdvisorGroups.specs(&1, filters))
+    |> Enum.flat_map(& &1)
+    |> Enum.filter(fn {_, args} ->
+      spec_advisor_id = args |> Keyword.fetch!(:advisor_id)
+      spec_advisor_id == advisor_id_filter || advisor_id_filter == nil
+    end)
+  end
 
   @spec info([advisor_spec]) :: [{advisor_spec, pid}]
   def info(specs) do

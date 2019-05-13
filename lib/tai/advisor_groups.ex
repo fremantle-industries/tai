@@ -1,19 +1,22 @@
 defmodule Tai.AdvisorGroups do
-  @type config :: Tai.Config.t()
-  @type advisor_spec :: {atom, [group_id: atom, advisor_id: atom, order_books: map, store: map]}
-  @type product :: Tai.Venues.Product.t()
+  @type group :: Tai.AdvisorGroup.t()
+  @type advisor_spec :: Tai.Advisor.spec()
 
-  defdelegate parse_config(config), to: Tai.AdvisorGroups.ParseConfig
-  defdelegate build_specs(config), to: Tai.AdvisorGroups.BuildSpecs
-  defdelegate build_specs(config, products), to: Tai.AdvisorGroups.BuildSpecs
-  defdelegate build_specs_for_group(config, group_id), to: Tai.AdvisorGroups.BuildSpecsForGroup
+  @spec specs(group, list) :: [advisor_spec]
+  def specs(%Tai.AdvisorGroup{factory: factory} = group, filters \\ []) do
+    if allow?(group, filters) do
+      group |> factory.advisor_specs()
+    else
+      []
+    end
+  end
 
-  defdelegate build_specs_for_group(config, group_id, products),
-    to: Tai.AdvisorGroups.BuildSpecsForGroup
+  defp allow?(group, filters) do
+    start_on_boot = filters |> Keyword.get(:start_on_boot)
+    group_id = filters |> Keyword.get(:group_id)
+    allow_start_on_boot = start_on_boot == group.start_on_boot || start_on_boot == nil
+    allow_group_id = group_id == group.id || group_id == nil
 
-  defdelegate build_specs_for_advisor(config, group_id, advisor_id),
-    to: Tai.AdvisorGroups.BuildSpecsForAdvisor
-
-  defdelegate build_specs_for_advisor(config, group_id, advisor_id, products),
-    to: Tai.AdvisorGroups.BuildSpecsForAdvisor
+    allow_start_on_boot && allow_group_id
+  end
 end

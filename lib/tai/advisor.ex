@@ -32,6 +32,7 @@ defmodule Tai.Advisor do
   @type group_id :: Tai.AdvisorGroup.id()
   @type id :: State.id()
   @type run_store :: State.run_store()
+  @type spec :: {atom, [group_id: group_id, advisor_id: id, order_books: map, store: run_store]}
   @type state :: State.t()
 
   @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, state) ::
