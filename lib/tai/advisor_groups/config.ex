@@ -1,30 +1,34 @@
 defmodule Tai.AdvisorGroups.Config do
+  alias Tai.AdvisorGroups.RichConfig
+
   @type config :: Tai.Config.t()
   @type product :: Tai.Venues.Product.t()
   @type advisor_group :: Tai.AdvisorGroup.t()
+  @type provider :: Tai.AdvisorGroups.RichConfig.provider()
 
-  @spec parse_groups(config, [product]) :: {:ok, [advisor_group]} | {:error, map}
-  def parse_groups(%Tai.Config{} = config, products \\ Tai.Venues.ProductStore.all()) do
-    venue_indexed_symbols = Tai.Transforms.ProductSymbolsByVenue.all(products)
-    groups = config.advisor_groups |> Enum.map(&build(&1, venue_indexed_symbols, products))
+  @spec parse_groups(config, provider) :: {:ok, [advisor_group]} | {:error, map}
+  def parse_groups(%Tai.Config{} = config, provider \\ Tai.AdvisorGroups.RichConfig) do
+    venue_indexed_symbols = Tai.Transforms.ProductSymbolsByVenue.all(provider.products)
+    groups = config.advisor_groups |> Enum.map(&build(&1, provider, venue_indexed_symbols))
     errors = groups |> Enum.reduce(%{}, &validate/2)
 
     if Enum.empty?(errors), do: {:ok, groups}, else: {:error, errors}
   end
 
-  defp build({id, config}, venue_indexed_symbols, products) do
-    products_query = config |> Keyword.get(:products, "")
+  defp build({id, group_config}, provider, venue_indexed_symbols) do
+    products_query = group_config |> Keyword.get(:products, "")
     filtered_venue_indexed_symbols = Juice.squeeze(venue_indexed_symbols, products_query)
-    filtered_products = filtered_venue_indexed_symbols |> filter_products(products)
+    filtered_products = filtered_venue_indexed_symbols |> filter_products(provider.products)
+    rich_config = group_config |> Keyword.get(:config, %{}) |> RichConfig.parse(provider)
 
     %Tai.AdvisorGroup{
       id: id,
-      start_on_boot: !!(config |> Keyword.get(:start_on_boot)),
-      advisor: config |> Keyword.get(:advisor),
-      factory: config |> Keyword.get(:factory),
+      start_on_boot: !!(group_config |> Keyword.get(:start_on_boot)),
+      advisor: group_config |> Keyword.get(:advisor),
+      factory: group_config |> Keyword.get(:factory),
       products: filtered_products,
-      config: config |> Keyword.get(:config, %{}),
-      trades: config |> Keyword.get(:trades, [])
+      config: rich_config,
+      trades: group_config |> Keyword.get(:trades, [])
     }
   end
 

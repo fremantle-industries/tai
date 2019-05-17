@@ -2,11 +2,12 @@ defmodule Tai.Advisors do
   @type config :: Tai.Config.t()
   @type product :: Tai.Venues.Product.t()
   @type advisor_spec :: Tai.Advisor.spec()
+  @type provider :: Tai.AdvisorGroups.RichConfig.provider()
 
-  @spec specs(config, list, [product]) :: [advisor_spec]
-  def specs(config, filters, products \\ Tai.Venues.ProductStore.all()) do
+  @spec specs(config, list, provider) :: [advisor_spec]
+  def specs(config, filters, provider \\ Tai.AdvisorGroups.RichConfigProvider) do
     advisor_id_filter = filters |> Keyword.get(:advisor_id)
-    {:ok, groups} = config |> Tai.AdvisorGroups.Config.parse_groups(products)
+    {:ok, groups} = config |> Tai.AdvisorGroups.Config.parse_groups(provider)
 
     groups
     |> Enum.map(&Tai.AdvisorGroups.specs(&1, filters))

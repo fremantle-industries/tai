@@ -1,10 +1,13 @@
 defmodule Tai.AdvisorGroups.ConfigTest do
   use ExUnit.Case, async: true
 
-  @btc_usdt struct(Tai.Venues.Product, symbol: :btc_usdt, venue_id: :venue_a)
-  @ltc_usdt struct(Tai.Venues.Product, symbol: :ltc_usdt, venue_id: :venue_b)
-  @eth_usdt struct(Tai.Venues.Product, symbol: :eth_usdt, venue_id: :venue_c)
-  @products [@btc_usdt, @ltc_usdt, @eth_usdt]
+  defmodule TestProvider do
+    @btc_usdt struct(Tai.Venues.Product, symbol: :btc_usdt, venue_id: :venue_a)
+    @ltc_usdt struct(Tai.Venues.Product, symbol: :ltc_usdt, venue_id: :venue_b)
+    @eth_usdt struct(Tai.Venues.Product, symbol: :eth_usdt, venue_id: :venue_c)
+
+    def products, do: [@btc_usdt, @ltc_usdt, @eth_usdt]
+  end
 
   test "returns a list of parsed advisor groups" do
     config =
@@ -21,7 +24,7 @@ defmodule Tai.AdvisorGroups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | []]} = Tai.AdvisorGroups.Config.parse_groups(config, @products)
+    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
     assert %Tai.AdvisorGroup{} = group
     assert group.id == :group_a
     assert group.advisor == AdvisorA
@@ -44,7 +47,7 @@ defmodule Tai.AdvisorGroups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, @products)
+    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
     assert [product | []] = group.products
     assert product.venue_id == :venue_a
     assert product.symbol == :btc_usdt
@@ -62,8 +65,29 @@ defmodule Tai.AdvisorGroups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, @products)
+    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
     assert group.start_on_boot == false
+  end
+
+  test "config can substitute rich types" do
+    config =
+      Tai.Config.parse(
+        advisor_groups: %{
+          group_a: [
+            advisor: AdvisorA,
+            factory: TestFactoryA,
+            products: "*",
+            config: %{
+              product_a: {{:venue_a, :btc_usdt}, :product}
+            }
+          ]
+        }
+      )
+
+    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
+    assert %Tai.Venues.Product{} = product_a = group.config.product_a
+    assert product_a.venue_id == :venue_a
+    assert product_a.symbol == :btc_usdt
   end
 
   test "config is an empty map when not present" do
@@ -78,7 +102,7 @@ defmodule Tai.AdvisorGroups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, @products)
+    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
     assert group.config == %{}
   end
 
@@ -94,7 +118,7 @@ defmodule Tai.AdvisorGroups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, @products)
+    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
     assert group.trades == []
   end
 
@@ -109,7 +133,7 @@ defmodule Tai.AdvisorGroups.ConfigTest do
         }
       )
 
-    assert {:error, errors} = Tai.AdvisorGroups.Config.parse_groups(config, @products)
+    assert {:error, errors} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
     assert errors.group_a == [{:advisor, "must be present"}]
   end
 
@@ -124,7 +148,7 @@ defmodule Tai.AdvisorGroups.ConfigTest do
         }
       )
 
-    assert {:error, errors} = Tai.AdvisorGroups.Config.parse_groups(config, @products)
+    assert {:error, errors} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
     assert errors.group_a == [{:factory, "must be present"}]
   end
 end
