@@ -120,6 +120,13 @@ config(:tai, :test_venue_adapters_create_order_error_insufficient_balance, [
 config(:tai, :test_venue_adapters_create_order_error, [:bitmex])
 config(:tai, :test_venue_adapters_cancel_order, [:bitmex])
 config(:tai, :test_venue_adapters_cancel_order_accepted, [:okex_futures, :okex_swap])
+
+config(:tai, :test_venue_adapters_cancel_order_error_timeout, [:bitmex, :okex_futures, :okex_swap])
+
+config(:tai, :test_venue_adapters_cancel_order_error_overloaded, [:bitmex])
+config(:tai, :test_venue_adapters_cancel_order_error_nonce_not_increasing, [:bitmex])
+config(:tai, :test_venue_adapters_cancel_order_error_rate_limited, [:bitmex])
+config(:tai, :test_venue_adapters_cancel_order_error_unhandled, [:bitmex])
 config(:tai, :test_venue_adapters_with_positions, [:bitmex])
 
 config :tai,

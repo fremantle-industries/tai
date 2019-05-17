@@ -35,6 +35,21 @@ defmodule Tai.TestSupport.Helpers do
   def test_venue_adapters_cancel_order_accepted,
     do: :test_venue_adapters_cancel_order_accepted |> filter()
 
+  def test_venue_adapters_cancel_order_error_timeout,
+    do: :test_venue_adapters_cancel_order_error_timeout |> filter()
+
+  def test_venue_adapters_cancel_order_error_overloaded,
+    do: :test_venue_adapters_cancel_order_error_overloaded |> filter()
+
+  def test_venue_adapters_cancel_order_error_nonce_not_increasing,
+    do: :test_venue_adapters_cancel_order_error_nonce_not_increasing |> filter()
+
+  def test_venue_adapters_cancel_order_error_rate_limited,
+    do: :test_venue_adapters_cancel_order_error_rate_limited |> filter()
+
+  def test_venue_adapters_cancel_order_error_unhandled,
+    do: :test_venue_adapters_cancel_order_error_unhandled |> filter()
+
   def test_venue_adapters_with_positions,
     do: :test_venue_adapters_with_positions |> filter()
 

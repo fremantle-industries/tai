@@ -13,9 +13,13 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
     HTTPoison.start()
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order()
+  @timeout_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_timeout()
+  @overloaded_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_overloaded()
+  @nonce_not_increasing_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_nonce_not_increasing()
+  @rate_limited_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_rate_limited()
+  @unhandled_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_unhandled()
 
-  @test_adapters
+  @timeout_test_adapters
   |> Enum.map(fn {_, adapter} ->
     @adapter adapter
 
@@ -27,67 +31,98 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
         enqueued_order = build_enqueued_order(@adapter.id)
 
         use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_#{@error_reason}" do
-          assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+          assert {:ok, order_response} =
+                   Tai.Venue.create_order(enqueued_order, @timeout_test_adapters)
 
           open_order = build_open_order(enqueued_order, order_response)
 
           with_mock HTTPoison,
-            request: fn _url -> {:error, %HTTPoison.Error{reason: @error_reason}} end do
-            assert {:error, reason} = Tai.Venue.cancel_order(open_order, @test_adapters)
+            request: fn _url -> {:error, %HTTPoison.Error{reason: @error_reason}} end,
+            post: fn _url, _body, _headers ->
+              {:error, %HTTPoison.Error{reason: @error_reason}}
+            end do
+            assert {:error, reason} = Tai.Venue.cancel_order(open_order, @timeout_test_adapters)
             assert reason == @error_reason
           end
         end
       end
     end)
+  end)
+
+  @overloaded_test_adapters
+  |> Enum.map(fn {_, adapter} ->
+    @adapter adapter
 
     test "#{adapter.id} overloaded error" do
       enqueued_order = build_enqueued_order(@adapter.id)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_overloaded_error" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, order_response} =
+                 Tai.Venue.create_order(enqueued_order, @overloaded_test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :overloaded}
+        assert Tai.Venue.cancel_order(open_order, @overloaded_test_adapters) ==
+                 {:error, :overloaded}
       end
     end
+  end)
+
+  @nonce_not_increasing_test_adapters
+  |> Enum.map(fn {_, adapter} ->
+    @adapter adapter
 
     test "#{adapter.id} nonce not increasing error" do
       enqueued_order = build_enqueued_order(@adapter.id)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_nonce_not_increasing_error" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, order_response} =
+                 Tai.Venue.create_order(enqueued_order, @nonce_not_increasing_test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
         assert {:error, {:nonce_not_increasing, msg}} =
-                 Tai.Venue.cancel_order(open_order, @test_adapters)
+                 Tai.Venue.cancel_order(open_order, @nonce_not_increasing_test_adapters)
 
         assert msg != nil
       end
     end
+  end)
+
+  @rate_limited_test_adapters
+  |> Enum.map(fn {_, adapter} ->
+    @adapter adapter
 
     test "#{adapter.id} rate limited error" do
       enqueued_order = build_enqueued_order(@adapter.id)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_rate_limited_error" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, order_response} =
+                 Tai.Venue.create_order(enqueued_order, @rate_limited_test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert Tai.Venue.cancel_order(open_order, @test_adapters) == {:error, :rate_limited}
+        assert Tai.Venue.cancel_order(open_order, @rate_limited_test_adapters) ==
+                 {:error, :rate_limited}
       end
     end
+  end)
+
+  @unhandled_test_adapters
+  |> Enum.map(fn {_, adapter} ->
+    @adapter adapter
 
     test "#{adapter.id} unhandled error" do
       enqueued_order = build_enqueued_order(@adapter.id)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_unhandled_error" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, order_response} =
+                 Tai.Venue.create_order(enqueued_order, @unhandled_test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert {:error, {:unhandled, error}} = Tai.Venue.cancel_order(open_order, @test_adapters)
+        assert {:error, {:unhandled, error}} =
+                 Tai.Venue.cancel_order(open_order, @unhandled_test_adapters)
 
         assert error != nil
       end
@@ -125,14 +160,18 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   end
 
   defp product_symbol(:bitmex), do: :xbth19
-  defp product_symbol(:okex_futures), do: :eth_usd_190426
+  defp product_symbol(:okex_futures), do: :eth_usd_190524
+  defp product_symbol(:okex_swap), do: :eth_usd_swap
   defp product_symbol(_), do: :btc_usd
 
+  defp product_type(:okex_swap), do: :swap
   defp product_type(_), do: :future
 
   defp price(:bitmex), do: Decimal.new("100.5")
   defp price(:okex_futures), do: Decimal.new("100.5")
+  defp price(:okex_swap), do: Decimal.new("100.5")
 
   defp qty(:bitmex), do: Decimal.new(1)
   defp qty(:okex_futures), do: Decimal.new(1)
+  defp qty(:okex_swap), do: Decimal.new(1)
 end

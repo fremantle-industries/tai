@@ -38,9 +38,9 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
     {:ok, response}
   end
 
-  # defp parse_response({:error, :timeout, nil}), do: {:error, :timeout}
-  # defp parse_response({:error, :connect_timeout, nil}), do: {:error, :connect_timeout}
-  # defp parse_response({:error, :overloaded, _}), do: {:error, :overloaded}
-  # defp parse_response({:error, :rate_limited, _}), do: {:error, :rate_limited}
-  # defp parse_response({:error, reason, _}), do: {:error, {:unhandled, reason}}
+  defp parse_response({:error, :timeout}), do: {:error, :timeout}
+  defp parse_response({:error, :connect_timeout}), do: {:error, :connect_timeout}
+  # defp parse_response({:error, :overloaded, do: {:error, :overloaded}
+  # defp parse_response({:error, :rate_limited, do: {:error, :rate_limited}
+  # defp parse_response({:error, reason, do: {:error, {:unhandled, reason}}
 end
