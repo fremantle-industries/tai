@@ -14,7 +14,7 @@ We are working to make `tai` production quality software.
 
 ## What Can I Do? TLDR;
 
-Stream market data to create and manage orders
+Stream market data to create and manage orders with a uniform API across multiple venues
 
 Here's an example of an advisor that logs the spread between multiple products on BitMEX
 
