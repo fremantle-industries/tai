@@ -9,6 +9,10 @@ defmodule Tai.AdvisorGroups.ConfigTest do
     def products, do: [@btc_usdt, @ltc_usdt, @eth_usdt]
   end
 
+  defmodule MyConfig do
+    defstruct ~w(my_symbol)a
+  end
+
   test "returns a list of parsed advisor groups" do
     config =
       Tai.Config.parse(
@@ -88,6 +92,24 @@ defmodule Tai.AdvisorGroups.ConfigTest do
     assert %Tai.Venues.Product{} = product_a = group.config.product_a
     assert product_a.venue_id == :venue_a
     assert product_a.symbol == :btc_usdt
+  end
+
+  test "config can be parsed into a struct" do
+    config =
+      Tai.Config.parse(
+        advisor_groups: %{
+          group_a: [
+            advisor: AdvisorA,
+            factory: TestFactoryA,
+            products: "*",
+            config: {MyConfig, %{my_symbol: :btc_usd}}
+          ]
+        }
+      )
+
+    assert {:ok, [group | _]} = Tai.AdvisorGroups.Config.parse_groups(config, TestProvider)
+    assert %MyConfig{} = group.config
+    assert group.config.my_symbol == :btc_usd
   end
 
   test "config is an empty map when not present" do

@@ -19,7 +19,7 @@ defmodule Tai.AdvisorGroups.Config do
     products_query = group_config |> Keyword.get(:products, "")
     filtered_venue_indexed_symbols = Juice.squeeze(venue_indexed_symbols, products_query)
     filtered_products = filtered_venue_indexed_symbols |> filter_products(provider.products)
-    rich_config = group_config |> Keyword.get(:config, %{}) |> RichConfig.parse(provider)
+    rich_config = group_config |> parse_config(provider)
 
     %Tai.AdvisorGroup{
       id: id,
@@ -30,6 +30,15 @@ defmodule Tai.AdvisorGroups.Config do
       config: rich_config,
       trades: group_config |> Keyword.get(:trades, [])
     }
+  end
+
+  defp parse_config(group_config, provider) do
+    group_config
+    |> Keyword.get(:config, %{})
+    |> case do
+      {s, c} -> struct!(s, c |> RichConfig.parse(provider))
+      c -> c |> RichConfig.parse(provider)
+    end
   end
 
   defp filter_products(filtered_venue_indexed_symbols, products) do
