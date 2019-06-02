@@ -23,13 +23,13 @@ defmodule Tai.Venues.BootTest do
   describe ".run success" do
     setup [:mock_products, :mock_asset_balances, :mock_maker_taker_fees]
 
-    @adapter %Tai.Venues.Adapter{
-      id: @venue_id,
-      adapter: Tai.VenueAdapters.Mock,
-      products: "* -ltc_usdt",
-      accounts: %{main: %{}},
-      timeout: @timeout
-    }
+    @adapter struct(Tai.Venues.Adapter, %{
+               id: @venue_id,
+               adapter: Tai.VenueAdapters.Mock,
+               products: "* -ltc_usdt",
+               accounts: %{main: %{}},
+               timeout: @timeout
+             })
 
     test "hydrates filtered products" do
       assert {:ok, %Tai.Venues.Adapter{}} = Tai.Venues.Boot.run(@adapter)
@@ -99,13 +99,14 @@ defmodule Tai.Venues.BootTest do
 
   describe ".run products hydrate error" do
     test "returns an error tuple" do
-      adapter = %Tai.Venues.Adapter{
-        id: :mock_boot,
-        adapter: Tai.VenueAdapters.Mock,
-        products: "*",
-        accounts: %{},
-        timeout: @timeout
-      }
+      adapter =
+        struct(Tai.Venues.Adapter, %{
+          id: :mock_boot,
+          adapter: Tai.VenueAdapters.Mock,
+          products: "*",
+          accounts: %{},
+          timeout: @timeout
+        })
 
       assert {:error, result} = Tai.Venues.Boot.run(adapter)
       assert {result_adapter, reasons} = result
@@ -118,13 +119,14 @@ defmodule Tai.Venues.BootTest do
     setup [:mock_products, :mock_maker_taker_fees]
 
     test "returns an error" do
-      adapter = %Tai.Venues.Adapter{
-        id: :mock_boot,
-        adapter: Tai.VenueAdapters.Mock,
-        products: "*",
-        accounts: %{main: %{}},
-        timeout: @timeout
-      }
+      adapter =
+        struct(Tai.Venues.Adapter, %{
+          id: :mock_boot,
+          adapter: Tai.VenueAdapters.Mock,
+          products: "*",
+          accounts: %{main: %{}},
+          timeout: @timeout
+        })
 
       assert {:error, result} = Tai.Venues.Boot.run(adapter)
       assert {result_adapter, reasons} = result
@@ -137,13 +139,14 @@ defmodule Tai.Venues.BootTest do
     setup [:mock_products, :mock_asset_balances]
 
     test "returns an error" do
-      adapter = %Tai.Venues.Adapter{
-        id: :mock_boot,
-        adapter: Tai.VenueAdapters.Mock,
-        products: "*",
-        accounts: %{main: %{}},
-        timeout: @timeout
-      }
+      adapter =
+        struct(Tai.Venues.Adapter, %{
+          id: :mock_boot,
+          adapter: Tai.VenueAdapters.Mock,
+          products: "*",
+          accounts: %{main: %{}},
+          timeout: @timeout
+        })
 
       assert {:error, result} = Tai.Venues.Boot.run(adapter)
       assert {result_adapter, reasons} = result

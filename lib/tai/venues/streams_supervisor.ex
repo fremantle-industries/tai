@@ -1,6 +1,8 @@
 defmodule Tai.Venues.StreamsSupervisor do
   use DynamicSupervisor
 
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
   @type null_supervisor :: Tai.Venues.NullStreamSupervisor
 
@@ -14,14 +16,18 @@ defmodule Tai.Venues.StreamsSupervisor do
 
   @spec start_stream(
           stream_supervisor :: atom | null_supervisor,
-          venue_id :: atom,
+          venue_id :: venue_id,
+          channels :: [channel],
           accounts :: map,
           products :: [product]
         ) :: DynamicSupervisor.on_start_child()
-  def start_stream(Tai.Venues.NullStreamSupervisor, _, _, _), do: :ignore
+  def start_stream(Tai.Venues.NullStreamSupervisor, _, _, _, _), do: :ignore
 
-  def start_stream(stream_supervisor, venue_id, accounts, products) do
-    spec = {stream_supervisor, [venue_id: venue_id, accounts: accounts, products: products]}
+  def start_stream(stream_supervisor, venue_id, channels, accounts, products) do
+    spec =
+      {stream_supervisor,
+       [venue_id: venue_id, channels: channels, accounts: accounts, products: products]}
+
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 end

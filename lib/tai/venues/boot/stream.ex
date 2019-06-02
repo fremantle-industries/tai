@@ -7,6 +7,7 @@ defmodule Tai.Venues.Boot.Stream do
     Tai.Venues.StreamsSupervisor.start_stream(
       adapter.adapter.stream_supervisor,
       adapter.id,
+      adapter.channels,
       adapter.accounts,
       products
     )

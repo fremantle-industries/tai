@@ -1,18 +1,21 @@
 defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   use Supervisor
 
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
 
-  @spec start_link(venue_id: atom, accounts: map, products: [product]) :: Supervisor.on_start()
-  def start_link([venue_id: venue_id, accounts: _, products: _] = args) do
+  @spec start_link(venue_id: venue_id, channels: [channel], accounts: map, products: [product]) ::
+          Supervisor.on_start()
+  def start_link([venue_id: venue_id, channels: _, accounts: _, products: _] = args) do
     Supervisor.start_link(__MODULE__, args, name: :"#{__MODULE__}_#{venue_id}")
   end
 
   # TODO: Make this configurable
   @base_url "wss://stream.binance.com:9443/stream"
 
-  def init(venue_id: venue_id, accounts: accounts, products: products) do
-    # TODO: Potentially this could use new order books? Send the change quote 
+  def init(venue_id: venue_id, channels: _, accounts: accounts, products: products) do
+    # TODO: Potentially this could use new order books? Send the change quote
     # event to subscribing advisors?
     order_books =
       products

@@ -3,18 +3,20 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
   alias Tai.VenueAdapters.OkEx.Stream
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
 
-  @spec start_link(venue_id: atom, accounts: map, products: [product]) :: Supervisor.on_start()
-  def start_link([venue_id: venue_id, accounts: _, products: _] = args) do
+  @spec start_link(venue_id: atom, channels: [channel], accounts: map, products: [product]) ::
+          Supervisor.on_start()
+  def start_link([venue_id: venue_id, channels: _, accounts: _, products: _] = args) do
     Supervisor.start_link(__MODULE__, args, name: :"#{__MODULE__}_#{venue_id}")
   end
 
   # TODO: Make this configurable
   @endpoint "wss://real.okex.com:10442/ws/v3"
 
-  def init(venue_id: venue_id, accounts: accounts, products: products) do
-    # TODO: Potentially this could use new order books? Send the change quote 
+  def init(venue_id: venue_id, channels: channels, accounts: accounts, products: products) do
+    # TODO: Potentially this could use new order books? Send the change quote
     # event to subscribing advisors?
     order_books =
       products
@@ -52,6 +54,7 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
        [
          endpoint: @endpoint,
          venue: venue_id,
+         channels: channels,
          account: accounts |> Map.to_list() |> List.first(),
          products: products
        ]}

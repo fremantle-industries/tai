@@ -3,6 +3,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   alias Tai.VenueAdapters.Mock
   require Logger
 
+  @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
   @type msg :: map
   @type account_config :: map
@@ -15,10 +16,11 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   @spec start_link(
           url: String.t(),
           venue_id: venue_id,
+          channels: [channel],
           account: {account_id, account_config} | nil,
           products: [product]
         ) :: {:ok, pid}
-  def start_link(url: url, venue_id: venue_id, account: _, products: _) do
+  def start_link(url: url, venue_id: venue_id, channels: _, account: _, products: _) do
     conn = %Mock.Stream.Connection{venue_id: venue_id}
     WebSockex.start_link(url, __MODULE__, conn, name: venue_id |> to_name)
   end

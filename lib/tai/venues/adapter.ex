@@ -1,6 +1,7 @@
 defmodule Tai.Venues.Adapter do
   alias Tai.Trading.OrderResponses
 
+  @type channel :: atom
   @type venue_id :: atom
   @type account_id :: atom
   @type credentials :: map
@@ -24,8 +25,9 @@ defmodule Tai.Venues.Adapter do
   @type amend_order_error_reason :: shared_error_reason | :not_found | :not_supported
   @type cancel_order_error_reason :: shared_error_reason | :not_found
   @type t :: %Tai.Venues.Adapter{
-          id: :atom,
-          adapter: :atom,
+          id: atom,
+          adapter: atom,
+          channels: [channel],
           products: String.t(),
           accounts: map,
           timeout: non_neg_integer
@@ -47,6 +49,6 @@ defmodule Tai.Venues.Adapter do
   @callback cancel_order(order, credentials) ::
               {:ok, cancel_response} | {:error, cancel_order_error_reason}
 
-  @enforce_keys ~w(id adapter products accounts timeout)a
-  defstruct ~w(id adapter products accounts timeout)a
+  @enforce_keys ~w(id adapter channels products accounts timeout)a
+  defstruct ~w(id adapter channels products accounts timeout)a
 end

@@ -13,6 +13,7 @@ defmodule Tai.Venues.Config do
             adapter = %Tai.Venues.Adapter{
               id: id,
               adapter: Keyword.fetch!(params, :adapter),
+              channels: Keyword.get(params, :channels, []),
               products: Keyword.get(params, :products, "*"),
               accounts: Keyword.get(params, :accounts, %{}),
               timeout: Keyword.get(params, :timeout, config.adapter_timeout)
