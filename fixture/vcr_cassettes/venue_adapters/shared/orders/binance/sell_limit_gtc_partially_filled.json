@@ -1,0 +1,42 @@
+[
+  {
+    "request": {
+      "body": "price=0.01519&quantity=0.2&recvWindow=1000&side=SELL&symbol=LTCBTC&timeInForce=GTC&timestamp=1559934880172&type=LIMIT&signature=***",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v3/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"symbol\":\"LTCBTC\",\"orderId\":167975617,\"clientOrderId\":\"6D6pFt9JcLbpNLqKreyD5B\",\"transactTime\":1559948880408,\"price\":\"0.01519000\",\"origQty\":\"0.20000000\",\"executedQty\":\"0.15000000\",\"cummulativeQuoteQty\":\"0.00303800\",\"status\":\"PARTIALLY_FILLED\",\"timeInForce\":\"GTC\",\"type\":\"LIMIT\",\"side\":\"SELL\",\"fills\":[{\"price\":\"0.01519000\",\"qty\":\"0.15000000\",\"commission\":\"0.00000304\",\"commissionAsset\":\"BTC\",\"tradeId\":27647786}]}",
+      "headers": {
+        "Content-Type": "application/json;charset=utf-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Fri, 07 Jun 2019 19:41:20 GMT",
+        "Server": "nginx",
+        "Vary": "Accept-Encoding",
+        "X-MBX-USED-WEIGHT": "31",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Miss from cloudfront",
+        "Via": "1.1 b48dedcc55e63f14261aa92cf2d61522.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "TX3uvSFSq67KkjfXoZTZMvntqaDSIBc_6e-_jieoe1XrlgrZuTu5ZA=="
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

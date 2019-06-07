@@ -3,16 +3,8 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   Create orders for the Binance adapter
   """
 
-  # @type credentials :: Tai.Venues.Adapter.credentials()
-  # @type order :: Tai.Trading.Order.t()
-  # @type response :: Tai.Trading.OrderResponses.Create.t()
-  # @type reason ::
-  #         :timeout
-  #         | :connect_timeout
-  #         | :overloaded
-  #         | :insufficient_balance
-  #         | {:nonce_not_increasing, msg :: String.t()}
-  #         | {:unhandled, term}
+  alias Tai.VenueAdapters.Binance.OrderStatus
+  alias Tai.Utils
 
   @limit "LIMIT"
 
@@ -42,22 +34,14 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   defp to_venue_time_in_force(:fok), do: "FOK"
   defp to_venue_time_in_force(:ioc), do: "IOC"
 
-  defp from_venue_status("EXPIRED"), do: :expired
-  defp from_venue_status("NEW"), do: :open
-
+  defp leaves_qty(:filled, _, _), do: Decimal.new(0)
   defp leaves_qty(:expired, _, _), do: Decimal.new(0)
-
-  defp leaves_qty(:open, original_size, cumulative_qty),
-    do: original_size |> Decimal.sub(cumulative_qty)
+  defp leaves_qty(:open, orig_qty, cum_qty), do: orig_qty |> Decimal.sub(cum_qty)
 
   defp parse_response({:ok, %ExBinance.Responses.CreateOrder{} = binance_response}, _) do
     received_at = Timex.now()
-
-    # avg_price =
-    #   (venue_order.avg_px && Tai.Utils.Decimal.from(venue_order.avg_px)) || Decimal.new(0)
-    # TODO: Might need to include fills to calculate this
-    avg_price = Decimal.new(0)
-    status = binance_response.status |> from_venue_status()
+    avg_price = binance_response.fills |> calc_avg_price()
+    status = binance_response.status |> OrderStatus.from_venue()
     original_size = binance_response.orig_qty |> Decimal.new() |> Decimal.reduce()
     cumulative_qty = binance_response.executed_qty |> Decimal.new() |> Decimal.reduce()
     leaves_qty = leaves_qty(status, original_size, cumulative_qty)
@@ -80,10 +64,29 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   defp parse_response({:error, :timeout} = error, _), do: error
   defp parse_response({:error, :connect_timeout} = error, _), do: error
 
-  # defp parse_response({:error, :rate_limited, _}, _), do: {:error, :rate_limited}
-
   defp parse_response({:error, {:insufficient_balance, _}}, _),
     do: {:error, :insufficient_balance}
 
   defp parse_response({:error, reason}, _), do: {:error, {:unhandled, reason}}
+
+  defp calc_avg_price([]), do: Decimal.new(0)
+
+  defp calc_avg_price(fills) do
+    {sum_price, sum_qty} =
+      fills
+      |> Enum.reduce(
+        {Decimal.new(0), Decimal.new(0)},
+        fn %{"price" => raw_price, "qty" => raw_qty}, {sum_price, sum_qty} ->
+          price = raw_price |> Utils.Decimal.from()
+          qty = raw_qty |> Utils.Decimal.from()
+
+          new_sum_price = price |> Decimal.mult(qty) |> Decimal.add(sum_price)
+          new_sum_qty = qty |> Decimal.add(sum_qty)
+
+          {new_sum_price, new_sum_qty}
+        end
+      )
+
+    sum_price |> Decimal.div(sum_qty)
+  end
 end

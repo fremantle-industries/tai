@@ -32,7 +32,6 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
         assert order_response.id != nil
         assert order_response.status == :canceled
         assert order_response.leaves_qty == Decimal.new(0)
-        assert %DateTime{} = order_response.venue_timestamp
       end
     end
   end)
@@ -65,6 +64,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       product_symbol: venue_id |> product_symbol,
       product_type: venue_id |> product_type,
       side: :buy,
+      type: :limit,
       price: venue_id |> price(),
       qty: venue_id |> qty(),
       time_in_force: :gtc,
@@ -80,6 +80,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       product_symbol: order.venue_id |> product_symbol,
       product_type: order.venue_id |> product_type,
       side: :buy,
+      type: :limit,
       price: order.venue_id |> price(),
       qty: order.venue_id |> qty(),
       time_in_force: :gtc,
@@ -90,16 +91,20 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   defp product_symbol(:bitmex), do: :xbth19
   defp product_symbol(:okex_swap), do: :eth_usd_swap
   defp product_symbol(:okex_futures), do: :eth_usd_190426
-  defp product_symbol(_), do: :btc_usd
+  defp product_symbol(_), do: :ltc_btc
 
+  defp product_type(:bitmex), do: :future
   defp product_type(:okex_swap), do: :swap
-  defp product_type(_), do: :future
+  defp product_type(:okex_futures), do: :future
+  defp product_type(_), do: :spot
 
   defp price(:bitmex), do: Decimal.new("100.5")
   defp price(:okex_swap), do: Decimal.new("100.5")
   defp price(:okex_futures), do: Decimal.new("100.5")
+  defp price(_), do: Decimal.new("0.007")
 
   defp qty(:bitmex), do: Decimal.new(1)
   defp qty(:okex_swap), do: Decimal.new(5)
   defp qty(:okex_futures), do: Decimal.new(5)
+  defp qty(_), do: Decimal.new("0.5")
 end

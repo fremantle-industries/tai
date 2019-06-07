@@ -1,0 +1,82 @@
+[
+  {
+    "request": {
+      "body": "price=0.007&quantity=0.5&recvWindow=1000&side=BUY&symbol=LTCBTC&timeInForce=GTC&timestamp=1560147129523&type=LIMIT&signature=***",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v3/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"symbol\":\"LTCBTC\",\"orderId\":167958809,\"clientOrderId\":\"iNm6l78Ru9goUUlkU9e5wC\",\"transactTime\":1560147129749,\"price\":\"0.00700000\",\"origQty\":\"0.50000000\",\"executedQty\":\"0.00000000\",\"cummulativeQuoteQty\":\"0.00000000\",\"status\":\"NEW\",\"timeInForce\":\"GTC\",\"type\":\"LIMIT\",\"side\":\"BUY\",\"fills\":[]}",
+      "headers": {
+        "Content-Type": "application/json;charset=utf-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Mon, 10 Jun 2019 06:12:09 GMT",
+        "Server": "nginx",
+        "Vary": "Accept-Encoding",
+        "X-MBX-USED-WEIGHT": "6",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Miss from cloudfront",
+        "Via": "1.1 82ee5868f58a60e97a683c1fda270de3.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "PcvRKwwpF4FjCke429UUKdr93BIEodO-3cd8uF6X521NaNVatX_G8g=="
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "orderId=167958809&recvWindow=1000&symbol=LTCBTC&timestamp=1560147129824&signature=***",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "delete",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v3/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"symbol\":\"LTCBTC\",\"origClientOrderId\":\"iNm6l78Ru9goUUlkU9e5wC\",\"orderId\":167958809,\"clientOrderId\":\"MIB1ZYj6t11zdbPpTrKajj\",\"price\":\"0.00700000\",\"origQty\":\"0.50000000\",\"executedQty\":\"0.00000000\",\"cummulativeQuoteQty\":\"0.00000000\",\"status\":\"CANCELED\",\"timeInForce\":\"GTC\",\"type\":\"LIMIT\",\"side\":\"BUY\"}",
+      "headers": {
+        "Content-Type": "application/json;charset=utf-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Mon, 10 Jun 2019 06:12:10 GMT",
+        "Server": "nginx",
+        "Vary": "Accept-Encoding",
+        "X-MBX-USED-WEIGHT": "7",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Miss from cloudfront",
+        "Via": "1.1 82ee5868f58a60e97a683c1fda270de3.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "XSH8e3cpHmEYOTDmEsX6DAjwqU4O0xjdNKx9ukBY-LjZVElfht-7pw=="
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]
