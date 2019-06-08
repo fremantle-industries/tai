@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
 
     order.product_symbol
     |> to_venue_symbol
-    |> ExBinance.Rest.Orders.create_order(
+    |> ExBinance.Private.create_order(
       venue_side,
       @limit,
       order.qty,
@@ -50,7 +50,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   defp leaves_qty(:open, original_size, cumulative_qty),
     do: original_size |> Decimal.sub(cumulative_qty)
 
-  defp parse_response({:ok, %ExBinance.OrderResponse{} = binance_response}, _) do
+  defp parse_response({:ok, %ExBinance.Responses.CreateOrder{} = binance_response}, _) do
     received_at = Timex.now()
 
     # avg_price =
