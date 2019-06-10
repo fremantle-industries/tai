@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Binance.AssetBalancesTest do
+defmodule Tai.Venues.Adapters.Binance.AssetBalancesTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 

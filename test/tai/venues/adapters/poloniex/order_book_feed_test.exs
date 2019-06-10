@@ -1,7 +1,5 @@
-defmodule Tai.VenueAdapters.Poloniex.OrderBookFeedTest do
+defmodule Tai.Venues.Adapters.Poloniex.OrderBookFeedTest do
   use ExUnit.Case
-  doctest Tai.VenueAdapters.Poloniex.OrderBookFeed
-
   import ExUnit.CaptureLog
 
   @currency_pair_channel_id_mappings %{

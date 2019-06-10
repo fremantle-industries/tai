@@ -1,8 +1,6 @@
-defmodule Tai.VenueAdapters.Gdax.OrderBookFeedTest do
+defmodule Tai.Venues.Adapters.Gdax.OrderBookFeedTest do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  doctest Tai.VenueAdapters.Gdax.OrderBookFeed
-
   import ExUnit.CaptureLog
 
   def send_feed_l2update(pid, product_id, changes) do

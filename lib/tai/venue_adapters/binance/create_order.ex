@@ -35,8 +35,8 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   end
 
   defdelegate to_venue_symbol(product_symbol),
-    to: Tai.VenueAdapters.Binance.SymbolMapping,
-    as: :to_binance
+    to: Tai.VenueAdapters.Binance.Products,
+    as: :to_symbol
 
   defp to_venue_time_in_force(:gtc), do: "GTC"
   defp to_venue_time_in_force(:fok), do: "FOK"

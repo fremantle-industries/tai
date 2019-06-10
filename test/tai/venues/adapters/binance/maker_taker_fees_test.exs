@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Binance.MakerTakerFeesTest do
+defmodule Tai.Venues.Adapters.Binance.MakerTakerFeesTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 

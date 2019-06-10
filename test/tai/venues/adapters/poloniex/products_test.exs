@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Poloniex.ProductsTest do
+defmodule Tai.Venues.Adapters.Poloniex.ProductsTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 

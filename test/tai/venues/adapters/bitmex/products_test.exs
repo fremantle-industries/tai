@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Bitmex.ProductsTest do
+defmodule Tai.Venues.Adapters.Bitmex.ProductsTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   import Mock
