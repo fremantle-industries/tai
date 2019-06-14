@@ -9,12 +9,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     @type channel_name :: atom
     @type t :: %State{
             venue: venue_id,
+            channels: [channel_name],
             account: {account_id, map} | nil,
             products: [product]
           }
 
-    @enforce_keys ~w(venue products)a
-    defstruct ~w(venue account products)a
+    @enforce_keys ~w(venue channels products)a
+    defstruct ~w(venue channels account products)a
   end
 
   @type product :: Venues.Product.t()
@@ -27,38 +28,18 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
           venue: venue_id,
           account: {account_id, account_config} | nil,
           products: [product]
-        ) :: {:ok, pid}
-  def start_link(url: url, venue: venue, account: nil, products: products) do
-    conn = %State{venue: venue, products: products}
-    name = venue |> to_name
-    {:ok, pid} = WebSockex.start_link(url, __MODULE__, conn, name: name)
-    subscribe_shared(pid, products)
-    {:ok, pid}
-  end
-
+        ) :: {:ok, pid} | {:error, term}
   def start_link(
         url: url,
         venue: venue,
-        account: {_account_id, %{api_key: api_key, api_secret: api_secret}} = account,
+        channels: channels,
+        account: account,
         products: products
       ) do
-    conn = %State{venue: venue, account: account, products: products}
+    state = %State{venue: venue, channels: channels, account: account, products: products}
     name = venue |> to_name
-    nonce = ExBitmex.Auth.nonce()
-    api_signature = ExBitmex.Auth.sign(api_secret, "GET", "/realtime", nonce, "")
-
-    auth_headers = [
-      "api-key": api_key,
-      "api-signature": api_signature,
-      "api-expires": nonce
-    ]
-
-    {:ok, pid} =
-      WebSockex.start_link(url, __MODULE__, conn, name: name, extra_headers: auth_headers)
-
-    subscribe_shared(pid, products)
-    subscribe_auth(pid)
-    {:ok, pid}
+    headers = auth_headers(state.account)
+    WebSockex.start_link(url, __MODULE__, state, name: name, extra_headers: headers)
   end
 
   @spec to_name(venue_id) :: atom
@@ -66,6 +47,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   def handle_connect(_conn, state) do
     Events.info(%Events.StreamConnect{venue: state.venue})
+    send(self(), :init_subscriptions)
     {:ok, state}
   end
 
@@ -78,6 +60,82 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:ok, state}
   end
 
+  @optional_channels [
+    :trades,
+    :connected_stats,
+    :liquidations,
+    :notifications,
+    :funding,
+    :insurance,
+    :settlement
+  ]
+  def handle_info(:init_subscriptions, state) do
+    if state.account, do: send(self(), :login)
+    send(self(), {:subscribe, :depth})
+
+    state.channels
+    |> Enum.each(fn c ->
+      if Enum.member?(@optional_channels, c) do
+        send(self(), {:subscribe, c})
+      else
+        Events.warn(%Events.StreamChannelInvalid{
+          venue: state.venue,
+          name: c,
+          available: @optional_channels
+        })
+      end
+    end)
+
+    {:ok, state}
+  end
+
+  def handle_info(:login, state) do
+    msg = %{"op" => "subscribe", "args" => ["order"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :depth}, state) do
+    args = state.products |> Enum.map(fn p -> "orderBookL2_25:#{p.venue_symbol}" end)
+    msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :trades}, state) do
+    args = state.products |> Enum.map(fn p -> "trade:#{p.venue_symbol}" end)
+    msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :connected_stats}, state) do
+    msg = %{"op" => "subscribe", "args" => ["connected"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :liquidations}, state) do
+    msg = %{"op" => "subscribe", "args" => ["liquidation"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :notifications}, state) do
+    msg = %{"op" => "subscribe", "args" => ["publicNotifications"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :funding}, state) do
+    msg = %{"op" => "subscribe", "args" => ["funding"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :insurance}, state) do
+    msg = %{"op" => "subscribe", "args" => ["insurance"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :settlement}, state) do
+    msg = %{"op" => "subscribe", "args" => ["settlement"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
   def handle_frame({:text, msg}, state) do
     msg
     |> Jason.decode!()
@@ -88,57 +146,18 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   def handle_frame(_frame, state), do: {:ok, state}
 
-  defp subscribe_shared(pid, products) do
-    subscribe_order_books(pid, products)
-    subscribe_trades(pid, products)
-    subscribe_interesting(pid)
+  defp auth_headers({_account_id, %{api_key: api_key, api_secret: api_secret}}) do
+    nonce = ExBitmex.Auth.nonce()
+    api_signature = ExBitmex.Auth.sign(api_secret, "GET", "/realtime", nonce, "")
+
+    [
+      "api-key": api_key,
+      "api-signature": api_signature,
+      "api-expires": nonce
+    ]
   end
 
-  defp subscribe_order_books(pid, products) do
-    args = Enum.map(products, fn p -> "orderBookL2_25:#{p.venue_symbol}" end)
-    msg = %{"op" => "subscribe", "args" => args}
-    Tai.WebSocket.send_json_msg(pid, msg)
-  end
-
-  defp subscribe_trades(pid, products) do
-    args = Enum.map(products, fn p -> "trade:#{p.venue_symbol}" end)
-    msg = %{"op" => "subscribe", "args" => args}
-    Tai.WebSocket.send_json_msg(pid, msg)
-  end
-
-  defp subscribe_interesting(pid) do
-    msg = %{
-      "op" => "subscribe",
-      "args" => [
-        "connected",
-        "liquidation",
-        "publicNotifications"
-        # NOTE:  These aren't required for now. It would be nice if the channels could be configured
-        # "funding",
-        # "insurance",
-        # "settlement",
-      ]
-    }
-
-    Tai.WebSocket.send_json_msg(pid, msg)
-  end
-
-  defp subscribe_auth(pid) do
-    msg = %{
-      "op" => "subscribe",
-      "args" => [
-        "order"
-        # NOTE:  These aren't required for now. It would be nice if the channels could be configured
-        # "execution",
-        # "margin",
-        # "position",
-        # "transact",
-        # "wallet"
-      ]
-    }
-
-    Tai.WebSocket.send_json_msg(pid, msg)
-  end
+  defp auth_headers(nil), do: []
 
   @spec handle_msg(msg :: map, venue_id) :: no_return
   defp handle_msg(msg, venue)
