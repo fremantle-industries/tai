@@ -70,6 +70,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     :settlement
   ]
   def handle_info(:init_subscriptions, state) do
+    schedule_heartbeat()
     if state.account, do: send(self(), :login)
     send(self(), {:subscribe, :depth})
 
@@ -136,6 +137,15 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
+  def handle_info(:heartbeat, state) do
+    {:reply, :ping, state}
+  end
+
+  def handle_pong(:pong, state) do
+    schedule_heartbeat()
+    {:ok, state}
+  end
+
   def handle_frame({:text, msg}, state) do
     msg
     |> Jason.decode!()
@@ -158,6 +168,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   defp auth_headers(nil), do: []
+
+  @heartbeat_ms 20_000
+  defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
 
   @spec handle_msg(msg :: map, venue_id) :: no_return
   defp handle_msg(msg, venue)
