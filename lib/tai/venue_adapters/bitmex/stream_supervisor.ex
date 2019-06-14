@@ -53,7 +53,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
       {Tai.VenueAdapters.Bitmex.Stream.Connection,
        [
          url: @url,
-         venue_id: venue_id,
+         venue: venue_id,
          account: accounts |> Map.to_list() |> List.first(),
          products: products
        ]}
