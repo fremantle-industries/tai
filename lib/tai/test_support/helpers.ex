@@ -35,6 +35,9 @@ defmodule Tai.TestSupport.Helpers do
   def test_venue_adapters_cancel_order_accepted,
     do: :test_venue_adapters_cancel_order_accepted |> filter()
 
+  def test_venue_adapters_cancel_order_error_not_found,
+    do: :test_venue_adapters_cancel_order_error_not_found |> filter()
+
   def test_venue_adapters_cancel_order_error_timeout,
     do: :test_venue_adapters_cancel_order_error_timeout |> filter()
 

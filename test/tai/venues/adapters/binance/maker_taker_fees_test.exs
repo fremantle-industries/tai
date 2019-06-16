@@ -33,10 +33,7 @@ defmodule Tai.Venues.Adapters.Binance.MakerTakerFeesTest do
   test "returns an error tuple when the timestamp of the local machine is outside the Binance receive window",
        %{adapter: adapter} do
     use_cassette "venue_adapters/shared/maker_taker_fees/binance/error_timestamp_outside_recv_window" do
-      assert Tai.Venue.maker_taker_fees(adapter, :main) == {
-               :error,
-               "Timestamp for this request is outside of the recvWindow."
-             }
+      assert Tai.Venue.maker_taker_fees(adapter, :main) == { :error, :receive_window }
     end
   end
 end

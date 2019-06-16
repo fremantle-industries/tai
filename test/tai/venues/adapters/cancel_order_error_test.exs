@@ -13,11 +13,31 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
     HTTPoison.start()
   end
 
+  @not_found_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_not_found()
   @timeout_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_timeout()
   @overloaded_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_overloaded()
   @nonce_not_increasing_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_nonce_not_increasing()
   @rate_limited_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_rate_limited()
   @unhandled_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_error_unhandled()
+
+  @not_found_test_adapters
+  |> Enum.map(fn {_, adapter} ->
+    @adapter adapter
+
+    test "#{adapter.id} not found error" do
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_error_not_found" do
+        order =
+          struct(Tai.Trading.Order,
+            venue_id: @adapter.id,
+            account_id: :main,
+            product_symbol: :ltc_btc,
+            venue_order_id: "1"
+          )
+
+        assert Tai.Venue.cancel_order(order, @not_found_test_adapters) == {:error, :not_found}
+      end
+    end
+  end)
 
   @timeout_test_adapters
   |> Enum.map(fn {_, adapter} ->
@@ -137,6 +157,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
       product_symbol: venue_id |> product_symbol,
       product_type: venue_id |> product_type,
       side: :buy,
+      type: :limit,
       price: venue_id |> price(),
       qty: venue_id |> qty(),
       time_in_force: :gtc,
@@ -152,6 +173,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
       product_symbol: order.venue_id |> product_symbol,
       product_type: order.venue_id |> product_type,
       side: :buy,
+      type: :limit,
       price: order.venue_id |> price(),
       qty: order.venue_id |> qty(),
       time_in_force: :gtc,
@@ -162,16 +184,19 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   defp product_symbol(:bitmex), do: :xbth19
   defp product_symbol(:okex_futures), do: :eth_usd_190524
   defp product_symbol(:okex_swap), do: :eth_usd_swap
-  defp product_symbol(_), do: :btc_usd
+  defp product_symbol(_), do: :ltc_btc
 
   defp product_type(:okex_swap), do: :swap
+  defp product_type(:binance), do: :spot
   defp product_type(_), do: :future
 
   defp price(:bitmex), do: Decimal.new("100.5")
   defp price(:okex_futures), do: Decimal.new("100.5")
   defp price(:okex_swap), do: Decimal.new("100.5")
+  defp price(:binance), do: Decimal.new("0.007")
 
   defp qty(:bitmex), do: Decimal.new(1)
   defp qty(:okex_futures), do: Decimal.new(1)
   defp qty(:okex_swap), do: Decimal.new(1)
+  defp qty(:binance), do: Decimal.new(1)
 end

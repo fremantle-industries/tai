@@ -1,0 +1,42 @@
+[
+  {
+    "request": {
+      "body": "orderId=1&recvWindow=1000&symbol=LTCBTC&timestamp=1560728627093&signature=***",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "delete",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v3/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"code\":-2011,\"msg\":\"Unknown order sent.\"}",
+      "headers": {
+        "Content-Type": "application/json;charset=utf-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Sun, 16 Jun 2019 23:43:47 GMT",
+        "Server": "nginx",
+        "X-MBX-USED-WEIGHT": "1",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Error from cloudfront",
+        "Via": "1.1 1b74ccf4cb51eacf97a0e6d60ae46a3f.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Pop": "SEA19-C2",
+        "X-Amz-Cf-Id": "bC3GYAKfl6NYm1WjISmG6LCEjj0LpgHaxAv9Lg8RX5EwkJVGxxTIVQ=="
+      },
+      "status_code": 400,
+      "type": "ok"
+    }
+  }
+]

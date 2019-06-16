@@ -8,13 +8,8 @@ defmodule Tai.VenueAdapters.Binance.MakerTakerFees do
       taker = account.taker_commission |> Decimal.new() |> Decimal.div(percent_factor)
       {:ok, {maker, taker}}
     else
-      {:error,
-       {:binance_error,
-        %{
-          "code" => -1021,
-          "msg" => "Timestamp for this request is outside of the recvWindow." = reason
-        }}} ->
-        {:error, reason}
+      {:error, :receive_window} = error ->
+        error
 
       {:error, {:binance_error, %{"code" => -2014, "msg" => "API-key format invalid." = reason}}} ->
         {:error, {:credentials, reason}}

@@ -33,10 +33,7 @@ defmodule Tai.Venues.Adapters.Binance.AssetBalancesTest do
   test "returns an error tuple when the timestamp of the local machine is outside the Binance receive window",
        %{adapter: adapter} do
     use_cassette "venue_adapters/shared/asset_balances/binance/error_timestamp_outside_recv_window" do
-      assert Tai.Venue.asset_balances(adapter, :main) == {
-               :error,
-               "Timestamp for this request is outside of the recvWindow."
-             }
+      assert Tai.Venue.asset_balances(adapter, :main) == {:error, :receive_window}
     end
   end
 end
