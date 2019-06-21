@@ -126,14 +126,10 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       received_at: Timex.now()
     }
 
-    key =
-      {OrderResponses.Amend,
-       %{
-         venue_order_id: order.venue_order_id,
-         price: price
-       }}
+    match_attrs = %{venue_order_id: order.venue_order_id, price: price}
 
-    Mocks.Server.insert(key, order_response)
+    {:amend_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
 
   @spec amend_price_and_qty(order, Decimal.t(), Decimal.t()) :: :ok
@@ -148,15 +144,10 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       received_at: Timex.now()
     }
 
-    key =
-      {OrderResponses.Amend,
-       %{
-         venue_order_id: order.venue_order_id,
-         price: price,
-         qty: qty
-       }}
+    match_attrs = %{venue_order_id: order.venue_order_id, price: price, qty: qty}
 
-    Mocks.Server.insert(key, order_response)
+    {:amend_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
 
   @spec cancel_accepted(venue_order_id) :: :ok

@@ -63,7 +63,9 @@ defmodule Tai.VenueAdapters.Mock do
 
   def amend_order(order, attrs, _credentials) do
     with_mock_server(fn ->
-      {OrderResponses.Amend, attrs |> Map.merge(%{venue_order_id: order.venue_order_id})}
+      match_attrs = Map.merge(attrs, %{venue_order_id: order.venue_order_id})
+
+      {:amend_order, match_attrs}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} -> raise reason

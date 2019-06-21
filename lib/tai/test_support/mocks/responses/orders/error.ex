@@ -27,13 +27,10 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
 
   @spec amend_raise(order, amend_attrs, reason) :: :ok
   def amend_raise(%Tai.Trading.Order{} = order, attrs, reason) do
-    match_attrs =
-      %{venue_order_id: order.venue_order_id}
-      |> Map.merge(attrs)
+    match_attrs = Map.merge(%{venue_order_id: order.venue_order_id}, attrs)
 
-    key = {Tai.Trading.OrderResponses.Amend, match_attrs}
-
-    Mocks.Server.insert(key, {:raise, reason})
+    {:amend_order, match_attrs}
+    |> Mocks.Server.insert({:raise, reason})
   end
 
   @spec cancel_raise(venue_order_id, reason) :: :ok
