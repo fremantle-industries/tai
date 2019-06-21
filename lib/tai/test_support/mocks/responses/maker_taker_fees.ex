@@ -5,9 +5,7 @@ defmodule Tai.TestSupport.Mocks.Responses.MakerTakerFees do
           {maker :: Decimal.t(), taker :: Decimal.t()}
         ) :: :ok
   def for_exchange_and_account(venue_id, account_id, {_, _} = maker_taker_fees) do
-    key = Tai.VenueAdapters.Mock.maker_taker_fees_response_key({venue_id, account_id})
-    :ok = Tai.TestSupport.Mocks.Server.insert(key, maker_taker_fees)
-
-    :ok
+    {:maker_taker_fees, venue_id, account_id}
+    |> Tai.TestSupport.Mocks.Server.insert(maker_taker_fees)
   end
 end

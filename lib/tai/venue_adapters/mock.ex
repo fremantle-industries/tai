@@ -31,8 +31,7 @@ defmodule Tai.VenueAdapters.Mock do
 
   def maker_taker_fees(venue_id, account_id, _credentials) do
     with_mock_server(fn ->
-      {venue_id, account_id}
-      |> maker_taker_fees_response_key()
+      {:maker_taker_fees, venue_id, account_id}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
         {:ok, fees} -> {:ok, fees}
@@ -90,7 +89,4 @@ defmodule Tai.VenueAdapters.Mock do
   def positions(_venue_id, _account_id, _credentials) do
     {:error, :not_supported}
   end
-
-  def maker_taker_fees_response_key({venue_id, account_id}),
-    do: {__MODULE__, :maker_taker_fees, venue_id, account_id}
 end
