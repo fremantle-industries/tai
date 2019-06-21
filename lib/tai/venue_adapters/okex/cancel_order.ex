@@ -1,11 +1,19 @@
 defmodule Tai.VenueAdapters.OkEx.CancelOrder do
+  @moduledoc """
+  Sends a cancel order request to OkEx.
+
+  OkEx uses different API endpoints for each of their
+  product types: futures, swap & spot.  API responses
+  across these products are inconsistent.
+  """
+
   alias Tai.VenueAdapters.OkEx.Products
   alias Tai.Trading.OrderResponses.CancelAccepted
 
   @type order :: Tai.Trading.Order.t()
   @type credentials :: Tai.Venues.Adapter.credentials()
   @type response :: CancelAccepted.t()
-  @type reason :: term
+  @type reason :: :timeout | :connect_timeout | :not_found
 
   @spec cancel_order(order, credentials) :: {:ok, response} | {:error, reason}
   def cancel_order(order, credentials) do
@@ -28,19 +36,24 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
     to: Tai.VenueAdapters.OkEx.Credentials,
     as: :from
 
-  defp parse_response({:ok, %{"order_ids" => [order_id | _]}}) do
+  defp parse_response({:ok, %{"result" => true, "order_ids" => [order_id | _]}}) do
     response = %CancelAccepted{id: order_id, received_at: Timex.now()}
     {:ok, response}
   end
 
-  defp parse_response({:ok, %{"ids" => [order_id | _]}}) do
+  defp parse_response({:ok, %{"result" => "true", "ids" => [order_id | _]}}) do
     response = %CancelAccepted{id: order_id, received_at: Timex.now()}
     {:ok, response}
+  end
+
+  defp parse_response({:ok, %{"result" => false, "error_message" => "error order_ids"}}) do
+    {:error, :not_found}
+  end
+
+  defp parse_response({:ok, %{"result" => "false"}}) do
+    {:error, :not_found}
   end
 
   defp parse_response({:error, :timeout}), do: {:error, :timeout}
   defp parse_response({:error, :connect_timeout}), do: {:error, :connect_timeout}
-  # defp parse_response({:error, :overloaded}), do: {:error, :overloaded}
-  # defp parse_response({:error, :rate_limited}), do: {:error, :rate_limited}
-  # defp parse_response({:error, reason}), do: {:error, {:unhandled, reason}}
 end

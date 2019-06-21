@@ -26,13 +26,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
 
     test "#{adapter.id} not found error" do
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_error_not_found" do
-        order =
-          struct(Tai.Trading.Order,
-            venue_id: @adapter.id,
-            account_id: :main,
-            product_symbol: :ltc_btc,
-            venue_order_id: "1"
-          )
+        order = build_not_found_order(@adapter.id)
 
         assert Tai.Venue.cancel_order(order, @not_found_test_adapters) == {:error, :not_found}
       end
@@ -149,6 +143,17 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
     end
   end)
 
+  defp build_not_found_order(venue_id) do
+    struct(
+      Tai.Trading.Order,
+      venue_id: venue_id,
+      account_id: :main,
+      product_symbol: venue_id |> product_symbol,
+      product_type: venue_id |> product_type,
+      venue_order_id: "1"
+    )
+  end
+
   defp build_enqueued_order(venue_id) do
     struct(Tai.Trading.Order, %{
       client_id: Ecto.UUID.generate(),
@@ -182,7 +187,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   end
 
   defp product_symbol(:bitmex), do: :xbth19
-  defp product_symbol(:okex_futures), do: :eth_usd_190524
+  defp product_symbol(:okex_futures), do: :eth_usd_190628
   defp product_symbol(:okex_swap), do: :eth_usd_swap
   defp product_symbol(_), do: :ltc_btc
 
