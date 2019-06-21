@@ -13,16 +13,15 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
   def create_raise(submission, reason) do
     order = Tai.Trading.OrderSubmissions.Factory.build!(submission)
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: order.product_symbol,
-         price: order.price,
-         size: order.qty,
-         time_in_force: order.time_in_force
-       ]}
+    match_attrs = %{
+      symbol: order.product_symbol,
+      price: order.price,
+      size: order.qty,
+      time_in_force: order.time_in_force
+    }
 
-    Mocks.Server.insert(key, {:raise, reason})
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert({:raise, reason})
   end
 
   @spec amend_raise(order, amend_attrs, reason) :: :ok

@@ -45,13 +45,14 @@ defmodule Tai.VenueAdapters.Mock do
 
   def create_order(%Tai.Trading.Order{} = order, _credentials) do
     with_mock_server(fn ->
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: order.product_symbol,
-         price: order.price,
-         size: order.qty,
-         time_in_force: order.time_in_force
-       ]}
+      match_attrs = %{
+        symbol: order.product_symbol,
+        price: order.price,
+        size: order.qty,
+        time_in_force: order.time_in_force
+      }
+
+      {:create_order, match_attrs}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} -> raise reason

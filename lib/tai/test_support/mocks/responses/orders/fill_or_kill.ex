@@ -22,16 +22,15 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
       received_at: Timex.now()
     }
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: submission.product_symbol,
-         price: submission.price,
-         size: qty,
-         time_in_force: :fok
-       ]}
+    match_attrs = %{
+      symbol: submission.product_symbol,
+      price: submission.price,
+      size: qty,
+      time_in_force: :fok
+    }
 
-    Mocks.Server.insert(key, order_response)
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
 
   @spec expired(submission) :: insert_result
@@ -50,16 +49,15 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
       received_at: Timex.now()
     }
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: submission.product_symbol,
-         price: submission.price,
-         size: submission.qty,
-         time_in_force: :fok
-       ]}
+    match_attrs = %{
+      symbol: submission.product_symbol,
+      price: submission.price,
+      size: submission.qty,
+      time_in_force: :fok
+    }
 
-    Mocks.Server.insert(key, order_response)
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
 
   @spec filled(submission) :: insert_result

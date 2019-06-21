@@ -7,6 +7,14 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.ImmediateOrCancel do
   @type venue_order_id :: Tai.Trading.Order.venue_order_id()
   @type insert_result :: :ok
 
+  @spec expired(submission) :: insert_result
+  def expired(submission), do: expired(Ecto.UUID.generate(), submission)
+
+  @spec expired(venue_order_id, submission) :: insert_result
+  def expired(venue_order_id, submission) do
+    expired(venue_order_id, submission, %{})
+  end
+
   @spec expired(venue_order_id, submission, map) :: insert_result
   def expired(venue_order_id, submission, attrs) do
     qty = submission.qty
@@ -24,25 +32,19 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.ImmediateOrCancel do
       received_at: Timex.now()
     }
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: submission.product_symbol,
-         price: submission.price,
-         size: qty,
-         time_in_force: :ioc
-       ]}
+    match_attrs = %{
+      symbol: submission.product_symbol,
+      price: submission.price,
+      size: qty,
+      time_in_force: :ioc
+    }
 
-    Mocks.Server.insert(key, order_response)
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
 
-  @spec expired(venue_order_id, submission) :: insert_result
-  def expired(venue_order_id, submission) do
-    expired(venue_order_id, submission, %{})
-  end
-
-  @spec expired(submission) :: insert_result
-  def expired(submission), do: expired(Ecto.UUID.generate(), submission)
+  @spec filled(submission) :: insert_result
+  def filled(submission), do: filled(Ecto.UUID.generate(), submission)
 
   @spec filled(venue_order_id, submission) :: insert_result
   def filled(venue_order_id, submission) do
@@ -57,18 +59,14 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.ImmediateOrCancel do
       received_at: Timex.now()
     }
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: submission.product_symbol,
-         price: submission.price,
-         size: submission.qty,
-         time_in_force: :ioc
-       ]}
+    match_attrs = %{
+      symbol: submission.product_symbol,
+      price: submission.price,
+      size: submission.qty,
+      time_in_force: :ioc
+    }
 
-    Mocks.Server.insert(key, order_response)
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
-
-  @spec filled(submission) :: insert_result
-  def filled(submission), do: filled(Ecto.UUID.generate(), submission)
 end

@@ -17,16 +17,15 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       received_at: Timex.now()
     }
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: submission.product_symbol,
-         price: submission.price,
-         size: submission.qty,
-         time_in_force: :gtc
-       ]}
+    match_attrs = %{
+      symbol: submission.product_symbol,
+      price: submission.price,
+      size: submission.qty,
+      time_in_force: :gtc
+    }
 
-    Mocks.Server.insert(key, order_response)
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
 
   @spec open(venue_order_id, submission, map) :: :ok
@@ -47,16 +46,15 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       received_at: Timex.now()
     }
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: submission.product_symbol,
-         price: submission.price,
-         size: submission.qty,
-         time_in_force: :gtc
-       ]}
+    match_attrs = %{
+      symbol: submission.product_symbol,
+      price: submission.price,
+      size: submission.qty,
+      time_in_force: :gtc
+    }
 
-    Mocks.Server.insert(key, order_response)
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
 
   @spec rejected(venue_order_id, submission) :: :ok
@@ -74,21 +72,23 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       received_at: Timex.now()
     }
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: submission.product_symbol,
-         price: submission.price,
-         size: submission.qty,
-         time_in_force: :gtc
-       ]}
+    match_attrs = %{
+      symbol: submission.product_symbol,
+      price: submission.price,
+      size: submission.qty,
+      time_in_force: :gtc
+    }
 
-    Mocks.Server.insert(key, order_response)
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
+
+  @spec filled(submission) :: insert_result
+  def filled(submission), do: filled(Ecto.UUID.generate(), submission)
 
   @spec filled(venue_order_id, submission) :: insert_result
   def filled(venue_order_id, submission) do
-    order_response = %Tai.Trading.OrderResponses.Create{
+    order_response = %OrderResponses.Create{
       id: venue_order_id,
       status: :filled,
       avg_price: submission.price,
@@ -99,20 +99,16 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       received_at: Timex.now()
     }
 
-    key =
-      {Tai.Trading.OrderResponse,
-       [
-         symbol: submission.product_symbol,
-         price: submission.price,
-         size: submission.qty,
-         time_in_force: :gtc
-       ]}
+    match_attrs = %{
+      symbol: submission.product_symbol,
+      price: submission.price,
+      size: submission.qty,
+      time_in_force: :gtc
+    }
 
-    Mocks.Server.insert(key, order_response)
+    {:create_order, match_attrs}
+    |> Mocks.Server.insert(order_response)
   end
-
-  @spec filled(submission) :: insert_result
-  def filled(submission), do: filled(Ecto.UUID.generate(), submission)
 
   @spec amend_price(order, Decimal.t()) :: :ok
   def amend_price(order, price) do
