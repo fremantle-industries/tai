@@ -9,9 +9,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Products do
         )
       end)
 
-    key = Tai.VenueAdapters.Mock.products_response_key(venue_id)
-    :ok = Tai.TestSupport.Mocks.Server.insert(key, products)
-
-    :ok
+    {:products, venue_id}
+    |> Tai.TestSupport.Mocks.Server.insert(products)
   end
 end

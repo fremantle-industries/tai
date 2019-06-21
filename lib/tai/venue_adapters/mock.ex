@@ -9,8 +9,7 @@ defmodule Tai.VenueAdapters.Mock do
 
   def products(venue_id) do
     with_mock_server(fn ->
-      venue_id
-      |> products_response_key()
+      {:products, venue_id}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
         {:ok, products} -> {:ok, products}
@@ -92,8 +91,6 @@ defmodule Tai.VenueAdapters.Mock do
   def positions(_venue_id, _account_id, _credentials) do
     {:error, :not_supported}
   end
-
-  def products_response_key(venue_id), do: {__MODULE__, :products, venue_id}
 
   def asset_balances_response_key({venue_id, account_id}),
     do: {__MODULE__, :asset_balances, venue_id, account_id}
