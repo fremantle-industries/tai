@@ -9,9 +9,7 @@ defmodule Tai.TestSupport.Mocks.Responses.AssetBalances do
         )
       end)
 
-    key = Tai.VenueAdapters.Mock.asset_balances_response_key({venue_id, account_id})
-    :ok = Tai.TestSupport.Mocks.Server.insert(key, balances)
-
-    :ok
+    {:asset_balances, venue_id, account_id}
+    |> Tai.TestSupport.Mocks.Server.insert(balances)
   end
 end
