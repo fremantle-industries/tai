@@ -75,7 +75,7 @@ defmodule Tai.VenueAdapters.Mock do
 
   def cancel_order(order, _credentials) do
     with_mock_server(fn ->
-      order.venue_order_id
+      {:cancel_order, order.venue_order_id}
       |> Tai.TestSupport.Mocks.Server.eject()
       |> case do
         {:ok, %OrderResponses.Cancel{}} = response -> response

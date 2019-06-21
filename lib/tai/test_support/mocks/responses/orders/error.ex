@@ -38,6 +38,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
 
   @spec cancel_raise(venue_order_id, reason) :: :ok
   def cancel_raise(venue_order_id, reason) do
-    Mocks.Server.insert(venue_order_id, {:raise, reason})
+    {:cancel_order, venue_order_id}
+    |> Mocks.Server.insert({:raise, reason})
   end
 end

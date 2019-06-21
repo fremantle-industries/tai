@@ -34,11 +34,6 @@ defmodule Tai.Trading.Orders.Cancel do
 
   defdelegate send_to_venue(order), to: Tai.Venue, as: :cancel_order
 
-  defp notify_updated_order({_, {:ok, {previous_order, order}}}),
-    do: Orders.updated!(previous_order, order)
-
-  defp notify_updated_order({:accept_cancel, {:error, {:invalid_status, _, _}}}), do: :ok
-
   defp parse_response({:ok, %Cancel{} = response}, order) do
     result = OrderStore.cancel(order.client_id, response.venue_timestamp)
     {:cancel, result}
@@ -58,6 +53,11 @@ defmodule Tai.Trading.Orders.Cancel do
     result = OrderStore.cancel_error(order.client_id, {:unhandled, reason}, Timex.now())
     {:cancel_error, result}
   end
+
+  defp notify_updated_order({_, {:ok, {previous_order, order}}}),
+    do: Orders.updated!(previous_order, order)
+
+  defp notify_updated_order({:accept_cancel, {:error, {:invalid_status, _, _}}}), do: :ok
 
   defp broadcast_invalid_status(client_id, action, was, required) do
     Tai.Events.error(%Tai.Events.OrderUpdateInvalidStatus{

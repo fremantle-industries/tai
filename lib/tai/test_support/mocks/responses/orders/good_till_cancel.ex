@@ -167,7 +167,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       received_at: Timex.now()
     }
 
-    Mocks.Server.insert(venue_order_id, order_response)
+    {:cancel_order, venue_order_id}
+    |> Mocks.Server.insert(order_response)
   end
 
   @spec canceled(venue_order_id) :: :ok
@@ -179,6 +180,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       venue_timestamp: Timex.now()
     }
 
-    Mocks.Server.insert(venue_order_id, order_response)
+    {:cancel_order, venue_order_id}
+    |> Mocks.Server.insert(order_response)
   end
 end
