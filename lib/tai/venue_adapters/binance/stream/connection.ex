@@ -39,8 +39,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   end
 
   def handle_frame({:text, msg}, state) do
-    Logger.debug(fn -> "Received raw msg: #{msg}" end)
-
     msg
     |> Jason.decode!()
     |> handle_msg(state.venue_id)
