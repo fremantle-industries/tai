@@ -1,7 +1,9 @@
 defmodule Tai.VenueAdapters.Mock do
-  @behaviour Tai.Venues.Adapter
-  import Tai.TestSupport.Mocks.Client
   alias Tai.Trading.OrderResponses
+  alias Tai.TestSupport.Mocks
+  import Mocks.Client
+
+  @behaviour Tai.Venues.Adapter
 
   def stream_supervisor, do: Tai.VenueAdapters.Mock.StreamSupervisor
 
@@ -10,7 +12,7 @@ defmodule Tai.VenueAdapters.Mock do
   def products(venue_id) do
     with_mock_server(fn ->
       {:products, venue_id}
-      |> Tai.TestSupport.Mocks.Server.eject()
+      |> Mocks.Server.eject()
       |> case do
         {:ok, products} -> {:ok, products}
         {:error, :not_found} -> {:error, :mock_response_not_found}
@@ -21,7 +23,7 @@ defmodule Tai.VenueAdapters.Mock do
   def asset_balances(venue_id, account_id, _credentials) do
     with_mock_server(fn ->
       {:asset_balances, venue_id, account_id}
-      |> Tai.TestSupport.Mocks.Server.eject()
+      |> Mocks.Server.eject()
       |> case do
         {:ok, asset_balances} -> {:ok, asset_balances}
         {:error, :not_found} -> {:error, :mock_response_not_found}
@@ -32,7 +34,7 @@ defmodule Tai.VenueAdapters.Mock do
   def maker_taker_fees(venue_id, account_id, _credentials) do
     with_mock_server(fn ->
       {:maker_taker_fees, venue_id, account_id}
-      |> Tai.TestSupport.Mocks.Server.eject()
+      |> Mocks.Server.eject()
       |> case do
         {:ok, fees} -> {:ok, fees}
         {:error, :not_found} -> {:error, :mock_response_not_found}
@@ -50,7 +52,7 @@ defmodule Tai.VenueAdapters.Mock do
       }
 
       {:create_order, match_attrs}
-      |> Tai.TestSupport.Mocks.Server.eject()
+      |> Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} -> raise reason
         {:ok, _response} = result -> result
@@ -64,7 +66,7 @@ defmodule Tai.VenueAdapters.Mock do
       match_attrs = Map.merge(attrs, %{venue_order_id: order.venue_order_id})
 
       {:amend_order, match_attrs}
-      |> Tai.TestSupport.Mocks.Server.eject()
+      |> Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} -> raise reason
         {:ok, _} = response -> response
@@ -76,7 +78,7 @@ defmodule Tai.VenueAdapters.Mock do
   def cancel_order(order, _credentials) do
     with_mock_server(fn ->
       {:cancel_order, order.venue_order_id}
-      |> Tai.TestSupport.Mocks.Server.eject()
+      |> Mocks.Server.eject()
       |> case do
         {:ok, %OrderResponses.Cancel{}} = response -> response
         {:ok, %OrderResponses.CancelAccepted{}} = response -> response
