@@ -40,6 +40,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
 
   defp parse_response({:ok, %ExBinance.Responses.CreateOrder{} = binance_response}, _) do
     received_at = Timex.now()
+    venue_order_id = binance_response.order_id |> Integer.to_string()
     avg_price = binance_response.fills |> calc_avg_price()
     status = binance_response.status |> OrderStatus.from_venue()
     original_size = binance_response.orig_qty |> Decimal.new() |> Decimal.reduce()
@@ -48,7 +49,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     venue_timestamp = binance_response.transact_time |> DateTime.from_unix!(:millisecond)
 
     response = %Tai.Trading.OrderResponses.Create{
-      id: binance_response.order_id,
+      id: venue_order_id,
       status: status,
       avg_price: avg_price,
       original_size: original_size,
