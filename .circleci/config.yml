@@ -46,8 +46,54 @@ jobs:
 
       - run: MIX_ENV=test mix coveralls.circle
 
+  "elixir-1.9":
+    docker:
+      - image: circleci/elixir:1.9
+
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - hex-packages-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - hex-packages-elixir-1.9-{{ arch }}-{{ .Branch }}
+            - hex-packages-elixir-1.9
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get
+      - save_cache:
+          key: hex-packages-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - deps
+
+      - restore_cache:
+          keys:
+            - test-build-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - test-build-elixir-1.9-{{ arch }}-{{ .Branch }}
+            - test-build-elixir-1.9
+      - run: mix test
+      - save_cache:
+          key: test-build-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build/test
+
+      - restore_cache:
+          keys:
+            - dialyzer-plt-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - dialyzer-plt-elixir-1.9-{{ arch }}-{{ .Branch }}
+            - dialyzer-plt-elixir-1.9
+      - run: mix dialyzer --halt-exit-status
+      - save_cache:
+          key: dialyzer-plt-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build/dev
+
+      - run: MIX_ENV=test mix coveralls.circle
+
 workflows:
   version: 2
   build:
     jobs:
       - "elixir-1.8"
+      - "elixir-1.9"
