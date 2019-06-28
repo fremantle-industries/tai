@@ -127,6 +127,7 @@ defmodule Tai.Trading.OrderStoreTest do
       assert updated.avg_price == @avg_price
       assert updated.cumulative_qty == @cumulative_qty
       assert updated.leaves_qty == @leaves_qty
+      assert updated.qty == Decimal.add(@cumulative_qty, @leaves_qty)
       assert updated.last_received_at == @last_received_at
       assert updated.last_venue_timestamp == @last_venue_timestamp
     end

@@ -27,11 +27,14 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
     |> parse_response(order)
   end
 
+  @limit "Limit"
   defp build_params(order) do
+    venue_client_order_id = ClientId.to_venue(order.client_id, order.time_in_force)
+
     params = %{
-      clOrdID: order.client_id |> ClientId.to_venue(order.time_in_force),
+      clOrdID: venue_client_order_id,
       side: order.side |> to_venue_side,
-      ordType: "Limit",
+      ordType: @limit,
       symbol: order.product_symbol |> to_venue_symbol,
       orderQty: order.qty,
       price: order.price,

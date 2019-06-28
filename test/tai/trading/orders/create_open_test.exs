@@ -15,7 +15,10 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
 
-  [{:buy, OrderSubmissions.BuyLimitGtc}, {:sell, OrderSubmissions.SellLimitGtc}]
+  [
+    {:buy, OrderSubmissions.BuyLimitGtc},
+    {:sell, OrderSubmissions.SellLimitGtc}
+  ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
 
@@ -54,8 +57,8 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
       assert open_order.venue_order_id == @venue_order_id
       assert open_order.avg_price == original_price
       assert open_order.leaves_qty == Decimal.new(6)
-      assert open_order.cumulative_qty == cumulative_qty
-      assert open_order.qty == original_qty
+      assert open_order.cumulative_qty == Decimal.new(4)
+      assert open_order.qty == Decimal.new(10)
       assert %DateTime{} = open_order.last_received_at
       assert %DateTime{} = open_order.last_venue_timestamp
     end

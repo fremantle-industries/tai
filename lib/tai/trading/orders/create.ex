@@ -43,7 +43,7 @@ defmodule Tai.Trading.Orders.Create do
   defp notify_updated_order({_, {:ok, {prev, current}}}), do: Orders.updated!(prev, current)
   defp notify_updated_order({:accept_create, {:error, {:invalid_status, _, _}}}), do: :ok
 
-  def send_to_venue(order) do
+  defp send_to_venue(order) do
     result = Tai.Venue.create_order(order)
     {result, order}
   end

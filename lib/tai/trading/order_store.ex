@@ -86,6 +86,8 @@ defmodule Tai.Trading.OrderStore do
         _from,
         state
       ) do
+    qty = Decimal.add(cumulative_qty, leaves_qty)
+
     response =
       update(client_id, @open_required, %{
         status: :open,
@@ -93,6 +95,7 @@ defmodule Tai.Trading.OrderStore do
         avg_price: avg_price,
         cumulative_qty: cumulative_qty,
         leaves_qty: leaves_qty,
+        qty: qty,
         last_received_at: last_received_at,
         last_venue_timestamp: last_venue_timestamp
       })
