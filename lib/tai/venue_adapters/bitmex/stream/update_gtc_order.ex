@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
   alias Tai.VenueAdapters.Bitmex.ClientId
+  alias Tai.Trading.OrderStore
 
   @date_format "{ISO:Extended}"
 
@@ -26,7 +27,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
     cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
 
     result =
-      Tai.Trading.OrderStore.passive_fill(client_id, cumulative_qty, received_at, venue_timestamp)
+      %OrderStore.Actions.PassiveFill{
+        client_id: client_id,
+        cumulative_qty: cumulative_qty,
+        last_received_at: received_at,
+        last_venue_timestamp: venue_timestamp
+      }
+      |> OrderStore.update()
 
     {client_id, :passive_fill, result}
   end
@@ -42,28 +49,37 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateGtcOrder do
          }
        ) do
     received_at = Timex.now()
-    venue_updated_at = timestamp |> Timex.parse!(@date_format)
+    venue_timestamp = timestamp |> Timex.parse!(@date_format)
     avg_price = avg_px |> Tai.Utils.Decimal.from()
     cumulative_qty = cum_qty |> Tai.Utils.Decimal.from()
     leaves_qty = lvs_qty |> Tai.Utils.Decimal.from()
 
     result =
-      Tai.Trading.OrderStore.passive_partial_fill(
-        client_id,
-        avg_price,
-        cumulative_qty,
-        leaves_qty,
-        received_at,
-        venue_updated_at
-      )
+      %OrderStore.Actions.PassivePartialFill{
+        client_id: client_id,
+        avg_price: avg_price,
+        cumulative_qty: cumulative_qty,
+        leaves_qty: leaves_qty,
+        last_received_at: received_at,
+        last_venue_timestamp: venue_timestamp
+      }
+      |> OrderStore.update()
 
     {client_id, :passive_partial_fill, result}
   end
 
   defp passive_update(:canceled, client_id, %{"timestamp" => timestamp}) do
     received_at = Timex.now()
-    venue_updated_at = timestamp |> Timex.parse!(@date_format)
-    result = Tai.Trading.OrderStore.passive_cancel(client_id, received_at, venue_updated_at)
+    venue_timestamp = timestamp |> Timex.parse!(@date_format)
+
+    result =
+      %OrderStore.Actions.PassiveCancel{
+        client_id: client_id,
+        last_received_at: received_at,
+        last_venue_timestamp: venue_timestamp
+      }
+      |> OrderStore.update()
+
     {client_id, :passive_cancel, result}
   end
 

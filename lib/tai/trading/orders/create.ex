@@ -53,12 +53,13 @@ defmodule Tai.Trading.Orders.Create do
          order
        }) do
     result =
-      OrderStore.accept_create(
-        order.client_id,
-        response.id,
-        response.received_at,
-        response.venue_timestamp
-      )
+      %OrderStore.Actions.AcceptCreate{
+        client_id: order.client_id,
+        venue_order_id: response.id,
+        last_received_at: response.received_at,
+        last_venue_timestamp: response.venue_timestamp
+      }
+      |> OrderStore.update()
 
     {:accept_create, result}
   end
@@ -68,15 +69,16 @@ defmodule Tai.Trading.Orders.Create do
          order
        }) do
     result =
-      OrderStore.open(
-        order.client_id,
-        response.id,
-        response.avg_price,
-        response.cumulative_qty,
-        response.leaves_qty,
-        response.received_at,
-        response.venue_timestamp
-      )
+      %OrderStore.Actions.Open{
+        client_id: order.client_id,
+        venue_order_id: response.id,
+        avg_price: response.avg_price,
+        cumulative_qty: response.cumulative_qty,
+        leaves_qty: response.leaves_qty,
+        last_received_at: response.received_at,
+        last_venue_timestamp: response.venue_timestamp
+      }
+      |> OrderStore.update()
 
     {:open, result}
   end
@@ -86,14 +88,15 @@ defmodule Tai.Trading.Orders.Create do
          order
        }) do
     result =
-      OrderStore.fill(
-        order.client_id,
-        response.id,
-        response.avg_price,
-        response.cumulative_qty,
-        response.received_at,
-        response.venue_timestamp
-      )
+      %OrderStore.Actions.Fill{
+        client_id: order.client_id,
+        venue_order_id: response.id,
+        avg_price: response.avg_price,
+        cumulative_qty: response.cumulative_qty,
+        last_received_at: response.received_at,
+        last_venue_timestamp: response.venue_timestamp
+      }
+      |> OrderStore.update()
 
     {:fill, result}
   end
@@ -103,15 +106,16 @@ defmodule Tai.Trading.Orders.Create do
          order
        }) do
     result =
-      OrderStore.expire(
-        order.client_id,
-        response.id,
-        response.avg_price,
-        response.cumulative_qty,
-        response.leaves_qty,
-        response.received_at,
-        response.venue_timestamp
-      )
+      %OrderStore.Actions.Expire{
+        client_id: order.client_id,
+        venue_order_id: response.id,
+        avg_price: response.avg_price,
+        cumulative_qty: response.cumulative_qty,
+        leaves_qty: response.leaves_qty,
+        last_received_at: response.received_at,
+        last_venue_timestamp: response.venue_timestamp
+      }
+      |> OrderStore.update()
 
     {:expire, result}
   end
@@ -121,28 +125,43 @@ defmodule Tai.Trading.Orders.Create do
          order
        }) do
     result =
-      OrderStore.reject(
-        order.client_id,
-        response.id,
-        response.received_at,
-        response.venue_timestamp
-      )
+      %OrderStore.Actions.Reject{
+        client_id: order.client_id,
+        venue_order_id: response.id,
+        last_received_at: response.received_at,
+        last_venue_timestamp: response.venue_timestamp
+      }
+      |> OrderStore.update()
 
     {:reject, result}
   end
 
   defp parse_response({{:error, reason}, order}) do
-    result = OrderStore.create_error(order.client_id, reason, Timex.now())
+    result =
+      %OrderStore.Actions.CreateError{
+        client_id: order.client_id,
+        reason: reason,
+        last_received_at: Timex.now()
+      }
+      |> OrderStore.update()
+
     {:create_error, result}
   end
 
   defp rescue_venue_adapter_error(reason, order) do
-    result = OrderStore.create_error(order.client_id, {:unhandled, reason}, Timex.now())
+    result =
+      %OrderStore.Actions.CreateError{
+        client_id: order.client_id,
+        reason: {:unhandled, reason},
+        last_received_at: Timex.now()
+      }
+      |> OrderStore.update()
+
     {:create_error, result}
   end
 
   defp skip!(client_id) do
-    result = OrderStore.skip(client_id)
+    result = %OrderStore.Actions.Skip{client_id: client_id} |> OrderStore.update()
     {:skip, result}
   end
 end

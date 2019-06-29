@@ -1,7 +1,8 @@
 defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   use WebSockex
-  alias Tai.VenueAdapters.Mock
   require Logger
+  alias Tai.VenueAdapters.Mock
+  alias Tai.Trading.OrderStore
 
   @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
@@ -91,14 +92,15 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     leaves_qty = raw_leaves_qty |> Tai.Utils.Decimal.from()
 
     {:ok, {prev_order, updated_order}} =
-      Tai.Trading.OrderStore.passive_partial_fill(
-        client_id,
-        avg_price,
-        cumulative_qty,
-        leaves_qty,
-        Timex.now(),
-        Timex.now()
-      )
+      %OrderStore.Actions.PassivePartialFill{
+        client_id: client_id,
+        avg_price: avg_price,
+        cumulative_qty: cumulative_qty,
+        leaves_qty: leaves_qty,
+        last_received_at: Timex.now(),
+        last_venue_timestamp: Timex.now()
+      }
+      |> OrderStore.update()
 
     Tai.Trading.Orders.updated!(prev_order, updated_order)
   end
@@ -114,12 +116,13 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.from()
 
     {:ok, {prev_order, updated_order}} =
-      Tai.Trading.OrderStore.passive_fill(
-        client_id,
-        cumulative_qty,
-        Timex.now(),
-        Timex.now()
-      )
+      %OrderStore.Actions.PassiveFill{
+        client_id: client_id,
+        cumulative_qty: cumulative_qty,
+        last_received_at: Timex.now(),
+        last_venue_timestamp: Timex.now()
+      }
+      |> OrderStore.update()
 
     Tai.Trading.Orders.updated!(prev_order, updated_order)
   end
@@ -132,7 +135,12 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          _venue_id
        ) do
     {:ok, {prev_order, updated_order}} =
-      Tai.Trading.OrderStore.passive_cancel(client_id, Timex.now(), Timex.now())
+      %OrderStore.Actions.PassiveCancel{
+        client_id: client_id,
+        last_received_at: Timex.now(),
+        last_venue_timestamp: Timex.now()
+      }
+      |> OrderStore.update()
 
     Tai.Trading.Orders.updated!(prev_order, updated_order)
   end

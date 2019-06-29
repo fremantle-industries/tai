@@ -1,4 +1,6 @@
 defmodule Tai.Trading.OrderStoreBackends.ETS do
+  alias Tai.Trading.OrderStore.Action
+
   @type order :: Tai.Trading.Order.t()
   @type client_id :: Tai.Trading.Order.client_id()
   @type name :: atom
@@ -14,14 +16,17 @@ defmodule Tai.Trading.OrderStoreBackends.ETS do
   @spec insert(order, name) :: :ok
   def insert(order, name) do
     record = {order.client_id, order}
-    :ets.insert(name, record)
+    true = :ets.insert(name, record)
+    :ok
   end
 
   @doc """
   Update an existing order in the ETS table
   """
-  def update(client_id, required, attrs, state) when is_list(required) do
-    with {:ok, old_order} <- find_by_client_id(client_id, state.name) do
+  def update(action, state) do
+    with required <- action |> Action.required() |> List.wrap(),
+         attrs <- Action.attrs(action),
+         {:ok, old_order} <- find_by_client_id(action.client_id, state.name) do
       if Enum.member?(required, old_order.status) do
         updated_order = old_order |> Map.merge(attrs)
         insert(updated_order, state.name)
@@ -32,8 +37,6 @@ defmodule Tai.Trading.OrderStoreBackends.ETS do
       end
     end
   end
-
-  def update(client_id, required, attrs, state), do: update(client_id, [required], attrs, state)
 
   @doc """
   Return a list of all orders currently stored in the ETS table

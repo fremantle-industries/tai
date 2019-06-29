@@ -7,7 +7,8 @@ defmodule Tai.Trading.Orders.Cancel do
 
   @spec cancel(order) :: {:ok, updated :: order} | {:error, error_reason}
   def cancel(%Order{client_id: client_id}) do
-    with {:ok, {old, updated}} <- OrderStore.pend_cancel(client_id, Timex.now()) do
+    with action <- %OrderStore.Actions.PendCancel{client_id: client_id, updated_at: Timex.now()},
+         {:ok, {old, updated}} <- OrderStore.update(action) do
       Orders.updated!(old, updated)
 
       Task.start_link(fn ->
@@ -35,22 +36,48 @@ defmodule Tai.Trading.Orders.Cancel do
   defdelegate send_to_venue(order), to: Tai.Venue, as: :cancel_order
 
   defp parse_response({:ok, %Cancel{} = response}, order) do
-    result = OrderStore.cancel(order.client_id, response.venue_timestamp)
+    result =
+      %OrderStore.Actions.Cancel{
+        client_id: order.client_id,
+        last_venue_timestamp: response.venue_timestamp
+      }
+      |> OrderStore.update()
+
     {:cancel, result}
   end
 
   defp parse_response({:ok, %CancelAccepted{} = response}, order) do
-    result = OrderStore.accept_cancel(order.client_id, response.venue_timestamp)
+    result =
+      %OrderStore.Actions.AcceptCancel{
+        client_id: order.client_id,
+        last_venue_timestamp: response.venue_timestamp
+      }
+      |> OrderStore.update()
+
     {:accept_cancel, result}
   end
 
   defp parse_response({:error, reason}, order) do
-    result = OrderStore.cancel_error(order.client_id, reason, Timex.now())
+    result =
+      %OrderStore.Actions.CancelError{
+        client_id: order.client_id,
+        reason: reason,
+        last_received_at: Timex.now()
+      }
+      |> OrderStore.update()
+
     {:cancel_error, result}
   end
 
   defp rescue_venue_adapter_error(reason, order) do
-    result = OrderStore.cancel_error(order.client_id, {:unhandled, reason}, Timex.now())
+    result =
+      %OrderStore.Actions.CancelError{
+        client_id: order.client_id,
+        reason: {:unhandled, reason},
+        last_received_at: Timex.now()
+      }
+      |> OrderStore.update()
+
     {:cancel_error, result}
   end
 
