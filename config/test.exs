@@ -36,7 +36,7 @@ config(:tai,
       accounts: %{
         main: %{
           api_key: {:system_file, "BITMEX_API_KEY"},
-          api_secret: {:system_file, "BITMEX_SECRET"}
+          api_secret: {:system_file, "BITMEX_API_SECRET"}
         }
       }
     ],
@@ -183,7 +183,7 @@ config :exvcr,
     [pattern: "signature=[A-Z0-9]+", placeholder: "signature=***"]
   ]
 
-config(:echo_boy, port: 4100)
+config :echo_boy, port: 4100
 
 config :ex_bitmex, domain: "testnet.bitmex.com"
 

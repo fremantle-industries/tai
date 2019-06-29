@@ -1,7 +1,9 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
   use ExUnit.Case, async: false
+  import Support.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
   alias Tai.VenueAdapters.Bitmex.ClientId
+  alias Tai.Events
 
   setup do
     on_exit(fn ->
@@ -15,7 +17,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
 
   describe "update" do
     test "updates each gtc order with a status" do
-      Tai.Events.firehose_subscribe()
+      Events.firehose_subscribe()
       order_1 = :buy |> enqueue(%{price: Decimal.new(100), qty: Decimal.new(5)}) |> open()
       order_2 = :sell |> enqueue(%{price: Decimal.new(1500), qty: Decimal.new(10)}) |> open()
       order_3 = :sell_ioc |> enqueue(%{price: Decimal.new(1200), qty: Decimal.new(45)})
@@ -39,9 +41,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
         %{
           "clOrdID" => order_2.client_id |> ClientId.to_venue(order_2.time_in_force),
           "ordStatus" => "PartiallyFilled",
-          "leavesQty" => 3,
-          "cumQty" => 7,
-          "avgPx" => 2000,
+          "leavesQty" => 30,
+          "orderQty" => 50,
+          "price" => 2000,
           "timestamp" => "2018-12-27T05:33:50.832Z"
         },
         %{
@@ -59,37 +61,45 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
 
-      assert_receive {Tai.Event,
-                      %Tai.Events.OrderUpdated{side: :buy, time_in_force: :gtc} =
-                        buy_updated_event, _}
+      assert_event(
+        %Events.OrderUpdated{
+          side: :buy,
+          time_in_force: :gtc,
+          status: :filled
+        } = buy_filled_updated_event
+      )
 
-      assert_receive {Tai.Event,
-                      %Tai.Events.OrderUpdated{side: :sell, time_in_force: :gtc} =
-                        sell_updated_event, _}
+      assert_event(
+        %Events.OrderUpdated{
+          side: :sell,
+          time_in_force: :gtc,
+          status: :open
+        } = sell_partially_filled_updated_event
+      )
 
-      refute_receive {Tai.Event, %Tai.Events.OrderUpdated{time_in_force: :ioc}, _}
-      refute_receive {Tai.Event, %Tai.Events.OrderUpdated{time_in_force: :gtc}, _}
+      refute_event(%Events.OrderUpdated{time_in_force: :ioc})
+      refute_event(%Events.OrderUpdated{time_in_force: :gtc})
 
-      assert buy_updated_event.client_id == order_1.client_id
-      assert buy_updated_event.status == :filled
-      assert buy_updated_event.leaves_qty == Decimal.new(0)
-      assert buy_updated_event.cumulative_qty == Decimal.new(5)
-      assert buy_updated_event.qty == Decimal.new(5)
-      assert %DateTime{} = buy_updated_event.last_received_at
-      assert %DateTime{} = buy_updated_event.last_venue_timestamp
+      assert buy_filled_updated_event.client_id == order_1.client_id
+      assert buy_filled_updated_event.status == :filled
+      assert buy_filled_updated_event.leaves_qty == Decimal.new(0)
+      assert buy_filled_updated_event.cumulative_qty == Decimal.new(5)
+      assert buy_filled_updated_event.qty == Decimal.new(5)
+      assert %DateTime{} = buy_filled_updated_event.last_received_at
+      assert %DateTime{} = buy_filled_updated_event.last_venue_timestamp
 
-      assert sell_updated_event.client_id == order_2.client_id
-      assert sell_updated_event.status == :open
-      assert sell_updated_event.avg_price == Decimal.new("2000")
-      assert sell_updated_event.leaves_qty == Decimal.new(3)
-      assert sell_updated_event.cumulative_qty == Decimal.new(7)
-      assert sell_updated_event.qty == Decimal.new(10)
-      assert %DateTime{} = buy_updated_event.last_received_at
-      assert %DateTime{} = buy_updated_event.last_venue_timestamp
+      assert sell_partially_filled_updated_event.client_id == order_2.client_id
+      assert sell_partially_filled_updated_event.status == :open
+      assert sell_partially_filled_updated_event.avg_price == Decimal.new("2000")
+      assert sell_partially_filled_updated_event.leaves_qty == Decimal.new(30)
+      assert sell_partially_filled_updated_event.cumulative_qty == Decimal.new(20)
+      assert sell_partially_filled_updated_event.qty == Decimal.new(10)
+      assert %DateTime{} = buy_filled_updated_event.last_received_at
+      assert %DateTime{} = buy_filled_updated_event.last_venue_timestamp
     end
 
     test "updates leaves_qty for canceled orders" do
-      Tai.Events.firehose_subscribe()
+      Events.firehose_subscribe()
       order = :buy |> enqueue(%{price: Decimal.new(100), qty: Decimal.new(5)}) |> open()
 
       bitmex_orders = [
@@ -107,7 +117,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
 
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdated{} = event, _}
+      assert_event(%Events.OrderUpdated{} = event)
 
       assert event.status == :canceled
       assert event.leaves_qty == Decimal.new(0)
@@ -117,7 +127,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
     end
 
     test "broadcasts an event when the status is invalid" do
-      Tai.Events.firehose_subscribe()
+      Events.firehose_subscribe()
       order_1 = :buy |> enqueue(%{price: Decimal.new(100), qty: Decimal.new(5)})
       order_2 = :sell |> enqueue(%{price: Decimal.new(1500), qty: Decimal.new(10)})
       order_3 = :buy |> enqueue(%{price: Decimal.new(100), qty: Decimal.new(5)})
@@ -133,8 +143,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
           "clOrdID" => order_2.client_id |> ClientId.to_venue(order_2.time_in_force),
           "ordStatus" => "PartiallyFilled",
           "leavesQty" => 3,
-          "cumQty" => 7,
-          "avgPx" => 2000,
+          "orderQty" => 10,
+          "price" => 2000,
           "timestamp" => "2018-12-27T05:33:50.832Z"
         },
         %{
@@ -153,17 +163,23 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
 
-      assert_receive {Tai.Event,
-                      %Tai.Events.OrderUpdateInvalidStatus{action: :passive_fill} =
-                        passive_fill_invalid_event, _}
+      assert_event(
+        %Events.OrderUpdateInvalidStatus{
+          action: :passive_fill
+        } = passive_fill_invalid_event
+      )
 
-      assert_receive {Tai.Event,
-                      %Tai.Events.OrderUpdateInvalidStatus{action: :passive_partial_fill} =
-                        passive_partial_fill_invalid_event, _}
+      assert_event(
+        %Events.OrderUpdateInvalidStatus{
+          action: :passive_partial_fill
+        } = passive_partial_fill_invalid_event
+      )
 
-      assert_receive {Tai.Event,
-                      %Tai.Events.OrderUpdateInvalidStatus{action: :passive_cancel} =
-                        passive_cancel_invalid_event, _}
+      assert_event(
+        %Events.OrderUpdateInvalidStatus{
+          action: :passive_cancel
+        } = passive_cancel_invalid_event
+      )
 
       assert passive_fill_invalid_event.client_id == order_1.client_id
       assert passive_fill_invalid_event.action == :passive_fill
@@ -206,7 +222,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
     end
 
     test "broadcasts an event when the order can't be found" do
-      Tai.Events.firehose_subscribe()
+      Events.firehose_subscribe()
       client_id = Ecto.UUID.generate()
 
       bitmex_orders = [
@@ -224,9 +240,22 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
 
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdateNotFound{} = not_found_event, _}
+      assert_event(%Events.OrderUpdateNotFound{} = not_found_event)
       assert not_found_event.client_id == client_id
       assert not_found_event.action == :passive_cancel
+    end
+
+    test "broadcasts an event when the message can't be handled" do
+      Events.firehose_subscribe()
+      bitmex_orders = [%{"unhandled" => true}]
+
+      :my_venue
+      |> ProcessAuth.to_name()
+      |> GenServer.cast(
+        {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
+      )
+
+      assert_event(%Events.StreamMessageUnhandled{} = not_found_event)
     end
   end
 

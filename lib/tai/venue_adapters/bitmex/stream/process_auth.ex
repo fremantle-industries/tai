@@ -1,121 +1,59 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
   use GenServer
-  alias Tai.VenueAdapters.Bitmex.Stream
+  alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
 
-  @type t :: %Stream.ProcessAuth{venue_id: atom}
+  defmodule State do
+    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type t :: %State{venue_id: venue_id, tasks: map}
 
-  @enforce_keys [:venue_id]
-  defstruct [:venue_id]
+    @enforce_keys ~w(venue_id tasks)a
+    defstruct ~w(venue_id tasks)a
+  end
+
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
 
   def start_link(venue_id: venue_id) do
-    state = %Stream.ProcessAuth{venue_id: venue_id}
-    GenServer.start_link(__MODULE__, state, name: venue_id |> to_name())
+    state = %State{venue_id: venue_id, tasks: %{}}
+    name = venue_id |> to_name()
+    GenServer.start_link(__MODULE__, state, name: name)
   end
 
   def init(state), do: {:ok, state}
 
-  @spec to_name(venue_id :: atom) :: atom
+  @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
-  def handle_cast({%{"table" => "wallet", "action" => "partial"}, _received_at}, state) do
-    {:noreply, state}
-  end
-
-  def handle_cast({%{"table" => "margin", "action" => "partial"}, _received_at}, state) do
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "margin", "action" => "update", "data" => _data}, _received_at},
-        state
-      ) do
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "position", "action" => "partial", "data" => _positions}, _received_at},
-        state
-      ) do
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "position", "action" => "insert", "data" => _positions}, _received_at},
-        state
-      ) do
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "position", "action" => "update", "data" => _positions}, _received_at},
-        state
-      ) do
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "order", "action" => "partial", "data" => _data}, _received_at},
-        state
-      ) do
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "order", "action" => "insert", "data" => _data}, _received_at},
-        state
-      ) do
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "order", "action" => "update", "data" => orders}, _received_at},
-        state
-      ) do
-    orders
-    |> Enum.each(fn
-      %{"clOrdID" => "gtc-" <> venue_client_id, "ordStatus" => _} = venue_order ->
-        Task.async(fn ->
-          Stream.UpdateGtcOrder.update(venue_client_id, venue_order)
-        end)
-
-      _ ->
-        :ignore_changes_with_no_status
-    end)
-
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "execution", "action" => "partial", "data" => _data}, _received_at},
-        state
-      ) do
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {%{"table" => "execution", "action" => "insert", "data" => _data}, _received_at},
-        state
-      ) do
-    {:noreply, state}
-  end
-
-  def handle_cast({%{"table" => "transact", "action" => "partial"}, _received_at}, state) do
-    {:noreply, state}
-  end
-
   def handle_cast({msg, _received_at}, state) do
-    Tai.Events.info(%Tai.Events.StreamMessageUnhandled{
-      venue_id: state.venue_id,
-      msg: msg
-    })
+    {:ok, new_state} =
+      msg
+      |> transform()
+      |> process_action(state)
 
-    {:noreply, state}
+    {:noreply, new_state}
   end
 
-  # TODO: Handle this message
-  # - Pretty sure this is coming from async order update task when it exits ^
-  def handle_info(_msg, state) do
-    # IO.puts("!!!!!!!!! IN handle_info - msg: #{inspect(msg)}")
-    {:noreply, state}
+  # TODO: Handle the return values of async tasks
+  def handle_info(_msg, state), do: {:noreply, state}
+
+  @transformers [
+    ProcessAuth.TransformMessages.UpdateOrders,
+    ProcessAuth.TransformMessages.NoOp
+  ]
+  defp transform(msg), do: msg |> transform(@transformers)
+
+  defp transform(msg, []), do: msg |> ProcessAuth.TransformMessages.Unhandled.from_venue()
+
+  defp transform(msg, [transformer | to_check]) do
+    msg
+    |> transformer.from_venue()
+    |> case do
+      {:ok, _} = result -> result
+      {:error, :not_handled} -> msg |> transform(to_check)
+    end
+  end
+
+  defp process_action({:ok, action}, state) do
+    {:ok, _} = result = action |> ProcessAuth.Message.process(state)
+    result
   end
 end
