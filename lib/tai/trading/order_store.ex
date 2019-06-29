@@ -9,6 +9,7 @@ defmodule Tai.Trading.OrderStore do
   @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
   @type client_id :: Order.client_id()
+  @type store_id :: atom
 
   @default_id :default
   @default_backend Tai.Trading.OrderStoreBackends.ETS
@@ -103,5 +104,6 @@ defmodule Tai.Trading.OrderStore do
     |> GenServer.call({:find_by_client_id, client_id})
   end
 
+  @spec to_name(store_id) :: atom
   def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
 end
