@@ -256,15 +256,16 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
 
   defp open(order, venue_order_id \\ Ecto.UUID.generate()) do
     {:ok, {_, open_order}} =
-      order.client_id
-      |> Tai.Trading.OrderStore.open(
-        venue_order_id,
-        order.price,
-        Decimal.new(0),
-        order.qty,
-        Timex.now(),
-        Timex.now()
-      )
+      %Tai.Trading.OrderStore.Actions.Open{
+        client_id: order.client_id,
+        venue_order_id: venue_order_id,
+        avg_price: order.price,
+        cumulative_qty: Decimal.new(0),
+        leaves_qty: order.qty,
+        last_received_at: Timex.now(),
+        last_venue_timestamp: Timex.now()
+      }
+      |> Tai.Trading.OrderStore.update()
 
     open_order
   end

@@ -14,7 +14,11 @@ defmodule Tai.Trading.Orders.Amend do
           {:ok, updated :: order}
           | {:error, {:invalid_status, status_was, status_required}}
   def amend(order, attrs) when is_map(attrs) do
-    with {:ok, {old, updated}} <- OrderStore.pend_amend(order.client_id, Timex.now()) do
+    with action <- %OrderStore.Actions.PendAmend{
+           client_id: order.client_id,
+           updated_at: Timex.now()
+         },
+         {:ok, {old, updated}} <- OrderStore.update(action) do
       Orders.updated!(old, updated)
 
       Task.start_link(fn ->
@@ -47,21 +51,32 @@ defmodule Tai.Trading.Orders.Amend do
   end
 
   defp parse_response({:ok, amend_response}, client_id) do
-    OrderStore.amend(
-      client_id,
-      amend_response.price,
-      amend_response.leaves_qty,
-      Timex.now(),
-      amend_response.venue_timestamp
-    )
+    %OrderStore.Actions.Amend{
+      client_id: client_id,
+      price: amend_response.price,
+      leaves_qty: amend_response.leaves_qty,
+      last_received_at: Timex.now(),
+      last_venue_timestamp: amend_response.venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   defp parse_response({:error, reason}, client_id) do
-    OrderStore.amend_error(client_id, reason, Timex.now())
+    %OrderStore.Actions.AmendError{
+      client_id: client_id,
+      reason: reason,
+      last_received_at: Timex.now()
+    }
+    |> OrderStore.update()
   end
 
   defp rescue_venue_adapter_error(reason, order) do
-    OrderStore.amend_error(order.client_id, {:unhandled, reason}, Timex.now())
+    %OrderStore.Actions.AmendError{
+      client_id: order.client_id,
+      reason: {:unhandled, reason},
+      last_received_at: Timex.now()
+    }
+    |> OrderStore.update()
   end
 
   defp broadcast_invalid_status(client_id, action, was, required) do

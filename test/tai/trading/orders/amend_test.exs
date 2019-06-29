@@ -39,15 +39,16 @@ defmodule Tai.Trading.Orders.AmendTest do
           |> Tai.Trading.OrderStore.enqueue()
 
         {:ok, {_, open_order}} =
-          Tai.Trading.OrderStore.open(
-            enqueued_order.client_id,
-            @venue_order_id,
-            @original_price,
-            Decimal.new(0),
-            @original_qty,
-            Timex.now(),
-            Timex.now()
-          )
+          %Tai.Trading.OrderStore.Actions.Open{
+            client_id: enqueued_order.client_id,
+            venue_order_id: @venue_order_id,
+            avg_price: @original_price,
+            cumulative_qty: Decimal.new(0),
+            leaves_qty: @original_qty,
+            last_received_at: Timex.now(),
+            last_venue_timestamp: Timex.now()
+          }
+          |> Tai.Trading.OrderStore.update()
 
         {:ok, %{order: open_order}}
       end
@@ -112,24 +113,31 @@ defmodule Tai.Trading.Orders.AmendTest do
           |> Tai.Trading.OrderStore.enqueue()
 
         {:ok, {_, _}} =
-          Tai.Trading.OrderStore.open(
-            enqueued_order.client_id,
-            @venue_order_id,
-            @original_price,
-            Decimal.new(0),
-            @original_qty,
-            Timex.now(),
-            Timex.now()
-          )
+          %Tai.Trading.OrderStore.Actions.Open{
+            client_id: enqueued_order.client_id,
+            venue_order_id: @venue_order_id,
+            avg_price: @original_price,
+            cumulative_qty: Decimal.new(0),
+            leaves_qty: @original_qty,
+            last_received_at: Timex.now(),
+            last_venue_timestamp: Timex.now()
+          }
+          |> Tai.Trading.OrderStore.update()
 
-        {:ok, {_, _}} = Tai.Trading.OrderStore.pend_amend(enqueued_order.client_id, Timex.now())
+        {:ok, {_, _}} =
+          %Tai.Trading.OrderStore.Actions.PendAmend{
+            client_id: enqueued_order.client_id,
+            updated_at: Timex.now()
+          }
+          |> Tai.Trading.OrderStore.update()
 
         {:ok, {_, amend_error_order}} =
-          Tai.Trading.OrderStore.amend_error(
-            enqueued_order.client_id,
-            "Invalid nonce",
-            Timex.now()
-          )
+          %Tai.Trading.OrderStore.Actions.AmendError{
+            client_id: enqueued_order.client_id,
+            reason: "Invalid nonce",
+            last_received_at: Timex.now()
+          }
+          |> Tai.Trading.OrderStore.update()
 
         {:ok, %{order: amend_error_order}}
       end
