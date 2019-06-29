@@ -103,5 +103,5 @@ defmodule Tai.Trading.OrderStore do
     |> GenServer.call({:find_by_client_id, client_id})
   end
 
-  defp to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
+  def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
 end

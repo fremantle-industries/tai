@@ -1,21 +1,19 @@
 defmodule Tai.Trading.OrderStoreTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Tai.Trading.OrderStore
   alias Tai.Trading.OrderStore
 
-  setup do
-    on_exit(fn ->
-      Application.stop(:tai)
-    end)
+  @store_id __MODULE__
 
-    {:ok, _} = Application.ensure_all_started(:tai)
+  setup do
+    {:ok, _} = start_supervised({OrderStore, [id: @store_id]})
     :ok
   end
 
   test ".enqueue creates an order from the submission" do
     submission = build_submission()
 
-    assert {:ok, order} = OrderStore.enqueue(submission)
+    assert {:ok, order} = OrderStore.enqueue(submission, @store_id)
     assert order.status == :enqueued
   end
 
@@ -24,7 +22,7 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:ok, order} = enqueue()
 
       action = struct!(Tai.Trading.OrderStore.Actions.Skip, client_id: order.client_id)
-      assert {:ok, {old, updated}} = OrderStore.update(action)
+      assert {:ok, {old, updated}} = OrderStore.update(action, @store_id)
 
       assert old.status == :enqueued
       assert updated.status == :skip
@@ -33,16 +31,16 @@ defmodule Tai.Trading.OrderStoreTest do
 
     test "returns an error when the order can't be found" do
       action = struct(Tai.Trading.OrderStore.Actions.Skip, client_id: "not_found")
-      assert OrderStore.update(action) == {:error, :not_found}
+      assert OrderStore.update(action, @store_id) == {:error, :not_found}
     end
 
     test "returns an error when the current status is invalid" do
       assert {:ok, order} = enqueue()
 
       action = struct!(Tai.Trading.OrderStore.Actions.Skip, client_id: order.client_id)
-      assert {:ok, _} = OrderStore.update(action)
+      assert {:ok, _} = OrderStore.update(action, @store_id)
 
-      assert {:error, reason} = OrderStore.update(action)
+      assert {:error, reason} = OrderStore.update(action, @store_id)
       assert reason == {:invalid_status, :skip, :enqueued}
     end
   end
@@ -50,27 +48,27 @@ defmodule Tai.Trading.OrderStoreTest do
   describe ".find_by_client_id" do
     test "returns the order " do
       {:ok, order} = enqueue()
-      assert {:ok, ^order} = OrderStore.find_by_client_id(order.client_id)
+      assert {:ok, ^order} = OrderStore.find_by_client_id(order.client_id, @store_id)
     end
 
     test "returns an error when no match was found" do
-      assert OrderStore.find_by_client_id("not found") == {:error, :not_found}
+      assert OrderStore.find_by_client_id("not found", @store_id) == {:error, :not_found}
     end
   end
 
   test ".all returns a list of current orders" do
-    assert OrderStore.all() == []
+    assert OrderStore.all(@store_id) == []
     {:ok, order} = enqueue()
-    assert OrderStore.all() == [order]
+    assert OrderStore.all(@store_id) == [order]
   end
 
   test ".count returns the total number of orders" do
-    assert OrderStore.count() == 0
+    assert OrderStore.count(@store_id) == 0
     {:ok, _} = enqueue()
-    assert OrderStore.count() == 1
+    assert OrderStore.count(@store_id) == 1
   end
 
-  defp enqueue, do: build_submission() |> OrderStore.enqueue()
+  defp enqueue(store_id \\ @store_id), do: build_submission() |> OrderStore.enqueue(store_id)
 
   defp build_submission do
     struct(Tai.Trading.OrderSubmissions.BuyLimitGtc,
