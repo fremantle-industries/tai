@@ -1,13 +1,13 @@
-defmodule Tai.AdvisorGroups.Config do
-  alias Tai.AdvisorGroups.RichConfig
+defmodule Tai.Advisors.Groups.Config do
+  alias Tai.Advisors.Groups.RichConfig
 
   @type config :: Tai.Config.t()
   @type product :: Tai.Venues.Product.t()
   @type advisor_group :: Tai.AdvisorGroup.t()
-  @type provider :: Tai.AdvisorGroups.RichConfig.provider()
+  @type provider :: Tai.Advisors.Groups.RichConfig.provider()
 
   @spec parse_groups(config, provider) :: {:ok, [advisor_group]} | {:error, map}
-  def parse_groups(%Tai.Config{} = config, provider \\ Tai.AdvisorGroups.RichConfig) do
+  def parse_groups(%Tai.Config{} = config, provider \\ Tai.Advisors.Groups.RichConfig) do
     venue_indexed_symbols = Tai.Transforms.ProductSymbolsByVenue.all(provider.products)
     groups = config.advisor_groups |> Enum.map(&build(&1, provider, venue_indexed_symbols))
     errors = groups |> Enum.reduce(%{}, &validate/2)

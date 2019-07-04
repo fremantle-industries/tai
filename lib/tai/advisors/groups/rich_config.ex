@@ -1,5 +1,5 @@
-defmodule Tai.AdvisorGroups.RichConfig do
-  alias Tai.AdvisorGroups.RichConfigProvider
+defmodule Tai.Advisors.Groups.RichConfig do
+  alias Tai.Advisors.Groups.RichConfigProvider
 
   @type config :: map
   @type provider :: atom

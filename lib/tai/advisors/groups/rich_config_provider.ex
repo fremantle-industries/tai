@@ -1,4 +1,4 @@
-defmodule Tai.AdvisorGroups.RichConfigProvider do
+defmodule Tai.Advisors.Groups.RichConfigProvider do
   @type product :: Tai.Venues.Product.t()
   @type fee :: Tai.Venues.FeeInfo.t()
 

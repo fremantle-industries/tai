@@ -1,6 +1,6 @@
-defmodule Tai.AdvisorGroups.RichConfigTest do
+defmodule Tai.Advisors.Groups.RichConfigTest do
   use ExUnit.Case, async: true
-  alias Tai.AdvisorGroups.RichConfig
+  alias Tai.Advisors.Groups.RichConfig
 
   defmodule TestProvider do
     @product_a struct(Tai.Venues.Product, venue_id: :venue_a, symbol: :btc_usd)
