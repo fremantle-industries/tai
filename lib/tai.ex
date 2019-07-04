@@ -29,8 +29,9 @@ defmodule Tai do
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)
 
-    config |> boot_venues!()
-    config |> boot_advisor_groups!()
+    config
+    |> boot_venues!()
+    |> boot_advisor_groups!()
 
     {:ok, pid}
   end
@@ -52,9 +53,11 @@ defmodule Tai do
     end)
     |> Enum.map(fn {task, adapter} -> Task.await(task, adapter.timeout) end)
     |> Enum.each(&config.venue_boot_handler.parse_response/1)
+
+    {:ok, config}
   end
 
-  defp boot_advisor_groups!(config) do
+  defp boot_advisor_groups!({:ok, config}) do
     config
     |> Tai.Advisors.specs(start_on_boot: true)
     |> Tai.Advisors.start()
