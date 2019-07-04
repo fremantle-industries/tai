@@ -41,7 +41,7 @@ defmodule Tai.Mixfile do
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},
       {:table_rex, "~> 2.0"},
-      {:timex, "~> 3.1"},
+      {:timex, "~> 3.6"},
       # Fixes deprecation warnings
       # {:websockex, github: "Azolo/websockex"},
       {:websockex, "~> 0.4.0"},
@@ -50,7 +50,7 @@ defmodule Tai.Mixfile do
       {:jason, "~> 1.1"},
       {:vex, "~> 0.7"},
       {:logger_file_backend_with_formatters, "~> 0.0.1", only: [:dev, :test]},
-      {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.3", only: [:dev, :test]},
+      {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.4", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:echo_boy, "~> 0.6.0", only: [:dev, :test]},
       {:exvcr, "~> 0.10.2", only: [:dev, :test]},
