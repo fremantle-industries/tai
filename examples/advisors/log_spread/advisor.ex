@@ -15,8 +15,8 @@ defmodule Examples.Advisors.LogSpread.Advisor do
         _changes,
         state
       ) do
-    bid_price = market_quote.bid.price |> Tai.Utils.Decimal.from()
-    ask_price = market_quote.ask.price |> Tai.Utils.Decimal.from()
+    bid_price = market_quote.bid.price |> Decimal.cast()
+    ask_price = market_quote.ask.price |> Decimal.cast()
     spread = Decimal.sub(ask_price, bid_price)
 
     Tai.Events.info(%Examples.Advisors.LogSpread.Events.Spread{

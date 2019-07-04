@@ -60,11 +60,8 @@ defmodule Tai.Commands.Markets do
   defp format_row(row) when is_list(row), do: row |> Enum.map(&format_col/1)
   defp format_col({nil, _}), do: format_col(nil)
   defp format_col({receiver, message}), do: receiver |> get_in([message]) |> format_col
-  defp format_col(num) when is_number(num), do: num |> to_decimal
+  defp format_col(num) when is_number(num), do: num |> Decimal.cast()
   defp format_col(%DateTime{} = date), do: Timex.from_now(date)
   defp format_col(nil), do: "~"
   defp format_col(pass_through), do: pass_through
-
-  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
-  defp to_decimal(val), do: val |> Decimal.new()
 end

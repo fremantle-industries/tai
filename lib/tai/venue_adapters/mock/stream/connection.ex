@@ -87,9 +87,9 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          },
          _venue_id
        ) do
-    avg_price = raw_avg_price |> Tai.Utils.Decimal.from()
-    cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.from()
-    leaves_qty = raw_leaves_qty |> Tai.Utils.Decimal.from()
+    avg_price = raw_avg_price |> Decimal.cast()
+    cumulative_qty = raw_cumulative_qty |> Decimal.cast()
+    leaves_qty = raw_leaves_qty |> Decimal.cast()
 
     {:ok, {prev_order, updated_order}} =
       %OrderStore.Actions.PassivePartialFill{
@@ -113,7 +113,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          },
          _venue_id
        ) do
-    cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.from()
+    cumulative_qty = raw_cumulative_qty |> Decimal.cast()
 
     {:ok, {prev_order, updated_order}} =
       %OrderStore.Actions.PassiveFill{

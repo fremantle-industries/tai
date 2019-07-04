@@ -73,9 +73,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
          order
        ) do
     received_at = Timex.now()
-
-    avg_price =
-      (venue_order.avg_px && Tai.Utils.Decimal.from(venue_order.avg_px)) || Decimal.new(0)
+    avg_price = (venue_order.avg_px && Decimal.cast(venue_order.avg_px)) || Decimal.new(0)
 
     response = %Tai.Trading.OrderResponses.Create{
       id: venue_order.order_id,

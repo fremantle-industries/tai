@@ -1,4 +1,5 @@
 defmodule Tai.Utils.Decimal do
+  @deprecated "Use Decimal.cast/1 instead."
   @spec from(number | String.t() | Decimal.t()) :: Decimal.t()
   def from(val) when is_float(val), do: Decimal.from_float(val)
   def from(val), do: Decimal.new(val)

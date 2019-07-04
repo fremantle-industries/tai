@@ -20,7 +20,7 @@ defmodule Tai.AdvisorGroups.RichConfig do
   end
 
   defp parse_item({k, {raw_val, :decimal}}, acc, _provider) do
-    decimal_val = Tai.Utils.Decimal.from(raw_val)
+    decimal_val = Decimal.cast(raw_val)
     acc |> Map.put(k, decimal_val)
   end
 

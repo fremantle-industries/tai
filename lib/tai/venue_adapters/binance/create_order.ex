@@ -4,7 +4,6 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   """
 
   alias Tai.VenueAdapters.Binance.OrderStatus
-  alias Tai.Utils
 
   @limit "LIMIT"
 
@@ -78,9 +77,8 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
       |> Enum.reduce(
         {Decimal.new(0), Decimal.new(0)},
         fn %{"price" => raw_price, "qty" => raw_qty}, {sum_price, sum_qty} ->
-          price = raw_price |> Utils.Decimal.from()
-          qty = raw_qty |> Utils.Decimal.from()
-
+          price = raw_price |> Decimal.cast()
+          qty = raw_qty |> Decimal.cast()
           new_sum_price = price |> Decimal.mult(qty) |> Decimal.add(sum_price)
           new_sum_qty = qty |> Decimal.add(sum_qty)
 

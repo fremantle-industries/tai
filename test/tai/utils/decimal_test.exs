@@ -2,15 +2,6 @@ defmodule Tai.Utils.DecimalTest do
   use ExUnit.Case, async: true
   doctest Tai.Utils.Decimal
 
-  describe ".from/1" do
-    test "returns a decimal from and integer, float, string or decimal" do
-      assert Tai.Utils.Decimal.from(1) == Decimal.new(1)
-      assert Tai.Utils.Decimal.from(1.1) == Decimal.new("1.1")
-      assert Tai.Utils.Decimal.from("1.2") == Decimal.new("1.2")
-      assert Tai.Utils.Decimal.from(Decimal.new("1.3")) == Decimal.new("1.3")
-    end
-  end
-
   describe ".round_up/2" do
     test "rounds the value up to the nearest increment" do
       assert Tai.Utils.Decimal.round_up(Decimal.new("3001.700"), Decimal.new("0.5")) ==

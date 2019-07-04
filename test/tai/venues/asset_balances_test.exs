@@ -142,8 +142,8 @@ defmodule Tai.Venues.AssetBalancesTest do
         venue_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: asset,
-        min: min |> to_decimal,
-        max: max |> to_decimal
+        min: min |> Decimal.cast(),
+        max: max |> Decimal.cast()
       })
     end
 
@@ -248,7 +248,7 @@ defmodule Tai.Venues.AssetBalancesTest do
         venue_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: asset,
-        qty: qty |> to_decimal
+        qty: qty |> Decimal.cast()
       })
     end
 
@@ -441,7 +441,4 @@ defmodule Tai.Venues.AssetBalancesTest do
     :ok = AssetBalances.upsert(balance)
     {:ok, %{balance: balance}}
   end
-
-  def to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
-  def to_decimal(val), do: val |> Decimal.new()
 end

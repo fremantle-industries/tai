@@ -199,7 +199,7 @@ defmodule Tai.Venues.AssetBalances do
   end
 
   def add(venue_id, account_id, asset, val) when is_number(val) or is_binary(val) do
-    add(venue_id, account_id, asset, to_decimal(val))
+    add(venue_id, account_id, asset, Decimal.cast(val))
   end
 
   @spec sub(venue_id, account_id, asset, val :: number | String.t() | Decimal.t()) ::
@@ -212,7 +212,7 @@ defmodule Tai.Venues.AssetBalances do
   end
 
   def sub(venue_id, account_id, asset, val) when is_number(val) or is_binary(val) do
-    sub(venue_id, account_id, asset, to_decimal(val))
+    sub(venue_id, account_id, asset, Decimal.cast(val))
   end
 
   @spec all :: [asset_balance]
@@ -277,7 +277,4 @@ defmodule Tai.Venues.AssetBalances do
   defp create_ets_table do
     :ets.new(__MODULE__, [:set, :protected, :named_table])
   end
-
-  defp to_decimal(val) when is_float(val), do: val |> Decimal.from_float()
-  defp to_decimal(val), do: val |> Decimal.new()
 end

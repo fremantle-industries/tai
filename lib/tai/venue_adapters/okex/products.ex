@@ -1,6 +1,4 @@
 defmodule Tai.VenueAdapters.OkEx.Products do
-  alias Tai.Utils
-
   def products(venue_id) do
     with {:ok, future_instruments} <- ExOkex.Futures.Public.instruments(),
          {:ok, swap_instruments} <- ExOkex.Swap.Public.instruments() do
@@ -35,8 +33,8 @@ defmodule Tai.VenueAdapters.OkEx.Products do
 
   defp build(instrument_id, raw_price_increment, raw_size_increment, type, venue_id) do
     symbol = instrument_id |> to_symbol()
-    price_increment = raw_price_increment |> Utils.Decimal.from()
-    size_increment = raw_size_increment |> Utils.Decimal.from()
+    price_increment = raw_price_increment |> Decimal.cast()
+    size_increment = raw_size_increment |> Decimal.cast()
 
     %Tai.Venues.Product{
       venue_id: venue_id,

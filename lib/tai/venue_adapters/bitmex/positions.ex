@@ -28,15 +28,14 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
       account_id: account_id,
       product_symbol: product_symbol,
       open: position.is_open,
-      avg_entry_price:
-        position.avg_entry_price && position.avg_entry_price |> Tai.Utils.Decimal.from(),
-      qty: position.current_qty |> Tai.Utils.Decimal.from(),
-      init_margin: position.init_margin |> Tai.Utils.Decimal.from(),
-      init_margin_req: position.init_margin_req |> Tai.Utils.Decimal.from(),
-      maint_margin: position.maint_margin |> Tai.Utils.Decimal.from(),
-      maint_margin_req: position.maint_margin_req |> Tai.Utils.Decimal.from(),
-      realised_pnl: position.realised_pnl |> Tai.Utils.Decimal.from(),
-      unrealised_pnl: position.unrealised_pnl |> Tai.Utils.Decimal.from()
+      avg_entry_price: position.avg_entry_price && position.avg_entry_price |> Decimal.cast(),
+      qty: position.current_qty |> Decimal.cast(),
+      init_margin: position.init_margin |> Decimal.cast(),
+      init_margin_req: position.init_margin_req |> Decimal.cast(),
+      maint_margin: position.maint_margin |> Decimal.cast(),
+      maint_margin_req: position.maint_margin_req |> Decimal.cast(),
+      realised_pnl: position.realised_pnl |> Decimal.cast(),
+      unrealised_pnl: position.unrealised_pnl |> Decimal.cast()
     }
   end
 end
