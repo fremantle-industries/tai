@@ -1,6 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
   use ExUnit.Case, async: false
-  import Support.Assertions.Event
+  import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
   alias Tai.VenueAdapters.Bitmex.ClientId
   alias Tai.Events

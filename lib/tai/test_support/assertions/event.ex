@@ -1,4 +1,4 @@
-defmodule Support.Assertions.Event do
+defmodule Tai.TestSupport.Assertions.Event do
   defmacro assert_event(event) do
     quote do
       assert_receive {Tai.Event, unquote(event), _}
