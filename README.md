@@ -29,7 +29,7 @@ config :tai,
     log_spread: [
       start_on_boot: true,
       advisor: Examples.Advisors.LogSpread.Advisor,
-      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
+      factory: Tai.Advisors.Factories.OnePerProduct,
       products: "*"
     ]
   }

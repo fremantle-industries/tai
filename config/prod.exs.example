@@ -7,17 +7,17 @@ config :tai,
   advisor_groups: %{
     create_and_cancel_pending_order: [
       advisor: Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
-      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
+      factory: Tai.Advisors.Factories.OnePerProduct,
       products: "gdax.btc_usd"
     ],
     log_spread: [
       advisor: Examples.Advisors.LogSpread.Advisor,
-      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
+      factory: Tai.Advisors.Factories.OnePerProduct,
       products: "binance.btc_usdt gdax.btc_usd poloniex.btc_usdt"
     ],
     fill_or_kill_orders: [
       advisor: Examples.Advisors.FillOrKillOrders.Advisor,
-      factory: Tai.Advisors.Factories.OnePerVenueAndProduct,
+      factory: Tai.Advisors.Factories.OnePerProduct,
       products: "binance.btc_usdt"
     ]
   }

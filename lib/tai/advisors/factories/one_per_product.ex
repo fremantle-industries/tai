@@ -1,4 +1,4 @@
-defmodule Tai.Advisors.Factories.OnePerVenueAndProduct do
+defmodule Tai.Advisors.Factories.OnePerProduct do
   @behaviour Tai.Advisors.Factory
 
   @type group :: Tai.AdvisorGroup.t()
