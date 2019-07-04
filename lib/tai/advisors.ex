@@ -56,12 +56,12 @@ defmodule Tai.Advisors do
   end
 
   defp start_advisor({spec, nil}, {new, old}) do
-    Tai.AdvisorsSupervisor.start_advisor(spec)
+    Tai.Advisors.Supervisor.start_advisor(spec)
     {new + 1, old}
   end
 
   defp stop_advisor({_, pid}, {new, old}) when is_pid(pid) do
-    Tai.AdvisorsSupervisor.terminate_advisor(pid)
+    Tai.Advisors.Supervisor.terminate_advisor(pid)
     {new + 1, old}
   end
 

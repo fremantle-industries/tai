@@ -103,7 +103,7 @@ defmodule Tai.AdvisorsTest do
       [group_id: :group_c, advisor_id: :advisor_b, products: [], config: %{}]
     }
 
-    start_supervised!(Tai.AdvisorsSupervisor)
+    start_supervised!(Tai.Advisors.Supervisor)
     start_supervised!(spec_1)
 
     assert Tai.Advisors.start([spec_1, spec_2, spec_3]) == {:ok, {2, 1}}
@@ -127,7 +127,7 @@ defmodule Tai.AdvisorsTest do
       [group_id: :group_c, advisor_id: :advisor_b, products: [], config: %{}]
     }
 
-    start_supervised!(Tai.AdvisorsSupervisor)
+    start_supervised!(Tai.Advisors.Supervisor)
     start_supervised!(spec_1)
 
     assert Tai.Advisors.stop([spec_1, spec_2, spec_3]) == {:ok, {1, 2}}

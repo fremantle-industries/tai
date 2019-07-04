@@ -3,7 +3,7 @@ defmodule Tai do
 
   def start(_type, _args) do
     # TODO:
-    # ex_poloniex won't need to resolve env on boot when 
+    # ex_poloniex won't need to resolve env on boot when
     # the venue adapters support per account configuration
     Confex.resolve_env!(:ex_poloniex)
     Confex.resolve_env!(:tai)
@@ -24,7 +24,7 @@ defmodule Tai do
       Tai.Venues.OrderBookFeedsSupervisor,
       Tai.Venues.StreamsSupervisor,
       {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},
-      Tai.AdvisorsSupervisor
+      Tai.Advisors.Supervisor
     ]
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)
