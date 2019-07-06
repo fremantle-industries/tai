@@ -15,12 +15,14 @@ defmodule Tai.Advisors.Factories.OneForAllProductsTest do
                        })
 
   test "returns one advisor spec for all products in one advisor group" do
-    assert [spec] = OneForAllProducts.advisor_specs(@group_with_products)
+    specs = OneForAllProducts.advisor_specs(@group_with_products)
 
-    assert {MyAdvisor, opts} = spec
-    assert Keyword.fetch!(opts, :group_id) == :group_a
-    assert Keyword.fetch!(opts, :advisor_id) == :main
-    assert Keyword.fetch!(opts, :config) == %{hello: :world}
-    assert Keyword.fetch!(opts, :products) == @products
+    assert Enum.count(specs) == 1
+    assert %Tai.Advisors.Spec{} = spec = specs |> List.first()
+    assert spec.group_id == :group_a
+    assert spec.advisor_id == :main
+    assert spec.config == %{hello: :world}
+    assert Enum.count(spec.products) == 2
+    assert spec.products == @products
   end
 end

@@ -149,16 +149,10 @@ iex(1)> help
 * fees
 * markets
 * orders
-* advisor_groups
-* advisors
-* advisor :group_id, :advisor_id
 * settings
-* start_advisors
-* start_advisor_group :group_id
-* start_advisor :group_id, :advisor_id
-* stop_advisors
-* stop_advisor_group :group_id
-* stop_advisor :group_id, :advisor_id
+* advisors [where: [...], order: [...]]
+* start_advisors [where: [...]]
+* stop_advisors [where: [...]]
 * enable_send_orders
 * disable_send_orders
 ```
@@ -272,29 +266,13 @@ iex(7)> settings
 +-------------+-------+
 ```
 
-#### advisor_groups
-
-Displays the aggregate status of all advisors in all groups
-
-
-```
-iex(8)> advisor_groups
-+---------------------------------+---------+-----------+-------+
-|                        Group ID | Running | Unstarted | Total |
-+---------------------------------+---------+-----------+-------+
-|                      log_spread |       0 |         3 |     3 |
-|             fill_or_kill_orders |       0 |         1 |     1 |
-| create_and_cancel_pending_order |       0 |         1 |     1 |
-+---------------------------------+---------+-----------+-------+
-```
-
 #### advisors
 
-Displays every advisor from every group along with their run status 
+List advisors that can optionally be filtered and ordered
 
 
 ```
-iex(9)> advisors
+iex(9)> advisors where: [status: :unstarted], order: [:group_id]
 +---------------------------------+-------------------+-----------+-----+
 |                        Group ID |        Advisor ID |    Status | PID |
 +---------------------------------+-------------------+-----------+-----+
@@ -306,71 +284,22 @@ iex(9)> advisors
 +---------------------------------+-------------------+-----------+-----+
 ```
 
-#### advisor
-
-Display details of an individual advisor in a group
-
-```
-iex(10)> advisor :log_spread, :gdax_btc_usd
-Group ID: log_spread
-Advisor ID: gdax_btc_usd
-Config: %{}
-Status: unstarted
-PID: -
-```
-
 #### start_advisors
 
-Starts every advisor in every group
+Starts advisors with an optional filter
 
 ```
-iex(11)> start_advisors
+iex(11)> start_advisors where: [status: :unstarted]
 Started advisors: 5 new, 0 already running
-```
-
-#### start_advisor_group
-
-Starts every advisor in the given group
-
-```
-iex(12)> start_advisor_group :log_spread
-Started advisors: 3 new, 0 already running
-```
-
-#### start_advisor
-
-Starts a single advisor in given group
-
-```
-iex(13)> start_advisor :log_spread, :binance_btc_usdt
-Started advisors: 1 new, 0 already running
 ```
 
 #### stop_advisors
 
-Stops every advisor in every group
+Stops advisors with an optional filter
 
 ```
-iex(14)> stop_advisor_groups
+iex(14)> stop_advisors where: [status: :running]
 Stopped advisors: 5 new, 0 already stopped
-```
-
-#### stop_advisor_group
-
-Stops every advisor in the given group
-
-```
-iex(15)> start_advisor_group :log_spread
-Stopped advisors: 3 new, 0 already stopped
-```
-
-#### start_advisor
-
-Stops a single advisor in given group
-
-```
-iex(16)> stop_advisor :log_spread, :binance_btc_usdt
-Stopped advisors: 1 new, 0 already stopped
 ```
 
 ## Logging

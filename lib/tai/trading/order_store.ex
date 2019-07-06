@@ -36,8 +36,7 @@ defmodule Tai.Trading.OrderStore do
 
   def handle_call({:enqueue, submission}, _from, state) do
     order = OrderSubmissions.Factory.build!(submission)
-    state.backend.insert(order, state.name)
-    response = {:ok, order}
+    response = state.backend.insert(order, state.name)
     {:reply, response, state}
   end
 

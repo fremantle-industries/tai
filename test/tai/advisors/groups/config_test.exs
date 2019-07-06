@@ -1,4 +1,4 @@
-defmodule Tai.Advisors.Groups.ConfigTest do
+defmodule Tai.Advisors.GroupsTest do
   use ExUnit.Case, async: true
 
   defmodule TestProvider do
@@ -28,7 +28,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert %Tai.AdvisorGroup{} = group
     assert group.id == :group_a
     assert group.advisor == AdvisorA
@@ -51,7 +51,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert [product | []] = group.products
     assert product.venue_id == :venue_a
     assert product.symbol == :btc_usdt
@@ -69,7 +69,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert group.start_on_boot == false
   end
 
@@ -88,7 +88,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert %Tai.Venues.Product{} = product_a = group.config.product_a
     assert product_a.venue_id == :venue_a
     assert product_a.symbol == :btc_usdt
@@ -107,7 +107,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert %MyConfig{} = group.config
     assert group.config.my_symbol == :btc_usd
   end
@@ -124,7 +124,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert group.config == %{}
   end
 
@@ -140,7 +140,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:ok, [group | _]} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert group.trades == []
   end
 
@@ -155,7 +155,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:error, errors} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:error, errors} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert errors.group_a == [{:advisor, "must be present"}]
   end
 
@@ -170,7 +170,7 @@ defmodule Tai.Advisors.Groups.ConfigTest do
         }
       )
 
-    assert {:error, errors} = Tai.Advisors.Groups.Config.parse_groups(config, TestProvider)
+    assert {:error, errors} = Tai.Advisors.Groups.parse_config(config, TestProvider)
     assert errors.group_a == [{:factory, "must be present"}]
   end
 end

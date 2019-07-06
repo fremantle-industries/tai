@@ -11,13 +11,16 @@ defmodule Tai.Advisors.Factories.OnePerProductTest do
                          config: %{hello: :world}
                        })
 
-  test "returns an advisor spec for each product on the given venues" do
-    assert [spec | []] = OnePerProduct.advisor_specs(@group_with_products)
+  test "returns an advisor spec for each product in the group" do
+    specs = OnePerProduct.advisor_specs(@group_with_products)
 
-    assert {MyAdvisor, opts} = spec
-    assert Keyword.fetch!(opts, :group_id) == :group_a
-    assert Keyword.fetch!(opts, :advisor_id) == :venue_a_btc_usdt
-    assert Keyword.fetch!(opts, :config) == %{hello: :world}
-    assert Keyword.fetch!(opts, :products) |> List.first() == @product
+    assert Enum.count(specs) == 1
+    assert %Tai.Advisors.Spec{} = spec = specs |> List.first()
+    assert spec.mod == MyAdvisor
+    assert spec.group_id == :group_a
+    assert spec.advisor_id == :venue_a_btc_usdt
+    assert spec.config == %{hello: :world}
+    assert Enum.count(spec.products) == 1
+    assert spec.products |> List.first() == @product
   end
 end

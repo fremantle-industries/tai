@@ -3,8 +3,8 @@ defmodule Tai do
 
   def start(_type, _args) do
     # TODO:
-    # ex_poloniex won't need to resolve env on boot when
-    # the venue adapters support per account configuration
+    # ex_poloniex won't need to resolve env on boot separately when
+    # it's venue adapter can support per account configuration
     Confex.resolve_env!(:ex_poloniex)
     Confex.resolve_env!(:tai)
 
@@ -24,6 +24,7 @@ defmodule Tai do
       Tai.Venues.OrderBookFeedsSupervisor,
       Tai.Venues.StreamsSupervisor,
       {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},
+      Tai.Advisors.Store,
       Tai.Advisors.Supervisor
     ]
 
@@ -31,7 +32,8 @@ defmodule Tai do
 
     config
     |> boot_venues!()
-    |> boot_advisor_groups!()
+    |> hydrate_advisors!()
+    |> boot_advisors!()
 
     {:ok, pid}
   end
@@ -57,9 +59,17 @@ defmodule Tai do
     {:ok, config}
   end
 
-  defp boot_advisor_groups!({:ok, config}) do
+  defp hydrate_advisors!({:ok, config}) do
     config
-    |> Tai.Advisors.specs(start_on_boot: true)
-    |> Tai.Advisors.start()
+    |> Tai.Advisors.Specs.from_config()
+    |> Enum.map(&Tai.Advisors.Instance.from_spec/1)
+    |> Enum.map(&Tai.Advisors.Store.upsert/1)
+  end
+
+  defp boot_advisors!(upsert_results) do
+    upsert_results
+    |> Enum.map(fn {:ok, instance} -> instance end)
+    |> Enum.filter(fn instance -> instance.start_on_boot end)
+    |> Tai.Advisors.Instances.start()
   end
 end

@@ -1,13 +1,13 @@
-defmodule Tai.Advisors.Groups.Config do
-  alias Tai.Advisors.Groups.RichConfig
+defmodule Tai.Advisors.Groups do
+  alias Tai.Advisors.Groups
 
   @type config :: Tai.Config.t()
   @type product :: Tai.Venues.Product.t()
   @type advisor_group :: Tai.AdvisorGroup.t()
-  @type provider :: Tai.Advisors.Groups.RichConfig.provider()
+  @type provider :: Groups.RichConfig.provider()
 
-  @spec parse_groups(config, provider) :: {:ok, [advisor_group]} | {:error, map}
-  def parse_groups(%Tai.Config{} = config, provider \\ Tai.Advisors.Groups.RichConfig) do
+  @spec parse_config(config, provider) :: {:ok, [advisor_group]} | {:error, map}
+  def parse_config(%Tai.Config{} = config, provider \\ Groups.RichConfig) do
     venue_indexed_symbols = Tai.Transforms.ProductSymbolsByVenue.all(provider.products)
     groups = config.advisor_groups |> Enum.map(&build(&1, provider, venue_indexed_symbols))
     errors = groups |> Enum.reduce(%{}, &validate/2)
@@ -19,7 +19,7 @@ defmodule Tai.Advisors.Groups.Config do
     products_query = group_config |> Keyword.get(:products, "")
     filtered_venue_indexed_symbols = Juice.squeeze(venue_indexed_symbols, products_query)
     filtered_products = filtered_venue_indexed_symbols |> filter_products(provider.products)
-    rich_config = group_config |> parse_config(provider)
+    rich_config = group_config |> parse_group_config(provider)
 
     %Tai.AdvisorGroup{
       id: id,
@@ -32,12 +32,12 @@ defmodule Tai.Advisors.Groups.Config do
     }
   end
 
-  defp parse_config(group_config, provider) do
+  defp parse_group_config(group_config, provider) do
     group_config
     |> Keyword.get(:config, %{})
     |> case do
-      {s, c} -> struct!(s, c |> RichConfig.parse(provider))
-      c -> c |> RichConfig.parse(provider)
+      {s, c} -> struct!(s, c |> Groups.RichConfig.parse(provider))
+      c -> c |> Groups.RichConfig.parse(provider)
     end
   end
 

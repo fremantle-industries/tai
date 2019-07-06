@@ -10,16 +10,10 @@ defmodule Tai.Commands.Help do
     * fees
     * markets
     * orders
-    * advisor_groups
-    * advisors
-    * advisor :group_id, :advisor_id
     * settings
-    * start_advisors
-    * start_advisor_group :group_id
-    * start_advisor :group_id, :advisor_id
-    * stop_advisors
-    * stop_advisor_group :group_id
-    * stop_advisor :group_id, :advisor_id
+    * advisors [where: [...], order: [...]]
+    * start_advisors [where: [...]]
+    * stop_advisors [where: [...]]
     * enable_send_orders
     * disable_send_orders
     """)

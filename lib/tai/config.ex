@@ -1,6 +1,6 @@
 defmodule Tai.Config do
   @moduledoc """
-  Module to parse the config from the application environment
+  Convert the application environment into a struct
   """
 
   @type t :: %Tai.Config{

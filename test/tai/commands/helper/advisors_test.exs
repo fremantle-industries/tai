@@ -1,38 +1,33 @@
 defmodule Tai.Commands.Helper.AdvisorsTest do
   use ExUnit.Case, async: false
-
   import ExUnit.CaptureIO
-  import Tai.TestSupport.Mock
+  import Support.Advisors, only: [insert_spec: 2]
+
+  @test_store_id __MODULE__
 
   setup do
-    on_exit(fn ->
-      Application.stop(:tai)
-    end)
-
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!({Tai.Advisors.Store, id: @test_store_id})
     :ok
   end
 
-  test "shows all advisors and their run status" do
-    mock_product(%{venue_id: :test_exchange_a, symbol: :btc_usdt})
-    mock_product(%{venue_id: :test_exchange_b, symbol: :eth_usdt})
+  test "shows all advisors in all groups ordered group id, advisor id by default" do
+    insert_spec(%{group_id: :log_spread, advisor_id: :a}, @test_store_id)
+    insert_spec(%{group_id: :log_spread, advisor_id: :b}, @test_store_id)
+    insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
 
-    assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +---------------------------------+--------------------------+-----------+-----+
-           |                        Group ID |               Advisor ID |    Status | PID |
-           +---------------------------------+--------------------------+-----------+-----+
-           | create_and_cancel_pending_order | test_exchange_a_btc_usdt | unstarted |   - |
-           |             fill_or_kill_orders | test_exchange_a_btc_usdt | unstarted |   - |
-           |                      log_spread | test_exchange_a_btc_usdt | unstarted |   - |
-           |                      log_spread | test_exchange_b_eth_usdt | unstarted |   - |
-           +---------------------------------+--------------------------+-----------+-----+\n
+    assert capture_io(fn -> Tai.Commands.Helper.advisors(store_id: @test_store_id) end) == """
+           +--------------+------------+-----------+-----+
+           |     Group ID | Advisor ID |    Status | PID |
+           +--------------+------------+-----------+-----+
+           |   log_spread |          a | unstarted |   - |
+           |   log_spread |          b | unstarted |   - |
+           | trade_spread |          a | unstarted |   - |
+           +--------------+------------+-----------+-----+\n
            """
   end
 
   test "shows an empty table when there are no advisors" do
-    config = struct(Tai.Config, advisor_groups: %{})
-
-    assert capture_io(fn -> Tai.Commands.Helper.advisors(config) end) == """
+    assert capture_io(fn -> Tai.Commands.Helper.advisors(store_id: @test_store_id) end) == """
            +----------+------------+--------+-----+
            | Group ID | Advisor ID | Status | PID |
            +----------+------------+--------+-----+
@@ -41,80 +36,44 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
            """
   end
 
-  test "can start and stop all advisors in all groups" do
-    mock_product(%{
-      venue_id: :test_exchange_a,
-      symbol: :btc_usdt
-    })
+  test "can filter by struct attributes" do
+    insert_spec(%{group_id: :log_spread, advisor_id: :a}, @test_store_id)
+    insert_spec(%{group_id: :log_spread, advisor_id: :b}, @test_store_id)
+    insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
 
-    mock_product(%{
-      venue_id: :test_exchange_b,
-      symbol: :eth_usdt
-    })
-
-    assert capture_io(&Tai.Commands.Helper.start_advisors/0) == """
-           Started advisors: 4 new, 0 already running
-           """
-
-    output = capture_io(&Tai.Commands.Helper.advisors/0)
-    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Status \|\s+PID \|/
-
-    assert output =~
-             ~r/\|\s+fill_or_kill_orders \|\s+test_exchange_a_btc_usdt \|\s+running \|\s+#PID<.+> \|/
-
-    assert output =~
-             ~r/\|\s+log_spread \|\s+test_exchange_a_btc_usdt \|\s+running \|\s+#PID<.+> \|/
-
-    assert output =~
-             ~r/\|\s+log_spread \|\s+test_exchange_b_eth_usdt \|\s+running \|\s+#PID<.+> \|/
-
-    assert capture_io(&Tai.Commands.Helper.stop_advisors/0) == """
-           Stopped advisors: 4 new, 0 already stopped
-           """
-
-    assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +---------------------------------+--------------------------+-----------+-----+
-           |                        Group ID |               Advisor ID |    Status | PID |
-           +---------------------------------+--------------------------+-----------+-----+
-           | create_and_cancel_pending_order | test_exchange_a_btc_usdt | unstarted |   - |
-           |             fill_or_kill_orders | test_exchange_a_btc_usdt | unstarted |   - |
-           |                      log_spread | test_exchange_a_btc_usdt | unstarted |   - |
-           |                      log_spread | test_exchange_b_eth_usdt | unstarted |   - |
-           +---------------------------------+--------------------------+-----------+-----+\n
+    assert capture_io(fn ->
+             Tai.Commands.Helper.advisors(
+               where: [group_id: :log_spread],
+               store_id: @test_store_id
+             )
+           end) == """
+           +------------+------------+-----------+-----+
+           |   Group ID | Advisor ID |    Status | PID |
+           +------------+------------+-----------+-----+
+           | log_spread |          a | unstarted |   - |
+           | log_spread |          b | unstarted |   - |
+           +------------+------------+-----------+-----+\n
            """
   end
 
-  test "starts and stops all advisors in a single group" do
-    mock_product(%{venue_id: :test_exchange_a, symbol: :btc_usdt})
-    mock_product(%{venue_id: :test_exchange_b, symbol: :eth_usdt})
+  test "can order ascending by struct attributes" do
+    insert_spec(%{group_id: :log_spread, advisor_id: :a}, @test_store_id)
+    insert_spec(%{group_id: :log_spread, advisor_id: :b}, @test_store_id)
+    insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
 
-    assert capture_io(fn -> Tai.Commands.Helper.start_advisor_group(:log_spread) end) == """
-           Started advisors: 2 new, 0 already running
-           """
-
-    output = capture_io(&Tai.Commands.Helper.advisors/0)
-    assert output =~ ~r/\|\s+Group ID \|\s+Advisor ID \|\s+Status \|\s+PID \|/
-    refute output =~ ~r/\|\s+fill_or_kill_orders.+running \|\s+#PID<.+> \|/
-
-    assert output =~
-             ~r/\|\s+log_spread \|\s+test_exchange_a_btc_usdt \|\s+running \|\s+#PID<.+> \|/
-
-    assert output =~
-             ~r/\|\s+log_spread \|\s+test_exchange_b_eth_usdt \|\s+running \|\s+#PID<.+> \|/
-
-    assert capture_io(fn -> Tai.Commands.Helper.stop_advisor_group(:log_spread) end) == """
-           Stopped advisors: 2 new, 0 already stopped
-           """
-
-    assert capture_io(&Tai.Commands.Helper.advisors/0) == """
-           +---------------------------------+--------------------------+-----------+-----+
-           |                        Group ID |               Advisor ID |    Status | PID |
-           +---------------------------------+--------------------------+-----------+-----+
-           | create_and_cancel_pending_order | test_exchange_a_btc_usdt | unstarted |   - |
-           |             fill_or_kill_orders | test_exchange_a_btc_usdt | unstarted |   - |
-           |                      log_spread | test_exchange_a_btc_usdt | unstarted |   - |
-           |                      log_spread | test_exchange_b_eth_usdt | unstarted |   - |
-           +---------------------------------+--------------------------+-----------+-----+\n
+    assert capture_io(fn ->
+             Tai.Commands.Helper.advisors(
+               order: [:advisor_id, :group_id],
+               store_id: @test_store_id
+             )
+           end) == """
+           +--------------+------------+-----------+-----+
+           |     Group ID | Advisor ID |    Status | PID |
+           +--------------+------------+-----------+-----+
+           |   log_spread |          a | unstarted |   - |
+           | trade_spread |          a | unstarted |   - |
+           |   log_spread |          b | unstarted |   - |
+           +--------------+------------+-----------+-----+\n
            """
   end
 end

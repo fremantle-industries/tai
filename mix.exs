@@ -32,6 +32,7 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
+      {:enumerati, "~> 0.0.3"},
       {:ex_binance, "~> 0.0.4"},
       {:ex_bitmex, "~> 0.1.0"},
       {:ex_okex, "~> 0.1"},

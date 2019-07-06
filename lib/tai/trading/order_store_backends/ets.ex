@@ -3,21 +3,22 @@ defmodule Tai.Trading.OrderStoreBackends.ETS do
 
   @type order :: Tai.Trading.Order.t()
   @type client_id :: Tai.Trading.Order.client_id()
-  @type name :: atom
+  @type table_name :: atom
 
-  def create(name) do
-    :ets.new(name, [:set, :protected, :named_table])
+  @spec create(table_name) :: :ok
+  def create(table_name) do
+    :ets.new(table_name, [:set, :protected, :named_table])
     :ok
   end
 
   @doc """
   Insert an order into the ETS table
   """
-  @spec insert(order, name) :: :ok
-  def insert(order, name) do
+  @spec insert(order, table_name) :: {:ok, order}
+  def insert(order, table_name) do
     record = {order.client_id, order}
-    true = :ets.insert(name, record)
-    :ok
+    true = :ets.insert(table_name, record)
+    {:ok, order}
   end
 
   @doc """
@@ -41,9 +42,9 @@ defmodule Tai.Trading.OrderStoreBackends.ETS do
   @doc """
   Return a list of all orders currently stored in the ETS table
   """
-  @spec all(name) :: [] | [order]
-  def all(name) do
-    name
+  @spec all(table_name) :: [] | [order]
+  def all(table_name) do
+    table_name
     |> :ets.select([{{:_, :_}, [], [:"$_"]}])
     |> Enum.map(fn {_, order} -> order end)
   end
@@ -51,9 +52,9 @@ defmodule Tai.Trading.OrderStoreBackends.ETS do
   @doc """
   Return the order from the ETS table that matches the given client_id
   """
-  @spec find_by_client_id(client_id, name) :: {:ok, order} | {:error, :not_found}
-  def find_by_client_id(client_id, name) do
-    with [{_, order}] <- :ets.lookup(name, client_id) do
+  @spec find_by_client_id(client_id, table_name) :: {:ok, order} | {:error, :not_found}
+  def find_by_client_id(client_id, table_name) do
+    with [{_, order}] <- :ets.lookup(table_name, client_id) do
       {:ok, order}
     else
       [] -> {:error, :not_found}
