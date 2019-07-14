@@ -24,7 +24,9 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
             %{venue_id: :test_exchange_a, symbol: :btc_usd}
           )
         ],
-        config: %{}
+        config: %{},
+        store: %{},
+        trades: []
       ]
     })
 

@@ -26,7 +26,9 @@ defmodule Examples.Advisors.CreateAndCancelPendingOrder.AdvisorTest do
             %{venue_id: :test_exchange_a, symbol: :btc_usd}
           )
         ],
-        config: %{}
+        config: %{},
+        store: %{},
+        trades: []
       ]
     })
 

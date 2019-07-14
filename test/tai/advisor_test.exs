@@ -16,7 +16,8 @@ defmodule Tai.AdvisorTest do
            advisor_id: :my_advisor,
            products: [],
            config: %{},
-           store: %{initialized: true}
+           store: %{initialized: true},
+           trades: []
          ]}
       )
 
@@ -167,7 +168,9 @@ defmodule Tai.AdvisorTest do
          group_id: group_id,
          advisor_id: advisor_id,
          products: [],
-         config: %{}
+         config: %{},
+         store: %{},
+         trades: []
        ]}
     )
 

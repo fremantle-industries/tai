@@ -31,7 +31,9 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
         group_id: :group_a,
         advisor_id: :my_advisor,
         products: [@btc_usd],
-        config: config
+        config: config,
+        store: %{},
+        trades: []
       ]
     })
   end
