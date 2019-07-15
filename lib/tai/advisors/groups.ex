@@ -6,7 +6,7 @@ defmodule Tai.Advisors.Groups do
   @type provider :: Groups.RichConfig.provider()
 
   @spec from_config(map, provider) :: {:ok, [advisor_group]} | {:error, map}
-  def from_config(advisor_groups, provider \\ Groups.RichConfig) do
+  def from_config(advisor_groups, provider \\ Groups.RichConfigProvider) do
     venue_indexed_symbols = Tai.Transforms.ProductSymbolsByVenue.all(provider.products)
     groups = advisor_groups |> Enum.map(&build(&1, provider, venue_indexed_symbols))
     errors = groups |> Enum.reduce(%{}, &validate/2)
