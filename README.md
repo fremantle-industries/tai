@@ -75,7 +75,7 @@ config :tai,
 ```elixir
 def deps do
   [
-    {:tai, "~> 0.0.24"}
+    {:tai, "~> 0.0.25"}
   ]
 end
 ```
