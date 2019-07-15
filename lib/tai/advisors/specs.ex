@@ -6,7 +6,7 @@ defmodule Tai.Advisors.Specs do
 
   @spec from_config(config) :: [spec]
   def from_config(config, provider \\ Groups.RichConfigProvider) do
-    {:ok, groups} = Groups.parse_config(config, provider)
+    {:ok, groups} = Groups.from_config(config.advisor_groups, provider)
 
     groups
     |> Enum.flat_map(fn group ->
