@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.AdvisorsTest do
+defmodule Tai.Commands.AdvisorsTest do
   use ExUnit.Case, async: false
   import ExUnit.CaptureIO
   import Support.Advisors, only: [insert_spec: 2]
@@ -15,7 +15,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
     insert_spec(%{group_id: :log_spread, advisor_id: :b}, @test_store_id)
     insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
 
-    assert capture_io(fn -> Tai.Commands.Helper.advisors(store_id: @test_store_id) end) == """
+    assert capture_io(fn -> Tai.CommandsHelper.advisors(store_id: @test_store_id) end) == """
            +--------------+------------+-----------+-----+
            |     Group ID | Advisor ID |    Status | PID |
            +--------------+------------+-----------+-----+
@@ -27,7 +27,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
   end
 
   test "shows an empty table when there are no advisors" do
-    assert capture_io(fn -> Tai.Commands.Helper.advisors(store_id: @test_store_id) end) == """
+    assert capture_io(fn -> Tai.CommandsHelper.advisors(store_id: @test_store_id) end) == """
            +----------+------------+--------+-----+
            | Group ID | Advisor ID | Status | PID |
            +----------+------------+--------+-----+
@@ -42,7 +42,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
     insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
 
     assert capture_io(fn ->
-             Tai.Commands.Helper.advisors(
+             Tai.CommandsHelper.advisors(
                where: [group_id: :log_spread],
                store_id: @test_store_id
              )
@@ -62,7 +62,7 @@ defmodule Tai.Commands.Helper.AdvisorsTest do
     insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
 
     assert capture_io(fn ->
-             Tai.Commands.Helper.advisors(
+             Tai.CommandsHelper.advisors(
                order: [:advisor_id, :group_id],
                store_id: @test_store_id
              )

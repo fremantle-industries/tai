@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.ProductsTest do
+defmodule Tai.Commands.ProductsTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -46,7 +46,7 @@ defmodule Tai.Commands.Helper.ProductsTest do
       min_notional: Decimal.new("0.01000000")
     })
 
-    assert capture_io(&Tai.Commands.Helper.products/0) == """
+    assert capture_io(&Tai.CommandsHelper.products/0) == """
            +-----------------+---------+--------------+---------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+
            |           Venue |  Symbol | Venue Symbol |  Status | Type | Maker Fee | Taker Fee | Price Increment | Size Increment | Min Price | Max Price | Min Size | Max Size | Min Notional |
            +-----------------+---------+--------------+---------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+
@@ -57,7 +57,7 @@ defmodule Tai.Commands.Helper.ProductsTest do
   end
 
   test "shows an empty table when there are no products" do
-    assert capture_io(&Tai.Commands.Helper.products/0) == """
+    assert capture_io(&Tai.CommandsHelper.products/0) == """
            +-------+--------+--------------+--------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+
            | Venue | Symbol | Venue Symbol | Status | Type | Maker Fee | Taker Fee | Price Increment | Size Increment | Min Price | Max Price | Min Size | Max Size | Min Notional |
            +-------+--------+--------------+--------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+

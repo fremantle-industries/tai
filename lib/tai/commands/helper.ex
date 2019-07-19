@@ -3,51 +3,51 @@ defmodule Tai.Commands.Helper do
   Commands for using `tai` in IEx
   """
 
-  @spec help :: no_return
-  defdelegate help, to: Tai.Commands.Help
+  @deprecated "Use Tai.CommandsHelper.help/0 instead."
+  defdelegate help, to: Tai.CommandsHelper
 
-  @spec balance :: no_return
-  defdelegate balance, to: Tai.Commands.Balance
+  @deprecated "Use Tai.CommandsHelper.balance/0 instead."
+  defdelegate balance, to: Tai.CommandsHelper
 
-  @spec products :: no_return
-  defdelegate products, to: Tai.Commands.Products
+  @deprecated "Use Tai.CommandsHelper.products/0 instead."
+  defdelegate products, to: Tai.CommandsHelper
 
-  @spec fees :: no_return
-  defdelegate fees, to: Tai.Commands.Fees
+  @deprecated "Use Tai.CommandsHelper.fees/0 instead."
+  defdelegate fees, to: Tai.CommandsHelper
 
-  @spec markets :: no_return
-  defdelegate markets, to: Tai.Commands.Markets
+  @deprecated "Use Tai.CommandsHelper.markets/0 instead."
+  defdelegate markets, to: Tai.CommandsHelper
 
-  @spec positions :: no_return
-  defdelegate positions, to: Tai.Commands.Positions
+  @deprecated "Use Tai.CommandsHelper.positions/0 instead."
+  defdelegate positions, to: Tai.CommandsHelper
 
-  @spec orders :: no_return
-  defdelegate orders, to: Tai.Commands.Orders
+  @deprecated "Use Tai.CommandsHelper.orders/0 instead."
+  defdelegate orders, to: Tai.CommandsHelper
 
-  @spec settings :: no_return
-  defdelegate settings, to: Tai.Commands.Settings
+  @deprecated "Use Tai.CommandsHelper.settings/0 instead."
+  defdelegate settings, to: Tai.CommandsHelper
 
-  @spec advisors() :: no_return
-  defdelegate advisors(), to: Tai.Commands.Advisors, as: :list
+  @deprecated "Use Tai.CommandsHelper.advisors/0 instead."
+  defdelegate advisors(), to: Tai.CommandsHelper
 
-  @spec advisors(list) :: no_return
-  defdelegate advisors(args), to: Tai.Commands.Advisors, as: :list
+  @deprecated "Use Tai.CommandsHelper.advisors/1 instead."
+  defdelegate advisors(args), to: Tai.CommandsHelper
 
-  @spec start_advisors() :: no_return
-  defdelegate start_advisors(), to: Tai.Commands.Advisors, as: :start
+  @deprecated "Use Tai.CommandsHelper.start_advisors/0 instead."
+  defdelegate start_advisors(), to: Tai.CommandsHelper
 
-  @spec start_advisors(list) :: no_return
-  defdelegate start_advisors(args), to: Tai.Commands.Advisors, as: :start
+  @deprecated "Use Tai.CommandsHelper.start_advisors/1 instead."
+  defdelegate start_advisors(args), to: Tai.CommandsHelper
 
-  @spec stop_advisors() :: no_return
-  defdelegate stop_advisors(), to: Tai.Commands.Advisors, as: :stop
+  @deprecated "Use Tai.CommandsHelper.stop_advisors/0 instead."
+  defdelegate stop_advisors(), to: Tai.CommandsHelper
 
-  @spec stop_advisors(list) :: no_return
-  defdelegate stop_advisors(args), to: Tai.Commands.Advisors, as: :stop
+  @deprecated "Use Tai.CommandsHelper.stop_advisors/1 instead."
+  defdelegate stop_advisors(args), to: Tai.CommandsHelper
 
-  @spec enable_send_orders :: no_return
-  defdelegate enable_send_orders, to: Tai.Commands.SendOrders, as: :enable
+  @deprecated "Use Tai.CommandsHelper.enable_send_orders/0 instead."
+  defdelegate enable_send_orders, to: Tai.CommandsHelper
 
-  @spec disable_send_orders :: no_return
-  defdelegate disable_send_orders, to: Tai.Commands.SendOrders, as: :disable
+  @deprecated "Use Tai.CommandsHelper.disable_send_orders/0 instead."
+  defdelegate disable_send_orders, to: Tai.CommandsHelper
 end

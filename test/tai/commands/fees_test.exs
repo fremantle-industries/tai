@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.FeesTest do
+defmodule Tai.Commands.FeesTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -34,7 +34,7 @@ defmodule Tai.Commands.Helper.FeesTest do
       taker_type: Tai.Venues.FeeInfo.percent()
     })
 
-    assert capture_io(&Tai.Commands.Helper.fees/0) == """
+    assert capture_io(&Tai.CommandsHelper.fees/0) == """
            +-----------------+------------+---------+--------+-------+
            |           Venue | Account ID |  Symbol |  Maker | Taker |
            +-----------------+------------+---------+--------+-------+
@@ -45,7 +45,7 @@ defmodule Tai.Commands.Helper.FeesTest do
   end
 
   test "shows an empty table when there are no fees" do
-    assert capture_io(&Tai.Commands.Helper.fees/0) == """
+    assert capture_io(&Tai.CommandsHelper.fees/0) == """
            +-------+------------+--------+-------+-------+
            | Venue | Account ID | Symbol | Maker | Taker |
            +-------+------------+--------+-------+-------+

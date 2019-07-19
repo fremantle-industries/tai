@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.PositionsTest do
+defmodule Tai.Commands.PositionsTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -49,7 +49,7 @@ defmodule Tai.Commands.Helper.PositionsTest do
       )
       |> Tai.Trading.PositionStore.add()
 
-    assert capture_io(&Tai.Commands.Helper.positions/0) == """
+    assert capture_io(&Tai.CommandsHelper.positions/0) == """
            +---------+-----------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+
            |   Venue |   Account | Product | Open | Avg Entry Price | Qty | Init Margin | Init Margin Req | Maint Margin | Maint Margin Req | Realised Pnl | Unrealised Pnl |
            +---------+-----------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+
@@ -60,7 +60,7 @@ defmodule Tai.Commands.Helper.PositionsTest do
   end
 
   test "shows an empty table when there are no positions" do
-    assert capture_io(&Tai.Commands.Helper.positions/0) == """
+    assert capture_io(&Tai.CommandsHelper.positions/0) == """
            +-------+---------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+
            | Venue | Account | Product | Open | Avg Entry Price | Qty | Init Margin | Init Margin Req | Maint Margin | Maint Margin Req | Realised Pnl | Unrealised Pnl |
            +-------+---------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+

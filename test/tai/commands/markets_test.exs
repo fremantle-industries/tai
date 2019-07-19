@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.MarketsTest do
+defmodule Tai.Commands.MarketsTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -30,7 +30,7 @@ defmodule Tai.Commands.Helper.MarketsTest do
       }
       |> Tai.Markets.OrderBook.replace()
 
-    assert capture_io(&Tai.Commands.Helper.markets/0) == """
+    assert capture_io(&Tai.CommandsHelper.markets/0) == """
            +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
            |           Venue | Product | Bid Price | Ask Price | Bid Size | Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
            +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+

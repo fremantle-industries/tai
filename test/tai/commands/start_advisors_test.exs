@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.StartAdvisorsTest do
+defmodule Tai.Commands.StartAdvisorsTest do
   use ExUnit.Case, async: false
   import ExUnit.CaptureIO
   import Support.Advisors, only: [insert_spec: 2]
@@ -14,10 +14,10 @@ defmodule Tai.Commands.Helper.StartAdvisorsTest do
   end
 
   test "can start all advisors" do
-    assert capture_io(fn -> Tai.Commands.Helper.start_advisors(store_id: @test_store_id) end) ==
+    assert capture_io(fn -> Tai.CommandsHelper.start_advisors(store_id: @test_store_id) end) ==
              "Started advisors: 2 new, 0 already running\n"
 
-    output = capture_io(fn -> Tai.Commands.Helper.advisors(store_id: @test_store_id) end)
+    output = capture_io(fn -> Tai.CommandsHelper.advisors(store_id: @test_store_id) end)
 
     assert output =~ ~r/\|\s+group_a \|\s+main \|\s+running \|\s+#PID<.+> \|/
     assert output =~ ~r/\|\s+group_b \|\s+main \|\s+running \|\s+#PID<.+> \|/
@@ -25,14 +25,14 @@ defmodule Tai.Commands.Helper.StartAdvisorsTest do
 
   test "can filter advisors to start by struct attributes" do
     assert capture_io(fn ->
-             Tai.Commands.Helper.start_advisors(
+             Tai.CommandsHelper.start_advisors(
                where: [group_id: :group_a],
                store_id: @test_store_id
              )
            end) ==
              "Started advisors: 1 new, 0 already running\n"
 
-    output = capture_io(fn -> Tai.Commands.Helper.advisors(store_id: @test_store_id) end)
+    output = capture_io(fn -> Tai.CommandsHelper.advisors(store_id: @test_store_id) end)
 
     assert output =~ ~r/\|\s+group_a \|\s+main \|\s+running \|\s+#PID<.+> \|/
     assert output =~ ~r/\|\s+group_b \|\s+main \|\s+unstarted \|\s+- \|/

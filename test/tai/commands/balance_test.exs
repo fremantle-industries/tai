@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.BalanceTest do
+defmodule Tai.Commands.BalanceTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -38,7 +38,7 @@ defmodule Tai.Commands.Helper.BalanceTest do
 
     mock_asset_balance(:test_exchange_b, :main, :ltc, "0.00000000", "0.03000000")
 
-    assert capture_io(&Tai.Commands.Helper.balance/0) == """
+    assert capture_io(&Tai.CommandsHelper.balance/0) == """
            +-----------------+---------+-------+----------------------+----------------------+----------------------+
            |           Venue | Account | Asset |                 Free |               Locked |              Balance |
            +-----------------+---------+-------+----------------------+----------------------+----------------------+
@@ -53,7 +53,7 @@ defmodule Tai.Commands.Helper.BalanceTest do
   end
 
   test "shows an empty table when there are no balances" do
-    assert capture_io(&Tai.Commands.Helper.balance/0) == """
+    assert capture_io(&Tai.CommandsHelper.balance/0) == """
            +-------+---------+-------+------+--------+---------+
            | Venue | Account | Asset | Free | Locked | Balance |
            +-------+---------+-------+------+--------+---------+

@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.SettingsTest do
+defmodule Tai.Commands.SettingsTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -13,7 +13,7 @@ defmodule Tai.Commands.Helper.SettingsTest do
   end
 
   test "settings displays the current values" do
-    assert capture_io(&Tai.Commands.Helper.settings/0) == """
+    assert capture_io(&Tai.CommandsHelper.settings/0) == """
            +-------------+-------+
            |        Name | Value |
            +-------------+-------+

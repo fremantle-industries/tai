@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.OrdersTest do
+defmodule Tai.Commands.OrdersTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -39,7 +39,7 @@ defmodule Tai.Commands.Helper.OrdersTest do
 
     ltc_usd_order_client_id = "#{ltc_usd_order.client_id |> String.slice(0..5)}..."
 
-    assert capture_io(&Tai.Commands.Helper.orders/0) == """
+    assert capture_io(&Tai.CommandsHelper.orders/0) == """
            +-----------------+---------+----------------+--------------+------+-------+----------+-----------+-----+------------+----------------+---------------+----------+-----------+----------------+-------------+------------------+----------------------+------------+--------------+
            |           Venue | Account | Product Symbol | Product Type | Side |  Type |    Price | Avg Price | Qty | Leaves Qty | Cumulative Qty | Time in Force |   Status | Client ID | Venue Order ID | Enqueued At | Last Received At | Last Venue Timestamp | Updated At | Error Reason |
            +-----------------+---------+----------------+--------------+------+-------+----------+-----------+-----+------------+----------------+---------------+----------+-----------+----------------+-------------+------------------+----------------------+------------+--------------+
@@ -54,7 +54,7 @@ defmodule Tai.Commands.Helper.OrdersTest do
   end
 
   test "shows an empty table when there are no orders" do
-    assert capture_io(&Tai.Commands.Helper.orders/0) == """
+    assert capture_io(&Tai.CommandsHelper.orders/0) == """
            +-------+---------+----------------+--------------+------+------+-------+-----------+-----+------------+----------------+---------------+--------+-----------+----------------+-------------+------------------+----------------------+------------+--------------+
            | Venue | Account | Product Symbol | Product Type | Side | Type | Price | Avg Price | Qty | Leaves Qty | Cumulative Qty | Time in Force | Status | Client ID | Venue Order ID | Enqueued At | Last Received At | Last Venue Timestamp | Updated At | Error Reason |
            +-------+---------+----------------+--------------+------+------+-------+-----------+-----+------------+----------------+---------------+--------+-----------+----------------+-------------+------------------+----------------------+------------+--------------+

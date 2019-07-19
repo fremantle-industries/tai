@@ -96,7 +96,7 @@ Create an `.iex.exs` file in the root of your project and import the `tai` helpe
 # .iex.exs
 Application.put_env(:elixir, :ansi_enabled, true)
 
-import Tai.Commands.Helper
+import Tai.CommandsHelper
 ```
 
 ## Usage

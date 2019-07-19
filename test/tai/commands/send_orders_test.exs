@@ -1,4 +1,4 @@
-defmodule Tai.Commands.Helper.SendOrdersTest do
+defmodule Tai.Commands.SendOrdersTest do
   use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
@@ -13,7 +13,7 @@ defmodule Tai.Commands.Helper.SendOrdersTest do
   end
 
   test "disable_send_orders sets the value to false" do
-    assert capture_io(&Tai.Commands.Helper.disable_send_orders/0) == """
+    assert capture_io(&Tai.CommandsHelper.disable_send_orders/0) == """
            +-------------+-------+
            |        Name | Value |
            +-------------+-------+
@@ -25,7 +25,7 @@ defmodule Tai.Commands.Helper.SendOrdersTest do
   test "enable_send_orders sets the value to false" do
     Tai.Settings.disable_send_orders!()
 
-    assert capture_io(&Tai.Commands.Helper.enable_send_orders/0) == """
+    assert capture_io(&Tai.CommandsHelper.enable_send_orders/0) == """
            +-------------+-------+
            |        Name | Value |
            +-------------+-------+
