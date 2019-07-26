@@ -11,12 +11,12 @@
 09:41:38.214 [info] {"type":"Examples.LogSpread.Events.Spread","data":{"venue_id":"binance","spread":"1.77","product_symbol":"btc_usdt","bid_price":"5620.64","ask_price":"5622.41"}}
 ```
 
-[Example](./log_spread/advisor.ex)
+[Example](./lib/examples/log_spread/advisor.ex)
 
 ### Create fill or kill orders
 
-[Example](./fill_or_kill_orders/advisor.ex)
+[Example](./lib/examples/fill_or_kill_orders/advisor.ex)
 
 ### Cancel pending orders
 
-[Example](./create_and_cancel_pending_order/advisor.ex)
+[Example](./lib/examples/create_and_cancel_pending_order/advisor.ex)
