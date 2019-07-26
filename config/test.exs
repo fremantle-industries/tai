@@ -7,17 +7,17 @@ config :tai,
 config :tai,
   advisor_groups: %{
     log_spread: [
-      advisor: Examples.Advisors.LogSpread.Advisor,
+      advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
       products: "*"
     ],
     fill_or_kill_orders: [
-      advisor: Examples.Advisors.FillOrKillOrders.Advisor,
+      advisor: Examples.FillOrKillOrders.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
       products: "test_exchange_a test_exchange_b.eth_usd"
     ],
     create_and_cancel_pending_order: [
-      advisor: Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
+      advisor: Examples.CreateAndCancelPendingOrder.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
       products: "test_exchange_a test_exchange_a.eth_usd"
     ]

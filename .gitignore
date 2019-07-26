@@ -30,3 +30,7 @@ secrets/*
 
 # Ignore elixir-ls
 .elixir_ls/*
+
+# logs
+log/*
+apps/*/log/*

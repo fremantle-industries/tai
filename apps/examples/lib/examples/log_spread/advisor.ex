@@ -1,4 +1,4 @@
-defmodule Examples.Advisors.LogSpread.Advisor do
+defmodule Examples.LogSpread.Advisor do
   @moduledoc """
   Log the spread between the bid/ask for a product
   """
@@ -19,7 +19,7 @@ defmodule Examples.Advisors.LogSpread.Advisor do
     ask_price = market_quote.ask.price |> Decimal.cast()
     spread = Decimal.sub(ask_price, bid_price)
 
-    Tai.Events.info(%Examples.Advisors.LogSpread.Events.Spread{
+    Tai.Events.info(%Examples.LogSpread.Events.Spread{
       venue_id: venue_id,
       product_symbol: product_symbol,
       bid_price: bid_price |> Decimal.to_string(:normal),

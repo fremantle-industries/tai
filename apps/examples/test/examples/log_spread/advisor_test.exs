@@ -1,4 +1,4 @@
-defmodule Examples.Advisors.LogSpread.AdvisorTest do
+defmodule Examples.LogSpread.AdvisorTest do
   use ExUnit.Case, async: false
 
   import Tai.TestSupport.Mock
@@ -14,7 +14,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
     {:ok, _} = Application.ensure_all_started(:tai)
 
     start_supervised!({
-      Examples.Advisors.LogSpread.Advisor,
+      Examples.LogSpread.Advisor,
       [
         group_id: :log_spread,
         advisor_id: :btc_usd,
@@ -46,7 +46,7 @@ defmodule Examples.Advisors.LogSpread.AdvisorTest do
     )
 
     assert_receive {Tai.Event,
-                    %Examples.Advisors.LogSpread.Events.Spread{
+                    %Examples.LogSpread.Events.Spread{
                       venue_id: :test_exchange_a,
                       product_symbol: :btc_usd,
                       bid_price: "6500.1",

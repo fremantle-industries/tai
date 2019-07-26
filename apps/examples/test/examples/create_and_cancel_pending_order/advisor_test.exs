@@ -1,4 +1,4 @@
-defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
+defmodule Examples.CreateAndCancelPendingOrder.AdvisorTest do
   use ExUnit.Case, async: false
 
   import Tai.TestSupport.Mock
@@ -11,14 +11,14 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
 
     start_supervised!(Mocks.Server)
     mock_product_responses()
-    mock_order_response()
+    mock_order_responses()
     {:ok, _} = Application.ensure_all_started(:tai)
     Tai.Settings.enable_send_orders!()
 
     start_supervised!({
-      Examples.Advisors.FillOrKillOrders.Advisor,
+      Examples.CreateAndCancelPendingOrder.Advisor,
       [
-        group_id: :fill_or_kill_orders,
+        group_id: :create_and_cancel_open_order,
         advisor_id: :btc_usd,
         products: [
           struct(
@@ -35,7 +35,7 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
     :ok
   end
 
-  test "creates a fill or kill order" do
+  test "creates a single limit order and then cancels it" do
     Tai.Events.firehose_subscribe()
 
     push_market_data_snapshot(
@@ -47,33 +47,35 @@ defmodule Examples.Advisors.FillOrKillOrders.AdvisorTest do
       %{100.11 => 1.2}
     )
 
-    assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{
-                      status: :enqueued
-                    } = enqueued_event, _}
-
-    assert enqueued_event.cumulative_qty == Decimal.new(0)
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :open, time_in_force: :gtc}, _}
 
     assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{
-                      status: :filled
-                    } = filled_event, _}
+                    %Tai.Events.OrderUpdated{status: :pending_cancel, time_in_force: :gtc}, _}
 
-    assert filled_event.cumulative_qty == Decimal.new("0.1")
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :canceled, time_in_force: :gtc},
+                    _}
   end
 
-  def mock_order_response do
-    Mocks.Responses.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.BuyLimitFok{
-      venue_id: :test_exchange_a,
-      account_id: :mock_account,
-      product_symbol: :btc_usd,
-      product_type: :spot,
-      price: Decimal.new("100.1"),
-      qty: Decimal.new("0.1")
-    })
+  def mock_order_responses do
+    venue_order_id = "e116de5f-8d14-491f-a794-0f94fbcdd7c1"
+
+    Mocks.Responses.Orders.GoodTillCancel.open(
+      venue_order_id,
+      %Tai.Trading.OrderSubmissions.BuyLimitGtc{
+        venue_id: :test_exchange_a,
+        account_id: :mock_account,
+        product_symbol: :btc_usd,
+        product_type: :spot,
+        price: Decimal.new("100.1"),
+        qty: Decimal.new("0.1"),
+        post_only: true
+      }
+    )
+
+    Mocks.Responses.Orders.GoodTillCancel.canceled(venue_order_id)
   end
 
-  def mock_product_responses do
+  def mock_product_responses() do
     Mocks.Responses.Products.for_venue(
       :test_exchange_a,
       [
