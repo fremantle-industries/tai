@@ -1,93 +1,22 @@
 defmodule Examples.FillOrKillOrders.AdvisorTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.E2ECase, async: false
 
-  import Tai.TestSupport.Mock
-  alias Tai.TestSupport.Mocks
+  @scenario :fill_or_kill_orders
 
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai)
-    end)
+  def before_app_start, do: seed_mock_responses(@scenario)
 
-    start_supervised!(Mocks.Server)
-    mock_product_responses()
-    mock_order_response()
-    {:ok, _} = Application.ensure_all_started(:tai)
-    Tai.Settings.enable_send_orders!()
-
-    start_supervised!({
-      Examples.FillOrKillOrders.Advisor,
-      [
-        group_id: :fill_or_kill_orders,
-        advisor_id: :btc_usd,
-        products: [
-          struct(
-            Tai.Venues.Product,
-            %{venue_id: :test_exchange_a, symbol: :btc_usd}
-          )
-        ],
-        config: %{},
-        store: %{},
-        trades: []
-      ]
-    })
-
-    :ok
+  def after_app_start do
+    configure_advisor_group(@scenario)
+    start_advisors(where: [group_id: @scenario])
   end
 
-  test "creates a fill or kill order" do
-    Tai.Events.firehose_subscribe()
+  test "creates a single fill or kill order" do
+    push_stream_market_data({:fill_or_kill_orders, :snapshot, :test_exchange_a, :btc_usd})
 
-    push_market_data_snapshot(
-      %Tai.Markets.Location{
-        venue_id: :test_exchange_a,
-        product_symbol: :btc_usd
-      },
-      %{100.1 => 1.1},
-      %{100.11 => 1.2}
-    )
-
-    assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{
-                      status: :enqueued
-                    } = enqueued_event, _}
-
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :enqueued} = enqueued_event, _}
     assert enqueued_event.cumulative_qty == Decimal.new(0)
 
-    assert_receive {Tai.Event,
-                    %Tai.Events.OrderUpdated{
-                      status: :filled
-                    } = filled_event, _}
-
+    assert_receive {Tai.Event, %Tai.Events.OrderUpdated{status: :filled} = filled_event, _}
     assert filled_event.cumulative_qty == Decimal.new("0.1")
-  end
-
-  def mock_order_response do
-    Mocks.Responses.Orders.FillOrKill.filled(%Tai.Trading.OrderSubmissions.BuyLimitFok{
-      venue_id: :test_exchange_a,
-      account_id: :mock_account,
-      product_symbol: :btc_usd,
-      product_type: :spot,
-      price: Decimal.new("100.1"),
-      qty: Decimal.new("0.1")
-    })
-  end
-
-  def mock_product_responses do
-    Mocks.Responses.Products.for_venue(
-      :test_exchange_a,
-      [
-        %{symbol: :btc_usd},
-        %{symbol: :ltc_usd}
-      ]
-    )
-
-    Mocks.Responses.Products.for_venue(
-      :test_exchange_b,
-      [
-        %{symbol: :eth_usd},
-        %{symbol: :ltc_usd}
-      ]
-    )
   end
 end

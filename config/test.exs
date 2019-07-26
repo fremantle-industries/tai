@@ -1,7 +1,8 @@
 use Mix.Config
 
 config :examples, :e2e_mappings, %{
-  log_spread: ExamplesSupport.E2E.LogSpread
+  log_spread: ExamplesSupport.E2E.LogSpread,
+  fill_or_kill_orders: ExamplesSupport.E2E.FillOrKillOrders
 }
 
 config :tai,
@@ -11,16 +12,6 @@ config :tai,
 
 config :tai,
   advisor_groups: %{
-    # log_spread: [
-    #   advisor: Examples.LogSpread.Advisor,
-    #   factory: Tai.Advisors.Factories.OnePerProduct,
-    #   products: "*"
-    # ],
-    fill_or_kill_orders: [
-      advisor: Examples.FillOrKillOrders.Advisor,
-      factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "test_exchange_a test_exchange_b.eth_usd"
-    ],
     create_and_cancel_pending_order: [
       advisor: Examples.CreateAndCancelPendingOrder.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
