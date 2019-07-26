@@ -1,24 +1,18 @@
-defmodule Examples.Advisors.FillOrKillOrders.Advisor do
-  @moduledoc """
-  Example advisor that demonstrates how to use fill or kill limit orders. It 
-  logs a success message when the order is successfully filled
-  """
-
+defmodule Examples.CreateAndCancelPendingOrder.Advisor do
   use Tai.Advisor
-
-  require Logger
 
   def handle_inside_quote(venue_id, product_symbol, _inside_quote, _changes, state) do
     if Tai.Trading.OrderStore.count() == 0 do
       {:ok, product} = Tai.Venues.ProductStore.find({venue_id, product_symbol})
 
-      Tai.Trading.Orders.create(%Tai.Trading.OrderSubmissions.BuyLimitFok{
+      Tai.Trading.Orders.create(%Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: venue_id,
         account_id: :main,
-        product_symbol: product.symbol,
+        product_symbol: product_symbol,
         product_type: product.type,
         price: Decimal.new("100.1"),
         qty: Decimal.new("0.1"),
+        post_only: false,
         order_updated_callback: &order_updated/2
       })
     end
@@ -28,9 +22,9 @@ defmodule Examples.Advisors.FillOrKillOrders.Advisor do
 
   def order_updated(
         %Tai.Trading.Order{status: :enqueued},
-        %Tai.Trading.Order{status: :filled} = updated_order
+        %Tai.Trading.Order{status: :open} = open_order
       ) do
-    Logger.info("successfully filled order #{inspect(updated_order)}")
+    Tai.Trading.Orders.cancel(open_order)
   end
 
   def order_updated(_previous_order, _updated_order), do: nil

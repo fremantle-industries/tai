@@ -28,7 +28,7 @@ config :tai,
   advisor_groups: %{
     log_spread: [
       start_on_boot: true,
-      advisor: Examples.Advisors.LogSpread.Advisor,
+      advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
       products: "*"
     ]
@@ -47,8 +47,8 @@ config :tai,
 
 ```
 # log/dev.log
-09:41:35.950 [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"bitmex","spread":"0.01","product_symbol":"xbtusd","bid_price":"5491.05","ask_price":"5491.06"}}
-09:41:37.211 [info] {"type":"Examples.Advisors.LogSpread.Events.Spread","data":{"venue_id":"bitmex","spread":"0.05","product_symbol":"ethusd","bid_price":"202.64","ask_price":"202.69"}}
+09:41:35.950 [info] {"type":"Examples.LogSpread.Events.Spread","data":{"venue_id":"bitmex","spread":"0.01","product_symbol":"xbtusd","bid_price":"5491.05","ask_price":"5491.06"}}
+09:41:37.211 [info] {"type":"Examples.LogSpread.Events.Spread","data":{"venue_id":"bitmex","spread":"0.05","product_symbol":"ethusd","bid_price":"202.64","ask_price":"202.69"}}
 ```
 
 ## Supported Venues
@@ -76,16 +76,6 @@ config :tai,
 def deps do
   [
     {:tai, "~> 0.0.25"}
-  ]
-end
-```
-
-Or use the lastest from `master`
-
-```elixir
-def deps do
-  [
-    {:tai, github: "fremantle-capital/tai"}
   ]
 end
 ```
@@ -126,7 +116,7 @@ market data to record and analyze data or execute automated trading strategies.
 Orders are created and managed through a uniform API across exchanges, with 
 fast execution and reliability.
 
-Take a look at some of the [examples](./examples/advisors) to understand what 
+Take a look at some of the [examples](./apps/examples) to understand what 
 you can create with advisors.
 
 ## Configuration

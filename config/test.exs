@@ -1,27 +1,17 @@
 use Mix.Config
 
-config :tai,
-  send_orders: true,
-  venue_boot_handler: Tai.TestSupport.VenueBootHandler
+config :examples, :e2e_mappings, %{
+  log_spread: ExamplesSupport.E2E.LogSpread,
+  fill_or_kill_orders: ExamplesSupport.E2E.FillOrKillOrders,
+  create_and_cancel_pending_order: ExamplesSupport.E2E.CreateAndCancelPendingOrder
+}
 
 config :tai,
-  advisor_groups: %{
-    log_spread: [
-      advisor: Examples.Advisors.LogSpread.Advisor,
-      factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "*"
-    ],
-    fill_or_kill_orders: [
-      advisor: Examples.Advisors.FillOrKillOrders.Advisor,
-      factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "test_exchange_a test_exchange_b.eth_usd"
-    ],
-    create_and_cancel_pending_order: [
-      advisor: Examples.Advisors.CreateAndCancelPendingOrder.Advisor,
-      factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "test_exchange_a test_exchange_a.eth_usd"
-    ]
-  }
+  send_orders: true,
+  venue_boot_handler: Tai.TestSupport.VenueBootHandler,
+  e2e_app: :examples
+
+config :tai, advisor_groups: %{}
 
 config(:tai,
   test_venue_adapters: %{

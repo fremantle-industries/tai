@@ -1,4 +1,4 @@
-defmodule Examples.Advisors.LogSpread.Advisor do
+defmodule Examples.LogSpread.Advisor do
   @moduledoc """
   Log the spread between the bid/ask for a product
   """
@@ -8,6 +8,7 @@ defmodule Examples.Advisors.LogSpread.Advisor do
   def handle_inside_quote(
         venue_id,
         product_symbol,
+        # wait until we have quotes for both sides of the order book
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{},
           ask: %Tai.Markets.PriceLevel{}
@@ -19,7 +20,7 @@ defmodule Examples.Advisors.LogSpread.Advisor do
     ask_price = market_quote.ask.price |> Decimal.cast()
     spread = Decimal.sub(ask_price, bid_price)
 
-    Tai.Events.info(%Examples.Advisors.LogSpread.Events.Spread{
+    Tai.Events.info(%Examples.LogSpread.Events.Spread{
       venue_id: venue_id,
       product_symbol: product_symbol,
       bid_price: bid_price |> Decimal.to_string(:normal),
@@ -30,5 +31,6 @@ defmodule Examples.Advisors.LogSpread.Advisor do
     {:ok, state.store}
   end
 
+  # ignore quotes that don't have both sides of the order book
   def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
 end
