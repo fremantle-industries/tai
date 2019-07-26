@@ -1,16 +1,21 @@
 use Mix.Config
 
+config :examples, :e2e_mappings, %{
+  log_spread: ExamplesSupport.E2E.LogSpread
+}
+
 config :tai,
   send_orders: true,
-  venue_boot_handler: Tai.TestSupport.VenueBootHandler
+  venue_boot_handler: Tai.TestSupport.VenueBootHandler,
+  e2e_app: :examples
 
 config :tai,
   advisor_groups: %{
-    log_spread: [
-      advisor: Examples.LogSpread.Advisor,
-      factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "*"
-    ],
+    # log_spread: [
+    #   advisor: Examples.LogSpread.Advisor,
+    #   factory: Tai.Advisors.Factories.OnePerProduct,
+    #   products: "*"
+    # ],
     fill_or_kill_orders: [
       advisor: Examples.FillOrKillOrders.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,

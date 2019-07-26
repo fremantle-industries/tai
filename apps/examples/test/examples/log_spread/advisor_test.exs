@@ -1,75 +1,23 @@
 defmodule Examples.LogSpread.AdvisorTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.E2ECase, async: false
 
-  import Tai.TestSupport.Mock
-  alias Tai.TestSupport.Mocks
+  @scenario :log_spread
 
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai)
-    end)
+  def before_app_start, do: seed_mock_responses(@scenario)
 
-    start_supervised!(Tai.TestSupport.Mocks.Server)
-    mock_product_responses()
-    {:ok, _} = Application.ensure_all_started(:tai)
-
-    start_supervised!({
-      Examples.LogSpread.Advisor,
-      [
-        group_id: :log_spread,
-        advisor_id: :btc_usd,
-        products: [
-          struct(
-            Tai.Venues.Product,
-            %{venue_id: :test_exchange_a, symbol: :btc_usd}
-          )
-        ],
-        config: %{},
-        store: %{},
-        trades: []
-      ]
-    })
-
-    :ok
+  def after_app_start do
+    configure_advisor_group(@scenario)
+    start_advisors(where: [group_id: @scenario])
   end
 
-  test "logs the bid/ask spread with a custom event" do
-    Tai.Events.firehose_subscribe()
+  test "logs the bid/ask spread via a custom event" do
+    push_stream_market_data({@scenario, :snapshot, :test_exchange_a, :btc_usd})
 
-    push_market_data_snapshot(
-      %Tai.Markets.Location{
-        venue_id: :test_exchange_a,
-        product_symbol: :btc_usd
-      },
-      %{6500.1 => 1.1},
-      %{6500.11 => 1.2}
-    )
-
-    assert_receive {Tai.Event,
-                    %Examples.LogSpread.Events.Spread{
-                      venue_id: :test_exchange_a,
-                      product_symbol: :btc_usd,
-                      bid_price: "6500.1",
-                      ask_price: "6500.11",
-                      spread: "0.01"
-                    }, _}
-  end
-
-  def mock_product_responses do
-    Mocks.Responses.Products.for_venue(
-      :test_exchange_a,
-      [
-        %{symbol: :btc_usd},
-        %{symbol: :ltc_usd}
-      ]
-    )
-
-    Mocks.Responses.Products.for_venue(
-      :test_exchange_b,
-      [
-        %{symbol: :eth_usd},
-        %{symbol: :ltc_usd}
-      ]
-    )
+    assert_receive {Tai.Event, %Examples.LogSpread.Events.Spread{} = event, _}
+    assert event.venue_id == :test_exchange_a
+    assert event.product_symbol == :btc_usd
+    assert event.bid_price == "6500.1"
+    assert event.ask_price == "6500.11"
+    assert event.spread == "0.01"
   end
 end

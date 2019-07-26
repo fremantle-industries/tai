@@ -8,6 +8,7 @@ defmodule Examples.LogSpread.Advisor do
   def handle_inside_quote(
         venue_id,
         product_symbol,
+        # wait until we have quotes for both sides of the order book
         %Tai.Markets.Quote{
           bid: %Tai.Markets.PriceLevel{},
           ask: %Tai.Markets.PriceLevel{}
@@ -30,5 +31,6 @@ defmodule Examples.LogSpread.Advisor do
     {:ok, state.store}
   end
 
+  # ignore quotes that don't have both sides of the order book
   def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
 end

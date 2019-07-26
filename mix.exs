@@ -10,7 +10,7 @@ defmodule TaiMonorepo.MixProject do
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
       dialyzer: [
-        plt_add_apps: [:mix],
+        plt_add_apps: [:mix, :ex_unit],
         ignore_warnings: ".dialyzer_ignore.exs",
         paths: [
           "_build/dev/lib/tai/ebin",
