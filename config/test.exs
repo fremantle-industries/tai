@@ -2,7 +2,8 @@ use Mix.Config
 
 config :examples, :e2e_mappings, %{
   log_spread: ExamplesSupport.E2E.LogSpread,
-  fill_or_kill_orders: ExamplesSupport.E2E.FillOrKillOrders
+  fill_or_kill_orders: ExamplesSupport.E2E.FillOrKillOrders,
+  create_and_cancel_pending_order: ExamplesSupport.E2E.CreateAndCancelPendingOrder
 }
 
 config :tai,
@@ -10,14 +11,7 @@ config :tai,
   venue_boot_handler: Tai.TestSupport.VenueBootHandler,
   e2e_app: :examples
 
-config :tai,
-  advisor_groups: %{
-    create_and_cancel_pending_order: [
-      advisor: Examples.CreateAndCancelPendingOrder.Advisor,
-      factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "test_exchange_a test_exchange_a.eth_usd"
-    ]
-  }
+config :tai, advisor_groups: %{}
 
 config(:tai,
   test_venue_adapters: %{
