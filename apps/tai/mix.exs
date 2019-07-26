@@ -4,7 +4,7 @@ defmodule Tai.Mixfile do
   def project do
     [
       app: :tai,
-      version: "0.0.25",
+      version: "0.0.26",
       elixir: "~> 1.8",
       package: package(),
       start_permanent: Mix.env() == :prod,
@@ -46,7 +46,8 @@ defmodule Tai.Mixfile do
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:echo_boy, "~> 0.6.0", only: [:dev, :test]},
       {:exvcr, "~> 0.10.2", only: [:dev, :test]},
-      {:mock, "~> 0.3.3", only: :test}
+      {:mock, "~> 0.3.3", only: :test},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 

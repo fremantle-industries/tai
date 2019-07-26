@@ -4,7 +4,7 @@ defmodule TaiMonorepo.MixProject do
   def project do
     [
       apps_path: "apps",
-      version: "0.0.25",
+      version: "0.0.26",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
@@ -31,7 +31,6 @@ defmodule TaiMonorepo.MixProject do
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_unit_notifier, "~> 0.1", only: :test},
       {:dialyxir, "~> 1.0.0-rc.6", only: :dev, runtime: false},
-      {:ex_doc, ">= 0.0.0", only: :dev},
       {:mix_test_watch, "~> 0.9", only: :dev, runtime: false}
     ]
   end

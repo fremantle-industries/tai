@@ -6,6 +6,8 @@
 
 # The directory Mix downloads your dependencies sources to.
 /deps/
+apps/*/deps/
+apps/*/_build/
 
 # Where 3rd-party dependencies like ExDoc output generated docs.
 /doc/
