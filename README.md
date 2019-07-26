@@ -262,7 +262,7 @@ List advisors that can optionally be filtered and ordered
 
 
 ```
-iex(9)> advisors where: [status: :unstarted], order: [:group_id]
+iex(8)> advisors where: [status: :unstarted], order: [:group_id]
 +---------------------------------+-------------------+-----------+-----+
 |                        Group ID |        Advisor ID |    Status | PID |
 +---------------------------------+-------------------+-----------+-----+
@@ -279,7 +279,7 @@ iex(9)> advisors where: [status: :unstarted], order: [:group_id]
 Starts advisors with an optional filter
 
 ```
-iex(11)> start_advisors where: [status: :unstarted]
+iex(9)> start_advisors where: [status: :unstarted]
 Started advisors: 5 new, 0 already running
 ```
 
@@ -288,7 +288,7 @@ Started advisors: 5 new, 0 already running
 Stops advisors with an optional filter
 
 ```
-iex(14)> stop_advisors where: [status: :running]
+iex(10)> stop_advisors where: [status: :running]
 Stopped advisors: 5 new, 0 already stopped
 ```
 
