@@ -16,40 +16,9 @@ We are working to make `tai` production quality software.
 
 Stream market data to create and manage orders with a uniform API across multiple venues
 
-Here's an example of an advisor that logs the spread between multiple products on BitMEX
+Here's an example of an advisor that logs the spread between multiple products on multiple venues
 
-```elixir
-# config/config.exs
-use Mix.Config
-
-config :tai, send_orders: false
-
-config :tai,
-  advisor_groups: %{
-    log_spread: [
-      start_on_boot: true,
-      advisor: Examples.LogSpread.Advisor,
-      factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "*"
-    ]
-  }
-
-config :tai,
-  venues: %{
-    bitmex: [
-      enabled: true,
-      adapter: Tai.VenueAdapters.Bitmex,
-      products: "xbtusd ethusd",
-      accounts: %{}
-    ]
-  }
-```
-
-```
-# log/dev.log
-09:41:35.950 [info] {"type":"Examples.LogSpread.Events.Spread","data":{"venue_id":"bitmex","spread":"0.01","product_symbol":"xbtusd","bid_price":"5491.05","ask_price":"5491.06"}}
-09:41:37.211 [info] {"type":"Examples.LogSpread.Events.Spread","data":{"venue_id":"bitmex","spread":"0.05","product_symbol":"ethusd","bid_price":"202.64","ask_price":"202.69"}}
-```
+[![asciicast](https://asciinema.org/a/259561.svg)](https://asciinema.org/a/259561)
 
 ## Supported Venues
 
@@ -93,20 +62,12 @@ import Tai.CommandsHelper
 
 `tai` runs as an OTP application.
 
-During development we can leverage `mix` to compile and run our application:
+During development we can leverage `mix` to compile and run our application with an 
+interactive Elixir shell that imports the set of `tai` helper [commands](#commands).
 
 ```bash
-elixir --sname tai -S mix run --no-halt
+iex -S mix
 ```
-
-This will run your `tai` configuration as a process in the foreground. We assign
-a shortname so that we can connect and observe the node at any time via `iex`:
-
-```bash
-iex --sname client --remsh tai@mymachinename
-```
-
-This gives you an interactive elixir shell with a set of `tai` helper [commands](#commands)
 
 ## Advisors
 
