@@ -125,7 +125,7 @@ iex(2)> balance
 
 #### products
 
-Display the products on the the exchange
+Display the products provided by configured venues
 
 ```
 iex(3)> products
@@ -145,7 +145,7 @@ iex(3)> products
 
 #### fees
 
-Display the maker/taker fees for the every product in the exchange accounts
+Display the maker/taker fees for every product from configured venue accounts
 
 ```
 iex(4)> fees
@@ -171,7 +171,7 @@ iex(4)> fees
 
 Displays the live top of the order book for the configured feeds. It includes 
 the time they were processed locally and if supported, the time they were sent 
-from the exchange. This allows you to monitor if a feed is under backpressure and
+from the venue. This allows you to monitor if a feed is under backpressure and
 starting to fall behind as it updates it's order books.
 
 ```
