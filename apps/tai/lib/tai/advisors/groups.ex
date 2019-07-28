@@ -23,6 +23,8 @@ defmodule Tai.Advisors.Groups do
     %Tai.AdvisorGroup{
       id: id,
       start_on_boot: !!(group_config |> Keyword.get(:start_on_boot)),
+      restart: group_config |> Keyword.get(:restart, :temporary),
+      shutdown: group_config |> Keyword.get(:shutdown, 5000),
       advisor: group_config |> Keyword.get(:advisor),
       factory: group_config |> Keyword.get(:factory),
       products: filtered_products,

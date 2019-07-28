@@ -17,6 +17,8 @@ defmodule Tai.Advisors.GroupsTest do
     groups_config = %{
       group_a: [
         start_on_boot: true,
+        restart: :permanent,
+        shutdown: 1000,
         advisor: AdvisorA,
         factory: TestFactoryA,
         products: "*",
@@ -31,6 +33,8 @@ defmodule Tai.Advisors.GroupsTest do
     assert group.advisor == AdvisorA
     assert group.factory == TestFactoryA
     assert group.start_on_boot == true
+    assert group.restart == :permanent
+    assert group.shutdown == 1000
     assert group.products != nil
     assert group.config == %{min_profit: 0.1}
     assert group.trades == [:a, :b]
@@ -62,6 +66,32 @@ defmodule Tai.Advisors.GroupsTest do
 
     assert {:ok, [group | _]} = Tai.Advisors.Groups.from_config(groups_config, TestProvider)
     assert group.start_on_boot == false
+  end
+
+  test "restart is temporary when not present" do
+    groups_config = %{
+      group_a: [
+        advisor: AdvisorA,
+        factory: TestFactoryA,
+        products: "*"
+      ]
+    }
+
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.from_config(groups_config, TestProvider)
+    assert group.restart == :temporary
+  end
+
+  test "shutdown is 5000 when not present" do
+    groups_config = %{
+      group_a: [
+        advisor: AdvisorA,
+        factory: TestFactoryA,
+        products: "*"
+      ]
+    }
+
+    assert {:ok, [group | _]} = Tai.Advisors.Groups.from_config(groups_config, TestProvider)
+    assert group.shutdown == 5000
   end
 
   test "config can substitute rich types" do

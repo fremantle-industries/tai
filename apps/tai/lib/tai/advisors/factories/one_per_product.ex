@@ -11,6 +11,8 @@ defmodule Tai.Advisors.Factories.OnePerProduct do
       %Tai.Advisors.Spec{
         mod: group.advisor,
         start_on_boot: group.start_on_boot,
+        restart: group.restart,
+        shutdown: group.shutdown,
         group_id: group.id,
         advisor_id: :"#{product.venue_id}_#{product.symbol}",
         products: [product],

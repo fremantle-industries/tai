@@ -17,6 +17,8 @@ defmodule Tai.Advisors.Spec do
   @type t :: %Tai.Advisors.Spec{
           mod: mod,
           start_on_boot: boolean,
+          restart: Tai.AdvisorGroup.restart(),
+          shutdown: Tai.AdvisorGroup.shutdown(),
           group_id: group_id,
           advisor_id: advisor_id,
           products: [product],
@@ -25,8 +27,8 @@ defmodule Tai.Advisors.Spec do
           trades: trades | nil
         }
 
-  @enforce_keys ~w(mod start_on_boot group_id advisor_id products config)a
-  defstruct ~w(mod start_on_boot group_id advisor_id products config run_store trades)a
+  @enforce_keys ~w(mod start_on_boot restart shutdown group_id advisor_id products config)a
+  defstruct ~w(mod start_on_boot restart shutdown group_id advisor_id products config run_store trades)a
 
   @spec to_child_spec(t) :: Supervisor.child_spec()
   def to_child_spec(spec) do
@@ -46,9 +48,9 @@ defmodule Tai.Advisors.Spec do
     %{
       id: name,
       start: {spec.mod, :start_link, [start_opts]},
-      type: :worker,
-      restart: :temporary,
-      shutdown: 5000
+      restart: spec.restart,
+      shutdown: spec.shutdown,
+      type: :worker
     }
   end
 end
