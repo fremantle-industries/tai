@@ -5,7 +5,8 @@ defmodule Tai.Advisors.Instance do
   @type status :: :unstarted | :running
   @type t :: %Instance{
           mod: Spec.mod(),
-          start_on_boot: boolean,
+          restart: Tai.AdvisorGroup.restart(),
+          shutdown: Tai.AdvisorGroup.shutdown(),
           group_id: Spec.group_id(),
           advisor_id: Spec.advisor_id(),
           products: [Spec.product()],
@@ -16,8 +17,8 @@ defmodule Tai.Advisors.Instance do
           status: status
         }
 
-  @enforce_keys ~w(mod start_on_boot group_id advisor_id products config pid status)a
-  defstruct ~w(mod start_on_boot group_id advisor_id products config trades run_store pid status)a
+  @enforce_keys ~w(mod start_on_boot restart shutdown group_id advisor_id products config pid status)a
+  defstruct ~w(mod start_on_boot restart shutdown group_id advisor_id products config trades run_store pid status)a
 
   @spec from_spec(spec) :: t
   def from_spec(spec) do
@@ -27,6 +28,8 @@ defmodule Tai.Advisors.Instance do
     %Instance{
       mod: spec.mod,
       start_on_boot: spec.start_on_boot,
+      restart: spec.restart,
+      shutdown: spec.shutdown,
       group_id: spec.group_id,
       advisor_id: spec.advisor_id,
       products: spec.products,
@@ -43,6 +46,8 @@ defmodule Tai.Advisors.Instance do
     %Spec{
       mod: instance.mod,
       start_on_boot: instance.start_on_boot,
+      restart: instance.restart,
+      shutdown: instance.shutdown,
       group_id: instance.group_id,
       advisor_id: instance.advisor_id,
       products: instance.products,
