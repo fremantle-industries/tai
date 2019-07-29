@@ -93,7 +93,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert amended_order.leaves_qty == amend_qty
         assert amended_order.qty == @original_qty
         assert %DateTime{} = amended_order.updated_at
-        assert amended_order.updated_at == pending_amend_order.updated_at
+        assert Timex.compare(amended_order.updated_at, pending_amend_order.updated_at) == 1
         assert %DateTime{} = amended_order.last_received_at
         assert %DateTime{} = amended_order.last_venue_timestamp
         assert amended_order.last_venue_timestamp != pending_amend_order.last_venue_timestamp
@@ -125,10 +125,7 @@ defmodule Tai.Trading.Orders.AmendTest do
           |> Tai.Trading.OrderStore.update()
 
         {:ok, {_, _}} =
-          %Tai.Trading.OrderStore.Actions.PendAmend{
-            client_id: enqueued_order.client_id,
-            updated_at: Timex.now()
-          }
+          %Tai.Trading.OrderStore.Actions.PendAmend{client_id: enqueued_order.client_id}
           |> Tai.Trading.OrderStore.update()
 
         {:ok, {_, amend_error_order}} =
@@ -183,7 +180,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert amended_order.leaves_qty == amend_qty
         assert amended_order.qty == @original_qty
         assert %DateTime{} = amended_order.updated_at
-        assert amended_order.updated_at == pending_amend_order.updated_at
+        assert Timex.compare(amended_order.updated_at, pending_amend_order.updated_at) == 1
         assert %DateTime{} = amended_order.last_received_at
         assert %DateTime{} = amended_order.last_venue_timestamp
         assert amended_order.last_venue_timestamp != pending_amend_order.last_venue_timestamp

@@ -29,7 +29,7 @@ defmodule Tai.Trading.OrderStoreBackends.ETS do
          attrs <- Action.attrs(action),
          {:ok, old_order} <- find_by_client_id(action.client_id, state.name) do
       if Enum.member?(required, old_order.status) do
-        updated_order = old_order |> Map.merge(attrs)
+        updated_order = old_order |> Map.merge(attrs) |> Map.put(:updated_at, Timex.now())
         insert(updated_order, state.name)
         {:ok, {old_order, updated_order}}
       else

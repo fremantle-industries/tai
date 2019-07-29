@@ -3,23 +3,21 @@ defmodule Tai.Trading.OrderStore.Actions.PendAmend do
   The order is going to be sent to the venue to be amended
   """
 
-  @type client_id :: Tai.Trading.Order.client_id()
-  @type t :: %__MODULE__{
-          client_id: client_id,
-          updated_at: DateTime.t()
-        }
+  alias Tai.Trading.OrderStore.Actions.PendAmend
 
-  @enforce_keys ~w(client_id updated_at)a
-  defstruct ~w(client_id updated_at)a
+  @type client_id :: Tai.Trading.Order.client_id()
+  @type t :: %PendAmend{client_id: client_id}
+
+  @enforce_keys ~w(client_id)a
+  defstruct ~w(client_id)a
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PendAmend do
   def required(_), do: [:open, :amend_error]
 
-  def attrs(action) do
+  def attrs(_action) do
     %{
       status: :pending_amend,
-      updated_at: action.updated_at,
       error_reason: nil
     }
   end
