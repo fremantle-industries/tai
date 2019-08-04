@@ -7,7 +7,6 @@ defmodule Tai.Trading.OrderResponses.Create do
           id: String.t(),
           status: atom,
           original_size: Decimal.t(),
-          avg_price: Decimal.t(),
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
           received_at: DateTime.t(),
@@ -17,7 +16,6 @@ defmodule Tai.Trading.OrderResponses.Create do
   @enforce_keys ~w(
     id
     status
-    avg_price
     original_size
     leaves_qty
     cumulative_qty
@@ -26,7 +24,6 @@ defmodule Tai.Trading.OrderResponses.Create do
   defstruct ~w(
     id
     status
-    avg_price
     original_size
     leaves_qty
     cumulative_qty

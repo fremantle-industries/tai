@@ -81,20 +81,17 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          %{
            "status" => "open",
            "client_id" => client_id,
-           "avg_price" => raw_avg_price,
            "cumulative_qty" => raw_cumulative_qty,
            "leaves_qty" => raw_leaves_qty
          },
          _venue_id
        ) do
-    avg_price = raw_avg_price |> Decimal.cast()
     cumulative_qty = raw_cumulative_qty |> Decimal.cast()
     leaves_qty = raw_leaves_qty |> Decimal.cast()
 
     {:ok, {prev_order, updated_order}} =
       %OrderStore.Actions.PassivePartialFill{
         client_id: client_id,
-        avg_price: avg_price,
         cumulative_qty: cumulative_qty,
         leaves_qty: leaves_qty,
         last_received_at: Timex.now(),

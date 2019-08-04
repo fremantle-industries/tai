@@ -90,7 +90,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
 
       assert sell_partially_filled_updated_event.client_id == order_2.client_id
       assert sell_partially_filled_updated_event.status == :open
-      assert sell_partially_filled_updated_event.avg_price == Decimal.new("2000")
       assert sell_partially_filled_updated_event.leaves_qty == Decimal.new(30)
       assert sell_partially_filled_updated_event.cumulative_qty == Decimal.new(20)
       assert sell_partially_filled_updated_event.qty == Decimal.new(10)
@@ -288,7 +287,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
       %Tai.Trading.OrderStore.Actions.Open{
         client_id: order.client_id,
         venue_order_id: venue_order_id,
-        avg_price: order.price,
         cumulative_qty: Decimal.new(0),
         leaves_qty: order.qty,
         last_received_at: Timex.now(),

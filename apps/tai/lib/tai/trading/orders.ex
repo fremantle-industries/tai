@@ -34,7 +34,6 @@ defmodule Tai.Trading.Orders do
       time_in_force: order.time_in_force,
       status: order.status,
       price: order.price,
-      avg_price: order.avg_price,
       qty: order.qty,
       leaves_qty: order.leaves_qty,
       cumulative_qty: order.cumulative_qty,

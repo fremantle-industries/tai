@@ -72,7 +72,6 @@ defmodule Tai.Trading.Orders.Create do
       %OrderStore.Actions.Open{
         client_id: order.client_id,
         venue_order_id: response.id,
-        avg_price: response.avg_price,
         cumulative_qty: response.cumulative_qty,
         leaves_qty: response.leaves_qty,
         last_received_at: response.received_at,
@@ -91,7 +90,6 @@ defmodule Tai.Trading.Orders.Create do
       %OrderStore.Actions.Fill{
         client_id: order.client_id,
         venue_order_id: response.id,
-        avg_price: response.avg_price,
         cumulative_qty: response.cumulative_qty,
         last_received_at: response.received_at,
         last_venue_timestamp: response.venue_timestamp
@@ -109,7 +107,6 @@ defmodule Tai.Trading.Orders.Create do
       %OrderStore.Actions.Expire{
         client_id: order.client_id,
         venue_order_id: response.id,
-        avg_price: response.avg_price,
         cumulative_qty: response.cumulative_qty,
         leaves_qty: response.leaves_qty,
         last_received_at: response.received_at,

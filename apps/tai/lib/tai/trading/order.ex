@@ -37,7 +37,6 @@ defmodule Tai.Trading.Order do
           time_in_force: time_in_force,
           type: type,
           price: Decimal.t(),
-          avg_price: Decimal.t(),
           qty: Decimal.t(),
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
@@ -56,7 +55,6 @@ defmodule Tai.Trading.Order do
     client_id
     enqueued_at
     price
-    avg_price
     side
     qty
     leaves_qty
@@ -74,7 +72,6 @@ defmodule Tai.Trading.Order do
     venue_id
     account_id
     price
-    avg_price
     venue_order_id
     side
     qty

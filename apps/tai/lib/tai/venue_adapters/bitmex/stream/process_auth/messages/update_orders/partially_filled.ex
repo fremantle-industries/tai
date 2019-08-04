@@ -28,15 +28,11 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
         client_id = Bitmex.ClientId.from_base64(id)
         received_at = Timex.now()
         venue_timestamp = message.timestamp |> Timex.parse!(@date_format)
-        # TODO: Figure out how to do avg price from a partial fill. Should it even have it?
-        # avg_price = message.avg_px |> Decimal.cast()
-        avg_price = message.price |> Decimal.cast()
         leaves_qty = message.leaves_qty |> Decimal.cast()
         cumulative_qty = message.order_qty |> Decimal.cast() |> Decimal.sub(leaves_qty)
 
         %Tai.Trading.OrderStore.Actions.PassivePartialFill{
           client_id: client_id,
-          avg_price: avg_price,
           cumulative_qty: cumulative_qty,
           leaves_qty: leaves_qty,
           last_received_at: received_at,

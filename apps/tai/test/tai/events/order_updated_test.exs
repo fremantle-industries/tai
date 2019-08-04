@@ -12,7 +12,6 @@ defmodule Tai.Events.OrderUpdatedTest do
     time_in_force: :gtc,
     status: :open,
     price: Decimal.new("0.1"),
-    avg_price: Decimal.new("0.11"),
     qty: Decimal.new("0.2"),
     leaves_qty: Decimal.new("0.15"),
     cumulative_qty: Decimal.new("0.3"),
@@ -39,7 +38,6 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert json.time_in_force == :gtc
     assert json.status == :open
     assert json.price == "0.1"
-    assert json.avg_price == "0.11"
     assert json.qty == "0.2"
     assert json.leaves_qty == "0.15"
     assert json.cumulative_qty == "0.3"

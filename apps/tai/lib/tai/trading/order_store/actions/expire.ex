@@ -8,7 +8,6 @@ defmodule Tai.Trading.OrderStore.Actions.Expire do
   @type t :: %__MODULE__{
           client_id: client_id,
           venue_order_id: venue_order_id,
-          avg_price: Decimal.t(),
           cumulative_qty: Decimal.t(),
           leaves_qty: Decimal.t(),
           last_received_at: DateTime.t(),
@@ -18,7 +17,6 @@ defmodule Tai.Trading.OrderStore.Actions.Expire do
   @enforce_keys ~w(
     client_id
     venue_order_id
-    avg_price
     cumulative_qty
     leaves_qty
     last_received_at
@@ -27,7 +25,6 @@ defmodule Tai.Trading.OrderStore.Actions.Expire do
   defstruct ~w(
     client_id
     venue_order_id
-    avg_price
     cumulative_qty
     leaves_qty
     last_received_at
@@ -42,7 +39,6 @@ defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.Expir
     %{
       status: :expired,
       venue_order_id: action.venue_order_id,
-      avg_price: action.avg_price,
       cumulative_qty: action.cumulative_qty,
       leaves_qty: action.leaves_qty,
       last_received_at: action.last_received_at,

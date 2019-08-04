@@ -41,7 +41,6 @@ defmodule Tai.Trading.Orders.CreateFilledTest do
       }
 
       assert filled_order.venue_order_id == @venue_order_id
-      assert filled_order.avg_price != Decimal.new(0)
       assert filled_order.leaves_qty == Decimal.new(0)
       assert filled_order.cumulative_qty == original_qty
       assert filled_order.qty == original_qty

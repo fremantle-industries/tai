@@ -60,7 +60,6 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
         assert order_response.leaves_qty == Decimal.new(0)
         assert order_response.cumulative_qty == Decimal.new(0)
         assert order_response.status == :rejected
-        assert order_response.avg_price == Decimal.new(0)
         assert %DateTime{} = order_response.venue_timestamp
       end
     end

@@ -14,7 +14,6 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
     order_response = %Tai.Trading.OrderResponses.Create{
       id: venue_order_id,
       status: :expired,
-      avg_price: Decimal.new(0),
       original_size: qty,
       cumulative_qty: Decimal.new(0),
       leaves_qty: Decimal.new(0),
@@ -41,7 +40,6 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
     order_response = %Tai.Trading.OrderResponses.Create{
       id: venue_order_id,
       status: :filled,
-      avg_price: submission.price,
       original_size: submission.qty,
       leaves_qty: Decimal.new(0),
       cumulative_qty: submission.qty,

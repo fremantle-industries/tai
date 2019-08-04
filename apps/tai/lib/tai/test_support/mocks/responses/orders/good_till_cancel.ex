@@ -33,12 +33,10 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     qty = submission.qty
     cumulative_qty = attrs |> Map.get(:cumulative_qty, Decimal.new(0))
     leaves_qty = Decimal.sub(qty, cumulative_qty)
-    avg_price = attrs |> Map.get(:avg_price, Decimal.new(0))
 
     order_response = %OrderResponses.Create{
       id: venue_order_id,
       status: :open,
-      avg_price: avg_price,
       original_size: qty,
       leaves_qty: leaves_qty,
       cumulative_qty: cumulative_qty,
@@ -64,7 +62,6 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     order_response = %OrderResponses.Create{
       id: venue_order_id,
       status: :rejected,
-      avg_price: Decimal.new(0),
       original_size: qty,
       leaves_qty: Decimal.new(0),
       cumulative_qty: Decimal.new(0),
@@ -91,7 +88,6 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     order_response = %OrderResponses.Create{
       id: venue_order_id,
       status: :filled,
-      avg_price: submission.price,
       original_size: submission.qty,
       leaves_qty: Decimal.new(0),
       cumulative_qty: submission.qty,

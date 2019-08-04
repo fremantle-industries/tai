@@ -8,7 +8,6 @@ defmodule Tai.Trading.OrderStore.Actions.Fill do
   @type t :: %__MODULE__{
           client_id: client_id,
           venue_order_id: venue_order_id,
-          avg_price: Decimal.t(),
           cumulative_qty: Decimal.t(),
           last_received_at: DateTime.t(),
           last_venue_timestamp: DateTime.t() | nil
@@ -17,7 +16,6 @@ defmodule Tai.Trading.OrderStore.Actions.Fill do
   @enforce_keys ~w(
     client_id
     venue_order_id
-    avg_price
     cumulative_qty
     last_received_at
     last_venue_timestamp
@@ -25,7 +23,6 @@ defmodule Tai.Trading.OrderStore.Actions.Fill do
   defstruct ~w(
     client_id
     venue_order_id
-    avg_price
     cumulative_qty
     last_received_at
     last_venue_timestamp
@@ -39,7 +36,6 @@ defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.Fill 
     %{
       status: :filled,
       venue_order_id: action.venue_order_id,
-      avg_price: action.avg_price,
       cumulative_qty: action.cumulative_qty,
       leaves_qty: Decimal.new(0),
       last_received_at: action.last_received_at,

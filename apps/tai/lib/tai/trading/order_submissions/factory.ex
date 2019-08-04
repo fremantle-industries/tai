@@ -34,7 +34,6 @@ defmodule Tai.Trading.OrderSubmissions.Factory do
       side: submission |> side,
       type: submission |> type,
       price: submission.price |> Decimal.abs(),
-      avg_price: @zero,
       qty: qty,
       leaves_qty: qty,
       cumulative_qty: @zero,

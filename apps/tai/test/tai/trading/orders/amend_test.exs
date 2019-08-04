@@ -42,7 +42,6 @@ defmodule Tai.Trading.Orders.AmendTest do
           %Tai.Trading.OrderStore.Actions.Open{
             client_id: enqueued_order.client_id,
             venue_order_id: @venue_order_id,
-            avg_price: @original_price,
             cumulative_qty: Decimal.new(0),
             leaves_qty: @original_qty,
             last_received_at: Timex.now(),
@@ -116,7 +115,6 @@ defmodule Tai.Trading.Orders.AmendTest do
           %Tai.Trading.OrderStore.Actions.Open{
             client_id: enqueued_order.client_id,
             venue_order_id: @venue_order_id,
-            avg_price: @original_price,
             cumulative_qty: Decimal.new(0),
             leaves_qty: @original_qty,
             last_received_at: Timex.now(),

@@ -33,11 +33,9 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
         })
 
       cumulative_qty = Decimal.new(4)
-      avg_price = Decimal.new(2000)
 
       Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission, %{
-        cumulative_qty: cumulative_qty,
-        avg_price: avg_price
+        cumulative_qty: cumulative_qty
       })
 
       {:ok, _} = Orders.create(submission)
@@ -55,7 +53,6 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
       }
 
       assert open_order.venue_order_id == @venue_order_id
-      assert open_order.avg_price == original_price
       assert open_order.leaves_qty == Decimal.new(6)
       assert open_order.cumulative_qty == Decimal.new(4)
       assert open_order.qty == Decimal.new(10)

@@ -36,7 +36,6 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
             assert order_response.leaves_qty == Decimal.new(0)
             assert order_response.cumulative_qty == order_response.original_size
             assert order_response.status == :filled
-            assert order_response.avg_price != Decimal.new(0)
             assert %DateTime{} = order_response.venue_timestamp
           end
         end
@@ -54,7 +53,6 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
             assert order_response.cumulative_qty != Decimal.new(0)
             assert order_response.cumulative_qty != order_response.original_size
             assert order_response.status == :expired
-            assert order_response.avg_price != Decimal.new(0)
             assert %DateTime{} = order_response.venue_timestamp
           end
         end
@@ -70,7 +68,6 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
             assert order_response.leaves_qty == Decimal.new(0)
             assert order_response.cumulative_qty == Decimal.new(0)
             assert order_response.status == :expired
-            assert order_response.avg_price == Decimal.new(0)
             assert %DateTime{} = order_response.venue_timestamp
           end
         end

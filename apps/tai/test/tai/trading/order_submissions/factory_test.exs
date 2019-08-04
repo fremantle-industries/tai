@@ -22,7 +22,6 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
-        assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
         assert %Decimal{} = order.leaves_qty
         assert order.qty == order.leaves_qty
@@ -46,7 +45,6 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
-        assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
         assert %Decimal{} = order.leaves_qty
         assert order.qty == order.leaves_qty
@@ -70,7 +68,6 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
-        assert order.avg_price == Decimal.new(0)
         assert %Decimal{} = order.qty
         assert %Decimal{} = order.leaves_qty
         assert order.qty == order.leaves_qty

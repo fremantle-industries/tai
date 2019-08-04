@@ -40,7 +40,6 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   defp parse_response({:ok, %ExBinance.Responses.CreateOrder{} = binance_response}, _) do
     received_at = Timex.now()
     venue_order_id = binance_response.order_id |> Integer.to_string()
-    avg_price = binance_response.fills |> calc_avg_price()
     status = binance_response.status |> OrderStatus.from_venue()
     original_size = binance_response.orig_qty |> Decimal.new() |> Decimal.reduce()
     cumulative_qty = binance_response.executed_qty |> Decimal.new() |> Decimal.reduce()
@@ -50,7 +49,6 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     response = %Tai.Trading.OrderResponses.Create{
       id: venue_order_id,
       status: status,
-      avg_price: avg_price,
       original_size: original_size,
       leaves_qty: leaves_qty,
       cumulative_qty: cumulative_qty,
@@ -68,24 +66,4 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     do: {:error, :insufficient_balance}
 
   defp parse_response({:error, reason}, _), do: {:error, {:unhandled, reason}}
-
-  defp calc_avg_price([]), do: Decimal.new(0)
-
-  defp calc_avg_price(fills) do
-    {sum_price, sum_qty} =
-      fills
-      |> Enum.reduce(
-        {Decimal.new(0), Decimal.new(0)},
-        fn %{"price" => raw_price, "qty" => raw_qty}, {sum_price, sum_qty} ->
-          price = raw_price |> Decimal.cast()
-          qty = raw_qty |> Decimal.cast()
-          new_sum_price = price |> Decimal.mult(qty) |> Decimal.add(sum_price)
-          new_sum_qty = qty |> Decimal.add(sum_qty)
-
-          {new_sum_price, new_sum_qty}
-        end
-      )
-
-    sum_price |> Decimal.div(sum_qty)
-  end
 end

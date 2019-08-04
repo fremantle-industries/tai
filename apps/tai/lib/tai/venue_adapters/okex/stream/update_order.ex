@@ -57,7 +57,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         %{
           "status" => status,
           "order_id" => venue_order_id,
-          "price_avg" => price_avg,
           "filled_qty" => filled_qty,
           "timestamp" => timestamp,
           "size" => size
@@ -66,7 +65,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       )
       when status == @pending do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
-    avg_price = price_avg |> Decimal.new()
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new()
 
@@ -74,7 +72,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       %OrderStore.Actions.Open{
         client_id: client_id,
         venue_order_id: venue_order_id,
-        avg_price: avg_price,
         cumulative_qty: cumulative_qty,
         leaves_qty: leaves_qty,
         last_received_at: received_at,
@@ -89,7 +86,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         client_id,
         %{
           "status" => status,
-          "price_avg" => price_avg,
           "filled_qty" => filled_qty,
           "timestamp" => timestamp,
           "size" => size
@@ -98,14 +94,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       )
       when status == @partially_filled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
-    avg_price = price_avg |> Decimal.new()
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new()
 
     result =
       %OrderStore.Actions.PassivePartialFill{
         client_id: client_id,
-        avg_price: avg_price,
         cumulative_qty: cumulative_qty,
         leaves_qty: leaves_qty,
         last_received_at: received_at,

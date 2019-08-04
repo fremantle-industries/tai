@@ -22,14 +22,12 @@ defmodule Tai.Trading.Orders.CreateExpiredTest do
     test "#{side} updates the relevant attributes" do
       original_qty = Decimal.new(10)
       cumulative_qty = Decimal.new(3)
-      avg_price = Decimal.new("1000.5")
 
       submission =
         Support.OrderSubmissions.build_with_callback(@submission_type, %{qty: original_qty})
 
       Mocks.Responses.Orders.ImmediateOrCancel.expired(@venue_order_id, submission, %{
-        cumulative_qty: cumulative_qty,
-        avg_price: avg_price
+        cumulative_qty: cumulative_qty
       })
 
       {:ok, _} = Orders.create(submission)
@@ -47,7 +45,6 @@ defmodule Tai.Trading.Orders.CreateExpiredTest do
       }
 
       assert expired_order.venue_order_id == @venue_order_id
-      assert expired_order.avg_price == avg_price
       assert expired_order.leaves_qty == Decimal.new(0)
       assert expired_order.cumulative_qty == cumulative_qty
       assert expired_order.qty == original_qty
