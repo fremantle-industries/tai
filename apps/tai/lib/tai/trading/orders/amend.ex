@@ -18,7 +18,7 @@ defmodule Tai.Trading.Orders.Amend do
          {:ok, {old, updated}} <- OrderStore.update(action) do
       Orders.updated!(old, updated)
 
-      Task.start_link(fn ->
+      Task.async(fn ->
         try do
           updated
           |> send_amend_order(attrs)

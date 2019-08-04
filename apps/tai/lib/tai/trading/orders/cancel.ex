@@ -11,7 +11,7 @@ defmodule Tai.Trading.Orders.Cancel do
          {:ok, {old, updated}} <- OrderStore.update(action) do
       Orders.updated!(old, updated)
 
-      Task.start_link(fn ->
+      Task.async(fn ->
         try do
           updated
           |> send_to_venue()
