@@ -11,5 +11,5 @@ end
 
 defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
   for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Created do
-  def process(_message, state), do: {:ok, state}
+  def process(_message, _received_at, state), do: {:ok, state}
 end

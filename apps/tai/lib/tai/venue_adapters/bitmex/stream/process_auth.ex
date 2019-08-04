@@ -23,11 +23,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
   @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
-  def handle_cast({msg, _received_at}, state) do
+  def handle_cast({msg, received_at}, state) do
     {:ok, new_state} =
       msg
       |> transform()
-      |> process_action(state)
+      |> process_action(received_at, state)
 
     {:noreply, new_state}
   end
@@ -52,8 +52,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
     end
   end
 
-  defp process_action({:ok, action}, state) do
-    {:ok, _} = result = action |> ProcessAuth.Message.process(state)
+  defp process_action({:ok, action}, received_at, state) do
+    {:ok, _} = result = action |> ProcessAuth.Message.process(received_at, state)
     result
   end
 end

@@ -7,11 +7,11 @@ defmodule Tai.Trading.Orders.Cancel do
 
   @spec cancel(order) :: {:ok, updated :: order} | {:error, error_reason}
   def cancel(%Order{client_id: client_id}) do
-    with action <- %OrderStore.Actions.PendCancel{client_id: client_id, updated_at: Timex.now()},
+    with action <- %OrderStore.Actions.PendCancel{client_id: client_id},
          {:ok, {old, updated}} <- OrderStore.update(action) do
       Orders.updated!(old, updated)
 
-      Task.start_link(fn ->
+      Task.async(fn ->
         try do
           updated
           |> send_to_venue()

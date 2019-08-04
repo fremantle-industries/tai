@@ -15,8 +15,9 @@ defmodule Tai.Trading.Order do
           | :skip
           | :create_accepted
           | :open
-          | :expired
+          | :partially_filled
           | :filled
+          | :expired
           | :rejected
           | :create_error
           | :pending_amend

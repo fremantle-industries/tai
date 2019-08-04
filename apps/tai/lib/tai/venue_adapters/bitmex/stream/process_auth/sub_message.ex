@@ -3,8 +3,9 @@ defprotocol Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage do
 
   @type action :: struct
   @type state :: Bitmex.Stream.ProcessAuth.State.t()
+  @type received_at :: DateTime.t()
   @type new_state :: Bitmex.Stream.ProcessAuth.State.t()
 
-  @spec process(action, state) :: {:ok, new_state}
-  def process(action, state)
+  @spec process(action, received_at, state) :: {:ok, new_state}
+  def process(action, received_at, state)
 end

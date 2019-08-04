@@ -12,7 +12,7 @@ defmodule Tai.Trading.OrderStore do
   @type store_id :: atom
 
   @default_id :default
-  @default_backend Tai.Trading.OrderStoreBackends.ETS
+  @default_backend Tai.Trading.OrderStore.Backends.ETS
 
   defmodule State do
     @type t :: %State{id: atom, name: atom, backend: atom}
@@ -41,7 +41,7 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:update, action}, _from, state) do
-    response = state.backend.update(action, state)
+    response = state.backend.update(action, state.name)
     {:reply, response, state}
   end
 

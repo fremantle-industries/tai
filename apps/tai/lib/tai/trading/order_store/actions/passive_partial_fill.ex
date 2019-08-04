@@ -17,11 +17,12 @@ defmodule Tai.Trading.OrderStore.Actions.PassivePartialFill do
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PassivePartialFill do
-  def required(_), do: [:open, :pending_amend, :pending_cancel, :amend_error, :cancel_error]
+  def required(_),
+    do: ~w(open partially_filled pending_amend pending_cancel amend_error cancel_error)a
 
   def attrs(action) do
     %{
-      status: :open,
+      status: :partially_filled,
       cumulative_qty: action.cumulative_qty,
       leaves_qty: action.leaves_qty,
       last_received_at: action.last_received_at,
