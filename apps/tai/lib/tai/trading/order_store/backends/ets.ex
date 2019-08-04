@@ -1,4 +1,4 @@
-defmodule Tai.Trading.OrderStoreBackends.ETS do
+defmodule Tai.Trading.OrderStore.Backends.ETS do
   alias Tai.Trading.OrderStore.Action
 
   @type order :: Tai.Trading.Order.t()
