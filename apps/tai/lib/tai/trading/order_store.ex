@@ -41,7 +41,7 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:update, action}, _from, state) do
-    response = state.backend.update(action, state)
+    response = state.backend.update(action, state.name)
     {:reply, response, state}
   end
 
