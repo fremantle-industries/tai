@@ -58,7 +58,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
       :my_venue
       |> ProcessAuth.to_name()
       |> GenServer.cast(
-        {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
+        {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, Timex.now()}
       )
 
       assert_event(
@@ -111,7 +111,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
       :my_venue
       |> ProcessAuth.to_name()
       |> GenServer.cast(
-        {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
+        {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, Timex.now()}
       )
 
       assert_event(%Events.OrderUpdated{} = event)

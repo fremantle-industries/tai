@@ -50,8 +50,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
     {:noreply, new_state}
   end
 
-  def handle_cast({msg, _received_at}, state) do
-    Events.info(%Events.StreamMessageUnhandled{venue_id: state.venue, msg: msg})
+  def handle_cast({msg, received_at}, state) do
+    %Events.StreamMessageUnhandled{
+      venue_id: state.venue,
+      msg: msg,
+      received_at: received_at
+    }
+    |> Events.info()
+
     {:noreply, state}
   end
 

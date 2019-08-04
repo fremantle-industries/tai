@@ -83,11 +83,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
     {:noreply, state}
   end
 
-  def handle_cast({msg, _received_at}, state) do
-    Tai.Events.info(%Tai.Events.StreamMessageUnhandled{
+  def handle_cast({msg, received_at}, state) do
+    %Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue_id,
-      msg: msg
-    })
+      msg: msg,
+      received_at: received_at
+    }
+    |> Tai.Events.info()
 
     {:noreply, state}
   end

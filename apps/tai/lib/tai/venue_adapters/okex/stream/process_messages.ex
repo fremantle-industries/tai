@@ -43,11 +43,13 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessMessages do
     {:noreply, state}
   end
 
-  def handle_cast({msg, _received_at}, state) do
-    Events.info(%Events.StreamMessageUnhandled{
+  def handle_cast({msg, received_at}, state) do
+    %Events.StreamMessageUnhandled{
       venue_id: state.venue,
-      msg: msg
-    })
+      msg: msg,
+      received_at: received_at
+    }
+    |> Events.info()
 
     {:noreply, state}
   end

@@ -11,7 +11,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
   for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders do
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
 
-  def process(message, state) do
+  def process(message, received_at, state) do
     message.data
     |> Enum.map(fn
       %{"ordStatus" => "Canceled"} = data ->
@@ -38,7 +38,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
         {:ok, %ProcessAuth.Messages.UpdateOrders.Unhandled{data: data}}
     end)
     |> Enum.each(fn {:ok, message} ->
-      Task.async(fn -> ProcessAuth.SubMessage.process(message, state) end)
+      Task.async(fn -> ProcessAuth.SubMessage.process(message, received_at, state) end)
     end)
 
     {:ok, state}

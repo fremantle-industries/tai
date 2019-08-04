@@ -21,12 +21,11 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
 
   @date_format "{ISO:Extended}"
 
-  def process(message, state) do
+  def process(message, received_at, state) do
     message.cl_ord_id
     |> case do
       "gtc-" <> id ->
         client_id = Bitmex.ClientId.from_base64(id)
-        received_at = Timex.now()
         venue_timestamp = message.timestamp |> Timex.parse!(@date_format)
         leaves_qty = message.leaves_qty |> Decimal.cast()
         cumulative_qty = message.order_qty |> Decimal.cast() |> Decimal.sub(leaves_qty)
