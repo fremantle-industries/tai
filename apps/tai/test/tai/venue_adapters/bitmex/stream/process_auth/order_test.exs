@@ -73,7 +73,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
         %Events.OrderUpdated{
           side: :sell,
           time_in_force: :gtc,
-          status: :open
+          status: :partially_filled
         } = sell_partially_filled_updated_event
       )
 
@@ -81,7 +81,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
       refute_event(%Events.OrderUpdated{time_in_force: :gtc})
 
       assert buy_filled_updated_event.client_id == order_1.client_id
-      assert buy_filled_updated_event.status == :filled
       assert buy_filled_updated_event.leaves_qty == Decimal.new(0)
       assert buy_filled_updated_event.cumulative_qty == Decimal.new(5)
       assert buy_filled_updated_event.qty == Decimal.new(5)
@@ -89,7 +88,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
       assert %DateTime{} = buy_filled_updated_event.last_venue_timestamp
 
       assert sell_partially_filled_updated_event.client_id == order_2.client_id
-      assert sell_partially_filled_updated_event.status == :open
       assert sell_partially_filled_updated_event.leaves_qty == Decimal.new(30)
       assert sell_partially_filled_updated_event.cumulative_qty == Decimal.new(20)
       assert sell_partially_filled_updated_event.qty == Decimal.new(10)
@@ -186,6 +184,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
 
       assert passive_fill_invalid_event.required == [
                :open,
+               :partially_filled,
                :pending_amend,
                :pending_cancel,
                :amend_error,
@@ -198,6 +197,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
 
       assert passive_partial_fill_invalid_event.required == [
                :open,
+               :partially_filled,
                :pending_amend,
                :pending_cancel,
                :amend_error,
@@ -210,8 +210,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
 
       assert passive_cancel_invalid_event.required == [
                :open,
-               :expired,
+               :partially_filled,
                :filled,
+               :expired,
                :pending_amend,
                :amend,
                :amend_error,

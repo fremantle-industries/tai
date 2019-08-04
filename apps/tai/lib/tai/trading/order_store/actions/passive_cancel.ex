@@ -16,7 +16,8 @@ end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PassiveCancel do
   def required(_),
-    do: ~w(open expired filled pending_amend amend amend_error pending_cancel cancel_accepted)a
+    do:
+      ~w(open partially_filled filled expired pending_amend amend amend_error pending_cancel cancel_accepted)a
 
   def attrs(action) do
     %{
