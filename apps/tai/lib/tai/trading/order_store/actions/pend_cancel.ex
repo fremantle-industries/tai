@@ -5,21 +5,19 @@ defmodule Tai.Trading.OrderStore.Actions.PendCancel do
 
   @type client_id :: Tai.Trading.Order.client_id()
   @type t :: %__MODULE__{
-          client_id: client_id,
-          updated_at: DateTime.t()
+          client_id: client_id
         }
 
-  @enforce_keys ~w(client_id updated_at)a
-  defstruct ~w(client_id updated_at)a
+  @enforce_keys ~w(client_id)a
+  defstruct ~w(client_id)a
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PendCancel do
   def required(_), do: [:open, :partially_filled]
 
-  def attrs(action) do
+  def attrs(_action) do
     %{
-      status: :pending_cancel,
-      updated_at: action.updated_at
+      status: :pending_cancel
     }
   end
 end
