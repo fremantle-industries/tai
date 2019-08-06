@@ -81,6 +81,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   ]
   def handle_info(:init_subscriptions, state) do
     schedule_heartbeat()
+    schedule_autocancel()
     if state.account, do: send(self(), :login)
     send(self(), {:subscribe, :depth})
 
@@ -151,6 +152,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:reply, :ping, state}
   end
 
+  @autocancel_after_ms 60_000
+  def handle_info(:ping_autocancel, state) do
+    schedule_autocancel()
+    msg = %{"op" => "cancelAllAfter", "args" => @autocancel_after_ms} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
   def handle_pong(:pong, state) do
     schedule_heartbeat()
     {:ok, state}
@@ -178,6 +186,10 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   defp auth_headers(nil), do: []
+
+  @autocancel_ping_interval_ms 15_000
+  defp schedule_autocancel,
+    do: Process.send_after(self(), :ping_autocancel, @autocancel_ping_interval_ms)
 
   @heartbeat_ms 20_000
   defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
