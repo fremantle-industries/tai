@@ -82,6 +82,7 @@ defmodule Tai.Advisor do
 
       @doc false
       def init(state) do
+        Process.flag(:trap_exit, true)
         {:ok, state, {:continue, :subscribe_to_products}}
       end
 
