@@ -30,7 +30,9 @@ config(:tai,
           api_secret: {:system_file, "BITMEX_API_SECRET"}
         }
       },
-      opts: %{}
+      opts: %{
+        autocancel: %{ping_interval_ms: 15_000, cancel_after_ms: 60_000}
+      }
     ],
     okex: [
       enabled: true,
