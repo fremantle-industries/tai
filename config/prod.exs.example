@@ -34,6 +34,7 @@ config :tai,
           api_secret: {:system_file, "BITMEX_SECRET"}
         }
       },
+      opts: %{},
       timeout: 60_000
     ],
     binance: [
