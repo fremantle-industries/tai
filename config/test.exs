@@ -18,7 +18,8 @@ config(:tai,
     mock: [
       enabled: true,
       adapter: Tai.VenueAdapters.Mock,
-      accounts: %{main: %{}}
+      accounts: %{main: %{}},
+      opts: %{}
     ],
     bitmex: [
       enabled: true,
@@ -28,6 +29,9 @@ config(:tai,
           api_key: {:system_file, "BITMEX_API_KEY"},
           api_secret: {:system_file, "BITMEX_API_SECRET"}
         }
+      },
+      opts: %{
+        autocancel: %{ping_interval_ms: 15_000, cancel_after_ms: 60_000}
       }
     ],
     okex: [
@@ -39,7 +43,8 @@ config(:tai,
           api_secret: {:system_file, "OKEX_API_SECRET"},
           api_passphrase: {:system_file, "OKEX_API_PASSPHRASE"}
         }
-      }
+      },
+      opts: %{}
     ],
     okex_futures: [
       enabled: true,
@@ -50,7 +55,8 @@ config(:tai,
           api_secret: {:system_file, "OKEX_API_SECRET"},
           api_passphrase: {:system_file, "OKEX_API_PASSPHRASE"}
         }
-      }
+      },
+      opts: %{}
     ],
     okex_swap: [
       enabled: true,
@@ -61,7 +67,8 @@ config(:tai,
           api_secret: {:system_file, "OKEX_API_SECRET"},
           api_passphrase: {:system_file, "OKEX_API_PASSPHRASE"}
         }
-      }
+      },
+      opts: %{}
     ],
     binance: [
       enabled: true,

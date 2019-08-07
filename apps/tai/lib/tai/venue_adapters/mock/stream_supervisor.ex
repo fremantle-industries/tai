@@ -4,13 +4,25 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
   @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
 
-  @spec start_link(venue_id: atom, channels: [channel], accounts: map, products: [product]) ::
+  @spec start_link(
+          venue_id: atom,
+          channels: [channel],
+          accounts: map,
+          products: [product],
+          opts: map
+        ) ::
           Supervisor.on_start()
-  def start_link([venue_id: venue_id, channels: _, accounts: _, products: _] = args) do
+  def start_link([venue_id: venue_id, channels: _, accounts: _, products: _, opts: _] = args) do
     Supervisor.start_link(__MODULE__, args, name: :"#{__MODULE__}_#{venue_id}")
   end
 
-  def init(venue_id: venue_id, channels: channels, accounts: accounts, products: products) do
+  def init(
+        venue_id: venue_id,
+        channels: channels,
+        accounts: accounts,
+        products: products,
+        opts: _
+      ) do
     order_books =
       products
       |> Enum.map(fn p ->

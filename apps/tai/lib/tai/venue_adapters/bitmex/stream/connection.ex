@@ -11,11 +11,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
             venue: venue_id,
             channels: [channel_name],
             account: {account_id, map} | nil,
-            products: [product]
+            products: [product],
+            opts: map
           }
 
-    @enforce_keys ~w(venue channels products)a
-    defstruct ~w(venue channels account products)a
+    @enforce_keys ~w(venue channels products opts)a
+    defstruct ~w(venue channels account products opts)a
   end
 
   @type product :: Venues.Product.t()
@@ -27,16 +28,25 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
           url: String.t(),
           venue: venue_id,
           account: {account_id, account_config} | nil,
-          products: [product]
+          products: [product],
+          opts: map
         ) :: {:ok, pid} | {:error, term}
   def start_link(
         url: url,
         venue: venue,
         channels: channels,
         account: account,
-        products: products
+        products: products,
+        opts: opts
       ) do
-    state = %State{venue: venue, channels: channels, account: account, products: products}
+    state = %State{
+      venue: venue,
+      channels: channels,
+      account: account,
+      products: products,
+      opts: opts
+    }
+
     name = venue |> to_name
     headers = auth_headers(state.account)
     WebSockex.start_link(url, __MODULE__, state, name: name, extra_headers: headers)
@@ -71,6 +81,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   ]
   def handle_info(:init_subscriptions, state) do
     schedule_heartbeat()
+    schedule_autocancel(0)
     if state.account, do: send(self(), :login)
     send(self(), {:subscribe, :depth})
 
@@ -141,6 +152,23 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:reply, :ping, state}
   end
 
+  def handle_info(
+        :ping_autocancel,
+        %{
+          opts: %{
+            autocancel: %{ping_interval_ms: ping_interval_ms, cancel_after_ms: cancel_after_ms}
+          }
+        } = state
+      )
+      when ping_interval_ms > 0 and is_integer(ping_interval_ms) and
+             cancel_after_ms > 0 and is_integer(cancel_after_ms) do
+    schedule_autocancel(ping_interval_ms)
+    msg = %{"op" => "cancelAllAfter", "args" => cancel_after_ms} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info(:ping_autocancel, state), do: {:ok, state}
+
   def handle_pong(:pong, state) do
     schedule_heartbeat()
     {:ok, state}
@@ -168,6 +196,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   defp auth_headers(nil), do: []
+
+  defp schedule_autocancel(after_ms),
+    do: Process.send_after(self(), :ping_autocancel, after_ms)
 
   @heartbeat_ms 20_000
   defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
