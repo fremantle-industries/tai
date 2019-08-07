@@ -9,7 +9,8 @@ defmodule Tai.Venues.Boot.Stream do
       adapter.id,
       adapter.channels,
       adapter.accounts,
-      products
+      products,
+      adapter.opts
     )
   end
 end

@@ -19,14 +19,21 @@ defmodule Tai.Venues.StreamsSupervisor do
           venue_id :: venue_id,
           channels :: [channel],
           accounts :: map,
-          products :: [product]
+          products :: [product],
+          opts :: map
         ) :: DynamicSupervisor.on_start_child()
   def start_stream(Tai.Venues.NullStreamSupervisor, _, _, _, _), do: :ignore
 
-  def start_stream(stream_supervisor, venue_id, channels, accounts, products) do
+  def start_stream(stream_supervisor, venue_id, channels, accounts, products, opts) do
     spec =
       {stream_supervisor,
-       [venue_id: venue_id, channels: channels, accounts: accounts, products: products]}
+       [
+         venue_id: venue_id,
+         channels: channels,
+         accounts: accounts,
+         products: products,
+         opts: opts
+       ]}
 
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
