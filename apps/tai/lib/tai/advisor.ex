@@ -256,6 +256,9 @@ defmodule Tai.Advisor do
           end
         end
       end
+
+      def terminate(_reason, _state), do: :ok
+      defoverridable terminate: 2
     end
   end
 end
