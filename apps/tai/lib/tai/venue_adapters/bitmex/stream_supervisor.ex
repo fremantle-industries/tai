@@ -25,7 +25,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
         channels: channels,
         accounts: accounts,
         products: products,
-        opts: _
+        opts: opts
       ) do
     # TODO: Potentially this could use new order books? Send the change quote
     # event to subscribing advisors?
@@ -68,7 +68,8 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
          venue: venue_id,
          channels: channels,
          account: accounts |> Map.to_list() |> List.first(),
-         products: products
+         products: products,
+         opts: opts
        ]}
     ]
 

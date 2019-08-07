@@ -11,11 +11,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
             venue: venue_id,
             channels: [channel_name],
             account: {account_id, map} | nil,
-            products: [product]
+            products: [product],
+            opts: map
           }
 
-    @enforce_keys ~w(venue channels products)a
-    defstruct ~w(venue channels account products)a
+    @enforce_keys ~w(venue channels products opts)a
+    defstruct ~w(venue channels account products opts)a
   end
 
   @type product :: Venues.Product.t()
@@ -27,16 +28,25 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
           url: String.t(),
           venue: venue_id,
           account: {account_id, account_config} | nil,
-          products: [product]
+          products: [product],
+          opts: map
         ) :: {:ok, pid} | {:error, term}
   def start_link(
         url: url,
         venue: venue,
         channels: channels,
         account: account,
-        products: products
+        products: products,
+        opts: opts
       ) do
-    state = %State{venue: venue, channels: channels, account: account, products: products}
+    state = %State{
+      venue: venue,
+      channels: channels,
+      account: account,
+      products: products,
+      opts: opts
+    }
+
     name = venue |> to_name
     headers = auth_headers(state.account)
     WebSockex.start_link(url, __MODULE__, state, name: name, extra_headers: headers)
