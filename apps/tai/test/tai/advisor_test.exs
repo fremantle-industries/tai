@@ -4,7 +4,7 @@ defmodule Tai.AdvisorTest do
 
   defmodule MyAdvisor do
     use Tai.Advisor
-    def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
+    def handle_inside_quote(_, _, _, state), do: {:ok, state.store}
 
     def init(%Tai.Advisor.State{config: %{callback: callback}} = state) do
       callback.()

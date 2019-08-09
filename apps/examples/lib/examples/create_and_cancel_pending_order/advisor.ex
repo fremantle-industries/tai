@@ -1,7 +1,7 @@
 defmodule Examples.CreateAndCancelPendingOrder.Advisor do
   use Tai.Advisor
 
-  def handle_inside_quote(venue_id, product_symbol, _inside_quote, _changes, state) do
+  def handle_inside_quote(venue_id, product_symbol, _data, state) do
     if Tai.Trading.OrderStore.count() == 0 do
       {:ok, product} = Tai.Venues.ProductStore.find({venue_id, product_symbol})
 

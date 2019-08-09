@@ -9,11 +9,13 @@ defmodule Examples.LogSpread.Advisor do
         venue_id,
         product_symbol,
         # wait until we have quotes for both sides of the order book
-        %Tai.Markets.Quote{
-          bid: %Tai.Markets.PriceLevel{},
-          ask: %Tai.Markets.PriceLevel{}
-        } = market_quote,
-        _changes,
+        %{
+          market_quote:
+            %Tai.Markets.Quote{
+              bid: %Tai.Markets.PriceLevel{},
+              ask: %Tai.Markets.PriceLevel{}
+            } = market_quote
+        },
         state
       ) do
     bid_price = market_quote.bid.price |> Decimal.cast()
@@ -32,5 +34,5 @@ defmodule Examples.LogSpread.Advisor do
   end
 
   # ignore quotes that don't have both sides of the order book
-  def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
+  def handle_inside_quote(_, _, _, state), do: {:ok, state.store}
 end

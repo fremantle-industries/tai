@@ -27,14 +27,12 @@ defmodule Tai.Advisor do
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type order :: Tai.Trading.Order.t()
-  @type market_quote :: Tai.Markets.Quote.t()
-  @type changes :: term
   @type group_id :: Tai.AdvisorGroup.id()
   @type id :: State.id()
   @type run_store :: State.run_store()
   @type state :: State.t()
 
-  @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, state) ::
+  @callback handle_inside_quote(venue_id, product_symbol, map, state) ::
               {:ok, run_store}
 
   @spec to_name(group_id, id) :: atom
@@ -225,8 +223,7 @@ defmodule Tai.Advisor do
                    handle_inside_quote(
                      venue_id,
                      product_symbol,
-                     current_inside_quote,
-                     changes,
+                     %{market_quote: current_inside_quote, changes: changes},
                      state
                    ) do
               Map.put(state, :store, new_store)

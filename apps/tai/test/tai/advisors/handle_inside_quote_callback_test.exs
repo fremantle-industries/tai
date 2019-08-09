@@ -4,12 +4,12 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
   defmodule MyAdvisor do
     use Tai.Advisor
 
-    def handle_inside_quote(feed_id, symbol, inside_quote, changes, state) do
+    def handle_inside_quote(feed_id, symbol, data, state) do
       if Map.has_key?(state.config, :error) do
         raise state.config.error
       end
 
-      send(:test, {feed_id, symbol, inside_quote, changes, state})
+      send(:test, {feed_id, symbol, data, state})
       {:ok, state.store}
     end
   end
@@ -17,8 +17,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
   defmodule ReturnAdvisor do
     use Tai.Advisor
 
-    def handle_inside_quote(venue_id, product_symbol, inside_quote, changes, state) do
-      send(:test, {venue_id, product_symbol, inside_quote, changes, state})
+    def handle_inside_quote(venue_id, product_symbol, data, state) do
+      send(:test, {venue_id, product_symbol, data, state})
       state.config[:return_val]
     end
   end
@@ -62,7 +62,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
 
     Tai.Markets.OrderBook.replace(snapshot)
 
-    assert_receive {:my_venue, :btc_usd, received_market_quote, received_snapshot,
+    assert_receive {:my_venue, :btc_usd,
+                    %{market_quote: received_market_quote, changes: received_snapshot},
                     %Tai.Advisor.State{}}
 
     assert %Tai.Markets.Quote{} = received_market_quote
@@ -99,21 +100,23 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     assert_receive {
       :my_venue,
       :btc_usd,
-      %Tai.Markets.Quote{
-        bid: %Tai.Markets.PriceLevel{
-          price: 101.2,
-          size: 1.0,
-          processed_at: nil,
-          server_changed_at: nil
+      %{
+        market_quote: %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.1,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
-        ask: %Tai.Markets.PriceLevel{
-          price: 101.3,
-          size: 0.1,
-          processed_at: nil,
-          server_changed_at: nil
-        }
+        changes: ^changes_1
       },
-      ^changes_1,
       %Tai.Advisor.State{}
     }
 
@@ -129,21 +132,23 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     assert_receive {
       :my_venue,
       :btc_usd,
-      %Tai.Markets.Quote{
-        bid: %Tai.Markets.PriceLevel{
-          price: 101.2,
-          size: 1.1,
-          processed_at: nil,
-          server_changed_at: nil
+      %{
+        market_quote: %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.1,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.1,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
-        ask: %Tai.Markets.PriceLevel{
-          price: 101.3,
-          size: 0.1,
-          processed_at: nil,
-          server_changed_at: nil
-        }
+        changes: ^changes_2
       },
-      ^changes_2,
       %Tai.Advisor.State{}
     }
   end
@@ -163,21 +168,23 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     assert_receive {
       :my_venue,
       :btc_usd,
-      %Tai.Markets.Quote{
-        bid: %Tai.Markets.PriceLevel{
-          price: 101.2,
-          size: 1.0,
-          processed_at: nil,
-          server_changed_at: nil
+      %{
+        market_quote: %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.1,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
-        ask: %Tai.Markets.PriceLevel{
-          price: 101.3,
-          size: 0.1,
-          processed_at: nil,
-          server_changed_at: nil
-        }
+        changes: ^changes_1
       },
-      ^changes_1,
       %Tai.Advisor.State{}
     }
 
@@ -193,21 +200,23 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     assert_receive {
       :my_venue,
       :btc_usd,
-      %Tai.Markets.Quote{
-        bid: %Tai.Markets.PriceLevel{
-          price: 101.2,
-          size: 1.0,
-          processed_at: nil,
-          server_changed_at: nil
+      %{
+        market_quote: %Tai.Markets.Quote{
+          bid: %Tai.Markets.PriceLevel{
+            price: 101.2,
+            size: 1.0,
+            processed_at: nil,
+            server_changed_at: nil
+          },
+          ask: %Tai.Markets.PriceLevel{
+            price: 101.3,
+            size: 0.2,
+            processed_at: nil,
+            server_changed_at: nil
+          }
         },
-        ask: %Tai.Markets.PriceLevel{
-          price: 101.3,
-          size: 0.2,
-          processed_at: nil,
-          server_changed_at: nil
-        }
+        changes: ^changes_2
       },
-      ^changes_2,
       %Tai.Advisor.State{}
     }
   end
@@ -227,8 +236,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     assert_receive {
       :my_venue,
       :btc_usd,
-      %Tai.Markets.Quote{},
-      ^snapshot,
+      %{market_quote: %Tai.Markets.Quote{}, changes: ^snapshot},
       %Tai.Advisor.State{advisor_id: :my_advisor, store: %{}}
     }
 
@@ -244,8 +252,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     assert_receive {
       :my_venue,
       :btc_usd,
-      %Tai.Markets.Quote{},
-      ^changes,
+      %{market_quote: %Tai.Markets.Quote{}, changes: ^changes},
       %Tai.Advisor.State{advisor_id: :my_advisor, store: %{hello: "world"}}
     }
   end
@@ -325,7 +332,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       assert event.error == %RuntimeError{message: "!!!This is an ERROR!!!"}
       assert [stack_1 | _] = event.stacktrace
 
-      assert {Tai.Advisors.HandleInsideQuoteCallbackTest.MyAdvisor, :handle_inside_quote, 5,
+      assert {Tai.Advisors.HandleInsideQuoteCallbackTest.MyAdvisor, :handle_inside_quote, 4,
               [file: _, line: _]} = stack_1
     end
 
