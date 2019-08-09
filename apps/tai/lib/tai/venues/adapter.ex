@@ -26,7 +26,7 @@ defmodule Tai.Venues.Adapter do
   @type cancel_order_error_reason :: shared_error_reason | :not_found
   @type t :: %Tai.Venues.Adapter{
           id: atom,
-          adapter: atom,
+          adapter: module,
           channels: [channel],
           products: String.t(),
           accounts: map,
@@ -34,10 +34,10 @@ defmodule Tai.Venues.Adapter do
           opts: map
         }
 
-  @callback stream_supervisor :: atom
-  @callback order_book_feed :: atom
+  @callback stream_supervisor :: module
+  @callback order_book_feed :: module
   @callback products(venue_id) :: {:ok, [product]} | {:error, reason :: term}
-  @callback asset_balances(venue_id :: atom, account_id, credentials) ::
+  @callback asset_balances(venue_id, account_id, credentials) ::
               {:ok, [asset_balance]} | {:error, reason :: term}
   @callback positions(venue_id, account_id, credentials) ::
               {:ok, [position]} | {:error, :not_supported | shared_error_reason}

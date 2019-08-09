@@ -15,7 +15,7 @@ defmodule Tai.Trading.OrderStore do
   @default_backend Tai.Trading.OrderStore.Backends.ETS
 
   defmodule State do
-    @type t :: %State{id: atom, name: atom, backend: atom}
+    @type t :: %State{id: atom, name: atom, backend: module}
     defstruct ~w(id name backend)a
   end
 

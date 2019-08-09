@@ -8,8 +8,8 @@ defmodule Tai.AdvisorGroup do
           start_on_boot: boolean,
           restart: restart,
           shutdown: shutdown,
-          advisor: atom,
-          factory: atom,
+          advisor: module,
+          factory: module,
           products: [product],
           config: map | struct,
           trades: list

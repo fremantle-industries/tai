@@ -15,7 +15,7 @@ defmodule Tai.Venues.StreamsSupervisor do
   end
 
   @spec start_stream(
-          stream_supervisor :: atom | null_supervisor,
+          stream_supervisor :: module | null_supervisor,
           venue_id :: venue_id,
           channels :: [channel],
           accounts :: map,
