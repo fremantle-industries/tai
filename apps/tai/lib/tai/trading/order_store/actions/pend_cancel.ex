@@ -13,7 +13,7 @@ defmodule Tai.Trading.OrderStore.Actions.PendCancel do
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PendCancel do
-  def required(_), do: [:open, :partially_filled]
+  def required(_), do: [:amend_error, :cancel_error, :open, :partially_filled]
 
   def attrs(_action) do
     %{
