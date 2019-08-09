@@ -295,6 +295,18 @@ config :logger_json, :backend, metadata: :all
 config :logger, backends: [LoggerJSON]
 ```
 
+## Secrets
+
+Managing secrets is a complex and opinionated topic. We recommend that you avoid compiling 
+application secrets into your OTP release and regularly rotate them. This can be achieved in many 
+different ways, `tai` has chosen to use [confex](https://github.com/Nebo15/confex) to manage 
+this workflow. `confex` provides the ability to read secrets from environment variables or the 
+file system out of the box. It also has the ability to read secrets from your any location you 
+wish via a custom adapter.
+
+Take a look at our example [dev configuration](./config/dev.exs.example#L32) which 
+reads secrets from the file system.
+
 ## Help Wanted :)
 
 If you think this `tai` thing might be worthwhile and you don't see a feature 
