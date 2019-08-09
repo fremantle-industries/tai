@@ -3,7 +3,8 @@ use Mix.Config
 config :examples, :e2e_mappings, %{
   log_spread: ExamplesSupport.E2E.LogSpread,
   fill_or_kill_orders: ExamplesSupport.E2E.FillOrKillOrders,
-  create_and_cancel_pending_order: ExamplesSupport.E2E.CreateAndCancelPendingOrder
+  create_and_cancel_pending_order: ExamplesSupport.E2E.CreateAndCancelPendingOrder,
+  ping_pong: ExamplesSupport.E2E.PingPong
 }
 
 config :tai,

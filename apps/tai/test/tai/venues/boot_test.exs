@@ -169,7 +169,7 @@ defmodule Tai.Venues.BootTest do
   end
 
   def mock_maker_taker_fees(_) do
-    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_exchange_and_account(
+    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_venue_and_account(
       @venue_id,
       @account_id,
       {Decimal.new("0.001"), Decimal.new("0.001")}
