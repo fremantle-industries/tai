@@ -8,8 +8,8 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   @type product :: Tai.Venues.Product.t()
   @type msg :: map
   @type account_config :: map
-  @type venue_id :: atom
-  @type account_id :: atom
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
 
   @enforce_keys [:venue_id]
   defstruct [:venue_id]

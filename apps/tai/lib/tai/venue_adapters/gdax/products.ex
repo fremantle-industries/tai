@@ -7,9 +7,10 @@ defmodule Tai.VenueAdapters.Gdax.Products do
           :timeout
           | {:credentials, reason :: term}
           | Tai.ServiceUnavailableError.t()
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type products :: Tai.Venues.Product.t()
 
-  @spec products(venue_id :: atom) :: {:ok, [products]} | {:error, error_reason}
+  @spec products(venue_id) :: {:ok, [products]} | {:error, error_reason}
   def products(venue_id) do
     with {:ok, exchange_products} <- ExGdax.list_products() do
       products = Enum.map(exchange_products, &build(&1, venue_id))

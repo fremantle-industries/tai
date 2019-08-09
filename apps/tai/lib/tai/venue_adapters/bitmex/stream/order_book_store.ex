@@ -2,14 +2,17 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
   use GenServer
   require Logger
 
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type product_symbol :: Tai.Venues.Product.symbol()
+
   @type t :: %Tai.VenueAdapters.Bitmex.Stream.OrderBookStore{
-          venue_id: atom,
-          symbol: atom,
+          venue_id: venue_id,
+          symbol: product_symbol,
           table: map
         }
 
-  @enforce_keys [:venue_id, :symbol, :table]
-  defstruct [:venue_id, :symbol, :table]
+  @enforce_keys ~w(venue_id symbol table)a
+  defstruct ~w(venue_id symbol table)a
 
   def start_link(venue_id: venue_id, symbol: symbol, venue_symbol: venue_symbol) do
     store = %Tai.VenueAdapters.Bitmex.Stream.OrderBookStore{
@@ -26,7 +29,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
     {:ok, state}
   end
 
-  @spec to_name(venue_id :: atom, venue_symbol :: String.t()) :: atom
+  @spec to_name(venue_id, venue_symbol :: String.t()) :: atom
   def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
 
   def handle_cast({:snapshot, data, received_at}, state) do

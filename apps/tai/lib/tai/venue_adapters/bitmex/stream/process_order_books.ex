@@ -2,13 +2,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBooks do
   use GenServer
   alias Tai.VenueAdapters.Bitmex.Stream
 
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type t :: %Stream.ProcessOrderBooks{
-          venue_id: atom,
+          venue_id: venue_id,
           exchange_products: map
         }
 
-  @enforce_keys [:venue_id, :exchange_products]
-  defstruct [:venue_id, :exchange_products]
+  @enforce_keys ~w(venue_id exchange_products)a
+  defstruct ~w(venue_id exchange_products)a
 
   def start_link(venue_id: venue_id, products: products) do
     exchange_products =
@@ -28,7 +29,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBooks do
 
   def init(state), do: {:ok, state}
 
-  @spec to_name(venue_id :: atom) :: atom
+  @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   def handle_cast({%{"request" => _}, _received_at}, state) do

@@ -4,11 +4,14 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBooks do
   alias Tai.VenueAdapters.Binance.Stream
 
   defmodule State do
-    @type t :: %State{venue_id: atom, venue_products: map}
+    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type t :: %State{venue_id: venue_id, venue_products: map}
 
     @enforce_keys ~w(venue_id venue_products)a
     defstruct ~w(venue_id venue_products)a
   end
+
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
 
   def start_link(venue_id: venue_id, products: products) do
     state = %State{
@@ -21,7 +24,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBooks do
 
   def init(state), do: {:ok, state}
 
-  @spec to_name(venue_id :: atom) :: atom
+  @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   def handle_cast(

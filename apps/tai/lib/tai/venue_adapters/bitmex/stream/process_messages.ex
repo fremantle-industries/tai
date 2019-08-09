@@ -2,12 +2,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
   use GenServer
   alias Tai.VenueAdapters.Bitmex.Stream
 
-  @type t :: %Stream.ProcessMessages{
-          venue_id: atom
-        }
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type t :: %Stream.ProcessMessages{venue_id: venue_id}
 
-  @enforce_keys [:venue_id]
-  defstruct [:venue_id]
+  @enforce_keys ~w(venue_id)a
+  defstruct ~w(venue_id)a
 
   def start_link(venue_id: venue_id) do
     state = %Stream.ProcessMessages{venue_id: venue_id}
@@ -16,7 +15,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessMessages do
 
   def init(state), do: {:ok, state}
 
-  @spec to_name(venue_id :: atom) :: atom
+  @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   def handle_cast(

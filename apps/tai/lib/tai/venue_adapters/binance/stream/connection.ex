@@ -4,8 +4,10 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   alias Tai.VenueAdapters.Binance.Stream
 
   @type product :: Tai.Venues.Product.t()
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
   @type t :: %Tai.VenueAdapters.Binance.Stream.Connection{
-          venue_id: atom
+          venue_id: venue_id
         }
 
   @enforce_keys [:venue_id]
@@ -13,8 +15,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
   @spec start_link(
           url: String.t(),
-          venue_id: atom,
-          account: {account_id :: atom, account_config :: map} | nil,
+          venue_id: venue_id,
+          account: {account_id, account_config :: map} | nil,
           products: [product]
         ) :: {:ok, pid}
   def start_link(url: url, venue_id: venue_id, account: _, products: products) do
@@ -60,7 +62,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     end)
   end
 
-  @spec handle_msg(msg :: map, venue_id :: atom) :: no_return
+  @spec handle_msg(msg :: map, venue_id) :: no_return
   defp handle_msg(msg, venue_id)
 
   defp handle_msg(%{"data" => %{"e" => "depthUpdate"}} = msg, venue_id) do
