@@ -85,6 +85,8 @@ defmodule Tai.Advisor do
         {:ok, state, {:continue, :subscribe_to_products}}
       end
 
+      defoverridable init: 1
+
       @doc false
       def handle_continue(:subscribe_to_products, state) do
         state.products
