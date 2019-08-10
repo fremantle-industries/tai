@@ -48,11 +48,14 @@ defmodule Tai.Advisor do
     GenServer.cast(name, {:order_updated, old_order, updated_order, callback, opts})
   end
 
-  defmacro __using__(_) do
+  defmacro __using__(opts \\ []) do
+    subscribe_to = Keyword.get(opts, :subscribe_to, [:changes, :market_quote])
+
     quote location: :keep do
       use GenServer
 
       @behaviour Tai.Advisor
+      @subscribe_to unquote(subscribe_to)
 
       def start_link(
             group_id: group_id,
@@ -64,6 +67,7 @@ defmodule Tai.Advisor do
           ) do
         name = Tai.Advisor.to_name(group_id, advisor_id)
         market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
+        config = Map.put(config || %{}, :subscribe_to, @subscribe_to)
 
         state = %State{
           group_id: group_id,
