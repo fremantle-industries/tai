@@ -77,9 +77,6 @@
 | Getbtc             
 | Hadax              
 | Hitbtc             
-| Huobi              
-| Huobicny           
-| Huobipro           
 | Ice3x              
 | Independentreserve 
 | Indodax            
