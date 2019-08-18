@@ -6,37 +6,46 @@ defmodule Tai.Utils.Decimal do
 
   @spec round_up(Decimal.t(), Decimal.t()) :: Decimal.t()
   def round_up(val, increment) do
-    d = :math.pow(10, abs(val.exp) - abs(increment.exp))
-    v = ceil(val.coef / d)
-    r = rem(v, increment.coef)
+    {vc, ic, e} = same_order_of(val, increment)
+    r = rem(vc, ic)
 
-    z =
-      if r == 0 do
-        0
-      else
-        if val.sign > 0, do: increment.coef - r, else: -r
-      end
-
-    coef = v + z
-
-    Decimal.new(val.sign, coef, increment.exp)
+    if val.sign == 1 and r > 0 do
+      v = vc + (ic - r)
+      Decimal.new(val.sign, v, e)
+    else
+      v = vc - r
+      Decimal.new(val.sign, v, e)
+    end
   end
 
   @spec round_down(Decimal.t(), Decimal.t()) :: Decimal.t()
   def round_down(val, increment) do
-    d = :math.pow(10, abs(val.exp) - abs(increment.exp))
-    v = trunc(val.coef / d)
-    r = rem(v, increment.coef)
+    {vc, ic, e} = same_order_of(val, increment)
+    r = rem(vc, ic)
 
-    z =
-      if r == 0 do
-        0
-      else
-        if val.sign > 0, do: -r, else: increment.coef - r
-      end
+    if val.sign == 1 or r == 0 do
+      v = vc - r
+      Decimal.new(val.sign, v, e)
+    else
+      v = vc + (ic - r)
+      Decimal.new(val.sign, v, e)
+    end
+  end
 
-    coef = v + z
+  defp same_order_of(val, increment) do
+    cond do
+      val.exp < increment.exp ->
+        s = abs(val.exp - increment.exp)
+        ic = trunc(:math.pow(10, s)) * increment.coef
+        {val.coef, ic, val.exp}
 
-    Decimal.new(val.sign, coef, increment.exp)
+      increment.exp < val.exp ->
+        s = abs(increment.exp - val.exp)
+        vc = trunc(:math.pow(10, s)) * val.coef
+        {vc, increment.coef, increment.exp}
+
+      true ->
+        {val.coef, increment.coef, val.exp}
+    end
   end
 end
