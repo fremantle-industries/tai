@@ -31,12 +31,12 @@ defmodule Tai.Utils.Decimal do
     cond do
       val.exp < increment.exp ->
         s = abs(val.exp - increment.exp)
-        ic = trunc(:math.pow(10, s)) * increment.coef
+        ic = trunc(Tai.Utils.Math.pow(10, s)) * increment.coef
         {val.coef, ic, val.exp}
 
       increment.exp < val.exp ->
         s = abs(increment.exp - val.exp)
-        vc = trunc(:math.pow(10, s)) * val.coef
+        vc = trunc(Tai.Utils.Math.pow(10, s)) * val.coef
         {vc, increment.coef, increment.exp}
 
       true ->

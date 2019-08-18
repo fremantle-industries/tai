@@ -67,6 +67,20 @@ defmodule Tai.Utils.DecimalTest do
              ) ==
                Decimal.new("0.035700000000000000000000000")
     end
+
+    test "can handle precision > 27 digit limit of :math.pow" do
+      assert Tai.Utils.Decimal.round_up(
+               Decimal.new("0.0356550362080315997366688619"),
+               Decimal.new("0.00001")
+             ) ==
+               Decimal.new("0.0356600000000000000000000000")
+
+      assert Tai.Utils.Decimal.round_up(
+               Decimal.new("1205.0356550362080315997366688"),
+               Decimal.new("0.00001")
+             ) ==
+               Decimal.new("1205.0356600000000000000000000")
+    end
   end
 
   describe ".round_down/2" do
@@ -133,6 +147,20 @@ defmodule Tai.Utils.DecimalTest do
                Decimal.new("0.00007")
              ) ==
                Decimal.new("0.035630000000000000000000000")
+    end
+
+    test "can handle precision > 27 digit limit of :math.pow" do
+      assert Tai.Utils.Decimal.round_down(
+               Decimal.new("0.0356550362080315997366688619"),
+               Decimal.new("0.00001")
+             ) ==
+               Decimal.new("0.0356500000000000000000000000")
+
+      assert Tai.Utils.Decimal.round_down(
+               Decimal.new("1205.0356550362080315997366688"),
+               Decimal.new("0.00001")
+             ) ==
+               Decimal.new("1205.0356500000000000000000000")
     end
   end
 end
