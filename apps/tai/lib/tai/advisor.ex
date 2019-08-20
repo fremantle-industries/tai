@@ -49,7 +49,11 @@ defmodule Tai.Advisor do
   end
 
   defmacro __using__(opts \\ []) do
-    subscribe_to = Keyword.get(opts, :subscribe_to, [:changes, :market_quote])
+    subscribe_to =
+      Keyword.get(opts, :subscribe_to, [
+        Tai.AdvisorResponders.Changes,
+        Tai.AdvisorResponders.MarketQuote
+      ])
 
     quote location: :keep do
       use GenServer
@@ -103,35 +107,17 @@ defmodule Tai.Advisor do
       end
 
       @doc false
-      def handle_info({:order_book_snapshot, venue_id, product_symbol, snapshot}, state) do
-        new_state =
-          state
-          |> cache_inside_quote(venue_id, product_symbol)
-          |> execute_handle_inside_quote(venue_id, product_symbol, snapshot)
-
-        {:noreply, new_state}
-      end
-
-      @doc false
-      def handle_info({:order_book_changes, venue_id, product_symbol, changes}, state) do
-        previous_inside_quote =
-          state.market_quotes |> Tai.Advisors.MarketQuotes.for(venue_id, product_symbol)
-
-        if inside_quote_is_stale?(previous_inside_quote, changes) do
-          new_state =
-            state
-            |> cache_inside_quote(venue_id, product_symbol)
-            |> execute_handle_inside_quote(
-              venue_id,
-              product_symbol,
-              changes,
-              previous_inside_quote
-            )
-
-          {:noreply, new_state}
-        else
-          {:noreply, state}
-        end
+      def handle_info({action, venue_id, product_symbol, changes}, state) do
+        state
+        |> Map.get(:config)
+        |> Map.get(:subscribe_to)
+        |> Enum.reduce({%{}, state}, fn mod, acc ->
+          args = {action, venue_id, product_symbol, changes}
+          {:ok, returns} = apply(mod, :respond, [acc, args])
+          returns
+        end)
+        |> execute_handle_inside_quote(venue_id, product_symbol)
+        |> (&{:noreply, &1}).()
       end
 
       @doc false
@@ -170,92 +156,38 @@ defmodule Tai.Advisor do
         end
       end
 
-      defp cache_inside_quote(state, venue_id, product_symbol) do
-        {:ok, current_inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol)
-        key = {venue_id, product_symbol}
-        old_market_quotes = state.market_quotes
-        updated_market_quotes_data = Map.put(old_market_quotes.data, key, current_inside_quote)
-        updated_market_quotes = Map.put(old_market_quotes, :data, updated_market_quotes_data)
-
-        state
-        |> Map.put(:market_quotes, updated_market_quotes)
-      end
-
-      defp inside_quote_is_stale?(
-             previous_inside_quote,
-             %Tai.Markets.OrderBook{bids: bids, asks: asks} = changes
-           ) do
-        (bids |> Enum.any?() && bids |> inside_bid_is_stale?(previous_inside_quote)) ||
-          (asks |> Enum.any?() && asks |> inside_ask_is_stale?(previous_inside_quote))
-      end
-
-      defp inside_bid_is_stale?(_bids, nil), do: true
-
-      defp inside_bid_is_stale?(bids, %Tai.Markets.Quote{} = prev_quote) do
-        bids
-        |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
-          price >= prev_quote.bid.price ||
-            (price == prev_quote.bid.price && size != prev_quote.bid.size)
-        end)
-      end
-
-      defp inside_ask_is_stale?(asks, nil), do: true
-
-      defp inside_ask_is_stale?(asks, %Tai.Markets.Quote{} = prev_quote) do
-        asks
-        |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
-          price <= prev_quote.ask.price ||
-            (price == prev_quote.ask.price && size != prev_quote.ask.size)
-        end)
-      end
-
       defp execute_handle_inside_quote(
-             state,
+             {data, state},
              venue_id,
-             product_symbol,
-             changes,
-             previous_inside_quote \\ nil
+             product_symbol
            ) do
-        current_inside_quote =
-          state.market_quotes |> Tai.Advisors.MarketQuotes.for(venue_id, product_symbol)
-
-        if current_inside_quote == previous_inside_quote do
-          state
-        else
-          try do
-            with {:ok, new_store} <-
-                   handle_inside_quote(
-                     venue_id,
-                     product_symbol,
-                     %{market_quote: current_inside_quote, changes: changes},
-                     state
-                   ) do
-              Map.put(state, :store, new_store)
-            else
-              unhandled ->
-                Tai.Events.info(%Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{
-                  advisor_id: state.advisor_id,
-                  group_id: state.group_id,
-                  venue_id: venue_id,
-                  product_symbol: product_symbol,
-                  return_value: unhandled
-                })
-
-                state
-            end
-          rescue
-            e ->
-              Tai.Events.info(%Tai.Events.AdvisorHandleInsideQuoteError{
+        try do
+          with {:ok, new_store} <- handle_inside_quote(venue_id, product_symbol, data, state) do
+            Map.put(state, :store, new_store)
+          else
+            unhandled ->
+              Tai.Events.info(%Tai.Events.AdvisorHandleInsideQuoteInvalidReturn{
                 advisor_id: state.advisor_id,
                 group_id: state.group_id,
                 venue_id: venue_id,
                 product_symbol: product_symbol,
-                error: e,
-                stacktrace: __STACKTRACE__
+                return_value: unhandled
               })
 
               state
           end
+        rescue
+          e ->
+            Tai.Events.info(%Tai.Events.AdvisorHandleInsideQuoteError{
+              advisor_id: state.advisor_id,
+              group_id: state.group_id,
+              venue_id: venue_id,
+              product_symbol: product_symbol,
+              error: e,
+              stacktrace: __STACKTRACE__
+            })
+
+            state
         end
       end
     end
