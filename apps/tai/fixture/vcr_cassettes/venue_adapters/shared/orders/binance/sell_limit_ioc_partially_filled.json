@@ -1,0 +1,47 @@
+[
+  {
+    "request": {
+      "body": "price=0.1&quantity=0.1&recvWindow=1000&side=SELL&symbol=LTCBTC&timeInForce=IOC&timestamp=1566617932471&type=LIMIT&signature=***",
+      "headers": {
+        "X-MBX-APIKEY": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://api.binance.com/api/v3/order"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"symbol\":\"LTCBTC\",\"orderId\":227739311,\"orderListId\":-1,\"clientOrderId\":\"JCUDVkQQ5f2dSk6Kl60YpG\",\"transactTime\":1566617248535,\"price\":\"0.10000000\",\"origQty\":\"0.10000000\",\"executedQty\":\"0.05000000\",\"cummulativeQuoteQty\":\"0.00000000\",\"status\":\"EXPIRED\",\"timeInForce\":\"IOC\",\"type\":\"LIMIT\",\"side\":\"SELL\",\"fills\":[]}",
+      "headers": {
+        "Content-Type": "application/json;charset=utf-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Date": "Sat, 24 Aug 2019 03:27:28 GMT",
+        "Server": "nginx",
+        "Vary": "Accept-Encoding",
+        "X-MBX-UUID": "04a7affb-ec6a-49bd-a6e0-29faa91f409b",
+        "X-MBX-USED-WEIGHT": "2",
+        "X-MBX-USED-WEIGHT-1M": "2",
+        "X-MBX-ORDER-COUNT-1S": "1",
+        "X-MBX-ORDER-COUNT-1D": "1",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Xss-Protection": "1; mode=block",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'",
+        "X-Content-Security-Policy": "default-src 'self'",
+        "X-WebKit-CSP": "default-src 'self'",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "Miss from cloudfront",
+        "Via": "1.1 e32fd4d6bca08174b7bd2cfbec023139.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Pop": "SYD1-C1",
+        "X-Amz-Cf-Id": "EUqqyIZaQVgvw35HPEW-k92eB0EqZcDXdJHOlKBnA0Dy6W9maeyyPQ=="
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]
