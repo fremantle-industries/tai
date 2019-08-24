@@ -31,7 +31,7 @@ Here's an example of an advisor that logs the spread between multiple products o
 
 | Venue    | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
 |----------|:---:|:---:|:---:|:---:|:---:|:---:|
-| Binance  | [x] | [x] | [ ] | [ ] | [x] | [x] |
+| Binance  | [x] | [x] | [x] | [ ] | [x] | [x] |
 | GDAX     | [x] | [x] | [ ] | [ ] | [x] | [x] |
 | Poloniex | [x] | [x] | [ ] | [ ] | [x] | [x] |
 | Huobi    | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
