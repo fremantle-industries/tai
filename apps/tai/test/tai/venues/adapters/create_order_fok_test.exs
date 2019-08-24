@@ -59,7 +59,6 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
 
   defp build_order(venue_id, side, time_in_force, opts) do
     action = Keyword.fetch!(opts, :action)
-    post_only = Keyword.get(opts, :post_only, false)
 
     struct(Tai.Trading.Order, %{
       client_id: Ecto.UUID.generate(),
@@ -71,7 +70,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
       qty: venue_id |> qty(side, time_in_force, action),
       type: :limit,
       time_in_force: time_in_force,
-      post_only: post_only
+      post_only: false
     })
   end
 

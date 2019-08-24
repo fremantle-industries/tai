@@ -12,7 +12,7 @@
     },
     "response": {
       "binary": false,
-      "body": "{\"symbol\":\"LTCBTC\",\"orderId\":47534691,\"clientOrderId\":\"XUw0I4WRQUniiFjbVCZDSv\",\"transactTime\":1527294884226,\"price\":\"0.01600000\",\"origQty\":\"0.01000000\",\"executedQty\":\"0.01000000\",\"status\":\"EXPIRED\",\"timeInForce\":\"FOK\",\"type\":\"LIMIT\",\"side\":\"SELL\"}",
+      "body": "{\"symbol\":\"LTCBTC\",\"orderId\":47534691,\"clientOrderId\":\"XUw0I4WRQUniiFjbVCZDSv\",\"transactTime\":1527294884226,\"price\":\"0.01600000\",\"origQty\":\"0.01000000\",\"executedQty\":\"0.01000000\",\"status\":\"FILLED\",\"timeInForce\":\"FOK\",\"type\":\"LIMIT\",\"side\":\"SELL\"}",
       "headers": {
         "Content-Type": "application/json",
         "Transfer-Encoding": "chunked",
