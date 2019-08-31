@@ -106,16 +106,32 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
+  def handle_info({:send_msg, msg}, state), do: {:reply, {:text, msg}, state}
+
+  # Bitmex has an unpublished limit to websocket message lengths.
+  @products_chunk_count 10
   def handle_info({:subscribe, :depth}, state) do
-    args = state.products |> Enum.map(fn p -> "orderBookL2_25:#{p.venue_symbol}" end)
-    msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
-    {:reply, {:text, msg}, state}
+    state.products
+    |> Enum.chunk_every(@products_chunk_count)
+    |> Enum.each(fn products ->
+      args = products |> Enum.map(fn p -> "orderBookL2_25:#{p.venue_symbol}" end)
+      msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
+      send(self(), {:send_msg, msg})
+    end)
+
+    {:ok, state}
   end
 
   def handle_info({:subscribe, :trades}, state) do
-    args = state.products |> Enum.map(fn p -> "trade:#{p.venue_symbol}" end)
-    msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
-    {:reply, {:text, msg}, state}
+    state.products
+    |> Enum.chunk_every(@products_chunk_count)
+    |> Enum.each(fn products ->
+      args = products |> Enum.map(fn p -> "trade:#{p.venue_symbol}" end)
+      msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
+      send(self(), {:send_msg, msg})
+    end)
+
+    {:ok, state}
   end
 
   def handle_info({:subscribe, :connected_stats}, state) do
