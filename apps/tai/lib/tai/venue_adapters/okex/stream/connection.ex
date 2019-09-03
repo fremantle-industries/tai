@@ -149,14 +149,16 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   @futures_depth "futures/depth"
   @swap_depth "swap/depth"
+  @spot_depth "spot/depth"
   defp handle_msg(%{"table" => table} = msg, state)
-       when table == @futures_depth or table == @swap_depth,
+       when table == @futures_depth or table == @swap_depth or table == @spot_depth,
        do: msg |> process_order_books(state)
 
   @futures_order "futures/order"
   @swap_order "swap/order"
+  @spot_order "spot/order"
   defp handle_msg(%{"table" => table} = msg, state)
-       when table == @futures_order or table == @swap_order,
+       when table == @futures_order or table == @swap_order or table == @spot_order,
        do: msg |> process_auth(state)
 
   defp handle_msg(msg, state), do: msg |> process_messages(state)

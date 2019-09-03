@@ -71,10 +71,16 @@ defmodule Tai.VenueAdapters.OkEx.Stream.OrderBookStore do
   defp normalize(data, side, received_at, venue_sent_at) do
     data
     |> Map.get(side, [])
-    |> Enum.reduce(%{}, fn [raw_price, raw_size, _forced_liquidations, _count], acc ->
-      {price, ""} = Float.parse(raw_price)
-      {size, ""} = Float.parse(raw_size)
-      acc |> Map.put(price, {size, received_at, venue_sent_at})
+    |> Enum.reduce(%{}, fn
+      [raw_price, raw_size, _count], acc ->
+        {price, ""} = Float.parse(raw_price)
+        {size, ""} = Float.parse(raw_size)
+        acc |> Map.put(price, {size, received_at, venue_sent_at})
+
+      [raw_price, raw_size, _forced_liquidations, _count], acc ->
+        {price, ""} = Float.parse(raw_price)
+        {size, ""} = Float.parse(raw_size)
+        acc |> Map.put(price, {size, received_at, venue_sent_at})
     end)
   end
 end

@@ -70,6 +70,18 @@ config(:tai,
       },
       opts: %{}
     ],
+    okex_spot: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.OkEx,
+      accounts: %{
+        main: %{
+          api_key: {:system_file, "OKEX_API_KEY"},
+          api_secret: {:system_file, "OKEX_API_SECRET"},
+          api_passphrase: {:system_file, "OKEX_API_PASSPHRASE"}
+        }
+      },
+      opts: %{}
+    ],
     binance: [
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,
