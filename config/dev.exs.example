@@ -4,20 +4,15 @@ config :tai, send_orders: false
 
 config :tai,
   advisor_groups: %{
-    create_and_cancel_pending_order: [
-      advisor: Examples.CreateAndCancelPendingOrder.Advisor,
-      factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "gdax.btc_usd"
-    ],
     log_spread: [
       advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
       products: "binance.btc_usdt gdax.btc_usd poloniex.btc_usdt"
     ],
-    fill_or_kill_orders: [
-      advisor: Examples.FillOrKillOrders.Advisor,
+    ping_pong: [
+      advisor: Examples.PingPong.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "binance.btc_usdt"
+      products: "bitmex.xbtusd"
     ]
   }
 
@@ -26,7 +21,7 @@ config :tai,
     bitmex: [
       enabled: true,
       adapter: Tai.VenueAdapters.Bitmex,
-      products: "xbtz18 xbth19",
+      products: "xbtusd",
       accounts: %{
         main: %{
           api_key: {:system_file, "BITMEX_API_KEY"},
