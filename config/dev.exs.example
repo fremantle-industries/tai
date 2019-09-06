@@ -12,7 +12,14 @@ config :tai,
     ping_pong: [
       advisor: Examples.PingPong.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "bitmex.xbtusd"
+      products: "bitmex.xbtusd",
+      config:
+        {Examples.PingPong.Config,
+         %{
+           product: {{:bitmex, :xbtusd}, :product},
+           fee: {{:bitmex, :xbtusd, :main}, :fee},
+           max_qty: {5, :decimal}
+         }}
     ]
   }
 
@@ -25,7 +32,7 @@ config :tai,
       accounts: %{
         main: %{
           api_key: {:system_file, "BITMEX_API_KEY"},
-          api_secret: {:system_file, "BITMEX_SECRET"}
+          api_secret: {:system_file, "BITMEX_API_SECRET"}
         }
       },
       opts: %{
