@@ -3,6 +3,7 @@ defmodule Tai.Trading.OrderSubmissions.SellLimitGtc do
   @type account_id :: Tai.Venues.Adapter.account_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type product_type :: Tai.Venues.Product.type()
+  @type callback :: Tai.Trading.Order.callback()
   @type t :: %Tai.Trading.OrderSubmissions.SellLimitGtc{
           venue_id: venue_id,
           account_id: account_id,
@@ -12,7 +13,7 @@ defmodule Tai.Trading.OrderSubmissions.SellLimitGtc do
           qty: Decimal.t(),
           close: boolean | nil,
           post_only: boolean,
-          order_updated_callback: function | nil
+          order_updated_callback: callback
         }
 
   @enforce_keys ~w(

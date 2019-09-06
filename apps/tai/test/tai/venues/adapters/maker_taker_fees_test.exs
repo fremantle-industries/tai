@@ -26,7 +26,7 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
   end)
 
   def setup_adapter(:mock) do
-    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_exchange_and_account(
+    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_venue_and_account(
       :mock,
       :main,
       {Decimal.new("0.001"), Decimal.new("0.001")}

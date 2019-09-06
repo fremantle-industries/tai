@@ -24,6 +24,7 @@ defmodule Tai.Advisor do
     defstruct ~w(advisor_id config group_id market_quotes products store trades)a
   end
 
+  @type advisor_id :: atom
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type order :: Tai.Trading.Order.t()
@@ -37,7 +38,7 @@ defmodule Tai.Advisor do
   @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, state) ::
               {:ok, run_store}
 
-  @spec to_name(group_id, id) :: atom
+  @spec to_name(group_id, id) :: advisor_id
   def to_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
 
   @spec cast_order_updated(atom, order | nil, order, fun) :: :ok
