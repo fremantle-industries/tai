@@ -41,7 +41,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
   end
 
   defp notify({:ok, {old, updated}}, _, _) do
-    Tai.Trading.Orders.updated!(old, updated)
+    Tai.Trading.NotifyOrderUpdate.notify!(old, updated)
   end
 
   defp notify({:error, {:invalid_status, was, required}}, action, client_id) do

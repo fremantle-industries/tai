@@ -1,5 +1,5 @@
 defmodule Tai.Trading.Orders.Cancel do
-  alias Tai.Trading.{Order, Orders, OrderStore}
+  alias Tai.Trading.{NotifyOrderUpdate, Order, OrderStore}
   alias Tai.Trading.OrderResponses.{Cancel, CancelAccepted}
 
   @type order :: Order.t()
@@ -9,7 +9,7 @@ defmodule Tai.Trading.Orders.Cancel do
   def cancel(%Order{client_id: client_id}) do
     with action <- %OrderStore.Actions.PendCancel{client_id: client_id},
          {:ok, {old, updated}} <- OrderStore.update(action) do
-      Orders.updated!(old, updated)
+      NotifyOrderUpdate.notify!(old, updated)
 
       Task.async(fn ->
         try do
@@ -82,7 +82,7 @@ defmodule Tai.Trading.Orders.Cancel do
   end
 
   defp notify_updated_order({_, {:ok, {previous_order, order}}}),
-    do: Orders.updated!(previous_order, order)
+    do: NotifyOrderUpdate.notify!(previous_order, order)
 
   defp notify_updated_order({:accept_cancel, {:error, {:invalid_status, _, _}}}), do: :ok
 

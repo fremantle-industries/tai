@@ -1,5 +1,5 @@
 defmodule Tai.Trading.Orders.Amend do
-  alias Tai.Trading.{Orders, OrderStore}
+  alias Tai.Trading.{NotifyOrderUpdate, OrderStore}
 
   @type order :: Tai.Trading.Order.t()
   @type status :: Tai.Trading.Order.status()
@@ -16,7 +16,7 @@ defmodule Tai.Trading.Orders.Amend do
   def amend(order, attrs) when is_map(attrs) do
     with action <- %OrderStore.Actions.PendAmend{client_id: order.client_id},
          {:ok, {old, updated}} <- OrderStore.update(action) do
-      Orders.updated!(old, updated)
+      NotifyOrderUpdate.notify!(old, updated)
 
       Task.async(fn ->
         try do
@@ -43,7 +43,7 @@ defmodule Tai.Trading.Orders.Amend do
   defdelegate send_amend_order(order, attrs), to: Tai.Venue, as: :amend_order
 
   defp notify_updated_order({:ok, {old, updated}}) do
-    Orders.updated!(old, updated)
+    NotifyOrderUpdate.notify!(old, updated)
     updated
   end
 

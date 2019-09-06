@@ -1,9 +1,9 @@
 defmodule Tai.Trading.Orders.Create do
   alias Tai.Trading.{
+    NotifyOrderUpdate,
     OrderStore,
     OrderResponses,
     Order,
-    Orders,
     OrderSubmissions
   }
 
@@ -38,9 +38,11 @@ defmodule Tai.Trading.Orders.Create do
     {:ok, order}
   end
 
-  defp notify_initial_updated_order(order), do: Orders.updated!(nil, order)
+  defp notify_initial_updated_order(order), do: NotifyOrderUpdate.notify!(nil, order)
 
-  defp notify_updated_order({_, {:ok, {prev, current}}}), do: Orders.updated!(prev, current)
+  defp notify_updated_order({_, {:ok, {prev, current}}}),
+    do: NotifyOrderUpdate.notify!(prev, current)
+
   defp notify_updated_order({:accept_create, {:error, {:invalid_status, _, _}}}), do: :ok
 
   defp send_to_venue(order) do

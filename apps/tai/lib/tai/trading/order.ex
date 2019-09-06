@@ -26,6 +26,7 @@ defmodule Tai.Trading.Order do
           | :cancel_accepted
           | :canceled
           | :cancel_error
+  @type callback :: fun | atom | pid | {atom | pid, term} | nil
   @type t :: %Order{
           client_id: client_id,
           venue_order_id: venue_order_id | nil,
@@ -47,7 +48,7 @@ defmodule Tai.Trading.Order do
           last_received_at: DateTime.t() | nil,
           last_venue_timestamp: DateTime.t() | nil,
           updated_at: DateTime.t() | nil,
-          order_updated_callback: fun | nil
+          order_updated_callback: callback
         }
 
   @enforce_keys ~w(

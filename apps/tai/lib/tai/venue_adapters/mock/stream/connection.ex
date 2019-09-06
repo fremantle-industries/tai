@@ -99,7 +99,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
       }
       |> OrderStore.update()
 
-    Tai.Trading.Orders.updated!(prev_order, updated_order)
+    Tai.Trading.NotifyOrderUpdate.notify!(prev_order, updated_order)
   end
 
   defp handle_msg(
@@ -121,7 +121,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
       }
       |> OrderStore.update()
 
-    Tai.Trading.Orders.updated!(prev_order, updated_order)
+    Tai.Trading.NotifyOrderUpdate.notify!(prev_order, updated_order)
   end
 
   defp handle_msg(
@@ -139,7 +139,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
       }
       |> OrderStore.update()
 
-    Tai.Trading.Orders.updated!(prev_order, updated_order)
+    Tai.Trading.NotifyOrderUpdate.notify!(prev_order, updated_order)
   end
 
   defp handle_msg(msg, venue_id) do

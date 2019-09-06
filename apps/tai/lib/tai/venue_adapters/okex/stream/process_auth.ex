@@ -75,7 +75,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   defp notify(:ok), do: nil
 
   defp notify({_, _, {:ok, {old, updated}}}) do
-    Tai.Trading.Orders.updated!(old, updated)
+    Tai.Trading.NotifyOrderUpdate.notify!(old, updated)
   end
 
   defp notify({client_id, action, {:error, {:invalid_status, was, required}}}) do
