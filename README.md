@@ -313,7 +313,7 @@ reads secrets from the file system.
 ## Help Wanted :)
 
 If you think this `tai` thing might be worthwhile and you don't see a feature 
-or exchange listed we would love your contributions to add them! Feel free to 
+or venue listed we would love your contributions to add them! Feel free to 
 drop us an email or open a Github issue.
 
 ## Authors

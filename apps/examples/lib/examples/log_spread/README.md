@@ -1,6 +1,4 @@
-# Examples
-
-### [Log the spread of every order book](./lib/examples/log_spread)
+# LogSpread Advisor - Examples
 
 ```bash
 # log/dev.log
@@ -11,4 +9,4 @@
 09:41:38.214 [info] {"type":"Examples.LogSpread.Events.Spread","data":{"venue_id":"binance","spread":"1.77","product_symbol":"btc_usdt","bid_price":"5620.64","ask_price":"5622.41"}}
 ```
 
-### [Ping/Pong a passive maker order](./lib/examples/ping_pong)
+[![asciicast](https://asciinema.org/a/259561.svg)](https://asciinema.org/a/259561)
