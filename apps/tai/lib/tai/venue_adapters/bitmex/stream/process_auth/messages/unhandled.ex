@@ -9,5 +9,5 @@ end
 
 defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
   for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.Unhandled do
-  def process(_message, _received_at, state), do: {:ok, state}
+  def process(_message, _received_at, _state), do: :ok
 end

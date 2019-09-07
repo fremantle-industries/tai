@@ -36,55 +36,47 @@ defmodule Tai.Trading.Orders.Cancel do
   defdelegate send_to_venue(order), to: Tai.Venue, as: :cancel_order
 
   defp parse_response({:ok, %Cancel{} = response}, order) do
-    result =
-      %OrderStore.Actions.Cancel{
-        client_id: order.client_id,
-        last_venue_timestamp: response.venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {:cancel, result}
+    %OrderStore.Actions.Cancel{
+      client_id: order.client_id,
+      last_venue_timestamp: response.venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   defp parse_response({:ok, %CancelAccepted{} = response}, order) do
-    result =
-      %OrderStore.Actions.AcceptCancel{
-        client_id: order.client_id,
-        last_venue_timestamp: response.venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {:accept_cancel, result}
+    %OrderStore.Actions.AcceptCancel{
+      client_id: order.client_id,
+      last_venue_timestamp: response.venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   defp parse_response({:error, reason}, order) do
-    result =
-      %OrderStore.Actions.CancelError{
-        client_id: order.client_id,
-        reason: reason,
-        last_received_at: Timex.now()
-      }
-      |> OrderStore.update()
-
-    {:cancel_error, result}
+    %OrderStore.Actions.CancelError{
+      client_id: order.client_id,
+      reason: reason,
+      last_received_at: Timex.now()
+    }
+    |> OrderStore.update()
   end
 
   defp rescue_venue_adapter_error(reason, order) do
-    result =
-      %OrderStore.Actions.CancelError{
-        client_id: order.client_id,
-        reason: {:unhandled, reason},
-        last_received_at: Timex.now()
-      }
-      |> OrderStore.update()
-
-    {:cancel_error, result}
+    %OrderStore.Actions.CancelError{
+      client_id: order.client_id,
+      reason: {:unhandled, reason},
+      last_received_at: Timex.now()
+    }
+    |> OrderStore.update()
   end
 
-  defp notify_updated_order({_, {:ok, {previous_order, order}}}),
-    do: NotifyOrderUpdate.notify!(previous_order, order)
+  defp notify_updated_order({:ok, {previous_order, order}}) do
+    NotifyOrderUpdate.notify!(previous_order, order)
+  end
 
-  defp notify_updated_order({:accept_cancel, {:error, {:invalid_status, _, _, _}}}), do: :ok
+  defp notify_updated_order({:error, {:invalid_status, _, _, %action_name{}}})
+       when action_name == OrderStore.Actions.AcceptCancel do
+    :ok
+  end
 
   defp warn_invalid_status(was, required, %action_name{} = action) do
     Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{

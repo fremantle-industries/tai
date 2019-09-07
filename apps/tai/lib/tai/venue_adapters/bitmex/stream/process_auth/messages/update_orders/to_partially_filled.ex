@@ -1,34 +1,34 @@
-defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.PartiallyFilled do
+defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPartiallyFilled do
   defstruct ~w(
-      account
-      cl_ord_id
-      leaves_qty
-      ord_status
-      order_id
-      order_qty
-      price
-      symbol
-      text
-      timestamp
-      transact_time
-      working_indicator
-    )a
+    account
+    cl_ord_id
+    leaves_qty
+    ord_status
+    order_id
+    cum_qty
+    price
+    symbol
+    text
+    timestamp
+    transact_time
+    working_indicator
+  )a
 end
 
-defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
-  for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.PartiallyFilled do
+defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
+  for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPartiallyFilled do
   alias Tai.VenueAdapters.Bitmex
 
   @date_format "{ISO:Extended}"
 
-  def process(message, received_at, state) do
+  def process(message, received_at, _state) do
     message.cl_ord_id
     |> case do
       "gtc-" <> id ->
         client_id = Bitmex.ClientId.from_base64(id)
         venue_timestamp = message.timestamp |> Timex.parse!(@date_format)
         leaves_qty = message.leaves_qty |> Decimal.cast()
-        cumulative_qty = message.order_qty |> Decimal.cast() |> Decimal.sub(leaves_qty)
+        cumulative_qty = message.cum_qty |> Decimal.cast()
 
         %Tai.Trading.OrderStore.Actions.PassivePartialFill{
           client_id: client_id,
@@ -44,7 +44,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
         :ignore
     end
 
-    {:ok, state}
+    :ok
   end
 
   defp notify({:ok, {old, updated}}) do

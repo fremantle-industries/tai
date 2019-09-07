@@ -12,13 +12,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
   )a
 end
 
-defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
+defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
   for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canceled do
   alias Tai.VenueAdapters.Bitmex
 
   @date_format "{ISO:Extended}"
 
-  def process(message, received_at, state) do
+  def process(message, received_at, _state) do
     message.cl_ord_id
     |> case do
       "gtc-" <> id ->
@@ -37,7 +37,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
         :ignore
     end
 
-    {:ok, state}
+    :ok
   end
 
   defp notify({:ok, {old, updated}}) do
@@ -49,7 +49,9 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
       was: was,
       required: required,
       client_id: action.client_id,
-      action: action_name
+      action: action_name,
+      last_received_at: action.last_received_at,
+      last_venue_timestamp: action.last_venue_timestamp
     })
   end
 

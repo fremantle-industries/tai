@@ -1,20 +1,17 @@
-defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Filled do
+defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewPartialFill do
   defstruct ~w(
     account
-    avg_px
     cl_ord_id
     cum_qty
     leaves_qty
-    ord_status
     order_id
     symbol
     timestamp
-    working_indicator
   )a
 end
 
 defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
-  for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Filled do
+  for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewPartialFill do
   alias Tai.VenueAdapters.Bitmex
 
   @date_format "{ISO:Extended}"
@@ -25,11 +22,13 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
       "gtc-" <> id ->
         client_id = Bitmex.ClientId.from_base64(id)
         venue_timestamp = message.timestamp |> Timex.parse!(@date_format)
+        leaves_qty = message.leaves_qty |> Decimal.cast()
         cumulative_qty = message.cum_qty |> Decimal.cast()
 
-        %Tai.Trading.OrderStore.Actions.PassiveFill{
+        %Tai.Trading.OrderStore.Actions.PassivePartialFill{
           client_id: client_id,
           cumulative_qty: cumulative_qty,
+          leaves_qty: leaves_qty,
           last_received_at: received_at,
           last_venue_timestamp: venue_timestamp
         }
@@ -49,10 +48,10 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
 
   defp notify({:error, {:invalid_status, was, required, %action_name{} = action}}) do
     Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
-      client_id: action.client_id,
-      action: action_name,
       was: was,
-      required: required
+      required: required,
+      client_id: action.client_id,
+      action: action_name
     })
   end
 
