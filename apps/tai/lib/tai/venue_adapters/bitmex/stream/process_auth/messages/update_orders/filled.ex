@@ -48,7 +48,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
   end
 
   defp notify({:error, {:invalid_status, was, required}}, action, client_id) do
-    Tai.Events.info(%Tai.Events.OrderUpdateInvalidStatus{
+    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: client_id,
       action: action,
       was: was,
@@ -57,7 +57,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
   end
 
   defp notify({:error, :not_found}, action, client_id) do
-    Tai.Events.info(%Tai.Events.OrderUpdateNotFound{
+    Tai.Events.warn(%Tai.Events.OrderUpdateNotFound{
       client_id: client_id,
       action: action
     })

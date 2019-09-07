@@ -41,14 +41,14 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
 
         Orders.cancel(order)
 
-        assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = cancel_error_event,
-                        :error}
+        assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = cancel_invalid_event,
+                        :warn}
 
-        assert cancel_error_event.client_id == order.client_id
-        assert cancel_error_event.action == :pend_cancel
-        assert cancel_error_event.was == :create_error
+        assert cancel_invalid_event.client_id == order.client_id
+        assert cancel_invalid_event.action == :pend_cancel
+        assert cancel_invalid_event.was == :create_error
 
-        assert cancel_error_event.required == [
+        assert cancel_invalid_event.required == [
                  :amend_error,
                  :cancel_error,
                  :open,

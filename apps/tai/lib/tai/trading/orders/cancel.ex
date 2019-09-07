@@ -87,7 +87,7 @@ defmodule Tai.Trading.Orders.Cancel do
   defp notify_updated_order({:accept_cancel, {:error, {:invalid_status, _, _}}}), do: :ok
 
   defp broadcast_invalid_status(client_id, action, was, required) do
-    Tai.Events.error(%Tai.Events.OrderUpdateInvalidStatus{
+    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: client_id,
       action: action,
       was: was,

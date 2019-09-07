@@ -79,7 +79,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   end
 
   defp notify({client_id, action, {:error, {:invalid_status, was, required}}}) do
-    Tai.Events.info(%Tai.Events.OrderUpdateInvalidStatus{
+    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: client_id,
       action: action,
       was: was,
@@ -88,7 +88,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   end
 
   defp notify({client_id, action, {:error, :not_found}}) do
-    Tai.Events.info(%Tai.Events.OrderUpdateNotFound{
+    Tai.Events.warn(%Tai.Events.OrderUpdateNotFound{
       client_id: client_id,
       action: action
     })
