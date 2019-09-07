@@ -27,8 +27,8 @@ defmodule Tai.Trading.Orders.Cancel do
 
       {:ok, updated}
     else
-      {:error, {:invalid_status, was, required}} = error ->
-        broadcast_invalid_status(client_id, :pend_cancel, was, required)
+      {:error, {:invalid_status, was, required, action}} = error ->
+        warn_invalid_status(was, required, action)
         error
     end
   end
@@ -84,14 +84,16 @@ defmodule Tai.Trading.Orders.Cancel do
   defp notify_updated_order({_, {:ok, {previous_order, order}}}),
     do: NotifyOrderUpdate.notify!(previous_order, order)
 
-  defp notify_updated_order({:accept_cancel, {:error, {:invalid_status, _, _}}}), do: :ok
+  defp notify_updated_order({:accept_cancel, {:error, {:invalid_status, _, _, _}}}), do: :ok
 
-  defp broadcast_invalid_status(client_id, action, was, required) do
-    Tai.Events.error(%Tai.Events.OrderUpdateInvalidStatus{
-      client_id: client_id,
-      action: action,
+  defp warn_invalid_status(was, required, %action_name{} = action) do
+    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
       was: was,
-      required: required
+      required: required,
+      client_id: action.client_id,
+      action: action_name,
+      last_received_at: action |> Map.get(:last_received_at),
+      last_venue_timestamp: action |> Map.get(:last_venue_timestamp)
     })
   end
 end

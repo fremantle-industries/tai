@@ -8,7 +8,9 @@ defmodule Tai.Trading.OrderStore do
 
   @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
+  @type status :: Order.status()
   @type client_id :: Order.client_id()
+  @type action :: term
   @type store_id :: atom
 
   @default_id :default
@@ -68,9 +70,11 @@ defmodule Tai.Trading.OrderStore do
   @doc """
   Update the state of the order from the actions params
   """
-  @spec update(action :: term) ::
+  @spec update(action) ::
           {:ok, {old :: order, updated :: order}}
-          | {:error, :not_found | {:invalid_status, current :: atom, required :: term}}
+          | {:error,
+             {:not_found, action}
+             | {:invalid_status, current :: status, required :: [status], action}}
   def update(action, store_id \\ @default_id) do
     store_id
     |> to_name

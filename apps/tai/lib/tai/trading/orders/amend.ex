@@ -34,8 +34,8 @@ defmodule Tai.Trading.Orders.Amend do
 
       {:ok, updated}
     else
-      {:error, {:invalid_status, was, required}} = error ->
-        broadcast_invalid_status(order.client_id, :pend_amend, was, required)
+      {:error, {:invalid_status, was, required, action}} = error ->
+        warn_invalid_status(action, was, required)
         error
     end
   end
@@ -76,10 +76,12 @@ defmodule Tai.Trading.Orders.Amend do
     |> OrderStore.update()
   end
 
-  defp broadcast_invalid_status(client_id, action, was, required) do
-    Tai.Events.info(%Tai.Events.OrderUpdateInvalidStatus{
-      client_id: client_id,
-      action: action,
+  defp warn_invalid_status(%action_name{} = action, was, required) do
+    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
+      client_id: action.client_id,
+      action: action_name,
+      last_received_at: action |> Map.get(:last_received_at),
+      last_venue_timestamp: action |> Map.get(:last_venue_timestamp),
       was: was,
       required: required
     })

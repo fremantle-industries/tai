@@ -1,24 +1,47 @@
 defmodule Tai.Events.OrderUpdateInvalidStatus do
-  alias Tai.Events.OrderUpdateInvalidStatus
+  alias __MODULE__
 
-  @type order_status :: Tai.Trading.Order.status()
+  @type status :: Tai.Trading.Order.status()
+  @type client_id :: Tai.Trading.Order.client_id()
   @type t :: %OrderUpdateInvalidStatus{
-          client_id: Tai.Trading.Order.client_id(),
-          action: atom,
-          was: order_status,
-          required: order_status | [order_status]
+          client_id: client_id,
+          action: atom | module,
+          was: status,
+          required: status | [status]
         }
 
-  @enforce_keys [
-    :client_id,
-    :action,
-    :was,
-    :required
-  ]
-  defstruct [
-    :client_id,
-    :action,
-    :was,
-    :required
-  ]
+  @enforce_keys ~w(
+    client_id
+    action
+    was
+    required
+  )a
+  defstruct ~w(
+    client_id
+    action
+    was
+    required
+    last_received_at
+    last_venue_timestamp
+  )a
+end
+
+defimpl Tai.LogEvent, for: Tai.Events.OrderUpdateInvalidStatus do
+  def to_data(event) do
+    keys =
+      event
+      |> Map.keys()
+      |> Enum.filter(&(&1 != :__struct__))
+
+    event
+    |> Map.take(keys)
+    |> Map.put(
+      :last_received_at,
+      event.last_received_at && event.last_received_at |> DateTime.to_iso8601()
+    )
+    |> Map.put(
+      :last_venue_timestamp,
+      event.last_venue_timestamp && event.last_venue_timestamp |> DateTime.to_iso8601()
+    )
+  end
 end

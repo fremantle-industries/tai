@@ -162,24 +162,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
 
       assert_event(
         %Events.OrderUpdateInvalidStatus{
-          action: :passive_fill
+          action: Tai.Trading.OrderStore.Actions.PassiveFill
         } = passive_fill_invalid_event
       )
 
-      assert_event(
-        %Events.OrderUpdateInvalidStatus{
-          action: :passive_partial_fill
-        } = passive_partial_fill_invalid_event
-      )
-
-      assert_event(
-        %Events.OrderUpdateInvalidStatus{
-          action: :passive_cancel
-        } = passive_cancel_invalid_event
-      )
-
       assert passive_fill_invalid_event.client_id == order_1.client_id
-      assert passive_fill_invalid_event.action == :passive_fill
       assert passive_fill_invalid_event.was == :enqueued
 
       assert passive_fill_invalid_event.required == [
@@ -191,8 +178,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
                :cancel_error
              ]
 
+      assert_event(
+        %Events.OrderUpdateInvalidStatus{
+          action: Tai.Trading.OrderStore.Actions.PassivePartialFill
+        } = passive_partial_fill_invalid_event
+      )
+
       assert passive_partial_fill_invalid_event.client_id == order_2.client_id
-      assert passive_partial_fill_invalid_event.action == :passive_partial_fill
       assert passive_partial_fill_invalid_event.was == :enqueued
 
       assert passive_partial_fill_invalid_event.required == [
@@ -204,8 +196,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
                :cancel_error
              ]
 
+      assert_event(
+        %Events.OrderUpdateInvalidStatus{
+          action: Tai.Trading.OrderStore.Actions.PassiveCancel
+        } = passive_cancel_invalid_event
+      )
+
       assert passive_cancel_invalid_event.client_id == order_3.client_id
-      assert passive_cancel_invalid_event.action == :passive_cancel
       assert passive_cancel_invalid_event.was == :enqueued
 
       assert passive_cancel_invalid_event.required == [
@@ -223,14 +220,32 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
 
     test "broadcasts an event when the order can't be found" do
       Events.firehose_subscribe()
-      client_id = Ecto.UUID.generate()
+      canceled_client_id = Ecto.UUID.generate()
+      partially_filled_client_id = Ecto.UUID.generate()
+      filled_client_id = Ecto.UUID.generate()
 
       bitmex_orders = [
         %{
-          "clOrdID" => client_id |> ClientId.to_venue(:gtc),
+          "clOrdID" => canceled_client_id |> ClientId.to_venue(:gtc),
           "leavesQty" => 0,
           "ordStatus" => "Canceled",
           "timestamp" => "2019-01-11T02:03:06.309Z"
+        },
+        %{
+          "clOrdID" => partially_filled_client_id |> ClientId.to_venue(:gtc),
+          "ordStatus" => "PartiallyFilled",
+          "leavesQty" => 3,
+          "orderQty" => 10,
+          "price" => 2000,
+          "timestamp" => "2018-12-27T05:33:50.832Z"
+        },
+        %{
+          "clOrdID" => filled_client_id |> ClientId.to_venue(:gtc),
+          "ordStatus" => "Filled",
+          "leavesQty" => 0,
+          "cumQty" => 5,
+          "avgPx" => 4265.5,
+          "timestamp" => "2018-12-27T05:33:50.795Z"
         }
       ]
 
@@ -240,9 +255,29 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
         {%{"table" => "order", "action" => "update", "data" => bitmex_orders}, :ignore}
       )
 
-      assert_event(%Events.OrderUpdateNotFound{} = not_found_event)
-      assert not_found_event.client_id == client_id
-      assert not_found_event.action == :passive_cancel
+      assert_event(
+        %Events.OrderUpdateNotFound{
+          action: Tai.Trading.OrderStore.Actions.PassiveCancel
+        } = canceled_not_found_event
+      )
+
+      assert canceled_not_found_event.client_id == canceled_client_id
+
+      assert_event(
+        %Events.OrderUpdateNotFound{
+          action: Tai.Trading.OrderStore.Actions.PassivePartialFill
+        } = partially_filled_not_found_event
+      )
+
+      assert partially_filled_not_found_event.client_id == partially_filled_client_id
+
+      assert_event(
+        %Events.OrderUpdateNotFound{
+          action: Tai.Trading.OrderStore.Actions.PassiveFill
+        } = filled_not_found_event
+      )
+
+      assert filled_not_found_event.client_id == filled_client_id
     end
 
     test "broadcasts an event when the message can't be handled" do

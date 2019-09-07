@@ -74,23 +74,23 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
 
   defp notify(:ok), do: nil
 
-  defp notify({_, _, {:ok, {old, updated}}}) do
+  defp notify({:ok, {old, updated}}) do
     Tai.Trading.NotifyOrderUpdate.notify!(old, updated)
   end
 
-  defp notify({client_id, action, {:error, {:invalid_status, was, required}}}) do
-    Tai.Events.info(%Tai.Events.OrderUpdateInvalidStatus{
-      client_id: client_id,
-      action: action,
+  defp notify({:error, {:invalid_status, was, required, %action_name{} = action}}) do
+    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
       was: was,
-      required: required
+      required: required,
+      client_id: action.client_id,
+      action: action_name
     })
   end
 
-  defp notify({client_id, action, {:error, :not_found}}) do
-    Tai.Events.info(%Tai.Events.OrderUpdateNotFound{
-      client_id: client_id,
-      action: action
+  defp notify({:error, {:not_found, %action_name{} = action}}) do
+    Tai.Events.warn(%Tai.Events.OrderUpdateNotFound{
+      client_id: action.client_id,
+      action: action_name
     })
   end
 end

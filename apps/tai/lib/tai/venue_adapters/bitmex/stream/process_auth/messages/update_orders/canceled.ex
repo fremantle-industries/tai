@@ -31,7 +31,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
           last_venue_timestamp: venue_timestamp
         }
         |> Tai.Trading.OrderStore.update()
-        |> notify(:passive_cancel, client_id)
+        |> notify()
 
       _ ->
         :ignore
@@ -40,23 +40,23 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
     {:ok, state}
   end
 
-  defp notify({:ok, {old, updated}}, _, _) do
+  defp notify({:ok, {old, updated}}) do
     Tai.Trading.NotifyOrderUpdate.notify!(old, updated)
   end
 
-  defp notify({:error, {:invalid_status, was, required}}, action, client_id) do
-    Tai.Events.info(%Tai.Events.OrderUpdateInvalidStatus{
-      client_id: client_id,
-      action: action,
+  defp notify({:error, {:invalid_status, was, required, %action_name{} = action}}) do
+    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
       was: was,
-      required: required
+      required: required,
+      client_id: action.client_id,
+      action: action_name
     })
   end
 
-  defp notify({:error, :not_found}, action, client_id) do
-    Tai.Events.info(%Tai.Events.OrderUpdateNotFound{
-      client_id: client_id,
-      action: action
+  defp notify({:error, {:not_found, %action_name{} = action}}) do
+    Tai.Events.warn(%Tai.Events.OrderUpdateNotFound{
+      client_id: action.client_id,
+      action: action_name
     })
   end
 end

@@ -75,5 +75,11 @@ defmodule Tai.Trading.NotifyOrderUpdateTest do
       assert updated == updated_order
       assert data == :data
     end
+
+    test "returns an error when sending a message to a process that doesn't exist" do
+      updated_order = struct(Order, order_updated_callback: :dead_process)
+
+      assert NotifyOrderUpdate.notify!(nil, updated_order) == {:error, :noproc}
+    end
   end
 end
