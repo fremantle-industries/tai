@@ -5,7 +5,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Part
       leaves_qty
       ord_status
       order_id
-      order_qty
+      cum_qty
       price
       symbol
       text
@@ -28,7 +28,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
         client_id = Bitmex.ClientId.from_base64(id)
         venue_timestamp = message.timestamp |> Timex.parse!(@date_format)
         leaves_qty = message.leaves_qty |> Decimal.cast()
-        cumulative_qty = message.order_qty |> Decimal.cast() |> Decimal.sub(leaves_qty)
+        cumulative_qty = message.cum_qty |> Decimal.cast()
 
         %Tai.Trading.OrderStore.Actions.PassivePartialFill{
           client_id: client_id,

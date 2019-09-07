@@ -42,7 +42,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
           "clOrdID" => order_2.client_id |> ClientId.to_venue(order_2.time_in_force),
           "ordStatus" => "PartiallyFilled",
           "leavesQty" => 30,
-          "orderQty" => 50,
+          "cumQty" => 20,
           "price" => 2000,
           "timestamp" => "2018-12-27T05:33:50.832Z"
         },
@@ -140,7 +140,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
           "clOrdID" => order_2.client_id |> ClientId.to_venue(order_2.time_in_force),
           "ordStatus" => "PartiallyFilled",
           "leavesQty" => 3,
-          "orderQty" => 10,
+          "cumQty" => 7,
           "price" => 2000,
           "timestamp" => "2018-12-27T05:33:50.832Z"
         },
@@ -236,7 +236,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
           "clOrdID" => partially_filled_client_id |> ClientId.to_venue(:gtc),
           "ordStatus" => "PartiallyFilled",
           "leavesQty" => 3,
-          "orderQty" => 10,
+          "cumQty" => 7,
           "price" => 2000,
           "timestamp" => "2018-12-27T05:33:50.832Z"
         },
