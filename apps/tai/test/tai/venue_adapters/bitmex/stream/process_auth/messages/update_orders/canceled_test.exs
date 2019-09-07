@@ -65,6 +65,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
 
     assert_event(%Events.OrderUpdateInvalidStatus{} = invalid_status_event)
     assert invalid_status_event.action == Tai.Trading.OrderStore.Actions.PassiveCancel
+    assert %DateTime{} = invalid_status_event.last_received_at
+    assert %DateTime{} = invalid_status_event.last_venue_timestamp
     assert invalid_status_event.was == :skip
 
     assert invalid_status_event.required == [

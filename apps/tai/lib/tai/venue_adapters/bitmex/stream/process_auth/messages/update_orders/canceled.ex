@@ -49,7 +49,9 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
       was: was,
       required: required,
       client_id: action.client_id,
-      action: action_name
+      action: action_name,
+      last_received_at: action.last_received_at,
+      last_venue_timestamp: action.last_venue_timestamp
     })
   end
 
