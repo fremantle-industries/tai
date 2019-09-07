@@ -4,6 +4,7 @@ defmodule Tai.TestSupport.E2ECase do
   using do
     quote do
       import ExUnit.CaptureIO
+      import Tai.TestSupport.Assertions.Event
 
       setup do
         on_exit(fn -> stop_app() end)
@@ -13,18 +14,6 @@ defmodule Tai.TestSupport.E2ECase do
         start_app()
         after_app_start()
         :ok
-      end
-
-      defmacro assert_event(event) do
-        quote do
-          assert_receive {Tai.Event, unquote(event), _}
-        end
-      end
-
-      defmacro refute_event(event) do
-        quote do
-          refute_receive {Tai.Event, unquote(event), _}
-        end
       end
 
       @spec before_app_start :: no_return
