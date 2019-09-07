@@ -4,11 +4,16 @@ defmodule Tai.Trading.NotifyOrderUpdate do
 
   @type order :: Order.t()
 
-  @spec notify!(order | nil, order) :: :ok
+  @spec notify!(order | nil, order) :: :ok | {:error, :noproc}
   def notify!(previous, %Order{} = updated) do
     :ok = broadcast(updated)
-    callback(previous, updated)
-    :ok
+
+    previous
+    |> callback(updated)
+    |> case do
+      {:error, :noproc} = error -> error
+      _ -> :ok
+    end
   end
 
   defp broadcast(order) do
@@ -41,18 +46,18 @@ defmodule Tai.Trading.NotifyOrderUpdate do
 
   defp callback(
          previous,
-         %Order{order_updated_callback: {callback, data}} = updated
+         %Order{order_updated_callback: {dest, data}} = updated
        )
-       when is_atom(callback) or is_pid(callback) do
-    send(callback, {:order_updated, previous, updated, data})
+       when is_atom(dest) or is_pid(dest) do
+    dest |> send_msg({:order_updated, previous, updated, data})
   end
 
   defp callback(
          previous,
-         %Order{order_updated_callback: callback} = updated
+         %Order{order_updated_callback: dest} = updated
        )
-       when is_atom(callback) or is_pid(callback) do
-    send(callback, {:order_updated, previous, updated})
+       when is_atom(dest) or is_pid(dest) do
+    dest |> send_msg({:order_updated, previous, updated})
   end
 
   defp callback(
@@ -61,5 +66,13 @@ defmodule Tai.Trading.NotifyOrderUpdate do
        )
        when is_function(callback) do
     callback.(previous, updated)
+  end
+
+  defp send_msg(dest, msg) do
+    try do
+      send(dest, msg)
+    rescue
+      _e in ArgumentError -> {:error, :noproc}
+    end
   end
 end
