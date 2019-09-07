@@ -206,6 +206,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrderTest do
       assert passive_cancel_invalid_event.was == :enqueued
 
       assert passive_cancel_invalid_event.required == [
+               :rejected,
                :open,
                :partially_filled,
                :filled,
