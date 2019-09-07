@@ -16,6 +16,9 @@ defmodule Tai.Trading.Orders do
   @spec amend(order, amend_attrs) :: {:ok, updated :: order} | {:error, amend_error_reason}
   defdelegate amend(order, attrs), to: Orders.Amend
 
+  @spec cancel(order, module) :: {:ok, updated :: order} | {:error, cancel_error_reason}
+  defdelegate cancel(order, provider), to: Orders.Cancel
+
   @spec cancel(order) :: {:ok, updated :: order} | {:error, cancel_error_reason}
   defdelegate cancel(order), to: Orders.Cancel
 end

@@ -200,6 +200,8 @@ defmodule Tai.Advisor do
 
       defp inside_ask_is_stale?(asks, nil), do: true
 
+      require Logger
+
       defp inside_ask_is_stale?(asks, %Tai.Markets.Quote{} = prev_quote) do
         asks
         |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
