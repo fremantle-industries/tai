@@ -1,5 +1,5 @@
 defmodule Examples.PingPong.ManageQuoteChange do
-  alias Examples.PingPong.CreateEntryOrder
+  alias Examples.PingPong.{CreateEntryOrder, EntryPrice}
   alias Tai.Markets.{PriceLevel, Quote}
   alias Tai.Trading.{Orders, Order}
   alias Tai.Advisor.State
@@ -17,30 +17,50 @@ defmodule Examples.PingPong.ManageQuoteChange do
   def with_all_quotes(%Quote{bid: %PriceLevel{}, ask: nil}), do: {:error, :no_ask}
   def with_all_quotes(%Quote{bid: nil, ask: nil}), do: {:error, :no_bid_or_ask}
 
-  @spec manage_entry_order({:ok, market_quote}, state) :: {:ok, run_store}
+  @spec manage_entry_order({:ok, market_quote}, state, module) :: {:ok, run_store}
+  def manage_entry_order(_, _, orders_provider \\ Orders)
+
   def manage_entry_order(
         {:ok, _},
-        %State{store: %{entry_order: %Order{status: :open} = entry_order}} = state
+        %State{store: %{entry_order: %Order{status: :open} = entry_order}} = state,
+        orders_provider
       ) do
-    {:ok, pending_cancel_order} = Orders.cancel(entry_order)
-    new_run_store = Map.put(state.store, :entry_order, pending_cancel_order)
-    {:ok, new_run_store}
+    market_quote =
+      Tai.Advisors.MarketQuotes.for(
+        state.market_quotes,
+        entry_order.venue_id,
+        entry_order.product_symbol
+      )
+
+    entry_price = EntryPrice.calculate(market_quote, state.config.product)
+
+    if Decimal.cmp(entry_order.price, entry_price) == :eq do
+      {:ok, state.store}
+    else
+      {:ok, pending_cancel_order} = orders_provider.cancel(entry_order)
+      new_run_store = Map.put(state.store, :entry_order, pending_cancel_order)
+      {:ok, new_run_store}
+    end
   end
 
   def manage_entry_order(
         {:ok, _},
-        %State{store: %{entry_order: %Order{}}} = state
+        %State{store: %{entry_order: %Order{}}} = state,
+        _orders_provider
       ) do
     {:ok, state.store}
   end
 
-  def manage_entry_order({:ok, market_quote}, state) do
+  def manage_entry_order({:ok, market_quote}, state, orders_provider) do
     advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
-    {:ok, entry_order} = CreateEntryOrder.create(advisor_id, market_quote, state.config)
+
+    {:ok, entry_order} =
+      CreateEntryOrder.create(advisor_id, market_quote, state.config, orders_provider)
+
     new_run_store = Map.put(state.store, :entry_order, entry_order)
 
     {:ok, new_run_store}
   end
 
-  def manage_entry_order({:error, _}, state), do: {:ok, state.store}
+  def manage_entry_order({:error, _}, state, _), do: {:ok, state.store}
 end
