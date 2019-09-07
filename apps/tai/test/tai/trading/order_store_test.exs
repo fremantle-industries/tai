@@ -32,7 +32,8 @@ defmodule Tai.Trading.OrderStoreTest do
 
     test "returns an error when the order can't be found" do
       action = struct(Tai.Trading.OrderStore.Actions.Skip, client_id: "not_found")
-      assert OrderStore.update(action, @store_id) == {:error, :not_found}
+      assert {:error, {:not_found, not_found_action}} = OrderStore.update(action, @store_id)
+      assert not_found_action == action
     end
 
     test "returns an error when the current status is invalid" do
@@ -42,7 +43,8 @@ defmodule Tai.Trading.OrderStoreTest do
       assert {:ok, _} = OrderStore.update(action, @store_id)
 
       assert {:error, reason} = OrderStore.update(action, @store_id)
-      assert reason == {:invalid_status, :skip, :enqueued}
+      assert {:invalid_status, :skip, :enqueued, invalid_action} = reason
+      assert invalid_action == action
     end
   end
 

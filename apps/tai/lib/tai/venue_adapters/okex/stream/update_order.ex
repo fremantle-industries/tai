@@ -17,15 +17,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       when status == @cancelled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
 
-    result =
-      %OrderStore.Actions.PassiveCancel{
-        client_id: client_id,
-        last_received_at: received_at,
-        last_venue_timestamp: venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {client_id, :passive_cancel, result}
+    %OrderStore.Actions.PassiveCancel{
+      client_id: client_id,
+      last_received_at: received_at,
+      last_venue_timestamp: venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   def update(
@@ -40,16 +37,13 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       when status == @submitting do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
 
-    result =
-      %OrderStore.Actions.AcceptCreate{
-        client_id: client_id,
-        venue_order_id: venue_order_id,
-        last_received_at: received_at,
-        last_venue_timestamp: venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {client_id, :accept_create, result}
+    %OrderStore.Actions.AcceptCreate{
+      client_id: client_id,
+      venue_order_id: venue_order_id,
+      last_received_at: received_at,
+      last_venue_timestamp: venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   def update(
@@ -68,18 +62,15 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new()
 
-    result =
-      %OrderStore.Actions.Open{
-        client_id: client_id,
-        venue_order_id: venue_order_id,
-        cumulative_qty: cumulative_qty,
-        leaves_qty: leaves_qty,
-        last_received_at: received_at,
-        last_venue_timestamp: venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {client_id, :open, result}
+    %OrderStore.Actions.Open{
+      client_id: client_id,
+      venue_order_id: venue_order_id,
+      cumulative_qty: cumulative_qty,
+      leaves_qty: leaves_qty,
+      last_received_at: received_at,
+      last_venue_timestamp: venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   def update(
@@ -97,17 +88,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new()
 
-    result =
-      %OrderStore.Actions.PassivePartialFill{
-        client_id: client_id,
-        cumulative_qty: cumulative_qty,
-        leaves_qty: leaves_qty,
-        last_received_at: received_at,
-        last_venue_timestamp: venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {client_id, :passive_partial_fill, result}
+    %OrderStore.Actions.PassivePartialFill{
+      client_id: client_id,
+      cumulative_qty: cumulative_qty,
+      leaves_qty: leaves_qty,
+      last_received_at: received_at,
+      last_venue_timestamp: venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   def update(
@@ -123,15 +111,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
 
-    result =
-      %OrderStore.Actions.PassiveFill{
-        client_id: client_id,
-        cumulative_qty: cumulative_qty,
-        last_received_at: received_at,
-        last_venue_timestamp: venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {client_id, :passive_partial_fill, result}
+    %OrderStore.Actions.PassiveFill{
+      client_id: client_id,
+      cumulative_qty: cumulative_qty,
+      last_received_at: received_at,
+      last_venue_timestamp: venue_timestamp
+    }
+    |> OrderStore.update()
   end
 end

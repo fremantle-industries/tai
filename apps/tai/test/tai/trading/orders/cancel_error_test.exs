@@ -31,9 +31,10 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
       test "returns an error", %{order: order} do
         assert {:error, reason} = Orders.cancel(order)
 
-        assert reason ==
-                 {:invalid_status, :create_error,
-                  [:amend_error, :cancel_error, :open, :partially_filled]}
+        assert {:invalid_status, :create_error,
+                [:amend_error, :cancel_error, :open, :partially_filled], action} = reason
+
+        assert %Tai.Trading.OrderStore.Actions.PendCancel{} = action
       end
 
       test "broadcasts an event", %{order: order} do
@@ -45,7 +46,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
                         :warn}
 
         assert cancel_invalid_event.client_id == order.client_id
-        assert cancel_invalid_event.action == :pend_cancel
+        assert cancel_invalid_event.action == Tai.Trading.OrderStore.Actions.PendCancel
         assert cancel_invalid_event.was == :create_error
 
         assert cancel_invalid_event.required == [

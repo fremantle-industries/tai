@@ -1,4 +1,6 @@
 defmodule Tai.Trading.Orders.Create do
+  alias Tai.Trading.OrderStore.Actions
+
   alias Tai.Trading.{
     NotifyOrderUpdate,
     OrderStore,
@@ -40,11 +42,6 @@ defmodule Tai.Trading.Orders.Create do
 
   defp notify_initial_updated_order(order), do: NotifyOrderUpdate.notify!(nil, order)
 
-  defp notify_updated_order({_, {:ok, {prev, current}}}),
-    do: NotifyOrderUpdate.notify!(prev, current)
-
-  defp notify_updated_order({:accept_create, {:error, {:invalid_status, _, _}}}), do: :ok
-
   defp send_to_venue(order) do
     result = Tai.Venue.create_order(order)
     {result, order}
@@ -54,113 +51,102 @@ defmodule Tai.Trading.Orders.Create do
          {:ok, %OrderResponses.CreateAccepted{} = response},
          order
        }) do
-    result =
-      %OrderStore.Actions.AcceptCreate{
-        client_id: order.client_id,
-        venue_order_id: response.id,
-        last_received_at: response.received_at,
-        last_venue_timestamp: response.venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {:accept_create, result}
+    %Actions.AcceptCreate{
+      client_id: order.client_id,
+      venue_order_id: response.id,
+      last_received_at: response.received_at,
+      last_venue_timestamp: response.venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   defp parse_response({
          {:ok, %OrderResponses.Create{status: :open} = response},
          order
        }) do
-    result =
-      %OrderStore.Actions.Open{
-        client_id: order.client_id,
-        venue_order_id: response.id,
-        cumulative_qty: response.cumulative_qty,
-        leaves_qty: response.leaves_qty,
-        last_received_at: response.received_at,
-        last_venue_timestamp: response.venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {:open, result}
+    %Actions.Open{
+      client_id: order.client_id,
+      venue_order_id: response.id,
+      cumulative_qty: response.cumulative_qty,
+      leaves_qty: response.leaves_qty,
+      last_received_at: response.received_at,
+      last_venue_timestamp: response.venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   defp parse_response({
          {:ok, %OrderResponses.Create{status: :filled} = response},
          order
        }) do
-    result =
-      %OrderStore.Actions.Fill{
-        client_id: order.client_id,
-        venue_order_id: response.id,
-        cumulative_qty: response.cumulative_qty,
-        last_received_at: response.received_at,
-        last_venue_timestamp: response.venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {:fill, result}
+    %Actions.Fill{
+      client_id: order.client_id,
+      venue_order_id: response.id,
+      cumulative_qty: response.cumulative_qty,
+      last_received_at: response.received_at,
+      last_venue_timestamp: response.venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   defp parse_response({
          {:ok, %OrderResponses.Create{status: :expired} = response},
          order
        }) do
-    result =
-      %OrderStore.Actions.Expire{
-        client_id: order.client_id,
-        venue_order_id: response.id,
-        cumulative_qty: response.cumulative_qty,
-        leaves_qty: response.leaves_qty,
-        last_received_at: response.received_at,
-        last_venue_timestamp: response.venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {:expire, result}
+    %Actions.Expire{
+      client_id: order.client_id,
+      venue_order_id: response.id,
+      cumulative_qty: response.cumulative_qty,
+      leaves_qty: response.leaves_qty,
+      last_received_at: response.received_at,
+      last_venue_timestamp: response.venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   defp parse_response({
          {:ok, %OrderResponses.Create{status: :rejected} = response},
          order
        }) do
-    result =
-      %OrderStore.Actions.Reject{
-        client_id: order.client_id,
-        venue_order_id: response.id,
-        last_received_at: response.received_at,
-        last_venue_timestamp: response.venue_timestamp
-      }
-      |> OrderStore.update()
-
-    {:reject, result}
+    %Actions.Reject{
+      client_id: order.client_id,
+      venue_order_id: response.id,
+      last_received_at: response.received_at,
+      last_venue_timestamp: response.venue_timestamp
+    }
+    |> OrderStore.update()
   end
 
   defp parse_response({{:error, reason}, order}) do
-    result =
-      %OrderStore.Actions.CreateError{
-        client_id: order.client_id,
-        reason: reason,
-        last_received_at: Timex.now()
-      }
-      |> OrderStore.update()
-
-    {:create_error, result}
+    %Actions.CreateError{
+      client_id: order.client_id,
+      reason: reason,
+      last_received_at: Timex.now()
+    }
+    |> OrderStore.update()
   end
 
   defp rescue_venue_adapter_error(reason, order) do
-    result =
-      %OrderStore.Actions.CreateError{
-        client_id: order.client_id,
-        reason: {:unhandled, reason},
-        last_received_at: Timex.now()
-      }
-      |> OrderStore.update()
-
-    {:create_error, result}
+    %Actions.CreateError{
+      client_id: order.client_id,
+      reason: {:unhandled, reason},
+      last_received_at: Timex.now()
+    }
+    |> OrderStore.update()
   end
 
   defp skip!(client_id) do
-    result = %OrderStore.Actions.Skip{client_id: client_id} |> OrderStore.update()
-    {:skip, result}
+    %Actions.Skip{
+      client_id: client_id
+    }
+    |> OrderStore.update()
+  end
+
+  defp notify_updated_order({:ok, {prev, current}}),
+    do: NotifyOrderUpdate.notify!(prev, current)
+
+  defp notify_updated_order({:error, {:invalid_status, _, _, %action_name{}}})
+       when action_name == Actions.AcceptCreate do
+    :ok
   end
 end

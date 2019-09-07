@@ -203,7 +203,10 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert {:error, reason} =
                  Tai.Trading.Orders.amend(enqueued_order, %{price: Decimal.new(1)})
 
-        assert reason == {:invalid_status, :enqueued, [:open, :partially_filled, :amend_error]}
+        assert {:invalid_status, :enqueued, [:open, :partially_filled, :amend_error], action} =
+                 reason
+
+        assert %Tai.Trading.OrderStore.Actions.PendAmend{} = action
       end
 
       test "broadcasts an event when the order does not have an amendable status", %{
@@ -215,7 +218,7 @@ defmodule Tai.Trading.Orders.AmendTest do
 
         assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = event, _}
         assert event.client_id != nil
-        assert event.action == :pend_amend
+        assert event.action == Tai.Trading.OrderStore.Actions.PendAmend
         assert event.was == :enqueued
         assert event.required == [:open, :partially_filled, :amend_error]
       end

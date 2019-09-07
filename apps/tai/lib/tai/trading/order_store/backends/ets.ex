@@ -1,9 +1,12 @@
 defmodule Tai.Trading.OrderStore.Backends.ETS do
   alias Tai.Trading.OrderStore.Action
+  alias Tai.Trading.Order
 
-  @type order :: Tai.Trading.Order.t()
-  @type client_id :: Tai.Trading.Order.client_id()
+  @type order :: Order.t()
+  @type status :: Order.status()
+  @type client_id :: Order.client_id()
   @type table_name :: atom
+  @type action :: term
 
   @spec create(table_name) :: :ok
   def create(table_name) do
@@ -23,6 +26,11 @@ defmodule Tai.Trading.OrderStore.Backends.ETS do
   @doc """
   Update an existing order in the ETS table
   """
+  @spec update(action, table_name) ::
+          {:ok, {old :: order, updated :: order}}
+          | {:error,
+             {:not_found, action}
+             | {:invalid_status, current :: status, required :: [status], action}}
   def update(action, table_name) do
     with required <- action |> Action.required() |> List.wrap(),
          attrs <- Action.attrs(action),
@@ -32,9 +40,11 @@ defmodule Tai.Trading.OrderStore.Backends.ETS do
         upsert(updated_order, table_name)
         {:ok, {old_order, updated_order}}
       else
-        reason = {:invalid_status, old_order.status, required |> format_required}
+        reason = {:invalid_status, old_order.status, required |> format_required, action}
         {:error, reason}
       end
+    else
+      {:error, :not_found} -> {:error, {:not_found, action}}
     end
   end
 
