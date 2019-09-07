@@ -20,6 +20,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.VenueMessages.UpdateOrders
     assert %ProcessAuth.Messages.UpdateOrders.ToPartiallyFilled{} = msg
   end
 
+  test ".extract/1 can parse new partial fill" do
+    data = [%{"cumQty" => 10, "leavesQty" => 5}]
+    assert [msg | []] = ProcessAuth.VenueMessages.UpdateOrders.extract(data)
+    assert %ProcessAuth.Messages.UpdateOrders.NewPartialFill{} = msg
+  end
+
   test ".extract/1 can parse created" do
     data = [%{"orderID" => "abc123", "workingIndicator" => true}]
     assert [msg | []] = ProcessAuth.VenueMessages.UpdateOrders.extract(data)

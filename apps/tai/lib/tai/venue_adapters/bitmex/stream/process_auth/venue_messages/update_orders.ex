@@ -24,6 +24,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.VenueMessages.UpdateOrders
           transformations: [:snake_case]
         )
 
+      %{"cumQty" => _, "leavesQty" => _} = data ->
+        Mapail.map_to_struct(data, ProcessAuth.Messages.UpdateOrders.NewPartialFill,
+          transformations: [:snake_case]
+        )
+
       data ->
         {:ok, %ProcessAuth.Messages.UpdateOrders.Unhandled{data: data}}
     end)
