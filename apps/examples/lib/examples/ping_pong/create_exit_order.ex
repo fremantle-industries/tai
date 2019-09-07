@@ -6,24 +6,25 @@ defmodule Examples.PingPong.CreateExitOrder do
   @type config :: Config.t()
   @type order :: Tai.Trading.Order.t()
 
-  @spec create(advisor_id, order, config) :: {:ok, order}
-  def create(advisor_id, entry_order, config) do
-    price = exit_price(entry_order, config.product)
+  @spec create(advisor_id, prev :: order, updated :: order, config) :: {:ok, order}
+  def create(advisor_id, prev_entry_order, updated_entry_order, config) do
+    price = exit_price(updated_entry_order, config.product)
+    qty = Decimal.sub(updated_entry_order.cumulative_qty, prev_entry_order.cumulative_qty)
 
     %OrderSubmissions.SellLimitGtc{
-      venue_id: entry_order.venue_id,
-      account_id: entry_order.account_id,
-      product_symbol: entry_order.product_symbol,
+      venue_id: updated_entry_order.venue_id,
+      account_id: updated_entry_order.account_id,
+      product_symbol: updated_entry_order.product_symbol,
       price: price,
-      qty: config.max_qty,
-      product_type: entry_order.product_type,
+      qty: qty,
+      product_type: updated_entry_order.product_type,
       post_only: true,
       order_updated_callback: {advisor_id, :exit_order}
     }
     |> Orders.create()
   end
 
-  defp exit_price(entry_order, product) do
-    entry_order.price |> Decimal.add(product.price_increment)
+  defp exit_price(updated_entry_order, product) do
+    updated_entry_order.price |> Decimal.add(product.price_increment)
   end
 end

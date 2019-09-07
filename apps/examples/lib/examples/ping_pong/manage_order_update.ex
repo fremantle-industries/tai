@@ -1,14 +1,30 @@
 defmodule Examples.PingPong.ManageOrderUpdate do
-  alias Examples.PingPong.{CreateEntryOrder, CreateExitOrder}
   alias Tai.Trading.Order
 
-  @type state :: Tai.Advisor.State.t()
-  @type run_store :: Tai.Advisor.run_store()
+  defmodule DefaultOrderProvider do
+    alias Examples.PingPong.{CreateEntryOrder, CreateExitOrder}
 
-  @spec entry_order_updated(run_store, state) :: {:ok, run_store}
+    defdelegate create_entry_order(advisor_id, market_quote, config),
+      to: CreateEntryOrder,
+      as: :create
+
+    defdelegate create_exit_order(advisor_id, prev_entry_order, entry_order, config),
+      to: CreateExitOrder,
+      as: :create
+  end
+
+  @type order :: Tai.Trading.Order.t()
+  @type run_store :: Tai.Advisor.run_store()
+  @type state :: Tai.Advisor.State.t()
+
+  @spec entry_order_updated(run_store, prev :: order, state, module) :: {:ok, run_store}
+  def entry_order_updated(run_store, prev, state, order_provider \\ DefaultOrderProvider)
+
   def entry_order_updated(
         %{entry_order: %Order{status: :canceled} = entry_order} = run_store,
-        state
+        _prev,
+        state,
+        order_provider
       ) do
     advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
 
@@ -19,22 +35,43 @@ defmodule Examples.PingPong.ManageOrderUpdate do
         entry_order.product_symbol
       )
 
-    {:ok, entry_order} = CreateEntryOrder.create(advisor_id, market_quote, state.config)
+    {:ok, entry_order} = order_provider.create_entry_order(advisor_id, market_quote, state.config)
     new_run_store = Map.put(run_store, :entry_order, entry_order)
 
     {:ok, new_run_store}
   end
 
   def entry_order_updated(
-        %{entry_order: %Order{status: :filled} = entry_order} = run_store,
-        state
+        %{entry_order: %Order{status: :partially_filled} = entry_order} = run_store,
+        prev,
+        state,
+        order_provider
       ) do
     advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
-    {:ok, exit_order} = CreateExitOrder.create(advisor_id, entry_order, state.config)
+
+    {:ok, exit_order} =
+      order_provider.create_exit_order(advisor_id, prev, entry_order, state.config)
+
     new_run_store = Map.put(run_store, :exit_order, exit_order)
 
     {:ok, new_run_store}
   end
 
-  def entry_order_updated(run_store, _), do: {:ok, run_store}
+  def entry_order_updated(
+        %{entry_order: %Order{status: :filled} = entry_order} = run_store,
+        prev,
+        state,
+        order_provider
+      ) do
+    advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
+
+    {:ok, exit_order} =
+      order_provider.create_exit_order(advisor_id, prev, entry_order, state.config)
+
+    new_run_store = Map.put(run_store, :exit_order, exit_order)
+
+    {:ok, new_run_store}
+  end
+
+  def entry_order_updated(run_store, _, _, _), do: {:ok, run_store}
 end
