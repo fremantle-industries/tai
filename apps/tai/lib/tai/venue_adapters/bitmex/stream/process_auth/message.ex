@@ -1,11 +1,10 @@
 defprotocol Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message do
-  alias Tai.VenueAdapters.Bitmex
+  alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
 
-  @type action :: struct
+  @type message :: struct
   @type received_at :: DateTime.t()
-  @type state :: Bitmex.Stream.ProcessAuth.State.t()
-  @type new_state :: Bitmex.Stream.ProcessAuth.State.t()
+  @type state :: ProcessAuth.State.t()
 
-  @spec process(action, received_at, state) :: {:ok, new_state}
-  def process(action, received_at, state)
+  @spec process(message, received_at, state) :: :ok
+  def process(message, received_at, state)
 end

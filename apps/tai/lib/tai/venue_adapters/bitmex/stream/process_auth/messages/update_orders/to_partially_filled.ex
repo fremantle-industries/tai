@@ -1,27 +1,27 @@
-defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.PartiallyFilled do
+defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPartiallyFilled do
   defstruct ~w(
-      account
-      cl_ord_id
-      leaves_qty
-      ord_status
-      order_id
-      cum_qty
-      price
-      symbol
-      text
-      timestamp
-      transact_time
-      working_indicator
-    )a
+    account
+    cl_ord_id
+    leaves_qty
+    ord_status
+    order_id
+    cum_qty
+    price
+    symbol
+    text
+    timestamp
+    transact_time
+    working_indicator
+  )a
 end
 
-defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
-  for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.PartiallyFilled do
+defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
+  for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPartiallyFilled do
   alias Tai.VenueAdapters.Bitmex
 
   @date_format "{ISO:Extended}"
 
-  def process(message, received_at, state) do
+  def process(message, received_at, _state) do
     message.cl_ord_id
     |> case do
       "gtc-" <> id ->
@@ -44,7 +44,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
         :ignore
     end
 
-    {:ok, state}
+    :ok
   end
 
   defp notify({:ok, {old, updated}}) do

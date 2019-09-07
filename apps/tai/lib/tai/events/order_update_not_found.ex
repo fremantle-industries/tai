@@ -1,11 +1,12 @@
 defmodule Tai.Events.OrderUpdateNotFound do
-  alias Tai.Events.OrderUpdateNotFound
+  alias __MODULE__
 
+  @type client_id :: Tai.Trading.Order.client_id()
   @type t :: %OrderUpdateNotFound{
-          client_id: Tai.Trading.Order.client_id(),
+          client_id: client_id,
           action: atom
         }
 
-  @enforce_keys [:client_id, :action]
-  defstruct [:client_id, :action]
+  @enforce_keys ~w(client_id action)a
+  defstruct ~w(client_id action)a
 end

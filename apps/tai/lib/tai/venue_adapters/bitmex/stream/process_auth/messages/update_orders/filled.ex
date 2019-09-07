@@ -13,13 +13,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Fill
   )a
 end
 
-defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
+defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
   for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Filled do
   alias Tai.VenueAdapters.Bitmex
 
   @date_format "{ISO:Extended}"
 
-  def process(message, received_at, state) do
+  def process(message, received_at, _state) do
     message.cl_ord_id
     |> case do
       "gtc-" <> id ->
@@ -40,7 +40,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
         :ignore
     end
 
-    {:ok, state}
+    :ok
   end
 
   defp notify({:ok, {old, updated}}) do

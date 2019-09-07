@@ -9,7 +9,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Crea
   )a
 end
 
-defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.SubMessage,
+defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
   for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Created do
-  def process(_message, _received_at, state), do: {:ok, state}
+  def process(_message, _received_at, _state), do: :ok
 end

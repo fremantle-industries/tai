@@ -1,6 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
   use GenServer
-  alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
+  alias __MODULE__
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -20,40 +20,43 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
 
   def init(state), do: {:ok, state}
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
-
-  def handle_cast({msg, received_at}, state) do
+  def handle_cast({venue_msg, received_at}, state) do
     {:ok, new_state} =
-      msg
-      |> transform()
-      |> process_action(received_at, state)
+      venue_msg
+      |> extract()
+      |> process(received_at, state)
 
     {:noreply, new_state}
   end
 
-  # TODO: Handle the return values of async tasks
-  def handle_info(_msg, state), do: {:noreply, state}
+  def handle_info({ref, :ok}, state) when is_reference(ref) do
+    new_tasks = Map.delete(state.tasks, ref)
+    new_state = Map.put(state, :tasks, new_tasks)
 
-  @transformers [
-    ProcessAuth.TransformMessages.UpdateOrders,
-    ProcessAuth.TransformMessages.NoOp
-  ]
-  defp transform(msg), do: msg |> transform(@transformers)
-
-  defp transform(msg, []), do: msg |> ProcessAuth.TransformMessages.Unhandled.from_venue()
-
-  defp transform(msg, [transformer | to_check]) do
-    msg
-    |> transformer.from_venue()
-    |> case do
-      {:ok, _} = result -> result
-      {:error, :not_handled} -> msg |> transform(to_check)
-    end
+    {:noreply, new_state}
   end
 
-  defp process_action({:ok, action}, received_at, state) do
-    {:ok, _} = result = action |> ProcessAuth.Message.process(received_at, state)
-    result
+  def handle_info(_msg, state), do: {:noreply, state}
+
+  @spec to_name(venue_id) :: atom
+  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
+
+  defdelegate extract(msg), to: ProcessAuth.VenueMessage
+
+  defp process(messages, received_at, state) do
+    message_tasks =
+      messages
+      |> Enum.reduce(
+        %{},
+        fn msg, tasks ->
+          t = Task.async(fn -> ProcessAuth.Message.process(msg, received_at, state) end)
+          Map.put(tasks, t.ref, t)
+        end
+      )
+
+    new_tasks = Map.merge(state.tasks, message_tasks)
+    new_state = Map.put(state, :tasks, new_tasks)
+
+    {:ok, new_state}
   end
 end
