@@ -41,11 +41,13 @@ defmodule Tai.Advisor do
   @spec to_name(group_id, id) :: advisor_id
   def to_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
 
+  @deprecated "Use order_updated_callback :: atom | pid instead."
   @spec cast_order_updated(atom, order | nil, order, fun) :: :ok
   def cast_order_updated(name, old_order, updated_order, callback) do
     GenServer.cast(name, {:order_updated, old_order, updated_order, callback})
   end
 
+  @deprecated "Use order_updated_callback :: {atom | pid, term} instead."
   @spec cast_order_updated(atom, order | nil, order, fun, term) :: :ok
   def cast_order_updated(name, old_order, updated_order, callback, opts) do
     GenServer.cast(name, {:order_updated, old_order, updated_order, callback, opts})
