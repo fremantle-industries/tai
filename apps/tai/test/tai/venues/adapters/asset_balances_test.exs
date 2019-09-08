@@ -40,7 +40,7 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
   end)
 
   def setup_adapter(:mock) do
-    Tai.TestSupport.Mocks.Responses.AssetBalances.for_exchange_and_account(
+    Tai.TestSupport.Mocks.Responses.AssetBalances.for_venue_and_account(
       :mock,
       :main,
       [

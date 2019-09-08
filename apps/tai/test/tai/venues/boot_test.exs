@@ -177,7 +177,7 @@ defmodule Tai.Venues.BootTest do
   end
 
   def mock_asset_balances(_) do
-    Tai.TestSupport.Mocks.Responses.AssetBalances.for_exchange_and_account(
+    Tai.TestSupport.Mocks.Responses.AssetBalances.for_venue_and_account(
       @venue_id,
       @account_id,
       [
