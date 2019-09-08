@@ -1,36 +1,36 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
   use GenServer
-  require Logger
+
+  defmodule State do
+    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type product_symbol :: Tai.Venues.Product.symbol()
+    @type t :: %State{
+            venue_id: venue_id,
+            symbol: product_symbol,
+            table: map
+          }
+
+    @enforce_keys ~w(venue_id symbol table)a
+    defstruct ~w(venue_id symbol table)a
+  end
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type product_symbol :: Tai.Venues.Product.symbol()
-
-  @type t :: %Tai.VenueAdapters.Bitmex.Stream.OrderBookStore{
-          venue_id: venue_id,
-          symbol: product_symbol,
-          table: map
-        }
-
-  @enforce_keys ~w(venue_id symbol table)a
-  defstruct ~w(venue_id symbol table)a
+  @type state :: State.t()
 
   def start_link(venue_id: venue_id, symbol: symbol, venue_symbol: venue_symbol) do
-    store = %Tai.VenueAdapters.Bitmex.Stream.OrderBookStore{
+    name = to_name(venue_id, venue_symbol)
+
+    state = %State{
       venue_id: venue_id,
       symbol: symbol,
       table: %{}
     }
 
-    GenServer.start_link(__MODULE__, store, name: to_name(venue_id, venue_symbol))
+    GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  @spec init(t) :: {:ok, t}
-  def init(state) do
-    {:ok, state}
-  end
-
-  @spec to_name(venue_id, venue_symbol :: String.t()) :: atom
-  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
+  @spec init(state) :: {:ok, state}
+  def init(state), do: {:ok, state}
 
   def handle_cast({:snapshot, data, received_at}, state) do
     normalized =
@@ -166,4 +166,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
 
     {:noreply, state}
   end
+
+  @spec to_name(venue_id, venue_symbol :: String.t()) :: atom
+  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
 end
