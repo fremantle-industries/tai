@@ -6,19 +6,24 @@ defmodule Tai.Trading.Orders do
   @type status :: Order.status()
   @type status_was :: status
   @type status_required :: status | [status]
+  @type cancel_error_reason :: {:invalid_status, status_was, status_required}
+  @type cancel_response :: {:ok, updated :: order} | {:error, cancel_error_reason}
   @type amend_attrs :: Orders.Amend.attrs()
   @type amend_error_reason :: {:invalid_status, status_was, status_required}
-  @type cancel_error_reason :: {:invalid_status, status_was, status_required}
+  @type amend_response :: {:ok, updated :: order} | {:error, amend_error_reason}
 
   @spec create(submission) :: {:ok, order}
   defdelegate create(submission), to: Orders.Create
 
-  @spec amend(order, amend_attrs) :: {:ok, updated :: order} | {:error, amend_error_reason}
+  @spec amend(order, amend_attrs, module) :: amend_response
+  defdelegate amend(order, attrs, provider), to: Orders.Amend
+
+  @spec amend(order, amend_attrs) :: amend_response
   defdelegate amend(order, attrs), to: Orders.Amend
 
-  @spec cancel(order, module) :: {:ok, updated :: order} | {:error, cancel_error_reason}
+  @spec cancel(order, module) :: cancel_response
   defdelegate cancel(order, provider), to: Orders.Cancel
 
-  @spec cancel(order) :: {:ok, updated :: order} | {:error, cancel_error_reason}
+  @spec cancel(order) :: cancel_response
   defdelegate cancel(order), to: Orders.Cancel
 end
