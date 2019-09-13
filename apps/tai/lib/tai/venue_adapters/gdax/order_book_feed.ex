@@ -48,15 +48,15 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
         },
         state
       ) do
-    processed_at = Timex.now()
-
+    received_at = Timex.now()
     symbol = Product.to_symbol(product_id)
 
     snapshot = %Tai.Markets.OrderBook{
       venue_id: state.feed_id,
       product_symbol: symbol,
-      bids: bids |> OrderBookFeed.Snapshot.normalize(processed_at),
-      asks: asks |> OrderBookFeed.Snapshot.normalize(processed_at)
+      bids: bids |> OrderBookFeed.Snapshot.normalize(received_at),
+      asks: asks |> OrderBookFeed.Snapshot.normalize(received_at),
+      last_received_at: received_at
     }
 
     Tai.Markets.OrderBook.replace(snapshot)
@@ -76,9 +76,8 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
         },
         state
       ) do
-    processed_at = Timex.now()
-    server_changed_at = Timex.parse!(time, "{ISO:Extended}")
-
+    received_at = Timex.now()
+    venue_timestamp = Timex.parse!(time, "{ISO:Extended}")
     symbol = product_id |> Product.to_symbol()
 
     normalized_changes =
@@ -86,8 +85,8 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
         state.feed_id,
         symbol,
         changes,
-        processed_at,
-        server_changed_at
+        received_at,
+        venue_timestamp
       )
 
     Tai.Markets.OrderBook.update(normalized_changes)

@@ -3,14 +3,16 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed.L2Update do
   @type change :: [...]
 
   @spec normalize(atom, atom, [[change]], DateTime.t(), DateTime.t()) :: order_book
-  def normalize(venue_id, symbol, changes, processed_at, server_changed_at) do
+  def normalize(venue_id, symbol, changes, received_at, venue_timestamp) do
     changes
     |> Enum.reduce(
       %Tai.Markets.OrderBook{
         venue_id: venue_id,
         product_symbol: symbol,
         bids: %{},
-        asks: %{}
+        asks: %{},
+        last_received_at: received_at,
+        last_venue_timestamp: venue_timestamp
       },
       fn [side, price, size], acc ->
         {parsed_price, _} = Float.parse(price)
@@ -20,7 +22,7 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed.L2Update do
         new_price_levels =
           acc
           |> Map.get(nside)
-          |> Map.put(parsed_price, {parsed_size, processed_at, server_changed_at})
+          |> Map.put(parsed_price, {parsed_size, received_at, venue_timestamp})
 
         acc
         |> Map.put(nside, new_price_levels)

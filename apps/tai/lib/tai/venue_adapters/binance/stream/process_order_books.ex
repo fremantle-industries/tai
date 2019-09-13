@@ -42,16 +42,18 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBooks do
          }, received_at},
         state
       ) do
-    {:ok, venue_sent_at} = DateTime.from_unix(event_time, :millisecond)
+    {:ok, venue_timestamp} = DateTime.from_unix(event_time, :millisecond)
     symbol = state.venue_products |> Map.fetch!(venue_symbol)
-    bids = changed_bids |> Stream.DepthUpdate.normalize(received_at, venue_sent_at)
-    asks = changed_asks |> Stream.DepthUpdate.normalize(received_at, venue_sent_at)
+    bids = changed_bids |> Stream.DepthUpdate.normalize(received_at, venue_timestamp)
+    asks = changed_asks |> Stream.DepthUpdate.normalize(received_at, venue_timestamp)
 
     %Tai.Markets.OrderBook{
       venue_id: state.venue_id,
       product_symbol: symbol,
       bids: bids,
-      asks: asks
+      asks: asks,
+      last_received_at: received_at,
+      last_venue_timestamp: venue_timestamp
     }
     |> Tai.Markets.OrderBook.update()
 
