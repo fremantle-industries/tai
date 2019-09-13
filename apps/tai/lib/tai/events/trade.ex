@@ -6,7 +6,8 @@ defmodule Tai.Events.Trade do
           timestamp: DateTime.t() | String.t(),
           price: Decimal.t() | number,
           qty: Decimal.t() | number,
-          side: atom
+          side: atom,
+          venue_trade_id: String.t()
         }
 
   @enforce_keys [
@@ -25,6 +26,7 @@ defmodule Tai.Events.Trade do
     :timestamp,
     :price,
     :qty,
-    :side
+    :side,
+    :venue_trade_id
   ]
 end

@@ -5,7 +5,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Trades do
           "timestamp" => timestamp,
           "price" => price,
           "size" => qty,
-          "side" => side
+          "side" => side,
+          "trdMatchID" => venue_trade_id
         },
         venue_id,
         received_at
@@ -20,7 +21,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Trades do
       timestamp: timestamp,
       price: price,
       qty: qty,
-      side: side |> normalize_side
+      side: side |> normalize_side,
+      venue_trade_id: venue_trade_id
     })
   end
 
