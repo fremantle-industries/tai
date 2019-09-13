@@ -17,7 +17,7 @@ defmodule Tai.Trading.OrderStore.Actions.Amend do
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.Amend do
-  def required(_), do: :pending_amend
+  def required(_), do: [:partially_filled, :pending_amend]
 
   def attrs(action) do
     %{
