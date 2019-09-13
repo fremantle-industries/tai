@@ -19,7 +19,7 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
   end
 
   # TODO: Make this configurable
-  @endpoint "wss://real.okex.com:10442/ws/v3"
+  @endpoint "wss://real.okex.com:8443/ws/v3"
 
   def init(
         venue_id: venue_id,
