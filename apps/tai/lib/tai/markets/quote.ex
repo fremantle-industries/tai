@@ -3,26 +3,30 @@ defmodule Tai.Markets.Quote do
   Represents a bid & ask price level row in the order book
   """
 
-  alias Tai.Markets
+  alias Tai.Markets.{PriceLevel, Quote}
 
-  @type price_level :: Markets.PriceLevel.t()
-  @type t :: %Markets.Quote{
+  @type price_level :: PriceLevel.t()
+  @type t :: %Quote{
           venue_id: atom,
           product_symbol: atom,
           bid: price_level,
-          ask: price_level
+          ask: price_level,
+          last_received_at: DateTime.t() | nil,
+          last_venue_timestamp: DateTime.t() | nil
         }
 
-  @enforce_keys [
-    :venue_id,
-    :product_symbol,
-    :bid,
-    :ask
-  ]
-  defstruct [
-    :venue_id,
-    :product_symbol,
-    :bid,
-    :ask
-  ]
+  @enforce_keys ~w(
+    venue_id
+    product_symbol
+    bid
+    ask
+  )a
+  defstruct ~w(
+    venue_id
+    product_symbol
+    bid
+    ask
+    last_received_at
+    last_venue_timestamp
+  )a
 end
