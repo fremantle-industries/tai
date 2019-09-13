@@ -1,13 +1,11 @@
 defmodule Tai.Trading.Orders.CancelErrorTest do
   use ExUnit.Case, async: false
   alias Tai.Trading.OrderSubmissions.SellLimitGtc
-  alias Tai.Trading.{Order, Orders}
+  alias Tai.Trading.{Order, Orders, OrderStore}
   alias Tai.Events
   alias Tai.TestSupport.Mocks
 
   defmodule TestFilledProvider do
-    alias Tai.Trading.{OrderStore, Order}
-
     @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
     @venue :test_exchange_a
     @account :main
@@ -66,14 +64,12 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
 
     test "returns an error", %{order: order} do
       assert {:error, reason} = Orders.cancel(order)
-
-      assert {:invalid_status, :create_error,
-              [:amend_error, :cancel_error, :open, :partially_filled], action} = reason
-
-      assert %Tai.Trading.OrderStore.Actions.PendCancel{} = action
+      assert {:invalid_status, :create_error, required_status, action} = reason
+      assert required_status == [:amend_error, :cancel_error, :open, :partially_filled]
+      assert %OrderStore.Actions.PendCancel{} = action
     end
 
-    test "broadcasts an event", %{order: order} do
+    test "emits an invalid status warning", %{order: order} do
       Tai.Events.firehose_subscribe()
 
       Orders.cancel(order)
@@ -85,7 +81,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
       }
 
       assert pending_cancel_invalid_event.client_id == order.client_id
-      assert pending_cancel_invalid_event.action == Tai.Trading.OrderStore.Actions.PendCancel
+      assert pending_cancel_invalid_event.action == OrderStore.Actions.PendCancel
       assert pending_cancel_invalid_event.was == :create_error
 
       assert pending_cancel_invalid_event.required == [
@@ -97,7 +93,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
     end
   end
 
-  test "invalid cancel status broadcasts an event" do
+  test "invalid cancel status emits an event" do
     open_order = struct(Order, client_id: "abc123", venue_order_id: @venue_order_id)
     Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
     Events.firehose_subscribe()
@@ -111,7 +107,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
     }
 
     assert cancel_invalid_event.client_id == open_order.client_id
-    assert cancel_invalid_event.action == Tai.Trading.OrderStore.Actions.Cancel
+    assert cancel_invalid_event.action == OrderStore.Actions.Cancel
     assert cancel_invalid_event.was == :filled
 
     assert cancel_invalid_event.required == [
@@ -133,7 +129,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
     assert error_event.error_reason == :mock_not_found
   end
 
-  test "adapter error is rescued", %{submission: submission} do
+  test "rescues adapter errors", %{submission: submission} do
     Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
     {:ok, order} = Tai.Trading.Orders.create(submission)
 
