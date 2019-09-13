@@ -7,7 +7,7 @@ config :tai,
     log_spread: [
       advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "binance.btc_usdt gdax.btc_usd poloniex.btc_usdt"
+      products: "binance.btc_usdt gdax.btc_usd"
     ],
     ping_pong: [
       advisor: Examples.PingPong.Advisor,
@@ -62,12 +62,6 @@ config :tai,
         }
       }
     ],
-    poloniex: [
-      enabled: true,
-      adapter: Tai.VenueAdapters.Poloniex,
-      products: "btc_usdt ltc_usdt eth_usdt",
-      accounts: %{main: %{}}
-    ],
     gdax: [
       enabled: true,
       adapter: Tai.VenueAdapters.Gdax,
@@ -84,7 +78,3 @@ config :tai,
   }
 
 config :echo_boy, port: 4200
-
-config :ex_poloniex,
-  api_key: {:system_file, "POLONIEX_API_KEY"},
-  api_secret: {:system_file, "POLONIEX_API_SECRET"}

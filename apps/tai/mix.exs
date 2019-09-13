@@ -28,7 +28,6 @@ defmodule Tai.Mixfile do
       {:ex_bitmex, "~> 0.1.0"},
       {:ex_okex, "~> 0.1"},
       {:ex_gdax, "~> 0.1.6"},
-      {:ex_poloniex, "~> 0.0.2"},
       {:decimal, "~> 1.7"},
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},

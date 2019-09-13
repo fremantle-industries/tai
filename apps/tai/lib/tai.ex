@@ -2,10 +2,6 @@ defmodule Tai do
   use Application
 
   def start(_type, _args) do
-    # TODO:
-    # ex_poloniex won't need to resolve env on boot separately when
-    # it's venue adapter can support per account configuration
-    Confex.resolve_env!(:ex_poloniex)
     Confex.resolve_env!(:tai)
 
     config = Tai.Config.parse()

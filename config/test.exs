@@ -93,11 +93,6 @@ config(:tai,
         }
       }
     ],
-    poloniex: [
-      enabled: true,
-      adapter: Tai.VenueAdapters.Poloniex,
-      accounts: %{main: %{}}
-    ],
     gdax: [
       enabled: true,
       adapter: Tai.VenueAdapters.Gdax,
@@ -113,9 +108,9 @@ config(:tai,
   }
 )
 
-config(:tai, :test_venue_adapters_products, [:mock, :binance, :poloniex, :gdax, :okex])
-config(:tai, :test_venue_adapters_asset_balances, [:mock, :binance, :poloniex, :gdax, :okex])
-config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :poloniex, :gdax, :okex])
+config(:tai, :test_venue_adapters_products, [:mock, :binance, :gdax, :okex])
+config(:tai, :test_venue_adapters_asset_balances, [:mock, :binance, :gdax, :okex])
+config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :gdax, :okex])
 config(:tai, :test_venue_adapters_create_order_gtc_open, [:bitmex, :binance])
 config(:tai, :test_venue_adapters_create_order_gtc_accepted, [:okex_futures, :okex_swap])
 config(:tai, :test_venue_adapters_create_order_fok, [:bitmex, :binance])
@@ -170,9 +165,6 @@ config :exvcr,
     "CB-ACCESS-SIGN",
     "CB-ACCESS-TIMESTAMP",
     "CB-ACCESS-PASSPHRASE",
-    # Poloniex
-    "Key",
-    "Sign",
     # Binance
     "X-MBX-APIKEY",
     # Bitmex
@@ -196,7 +188,3 @@ config :exvcr,
 config :echo_boy, port: 4100
 
 config :ex_bitmex, domain: "testnet.bitmex.com"
-
-config :ex_poloniex,
-  api_key: {:system_file, "POLONIEX_API_KEY"},
-  api_secret: {:system_file, "POLONIEX_API_SECRET"}

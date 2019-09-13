@@ -33,11 +33,11 @@ Here's an example of an advisor that logs the spread between multiple products o
 |----------|:---:|:---:|:---:|:---:|:---:|:---:|
 | Binance  | [x] | [x] | [x] | [ ] | [x] | [x] |
 | GDAX     | [x] | [x] | [ ] | [ ] | [x] | [x] |
-| Poloniex | [x] | [x] | [ ] | [ ] | [x] | [x] |
 | FTX      | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | Deribit  | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | Huobi    | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | Coinflex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| Poloniex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 
 [Planned Venues...](./PLANNED_VENUES.md)
 
