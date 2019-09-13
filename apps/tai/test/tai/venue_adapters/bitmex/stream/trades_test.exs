@@ -1,0 +1,40 @@
+defmodule Tai.VenueAdapters.Bitmex.Stream.TradeTest do
+  use ExUnit.Case, async: false
+  import Tai.TestSupport.Assertions.Event
+  alias Tai.VenueAdapters.Bitmex.Stream.ProcessMessages
+  alias Tai.Events
+
+  setup do
+    start_supervised!({Tai.Events, 1})
+    start_supervised!({ProcessMessages, [venue_id: :my_venue]})
+    :ok
+  end
+
+  test "broadcasts an event when public trade is received" do
+    Events.firehose_subscribe()
+    venue_trade_id = Ecto.UUID.generate()
+
+    venue_trades = [
+      %{
+        "timestamp" => "2019-09-13T07:25:39.207Z",
+        "symbol" => "XBTUSD",
+        "side" => "Buy",
+        "size" => 0,
+        "price" => 0,
+        "tickDirection" => "string",
+        "trdMatchID" => venue_trade_id,
+        "grossValue" => 0,
+        "homeNotional" => 0,
+        "foreignNotional" => 0
+      }
+    ]
+
+    :my_venue
+    |> ProcessMessages.to_name()
+    |> GenServer.cast(
+      {%{"table" => "trade", "action" => "insert", "data" => venue_trades}, :ignore}
+    )
+
+    assert_event(%Events.Trade{venue_trade_id: venue_trade_id})
+  end
+end
