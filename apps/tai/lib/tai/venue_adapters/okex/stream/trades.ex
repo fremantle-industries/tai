@@ -8,7 +8,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
           "price" => price,
           "qty" => qty,
           "side" => side,
-          "timestamp" => timestamp
+          "timestamp" => timestamp,
+          "trade_id" => venue_trade_id
         },
         venue_id,
         received_at
@@ -20,7 +21,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       timestamp: timestamp,
       price: price,
       qty: qty,
-      side: side |> normalize_side
+      side: side |> normalize_side,
+      venue_trade_id: venue_trade_id
     })
   end
 
@@ -30,7 +32,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
           "price" => price,
           "size" => size,
           "side" => side,
-          "timestamp" => timestamp
+          "timestamp" => timestamp,
+          "trade_id" => venue_trade_id
         },
         venue_id,
         received_at
@@ -42,7 +45,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       timestamp: timestamp,
       price: price,
       qty: size,
-      side: side |> normalize_side
+      side: side |> normalize_side,
+      venue_trade_id: venue_trade_id
     })
   end
 
