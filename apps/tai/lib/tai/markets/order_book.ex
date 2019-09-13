@@ -14,7 +14,7 @@ defmodule Tai.Markets.OrderBook do
           product_symbol: product_symbol,
           bids: map,
           asks: map,
-          last_received_at: DateTime.t() | nil,
+          last_received_at: DateTime.t(),
           last_venue_timestamp: DateTime.t() | nil
         }
 

@@ -65,13 +65,14 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          venue_id
        ) do
     symbol = String.to_atom(raw_symbol)
-    processed_at = Timex.now()
+    received_at = Timex.now()
 
     snapshot = %Tai.Markets.OrderBook{
       venue_id: venue_id,
       product_symbol: symbol,
-      bids: Mock.Stream.Snapshot.normalize(bids, processed_at),
-      asks: Mock.Stream.Snapshot.normalize(asks, processed_at)
+      last_received_at: received_at,
+      bids: Mock.Stream.Snapshot.normalize(bids, received_at),
+      asks: Mock.Stream.Snapshot.normalize(asks, received_at)
     }
 
     Tai.Markets.OrderBook.replace(snapshot)
