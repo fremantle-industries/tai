@@ -18,7 +18,7 @@ defmodule Tai.Trading.OrderStoreTest do
   end
 
   describe ".update" do
-    test "updates the actions and the updated_at timestamp attributes" do
+    test "updates the actions attributes and timestamps the update" do
       assert {:ok, order} = enqueue()
 
       action = struct!(Tai.Trading.OrderStore.Actions.Skip, client_id: order.client_id)

@@ -25,6 +25,7 @@ defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.Passi
       status: :partially_filled,
       cumulative_qty: action.cumulative_qty,
       leaves_qty: action.leaves_qty,
+      qty: Decimal.add(action.cumulative_qty, action.leaves_qty),
       last_received_at: action.last_received_at,
       last_venue_timestamp: action.last_venue_timestamp
     }
