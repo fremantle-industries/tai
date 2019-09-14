@@ -11,11 +11,7 @@ defmodule Tai.Commands.Markets do
     "Bid Price",
     "Ask Price",
     "Bid Size",
-    "Ask Size",
-    "Bid Processed At",
-    "Bid Server Changed At",
-    "Ask Processed At",
-    "Ask Server Changed At"
+    "Ask Size"
   ]
 
   @spec markets :: no_return
@@ -45,11 +41,7 @@ defmodule Tai.Commands.Markets do
         {bid, :price},
         {ask, :price},
         {bid, :size},
-        {ask, :size},
-        {bid, :processed_at},
-        {bid, :server_changed_at},
-        {ask, :processed_at},
-        {ask, :server_changed_at}
+        {ask, :size}
       ]
       |> format_row
     end)

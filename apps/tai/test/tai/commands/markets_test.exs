@@ -1,6 +1,5 @@
 defmodule Tai.Commands.MarketsTest do
   use ExUnit.Case, async: false
-
   import ExUnit.CaptureIO
 
   setup do
@@ -31,18 +30,18 @@ defmodule Tai.Commands.MarketsTest do
       |> Tai.Markets.OrderBook.replace()
 
     assert capture_io(&Tai.CommandsHelper.markets/0) == """
-           +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
-           |           Venue | Product | Bid Price | Ask Price | Bid Size | Ask Size | Bid Processed At | Bid Server Changed At | Ask Processed At | Ask Server Changed At |
-           +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+
-           | test_exchange_a | btc_usd |  12999.99 |  13000.01 | 0.000021 |     1.11 |              now |                   now |              now |                   now |
-           | test_exchange_a | ltc_usd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
-           | test_exchange_b | eth_usd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
-           | test_exchange_b | ltc_usd |         ~ |         ~ |        ~ |        ~ |                ~ |                     ~ |                ~ |                     ~ |
-           +-----------------+---------+-----------+-----------+----------+----------+------------------+-----------------------+------------------+-----------------------+\n
+           +-----------------+---------+-----------+-----------+----------+----------+
+           |           Venue | Product | Bid Price | Ask Price | Bid Size | Ask Size |
+           +-----------------+---------+-----------+-----------+----------+----------+
+           | test_exchange_a | btc_usd |  12999.99 |  13000.01 | 0.000021 |     1.11 |
+           | test_exchange_a | ltc_usd |         ~ |         ~ |        ~ |        ~ |
+           | test_exchange_b | eth_usd |         ~ |         ~ |        ~ |        ~ |
+           | test_exchange_b | ltc_usd |         ~ |         ~ |        ~ |        ~ |
+           +-----------------+---------+-----------+-----------+----------+----------+\n
            """
   end
 
-  def mock_products() do
+  def mock_products do
     Tai.TestSupport.Mocks.Responses.Products.for_venue(
       :test_exchange_a,
       [
