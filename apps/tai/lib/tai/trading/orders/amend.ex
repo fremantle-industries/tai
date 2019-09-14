@@ -16,7 +16,7 @@ defmodule Tai.Trading.Orders.Amend do
 
   @spec amend(order, attrs) ::
           {:ok, updated :: order}
-          | {:error, {:invalid_status, was :: status, status_required}}
+          | {:error, {:invalid_status, was :: status, status_required, action :: term}}
   def amend(order, attrs, provider \\ Provider) when is_map(attrs) do
     with action <- %OrderStore.Actions.PendAmend{client_id: order.client_id},
          {:ok, {old, updated}} <- provider.update(action) do

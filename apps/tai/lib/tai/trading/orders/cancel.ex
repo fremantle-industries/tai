@@ -9,7 +9,7 @@ defmodule Tai.Trading.Orders.Cancel do
   end
 
   @type order :: Order.t()
-  @type error_reason :: {:invalid_status, was :: term, required :: term}
+  @type error_reason :: {:invalid_status, was :: term, required :: term, action :: term}
 
   @spec cancel(order, module) :: {:ok, updated :: order} | {:error, error_reason}
   def cancel(%Order{client_id: client_id}, provider \\ Provider) do
