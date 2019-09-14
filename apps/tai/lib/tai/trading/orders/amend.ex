@@ -13,10 +13,12 @@ defmodule Tai.Trading.Orders.Amend do
           optional(:price) => Decimal.t(),
           optional(:qty) => Decimal.t()
         }
-
-  @spec amend(order, attrs) ::
+  @type action :: Tai.Trading.OrderStore.Action.t()
+  @type response ::
           {:ok, updated :: order}
-          | {:error, {:invalid_status, was :: status, status_required, action :: term}}
+          | {:error, {:invalid_status, was :: status, status_required, action}}
+
+  @spec amend(order, attrs) :: response
   def amend(order, attrs, provider \\ Provider) when is_map(attrs) do
     with action <- %OrderStore.Actions.PendAmend{client_id: order.client_id},
          {:ok, {old, updated}} <- provider.update(action) do

@@ -11,8 +11,9 @@ defmodule Tai.Trading.Orders.Create do
 
   @type order :: Order.t()
   @type submission :: OrderSubmissions.Factory.submission()
+  @type response :: {:ok, order}
 
-  @spec create(submission) :: {:ok, order}
+  @spec create(submission) :: response
   def create(submission) do
     {:ok, order} = OrderStore.enqueue(submission)
     notify_initial_updated_order(order)

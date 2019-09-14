@@ -3,17 +3,12 @@ defmodule Tai.Trading.Orders do
 
   @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
-  @type status :: Order.status()
-  @type status_was :: status
-  @type status_required :: status | [status]
-  @type action :: term
-  @type cancel_error_reason :: {:invalid_status, status_was, status_required, action}
-  @type cancel_response :: {:ok, updated :: order} | {:error, cancel_error_reason}
+  @type create_response :: Orders.Create.response()
   @type amend_attrs :: Orders.Amend.attrs()
-  @type amend_error_reason :: {:invalid_status, status_was, status_required, action}
-  @type amend_response :: {:ok, updated :: order} | {:error, amend_error_reason}
+  @type amend_response :: Orders.Amend.response()
+  @type cancel_response :: Orders.Cancel.response()
 
-  @spec create(submission) :: {:ok, order}
+  @spec create(submission) :: create_response
   defdelegate create(submission), to: Orders.Create
 
   @spec amend(order, amend_attrs, module) :: amend_response

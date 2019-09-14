@@ -9,9 +9,13 @@ defmodule Tai.Trading.Orders.Cancel do
   end
 
   @type order :: Order.t()
-  @type error_reason :: {:invalid_status, was :: term, required :: term, action :: term}
+  @type status :: Tai.Trading.Order.status()
+  @type status_required :: status | [status]
+  @type action :: Tai.Trading.OrderStore.Action.t()
+  @type error_reason :: {:invalid_status, was :: status, status_required, action}
+  @type response :: {:ok, updated :: order} | {:error, error_reason}
 
-  @spec cancel(order, module) :: {:ok, updated :: order} | {:error, error_reason}
+  @spec cancel(order, module) :: response
   def cancel(%Order{client_id: client_id}, provider \\ Provider) do
     with action <- %OrderStore.Actions.PendCancel{client_id: client_id},
          {:ok, {old, updated}} <- provider.update(action) do
