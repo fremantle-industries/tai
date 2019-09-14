@@ -1,5 +1,5 @@
 defmodule Tai.PubSubTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   doctest Tai.PubSub
 
   defmodule MultiSubscriber do
