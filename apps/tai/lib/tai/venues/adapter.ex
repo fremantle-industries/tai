@@ -28,7 +28,7 @@ defmodule Tai.Venues.Adapter do
           id: atom,
           adapter: module,
           channels: [channel],
-          products: String.t(),
+          products: String.t() | function,
           accounts: map,
           timeout: non_neg_integer,
           opts: map

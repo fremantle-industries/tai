@@ -20,6 +20,9 @@ defmodule Tai.Venues.Boot.Products do
     end
   end
 
+  defp filter(all_products, filters) when is_function(filters),
+    do: all_products |> filters.()
+
   defp filter(all_products, filters) do
     all_products
     |> Enum.reduce(
