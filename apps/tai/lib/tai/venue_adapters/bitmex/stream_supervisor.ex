@@ -17,8 +17,8 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     Supervisor.start_link(__MODULE__, args, name: :"#{__MODULE__}_#{venue_id}")
   end
 
-  # TODO: Make this configurable
-  @url "wss://" <> ExBitmex.Rest.HTTPClient.domain() <> "/realtime"
+  # TODO: Make this configurable. Could this come from opts?
+  @endpoint "wss://" <> ExBitmex.Rest.HTTPClient.domain() <> "/realtime"
 
   def init(
         venue_id: venue_id,
@@ -37,6 +37,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
         %{
           id: name,
           start: {
+            # TODO: This could just pass the product struct. Use deprecate to switch over
             Tai.Markets.OrderBook,
             :start_link,
             [[feed_id: venue_id, symbol: p.symbol]]
@@ -64,7 +65,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
       {Tai.VenueAdapters.Bitmex.Stream.ProcessMessages, [venue_id: venue_id]},
       {Tai.VenueAdapters.Bitmex.Stream.Connection,
        [
-         url: @url,
+         url: @endpoint,
          venue: venue_id,
          channels: channels,
          account: accounts |> Map.to_list() |> List.first(),

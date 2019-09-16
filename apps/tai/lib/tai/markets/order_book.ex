@@ -12,8 +12,8 @@ defmodule Tai.Markets.OrderBook do
   @type t :: %OrderBook{
           venue_id: venue_id,
           product_symbol: product_symbol,
-          bids: map,
-          asks: map,
+          bids: %{(price :: number) => size :: pos_integer},
+          asks: %{(price :: number) => size :: pos_integer},
           last_received_at: DateTime.t(),
           last_venue_timestamp: DateTime.t() | nil
         }
@@ -72,10 +72,15 @@ defmodule Tai.Markets.OrderBook do
       {:order_book_snapshot, snapshot.venue_id, snapshot.product_symbol, snapshot}
     )
 
+    Tai.Events.debug(%Tai.Events.OrderBookSnapshot{
+      venue_id: snapshot.venue_id,
+      symbol: snapshot.product_symbol
+    })
+
     {:reply, :ok, snapshot}
   end
 
-  def handle_call({:update, %OrderBook{bids: bids, asks: asks} = changes}, _from, state) do
+  def handle_call({:update, changes}, _from, state) do
     PubSub.broadcast(
       {:order_book_changes, state.venue_id, state.product_symbol},
       {:order_book_changes, state.venue_id, state.product_symbol, changes}
@@ -83,10 +88,15 @@ defmodule Tai.Markets.OrderBook do
 
     new_state =
       state
-      |> update_side(:bids, bids)
-      |> update_side(:asks, asks)
+      |> update_side(:bids, changes.bids)
+      |> update_side(:asks, changes.asks)
       |> Map.put(:last_received_at, changes.last_received_at)
       |> Map.put(:last_venue_timestamp, changes.last_venue_timestamp)
+
+    Tai.Events.debug(%Tai.Events.OrderBookUpdate{
+      venue_id: state.venue_id,
+      symbol: state.product_symbol
+    })
 
     {:reply, :ok, new_state}
   end

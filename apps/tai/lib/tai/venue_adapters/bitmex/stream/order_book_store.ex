@@ -7,7 +7,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
     @type t :: %State{
             venue_id: venue_id,
             symbol: product_symbol,
-            table: map
+            table: %{optional(String.t()) => number}
           }
 
     @enforce_keys ~w(venue_id symbol table)a
@@ -15,8 +15,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
   end
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type product_symbol :: Tai.Venues.Product.symbol()
+  @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type state :: State.t()
 
+  @spec start_link(venue_id: venue_id, symbol: product_symbol, venue_symbol: venue_symbol) ::
+          GenServer.on_start()
   def start_link(venue_id: venue_id, symbol: symbol, venue_symbol: venue_symbol) do
     name = to_name(venue_id, venue_symbol)
 
@@ -39,7 +43,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
         %{bids: %{}, asks: %{}, table: %{}},
         fn
           %{"id" => id, "price" => price, "side" => "Sell", "size" => size}, acc ->
-            asks = acc.asks |> Map.put(price, {size, received_at, nil})
+            asks = acc.asks |> Map.put(price, size)
             table = acc.table |> Map.put(id, price)
 
             acc
@@ -47,7 +51,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
             |> Map.put(:table, table)
 
           %{"id" => id, "price" => price, "side" => "Buy", "size" => size}, acc ->
-            bids = acc.bids |> Map.put(price, {size, received_at, nil})
+            bids = acc.bids |> Map.put(price, size)
             table = acc.table |> Map.put(id, price)
 
             acc
@@ -65,7 +69,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
     }
 
     :ok = Tai.Markets.OrderBook.replace(snapshot)
-
     new_table = Map.merge(state.table, normalized.table)
     new_state = Map.put(state, :table, new_table)
 
@@ -79,7 +82,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
         %{bids: %{}, asks: %{}, table: %{}},
         fn
           %{"id" => id, "price" => price, "side" => "Sell", "size" => size}, acc ->
-            asks = acc.asks |> Map.put(price, {size, received_at, nil})
+            asks = acc.asks |> Map.put(price, size)
             table = acc.table |> Map.put(id, price)
 
             acc
@@ -87,7 +90,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
             |> Map.put(:table, table)
 
           %{"id" => id, "price" => price, "side" => "Buy", "size" => size}, acc ->
-            bids = acc.bids |> Map.put(price, {size, received_at, nil})
+            bids = acc.bids |> Map.put(price, size)
             table = acc.table |> Map.put(id, price)
 
             acc
@@ -119,12 +122,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
         fn
           %{"id" => id, "side" => "Sell", "size" => size}, acc ->
             price = Map.fetch!(state.table, id)
-            asks = acc.asks |> Map.put(price, {size, received_at, nil})
+            asks = acc.asks |> Map.put(price, size)
             Map.put(acc, :asks, asks)
 
           %{"id" => id, "side" => "Buy", "size" => size}, acc ->
             price = Map.fetch!(state.table, id)
-            bids = acc.bids |> Map.put(price, {size, received_at, nil})
+            bids = acc.bids |> Map.put(price, size)
             Map.put(acc, :bids, bids)
         end
       )
@@ -149,12 +152,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
         fn
           %{"id" => id, "side" => "Sell"}, acc ->
             price = Map.fetch!(state.table, id)
-            asks = acc.asks |> Map.put(price, {0, received_at, nil})
+            asks = acc.asks |> Map.put(price, 0)
             Map.put(acc, :asks, asks)
 
           %{"id" => id, "side" => "Buy"}, acc ->
             price = Map.fetch!(state.table, id)
-            bids = acc.bids |> Map.put(price, {0, received_at, nil})
+            bids = acc.bids |> Map.put(price, 0)
             Map.put(acc, :bids, bids)
         end
       )

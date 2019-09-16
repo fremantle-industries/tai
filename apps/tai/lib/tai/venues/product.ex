@@ -11,11 +11,12 @@ defmodule Tai.Venues.Product do
           | :unlisted
 
   @type symbol :: atom
+  @type venue_symbol :: String.t()
   @type type :: :spot | :future | :swap | :option
   @type t :: %Tai.Venues.Product{
           venue_id: Tai.Venues.Adapter.venue_id(),
           symbol: symbol,
-          venue_symbol: String.t(),
+          venue_symbol: venue_symbol,
           status: status,
           type: type,
           price_increment: Decimal.t(),
