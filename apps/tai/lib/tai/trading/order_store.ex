@@ -1,16 +1,16 @@
 defmodule Tai.Trading.OrderStore do
   @moduledoc """
-  ETS backed store for the local state of orders
+  Track and manage the local state of orders with a swappable backend
   """
 
   use GenServer
-  alias Tai.Trading.{Order, OrderSubmissions}
+  alias Tai.Trading.{Order, OrderSubmissions, OrderStore}
 
   @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
   @type status :: Order.status()
   @type client_id :: Order.client_id()
-  @type action :: term
+  @type action :: OrderStore.Action.t()
   @type store_id :: atom
 
   @default_id :default
@@ -43,9 +43,49 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:update, action}, _from, state) do
-    response = state.backend.update(action, state.name)
+    response =
+      with {:ok, old_order} <- state.backend.find_by_client_id(action.client_id, state.name) do
+        required = action |> OrderStore.Action.required() |> List.wrap()
+
+        if Enum.member?(required, old_order.status) do
+          new_attrs =
+            action
+            |> OrderStore.Action.attrs()
+            |> normalize_attrs(old_order, action)
+            |> Map.put(:updated_at, Timex.now())
+
+          updated_order = old_order |> Map.merge(new_attrs)
+          state.backend.update(updated_order, state.name)
+          {:ok, {old_order, updated_order}}
+        else
+          reason = {:invalid_status, old_order.status, required |> format_required, action}
+          {:error, reason}
+        end
+      else
+        {:error, :not_found} -> {:error, {:not_found, action}}
+      end
+
     {:reply, response, state}
   end
+
+  defp normalize_attrs(
+         update_attrs,
+         %Order{cumulative_qty: cumulative_qty},
+         %OrderStore.Actions.Amend{leaves_qty: leaves_qty}
+       ) do
+    qty = Decimal.add(cumulative_qty, leaves_qty)
+    update_attrs |> Map.put(:qty, qty)
+  end
+
+  defp normalize_attrs(
+         update_attrs,
+         %Order{cumulative_qty: cumulative_qty},
+         %OrderStore.Actions.Cancel{}
+       ) do
+    update_attrs |> Map.put(:qty, cumulative_qty)
+  end
+
+  defp normalize_attrs(update_attrs, _, _), do: update_attrs
 
   def handle_call(:all, _from, state) do
     response = state.backend.all(state.name)
@@ -109,4 +149,7 @@ defmodule Tai.Trading.OrderStore do
 
   @spec to_name(store_id) :: atom
   def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
+
+  defp format_required([required | []]), do: required
+  defp format_required(required), do: required
 end
