@@ -22,7 +22,7 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed.L2Update do
         new_price_levels =
           acc
           |> Map.get(nside)
-          |> Map.put(parsed_price, {parsed_size, received_at, venue_timestamp})
+          |> Map.put(parsed_price, parsed_size)
 
         acc
         |> Map.put(nside, new_price_levels)

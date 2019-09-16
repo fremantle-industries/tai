@@ -73,27 +73,27 @@ defmodule Tai.Venues.Adapters.Gdax.OrderBookFeedTest do
       venue_id: :my_gdax_feed,
       product_symbol: :btc_usd,
       bids: %{
-        1.0 => {1.1, nil, nil},
-        1.1 => {1.0, nil, nil}
+        1.0 => 1.1,
+        1.1 => 1.0
       },
       asks: %{
-        1.2 => {0.1, nil, nil},
-        1.3 => {0.11, nil, nil}
+        1.2 => 0.1,
+        1.3 => 0.11
       }
     })
 
     Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
       venue_id: :my_gdax_feed,
       product_symbol: :ltc_usd,
-      bids: %{100.0 => {0.1, nil, nil}},
-      asks: %{100.1 => {0.1, nil, nil}}
+      bids: %{100.0 => 0.1},
+      asks: %{100.1 => 0.1}
     })
 
     Tai.Markets.OrderBook.replace(%Tai.Markets.OrderBook{
       venue_id: :my_feed_b,
       product_symbol: :btc_usd,
-      bids: %{1.0 => {1.1, nil, nil}},
-      asks: %{1.2 => {0.1, nil, nil}}
+      bids: %{1.0 => 1.1},
+      asks: %{1.2 => 0.1}
     })
 
     start_supervised!({
@@ -129,18 +129,14 @@ defmodule Tai.Venues.Adapters.Gdax.OrderBookFeedTest do
       Tai.Markets.OrderBook.quotes(my_gdax_feed_btc_usd_pid)
 
     [
-      %Tai.Markets.PriceLevel{price: 110.0, size: 100.0, server_changed_at: nil} = bid_a,
-      %Tai.Markets.PriceLevel{price: 100.0, size: 110.0, server_changed_at: nil} = bid_b
+      %Tai.Markets.PricePoint{price: 110.0, size: 100.0},
+      %Tai.Markets.PricePoint{price: 100.0, size: 110.0}
     ] = bids
 
     [
-      %Tai.Markets.PriceLevel{price: 120.0, size: 10.0, server_changed_at: nil} = ask_a,
-      %Tai.Markets.PriceLevel{price: 130.0, size: 11.0, server_changed_at: nil} = ask_b
+      %Tai.Markets.PricePoint{price: 120.0, size: 10.0},
+      %Tai.Markets.PricePoint{price: 130.0, size: 11.0}
     ] = asks
-
-    assert DateTime.compare(bid_a.processed_at, bid_b.processed_at)
-    assert DateTime.compare(bid_a.processed_at, ask_a.processed_at)
-    assert DateTime.compare(bid_a.processed_at, ask_b.processed_at)
 
     assert Tai.Markets.OrderBook.quotes(my_gdax_feed_ltc_usd_pid) == {
              :ok,
@@ -148,20 +144,10 @@ defmodule Tai.Venues.Adapters.Gdax.OrderBookFeedTest do
                venue_id: :my_gdax_feed,
                product_symbol: :ltc_usd,
                bids: [
-                 %Tai.Markets.PriceLevel{
-                   price: 100.0,
-                   size: 0.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
+                 %Tai.Markets.PricePoint{price: 100.0, size: 0.1}
                ],
                asks: [
-                 %Tai.Markets.PriceLevel{
-                   price: 100.1,
-                   size: 0.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
+                 %Tai.Markets.PricePoint{price: 100.1, size: 0.1}
                ]
              }
            }
@@ -172,20 +158,10 @@ defmodule Tai.Venues.Adapters.Gdax.OrderBookFeedTest do
                venue_id: :my_feed_b,
                product_symbol: :btc_usd,
                bids: [
-                 %Tai.Markets.PriceLevel{
-                   price: 1.0,
-                   size: 1.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
+                 %Tai.Markets.PricePoint{price: 1.0, size: 1.1}
                ],
                asks: [
-                 %Tai.Markets.PriceLevel{
-                   price: 1.2,
-                   size: 0.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
+                 %Tai.Markets.PricePoint{price: 1.2, size: 0.1}
                ]
              }
            }
@@ -212,21 +188,14 @@ defmodule Tai.Venues.Adapters.Gdax.OrderBookFeedTest do
       Tai.Markets.OrderBook.quotes(my_gdax_feed_btc_usd_pid)
 
     [
-      %Tai.Markets.PriceLevel{price: 1.0, size: 1.2} = bid_a,
-      %Tai.Markets.PriceLevel{price: 0.9, size: 0.1} = bid_b
+      %Tai.Markets.PricePoint{price: 1.0, size: 1.2},
+      %Tai.Markets.PricePoint{price: 0.9, size: 0.1}
     ] = bids
 
     [
-      %Tai.Markets.PriceLevel{price: 1.2, size: 0.11} = ask_a,
-      %Tai.Markets.PriceLevel{price: 1.4, size: 0.12} = ask_b
+      %Tai.Markets.PricePoint{price: 1.2, size: 0.11},
+      %Tai.Markets.PricePoint{price: 1.4, size: 0.12}
     ] = asks
-
-    assert DateTime.compare(bid_a.processed_at, bid_b.processed_at)
-    assert DateTime.compare(bid_a.processed_at, ask_a.processed_at)
-    assert DateTime.compare(bid_a.processed_at, ask_b.processed_at)
-    assert DateTime.compare(bid_a.server_changed_at, bid_b.server_changed_at)
-    assert DateTime.compare(bid_a.server_changed_at, ask_a.server_changed_at)
-    assert DateTime.compare(bid_a.server_changed_at, ask_b.server_changed_at)
 
     assert Tai.Markets.OrderBook.quotes(my_gdax_feed_ltc_usd_pid) == {
              :ok,
@@ -234,20 +203,10 @@ defmodule Tai.Venues.Adapters.Gdax.OrderBookFeedTest do
                venue_id: :my_gdax_feed,
                product_symbol: :ltc_usd,
                bids: [
-                 %Tai.Markets.PriceLevel{
-                   price: 100.0,
-                   size: 0.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
+                 %Tai.Markets.PricePoint{price: 100.0, size: 0.1}
                ],
                asks: [
-                 %Tai.Markets.PriceLevel{
-                   price: 100.1,
-                   size: 0.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
+                 %Tai.Markets.PricePoint{price: 100.1, size: 0.1}
                ]
              }
            }
@@ -258,20 +217,10 @@ defmodule Tai.Venues.Adapters.Gdax.OrderBookFeedTest do
                venue_id: :my_feed_b,
                product_symbol: :btc_usd,
                bids: [
-                 %Tai.Markets.PriceLevel{
-                   price: 1.0,
-                   size: 1.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
+                 %Tai.Markets.PricePoint{price: 1.0, size: 1.1}
                ],
                asks: [
-                 %Tai.Markets.PriceLevel{
-                   price: 1.2,
-                   size: 0.1,
-                   processed_at: nil,
-                   server_changed_at: nil
-                 }
+                 %Tai.Markets.PricePoint{price: 1.2, size: 0.1}
                ]
              }
            }

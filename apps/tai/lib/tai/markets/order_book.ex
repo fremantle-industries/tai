@@ -4,7 +4,7 @@ defmodule Tai.Markets.OrderBook do
   """
 
   use GenServer
-  alias Tai.Markets.{OrderBook, PriceLevel, Quote}
+  alias Tai.Markets.{OrderBook, PricePoint, Quote}
   alias Tai.PubSub
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -71,12 +71,6 @@ defmodule Tai.Markets.OrderBook do
       {:order_book_snapshot, snapshot.venue_id, snapshot.product_symbol},
       {:order_book_snapshot, snapshot.venue_id, snapshot.product_symbol, snapshot}
     )
-
-    Tai.Events.debug(%Tai.Events.OrderBookSnapshot{
-      venue_id: snapshot.venue_id,
-      symbol: snapshot.product_symbol,
-      snapshot: snapshot
-    })
 
     {:reply, :ok, snapshot}
   end
@@ -152,27 +146,21 @@ defmodule Tai.Markets.OrderBook do
     |> Map.keys()
     |> Enum.sort()
     |> Enum.reverse()
-    |> with_price_levels(state.bids)
+    |> with_price_points(state.bids)
   end
 
   defp ordered_asks(state) do
     state.asks
     |> Map.keys()
     |> Enum.sort()
-    |> with_price_levels(state.asks)
+    |> with_price_points(state.asks)
   end
 
-  defp with_price_levels(prices, level_details) do
+  defp with_price_points(prices, levels) do
     prices
     |> Enum.map(fn price ->
-      {size, processed_at, server_changed_at} = level_details[price]
-
-      %PriceLevel{
-        price: price,
-        size: size,
-        processed_at: processed_at,
-        server_changed_at: server_changed_at
-      }
+      size = levels[price]
+      %PricePoint{price: price, size: size}
     end)
   end
 
@@ -196,7 +184,7 @@ defmodule Tai.Markets.OrderBook do
 
   defp drop_prices(price_levels) do
     price_levels
-    |> Enum.filter(fn {_price, {size, _processed_at, _server_changed_at}} -> size == 0 end)
+    |> Enum.filter(fn {_, size} -> size == 0 end)
     |> Enum.map(fn {price, _} -> price end)
   end
 end

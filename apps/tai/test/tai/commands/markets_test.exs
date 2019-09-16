@@ -19,12 +19,12 @@ defmodule Tai.Commands.MarketsTest do
         venue_id: :test_exchange_a,
         product_symbol: :btc_usd,
         bids: %{
-          12_999.99 => {0.000021, Timex.now(), Timex.now()},
-          12_999.98 => {1.0, nil, nil}
+          12_999.99 => 0.000021,
+          12_999.98 => 1.0
         },
         asks: %{
-          13_000.01 => {1.11, Timex.now(), Timex.now()},
-          13_000.02 => {1.25, nil, nil}
+          13_000.01 => 1.11,
+          13_000.02 => 1.25
         }
       }
       |> Tai.Markets.OrderBook.replace()

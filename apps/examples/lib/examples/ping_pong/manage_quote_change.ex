@@ -1,6 +1,6 @@
 defmodule Examples.PingPong.ManageQuoteChange do
   alias Examples.PingPong.{CreateEntryOrder, EntryPrice}
-  alias Tai.Markets.{PriceLevel, Quote}
+  alias Tai.Markets.{PricePoint, Quote}
   alias Tai.Trading.{Orders, Order}
   alias Tai.Advisor.State
 
@@ -10,11 +10,11 @@ defmodule Examples.PingPong.ManageQuoteChange do
 
   @spec with_all_quotes(market_quote) ::
           {:ok, market_quote} | {:error, :no_bid | :no_ask | :no_bid_or_ask}
-  def with_all_quotes(%Quote{bid: %PriceLevel{}, ask: %PriceLevel{}} = market_quote),
+  def with_all_quotes(%Quote{bid: %PricePoint{}, ask: %PricePoint{}} = market_quote),
     do: {:ok, market_quote}
 
-  def with_all_quotes(%Quote{bid: nil, ask: %PriceLevel{}}), do: {:error, :no_bid}
-  def with_all_quotes(%Quote{bid: %PriceLevel{}, ask: nil}), do: {:error, :no_ask}
+  def with_all_quotes(%Quote{bid: nil, ask: %PricePoint{}}), do: {:error, :no_bid}
+  def with_all_quotes(%Quote{bid: %PricePoint{}, ask: nil}), do: {:error, :no_ask}
   def with_all_quotes(%Quote{bid: nil, ask: nil}), do: {:error, :no_bid_or_ask}
 
   @spec manage_entry_order({:ok, market_quote}, state, module) :: {:ok, run_store}

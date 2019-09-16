@@ -54,8 +54,8 @@ defmodule Tai.VenueAdapters.Gdax.OrderBookFeed do
     snapshot = %Tai.Markets.OrderBook{
       venue_id: state.feed_id,
       product_symbol: symbol,
-      bids: bids |> OrderBookFeed.Snapshot.normalize(received_at),
-      asks: asks |> OrderBookFeed.Snapshot.normalize(received_at),
+      bids: bids |> OrderBookFeed.Snapshot.normalize(),
+      asks: asks |> OrderBookFeed.Snapshot.normalize(),
       last_received_at: received_at
     }
 

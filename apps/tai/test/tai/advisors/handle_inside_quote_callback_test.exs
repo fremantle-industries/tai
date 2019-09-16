@@ -56,8 +56,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     snapshot = %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
+      bids: %{101.2 => 1.0},
+      asks: %{101.3 => 0.1}
     }
 
     Tai.Markets.OrderBook.replace(snapshot)
@@ -66,21 +66,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
                     %Tai.Advisor.State{}}
 
     assert %Tai.Markets.Quote{} = received_market_quote
-
-    assert %Tai.Markets.PriceLevel{
-             price: 101.2,
-             size: 1.0,
-             processed_at: nil,
-             server_changed_at: nil
-           } = received_market_quote.bid
-
-    assert %Tai.Markets.PriceLevel{
-             price: 101.3,
-             size: 0.1,
-             processed_at: nil,
-             server_changed_at: nil
-           } = received_market_quote.ask
-
+    assert %Tai.Markets.PricePoint{price: 101.2, size: 1.0} = received_market_quote.bid
+    assert %Tai.Markets.PricePoint{price: 101.3, size: 0.1} = received_market_quote.ask
     assert received_snapshot == snapshot
   end
 
@@ -90,8 +77,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     changes_1 = %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
+      bids: %{101.2 => 1.0},
+      asks: %{101.3 => 0.1}
     }
 
     Tai.Markets.OrderBook.update(changes_1)
@@ -100,18 +87,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       :my_venue,
       :btc_usd,
       %Tai.Markets.Quote{
-        bid: %Tai.Markets.PriceLevel{
-          price: 101.2,
-          size: 1.0,
-          processed_at: nil,
-          server_changed_at: nil
-        },
-        ask: %Tai.Markets.PriceLevel{
-          price: 101.3,
-          size: 0.1,
-          processed_at: nil,
-          server_changed_at: nil
-        }
+        bid: %Tai.Markets.PricePoint{price: 101.2, size: 1.0},
+        ask: %Tai.Markets.PricePoint{price: 101.3, size: 0.1}
       },
       ^changes_1,
       %Tai.Advisor.State{}
@@ -120,7 +97,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     changes_2 = %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
-      bids: %{101.2 => {1.1, nil, nil}},
+      bids: %{101.2 => 1.1},
       asks: %{}
     }
 
@@ -130,18 +107,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       :my_venue,
       :btc_usd,
       %Tai.Markets.Quote{
-        bid: %Tai.Markets.PriceLevel{
-          price: 101.2,
-          size: 1.1,
-          processed_at: nil,
-          server_changed_at: nil
-        },
-        ask: %Tai.Markets.PriceLevel{
-          price: 101.3,
-          size: 0.1,
-          processed_at: nil,
-          server_changed_at: nil
-        }
+        bid: %Tai.Markets.PricePoint{price: 101.2, size: 1.1},
+        ask: %Tai.Markets.PricePoint{price: 101.3, size: 0.1}
       },
       ^changes_2,
       %Tai.Advisor.State{}
@@ -154,8 +121,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     changes_1 = %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
+      bids: %{101.2 => 1.0},
+      asks: %{101.3 => 0.1}
     }
 
     Tai.Markets.OrderBook.update(changes_1)
@@ -164,18 +131,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       :my_venue,
       :btc_usd,
       %Tai.Markets.Quote{
-        bid: %Tai.Markets.PriceLevel{
-          price: 101.2,
-          size: 1.0,
-          processed_at: nil,
-          server_changed_at: nil
-        },
-        ask: %Tai.Markets.PriceLevel{
-          price: 101.3,
-          size: 0.1,
-          processed_at: nil,
-          server_changed_at: nil
-        }
+        bid: %Tai.Markets.PricePoint{price: 101.2, size: 1.0},
+        ask: %Tai.Markets.PricePoint{price: 101.3, size: 0.1}
       },
       ^changes_1,
       %Tai.Advisor.State{}
@@ -185,7 +142,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       venue_id: :my_venue,
       product_symbol: :btc_usd,
       bids: %{},
-      asks: %{101.3 => {0.2, nil, nil}}
+      asks: %{101.3 => 0.2}
     }
 
     Tai.Markets.OrderBook.update(changes_2)
@@ -194,18 +151,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       :my_venue,
       :btc_usd,
       %Tai.Markets.Quote{
-        bid: %Tai.Markets.PriceLevel{
-          price: 101.2,
-          size: 1.0,
-          processed_at: nil,
-          server_changed_at: nil
-        },
-        ask: %Tai.Markets.PriceLevel{
-          price: 101.3,
-          size: 0.2,
-          processed_at: nil,
-          server_changed_at: nil
-        }
+        bid: %Tai.Markets.PricePoint{price: 101.2, size: 1.0},
+        ask: %Tai.Markets.PricePoint{price: 101.3, size: 0.2}
       },
       ^changes_2,
       %Tai.Advisor.State{}
@@ -218,8 +165,8 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     snapshot = %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.1, nil, nil}}
+      bids: %{101.2 => 1.0},
+      asks: %{101.3 => 0.1}
     }
 
     Tai.Markets.OrderBook.replace(snapshot)
@@ -236,7 +183,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
       venue_id: :my_venue,
       product_symbol: :btc_usd,
       bids: %{},
-      asks: %{101.3 => {0.2, nil, nil}}
+      asks: %{101.3 => 0.2}
     }
 
     Tai.Markets.OrderBook.update(changes)
@@ -260,14 +207,14 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     @snapshot %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.2, nil, nil}}
+      bids: %{101.2 => 1.0},
+      asks: %{101.3 => 0.2}
     }
     @changes %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
       bids: %{},
-      asks: %{101.3 => {0.7, nil, nil}}
+      asks: %{101.3 => 0.7}
     }
 
     test "broadcasts an event" do
@@ -304,14 +251,14 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     @snapshot %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
-      bids: %{101.2 => {1.0, nil, nil}},
-      asks: %{101.3 => {0.2, nil, nil}}
+      bids: %{101.2 => 1.0},
+      asks: %{101.3 => 0.2}
     }
     @changes %Tai.Markets.OrderBook{
       venue_id: :my_venue,
       product_symbol: :btc_usd,
       bids: %{},
-      asks: %{101.3 => {0.7, nil, nil}}
+      asks: %{101.3 => 0.7}
     }
 
     test "broadcasts an event" do
