@@ -68,25 +68,6 @@ defmodule Tai.Trading.OrderStore do
     {:reply, response, state}
   end
 
-  defp normalize_attrs(
-         update_attrs,
-         %Order{cumulative_qty: cumulative_qty},
-         %OrderStore.Actions.Amend{leaves_qty: leaves_qty}
-       ) do
-    qty = Decimal.add(cumulative_qty, leaves_qty)
-    update_attrs |> Map.put(:qty, qty)
-  end
-
-  defp normalize_attrs(
-         update_attrs,
-         %Order{cumulative_qty: cumulative_qty},
-         %OrderStore.Actions.Cancel{}
-       ) do
-    update_attrs |> Map.put(:qty, cumulative_qty)
-  end
-
-  defp normalize_attrs(update_attrs, _, _), do: update_attrs
-
   def handle_call(:all, _from, state) do
     response = state.backend.all(state.name)
     {:reply, response, state}
@@ -149,6 +130,25 @@ defmodule Tai.Trading.OrderStore do
 
   @spec to_name(store_id) :: atom
   def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
+
+  defp normalize_attrs(
+         update_attrs,
+         %Order{cumulative_qty: cumulative_qty},
+         %OrderStore.Actions.Amend{leaves_qty: leaves_qty}
+       ) do
+    qty = Decimal.add(cumulative_qty, leaves_qty)
+    update_attrs |> Map.put(:qty, qty)
+  end
+
+  defp normalize_attrs(
+         update_attrs,
+         %Order{cumulative_qty: cumulative_qty},
+         %OrderStore.Actions.Cancel{}
+       ) do
+    update_attrs |> Map.put(:qty, cumulative_qty)
+  end
+
+  defp normalize_attrs(update_attrs, _, _), do: update_attrs
 
   defp format_required([required | []]), do: required
   defp format_required(required), do: required

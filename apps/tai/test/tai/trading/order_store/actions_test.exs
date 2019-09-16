@@ -3,6 +3,10 @@ defmodule Tai.Trading.OrderStore.ActionsTest do
   alias Tai.Trading.OrderStore
 
   setup do
+    on_exit(fn ->
+      Application.stop(:tai)
+    end)
+
     {:ok, _} = Application.ensure_all_started(:tai)
     Tai.Settings.enable_send_orders!()
 

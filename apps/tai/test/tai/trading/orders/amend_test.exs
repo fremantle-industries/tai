@@ -89,7 +89,7 @@ defmodule Tai.Trading.Orders.AmendTest do
 
         assert amended_order.price == amend_price
         assert amended_order.leaves_qty == amend_qty
-        assert amended_order.qty == @original_qty
+        assert amended_order.qty == amend_qty
         assert %DateTime{} = amended_order.updated_at
         assert Timex.compare(amended_order.updated_at, pending_amend_order.updated_at) == 1
         assert %DateTime{} = amended_order.last_received_at
@@ -175,7 +175,7 @@ defmodule Tai.Trading.Orders.AmendTest do
 
         assert amended_order.price == amend_price
         assert amended_order.leaves_qty == amend_qty
-        assert amended_order.qty == @original_qty
+        assert amended_order.qty == amend_qty
         assert %DateTime{} = amended_order.updated_at
         assert Timex.compare(amended_order.updated_at, pending_amend_order.updated_at) == 1
         assert %DateTime{} = amended_order.last_received_at
