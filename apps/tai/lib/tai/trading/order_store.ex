@@ -77,6 +77,14 @@ defmodule Tai.Trading.OrderStore do
     update_attrs |> Map.put(:qty, qty)
   end
 
+  defp normalize_attrs(
+         update_attrs,
+         %Order{cumulative_qty: cumulative_qty},
+         %OrderStore.Actions.Cancel{}
+       ) do
+    update_attrs |> Map.put(:qty, cumulative_qty)
+  end
+
   defp normalize_attrs(update_attrs, _, _), do: update_attrs
 
   def handle_call(:all, _from, state) do
