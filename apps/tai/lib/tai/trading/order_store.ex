@@ -43,13 +43,18 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:update, action}, _from, state) do
-    required = action |> OrderStore.Action.required() |> List.wrap()
-    attrs = OrderStore.Action.attrs(action)
-
     response =
       with {:ok, old_order} <- state.backend.find_by_client_id(action.client_id, state.name) do
+        required = action |> OrderStore.Action.required() |> List.wrap()
+
         if Enum.member?(required, old_order.status) do
-          updated_order = old_order |> Map.merge(attrs) |> Map.put(:updated_at, Timex.now())
+          new_attrs =
+            action
+            |> OrderStore.Action.attrs()
+            |> normalize_attrs(old_order, action)
+            |> Map.put(:updated_at, Timex.now())
+
+          updated_order = old_order |> Map.merge(new_attrs)
           state.backend.update(updated_order, state.name)
           {:ok, {old_order, updated_order}}
         else
@@ -62,6 +67,17 @@ defmodule Tai.Trading.OrderStore do
 
     {:reply, response, state}
   end
+
+  defp normalize_attrs(
+         update_attrs,
+         %Order{cumulative_qty: cumulative_qty},
+         %OrderStore.Actions.Amend{leaves_qty: leaves_qty}
+       ) do
+    qty = Decimal.add(cumulative_qty, leaves_qty)
+    update_attrs |> Map.put(:qty, qty)
+  end
+
+  defp normalize_attrs(update_attrs, _, _), do: update_attrs
 
   def handle_call(:all, _from, state) do
     response = state.backend.all(state.name)
