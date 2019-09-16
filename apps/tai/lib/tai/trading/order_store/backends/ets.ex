@@ -1,5 +1,4 @@
 defmodule Tai.Trading.OrderStore.Backends.ETS do
-  alias Tai.Trading.OrderStore.Action
   alias Tai.Trading.Order
 
   @type order :: Order.t()
@@ -26,26 +25,10 @@ defmodule Tai.Trading.OrderStore.Backends.ETS do
   @doc """
   Update an existing order in the ETS table
   """
-  @spec update(action, table_name) ::
-          {:ok, {old :: order, updated :: order}}
-          | {:error,
-             {:not_found, action}
-             | {:invalid_status, current :: status, required :: [status], action}}
-  def update(action, table_name) do
-    with required <- action |> Action.required() |> List.wrap(),
-         attrs <- Action.attrs(action),
-         {:ok, old_order} <- find_by_client_id(action.client_id, table_name) do
-      if Enum.member?(required, old_order.status) do
-        updated_order = old_order |> Map.merge(attrs) |> Map.put(:updated_at, Timex.now())
-        upsert(updated_order, table_name)
-        {:ok, {old_order, updated_order}}
-      else
-        reason = {:invalid_status, old_order.status, required |> format_required, action}
-        {:error, reason}
-      end
-    else
-      {:error, :not_found} -> {:error, {:not_found, action}}
-    end
+  @spec update(action, table_name) :: {:ok, order}
+  def update(order, table_name) do
+    true = upsert(order, table_name)
+    {:ok, order}
   end
 
   @doc """
@@ -74,7 +57,4 @@ defmodule Tai.Trading.OrderStore.Backends.ETS do
     record = {order.client_id, order}
     :ets.insert(table_name, record)
   end
-
-  defp format_required([required | []]), do: required
-  defp format_required(required), do: required
 end

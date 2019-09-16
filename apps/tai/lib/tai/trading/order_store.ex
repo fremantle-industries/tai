@@ -1,16 +1,16 @@
 defmodule Tai.Trading.OrderStore do
   @moduledoc """
-  ETS backed store for the local state of orders
+  Track and manage the local state of orders with a swappable backend
   """
 
   use GenServer
-  alias Tai.Trading.{Order, OrderSubmissions}
+  alias Tai.Trading.{Order, OrderSubmissions, OrderStore}
 
   @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
   @type status :: Order.status()
   @type client_id :: Order.client_id()
-  @type action :: term
+  @type action :: OrderStore.Action.t()
   @type store_id :: atom
 
   @default_id :default
@@ -43,7 +43,23 @@ defmodule Tai.Trading.OrderStore do
   end
 
   def handle_call({:update, action}, _from, state) do
-    response = state.backend.update(action, state.name)
+    required = action |> OrderStore.Action.required() |> List.wrap()
+    attrs = OrderStore.Action.attrs(action)
+
+    response =
+      with {:ok, old_order} <- state.backend.find_by_client_id(action.client_id, state.name) do
+        if Enum.member?(required, old_order.status) do
+          updated_order = old_order |> Map.merge(attrs) |> Map.put(:updated_at, Timex.now())
+          state.backend.update(updated_order, state.name)
+          {:ok, {old_order, updated_order}}
+        else
+          reason = {:invalid_status, old_order.status, required |> format_required, action}
+          {:error, reason}
+        end
+      else
+        {:error, :not_found} -> {:error, {:not_found, action}}
+      end
+
     {:reply, response, state}
   end
 
@@ -109,4 +125,7 @@ defmodule Tai.Trading.OrderStore do
 
   @spec to_name(store_id) :: atom
   def to_name(store_id), do: :"#{__MODULE__}_#{store_id}"
+
+  defp format_required([required | []]), do: required
+  defp format_required(required), do: required
 end
