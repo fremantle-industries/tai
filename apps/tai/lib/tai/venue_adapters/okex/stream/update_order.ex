@@ -7,7 +7,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   @fully_filled "2"
   @submitting "3"
 
-  @date_format "{ISO:Extended}"
+  @date_format "{ISO:Extended:Z}"
 
   def update(
         client_id,

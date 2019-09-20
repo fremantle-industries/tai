@@ -188,3 +188,5 @@ config :exvcr,
 config :echo_boy, port: 4100
 
 config :ex_bitmex, domain: "testnet.bitmex.com"
+
+config :tzdata, :data_dir, "prev/tzdata_release_ets"
