@@ -10,23 +10,23 @@ defmodule Tai.Events.Trade do
           venue_trade_id: String.t()
         }
 
-  @enforce_keys [
-    :venue_id,
-    :symbol,
-    :received_at,
-    :timestamp,
-    :price,
-    :qty,
-    :side
-  ]
-  defstruct [
-    :venue_id,
-    :symbol,
-    :received_at,
-    :timestamp,
-    :price,
-    :qty,
-    :side,
-    :venue_trade_id
-  ]
+  @enforce_keys ~w(
+    venue_id
+    symbol
+    received_at
+    timestamp
+    price
+    qty
+    side
+  )a
+  defstruct ~w(
+    venue_id
+    symbol
+    received_at
+    timestamp
+    price
+    qty
+    side
+    venue_trade_id
+  )a
 end
