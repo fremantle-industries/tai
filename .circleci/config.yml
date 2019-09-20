@@ -12,36 +12,36 @@ jobs:
 
       - restore_cache:
           keys:
-            - hex-packages-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - hex-packages-elixir-1.8-{{ arch }}-{{ .Branch }}
+            - hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
             - hex-packages-elixir-1.8
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
       - save_cache:
-          key: hex-packages-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - deps
 
       - restore_cache:
           keys:
-            - test-build-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - test-build-elixir-1.8-{{ arch }}-{{ .Branch }}
+            - test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
             - test-build-elixir-1.8
       - run: mix test
       - save_cache:
-          key: test-build-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/test
 
       - restore_cache:
           keys:
-            - dialyzer-plt-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - dialyzer-plt-elixir-1.8-{{ arch }}-{{ .Branch }}
+            - dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
             - dialyzer-plt-elixir-1.8
       - run: mix dialyzer --halt-exit-status
       - save_cache:
-          key: dialyzer-plt-elixir-1.8-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/dev
 
@@ -63,36 +63,36 @@ jobs:
 
       - restore_cache:
           keys:
-            - hex-packages-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - hex-packages-elixir-1.9-{{ arch }}-{{ .Branch }}
+            - hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
             - hex-packages-elixir-1.9
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
       - save_cache:
-          key: hex-packages-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - deps
 
       - restore_cache:
           keys:
-            - test-build-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - test-build-elixir-1.9-{{ arch }}-{{ .Branch }}
+            - test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
             - test-build-elixir-1.9
       - run: mix test
       - save_cache:
-          key: test-build-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/test
 
       - restore_cache:
           keys:
-            - dialyzer-plt-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - dialyzer-plt-elixir-1.9-{{ arch }}-{{ .Branch }}
+            - dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
             - dialyzer-plt-elixir-1.9
       - run: mix dialyzer --halt-exit-status
       - save_cache:
-          key: dialyzer-plt-elixir-1.9-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/dev
 
