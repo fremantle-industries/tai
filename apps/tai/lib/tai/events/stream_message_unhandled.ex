@@ -1,6 +1,9 @@
 defmodule Tai.Events.StreamMessageUnhandled do
-  @type t :: %Tai.Events.StreamMessageUnhandled{
-          venue_id: atom,
+  alias __MODULE__
+
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type t :: %StreamMessageUnhandled{
+          venue_id: venue_id,
           msg: map,
           received_at: DateTime.t()
         }

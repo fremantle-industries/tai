@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   alias Tai.Trading.OrderStore
 
-  @cancelled "-1"
+  @canceled "-1"
   @pending "0"
   @partially_filled "1"
   @fully_filled "2"
@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         %{"status" => status, "timestamp" => timestamp},
         received_at
       )
-      when status == @cancelled do
+      when status == @canceled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
 
     %OrderStore.Actions.PassiveCancel{
