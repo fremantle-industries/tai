@@ -21,7 +21,10 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   end
 
   @spec init(state) :: {:ok, state}
-  def init(state), do: {:ok, state}
+  def init(state) do
+    Process.flag(:trap_exit, true)
+    {:ok, state}
+  end
 
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
@@ -56,7 +59,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
       msg: msg,
       received_at: received_at
     }
-    |> Events.info()
+    |> Events.warn()
 
     {:noreply, state}
   end
@@ -71,6 +74,20 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
     new_state = state |> Map.put(:tasks, new_tasks)
     {:noreply, new_state}
   end
+
+  def handle_info({:DOWN, reference, :process, _pid, reason}, state) do
+    %Events.StreamError{
+      venue_id: state.venue,
+      reason: reason
+    }
+    |> Events.error()
+
+    new_tasks = state.tasks |> Map.delete(reference)
+    new_state = state |> Map.put(:tasks, new_tasks)
+    {:noreply, new_state}
+  end
+
+  def handle_info({:EXIT, _, _}, state), do: {:noreply, state}
 
   defp notify(:ok), do: nil
 
