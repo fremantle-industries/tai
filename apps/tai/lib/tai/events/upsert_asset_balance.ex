@@ -20,7 +20,7 @@ defimpl Tai.LogEvent, for: Tai.Events.UpsertAssetBalance do
 
     event
     |> Map.take(keys)
-    |> Map.put(:free, event.free |> Decimal.to_string(:normal))
-    |> Map.put(:locked, event.locked |> Decimal.to_string(:normal))
+    |> Map.put(:free, event.free && event.free |> Decimal.to_string(:normal))
+    |> Map.put(:locked, event.locked && event.locked |> Decimal.to_string(:normal))
   end
 end
