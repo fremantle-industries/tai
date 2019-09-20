@@ -8,6 +8,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
+      - run: echo $CACHE_VERSION > cache.version
 
       - restore_cache:
           keys:
@@ -48,7 +49,6 @@ jobs:
 
       - store_artifacts:
           path: apps/tai/log
-
       - store_artifacts:
           path: apps/examples/log
 
@@ -59,6 +59,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
+      - run: echo $CACHE_VERSION > cache.version
 
       - restore_cache:
           keys:
@@ -99,7 +100,6 @@ jobs:
 
       - store_artifacts:
           path: apps/tai/log
-
       - store_artifacts:
           path: apps/examples/log
 
