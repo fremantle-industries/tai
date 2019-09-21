@@ -1,31 +1,20 @@
 defmodule Tai.VenueAdapters.Gdax do
+  alias Tai.VenueAdapters.Gdax.{
+    StreamSupervisor,
+    AssetBalances,
+    MakerTakerFees,
+    Products
+  }
+
   @behaviour Tai.Venues.Adapter
 
-  def stream_supervisor, do: Tai.Venues.NullStreamSupervisor
-
-  def order_book_feed, do: Tai.VenueAdapters.Gdax.OrderBookFeed
-
-  defdelegate products(venue_id), to: Tai.VenueAdapters.Gdax.Products
-
-  defdelegate asset_balances(venue_id, account_id, credentials),
-    to: Tai.VenueAdapters.Gdax.AssetBalances
-
-  defdelegate maker_taker_fees(venue_id, account_id, credentials),
-    to: Tai.VenueAdapters.Gdax.MakerTakerFees
-
-  def positions(_venue_id, _account_id, _credentials) do
-    {:error, :not_supported}
-  end
-
-  def create_order(%Tai.Trading.Order{} = _order, _credentials) do
-    {:error, :not_implemented}
-  end
-
-  def amend_order(_venue_order_id, _attrs, _credentials) do
-    {:error, :not_implemented}
-  end
-
-  def cancel_order(_venue_order_id, _credentials) do
-    {:error, :not_implemented}
-  end
+  def stream_supervisor, do: StreamSupervisor
+  def order_book_feed, do: Tai.VenueAdapters.NullOrderBookFeed
+  defdelegate products(venue_id), to: Products
+  defdelegate asset_balances(venue_id, account_id, credentials), to: AssetBalances
+  defdelegate maker_taker_fees(venue_id, account_id, credentials), to: MakerTakerFees
+  def positions(_venue_id, _account_id, _credentials), do: {:error, :not_supported}
+  def create_order(_order, _credentials), do: {:error, :not_implemented}
+  def amend_order(_venue_order_id, _attrs, _credentials), do: {:error, :not_implemented}
+  def cancel_order(_venue_order_id, _credentials), do: {:error, :not_implemented}
 end
