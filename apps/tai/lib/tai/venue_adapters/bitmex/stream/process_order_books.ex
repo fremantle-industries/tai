@@ -18,9 +18,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBooks do
 
   @spec start_link(venue_id: venue_id, products: [product]) :: GenServer.on_start()
   def start_link(venue_id: venue_id, products: products) do
-    name = venue_id |> to_name()
     stores = products |> build_stores(venue_id)
     state = %State{venue_id: venue_id, stores: stores}
+    name = venue_id |> to_name()
 
     GenServer.start_link(__MODULE__, state, name: name)
   end
