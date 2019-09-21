@@ -1,17 +1,18 @@
 defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   use WebSockex
-  require Logger
   alias Tai.VenueAdapters.Binance.Stream
+
+  defmodule State do
+    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type t :: %State{venue_id: venue_id}
+
+    @enforce_keys ~w(venue_id)a
+    defstruct ~w(venue_id)a
+  end
 
   @type product :: Tai.Venues.Product.t()
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type account_id :: Tai.Venues.Adapter.account_id()
-  @type t :: %Tai.VenueAdapters.Binance.Stream.Connection{
-          venue_id: venue_id
-        }
-
-  @enforce_keys [:venue_id]
-  defstruct [:venue_id]
 
   @spec start_link(
           url: String.t(),
@@ -20,8 +21,10 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
           products: [product]
         ) :: {:ok, pid}
   def start_link(url: url, venue_id: venue_id, account: _, products: products) do
-    conn = %Tai.VenueAdapters.Binance.Stream.Connection{venue_id: venue_id}
-    {:ok, pid} = WebSockex.start_link(url, __MODULE__, conn, name: :"#{__MODULE__}_#{venue_id}")
+    state = %State{venue_id: venue_id}
+    name = :"#{__MODULE__}_#{venue_id}"
+
+    {:ok, pid} = WebSockex.start_link(url, __MODULE__, state, name: name)
     snapshot_order_books(products)
     {:ok, pid}
   end
@@ -62,9 +65,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     end)
   end
 
-  @spec handle_msg(msg :: map, venue_id) :: no_return
-  defp handle_msg(msg, venue_id)
-
   defp handle_msg(%{"data" => %{"e" => "depthUpdate"}} = msg, venue_id) do
     venue_id |> process_order_books(msg)
   end
@@ -75,13 +75,13 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
   defp process_order_books(venue_id, msg) do
     venue_id
-    |> Tai.VenueAdapters.Binance.Stream.ProcessOrderBooks.to_name()
+    |> Stream.ProcessOrderBooks.to_name()
     |> GenServer.cast({msg, Timex.now()})
   end
 
   defp process_messages(venue_id, msg) do
     venue_id
-    |> Tai.VenueAdapters.Binance.Stream.ProcessMessages.to_name()
+    |> Stream.ProcessMessages.to_name()
     |> GenServer.cast({msg, Timex.now()})
   end
 end

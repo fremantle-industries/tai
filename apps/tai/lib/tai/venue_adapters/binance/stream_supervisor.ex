@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   use Supervisor
+  alias Tai.VenueAdapters.Binance.Stream.OrderBookStore
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type channel :: Tai.Venues.Adapter.channel()
@@ -38,6 +39,15 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
         }
       end)
 
+    order_book_stores =
+      products
+      |> Enum.map(fn p ->
+        %{
+          id: OrderBookStore.to_name(venue_id, p.venue_symbol),
+          start: {OrderBookStore, :start_link, [p]}
+        }
+      end)
+
     system = [
       {Tai.VenueAdapters.Binance.Stream.ProcessOrderBooks,
        [venue_id: venue_id, products: products]},
@@ -51,7 +61,7 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
        ]}
     ]
 
-    (order_books ++ system)
+    (order_books ++ order_book_stores ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
 
