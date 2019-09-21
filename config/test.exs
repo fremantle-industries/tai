@@ -189,4 +189,4 @@ config :echo_boy, port: 4100
 
 config :ex_bitmex, domain: "testnet.bitmex.com"
 
-config :tzdata, :data_dir, "prev/tzdata_release_ets"
+config :tzdata, :data_dir, "priv/tzdata_release_ets"
