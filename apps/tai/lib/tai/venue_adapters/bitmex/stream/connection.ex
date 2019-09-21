@@ -1,28 +1,31 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   use WebSockex
-  alias Tai.{Events, Venues, VenueAdapters.Bitmex.Stream}
+  alias Tai.{Events, VenueAdapters.Bitmex.Stream}
 
   defmodule State do
-    @type product :: Venues.Product.t()
-    @type venue_id :: Venues.Adapter.venue_id()
-    @type account_id :: Venues.Adapter.account_id()
+    @type product :: Tai.Venues.Product.t()
+    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type account_id :: Tai.Venues.Adapter.account_id()
     @type channel_name :: atom
+    @type route :: :auth | :order_books | :optional_channels
     @type t :: %State{
             venue: venue_id,
+            routes: %{required(route) => atom},
             channels: [channel_name],
             account: {account_id, map} | nil,
             products: [product],
             opts: map
           }
 
-    @enforce_keys ~w(venue channels products opts)a
-    defstruct ~w(venue channels account products opts)a
+    @enforce_keys ~w(venue routes channels products opts)a
+    defstruct ~w(venue routes channels account products opts)a
   end
 
-  @type product :: Venues.Product.t()
-  @type venue_id :: Venues.Adapter.venue_id()
-  @type account_id :: Venues.Adapter.account_id()
+  @type product :: Tai.Venues.Product.t()
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
   @type account_config :: map
+  @type venue_msg :: map
 
   @spec start_link(
           url: String.t(),
@@ -39,8 +42,15 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
         products: products,
         opts: opts
       ) do
+    routes = %{
+      auth: venue |> Stream.ProcessAuth.to_name(),
+      order_books: venue |> Stream.RouteOrderBooks.to_name(),
+      optional_channels: venue |> Stream.ProcessOptionalChannels.to_name()
+    }
+
     state = %State{
       venue: venue,
+      routes: routes,
       channels: channels,
       account: account,
       products: products,
@@ -190,7 +200,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   def handle_frame({:text, msg}, state) do
     msg
     |> Jason.decode!()
-    |> handle_msg(state.venue)
+    |> handle_msg(state)
 
     {:ok, state}
   end
@@ -219,67 +229,36 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   @heartbeat_ms 20_000
   defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
 
-  @spec handle_msg(msg :: map, venue_id) :: no_return
-  defp handle_msg(msg, venue)
+  @spec handle_msg(venue_msg, State.t()) :: no_return
+  defp handle_msg(msg, state)
 
-  defp handle_msg(%{"limit" => %{"remaining" => remaining}, "version" => _}, venue) do
+  defp handle_msg(%{"limit" => %{"remaining" => remaining}, "version" => _}, state) do
     Events.info(%Events.BitmexStreamConnectionLimitDetails{
-      venue_id: venue,
+      venue_id: state.venue,
       remaining: remaining
     })
   end
 
-  defp handle_msg(%{"request" => _, "subscribe" => _} = msg, venue) do
-    venue |> process_order_books(msg)
+  defp handle_msg(%{"request" => _, "subscribe" => _} = msg, state) do
+    msg |> forward(:order_books, state)
   end
 
-  defp handle_msg(%{"table" => "orderBookL2_25"} = msg, venue) do
-    venue |> process_order_books(msg)
+  defp handle_msg(%{"table" => "orderBookL2_25"} = msg, state) do
+    msg |> forward(:order_books, state)
   end
 
-  defp handle_msg(%{"table" => "position"} = msg, venue) do
-    venue |> process_auth_messages(msg)
+  @auth_tables ~w(position wallet margin order execution transact)
+  defp handle_msg(%{"table" => table} = msg, state) when table in @auth_tables do
+    msg |> forward(:auth, state)
   end
 
-  defp handle_msg(%{"table" => "wallet"} = msg, venue) do
-    venue |> process_auth_messages(msg)
+  defp handle_msg(msg, state) do
+    msg |> forward(:optional_channels, state)
   end
 
-  defp handle_msg(%{"table" => "margin"} = msg, venue) do
-    venue |> process_auth_messages(msg)
-  end
-
-  defp handle_msg(%{"table" => "order"} = msg, venue) do
-    venue |> process_auth_messages(msg)
-  end
-
-  defp handle_msg(%{"table" => "execution"} = msg, venue) do
-    venue |> process_auth_messages(msg)
-  end
-
-  defp handle_msg(%{"table" => "transact"} = msg, venue) do
-    venue |> process_auth_messages(msg)
-  end
-
-  defp handle_msg(msg, venue) do
-    venue |> process_messages(msg)
-  end
-
-  defp process_order_books(venue, msg) do
-    venue
-    |> Stream.ProcessOrderBooks.to_name()
-    |> GenServer.cast({msg, Timex.now()})
-  end
-
-  defp process_auth_messages(venue, msg) do
-    venue
-    |> Stream.ProcessAuth.to_name()
-    |> GenServer.cast({msg, Timex.now()})
-  end
-
-  defp process_messages(venue, msg) do
-    venue
-    |> Stream.ProcessMessages.to_name()
+  defp forward(msg, to, state) do
+    state.routes
+    |> Map.fetch!(to)
     |> GenServer.cast({msg, Timex.now()})
   end
 end

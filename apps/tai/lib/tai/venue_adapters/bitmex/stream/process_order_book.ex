@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Bitmex.Stream.OrderBookStore do
+defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBook do
   use GenServer
 
   defmodule State do

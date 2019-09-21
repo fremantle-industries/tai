@@ -1,6 +1,14 @@
 defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   use Supervisor
 
+  alias Tai.VenueAdapters.Bitmex.Stream.{
+    Connection,
+    ProcessAuth,
+    ProcessOptionalChannels,
+    ProcessOrderBook,
+    RouteOrderBooks
+  }
+
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
@@ -14,7 +22,8 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
         ) ::
           Supervisor.on_start()
   def start_link([venue_id: venue_id, channels: _, accounts: _, products: _, opts: _] = args) do
-    Supervisor.start_link(__MODULE__, args, name: :"#{__MODULE__}_#{venue_id}")
+    name = venue_id |> to_name()
+    Supervisor.start_link(__MODULE__, args, name: name)
   end
 
   # TODO: Make this configurable. Could this come from opts?
@@ -27,43 +36,14 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
         products: products,
         opts: opts
       ) do
-    # TODO: Potentially this could use new order books? Send the change quote
-    # event to subscribing advisors?
-    order_books =
-      products
-      |> Enum.map(fn p ->
-        name = Tai.Markets.OrderBook.to_name(venue_id, p.symbol)
-
-        %{
-          id: name,
-          start: {
-            # TODO: This could just pass the product struct. Use deprecate to switch over
-            Tai.Markets.OrderBook,
-            :start_link,
-            [[feed_id: venue_id, symbol: p.symbol]]
-          }
-        }
-      end)
-
-    order_book_stores =
-      products
-      |> Enum.map(fn p ->
-        %{
-          id: Tai.VenueAdapters.Bitmex.Stream.OrderBookStore.to_name(venue_id, p.venue_symbol),
-          start: {
-            Tai.VenueAdapters.Bitmex.Stream.OrderBookStore,
-            :start_link,
-            [[venue_id: venue_id, symbol: p.symbol, venue_symbol: p.venue_symbol]]
-          }
-        }
-      end)
+    order_books = build_order_books(products)
+    order_book_stores = build_order_book_stores(products)
 
     system = [
-      {Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBooks,
-       [venue_id: venue_id, products: products]},
-      {Tai.VenueAdapters.Bitmex.Stream.ProcessAuth, [venue_id: venue_id]},
-      {Tai.VenueAdapters.Bitmex.Stream.ProcessMessages, [venue_id: venue_id]},
-      {Tai.VenueAdapters.Bitmex.Stream.Connection,
+      {RouteOrderBooks, [venue_id: venue_id, products: products]},
+      {ProcessAuth, [venue_id: venue_id]},
+      {ProcessOptionalChannels, [venue_id: venue_id]},
+      {Connection,
        [
          url: @endpoint,
          venue: venue_id,
@@ -76,5 +56,41 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
 
     (order_books ++ order_book_stores ++ system)
     |> Supervisor.init(strategy: :one_for_one)
+  end
+
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
+  # TODO: Potentially this could use new order books? Send the change quote
+  # event to subscribing advisors?
+  defp build_order_books(products) do
+    products
+    |> Enum.map(fn p ->
+      name = Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol)
+
+      %{
+        id: name,
+        start: {
+          # TODO: This could just pass the product struct. Use deprecate to switch over
+          Tai.Markets.OrderBook,
+          :start_link,
+          [[feed_id: p.venue_id, symbol: p.symbol]]
+        }
+      }
+    end)
+  end
+
+  defp build_order_book_stores(products) do
+    products
+    |> Enum.map(fn p ->
+      %{
+        id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),
+        start: {
+          ProcessOrderBook,
+          :start_link,
+          [[venue_id: p.venue_id, symbol: p.symbol, venue_symbol: p.venue_symbol]]
+        }
+      }
+    end)
   end
 end
