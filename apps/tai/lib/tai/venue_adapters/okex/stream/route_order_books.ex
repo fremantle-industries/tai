@@ -1,6 +1,6 @@
-defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBooks do
+defmodule Tai.VenueAdapters.OkEx.Stream.RouteOrderBooks do
   use GenServer
-  alias Tai.VenueAdapters.OkEx.Stream.OrderBookStore
+  alias Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -19,7 +19,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBooks do
 
   @spec start_link(venue: venue_id, products: [product]) :: GenServer.on_start()
   def start_link(venue: venue, products: products) do
-    stores = products |> build_stores(venue)
+    stores = products |> build_stores()
     state = %State{venue: venue, stores: stores}
     name = venue |> to_name()
 
@@ -58,11 +58,11 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBooks do
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-  defp build_stores(products, venue_id) do
+  defp build_stores(products) do
     products
     |> Enum.reduce(
       %{},
-      &Map.put(&2, &1.venue_symbol, venue_id |> OrderBookStore.to_name(&1.venue_symbol))
+      &Map.put(&2, &1.venue_symbol, &1.venue_id |> ProcessOrderBook.to_name(&1.venue_symbol))
     )
   end
 

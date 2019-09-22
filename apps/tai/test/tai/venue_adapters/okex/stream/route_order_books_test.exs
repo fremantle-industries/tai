@@ -1,16 +1,16 @@
-defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBooksTest do
+defmodule Tai.VenueAdapters.OkEx.Stream.RouteOrderBooksTest do
   use ExUnit.Case, async: false
-  alias Tai.VenueAdapters.OkEx.Stream.{OrderBookStore, ProcessOrderBooks}
+  alias Tai.VenueAdapters.OkEx.Stream.{ProcessOrderBook, RouteOrderBooks}
 
   @venue :venue_a
   @venue_symbol "BTC-USD-SWAP"
-  @product struct(Tai.Venues.Product, venue_symbol: @venue_symbol)
+  @product struct(Tai.Venues.Product, venue_id: @venue, venue_symbol: @venue_symbol)
   @received_at Timex.now()
 
   setup do
-    name = OrderBookStore.to_name(@venue, @venue_symbol)
+    name = ProcessOrderBook.to_name(@venue, @venue_symbol)
     Process.register(self(), name)
-    {:ok, pid} = start_supervised({ProcessOrderBooks, [venue: @venue, products: [@product]]})
+    {:ok, pid} = start_supervised({RouteOrderBooks, [venue: @venue, products: [@product]]})
 
     {:ok, %{pid: pid}}
   end

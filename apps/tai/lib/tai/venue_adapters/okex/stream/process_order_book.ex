@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.OkEx.Stream.OrderBookStore do
+defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
   use GenServer
 
   defmodule State do
