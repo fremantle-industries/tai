@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Binance.Stream.OrderBookStore do
+defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBook do
   use GenServer
 
   defmodule State do

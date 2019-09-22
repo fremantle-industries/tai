@@ -1,6 +1,6 @@
-defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBooks do
+defmodule Tai.VenueAdapters.Binance.Stream.RouteOrderBooks do
   use GenServer
-  alias Tai.VenueAdapters.Binance.Stream.OrderBookStore
+  alias Tai.VenueAdapters.Binance.Stream.ProcessOrderBook
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -47,7 +47,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBooks do
     products
     |> Enum.reduce(
       %{},
-      &Map.put(&2, &1.venue_symbol, &1.venue_id |> OrderBookStore.to_name(&1.venue_symbol))
+      &Map.put(&2, &1.venue_symbol, &1.venue_id |> ProcessOrderBook.to_name(&1.venue_symbol))
     )
   end
 

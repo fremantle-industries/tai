@@ -1,6 +1,6 @@
-defmodule Tai.VenueAdapters.Binance.Stream.OrderBookStoreTest do
+defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
   use ExUnit.Case, async: false
-  alias Tai.VenueAdapters.Binance.Stream.OrderBookStore
+  alias Tai.VenueAdapters.Binance.Stream.ProcessOrderBook
   alias Tai.Markets.{OrderBook, PricePoint}
 
   @venue :venue_a
@@ -17,7 +17,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.OrderBookStoreTest do
     start_supervised!({Tai.Events, 1})
 
     {:ok, book_pid} = start_supervised({OrderBook, [venue: @venue, symbol: @symbol]})
-    {:ok, store_pid} = start_supervised({OrderBookStore, @product})
+    {:ok, store_pid} = start_supervised({ProcessOrderBook, @product})
 
     {:ok, %{book_pid: book_pid, store_pid: store_pid}}
   end

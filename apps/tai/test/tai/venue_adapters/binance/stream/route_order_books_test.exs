@@ -1,6 +1,6 @@
-defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBooksTest do
+defmodule Tai.VenueAdapters.Binance.Stream.RouteOrderBooksTest do
   use ExUnit.Case, async: false
-  alias Tai.VenueAdapters.Binance.Stream.{OrderBookStore, ProcessOrderBooks}
+  alias Tai.VenueAdapters.Binance.Stream.{ProcessOrderBook, RouteOrderBooks}
 
   @venue :venue_a
   @venue_symbol "BTC_USD"
@@ -8,9 +8,9 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBooksTest do
   @received_at Timex.now()
 
   setup do
-    name = OrderBookStore.to_name(@venue, @venue_symbol)
+    name = ProcessOrderBook.to_name(@venue, @venue_symbol)
     Process.register(self(), name)
-    {:ok, pid} = start_supervised({ProcessOrderBooks, [venue_id: @venue, products: [@product]]})
+    {:ok, pid} = start_supervised({RouteOrderBooks, [venue_id: @venue, products: [@product]]})
 
     {:ok, %{pid: pid}}
   end

@@ -1,6 +1,12 @@
 defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   use Supervisor
-  alias Tai.VenueAdapters.Binance.Stream.OrderBookStore
+
+  alias Tai.VenueAdapters.Binance.Stream.{
+    Connection,
+    ProcessOptionalChannels,
+    ProcessOrderBook,
+    RouteOrderBooks
+  }
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type channel :: Tai.Venues.Adapter.channel()
@@ -22,37 +28,13 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   @base_url "wss://stream.binance.com:9443/stream"
 
   def init(venue_id: venue_id, channels: _, accounts: accounts, products: products, opts: _) do
-    # TODO: Potentially this could use new order books? Send the change quote
-    # event to subscribing advisors?
-    order_books =
-      products
-      |> Enum.map(fn p ->
-        name = Tai.Markets.OrderBook.to_name(venue_id, p.symbol)
-
-        %{
-          id: name,
-          start: {
-            Tai.Markets.OrderBook,
-            :start_link,
-            [[feed_id: venue_id, symbol: p.symbol]]
-          }
-        }
-      end)
-
-    order_book_stores =
-      products
-      |> Enum.map(fn p ->
-        %{
-          id: OrderBookStore.to_name(venue_id, p.venue_symbol),
-          start: {OrderBookStore, :start_link, [p]}
-        }
-      end)
+    order_books = build_order_books(products)
+    order_book_stores = build_order_book_stores(products)
 
     system = [
-      {Tai.VenueAdapters.Binance.Stream.ProcessOrderBooks,
-       [venue_id: venue_id, products: products]},
-      {Tai.VenueAdapters.Binance.Stream.ProcessMessages, [venue_id: venue_id]},
-      {Tai.VenueAdapters.Binance.Stream.Connection,
+      {RouteOrderBooks, [venue_id: venue_id, products: products]},
+      {ProcessOptionalChannels, [venue_id: venue_id]},
+      {Connection,
        [
          url: products |> url(),
          venue_id: venue_id,
@@ -74,5 +56,33 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
       |> Enum.join("/")
 
     "#{@base_url}?streams=#{streams}"
+  end
+
+  # TODO: Potentially this could use new order books? Send the change quote
+  # event to subscribing advisors?
+  defp build_order_books(products) do
+    products
+    |> Enum.map(fn p ->
+      name = Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol)
+
+      %{
+        id: name,
+        start: {
+          Tai.Markets.OrderBook,
+          :start_link,
+          [[feed_id: p.venue_id, symbol: p.symbol]]
+        }
+      }
+    end)
+  end
+
+  defp build_order_book_stores(products) do
+    products
+    |> Enum.map(fn p ->
+      %{
+        id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),
+        start: {ProcessOrderBook, :start_link, [p]}
+      }
+    end)
   end
 end

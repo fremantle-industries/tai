@@ -4,10 +4,14 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
-    @type t :: %State{venue_id: venue_id}
+    @type route :: :order_books | :optional_channels
+    @type t :: %State{
+            venue_id: venue_id,
+            routes: %{required(route) => atom}
+          }
 
-    @enforce_keys ~w(venue_id)a
-    defstruct ~w(venue_id)a
+    @enforce_keys ~w(venue_id routes)a
+    defstruct ~w(venue_id routes)a
   end
 
   @type product :: Tai.Venues.Product.t()
@@ -21,7 +25,12 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
           products: [product]
         ) :: {:ok, pid}
   def start_link(url: url, venue_id: venue_id, account: _, products: products) do
-    state = %State{venue_id: venue_id}
+    routes = %{
+      order_books: venue_id |> Stream.RouteOrderBooks.to_name(),
+      optional_channels: venue_id |> Stream.ProcessOptionalChannels.to_name()
+    }
+
+    state = %State{venue_id: venue_id, routes: routes}
     name = :"#{__MODULE__}_#{venue_id}"
 
     {:ok, pid} = WebSockex.start_link(url, __MODULE__, state, name: name)
@@ -46,7 +55,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   def handle_frame({:text, msg}, state) do
     msg
     |> Jason.decode!()
-    |> handle_msg(state.venue_id)
+    |> handle_msg(state)
 
     {:ok, state}
   end
@@ -65,23 +74,17 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     end)
   end
 
-  defp handle_msg(%{"data" => %{"e" => "depthUpdate"}} = msg, venue_id) do
-    venue_id |> process_order_books(msg)
+  defp handle_msg(%{"data" => %{"e" => "depthUpdate"}} = msg, state) do
+    msg |> forward(:order_books, state)
   end
 
-  defp handle_msg(msg, venue_id) do
-    venue_id |> process_messages(msg)
+  defp handle_msg(msg, state) do
+    msg |> forward(:optional_channels, state)
   end
 
-  defp process_order_books(venue_id, msg) do
-    venue_id
-    |> Stream.ProcessOrderBooks.to_name()
-    |> GenServer.cast({msg, Timex.now()})
-  end
-
-  defp process_messages(venue_id, msg) do
-    venue_id
-    |> Stream.ProcessMessages.to_name()
+  defp forward(msg, to, state) do
+    state.routes
+    |> Map.fetch!(to)
     |> GenServer.cast({msg, Timex.now()})
   end
 end
