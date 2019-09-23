@@ -6,12 +6,17 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
   @venue :venue_a
   @symbol :xbtusd
   @venue_symbol "XBTUSD"
+  @product struct(Tai.Venues.Product,
+             venue_id: @venue,
+             symbol: @symbol,
+             venue_symbol: @venue_symbol
+           )
 
   setup do
     start_supervised!(Tai.PubSub)
     start_supervised!({Tai.Events, 1})
 
-    {:ok, book_pid} = start_supervised({OrderBook, [venue: @venue, symbol: @symbol]})
+    {:ok, book_pid} = start_supervised({OrderBook, @product})
 
     {:ok, store_pid} =
       start_supervised(

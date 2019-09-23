@@ -8,6 +8,7 @@ defmodule Tai.Markets.OrderBook do
   alias Tai.PubSub
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type product :: Tai.Venues.Product.t()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type t :: %OrderBook{
           venue_id: venue_id,
@@ -33,22 +34,18 @@ defmodule Tai.Markets.OrderBook do
     last_venue_timestamp
   )a
 
-  def start_link(venue: venue_id, symbol: product_symbol) do
-    name = to_name(venue_id, product_symbol)
+  @spec start_link(product) :: GenServer.on_start()
+  def start_link(product) do
+    name = to_name(product.venue_id, product.symbol)
 
     state = %OrderBook{
-      venue_id: venue_id,
-      product_symbol: product_symbol,
+      venue_id: product.venue_id,
+      product_symbol: product.symbol,
       bids: %{},
       asks: %{}
     }
 
     GenServer.start_link(__MODULE__, state, name: name)
-  end
-
-  @deprecated "Use Tai.Markets.OrderBook.start_link(venue: _, symbol: _) instead."
-  def start_link(feed_id: venue_id, symbol: product_symbol) do
-    start_link(venue: venue_id, symbol: product_symbol)
   end
 
   def init(state), do: {:ok, state}

@@ -25,11 +25,14 @@ defmodule Tai.VenueAdapters.Gdax.StreamSupervisor do
     Supervisor.start_link(__MODULE__, args, name: name)
   end
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
   # TODO: Make this configurable
   @endpoint "wss://ws-feed.pro.coinbase.com/"
 
   def init(
-        venue_id: venue_id,
+        venue_id: venue,
         channels: channels,
         accounts: accounts,
         products: products,
@@ -39,12 +42,12 @@ defmodule Tai.VenueAdapters.Gdax.StreamSupervisor do
     order_book_stores = build_order_book_stores(products)
 
     system = [
-      {RouteOrderBooks, [venue_id: venue_id, products: products]},
-      {ProcessOptionalChannels, [venue_id: venue_id]},
+      {RouteOrderBooks, [venue_id: venue, products: products]},
+      {ProcessOptionalChannels, [venue_id: venue]},
       {Connection,
        [
          url: @endpoint,
-         venue: venue_id,
+         venue: venue,
          channels: channels,
          account: accounts |> Map.to_list() |> List.first(),
          products: products,
@@ -56,24 +59,12 @@ defmodule Tai.VenueAdapters.Gdax.StreamSupervisor do
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
-
-  # TODO: Potentially this could use new order books? Send the change quote
-  # event to subscribing advisors?
   defp build_order_books(products) do
     products
     |> Enum.map(fn p ->
-      name = Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol)
-
       %{
-        id: name,
-        start: {
-          # TODO: This could just pass the product struct. Use deprecate to switch over
-          Tai.Markets.OrderBook,
-          :start_link,
-          [[feed_id: p.venue_id, symbol: p.symbol]]
-        }
+        id: Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol),
+        start: {Tai.Markets.OrderBook, :start_link, [p]}
       }
     end)
   end

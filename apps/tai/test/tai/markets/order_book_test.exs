@@ -2,8 +2,6 @@ defmodule Tai.Markets.OrderBookTest do
   use ExUnit.Case, async: true
   alias Tai.Markets.{OrderBook, PricePoint, Quote}
 
-  @venue Tai.Markets.OrderBookTest
-
   defmodule Subscriber do
     use GenServer
 
@@ -31,13 +29,17 @@ defmodule Tai.Markets.OrderBookTest do
     end
   end
 
+  @venue Tai.Markets.OrderBookTest
+  @product_symbol :btc_usd
+  @product struct(Tai.Venues.Product, venue_id: @venue, symbol: @product_symbol)
+
   setup do
     on_exit(fn ->
       Application.stop(:tai)
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)
-    book_pid = start_supervised!({OrderBook, venue: @venue, symbol: :btc_usd})
+    book_pid = start_supervised!({OrderBook, @product})
 
     %{book_pid: book_pid}
   end
@@ -47,7 +49,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           bids: %{
             999.9 => 1.1,
             999.8 => 1.0
@@ -76,7 +78,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           bids: %{999.9 => 1.1},
           asks: %{1000.0 => 0.1}
         })
@@ -102,7 +104,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           bids: %{
             147.52 => 10.1,
             147.53 => 10.3
@@ -130,7 +132,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           last_received_at: last_received_at,
           bids: %{},
           asks: %{}
@@ -146,7 +148,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           last_venue_timestamp: last_venue_timestamp,
           bids: %{},
           asks: %{}
@@ -160,7 +162,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           bids: %{
             100.0 => 1.0,
             101.0 => 1.0
@@ -186,7 +188,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           bids: %{100.0 => 0.0},
           asks: %{102.0 => 0}
         })
@@ -208,8 +210,8 @@ defmodule Tai.Markets.OrderBookTest do
 
       :ok =
         OrderBook.update(%OrderBook{
-          venue_id: venue,
-          product_symbol: :btc_usd,
+          venue_id: @venue,
+          product_symbol: @product_symbol,
           bids: %{100.0 => {0.1, bid_processed_at, bid_server_changed_at}},
           asks: %{102.0 => {0.2, ask_processed_at, ask_server_changed_at}}
         })
@@ -236,7 +238,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           bids: %{
             146.00 => 10.1,
             147.51 => 10.2
@@ -262,7 +264,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           bids: %{
             146.00 => 10.1,
             147.51 => 10.2,
@@ -295,7 +297,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: :btc_usd,
+          product_symbol: @product_symbol,
           bids: %{
             146.00 => {10.1, nil, nil},
             147.51 => {10.2, nil, nil}

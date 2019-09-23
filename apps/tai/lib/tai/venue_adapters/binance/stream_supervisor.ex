@@ -27,17 +27,17 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   # TODO: Make this configurable
   @base_url "wss://stream.binance.com:9443/stream"
 
-  def init(venue_id: venue_id, channels: _, accounts: accounts, products: products, opts: _) do
+  def init(venue_id: venue, channels: _, accounts: accounts, products: products, opts: _) do
     order_books = build_order_books(products)
     order_book_stores = build_order_book_stores(products)
 
     system = [
-      {RouteOrderBooks, [venue_id: venue_id, products: products]},
-      {ProcessOptionalChannels, [venue_id: venue_id]},
+      {RouteOrderBooks, [venue_id: venue, products: products]},
+      {ProcessOptionalChannels, [venue_id: venue]},
       {Connection,
        [
          url: products |> url(),
-         venue_id: venue_id,
+         venue_id: venue,
          account: accounts |> Map.to_list() |> List.first(),
          products: products
        ]}
@@ -58,20 +58,12 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
     "#{@base_url}?streams=#{streams}"
   end
 
-  # TODO: Potentially this could use new order books? Send the change quote
-  # event to subscribing advisors?
   defp build_order_books(products) do
     products
     |> Enum.map(fn p ->
-      name = Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol)
-
       %{
-        id: name,
-        start: {
-          Tai.Markets.OrderBook,
-          :start_link,
-          [[feed_id: p.venue_id, symbol: p.symbol]]
-        }
+        id: Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol),
+        start: {Tai.Markets.OrderBook, :start_link, [p]}
       }
     end)
   end

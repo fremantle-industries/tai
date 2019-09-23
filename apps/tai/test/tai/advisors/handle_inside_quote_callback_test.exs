@@ -23,14 +23,15 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
     end
   end
 
-  @btc_usd struct(Tai.Venues.Product, %{venue_id: :my_venue, symbol: :btc_usd})
+  @product struct(Tai.Venues.Product, %{venue_id: :my_venue, symbol: :btc_usd})
+
   defp start_advisor!(advisor, config \\ %{}) do
     start_supervised!({
       advisor,
       [
         group_id: :group_a,
         advisor_id: :my_advisor,
-        products: [@btc_usd],
+        products: [@product],
         config: config,
         store: %{},
         trades: []
@@ -45,7 +46,7 @@ defmodule Tai.Advisors.HandleInsideQuoteCallbackTest do
 
     Process.register(self(), :test)
     {:ok, _} = Application.ensure_all_started(:tai)
-    book_pid = start_supervised!({Tai.Markets.OrderBook, feed_id: :my_venue, symbol: :btc_usd})
+    book_pid = start_supervised!({Tai.Markets.OrderBook, @product})
 
     {:ok, %{book_pid: book_pid}}
   end

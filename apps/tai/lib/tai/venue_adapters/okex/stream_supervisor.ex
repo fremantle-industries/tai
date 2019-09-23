@@ -22,7 +22,7 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
   @endpoint "wss://real.okex.com:8443/ws/v3"
 
   def init(
-        venue_id: venue_id,
+        venue_id: venue,
         channels: channels,
         accounts: accounts,
         products: products,
@@ -32,13 +32,13 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
     order_book_stores = build_order_book_stores(products)
 
     system = [
-      {Stream.RouteOrderBooks, [venue: venue_id, products: products]},
-      {Stream.ProcessAuth, [venue: venue_id]},
-      {Stream.ProcessOptionalChannels, [venue: venue_id]},
+      {Stream.RouteOrderBooks, [venue: venue, products: products]},
+      {Stream.ProcessAuth, [venue: venue]},
+      {Stream.ProcessOptionalChannels, [venue: venue]},
       {Stream.Connection,
        [
          endpoint: @endpoint,
-         venue: venue_id,
+         venue: venue,
          channels: channels,
          account: accounts |> Map.to_list() |> List.first(),
          products: products
@@ -49,20 +49,12 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  # TODO: Potentially this could use new order books? Send the change quote
-  # event to subscribing advisors?
   defp build_order_books(products) do
     products
     |> Enum.map(fn p ->
-      name = Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol)
-
       %{
-        id: name,
-        start: {
-          Tai.Markets.OrderBook,
-          :start_link,
-          [[feed_id: p.venue_id, symbol: p.symbol]]
-        }
+        id: Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol),
+        start: {Tai.Markets.OrderBook, :start_link, [p]}
       }
     end)
   end

@@ -23,20 +23,7 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
         products: products,
         opts: _
       ) do
-    order_books =
-      products
-      |> Enum.map(fn p ->
-        name = Tai.Markets.OrderBook.to_name(venue_id, p.symbol)
-
-        %{
-          id: name,
-          start: {
-            Tai.Markets.OrderBook,
-            :start_link,
-            [[feed_id: venue_id, symbol: p.symbol]]
-          }
-        }
-      end)
+    order_books = build_order_books(products)
 
     system = [
       {Tai.VenueAdapters.Mock.Stream.Connection,
@@ -51,6 +38,16 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
 
     (order_books ++ system)
     |> Supervisor.init(strategy: :one_for_one)
+  end
+
+  defp build_order_books(products) do
+    products
+    |> Enum.map(fn p ->
+      %{
+        id: Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol),
+        start: {Tai.Markets.OrderBook, :start_link, [p]}
+      }
+    end)
   end
 
   # TODO: Make this configurable

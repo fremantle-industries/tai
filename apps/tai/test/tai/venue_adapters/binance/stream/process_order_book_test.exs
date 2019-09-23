@@ -16,7 +16,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
     start_supervised!(Tai.PubSub)
     start_supervised!({Tai.Events, 1})
 
-    {:ok, book_pid} = start_supervised({OrderBook, [venue: @venue, symbol: @symbol]})
+    {:ok, book_pid} = start_supervised({OrderBook, @product})
     {:ok, store_pid} = start_supervised({ProcessOrderBook, @product})
 
     {:ok, %{book_pid: book_pid, store_pid: store_pid}}
