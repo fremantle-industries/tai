@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.OkEx.Stream.OrderBookStore do
+defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
   use GenServer
 
   defmodule State do
@@ -22,9 +22,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.OrderBookStore do
   @spec init(state) :: {:ok, state}
   def init(state), do: {:ok, state}
 
-  @spec to_name(venue_id, venue_symbol) :: atom
-  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
-
   @bids "bids"
   @asks "asks"
   def handle_cast(
@@ -32,14 +29,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.OrderBookStore do
         state
       ) do
     {:ok, venue_timestamp, _} = DateTime.from_iso8601(timestamp)
-    normalized_bids = data |> normalize(@bids, received_at, venue_timestamp)
-    normalized_asks = data |> normalize(@asks, received_at, venue_timestamp)
 
     snapshot = %Tai.Markets.OrderBook{
       venue_id: state.venue,
       product_symbol: state.symbol,
-      bids: normalized_bids,
-      asks: normalized_asks,
+      bids: data |> normalize(@bids),
+      asks: data |> normalize(@asks),
       last_received_at: received_at,
       last_venue_timestamp: venue_timestamp
     }
@@ -54,14 +49,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.OrderBookStore do
         state
       ) do
     {:ok, venue_timestamp, _} = DateTime.from_iso8601(timestamp)
-    normalized_bids = data |> normalize(@bids, received_at, venue_timestamp)
-    normalized_asks = data |> normalize(@asks, received_at, venue_timestamp)
 
     snapshot = %Tai.Markets.OrderBook{
       venue_id: state.venue,
       product_symbol: state.symbol,
-      bids: normalized_bids,
-      asks: normalized_asks,
+      bids: data |> normalize(@bids),
+      asks: data |> normalize(@asks),
       last_received_at: received_at,
       last_venue_timestamp: venue_timestamp
     }
@@ -71,19 +64,22 @@ defmodule Tai.VenueAdapters.OkEx.Stream.OrderBookStore do
     {:noreply, state}
   end
 
-  defp normalize(data, side, received_at, venue_timestamp) do
+  @spec to_name(venue_id, venue_symbol) :: atom
+  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
+
+  defp normalize(data, side) do
     data
     |> Map.get(side, [])
     |> Enum.reduce(%{}, fn
       [raw_price, raw_size, _count], acc ->
         {price, ""} = Float.parse(raw_price)
         {size, ""} = Float.parse(raw_size)
-        acc |> Map.put(price, {size, received_at, venue_timestamp})
+        acc |> Map.put(price, size)
 
       [raw_price, raw_size, _forced_liquidations, _count], acc ->
         {price, ""} = Float.parse(raw_price)
         {size, ""} = Float.parse(raw_size)
-        acc |> Map.put(price, {size, received_at, venue_timestamp})
+        acc |> Map.put(price, size)
     end)
   end
 end

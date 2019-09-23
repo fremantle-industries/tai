@@ -35,7 +35,6 @@ defmodule Tai.Venues.Adapter do
         }
 
   @callback stream_supervisor :: module
-  @callback order_book_feed :: module
   @callback products(venue_id) :: {:ok, [product]} | {:error, reason :: term}
   @callback asset_balances(venue_id, account_id, credentials) ::
               {:ok, [asset_balance]} | {:error, reason :: term}

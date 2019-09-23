@@ -4,7 +4,7 @@ defmodule Tai.Markets.OrderBook do
   """
 
   use GenServer
-  alias Tai.Markets.{OrderBook, PriceLevel, Quote}
+  alias Tai.Markets.{OrderBook, PricePoint, Quote}
   alias Tai.PubSub
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -12,8 +12,8 @@ defmodule Tai.Markets.OrderBook do
   @type t :: %OrderBook{
           venue_id: venue_id,
           product_symbol: product_symbol,
-          bids: map,
-          asks: map,
+          bids: %{(price :: number) => size :: pos_integer},
+          asks: %{(price :: number) => size :: pos_integer},
           last_received_at: DateTime.t(),
           last_venue_timestamp: DateTime.t() | nil
         }
@@ -74,14 +74,13 @@ defmodule Tai.Markets.OrderBook do
 
     Tai.Events.debug(%Tai.Events.OrderBookSnapshot{
       venue_id: snapshot.venue_id,
-      symbol: snapshot.product_symbol,
-      snapshot: snapshot
+      symbol: snapshot.product_symbol
     })
 
     {:reply, :ok, snapshot}
   end
 
-  def handle_call({:update, %OrderBook{bids: bids, asks: asks} = changes}, _from, state) do
+  def handle_call({:update, changes}, _from, state) do
     PubSub.broadcast(
       {:order_book_changes, state.venue_id, state.product_symbol},
       {:order_book_changes, state.venue_id, state.product_symbol, changes}
@@ -89,10 +88,15 @@ defmodule Tai.Markets.OrderBook do
 
     new_state =
       state
-      |> update_side(:bids, bids)
-      |> update_side(:asks, asks)
+      |> update_side(:bids, changes.bids)
+      |> update_side(:asks, changes.asks)
       |> Map.put(:last_received_at, changes.last_received_at)
       |> Map.put(:last_venue_timestamp, changes.last_venue_timestamp)
+
+    Tai.Events.debug(%Tai.Events.OrderBookUpdate{
+      venue_id: state.venue_id,
+      symbol: state.product_symbol
+    })
 
     {:reply, :ok, new_state}
   end
@@ -152,27 +156,21 @@ defmodule Tai.Markets.OrderBook do
     |> Map.keys()
     |> Enum.sort()
     |> Enum.reverse()
-    |> with_price_levels(state.bids)
+    |> with_price_points(state.bids)
   end
 
   defp ordered_asks(state) do
     state.asks
     |> Map.keys()
     |> Enum.sort()
-    |> with_price_levels(state.asks)
+    |> with_price_points(state.asks)
   end
 
-  defp with_price_levels(prices, level_details) do
+  defp with_price_points(prices, levels) do
     prices
     |> Enum.map(fn price ->
-      {size, processed_at, server_changed_at} = level_details[price]
-
-      %PriceLevel{
-        price: price,
-        size: size,
-        processed_at: processed_at,
-        server_changed_at: server_changed_at
-      }
+      size = levels[price]
+      %PricePoint{price: price, size: size}
     end)
   end
 
@@ -196,7 +194,7 @@ defmodule Tai.Markets.OrderBook do
 
   defp drop_prices(price_levels) do
     price_levels
-    |> Enum.filter(fn {_price, {size, _processed_at, _server_changed_at}} -> size == 0 end)
+    |> Enum.filter(fn {_, size} -> size == 0 end)
     |> Enum.map(fn {price, _} -> price end)
   end
 end

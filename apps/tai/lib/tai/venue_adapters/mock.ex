@@ -7,8 +7,6 @@ defmodule Tai.VenueAdapters.Mock do
 
   def stream_supervisor, do: Tai.VenueAdapters.Mock.StreamSupervisor
 
-  def order_book_feed, do: Tai.VenueAdapters.NullOrderBookFeed
-
   def products(venue_id) do
     with_mock_server(fn ->
       {:products, venue_id}

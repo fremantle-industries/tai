@@ -1,12 +1,12 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.TradeTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Assertions.Event
-  alias Tai.VenueAdapters.Bitmex.Stream.ProcessMessages
+  alias Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels
   alias Tai.Events
 
   setup do
     start_supervised!({Tai.Events, 1})
-    start_supervised!({ProcessMessages, [venue_id: :my_venue]})
+    start_supervised!({ProcessOptionalChannels, [venue_id: :my_venue]})
     :ok
   end
 
@@ -30,7 +30,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.TradeTest do
     ]
 
     :my_venue
-    |> ProcessMessages.to_name()
+    |> ProcessOptionalChannels.to_name()
     |> GenServer.cast(
       {%{"table" => "trade", "action" => "insert", "data" => venue_trades}, :ignore}
     )

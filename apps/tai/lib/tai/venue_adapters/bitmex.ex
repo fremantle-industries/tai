@@ -12,7 +12,6 @@ defmodule Tai.VenueAdapters.Bitmex do
   @behaviour Tai.Venues.Adapter
 
   def stream_supervisor, do: StreamSupervisor
-  def order_book_feed, do: Tai.VenueAdapters.NullOrderBookFeed
   defdelegate products(venue_id), to: Products
   defdelegate asset_balances(venue_id, account_id, credentials), to: AssetBalances
   def maker_taker_fees(_, _, _), do: {:ok, nil}

@@ -8,15 +8,17 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     @type venue_id :: Venues.Adapter.venue_id()
     @type account_id :: Venues.Adapter.account_id()
     @type channel_name :: atom
+    @type route :: :auth | :order_books | :optional_channels
     @type t :: %State{
             venue: venue_id,
+            routes: %{required(route) => atom},
             channels: [channel_name],
             account: {account_id, map},
             products: [product]
           }
 
-    @enforce_keys ~w(venue channels account products)a
-    defstruct ~w(venue channels account products)a
+    @enforce_keys ~w(venue routes channels account products)a
+    defstruct ~w(venue routes channels account products)a
   end
 
   @type product :: Venues.Product.t()
@@ -42,13 +44,23 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
         account: account,
         products: products
       ) do
-    state = %State{venue: venue, channels: channels, account: account, products: products}
+    routes = %{
+      auth: venue |> Stream.ProcessAuth.to_name(),
+      order_books: venue |> Stream.RouteOrderBooks.to_name(),
+      optional_channels: venue |> Stream.ProcessOptionalChannels.to_name()
+    }
+
+    state = %State{
+      venue: venue,
+      routes: routes,
+      channels: channels,
+      account: account,
+      products: products
+    }
+
     name = venue |> to_name
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
-
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   def handle_connect(_conn, state) do
     Events.info(%Events.StreamConnect{venue: state.venue})
@@ -132,11 +144,11 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   def handle_frame({:text, _}, state), do: {:ok, state}
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
   @heartbeat_ms 20_000
   defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
-
-  @spec handle_msg(msg, state) :: {:ok, state}
-  defp handle_msg(msg, state)
 
   defp handle_msg(
          %{"event" => "login", "success" => true},
@@ -147,43 +159,28 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     {:ok, state}
   end
 
-  @futures_depth "futures/depth"
-  @swap_depth "swap/depth"
-  @spot_depth "spot/depth"
-  defp handle_msg(%{"table" => table} = msg, state)
-       when table == @futures_depth or table == @swap_depth or table == @spot_depth,
-       do: msg |> process_order_books(state)
+  @product_types ~w(futures swap spot)
+  @depth_tables @product_types |> Enum.map(&"#{&1}/depth")
+  @order_tables @product_types |> Enum.map(&"#{&1}/order")
 
-  @futures_order "futures/order"
-  @swap_order "swap/order"
-  @spot_order "spot/order"
-  defp handle_msg(%{"table" => table} = msg, state)
-       when table == @futures_order or table == @swap_order or table == @spot_order,
-       do: msg |> process_auth(state)
-
-  defp handle_msg(msg, state), do: msg |> process_messages(state)
-
-  defp process_order_books(msg, state) do
-    state.venue
-    |> Stream.ProcessOrderBooks.to_name()
-    |> GenServer.cast({msg, Timex.now()})
-
+  defp handle_msg(%{"table" => table} = msg, state) when table in @depth_tables do
+    msg |> forward(:order_books, state)
     {:ok, state}
   end
 
-  defp process_auth(msg, state) do
-    state.venue
-    |> Stream.ProcessAuth.to_name()
-    |> GenServer.cast({msg, Timex.now()})
-
+  defp handle_msg(%{"table" => table} = msg, state) when table in @order_tables do
+    msg |> forward(:auth, state)
     {:ok, state}
   end
 
-  defp process_messages(msg, state) do
-    state.venue
-    |> Stream.ProcessMessages.to_name()
-    |> GenServer.cast({msg, Timex.now()})
-
+  defp handle_msg(msg, state) do
+    msg |> forward(:optional_channels, state)
     {:ok, state}
+  end
+
+  defp forward(msg, to, state) do
+    state.routes
+    |> Map.fetch!(to)
+    |> GenServer.cast({msg, Timex.now()})
   end
 end

@@ -1,12 +1,12 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Assertions.Event
-  alias Tai.VenueAdapters.OkEx.Stream.ProcessMessages
+  alias Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels
   alias Tai.Events
 
   setup do
     start_supervised!({Tai.Events, 1})
-    start_supervised!({ProcessMessages, [venue: :my_venue]})
+    start_supervised!({ProcessOptionalChannels, [venue: :my_venue]})
     :ok
   end
 
@@ -26,7 +26,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
     ]
 
     :my_venue
-    |> ProcessMessages.to_name()
+    |> ProcessOptionalChannels.to_name()
     |> GenServer.cast({%{"table" => "futures/trade", "data" => venue_trades}, :ignore})
 
     assert_event(%Events.Trade{venue_trade_id: venue_trade_id})

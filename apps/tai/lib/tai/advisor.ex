@@ -182,7 +182,7 @@ defmodule Tai.Advisor do
 
       defp inside_bid_is_stale?(bids, %Tai.Markets.Quote{} = prev_quote) do
         bids
-        |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
+        |> Enum.any?(fn {price, size} ->
           price >= prev_quote.bid.price ||
             (price == prev_quote.bid.price && size != prev_quote.bid.size)
         end)
@@ -192,7 +192,7 @@ defmodule Tai.Advisor do
 
       defp inside_ask_is_stale?(asks, %Tai.Markets.Quote{} = prev_quote) do
         asks
-        |> Enum.any?(fn {price, {size, _processed_at, _server_changed_at}} ->
+        |> Enum.any?(fn {price, size} ->
           price <= prev_quote.ask.price ||
             (price == prev_quote.ask.price && size != prev_quote.ask.size)
         end)

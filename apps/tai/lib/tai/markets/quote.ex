@@ -3,9 +3,9 @@ defmodule Tai.Markets.Quote do
   Represents a bid & ask price level row in the order book
   """
 
-  alias Tai.Markets.{PriceLevel, Quote}
+  alias Tai.Markets.{PricePoint, Quote}
 
-  @type price_level :: PriceLevel.t()
+  @type price_level :: PricePoint.t()
   @type t :: %Quote{
           venue_id: atom,
           product_symbol: atom,

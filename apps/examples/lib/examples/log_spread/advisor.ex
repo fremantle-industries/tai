@@ -10,8 +10,8 @@ defmodule Examples.LogSpread.Advisor do
         product_symbol,
         # wait until we have quotes for both sides of the order book
         %Tai.Markets.Quote{
-          bid: %Tai.Markets.PriceLevel{},
-          ask: %Tai.Markets.PriceLevel{}
+          bid: %Tai.Markets.PricePoint{},
+          ask: %Tai.Markets.PricePoint{}
         } = market_quote,
         _changes,
         state

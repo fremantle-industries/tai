@@ -11,7 +11,6 @@ defmodule Tai.VenueAdapters.Binance do
   @behaviour Tai.Venues.Adapter
 
   def stream_supervisor, do: StreamSupervisor
-  def order_book_feed, do: Tai.VenueAdapters.NullOrderBookFeed
   defdelegate products(venue_id), to: Products
   defdelegate asset_balances(venue_id, account_id, credentials), to: AssetBalances
   defdelegate maker_taker_fees(venue_id, account_id, credentials), to: MakerTakerFees

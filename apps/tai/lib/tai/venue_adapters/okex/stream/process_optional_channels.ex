@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.OkEx.Stream.ProcessMessages do
+defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels do
   use GenServer
   alias Tai.{Events, VenueAdapters.OkEx.Stream}
 

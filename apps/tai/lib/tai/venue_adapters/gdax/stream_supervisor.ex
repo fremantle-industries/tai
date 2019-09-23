@@ -1,9 +1,8 @@
-defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
+defmodule Tai.VenueAdapters.Gdax.StreamSupervisor do
   use Supervisor
 
-  alias Tai.VenueAdapters.Bitmex.Stream.{
+  alias Tai.VenueAdapters.Gdax.Stream.{
     Connection,
-    ProcessAuth,
     ProcessOptionalChannels,
     ProcessOrderBook,
     RouteOrderBooks
@@ -26,8 +25,8 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     Supervisor.start_link(__MODULE__, args, name: name)
   end
 
-  # TODO: Make this configurable. Could this come from opts?
-  @endpoint "wss://" <> ExBitmex.Rest.HTTPClient.domain() <> "/realtime"
+  # TODO: Make this configurable
+  @endpoint "wss://ws-feed.pro.coinbase.com/"
 
   def init(
         venue_id: venue_id,
@@ -41,7 +40,6 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
 
     system = [
       {RouteOrderBooks, [venue_id: venue_id, products: products]},
-      {ProcessAuth, [venue_id: venue_id]},
       {ProcessOptionalChannels, [venue_id: venue_id]},
       {Connection,
        [
