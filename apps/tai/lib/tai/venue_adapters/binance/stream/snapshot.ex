@@ -11,22 +11,22 @@ defmodule Tai.VenueAdapters.Binance.Stream.Snapshot do
         venue_id: product.venue_id,
         product_symbol: product.symbol,
         last_received_at: received_at,
-        bids: binance_book.bids |> to_price_points(received_at),
-        asks: binance_book.asks |> to_price_points(received_at)
+        bids: binance_book.bids |> to_price_points(),
+        asks: binance_book.asks |> to_price_points()
       }
 
       {:ok, book}
     end
   end
 
-  defp to_price_points(raw_price_points, received_at) do
+  defp to_price_points(raw_price_points) do
     raw_price_points
     |> Enum.reduce(
       %{},
       fn [raw_price, raw_size], acc ->
         {price, _} = Float.parse(raw_price)
         {size, _} = Float.parse(raw_size)
-        Map.put(acc, price, {size, received_at, nil})
+        Map.put(acc, price, size)
       end
     )
   end
