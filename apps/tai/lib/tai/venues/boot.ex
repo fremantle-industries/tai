@@ -43,11 +43,9 @@ defmodule Tai.Venues.Boot do
     t_fees = Task.async(Boot.Fees, :hydrate, [adapter, products])
     t_positions = Task.async(Boot.Positions, :hydrate, [adapter])
     t_stream = Task.async(Boot.Stream, :start, [adapter, products])
-    t_order_books = Task.async(Boot.OrderBooks, :start, [adapter, products])
     new_working_tasks = [{:fees, t_fees} | working_tasks]
     new_working_tasks = [{:positions, t_positions} | new_working_tasks]
-    new_working_tasks = [{:order_books, t_stream} | new_working_tasks]
-    new_working_tasks = [{:order_books, t_order_books} | new_working_tasks]
+    new_working_tasks = [{:streams, t_stream} | new_working_tasks]
     {:ok, adapter, new_working_tasks}
   end
 
