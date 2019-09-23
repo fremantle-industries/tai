@@ -29,7 +29,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOptionalChannels do
       msg: msg,
       received_at: received_at
     }
-    |> Tai.Events.info()
+    |> Tai.Events.warn()
 
     {:noreply, state}
   end
