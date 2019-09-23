@@ -46,5 +46,24 @@ defmodule Tai.EventTest do
                }
                |> Jason.encode!()
     end
+
+    test "it encodes Decimal values to string" do
+      defmodule MyDecimalEvent do
+        defstruct [:decimal]
+      end
+
+      event =
+        %{decimal: Decimal.cast(42.0)}
+        |> Map.put(:__struct__, MyDecimalEvent)
+
+      assert Tai.Event.encode!(event) ==
+               %{
+                 type: "Tai.EventTest.MyDecimalEvent",
+                 data: %{
+                   decimal: "42.0"
+                 }
+               }
+               |> Jason.encode!()
+    end
   end
 end
