@@ -73,8 +73,8 @@ defmodule Tai.Venues.ProductStore do
   @spec all :: [product]
   def all do
     __MODULE__
-    |> :ets.select([{{:_, :_}, [], [:"$_"]}])
-    |> Enum.map(fn {{_, _}, product} -> product end)
+    |> :ets.tab2list()
+    |> Enum.map(&elem(&1, 1))
   end
 
   defp create_ets_table do
