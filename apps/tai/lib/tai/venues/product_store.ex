@@ -3,6 +3,7 @@ defmodule Tai.Venues.ProductStore do
 
   @type product :: Tai.Venues.Product.t()
   @type symbol :: Tai.Venues.Product.symbol()
+  @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type venue_id :: Tai.Venues.Adapter.venue_id()
 
   def start_link(_) do
@@ -47,6 +48,16 @@ defmodule Tai.Venues.ProductStore do
   def find({venue_id, symbol}) do
     with [[%Tai.Venues.Product{} = product]] <-
            :ets.match(__MODULE__, {{venue_id, symbol, :_}, :"$1"}) do
+      {:ok, product}
+    else
+      [] -> {:error, :not_found}
+    end
+  end
+
+  @spec find_by_venue_symbol({venue_id, venue_symbol}) :: {:ok, product} | {:error, :not_found}
+  def find_by_venue_symbol({venue_id, venue_symbol}) do
+    with [[%Tai.Venues.Product{} = product]] <-
+           :ets.match(__MODULE__, {{venue_id, :_, venue_symbol}, :"$1"}) do
       {:ok, product}
     else
       [] -> {:error, :not_found}

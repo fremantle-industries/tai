@@ -24,7 +24,7 @@ defmodule Tai.Venues.ProductStoreTest do
       assert Tai.Venues.ProductStore.upsert(product) == :ok
 
       assert [{{:my_venue, :btc_usdt, "BTCUSDT"}, ^product}] =
-               :ets.lookup(Tai.Venues.ProductStore, {:my_venue, :btc_usdt})
+               :ets.lookup(Tai.Venues.ProductStore, {:my_venue, :btc_usdt, "BTCUSDT"})
     end
   end
 
@@ -47,6 +47,20 @@ defmodule Tai.Venues.ProductStoreTest do
 
     test "returns an error tuple when the key is not found" do
       assert Tai.Venues.ProductStore.find({:my_venue_does_not_exist, :btc_usdt}) ==
+               {:error, :not_found}
+    end
+  end
+
+  describe "#find_by_venue_symbol" do
+    test "returns the product in an ok tuple", %{product: product} do
+      assert Tai.Venues.ProductStore.upsert(product) == :ok
+
+      assert {:ok, ^product} =
+               Tai.Venues.ProductStore.find_by_venue_symbol({:my_venue, "BTCUSDT"})
+    end
+
+    test "returns an error tuple when the key is not found" do
+      assert Tai.Venues.ProductStore.find_by_venue_symbol({:my_venue, "ETCUSDT"}) ==
                {:error, :not_found}
     end
   end
