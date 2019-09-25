@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.Binance.Stream.ProcessOptionalChannels do
   use GenServer
+  alias Tai.VenueAdapters.Binance.Stream
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -22,6 +23,11 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOptionalChannels do
 
   @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
+
+  def handle_cast({%{"data" => %{"e" => "trade"} = trade}, received_at}, state) do
+    Stream.Trades.broadcast(trade, state.venue_id, received_at)
+    {:noreply, state}
+  end
 
   def handle_cast({msg, received_at}, state) do
     %Tai.Events.StreamMessageUnhandled{
