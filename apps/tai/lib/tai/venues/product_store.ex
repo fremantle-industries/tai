@@ -21,7 +21,7 @@ defmodule Tai.Venues.ProductStore do
   end
 
   def handle_call({:upsert, product}, _from, state) do
-    record = {{product.venue_id, product.symbol}, product}
+    record = {{product.venue_id, product.symbol, product.venue_symbol}, product}
     :ets.insert(__MODULE__, record)
     {:reply, :ok, state}
   end
@@ -44,8 +44,9 @@ defmodule Tai.Venues.ProductStore do
   end
 
   @spec find({venue_id, symbol}) :: {:ok, product} | {:error, :not_found}
-  def find(key) do
-    with [[%Tai.Venues.Product{} = product]] <- :ets.match(__MODULE__, {key, :"$1"}) do
+  def find({venue_id, symbol}) do
+    with [[%Tai.Venues.Product{} = product]] <-
+           :ets.match(__MODULE__, {{venue_id, symbol, :_}, :"$1"}) do
       {:ok, product}
     else
       [] -> {:error, :not_found}

@@ -12,7 +12,8 @@ defmodule Tai.Venues.ProductStoreTest do
     product =
       struct(Tai.Venues.Product, %{
         venue_id: :my_venue,
-        symbol: :btc_usdt
+        symbol: :btc_usdt,
+        venue_symbol: "BTCUSDT"
       })
 
     {:ok, %{product: product}}
@@ -22,7 +23,7 @@ defmodule Tai.Venues.ProductStoreTest do
     test "inserts the product into the 'products' ETS table", %{product: product} do
       assert Tai.Venues.ProductStore.upsert(product) == :ok
 
-      assert [{{:my_venue, :btc_usdt}, ^product}] =
+      assert [{{:my_venue, :btc_usdt, "BTCUSDT"}, ^product}] =
                :ets.lookup(Tai.Venues.ProductStore, {:my_venue, :btc_usdt})
     end
   end
