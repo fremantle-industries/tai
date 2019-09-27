@@ -1,6 +1,5 @@
 defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   use WebSockex
-  alias Tai.VenueAdapters.Mock
   alias Tai.Trading.OrderStore
   alias Tai.Events
 
@@ -36,15 +35,18 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   def handle_connect(_conn, state) do
-    Tai.Events.info(%Tai.Events.StreamConnect{venue: state.venue_id})
+    %Events.StreamConnect{venue: state.venue_id}
+    |> Events.info()
+
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    Tai.Events.info(%Tai.Events.StreamDisconnect{
+    %Events.StreamDisconnect{
       venue: state.venue_id,
       reason: conn_status.reason
-    })
+    }
+    |> Events.info()
 
     {:ok, state}
   end
@@ -62,21 +64,18 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   defp handle_msg(
          %{
            "type" => "snapshot",
-           "symbol" => raw_symbol,
+           "symbol" => symbol_str,
            "bids" => bids,
            "asks" => asks
          },
          state
        ) do
-    symbol = String.to_atom(raw_symbol)
-    received_at = Timex.now()
-
     snapshot = %Tai.Markets.OrderBook{
       venue_id: state.venue_id,
-      product_symbol: symbol,
-      last_received_at: received_at,
-      bids: Mock.Stream.Snapshot.normalize(bids, received_at),
-      asks: Mock.Stream.Snapshot.normalize(asks, received_at)
+      product_symbol: String.to_atom(symbol_str),
+      last_received_at: Timex.now(),
+      bids: bids |> normalize_snapshot(),
+      asks: asks |> normalize_snapshot()
     }
 
     Tai.Markets.OrderBook.replace(snapshot)
@@ -154,5 +153,16 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
       received_at: Timex.now()
     }
     |> Events.warn()
+  end
+
+  defp normalize_snapshot(raw_price_points) do
+    raw_price_points
+    |> Enum.reduce(
+      %{},
+      fn {price_str, size}, acc ->
+        {price, ""} = Float.parse(price_str)
+        Map.put(acc, price, size)
+      end
+    )
   end
 end
