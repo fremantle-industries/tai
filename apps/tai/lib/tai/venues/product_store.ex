@@ -3,6 +3,7 @@ defmodule Tai.Venues.ProductStore do
 
   @type product :: Tai.Venues.Product.t()
   @type symbol :: Tai.Venues.Product.symbol()
+  @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type venue_id :: Tai.Venues.Adapter.venue_id()
 
   def start_link(_) do
@@ -21,7 +22,7 @@ defmodule Tai.Venues.ProductStore do
   end
 
   def handle_call({:upsert, product}, _from, state) do
-    record = {{product.venue_id, product.symbol}, product}
+    record = {{product.venue_id, product.symbol, product.venue_symbol}, product}
     :ets.insert(__MODULE__, record)
     {:reply, :ok, state}
   end
@@ -44,8 +45,19 @@ defmodule Tai.Venues.ProductStore do
   end
 
   @spec find({venue_id, symbol}) :: {:ok, product} | {:error, :not_found}
-  def find(key) do
-    with [[%Tai.Venues.Product{} = product]] <- :ets.match(__MODULE__, {key, :"$1"}) do
+  def find({venue_id, symbol}) do
+    with [[%Tai.Venues.Product{} = product]] <-
+           :ets.match(__MODULE__, {{venue_id, symbol, :_}, :"$1"}) do
+      {:ok, product}
+    else
+      [] -> {:error, :not_found}
+    end
+  end
+
+  @spec find_by_venue_symbol({venue_id, venue_symbol}) :: {:ok, product} | {:error, :not_found}
+  def find_by_venue_symbol({venue_id, venue_symbol}) do
+    with [[%Tai.Venues.Product{} = product]] <-
+           :ets.match(__MODULE__, {{venue_id, :_, venue_symbol}, :"$1"}) do
       {:ok, product}
     else
       [] -> {:error, :not_found}
@@ -73,8 +85,8 @@ defmodule Tai.Venues.ProductStore do
   @spec all :: [product]
   def all do
     __MODULE__
-    |> :ets.select([{{:_, :_}, [], [:"$_"]}])
-    |> Enum.map(fn {{_, _}, product} -> product end)
+    |> :ets.tab2list()
+    |> Enum.map(&elem(&1, 1))
   end
 
   defp create_ets_table do
