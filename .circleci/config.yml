@@ -12,40 +12,38 @@ jobs:
 
       - restore_cache:
           keys:
-            - hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
-            - hex-packages-elixir-1.8
+            - hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}
+            - hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
       - save_cache:
-          key: hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: hex-packages-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - deps
 
       - restore_cache:
           keys:
-            - test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
-            - test-build-elixir-1.8
+            - test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}
+            - test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}
       - run: mix test
       - save_cache:
-          key: test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: test-build-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/test
 
-      # Fails on OTP 22.1. Need to wait for update to re-run it
-      # ** (UndefinedFunctionError) function Dialyxir.Project.dialyzer_paths/0 is undefined or private. Did you mean one of:
-      # - restore_cache:
-      #     keys:
-      #       - dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-      #       - dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
-      #       - dialyzer-plt-elixir-1.8
-      # - run: mix dialyzer --halt-exit-status
-      # - save_cache:
-      #     key: dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-      #     paths:
-      #       - _build/dev
+      - restore_cache:
+          keys:
+            - dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}
+            - dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}
+      - run: mix dialyzer --halt-exit-status
+      - save_cache:
+          key: dialyzer-plt-elixir-1.8-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build/dev
 
       - run: MIX_ENV=test mix coveralls.circle
 
@@ -65,40 +63,38 @@ jobs:
 
       - restore_cache:
           keys:
-            - hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
-            - hex-packages-elixir-1.9
+            - hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}
+            - hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
       - save_cache:
-          key: hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: hex-packages-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - deps
 
       - restore_cache:
           keys:
-            - test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
-            - test-build-elixir-1.9
+            - test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}
+            - test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}
       - run: mix test
       - save_cache:
-          key: test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: test-build-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
             - _build/test
 
-      # Fails on OTP 22.1. Need to wait for update to re-run it
-      # ** (UndefinedFunctionError) function Dialyxir.Project.dialyzer_paths/0 is undefined or private. Did you mean one of:
-      # - restore_cache:
-      #     keys:
-      #       - dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-      #       - dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}
-      #       - dialyzer-plt-elixir-1.9
-      # - run: mix dialyzer --halt-exit-status
-      # - save_cache:
-      #     key: dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
-      #     paths:
-      #       - _build/dev
+      - restore_cache:
+          keys:
+            - dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}
+            - dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}
+      - run: mix dialyzer --halt-exit-status
+      - save_cache:
+          key: dialyzer-plt-elixir-1.9-{{ .Environment.CACHE_VERSION }}-{{ arch }}-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build/dev
 
       - run: MIX_ENV=test mix coveralls.circle
 
