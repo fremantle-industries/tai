@@ -1,18 +1,23 @@
 defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   use WebSockex
-  require Logger
   alias Tai.VenueAdapters.Mock
   alias Tai.Trading.OrderStore
+  alias Tai.Events
 
+  defmodule State do
+    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type t :: %State{venue_id: venue_id}
+
+    @enforce_keys ~w(venue_id)a
+    defstruct ~w(venue_id)a
+  end
+
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type channel :: Tai.Venues.Adapter.channel()
+  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type account_config :: map
   @type product :: Tai.Venues.Product.t()
   @type msg :: map
-  @type account_config :: map
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
-
-  @enforce_keys [:venue_id]
-  defstruct [:venue_id]
 
   @spec start_link(
           url: String.t(),
@@ -22,8 +27,10 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
           products: [product]
         ) :: {:ok, pid}
   def start_link(url: url, venue_id: venue_id, channels: _, account: _, products: _) do
-    conn = %Mock.Stream.Connection{venue_id: venue_id}
-    WebSockex.start_link(url, __MODULE__, conn, name: venue_id |> to_name)
+    conn = %State{venue_id: venue_id}
+    name = venue_id |> to_name
+
+    WebSockex.start_link(url, __MODULE__, conn, name: name)
   end
 
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
@@ -45,15 +52,12 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   def handle_frame({:text, msg}, state) do
     msg
     |> Jason.decode!()
-    |> handle_msg(state.venue_id)
+    |> handle_msg(state)
 
     {:ok, state}
   end
 
   def handle_frame(_frame, state), do: {:ok, state}
-
-  @spec handle_msg(msg, venue_id) :: no_return
-  defp handle_msg(msg, venue_id)
 
   defp handle_msg(
          %{
@@ -62,13 +66,13 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
            "bids" => bids,
            "asks" => asks
          },
-         venue_id
+         state
        ) do
     symbol = String.to_atom(raw_symbol)
     received_at = Timex.now()
 
     snapshot = %Tai.Markets.OrderBook{
-      venue_id: venue_id,
+      venue_id: state.venue_id,
       product_symbol: symbol,
       last_received_at: received_at,
       bids: Mock.Stream.Snapshot.normalize(bids, received_at),
@@ -85,7 +89,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
            "cumulative_qty" => raw_cumulative_qty,
            "leaves_qty" => raw_leaves_qty
          },
-         _venue_id
+         _state
        ) do
     cumulative_qty = raw_cumulative_qty |> Decimal.cast()
     leaves_qty = raw_leaves_qty |> Decimal.cast()
@@ -109,7 +113,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
            "client_id" => client_id,
            "cumulative_qty" => raw_cumulative_qty
          },
-         _venue_id
+         _state
        ) do
     cumulative_qty = raw_cumulative_qty |> Decimal.cast()
 
@@ -130,7 +134,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
            "status" => "canceled",
            "client_id" => client_id
          },
-         _venue_id
+         _state
        ) do
     {:ok, {prev_order, updated_order}} =
       %OrderStore.Actions.PassiveCancel{
@@ -143,9 +147,12 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     Tai.Trading.NotifyOrderUpdate.notify!(prev_order, updated_order)
   end
 
-  defp handle_msg(msg, venue_id) do
-    Logger.error(fn ->
-      "Unhandled stream message - venue_id: #{inspect(venue_id)}, msg: #{inspect(msg)}"
-    end)
+  defp handle_msg(msg, state) do
+    %Events.StreamMessageUnhandled{
+      venue_id: state.venue_id,
+      msg: msg,
+      received_at: Timex.now()
+    }
+    |> Events.warn()
   end
 end
