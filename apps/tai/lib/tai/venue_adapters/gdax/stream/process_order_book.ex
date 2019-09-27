@@ -11,18 +11,20 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOrderBook do
   end
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type product_symbol :: Tai.Venues.Product.symbol()
+  @type product :: Tai.Venues.Product.t()
   @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type state :: State.t()
 
-  @spec start_link(venue_id: venue_id, symbol: product_symbol, venue_symbol: venue_symbol) ::
-          GenServer.on_start()
-  def start_link(venue_id: venue_id, symbol: symbol, venue_symbol: venue_symbol) do
-    state = %State{venue: venue_id, symbol: symbol}
-    name = to_name(venue_id, venue_symbol)
+  @spec start_link(product) :: GenServer.on_start()
+  def start_link(product) do
+    state = %State{venue: product.venue_id, symbol: product.symbol}
+    name = to_name(product.venue_id, product.venue_symbol)
 
     GenServer.start_link(__MODULE__, state, name: name)
   end
+
+  @spec to_name(venue_id, venue_symbol :: String.t()) :: atom
+  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
 
   @spec init(state) :: {:ok, state}
   def init(state), do: {:ok, state}
@@ -48,9 +50,6 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOrderBook do
 
     {:noreply, state}
   end
-
-  @spec to_name(venue_id, venue_symbol :: String.t()) :: atom
-  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
 
   defp normalize_snapshot(snapshot_side) do
     snapshot_side

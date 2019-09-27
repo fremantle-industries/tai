@@ -16,13 +16,8 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOrderBookTest do
     {:ok, _} = Application.ensure_all_started(:tzdata)
     start_supervised!(Tai.PubSub)
     start_supervised!({Tai.Events, 1})
-
     {:ok, book_pid} = start_supervised({OrderBook, @product})
-
-    {:ok, store_pid} =
-      start_supervised(
-        {ProcessOrderBook, [venue_id: @venue, symbol: @symbol, venue_symbol: @venue_symbol]}
-      )
+    {:ok, store_pid} = start_supervised({ProcessOrderBook, @product})
 
     {:ok, %{book_pid: book_pid, store_pid: store_pid}}
   end
