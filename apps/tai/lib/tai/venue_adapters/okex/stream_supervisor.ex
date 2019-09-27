@@ -64,11 +64,7 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
     |> Enum.map(fn p ->
       %{
         id: Stream.ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),
-        start: {
-          Stream.ProcessOrderBook,
-          :start_link,
-          [[venue_id: p.venue_id, symbol: p.symbol, venue_symbol: p.venue_symbol]]
-        }
+        start: { Stream.ProcessOrderBook, :start_link, [p] }
       }
     end)
   end

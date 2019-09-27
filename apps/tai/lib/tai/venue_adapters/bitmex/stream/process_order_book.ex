@@ -15,23 +15,20 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBook do
   end
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type product_symbol :: Tai.Venues.Product.symbol()
+  @type product :: Tai.Venues.Product.t()
   @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type state :: State.t()
 
-  @spec start_link(venue_id: venue_id, symbol: product_symbol, venue_symbol: venue_symbol) ::
-          GenServer.on_start()
-  def start_link(venue_id: venue_id, symbol: symbol, venue_symbol: venue_symbol) do
-    name = to_name(venue_id, venue_symbol)
-
-    state = %State{
-      venue_id: venue_id,
-      symbol: symbol,
-      table: %{}
-    }
+  @spec start_link(product) :: GenServer.on_start()
+  def start_link(product) do
+    state = %State{venue_id: product.venue_id, symbol: product.symbol, table: %{}}
+    name = to_name(product.venue_id, product.venue_symbol)
 
     GenServer.start_link(__MODULE__, state, name: name)
   end
+
+  @spec to_name(venue_id, venue_symbol) :: atom
+  def to_name(venue, symbol), do: :"#{__MODULE__}_#{venue}_#{symbol}"
 
   @spec init(state) :: {:ok, state}
   def init(state), do: {:ok, state}
@@ -173,7 +170,4 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBook do
 
     {:noreply, state}
   end
-
-  @spec to_name(venue_id, venue_symbol :: String.t()) :: atom
-  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
 end

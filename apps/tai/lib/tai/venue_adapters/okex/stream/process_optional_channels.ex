@@ -45,7 +45,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels do
       msg: msg,
       received_at: received_at
     }
-    |> Events.info()
+    |> Events.warn()
 
     {:noreply, state}
   end

@@ -10,14 +10,20 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
   end
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type venue_symbol :: String.t()
+  @type venue_symbol :: Tai.Venues.Product.venue_symbol()
+  @type product :: Tai.Venues.Product.t()
   @type state :: State.t()
 
-  def start_link(venue_id: venue_id, symbol: symbol, venue_symbol: venue_symbol) do
-    store = %State{venue: venue_id, symbol: symbol}
-    name = to_name(venue_id, venue_symbol)
-    GenServer.start_link(__MODULE__, store, name: name)
+  @spec start_link(product) :: GenServer.on_start()
+  def start_link(product) do
+    state = %State{venue: product.venue_id, symbol: product.symbol}
+    name = to_name(product.venue_id, product.venue_symbol)
+
+    GenServer.start_link(__MODULE__, state, name: name)
   end
+
+  @spec to_name(venue_id, venue_symbol) :: atom
+  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
 
   @spec init(state) :: {:ok, state}
   def init(state), do: {:ok, state}
@@ -63,9 +69,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
 
     {:noreply, state}
   end
-
-  @spec to_name(venue_id, venue_symbol) :: atom
-  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
 
   defp normalize(data, side) do
     data

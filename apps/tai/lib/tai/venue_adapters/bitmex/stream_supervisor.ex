@@ -76,11 +76,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     |> Enum.map(fn p ->
       %{
         id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),
-        start: {
-          ProcessOrderBook,
-          :start_link,
-          [[venue_id: p.venue_id, symbol: p.symbol, venue_symbol: p.venue_symbol]]
-        }
+        start: {ProcessOrderBook, :start_link, [p]}
       }
     end)
   end
