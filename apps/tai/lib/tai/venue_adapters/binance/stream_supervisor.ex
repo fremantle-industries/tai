@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   # TODO: Make this configurable
   @base_url "wss://stream.binance.com:9443/stream"
 
-  def init(venue_id: venue, channels: _, accounts: accounts, products: products, opts: _) do
+  def init(venue_id: venue, channels: channels, accounts: accounts, products: products, opts: _) do
     order_books = build_order_books(products)
     order_book_stores = build_order_book_stores(products)
 
@@ -36,7 +36,7 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
       {ProcessOptionalChannels, [venue_id: venue]},
       {Connection,
        [
-         url: products |> url(),
+         url: url(products, channels),
          venue_id: venue,
          account: accounts |> Map.to_list() |> List.first(),
          products: products
@@ -47,15 +47,37 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp url(products) do
+  defp url(products, channels) do
     streams =
-      products
-      |> Enum.map(& &1.venue_symbol)
-      |> Enum.map(&String.downcase/1)
-      |> Enum.map(&"#{&1}@depth")
+      (build_depth_url_segments(products) ++ build_trade_url_segments(channels, products))
       |> Enum.join("/")
 
     "#{@base_url}?streams=#{streams}"
+  end
+
+  defp build_depth_url_segments(products) do
+    products
+    |> build_venue_symbols
+    |> Enum.map(&"#{&1}@depth")
+  end
+
+  @optional_channels ~w(trades)a
+  defp build_trade_url_segments(channels, products) do
+    channels
+    |> Enum.filter(&Enum.member?(@optional_channels, &1))
+    |> Enum.map(fn
+      :trades ->
+        products
+        |> build_venue_symbols
+        |> Enum.map(&"#{&1}@trade")
+    end)
+    |> List.flatten()
+  end
+
+  defp build_venue_symbols(products) do
+    products
+    |> Enum.map(& &1.venue_symbol)
+    |> Enum.map(&String.downcase/1)
   end
 
   defp build_order_books(products) do
