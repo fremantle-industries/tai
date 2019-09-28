@@ -1,5 +1,7 @@
 defmodule Tai.Events do
   @type event :: Tai.Event.t()
+  @type event_type :: module
+  @type partitions :: pos_integer
   @type level :: :debug | :info | :warn | :error
   @type subscribe_error_reasons :: {:already_registered, pid} | :event_not_registered
 
@@ -14,7 +16,7 @@ defmodule Tai.Events do
     }
   end
 
-  @spec start_link(partitions :: pos_integer) :: {:ok, pid} | {:error, term}
+  @spec start_link(partitions) :: {:ok, pid} | {:error, term}
   def start_link(partitions) when partitions > 0 do
     Registry.start_link(keys: :duplicate, name: __MODULE__, partitions: partitions)
   end
@@ -24,7 +26,7 @@ defmodule Tai.Events do
     Registry.register(__MODULE__, :firehose, [])
   end
 
-  @spec subscribe(event_type :: atom) :: {:ok, pid} | {:error, :subscribe_error_reasons}
+  @spec subscribe(event_type) :: {:ok, pid} | {:error, :subscribe_error_reasons}
   def subscribe(event_type) when is_atom(event_type) do
     Registry.register(__MODULE__, event_type, [])
   end
