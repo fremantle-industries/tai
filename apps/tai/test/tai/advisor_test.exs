@@ -1,17 +1,9 @@
 defmodule Tai.AdvisorTest do
   use ExUnit.Case, async: false
-  doctest Tai.Advisor
 
   defmodule MyAdvisor do
     use Tai.Advisor
     def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
-
-    def init(%Tai.Advisor.State{config: %{callback: callback}} = state) do
-      callback.()
-      super(state)
-    end
-
-    def init(state), do: super(state)
   end
 
   describe ".start_link" do
@@ -28,15 +20,6 @@ defmodule Tai.AdvisorTest do
 
       assert state.trades == [:a]
     end
-  end
-
-  test ".init/1 can be overridden" do
-    Process.register(self(), :test)
-    callback = fn -> send(:test, :init_called) end
-
-    start!(:init_override, :my_advisor, config: %{callback: callback})
-
-    assert_receive :init_called
   end
 
   defp start!(group_id, advisor_id, opts) do
