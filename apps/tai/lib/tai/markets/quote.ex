@@ -31,3 +31,10 @@ defmodule Tai.Markets.Quote do
     last_venue_timestamp
   )a
 end
+
+defimpl Stored.Item, for: Tai.Markets.Quote do
+  @type market_quote :: Tai.Markets.Quote.t()
+
+  @spec key(market_quote) :: String.t()
+  def key(q), do: "#{q.venue_id}_#{q.product_symbol}"
+end

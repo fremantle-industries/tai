@@ -14,6 +14,7 @@ defmodule Tai do
       {Tai.Settings, settings},
       Tai.Trading.PositionStore,
       Tai.Trading.OrderStore,
+      Tai.Markets.QuoteStore,
       Tai.Venues.ProductStore,
       Tai.Venues.FeeStore,
       Tai.Venues.AssetBalances,
