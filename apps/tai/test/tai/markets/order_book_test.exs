@@ -30,8 +30,9 @@ defmodule Tai.Markets.OrderBookTest do
   end
 
   @venue Tai.Markets.OrderBookTest
-  @product_symbol :btc_usd
-  @product struct(Tai.Venues.Product, venue_id: @venue, symbol: @product_symbol)
+  @symbol :btc_usd
+  @process_quote_name Tai.Markets.ProcessQuote.to_name(@venue, @symbol)
+  @product struct(Tai.Venues.Product, venue_id: @venue, symbol: @symbol)
 
   setup do
     on_exit(fn ->
@@ -44,12 +45,12 @@ defmodule Tai.Markets.OrderBookTest do
     %{book_pid: book_pid}
   end
 
-  describe ".replace" do
+  describe ".replace with order book" do
     test "overrides the bids & asks", %{book_pid: book_pid} do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{
             999.9 => 1.1,
             999.8 => 1.0
@@ -78,7 +79,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{999.9 => 1.1},
           asks: %{1000.0 => 0.1}
         })
@@ -99,12 +100,45 @@ defmodule Tai.Markets.OrderBookTest do
     end
   end
 
+  test ".replace/1 replaces price points and timestamps" do
+    Process.register(self(), @process_quote_name)
+    last_venue_timestamp = Timex.now()
+    last_received_at = Timex.now()
+
+    change_set = %OrderBook.ChangeSet{
+      venue: @venue,
+      symbol: @symbol,
+      last_venue_timestamp: last_venue_timestamp,
+      last_received_at: last_received_at,
+      changes: [
+        {:upsert, :bid, 999.9, 1.1},
+        {:upsert, :bid, 999.8, 1.0},
+        {:upsert, :ask, 1000.0, 0.1},
+        {:upsert, :ask, 1001.1, 0.11}
+      ]
+    }
+
+    change_set |> OrderBook.replace()
+
+    assert_receive {:"$gen_cast",
+                    {:order_book_snapshot, forwarded_order_book, applied_change_set}}
+
+    assert applied_change_set == change_set
+
+    assert forwarded_order_book.last_venue_timestamp == last_venue_timestamp
+    assert forwarded_order_book.last_received_at == last_received_at
+    assert Enum.count(forwarded_order_book.bids) == 2
+    assert forwarded_order_book.bids == %{999.9 => 1.1, 999.8 => 1.0}
+    assert Enum.count(forwarded_order_book.asks) == 2
+    assert forwarded_order_book.asks == %{1000.0 => 0.1, 1001.1 => 0.11}
+  end
+
   describe ".update" do
     test "changes the given bids and asks", %{book_pid: book_pid} do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{
             147.52 => 10.1,
             147.53 => 10.3
@@ -132,7 +166,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           last_received_at: last_received_at,
           bids: %{},
           asks: %{}
@@ -148,7 +182,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           last_venue_timestamp: last_venue_timestamp,
           bids: %{},
           asks: %{}
@@ -162,7 +196,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{
             100.0 => 1.0,
             101.0 => 1.0
@@ -188,7 +222,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{100.0 => 0.0},
           asks: %{102.0 => 0}
         })
@@ -211,7 +245,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.update(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{100.0 => {0.1, bid_processed_at, bid_server_changed_at}},
           asks: %{102.0 => {0.2, ask_processed_at, ask_server_changed_at}}
         })
@@ -233,12 +267,112 @@ defmodule Tai.Markets.OrderBookTest do
     end
   end
 
+  describe ".apply" do
+    test "can upsert new and existing bids/asks" do
+      process_quote_name = Tai.Markets.ProcessQuote.to_name(@venue, @symbol)
+      Process.register(self(), process_quote_name)
+
+      changes_1 = [
+        {:upsert, :bid, 100.0, 1.0},
+        {:upsert, :ask, 102.0, 11.0}
+      ]
+
+      change_set_1 = %OrderBook.ChangeSet{
+        venue: @venue,
+        symbol: @symbol,
+        changes: changes_1,
+        last_venue_timestamp: Timex.now(),
+        last_received_at: Timex.now()
+      }
+
+      OrderBook.apply(change_set_1)
+
+      assert_receive {:"$gen_cast", {:order_book_apply, _, _}}
+
+      last_venue_timestamp = Timex.now()
+      last_received_at = Timex.now()
+
+      changes_2 = [
+        {:upsert, :bid, 100.0, 5.0},
+        {:upsert, :ask, 102.0, 7.0}
+      ]
+
+      change_set_2 = %OrderBook.ChangeSet{
+        venue: @venue,
+        symbol: @symbol,
+        changes: changes_2,
+        last_venue_timestamp: last_venue_timestamp,
+        last_received_at: last_received_at
+      }
+
+      OrderBook.apply(change_set_2)
+
+      assert_receive {:"$gen_cast", {:order_book_apply, forwarded_book, forwarded_change_set}}
+
+      assert forwarded_book.last_received_at == last_received_at
+      assert forwarded_book.last_venue_timestamp == last_venue_timestamp
+      assert forwarded_book.bids == %{100.0 => 5.0}
+      assert forwarded_book.asks == %{102.0 => 7.0}
+
+      assert forwarded_change_set == change_set_2
+    end
+
+    test "can delete existing bids & asks" do
+      process_quote_name = Tai.Markets.ProcessQuote.to_name(@venue, @symbol)
+      Process.register(self(), process_quote_name)
+
+      changes_1 = [
+        {:upsert, :bid, 100.0, 1.0},
+        {:upsert, :ask, 102.0, 11.0}
+      ]
+
+      change_set_1 = %OrderBook.ChangeSet{
+        venue: @venue,
+        symbol: @symbol,
+        changes: changes_1,
+        last_venue_timestamp: Timex.now(),
+        last_received_at: Timex.now()
+      }
+
+      OrderBook.apply(change_set_1)
+
+      assert_receive {:"$gen_cast", {:order_book_apply, _, _}}
+
+      last_venue_timestamp = Timex.now()
+      last_received_at = Timex.now()
+
+      changes_2 = [
+        {:delete, :bid, 100.0},
+        {:delete, :ask, 102.0}
+      ]
+
+      change_set_2 = %OrderBook.ChangeSet{
+        venue: @venue,
+        symbol: @symbol,
+        changes: changes_2,
+        last_venue_timestamp: last_venue_timestamp,
+        last_received_at: last_received_at
+      }
+
+      OrderBook.apply(change_set_2)
+
+      assert_receive {:"$gen_cast", {:order_book_apply, forwarded_book, forwarded_change_set}}
+
+      assert forwarded_book.last_received_at == last_received_at
+      assert forwarded_book.last_venue_timestamp == last_venue_timestamp
+      assert forwarded_book.bids == %{}
+      assert forwarded_book.asks == %{}
+
+      assert forwarded_change_set == change_set_2
+    end
+  end
+
   describe ".quotes" do
     test "returns a price ordered list of all bids and asks", %{book_pid: book_pid} do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{
             146.00 => 10.1,
             147.51 => 10.2
@@ -264,7 +398,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{
             146.00 => 10.1,
             147.51 => 10.2,
@@ -297,7 +431,7 @@ defmodule Tai.Markets.OrderBookTest do
       :ok =
         OrderBook.replace(%OrderBook{
           venue_id: @venue,
-          product_symbol: @product_symbol,
+          product_symbol: @symbol,
           bids: %{
             146.00 => {10.1, nil, nil},
             147.51 => {10.2, nil, nil}
