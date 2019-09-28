@@ -12,7 +12,8 @@ defmodule Tai.ConfigTest do
                venues: %{},
                advisor_groups: %{},
                adapter_timeout: 10_000,
-               event_registry_partitions: ^schedulers_online
+               event_registry_partitions: ^schedulers_online,
+               pub_sub_registry_partitions: ^schedulers_online
              } = Tai.Config.parse([])
     end
 

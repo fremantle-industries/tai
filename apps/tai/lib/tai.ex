@@ -8,7 +8,7 @@ defmodule Tai do
     settings = Tai.Settings.from_config(config)
 
     children = [
-      Tai.PubSub,
+      {Tai.PubSub, config.pub_sub_registry_partitions},
       {Tai.Events, config.event_registry_partitions},
       Tai.EventsLogger,
       {Tai.Settings, settings},

@@ -1,4 +1,7 @@
 defmodule Tai.PubSub do
+  @type partitions :: pos_integer
+
+  @spec child_spec(opts :: term) :: Supervisor.child_spec()
   def child_spec(opts) do
     %{
       id: __MODULE__,
@@ -9,11 +12,12 @@ defmodule Tai.PubSub do
     }
   end
 
-  def start_link(_) do
+  @spec start_link(partitions) :: {:ok, pid} | {:error, term}
+  def start_link(partitions) do
     Registry.start_link(
       keys: :duplicate,
       name: __MODULE__,
-      partitions: System.schedulers_online()
+      partitions: partitions
     )
   end
 

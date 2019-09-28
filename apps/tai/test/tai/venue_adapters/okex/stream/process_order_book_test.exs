@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
            )
 
   setup do
-    start_supervised!(Tai.PubSub)
+    start_supervised!({Tai.PubSub, 1})
     start_supervised!({Tai.Events, 1})
     {:ok, book_pid} = start_supervised({OrderBook, @product})
     {:ok, store_pid} = start_supervised({ProcessOrderBook, @product})
