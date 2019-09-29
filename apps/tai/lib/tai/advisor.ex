@@ -27,8 +27,8 @@ defmodule Tai.Advisor do
   alias Tai.Markets.Quote
 
   @type group_id :: Tai.AdvisorGroup.id()
-  @type advisor_id :: atom
   @type id :: State.id()
+  @type advisor_name :: atom
   @type event :: term
   @type run_store :: State.run_store()
   @type state :: State.t()
@@ -36,7 +36,7 @@ defmodule Tai.Advisor do
   @callback after_start(state) :: {:ok, run_store}
   @callback handle_event(event, state) :: {:ok, run_store}
 
-  @spec to_name(group_id, id) :: advisor_id
+  @spec to_name(group_id, id) :: advisor_name
   def to_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
 
   defmacro __using__(_) do

@@ -2,7 +2,7 @@ defmodule Tai.Events.AdvisorHandleEventError do
   alias __MODULE__
 
   @type group_id :: Tai.AdvisorGroup.id()
-  @type advisor_id :: Tai.Advisor.advisor_id()
+  @type advisor_id :: Tai.Advisor.id()
   @type t :: %AdvisorHandleEventError{
           advisor_id: advisor_id,
           group_id: group_id,
