@@ -128,40 +128,6 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
 
-      def handle_cast({:order_updated, old_order, updated_order, callback}, state) do
-        try do
-          case callback.(old_order, updated_order, state) do
-            {:ok, new_store} -> {:noreply, state |> Map.put(:store, new_store)}
-            _ -> {:noreply, state}
-          end
-        rescue
-          e ->
-            Tai.Events.info(%Tai.Events.AdvisorOrderUpdatedError{
-              error: e,
-              stacktrace: __STACKTRACE__
-            })
-
-            {:noreply, state}
-        end
-      end
-
-      def handle_cast({:order_updated, old_order, updated_order, callback, opts}, state) do
-        try do
-          case callback.(old_order, updated_order, opts, state) do
-            {:ok, new_store} -> {:noreply, state |> Map.put(:store, new_store)}
-            _ -> {:noreply, state}
-          end
-        rescue
-          e ->
-            Tai.Events.info(%Tai.Events.AdvisorOrderUpdatedError{
-              error: e,
-              stacktrace: __STACKTRACE__
-            })
-
-            {:noreply, state}
-        end
-      end
-
       def after_start(state), do: {:ok, state.store}
 
       def handle_event(_, state), do: {:ok, state.store}
