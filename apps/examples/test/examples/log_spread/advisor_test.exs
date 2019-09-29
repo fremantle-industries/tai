@@ -16,8 +16,8 @@ defmodule Examples.LogSpread.AdvisorTest do
     assert_receive {Tai.Event, %Examples.LogSpread.Events.Spread{} = event, _}
     assert event.venue_id == :test_exchange_a
     assert event.product_symbol == :btc_usd
-    assert event.bid_price == "6500.1"
-    assert event.ask_price == "6500.11"
-    assert event.spread == "0.01"
+    assert event.bid_price == Decimal.new("6500.1")
+    assert event.ask_price == Decimal.new("6500.11")
+    assert event.spread == Decimal.new("0.01")
   end
 end

@@ -14,15 +14,19 @@ defmodule Examples.LogSpread.Advisor do
         state
       ) do
     bid_price = market_quote.bid.price |> Decimal.cast()
+    bid_size = market_quote.bid.size |> Decimal.cast()
     ask_price = market_quote.ask.price |> Decimal.cast()
+    ask_size = market_quote.ask.size |> Decimal.cast()
     spread = Decimal.sub(ask_price, bid_price)
 
     %Examples.LogSpread.Events.Spread{
       venue_id: market_quote.venue_id,
       product_symbol: market_quote.product_symbol,
-      bid_price: bid_price |> Decimal.to_string(:normal),
-      ask_price: ask_price |> Decimal.to_string(:normal),
-      spread: spread |> Decimal.to_string(:normal)
+      bid_price: bid_price,
+      bid_size: bid_size,
+      ask_price: ask_price,
+      ask_size: ask_size,
+      spread: spread
     }
     |> Tai.Events.info()
 
