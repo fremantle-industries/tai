@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
   use Supervisor
+  alias Tai.Markets.{OrderBook, ProcessQuote}
 
   @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
@@ -23,7 +24,10 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
         products: products,
         opts: _
       ) do
-    order_books = build_order_books(products)
+    account = accounts |> Map.to_list() |> List.first()
+
+    market_quote_children = market_quote_children(products)
+    order_book_children = order_book_children(products)
 
     system = [
       {Tai.VenueAdapters.Mock.Stream.Connection,
@@ -31,21 +35,31 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
          url: url(),
          venue_id: venue_id,
          channels: channels,
-         account: accounts |> Map.to_list() |> List.first(),
+         account: account,
          products: products
        ]}
     ]
 
-    (order_books ++ system)
+    (market_quote_children ++ order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp build_order_books(products) do
+  defp market_quote_children(products) do
     products
     |> Enum.map(fn p ->
       %{
-        id: Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol),
-        start: {Tai.Markets.OrderBook, :start_link, [p]}
+        id: ProcessQuote.to_name(p.venue_id, p.symbol),
+        start: {ProcessQuote, :start_link, [p]}
+      }
+    end)
+  end
+
+  defp order_book_children(products) do
+    products
+    |> Enum.map(fn p ->
+      %{
+        id: OrderBook.to_name(p.venue_id, p.symbol),
+        start: {OrderBook, :start_link, [p]}
       }
     end)
   end

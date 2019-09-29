@@ -1,6 +1,7 @@
 defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   use WebSockex
   alias Tai.Trading.OrderStore
+  alias Tai.Markets.OrderBook
   alias Tai.Events
 
   defmodule State do
@@ -70,15 +71,16 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          },
          state
        ) do
-    snapshot = %Tai.Markets.OrderBook{
-      venue_id: state.venue_id,
-      product_symbol: String.to_atom(symbol_str),
-      last_received_at: Timex.now(),
-      bids: bids |> normalize_snapshot(),
-      asks: asks |> normalize_snapshot()
-    }
+    normalized_bids = bids |> normalize_snapshot_changes(:bid)
+    normalized_asks = asks |> normalize_snapshot_changes(:ask)
 
-    Tai.Markets.OrderBook.replace(snapshot)
+    %OrderBook.ChangeSet{
+      venue: state.venue_id,
+      symbol: String.to_atom(symbol_str),
+      last_received_at: Timex.now(),
+      changes: Enum.concat(normalized_bids, normalized_asks)
+    }
+    |> OrderBook.replace()
   end
 
   defp handle_msg(
@@ -155,14 +157,15 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     |> Events.warn()
   end
 
-  defp normalize_snapshot(raw_price_points) do
-    raw_price_points
-    |> Enum.reduce(
-      %{},
-      fn {price_str, size}, acc ->
-        {price, ""} = Float.parse(price_str)
-        Map.put(acc, price, size)
-      end
-    )
+  defp normalize_snapshot_changes(venue_price_points, side) do
+    venue_price_points
+    |> Enum.map(fn {venue_price, venue_size} ->
+      {price, ""} = Float.parse(venue_price)
+      {side, price, venue_size}
+    end)
+    |> Enum.map(fn
+      {side, price, 0.0} -> {:delete, side, price}
+      {side, price, size} -> {:upsert, side, price, size}
+    end)
   end
 end
