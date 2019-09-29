@@ -16,32 +16,22 @@ defmodule Tai.Commands.Markets do
 
   @spec markets :: no_return
   def markets do
-    Tai.Venues.ProductStore.all()
-    |> fetch_inside_quotes
+    Tai.Markets.QuoteStore.all()
     |> format_rows
     |> sort_rows
     |> render!(@header)
   end
 
-  defp fetch_inside_quotes(products) when is_list(products) do
-    products
-    |> Enum.map(fn p -> {p.venue_id, p.symbol} end)
-    |> Enum.map(fn {venue_id, symbol} ->
-      {:ok, inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, symbol)
-      {venue_id, symbol, inside_quote}
-    end)
-  end
-
-  defp format_rows(products_with_inside_quote) do
-    products_with_inside_quote
-    |> Enum.map(fn {venue_id, symbol, %Tai.Markets.Quote{bid: bid, ask: ask}} ->
+  defp format_rows(market_quotes) do
+    market_quotes
+    |> Enum.map(fn market_quote ->
       [
-        venue_id,
-        symbol,
-        {bid, :price},
-        {ask, :price},
-        {bid, :size},
-        {ask, :size}
+        market_quote.venue_id,
+        market_quote.product_symbol,
+        {market_quote.bid, :price},
+        {market_quote.ask, :price},
+        {market_quote.bid, :size},
+        {market_quote.ask, :size}
       ]
       |> format_row
     end)
@@ -50,6 +40,7 @@ defmodule Tai.Commands.Markets do
   defp sort_rows(rows), do: rows |> Enum.sort(&(&1 < &2))
 
   defp format_row(row) when is_list(row), do: row |> Enum.map(&format_col/1)
+
   defp format_col({nil, _}), do: format_col(nil)
   defp format_col({receiver, message}), do: receiver |> get_in([message]) |> format_col
   defp format_col(num) when is_number(num), do: num |> Decimal.cast()

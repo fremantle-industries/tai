@@ -10,8 +10,8 @@ defmodule Tai.Markets.Quote do
   @type t :: %Quote{
           venue_id: atom,
           product_symbol: atom,
-          bid: price_point,
-          ask: price_point,
+          bid: price_point | nil,
+          ask: price_point | nil,
           last_received_at: DateTime.t() | nil,
           last_venue_timestamp: DateTime.t() | nil
         }
@@ -19,8 +19,6 @@ defmodule Tai.Markets.Quote do
   @enforce_keys ~w(
     venue_id
     product_symbol
-    bid
-    ask
   )a
   defstruct ~w(
     venue_id
