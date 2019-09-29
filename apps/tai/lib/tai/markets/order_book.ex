@@ -4,8 +4,7 @@ defmodule Tai.Markets.OrderBook do
   """
 
   use GenServer
-  alias Tai.Markets.{OrderBook, PricePoint, Quote}
-  alias Tai.PubSub
+  alias __MODULE__
 
   defmodule ChangeSet do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -69,26 +68,14 @@ defmodule Tai.Markets.OrderBook do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  @spec replace(t | ChangeSet.t()) :: :ok
-  def replace(snapshot_or_change_set)
+  @spec to_name(venue_id, product_symbol) :: atom
+  def to_name(venue, symbol), do: :"#{__MODULE__}_#{venue}_#{symbol}"
 
-  def replace(%OrderBook{} = snapshot) do
-    snapshot.venue_id
-    |> OrderBook.to_name(snapshot.product_symbol)
-    |> GenServer.call({:replace, snapshot})
-  end
-
+  @spec replace(ChangeSet.t()) :: :ok
   def replace(%OrderBook.ChangeSet{} = change_set) do
     change_set.venue
     |> OrderBook.to_name(change_set.symbol)
     |> GenServer.cast({:replace, change_set})
-  end
-
-  @spec update(t) :: :ok
-  def update(%OrderBook{} = changes) do
-    changes.venue_id
-    |> OrderBook.to_name(changes.product_symbol)
-    |> GenServer.call({:update, changes})
   end
 
   @spec apply(ChangeSet.t()) :: term
@@ -98,91 +85,7 @@ defmodule Tai.Markets.OrderBook do
     |> GenServer.cast({:apply, change_set})
   end
 
-  @doc """
-  Return bid/asks up to the given depth. If depth is not provided it returns
-  the full order book.
-  """
-  def quotes(name, depth \\ :all), do: GenServer.call(name, {:quotes, depth: depth})
-
-  @doc """
-  Return the bid/ask at the top of the book
-  """
-  @spec inside_quote(venue_id, product_symbol) :: {:ok, Quote.t()}
-  def inside_quote(venue, symbol) do
-    name = to_name(venue, symbol)
-
-    name
-    |> quotes(1)
-    |> case do
-      {:ok, book} ->
-        inside_bid = List.first(book.bids)
-        inside_ask = List.first(book.asks)
-
-        q = %Quote{
-          venue_id: venue,
-          product_symbol: symbol,
-          last_received_at: book.last_received_at,
-          last_venue_timestamp: book.last_venue_timestamp,
-          bid: inside_bid,
-          ask: inside_ask
-        }
-
-        {:ok, q}
-    end
-  end
-
-  @spec to_name(venue_id, product_symbol) :: atom
-  def to_name(venue, symbol), do: :"#{__MODULE__}_#{venue}_#{symbol}"
-
   def init(state), do: {:ok, state}
-
-  def handle_call({:quotes, depth: depth}, _from, state) do
-    order_book = %OrderBook{
-      venue_id: state.venue_id,
-      product_symbol: state.product_symbol,
-      last_received_at: state.last_received_at,
-      last_venue_timestamp: state.last_venue_timestamp,
-      bids: state |> ordered_bids |> take(depth),
-      asks: state |> ordered_asks |> take(depth)
-    }
-
-    {:reply, {:ok, order_book}, state}
-  end
-
-  def handle_call({:replace, %OrderBook{} = snapshot}, _from, _state) do
-    PubSub.broadcast(
-      {:order_book_snapshot, snapshot.venue_id, snapshot.product_symbol},
-      {:order_book_snapshot, snapshot.venue_id, snapshot.product_symbol, snapshot}
-    )
-
-    Tai.Events.debug(%Tai.Events.OrderBookSnapshot{
-      venue_id: snapshot.venue_id,
-      symbol: snapshot.product_symbol
-    })
-
-    {:reply, :ok, snapshot}
-  end
-
-  def handle_call({:update, changes}, _from, state) do
-    PubSub.broadcast(
-      {:order_book_changes, state.venue_id, state.product_symbol},
-      {:order_book_changes, state.venue_id, state.product_symbol, changes}
-    )
-
-    new_state =
-      state
-      |> update_side(:bids, changes.bids)
-      |> update_side(:asks, changes.asks)
-      |> Map.put(:last_received_at, changes.last_received_at)
-      |> Map.put(:last_venue_timestamp, changes.last_venue_timestamp)
-
-    Tai.Events.debug(%Tai.Events.OrderBookUpdate{
-      venue_id: state.venue_id,
-      symbol: state.product_symbol
-    })
-
-    {:reply, :ok, new_state}
-  end
 
   def handle_cast({:replace, %OrderBook.ChangeSet{} = change_set}, state) do
     new_state =
@@ -240,52 +143,5 @@ defmodule Tai.Markets.OrderBook do
           Map.put(acc, :asks, new_asks)
       end
     )
-  end
-
-  defp ordered_bids(state) do
-    state.bids
-    |> Map.keys()
-    |> Enum.sort()
-    |> Enum.reverse()
-    |> with_price_points(state.bids)
-  end
-
-  defp ordered_asks(state) do
-    state.asks
-    |> Map.keys()
-    |> Enum.sort()
-    |> with_price_points(state.asks)
-  end
-
-  defp with_price_points(prices, levels) do
-    prices
-    |> Enum.map(fn price ->
-      size = levels[price]
-      %PricePoint{price: price, size: size}
-    end)
-  end
-
-  defp take(list, :all), do: list
-
-  defp take(list, depth) do
-    list
-    |> Enum.take(depth)
-  end
-
-  defp update_side(state, side, price_levels) do
-    new_side =
-      state
-      |> Map.get(side)
-      |> Map.merge(price_levels)
-      |> Map.drop(price_levels |> drop_prices)
-
-    state
-    |> Map.put(side, new_side)
-  end
-
-  defp drop_prices(price_levels) do
-    price_levels
-    |> Enum.filter(fn {_, size} -> size == 0 end)
-    |> Enum.map(fn {price, _} -> price end)
   end
 end

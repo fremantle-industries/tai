@@ -4,12 +4,11 @@ defmodule Tai.Event do
           | Tai.Events.HydrateProducts.t()
           | Tai.Events.LockAssetBalanceInsufficientFunds.t()
           | Tai.Events.LockAssetBalanceOk.t()
-          | Tai.Events.OrderBookSnapshot.t()
           | Tai.Events.SubFreeAssetBalance.t()
           | Tai.Events.UnlockAssetBalanceInsufficientFunds.t()
           | Tai.Events.UnlockAssetBalanceOk.t()
           | Tai.Events.UpsertAssetBalance.t()
-          | map
+          | struct
 
   @spec encode!(event :: t) :: iodata | no_return
   def encode!(event) when is_map(event) do
