@@ -66,8 +66,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   defp snapshot_order_books(products) do
     products
     |> Enum.map(fn product ->
-      with {:ok, snapshot} <- Stream.Snapshot.fetch(product, @price_levels) do
-        :ok = Tai.Markets.OrderBook.replace(snapshot)
+      with {:ok, change_set} <- Stream.Snapshot.fetch(product, @price_levels) do
+        change_set |> Tai.Markets.OrderBook.replace()
       else
         {:error, reason} -> raise reason
       end

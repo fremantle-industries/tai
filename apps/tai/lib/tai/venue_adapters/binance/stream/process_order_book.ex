@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBook do
   use GenServer
+  alias Tai.Markets.OrderBook
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -26,6 +27,9 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBook do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
+  @spec to_name(venue_id, venue_symbol) :: atom
+  def to_name(venue, venue_symbol), do: :"#{__MODULE__}_#{venue}_#{venue_symbol}"
+
   @spec init(state) :: {:ok, state}
   def init(state), do: {:ok, state}
 
@@ -42,34 +46,31 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBook do
         state
       ) do
     {:ok, venue_timestamp} = DateTime.from_unix(event_time, :millisecond)
-    bids = changed_bids |> normalize(received_at, venue_timestamp)
-    asks = changed_asks |> normalize(received_at, venue_timestamp)
+    normalized_bids = changed_bids |> normalize_changes(:bid)
+    normalized_asks = changed_asks |> normalize_changes(:ask)
 
-    %Tai.Markets.OrderBook{
-      venue_id: state.venue,
-      product_symbol: state.symbol,
-      bids: bids,
-      asks: asks,
+    %OrderBook.ChangeSet{
+      venue: state.venue,
+      symbol: state.symbol,
+      last_venue_timestamp: venue_timestamp,
       last_received_at: received_at,
-      last_venue_timestamp: venue_timestamp
+      changes: Enum.concat(normalized_bids, normalized_asks)
     }
-    |> Tai.Markets.OrderBook.update()
+    |> OrderBook.apply()
 
     {:noreply, state}
   end
 
-  @spec to_name(venue_id, venue_symbol) :: atom
-  def to_name(venue, venue_symbol), do: :"#{__MODULE__}_#{venue}_#{venue_symbol}"
-
-  defp normalize(raw_price_levels, _received_at, _venue_sent_at) do
-    raw_price_levels
-    |> Enum.reduce(
-      %{},
-      fn [raw_price, raw_size], acc ->
-        {price, _} = Float.parse(raw_price)
-        {size, _} = Float.parse(raw_size)
-        Map.put(acc, price, size)
-      end
-    )
+  defp normalize_changes(venue_price_points, side) do
+    venue_price_points
+    |> Enum.map(fn [raw_price, raw_size] ->
+      {price, _} = Float.parse(raw_price)
+      {size, _} = Float.parse(raw_size)
+      {price, size}
+    end)
+    |> Enum.map(fn
+      {price, 0.0} -> {:delete, side, price}
+      {price, size} -> {:upsert, side, price, size}
+    end)
   end
 end

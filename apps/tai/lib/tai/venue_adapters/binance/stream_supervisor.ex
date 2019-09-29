@@ -8,6 +8,8 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
     RouteOrderBooks
   }
 
+  alias Tai.Markets.{OrderBook, ProcessQuote}
+
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
@@ -28,8 +30,11 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   @base_url "wss://stream.binance.com:9443/stream"
 
   def init(venue_id: venue, channels: channels, accounts: accounts, products: products, opts: _) do
-    order_books = build_order_books(products)
-    order_book_stores = build_order_book_stores(products)
+    account = accounts |> Map.to_list() |> List.first()
+
+    market_quote_children = market_quote_children(products)
+    order_book_children = order_book_children(products)
+    process_order_book_children = process_order_book_children(products)
 
     system = [
       {RouteOrderBooks, [venue_id: venue, products: products]},
@@ -38,12 +43,12 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
        [
          url: url(products, channels),
          venue_id: venue,
-         account: accounts |> Map.to_list() |> List.first(),
+         account: account,
          products: products
        ]}
     ]
 
-    (order_books ++ order_book_stores ++ system)
+    (market_quote_children ++ order_book_children ++ process_order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
 
@@ -80,17 +85,27 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
     |> Enum.map(&String.downcase/1)
   end
 
-  defp build_order_books(products) do
+  defp market_quote_children(products) do
     products
     |> Enum.map(fn p ->
       %{
-        id: Tai.Markets.OrderBook.to_name(p.venue_id, p.symbol),
-        start: {Tai.Markets.OrderBook, :start_link, [p]}
+        id: ProcessQuote.to_name(p.venue_id, p.symbol),
+        start: {ProcessQuote, :start_link, [p]}
       }
     end)
   end
 
-  defp build_order_book_stores(products) do
+  defp order_book_children(products) do
+    products
+    |> Enum.map(fn p ->
+      %{
+        id: OrderBook.to_name(p.venue_id, p.symbol),
+        start: {OrderBook, :start_link, [p]}
+      }
+    end)
+  end
+
+  defp process_order_book_children(products) do
     products
     |> Enum.map(fn p ->
       %{

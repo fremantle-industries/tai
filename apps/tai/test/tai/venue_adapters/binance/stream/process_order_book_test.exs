@@ -1,11 +1,12 @@
 defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
   use ExUnit.Case, async: false
   alias Tai.VenueAdapters.Binance.Stream.ProcessOrderBook
-  alias Tai.Markets.{OrderBook, PricePoint}
+  alias Tai.Markets.OrderBook
 
   @venue :venue_a
   @symbol :xbtusd
   @venue_symbol "XBTUSD"
+  @process_quote_name Tai.Markets.ProcessQuote.to_name(@venue, @symbol)
   @product struct(Tai.Venues.Product,
              venue_id: @venue,
              symbol: @symbol,
@@ -13,118 +14,97 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
            )
 
   setup do
+    Process.register(self(), @process_quote_name)
     start_supervised!({Tai.PubSub, 1})
     start_supervised!({Tai.Events, 1})
+    start_supervised!({OrderBook, @product})
+    {:ok, pid} = start_supervised({ProcessOrderBook, @product})
 
-    {:ok, book_pid} = start_supervised({OrderBook, @product})
-    {:ok, store_pid} = start_supervised({ProcessOrderBook, @product})
-
-    {:ok, %{book_pid: book_pid, store_pid: store_pid}}
+    {:ok, %{pid: pid}}
   end
 
-  test "can insert new price points into the order book", %{
-    book_pid: book_pid,
-    store_pid: store_pid
-  } do
-    Tai.Events.firehose_subscribe()
+  test "can insert new price points into the order book", %{pid: pid} do
+    data = %{
+      "E" => 1_569_054_255_636,
+      "s" => @venue_symbol,
+      "b" => [["100", "15"]],
+      "a" => [["101", "11"]]
+    }
 
+    GenServer.cast(pid, {:update, data, Timex.now()})
+
+    assert_receive {:"$gen_cast", {:order_book_apply, forwarded_order_book, change_set}}
+
+    assert Enum.count(forwarded_order_book.bids) == 1
+    assert forwarded_order_book.bids == %{100.0 => 15.0}
+    assert Enum.count(forwarded_order_book.asks) == 1
+    assert forwarded_order_book.asks == %{101.0 => 11.0}
+
+    assert %DateTime{} = forwarded_order_book.last_venue_timestamp
+    assert %DateTime{} = forwarded_order_book.last_received_at
+  end
+
+  test "can update existing price points in the order book", %{pid: pid} do
     snapshot =
-      struct(OrderBook,
-        venue_id: @venue,
-        product_symbol: @symbol,
-        bids: %{},
-        asks: %{}
+      struct(OrderBook.ChangeSet,
+        venue: @venue,
+        symbol: @symbol,
+        changes: [
+          {:upsert, :bid, 100.0, 5.0},
+          {:upsert, :ask, 101.0, 10.0}
+        ]
       )
 
-    :ok = OrderBook.replace(snapshot)
+    OrderBook.replace(snapshot)
 
     data = %{
       "E" => 1_569_054_255_636,
       "s" => @venue_symbol,
-      "b" => [["101", "15"]],
-      "a" => [["100", "11"]]
+      "b" => [["100", "15"]],
+      "a" => [["101", "11"]]
     }
 
-    GenServer.cast(store_pid, {:update, data, Timex.now()})
+    GenServer.cast(pid, {:update, data, Timex.now()})
 
-    assert_receive {Tai.Event, %Tai.Events.OrderBookUpdate{} = event, :debug}
-    assert event.venue_id == @venue
-    assert event.symbol == @symbol
+    assert_receive {:"$gen_cast", {:order_book_apply, forwarded_order_book, change_set}}
 
-    assert {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(book_pid)
-    assert Enum.count(bids) == 1
-    assert Enum.at(bids, 0) == %PricePoint{price: 101.0, size: 15}
-    assert Enum.count(asks) == 1
-    assert Enum.at(asks, 0) == %PricePoint{price: 100.0, size: 11}
+    assert Enum.count(forwarded_order_book.bids) == 1
+    assert forwarded_order_book.bids == %{100.0 => 15.0}
+    assert Enum.count(forwarded_order_book.asks) == 1
+    assert forwarded_order_book.asks == %{101.0 => 11.0}
+
+    assert %DateTime{} = forwarded_order_book.last_venue_timestamp
+    assert %DateTime{} = forwarded_order_book.last_received_at
   end
 
-  test "can update existing price points in the order book", %{
-    book_pid: book_pid,
-    store_pid: store_pid
-  } do
-    Tai.Events.firehose_subscribe()
-
+  test "can delete existing price points from the order book", %{pid: pid} do
     snapshot =
-      struct(OrderBook,
-        venue_id: @venue,
-        product_symbol: @symbol,
-        bids: %{101.0 => 5},
-        asks: %{100.0 => 10}
+      struct(OrderBook.ChangeSet,
+        venue: @venue,
+        symbol: @symbol,
+        changes: [
+          {:upsert, :bid, 100.0, 5.0},
+          {:upsert, :ask, 101.0, 10.0}
+        ]
       )
 
-    :ok = OrderBook.replace(snapshot)
+    OrderBook.replace(snapshot)
 
     data = %{
       "E" => 1_569_054_255_636,
       "s" => @venue_symbol,
-      "b" => [["101", "15"]],
-      "a" => [["100", "11"]]
+      "b" => [["100", "0"]],
+      "a" => [["101", "0"]]
     }
 
-    GenServer.cast(store_pid, {:update, data, Timex.now()})
+    GenServer.cast(pid, {:update, data, Timex.now()})
 
-    assert_receive {Tai.Event, %Tai.Events.OrderBookUpdate{} = event, :debug}
-    assert event.venue_id == @venue
-    assert event.symbol == @symbol
+    assert_receive {:"$gen_cast", {:order_book_apply, forwarded_order_book, change_set}}
 
-    assert {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(book_pid)
-    assert Enum.count(bids) == 1
-    assert Enum.at(bids, 0) == %PricePoint{price: 101.0, size: 15}
-    assert Enum.count(asks) == 1
-    assert Enum.at(asks, 0) == %PricePoint{price: 100.0, size: 11}
-  end
+    assert Enum.count(forwarded_order_book.bids) == 0
+    assert Enum.count(forwarded_order_book.asks) == 0
 
-  test "can delete existing price points from the order book", %{
-    book_pid: book_pid,
-    store_pid: store_pid
-  } do
-    Tai.Events.firehose_subscribe()
-
-    snapshot =
-      struct(OrderBook,
-        venue_id: @venue,
-        product_symbol: @symbol,
-        bids: %{101.0 => 5},
-        asks: %{100.0 => 10}
-      )
-
-    :ok = OrderBook.replace(snapshot)
-
-    data = %{
-      "E" => 1_569_054_255_636,
-      "s" => @venue_symbol,
-      "b" => [["101", "0"]],
-      "a" => [["100", "0"]]
-    }
-
-    GenServer.cast(store_pid, {:update, data, Timex.now()})
-
-    assert_receive {Tai.Event, %Tai.Events.OrderBookUpdate{} = event, :debug}
-    assert event.venue_id == @venue
-    assert event.symbol == @symbol
-
-    assert {:ok, %OrderBook{bids: bids, asks: asks}} = OrderBook.quotes(book_pid)
-    assert Enum.count(bids) == 0
-    assert Enum.count(asks) == 0
+    assert %DateTime{} = forwarded_order_book.last_venue_timestamp
+    assert %DateTime{} = forwarded_order_book.last_received_at
   end
 end
