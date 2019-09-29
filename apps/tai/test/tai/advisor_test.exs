@@ -3,13 +3,13 @@ defmodule Tai.AdvisorTest do
 
   defmodule NoOpAdvisor do
     use Tai.Advisor
-    def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
+    def handle_event(_, state), do: {:ok, state.store}
   end
 
   defmodule CallbackAdvisor do
     use Tai.Advisor
 
-    def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
+    def handle_event(_, state), do: {:ok, state.store}
 
     def after_start(state) do
       send(Tai.AdvisorTest, :after_start_callback)
