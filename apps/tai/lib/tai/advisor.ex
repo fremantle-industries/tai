@@ -75,7 +75,8 @@ defmodule Tai.Advisor do
       def init(state), do: {:ok, state, {:continue, :started}}
 
       def handle_continue(:started, state) do
-        after_start(state)
+        {:ok, new_run_store} = after_start(state)
+        new_state = Map.put(state, :store, new_run_store)
 
         state.products
         |> Enum.each(fn p ->
@@ -85,7 +86,7 @@ defmodule Tai.Advisor do
           ])
         end)
 
-        {:noreply, state}
+        {:noreply, new_state}
       end
 
       def handle_info({:order_book_snapshot, venue_id, product_symbol, snapshot}, state) do

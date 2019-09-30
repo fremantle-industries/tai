@@ -12,8 +12,9 @@ defmodule Tai.AdvisorTest do
     def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
 
     def after_start(state) do
-      send(Tai.AdvisorTest, {:after_start_callback, state})
-      {:ok, state.store}
+      send(Tai.AdvisorTest, :after_start_callback)
+      store = Map.put(state.store, :after_start_store, :is_updatable)
+      {:ok, store}
     end
   end
 
@@ -36,10 +37,11 @@ defmodule Tai.AdvisorTest do
   test "fires the after_start callback" do
     Process.register(self(), __MODULE__)
 
-    start!(CallbackAdvisor, :init_trades, :my_advisor, [])
+    advisor_pid = start!(CallbackAdvisor, :init_trades, :my_advisor, [])
 
-    assert_receive {:after_start_callback, state}
-    assert %Tai.Advisor.State{} = state
+    assert_receive :after_start_callback
+    assert %Tai.Advisor.State{store: store} = :sys.get_state(advisor_pid)
+    assert %{after_start_store: :is_updatable} = store
   end
 
   defp start!(advisor, group_id, advisor_id, opts) do
