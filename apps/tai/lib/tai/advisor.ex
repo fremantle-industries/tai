@@ -35,6 +35,7 @@ defmodule Tai.Advisor do
   @type run_store :: State.run_store()
   @type state :: State.t()
 
+  @callback after_start(state) :: {:ok, run_store}
   @callback handle_inside_quote(venue_id, product_symbol, market_quote, changes, state) ::
               {:ok, run_store}
 
@@ -71,13 +72,11 @@ defmodule Tai.Advisor do
         GenServer.start_link(__MODULE__, state, name: name)
       end
 
-      @doc false
-      def init(state) do
-        {:ok, state, {:continue, :subscribe_to_products}}
-      end
+      def init(state), do: {:ok, state, {:continue, :started}}
 
-      @doc false
-      def handle_continue(:subscribe_to_products, state) do
+      def handle_continue(:started, state) do
+        after_start(state)
+
         state.products
         |> Enum.each(fn p ->
           Tai.PubSub.subscribe([
@@ -89,7 +88,6 @@ defmodule Tai.Advisor do
         {:noreply, state}
       end
 
-      @doc false
       def handle_info({:order_book_snapshot, venue_id, product_symbol, snapshot}, state) do
         new_state =
           state
@@ -99,7 +97,6 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
 
-      @doc false
       def handle_info({:order_book_changes, venue_id, product_symbol, changes}, state) do
         previous_inside_quote =
           state.market_quotes |> Tai.Advisors.MarketQuotes.for(venue_id, product_symbol)
@@ -121,7 +118,6 @@ defmodule Tai.Advisor do
         end
       end
 
-      @doc false
       def handle_cast({:order_updated, old_order, updated_order, callback}, state) do
         try do
           case callback.(old_order, updated_order, state) do
@@ -139,7 +135,6 @@ defmodule Tai.Advisor do
         end
       end
 
-      @doc false
       def handle_cast({:order_updated, old_order, updated_order, callback, opts}, state) do
         try do
           case callback.(old_order, updated_order, opts, state) do
@@ -156,6 +151,10 @@ defmodule Tai.Advisor do
             {:noreply, state}
         end
       end
+
+      def after_start(state), do: {:ok, state.store}
+
+      defoverridable after_start: 1
 
       defp cache_inside_quote(state, venue_id, product_symbol) do
         {:ok, current_inside_quote} = Tai.Markets.OrderBook.inside_quote(venue_id, product_symbol)
