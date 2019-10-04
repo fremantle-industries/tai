@@ -16,8 +16,8 @@ defmodule Tai.Trading.OrderStore.Actions.PassiveFill do
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PassiveFill do
-  def required(_),
-    do: ~w(open partially_filled pending_amend pending_cancel amend_error cancel_error)a
+  @required ~w(open partially_filled pending_amend pending_cancel amend_error cancel_accepted cancel_error)a
+  def required(_), do: @required
 
   def attrs(action) do
     %{

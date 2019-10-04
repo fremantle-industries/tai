@@ -83,6 +83,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Fill
              :pending_amend,
              :pending_cancel,
              :amend_error,
+             :cancel_accepted,
              :cancel_error
            ]
   end
