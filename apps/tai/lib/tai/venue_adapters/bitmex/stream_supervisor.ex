@@ -30,7 +30,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   def init(venue_adapter: venue_adapter, products: products) do
     account = venue_adapter.accounts |> Map.to_list() |> List.first()
 
-    market_quote_children = market_quote_children(products)
+    market_quote_children = market_quote_children(products, venue_adapter.quote_depth)
     order_book_children = order_book_children(products)
     process_order_book_children = process_order_book_children(products)
 
@@ -53,12 +53,12 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp market_quote_children(products) do
+  defp market_quote_children(products, depth) do
     products
     |> Enum.map(fn p ->
       %{
         id: ProcessQuote.to_name(p.venue_id, p.symbol),
-        start: {ProcessQuote, :start_link, [[product: p, depth: 1]]}
+        start: {ProcessQuote, :start_link, [[product: p, depth: depth]]}
       }
     end)
   end
