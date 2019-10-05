@@ -10,39 +10,36 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
 
   alias Tai.Markets.{OrderBook, ProcessQuote}
 
+  @type adapter :: Tai.Venues.Adapter.t()
   @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type channel :: Tai.Venues.Adapter.channel()
   @type product :: Tai.Venues.Product.t()
 
-  @spec start_link(
-          venue_id: venue_id,
-          channels: [channel],
-          accounts: map,
-          products: [product],
-          opts: map
-        ) ::
-          Supervisor.on_start()
-  def start_link([venue_id: venue_id, channels: _, accounts: _, products: _, opts: _] = args) do
-    Supervisor.start_link(__MODULE__, args, name: :"#{__MODULE__}_#{venue_id}")
+  @spec start_link(venue_adapter: adapter, products: [product]) :: Supervisor.on_start()
+  def start_link([venue_adapter: venue_adapter, products: _] = args) do
+    name = venue_adapter.id |> to_name()
+    Supervisor.start_link(__MODULE__, args, name: name)
   end
+
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   # TODO: Make this configurable
   @base_url "wss://stream.binance.com:9443/stream"
 
-  def init(venue_id: venue, channels: channels, accounts: accounts, products: products, opts: _) do
-    account = accounts |> Map.to_list() |> List.first()
+  def init(venue_adapter: venue_adapter, products: products) do
+    account = venue_adapter.accounts |> Map.to_list() |> List.first()
 
     market_quote_children = market_quote_children(products)
     order_book_children = order_book_children(products)
     process_order_book_children = process_order_book_children(products)
 
     system = [
-      {RouteOrderBooks, [venue_id: venue, products: products]},
-      {ProcessOptionalChannels, [venue_id: venue]},
+      {RouteOrderBooks, [venue_id: venue_adapter.id, products: products]},
+      {ProcessOptionalChannels, [venue_id: venue_adapter.id]},
       {Connection,
        [
-         url: url(products, channels),
-         venue_id: venue,
+         url: url(products, venue_adapter.channels),
+         venue_id: venue_adapter.id,
          account: account,
          products: products
        ]}
