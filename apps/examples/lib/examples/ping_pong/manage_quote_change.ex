@@ -1,7 +1,7 @@
 defmodule Examples.PingPong.ManageQuoteChange do
   alias Examples.PingPong.{CreateEntryOrder, EntryPrice}
-  alias Tai.Markets.{PricePoint, Quote}
   alias Tai.Trading.{Orders, Order}
+  alias Tai.Markets.Quote
   alias Tai.Advisor.State
 
   @type market_quote :: Tai.Markets.Quote.t()
@@ -10,12 +10,12 @@ defmodule Examples.PingPong.ManageQuoteChange do
 
   @spec with_all_quotes(market_quote) ::
           {:ok, market_quote} | {:error, :no_bid | :no_ask | :no_bid_or_ask}
-  def with_all_quotes(%Quote{bid: %PricePoint{}, ask: %PricePoint{}} = market_quote),
+  def with_all_quotes(%Quote{bids: [_ | _], asks: [_ | _]} = market_quote),
     do: {:ok, market_quote}
 
-  def with_all_quotes(%Quote{bid: nil, ask: %PricePoint{}}), do: {:error, :no_bid}
-  def with_all_quotes(%Quote{bid: %PricePoint{}, ask: nil}), do: {:error, :no_ask}
-  def with_all_quotes(%Quote{bid: nil, ask: nil}), do: {:error, :no_bid_or_ask}
+  def with_all_quotes(%Quote{bids: [], asks: []}), do: {:error, :no_bid_or_ask}
+  def with_all_quotes(%Quote{bids: [], asks: _}), do: {:error, :no_bid}
+  def with_all_quotes(%Quote{bids: _, asks: []}), do: {:error, :no_ask}
 
   @spec manage_entry_order({:ok, market_quote}, state, module) :: {:ok, run_store}
   def manage_entry_order(_, _, orders_provider \\ Orders)

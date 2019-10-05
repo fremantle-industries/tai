@@ -18,7 +18,8 @@ defmodule Examples.PingPong.ManageQuoteChangeTest do
       product = struct(Tai.Venues.Product, price_increment: Decimal.new("0.5"))
       config = struct(Examples.PingPong.Config, product: product)
 
-      market_quote = struct(Tai.Markets.Quote, ask: struct(Tai.Markets.PricePoint, price: 100.5))
+      market_quote =
+        struct(Tai.Markets.Quote, asks: [struct(Tai.Markets.PricePoint, price: 100.5)])
 
       market_quotes =
         struct(Tai.Advisors.MarketQuotes, data: %{{:venue_a, :product_a} => market_quote})
@@ -50,7 +51,7 @@ defmodule Examples.PingPong.ManageQuoteChangeTest do
       assert unchanged_run_store.entry_order.client_id == "A"
 
       changed_market_quote =
-        struct(Tai.Markets.Quote, ask: struct(Tai.Markets.PricePoint, price: 120))
+        struct(Tai.Markets.Quote, asks: [struct(Tai.Markets.PricePoint, price: 120)])
 
       changed_market_quotes =
         struct(Tai.Advisors.MarketQuotes, data: %{{:venue_a, :product_a} => changed_market_quote})

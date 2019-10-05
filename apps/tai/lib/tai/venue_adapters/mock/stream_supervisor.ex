@@ -41,7 +41,7 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
     |> Enum.map(fn p ->
       %{
         id: ProcessQuote.to_name(p.venue_id, p.symbol),
-        start: {ProcessQuote, :start_link, [p]}
+        start: {ProcessQuote, :start_link, [[product: p, depth: 1]]}
       }
     end)
   end

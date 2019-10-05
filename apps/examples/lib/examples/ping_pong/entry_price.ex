@@ -5,8 +5,8 @@ defmodule Examples.PingPong.EntryPrice do
   @type product :: Tai.Venues.Product.t()
 
   @spec calculate(market_quote, product) :: Decimal.t()
-  def calculate(%Quote{} = market_quote, product) do
-    market_quote.ask.price
+  def calculate(%Quote{asks: [inside_ask | _]}, product) do
+    inside_ask.price
     |> Decimal.cast()
     |> Decimal.sub(product.price_increment)
   end

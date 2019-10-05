@@ -13,22 +13,22 @@ defmodule Tai.Commands.MarketsTest do
     %Quote{
       venue_id: :test_exchange_a,
       product_symbol: :btc_usd,
-      bid: %PricePoint{price: 12_999.99, size: 0.000021},
-      ask: %PricePoint{price: 13_000.01, size: 1.11}
+      bids: [%PricePoint{price: 12_999.99, size: 0.000021}],
+      asks: [%PricePoint{price: 13_000.01, size: 1.11}]
     }
     |> Tai.Markets.QuoteStore.upsert()
 
     %Quote{
       venue_id: :test_exchange_a,
       product_symbol: :ltc_usd,
-      bid: %PricePoint{price: 101.99, size: 1.3}
+      bids: [%PricePoint{price: 101.99, size: 1.3}]
     }
     |> Tai.Markets.QuoteStore.upsert()
 
     %Quote{
       venue_id: :test_exchange_a,
       product_symbol: :eth_usd,
-      ask: %PricePoint{price: 195.66, size: 0.12}
+      asks: [%PricePoint{price: 195.66, size: 0.12}]
     }
     |> Tai.Markets.QuoteStore.upsert()
 

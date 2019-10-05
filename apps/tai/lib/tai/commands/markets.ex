@@ -4,6 +4,7 @@ defmodule Tai.Commands.Markets do
   """
 
   import Tai.Commands.Table, only: [render!: 2]
+  alias Tai.Markets.Quote
 
   @header [
     "Venue",
@@ -25,13 +26,16 @@ defmodule Tai.Commands.Markets do
   defp format_rows(market_quotes) do
     market_quotes
     |> Enum.map(fn market_quote ->
+      inside_bid = Quote.inside_bid(market_quote)
+      inside_ask = Quote.inside_ask(market_quote)
+
       [
         market_quote.venue_id,
         market_quote.product_symbol,
-        {market_quote.bid, :price},
-        {market_quote.ask, :price},
-        {market_quote.bid, :size},
-        {market_quote.ask, :size}
+        {inside_bid, :price},
+        {inside_ask, :price},
+        {inside_bid, :size},
+        {inside_ask, :size}
       ]
       |> format_row
     end)

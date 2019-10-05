@@ -31,8 +31,8 @@ defmodule Tai.Advisors.HandleEventTest do
   @market_quote %Quote{
     venue_id: @venue,
     product_symbol: @symbol,
-    bid: %PricePoint{price: 101.2, size: 1.0},
-    ask: %PricePoint{price: 101.3, size: 0.1}
+    bids: [%PricePoint{price: 101.2, size: 1.0}],
+    asks: [%PricePoint{price: 101.3, size: 0.1}]
   }
 
   defp start_advisor!(advisor, config \\ %{}) do
@@ -70,10 +70,13 @@ defmodule Tai.Advisors.HandleEventTest do
     assert received_market_quote.venue_id == @venue
     assert received_market_quote.product_symbol == @symbol
 
-    assert received_market_quote.bid.price == 101.2
-    assert received_market_quote.bid.size == 1.0
-    assert received_market_quote.ask.price == 101.3
-    assert received_market_quote.ask.size == 0.1
+    assert %PricePoint{} = inside_bid = received_market_quote.bids |> hd()
+    assert inside_bid.price == 101.2
+    assert inside_bid.size == 1.0
+
+    assert %PricePoint{} = inside_ask = received_market_quote.asks |> hd()
+    assert inside_ask.price == 101.3
+    assert inside_ask.size == 0.1
   end
 
   test "emits an event and maintains state between callbacks when return is invalid" do

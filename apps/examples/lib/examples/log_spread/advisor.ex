@@ -7,16 +7,13 @@ defmodule Examples.LogSpread.Advisor do
 
   def handle_event(
         # wait until we have a quote with price points for both sides of the order book
-        %Tai.Markets.Quote{
-          bid: %Tai.Markets.PricePoint{},
-          ask: %Tai.Markets.PricePoint{}
-        } = market_quote,
+        %Tai.Markets.Quote{bids: [inside_bid | _], asks: [inside_ask | _]} = market_quote,
         state
       ) do
-    bid_price = market_quote.bid.price |> Decimal.cast()
-    bid_size = market_quote.bid.size |> Decimal.cast()
-    ask_price = market_quote.ask.price |> Decimal.cast()
-    ask_size = market_quote.ask.size |> Decimal.cast()
+    bid_price = inside_bid.price |> Decimal.cast()
+    bid_size = inside_bid.size |> Decimal.cast()
+    ask_price = inside_ask.price |> Decimal.cast()
+    ask_size = inside_ask.size |> Decimal.cast()
     spread = Decimal.sub(ask_price, bid_price)
 
     %Examples.LogSpread.Events.Spread{
