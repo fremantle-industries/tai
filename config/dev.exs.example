@@ -29,6 +29,7 @@ config :tai,
       enabled: true,
       adapter: Tai.VenueAdapters.Bitmex,
       products: "xbtusd",
+      quote_depth: 3,
       accounts: %{
         main: %{
           api_key: {:system_file, "BITMEX_API_KEY"},

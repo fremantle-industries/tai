@@ -30,6 +30,7 @@ defmodule Tai.Venues.Adapter do
           channels: [channel],
           products: String.t() | function,
           accounts: map,
+          quote_depth: pos_integer,
           timeout: non_neg_integer,
           opts: map
         }
@@ -49,6 +50,24 @@ defmodule Tai.Venues.Adapter do
   @callback cancel_order(order, credentials) ::
               {:ok, cancel_response} | {:error, cancel_order_error_reason}
 
-  @enforce_keys ~w(id adapter channels products accounts timeout opts)a
-  defstruct ~w(id adapter channels products accounts timeout opts)a
+  @enforce_keys ~w(
+    id
+    adapter
+    channels
+    products
+    accounts
+    quote_depth
+    timeout
+    opts
+  )a
+  defstruct ~w(
+    id
+    adapter
+    channels
+    products
+    accounts
+    quote_depth
+    timeout
+    opts
+  )a
 end

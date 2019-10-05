@@ -5,32 +5,31 @@ defmodule Examples.LogSpread.Advisor do
 
   use Tai.Advisor
 
-  def handle_inside_quote(
-        venue_id,
-        product_symbol,
-        # wait until we have quotes for both sides of the order book
-        %Tai.Markets.Quote{
-          bid: %Tai.Markets.PricePoint{},
-          ask: %Tai.Markets.PricePoint{}
-        } = market_quote,
-        _changes,
+  def handle_event(
+        # wait until we have a quote with price points for both sides of the order book
+        %Tai.Markets.Quote{bids: [inside_bid | _], asks: [inside_ask | _]} = market_quote,
         state
       ) do
-    bid_price = market_quote.bid.price |> Decimal.cast()
-    ask_price = market_quote.ask.price |> Decimal.cast()
+    bid_price = inside_bid.price |> Decimal.cast()
+    bid_size = inside_bid.size |> Decimal.cast()
+    ask_price = inside_ask.price |> Decimal.cast()
+    ask_size = inside_ask.size |> Decimal.cast()
     spread = Decimal.sub(ask_price, bid_price)
 
-    Tai.Events.info(%Examples.LogSpread.Events.Spread{
-      venue_id: venue_id,
-      product_symbol: product_symbol,
-      bid_price: bid_price |> Decimal.to_string(:normal),
-      ask_price: ask_price |> Decimal.to_string(:normal),
-      spread: spread |> Decimal.to_string(:normal)
-    })
+    %Examples.LogSpread.Events.Spread{
+      venue_id: market_quote.venue_id,
+      product_symbol: market_quote.product_symbol,
+      bid_price: bid_price,
+      bid_size: bid_size,
+      ask_price: ask_price,
+      ask_size: ask_size,
+      spread: spread
+    }
+    |> Tai.Events.info()
 
     {:ok, state.store}
   end
 
   # ignore quotes that don't have both sides of the order book
-  def handle_inside_quote(_, _, _, _, state), do: {:ok, state.store}
+  def handle_event(_, state), do: {:ok, state.store}
 end

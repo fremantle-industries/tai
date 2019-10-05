@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
   use GenServer
+  alias Tai.Markets.OrderBook
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -28,61 +29,58 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
   @spec init(state) :: {:ok, state}
   def init(state), do: {:ok, state}
 
+  def handle_cast({:snapshot, data, received_at}, state) do
+    {data, received_at, state}
+    |> build_change_set()
+    |> OrderBook.replace()
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:update, data, received_at}, state) do
+    {data, received_at, state}
+    |> build_change_set()
+    |> OrderBook.apply()
+
+    {:noreply, state}
+  end
+
+  @timestamp "timestamp"
+  defp build_change_set({data, received_at, state}) do
+    {:ok, venue_timestamp, _} = data |> Map.fetch!(@timestamp) |> DateTime.from_iso8601()
+    normalized_bids = data |> normalize_changes(:bid)
+    normalized_asks = data |> normalize_changes(:ask)
+
+    %OrderBook.ChangeSet{
+      venue: state.venue,
+      symbol: state.symbol,
+      last_venue_timestamp: venue_timestamp,
+      last_received_at: received_at,
+      changes: Enum.concat(normalized_bids, normalized_asks)
+    }
+  end
+
   @bids "bids"
   @asks "asks"
-  def handle_cast(
-        {:snapshot, %{"timestamp" => timestamp} = data, received_at},
-        state
-      ) do
-    {:ok, venue_timestamp, _} = DateTime.from_iso8601(timestamp)
+  defp normalize_changes(data, :bid), do: data |> Map.get(@bids, []) |> normalize_side(:bid)
+  defp normalize_changes(data, :ask), do: data |> Map.get(@asks, []) |> normalize_side(:ask)
 
-    snapshot = %Tai.Markets.OrderBook{
-      venue_id: state.venue,
-      product_symbol: state.symbol,
-      bids: data |> normalize(@bids),
-      asks: data |> normalize(@asks),
-      last_received_at: received_at,
-      last_venue_timestamp: venue_timestamp
-    }
-
-    :ok = Tai.Markets.OrderBook.replace(snapshot)
-
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        {:update, %{"timestamp" => timestamp} = data, received_at},
-        state
-      ) do
-    {:ok, venue_timestamp, _} = DateTime.from_iso8601(timestamp)
-
-    snapshot = %Tai.Markets.OrderBook{
-      venue_id: state.venue,
-      product_symbol: state.symbol,
-      bids: data |> normalize(@bids),
-      asks: data |> normalize(@asks),
-      last_received_at: received_at,
-      last_venue_timestamp: venue_timestamp
-    }
-
-    :ok = Tai.Markets.OrderBook.update(snapshot)
-
-    {:noreply, state}
-  end
-
-  defp normalize(data, side) do
+  defp normalize_side(data, side) do
     data
-    |> Map.get(side, [])
-    |> Enum.reduce(%{}, fn
-      [raw_price, raw_size, _count], acc ->
+    |> Enum.map(fn
+      [raw_price, raw_size, _count] ->
         {price, ""} = Float.parse(raw_price)
         {size, ""} = Float.parse(raw_size)
-        acc |> Map.put(price, size)
+        {price, size}
 
-      [raw_price, raw_size, _forced_liquidations, _count], acc ->
+      [raw_price, raw_size, _forced_liquidations, _count] ->
         {price, ""} = Float.parse(raw_price)
         {size, ""} = Float.parse(raw_size)
-        acc |> Map.put(price, size)
+        {price, size}
+    end)
+    |> Enum.map(fn
+      {price, 0.0} -> {:delete, side, price}
+      {price, size} -> {:upsert, side, price, size}
     end)
   end
 end

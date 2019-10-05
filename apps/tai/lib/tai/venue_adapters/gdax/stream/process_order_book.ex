@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOrderBook do
   use GenServer
+  alias Tai.Markets.OrderBook
 
   defmodule State do
     @type venue_id :: Tai.Venues.Adapter.venue_id()
@@ -30,63 +31,57 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOrderBook do
   def init(state), do: {:ok, state}
 
   def handle_cast({:snapshot, %{"bids" => bids, "asks" => asks}, received_at}, state) do
-    snapshot = %Tai.Markets.OrderBook{
-      venue_id: state.venue,
-      product_symbol: state.symbol,
-      bids: bids |> normalize_snapshot(),
-      asks: asks |> normalize_snapshot(),
-      last_received_at: received_at
-    }
+    normalized_bids = bids |> normalize_snapshot_changes(:bid)
+    normalized_asks = asks |> normalize_snapshot_changes(:ask)
 
-    Tai.Markets.OrderBook.replace(snapshot)
+    %OrderBook.ChangeSet{
+      venue: state.venue,
+      symbol: state.symbol,
+      last_received_at: received_at,
+      changes: Enum.concat(normalized_bids, normalized_asks)
+    }
+    |> OrderBook.replace()
 
     {:noreply, state}
   end
 
   def handle_cast({:update, %{"changes" => changes, "time" => time}, received_at}, state) do
-    venue_timestamp = Timex.parse!(time, "{ISO:Extended}")
-    normalized_changes = normalize_update(changes, received_at, venue_timestamp, state)
-    Tai.Markets.OrderBook.update(normalized_changes)
+    {:ok, venue_timestamp} = Timex.parse(time, "{ISO:Extended}")
+    normalized_changes = changes |> normalize_update_changes()
+
+    %OrderBook.ChangeSet{
+      venue: state.venue,
+      symbol: state.symbol,
+      last_venue_timestamp: venue_timestamp,
+      last_received_at: received_at,
+      changes: normalized_changes
+    }
+    |> OrderBook.apply()
 
     {:noreply, state}
   end
 
-  defp normalize_snapshot(snapshot_side) do
-    snapshot_side
-    |> Enum.reduce(%{}, fn [price, size], acc ->
-      {parsed_price, _} = Float.parse(price)
-      {parsed_size, _} = Float.parse(size)
-      Map.put(acc, parsed_price, parsed_size)
+  defp normalize_snapshot_changes(data, side) do
+    data
+    |> Enum.map(fn [venue_price, venue_size] ->
+      {price, _} = Float.parse(venue_price)
+      {size, _} = Float.parse(venue_size)
+      {:upsert, side, price, size}
     end)
   end
 
-  defp normalize_update(changes, received_at, venue_timestamp, state) do
+  defp normalize_update_changes(changes) do
     changes
-    |> Enum.reduce(
-      %Tai.Markets.OrderBook{
-        venue_id: state.venue,
-        product_symbol: state.symbol,
-        bids: %{},
-        asks: %{},
-        last_received_at: received_at,
-        last_venue_timestamp: venue_timestamp
-      },
-      fn [side, price, size], acc ->
-        {parsed_price, _} = Float.parse(price)
-        {parsed_size, _} = Float.parse(size)
-        nside = side |> normalize_side
-
-        new_price_levels =
-          acc
-          |> Map.get(nside)
-          |> Map.put(parsed_price, parsed_size)
-
-        acc
-        |> Map.put(nside, new_price_levels)
-      end
-    )
+    |> Enum.map(fn [side, venue_price, venue_size] ->
+      {price, _} = Float.parse(venue_price)
+      {size, _} = Float.parse(venue_size)
+      {side, price, size}
+    end)
+    |> Enum.map(fn
+      {"buy", price, 0.0} -> {:delete, :bid, price}
+      {"buy", price, size} -> {:upsert, :bid, price, size}
+      {"sell", price, 0.0} -> {:delete, :ask, price}
+      {"sell", price, size} -> {:upsert, :ask, price, size}
+    end)
   end
-
-  defp normalize_side("buy"), do: :bids
-  defp normalize_side("sell"), do: :asks
 end

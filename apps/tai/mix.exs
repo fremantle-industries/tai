@@ -40,6 +40,7 @@ defmodule Tai.Mixfile do
       {:ecto, "~> 3.1"},
       {:jason, "~> 1.1"},
       {:vex, "~> 0.7"},
+      {:stored, "~> 0.0.2"},
       {:logger_file_backend_with_formatters, "~> 0.0.1", only: [:dev, :test]},
       {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.4", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},

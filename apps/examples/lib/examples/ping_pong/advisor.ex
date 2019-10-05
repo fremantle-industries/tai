@@ -13,7 +13,7 @@ defmodule Examples.PingPong.Advisor do
   import Examples.PingPong.ManageQuoteChange, only: [with_all_quotes: 1, manage_entry_order: 2]
   import Examples.PingPong.ManageOrderUpdate, only: [entry_order_updated: 3]
 
-  def handle_inside_quote(_, _, market_quote, _, state) do
+  def handle_event(market_quote, state) do
     market_quote
     |> with_all_quotes()
     |> manage_entry_order(state)

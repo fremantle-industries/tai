@@ -34,140 +34,145 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBook do
   def init(state), do: {:ok, state}
 
   def handle_cast({:snapshot, data, received_at}, state) do
-    normalized =
+    normalized_data =
       data
       |> Enum.reduce(
-        %{bids: %{}, asks: %{}, table: %{}},
+        %{changes: [], table: %{}},
         fn
           %{"id" => id, "price" => price, "side" => "Sell", "size" => size}, acc ->
-            asks = acc.asks |> Map.put(price, size)
+            changes = [{:upsert, :ask, price, size} | acc.changes]
             table = acc.table |> Map.put(id, price)
 
             acc
-            |> Map.put(:asks, asks)
+            |> Map.put(:changes, changes)
             |> Map.put(:table, table)
 
           %{"id" => id, "price" => price, "side" => "Buy", "size" => size}, acc ->
-            bids = acc.bids |> Map.put(price, size)
+            changes = [{:upsert, :bid, price, size} | acc.changes]
             table = acc.table |> Map.put(id, price)
 
             acc
-            |> Map.put(:bids, bids)
+            |> Map.put(:changes, changes)
             |> Map.put(:table, table)
         end
       )
 
-    snapshot = %Tai.Markets.OrderBook{
-      venue_id: state.venue_id,
-      product_symbol: state.symbol,
+    %Tai.Markets.OrderBook.ChangeSet{
+      venue: state.venue_id,
+      symbol: state.symbol,
       last_received_at: received_at,
-      bids: normalized.bids,
-      asks: normalized.asks
+      changes: normalized_data.changes
     }
+    |> Tai.Markets.OrderBook.replace()
 
-    :ok = Tai.Markets.OrderBook.replace(snapshot)
-    new_table = Map.merge(state.table, normalized.table)
+    new_table = Map.merge(state.table, normalized_data.table)
     new_state = Map.put(state, :table, new_table)
 
     {:noreply, new_state}
   end
 
   def handle_cast({:insert, data, received_at}, state) do
-    normalized =
+    normalized_data =
       data
       |> Enum.reduce(
-        %{bids: %{}, asks: %{}, table: %{}},
+        %{changes: [], table: %{}},
         fn
           %{"id" => id, "price" => price, "side" => "Sell", "size" => size}, acc ->
-            asks = acc.asks |> Map.put(price, size)
+            changes = [{:upsert, :ask, price, size} | acc.changes]
             table = acc.table |> Map.put(id, price)
 
             acc
-            |> Map.put(:asks, asks)
+            |> Map.put(:changes, changes)
             |> Map.put(:table, table)
 
           %{"id" => id, "price" => price, "side" => "Buy", "size" => size}, acc ->
-            bids = acc.bids |> Map.put(price, size)
+            changes = [{:upsert, :bid, price, size} | acc.changes]
             table = acc.table |> Map.put(id, price)
 
             acc
-            |> Map.put(:bids, bids)
+            |> Map.put(:changes, changes)
             |> Map.put(:table, table)
         end
       )
 
-    %Tai.Markets.OrderBook{
-      venue_id: state.venue_id,
-      product_symbol: state.symbol,
+    %Tai.Markets.OrderBook.ChangeSet{
+      venue: state.venue_id,
+      symbol: state.symbol,
       last_received_at: received_at,
-      bids: normalized.bids,
-      asks: normalized.asks
+      changes: normalized_data.changes |> Enum.reverse()
     }
-    |> Tai.Markets.OrderBook.update()
+    |> Tai.Markets.OrderBook.apply()
 
-    new_table = Map.merge(state.table, normalized.table)
+    new_table = Map.merge(state.table, normalized_data.table)
     new_state = Map.put(state, :table, new_table)
 
     {:noreply, new_state}
   end
 
   def handle_cast({:update, data, received_at}, state) do
-    normalized =
+    changes =
       data
       |> Enum.reduce(
-        %{bids: %{}, asks: %{}},
+        [],
         fn
           %{"id" => id, "side" => "Sell", "size" => size}, acc ->
             price = Map.fetch!(state.table, id)
-            asks = acc.asks |> Map.put(price, size)
-            Map.put(acc, :asks, asks)
+            [{:upsert, :ask, price, size} | acc]
 
           %{"id" => id, "side" => "Buy", "size" => size}, acc ->
             price = Map.fetch!(state.table, id)
-            bids = acc.bids |> Map.put(price, size)
-            Map.put(acc, :bids, bids)
+            [{:upsert, :bid, price, size} | acc]
         end
       )
 
-    %Tai.Markets.OrderBook{
-      venue_id: state.venue_id,
-      product_symbol: state.symbol,
+    %Tai.Markets.OrderBook.ChangeSet{
+      venue: state.venue_id,
+      symbol: state.symbol,
       last_received_at: received_at,
-      bids: normalized.bids,
-      asks: normalized.asks
+      changes: changes |> Enum.reverse()
     }
-    |> Tai.Markets.OrderBook.update()
+    |> Tai.Markets.OrderBook.apply()
 
     {:noreply, state}
   end
 
   def handle_cast({:delete, data, received_at}, state) do
-    normalized =
+    normalized_data =
       data
       |> Enum.reduce(
-        %{bids: %{}, asks: %{}},
+        %{changes: [], table: []},
         fn
           %{"id" => id, "side" => "Sell"}, acc ->
             price = Map.fetch!(state.table, id)
-            asks = acc.asks |> Map.put(price, 0)
-            Map.put(acc, :asks, asks)
+            changes = [{:delete, :ask, price} | acc.changes]
+            table = [id | acc.table]
+
+            acc
+            |> Map.put(:changes, changes)
+            |> Map.put(:table, table)
 
           %{"id" => id, "side" => "Buy"}, acc ->
             price = Map.fetch!(state.table, id)
-            bids = acc.bids |> Map.put(price, 0)
-            Map.put(acc, :bids, bids)
+            changes = [{:delete, :bid, price} | acc.changes]
+            table = [id | acc.table]
+
+            acc
+            |> Map.put(:changes, changes)
+            |> Map.put(:table, table)
         end
       )
 
-    %Tai.Markets.OrderBook{
-      venue_id: state.venue_id,
-      product_symbol: state.symbol,
+    %Tai.Markets.OrderBook.ChangeSet{
+      venue: state.venue_id,
+      symbol: state.symbol,
       last_received_at: received_at,
-      bids: normalized.bids,
-      asks: normalized.asks
+      changes: normalized_data.changes |> Enum.reverse()
     }
-    |> Tai.Markets.OrderBook.update()
+    |> Tai.Markets.OrderBook.apply()
 
-    {:noreply, state}
+    new_table = Map.drop(state.table, normalized_data.table)
+    new_state = Map.put(state, :table, new_table)
+
+    {:noreply, new_state}
   end
 end
