@@ -39,6 +39,13 @@ defmodule Tai.Venues.ConfigTest do
       assert adapter.channels == []
     end
 
+    test "assigns a quote depth of 1 when not provided" do
+      config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
+
+      assert %{venue_a: adapter} = Tai.Venues.Config.parse_adapters(config)
+      assert adapter.quote_depth == 1
+    end
+
     test "can provide channels" do
       config =
         Tai.Config.parse(
@@ -112,6 +119,22 @@ defmodule Tai.Venues.ConfigTest do
                  accounts: %{main: %{}}
                }
              } = Tai.Venues.Config.parse_adapters(config)
+    end
+
+    test "can provide a quote depth" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            venue_a: [
+              enabled: true,
+              adapter: MyAdapterA,
+              quote_depth: 5
+            ]
+          }
+        )
+
+      assert %{venue_a: adapter} = Tai.Venues.Config.parse_adapters(config)
+      assert adapter.quote_depth == 5
     end
 
     test "raises a KeyError when there is no adapter specified" do

@@ -16,6 +16,7 @@ defmodule Tai.Venues.Config do
               channels: Keyword.get(params, :channels, []),
               products: Keyword.get(params, :products, "*"),
               accounts: Keyword.get(params, :accounts, %{}),
+              quote_depth: Keyword.get(params, :quote_depth, 1),
               opts: Keyword.get(params, :opts, %{}),
               timeout: Keyword.get(params, :timeout, config.adapter_timeout)
             }
