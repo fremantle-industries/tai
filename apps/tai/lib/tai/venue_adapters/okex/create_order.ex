@@ -73,8 +73,8 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
   @open_short 2
   @close_long 3
   @close_short 4
-  defp to_venue_type(%Tai.Trading.Order{side: :buy, close: true}), do: @close_long
-  defp to_venue_type(%Tai.Trading.Order{side: :sell, close: true}), do: @close_short
+  defp to_venue_type(%Tai.Trading.Order{side: :buy, close: true}), do: @close_short
+  defp to_venue_type(%Tai.Trading.Order{side: :sell, close: true}), do: @close_long
   defp to_venue_type(%Tai.Trading.Order{side: :buy}), do: @open_long
   defp to_venue_type(%Tai.Trading.Order{side: :sell}), do: @open_short
 
