@@ -14,11 +14,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
             channels: [channel_name],
             account: {account_id, map} | nil,
             products: [product],
+            quote_depth: pos_integer,
             opts: map
           }
 
-    @enforce_keys ~w(venue routes channels products opts)a
-    defstruct ~w(venue routes channels account products opts)a
+    @enforce_keys ~w(venue routes channels products quote_depth opts)a
+    defstruct ~w(venue routes channels account products quote_depth opts)a
   end
 
   @type product :: Tai.Venues.Product.t()
@@ -32,6 +33,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
           venue: venue_id,
           account: {account_id, account_config} | nil,
           products: [product],
+          quote_depth: pos_integer,
           opts: map
         ) :: {:ok, pid} | {:error, term}
   def start_link(
@@ -40,6 +42,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
         channels: channels,
         account: account,
         products: products,
+        quote_depth: quote_depth,
         opts: opts
       ) do
     routes = %{
@@ -54,6 +57,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
       channels: channels,
       account: account,
       products: products,
+      quote_depth: quote_depth,
       opts: opts
     }
 
