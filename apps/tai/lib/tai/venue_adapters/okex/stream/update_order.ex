@@ -60,7 +60,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       when status == @pending do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
-    leaves_qty = size |> Decimal.new()
+    leaves_qty = size |> Decimal.new() |> Decimal.sub(cumulative_qty)
 
     %OrderStore.Actions.Open{
       client_id: client_id,
@@ -86,7 +86,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       when status == @partially_filled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
-    leaves_qty = size |> Decimal.new()
+    leaves_qty = size |> Decimal.new() |> Decimal.sub(cumulative_qty)
 
     %OrderStore.Actions.PassivePartialFill{
       client_id: client_id,
