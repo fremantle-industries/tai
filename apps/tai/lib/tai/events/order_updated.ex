@@ -76,7 +76,7 @@ defimpl Tai.LogEvent, for: Tai.Events.OrderUpdated do
 
     event
     |> Map.take(keys)
-    |> Map.put(:error_reason, event.error_reason |> inspect)
+    |> Map.put(:error_reason, event.error_reason && event.error_reason |> inspect)
     |> Map.put(:price, event.price && event.price |> Decimal.to_string(:normal))
     |> Map.put(:qty, event.qty && event.qty |> Decimal.to_string(:normal))
     |> Map.put(:leaves_qty, event.leaves_qty && event.leaves_qty |> Decimal.to_string(:normal))
