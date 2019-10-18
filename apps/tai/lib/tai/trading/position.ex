@@ -15,31 +15,31 @@ defmodule Tai.Trading.Position do
           unrealised_pnl: Decimal.t()
         }
 
-  @enforce_keys [
-    :venue_id,
-    :account_id,
-    :product_symbol,
-    :open,
-    :qty,
-    :init_margin,
-    :init_margin_req,
-    :maint_margin,
-    :maint_margin_req,
-    :realised_pnl,
-    :unrealised_pnl
-  ]
-  defstruct [
-    :venue_id,
-    :account_id,
-    :product_symbol,
-    :open,
-    :avg_entry_price,
-    :qty,
-    :init_margin,
-    :init_margin_req,
-    :maint_margin,
-    :maint_margin_req,
-    :realised_pnl,
-    :unrealised_pnl
-  ]
+  @enforce_keys ~w(
+    venue_id
+    account_id
+    product_symbol
+    open
+    qty
+    init_margin
+    init_margin_req
+    maint_margin
+    maint_margin_req
+    realised_pnl
+    unrealised_pnl
+  )a
+  defstruct ~w(
+    venue_id
+    account_id
+    product_symbol
+    open
+    avg_entry_price
+    qty
+    init_margin
+    init_margin_req
+    maint_margin
+    maint_margin_req
+    realised_pnl
+    unrealised_pnl
+  )a
 end
