@@ -45,6 +45,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
          channels: venue_adapter.channels,
          account: account,
          products: products,
+         quote_depth: venue_adapter.quote_depth,
          opts: venue_adapter.opts
        ]}
     ]

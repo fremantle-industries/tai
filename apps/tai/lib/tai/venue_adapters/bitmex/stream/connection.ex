@@ -14,11 +14,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
             channels: [channel_name],
             account: {account_id, map} | nil,
             products: [product],
+            quote_depth: pos_integer,
             opts: map
           }
 
-    @enforce_keys ~w(venue routes channels products opts)a
-    defstruct ~w(venue routes channels account products opts)a
+    @enforce_keys ~w(venue routes channels products quote_depth opts)a
+    defstruct ~w(venue routes channels account products quote_depth opts)a
   end
 
   @type product :: Tai.Venues.Product.t()
@@ -32,6 +33,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
           venue: venue_id,
           account: {account_id, account_config} | nil,
           products: [product],
+          quote_depth: pos_integer,
           opts: map
         ) :: {:ok, pid} | {:error, term}
   def start_link(
@@ -40,6 +42,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
         channels: channels,
         account: account,
         products: products,
+        quote_depth: quote_depth,
         opts: opts
       ) do
     routes = %{
@@ -54,6 +57,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
       channels: channels,
       account: account,
       products: products,
+      quote_depth: quote_depth,
       opts: opts
     }
 
@@ -118,10 +122,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   # Bitmex has an unpublished limit to websocket message lengths.
   @products_chunk_count 10
   def handle_info({:subscribe, :depth}, state) do
+    order_book_table = if state.quote_depth <= 25, do: "orderBookL2_25", else: "orderBookL2"
+
     state.products
     |> Enum.chunk_every(@products_chunk_count)
     |> Enum.each(fn products ->
-      args = products |> Enum.map(fn p -> "orderBookL2_25:#{p.venue_symbol}" end)
+      args = products |> Enum.map(fn p -> "#{order_book_table}:#{p.venue_symbol}" end)
       msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
       send(self(), {:send_msg, msg})
     end)
@@ -243,7 +249,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     msg |> forward(:order_books, state)
   end
 
-  defp handle_msg(%{"table" => "orderBookL2_25"} = msg, state) do
+  @order_book_tables ~w(orderBookL2 orderBookL2_25)
+  defp handle_msg(%{"table" => table} = msg, state) when table in @order_book_tables do
     msg |> forward(:order_books, state)
   end
 
