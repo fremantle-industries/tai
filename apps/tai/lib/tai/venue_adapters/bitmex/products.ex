@@ -28,6 +28,8 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
       venue_id: venue_id,
       symbol: instrument.symbol |> to_symbol,
       venue_symbol: instrument.symbol,
+      base: instrument.underlying,
+      quote: instrument.quote_currency,
       status: status,
       type: :future,
       price_increment: tick_size,
