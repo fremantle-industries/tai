@@ -52,7 +52,11 @@ defmodule Tai.VenueAdapters.Binance.Products do
   defp price_filter(filters) do
     with %{"minPrice" => min, "maxPrice" => max, "tickSize" => tick} <-
            find_filter(filters, @price_filter) do
-      {Decimal.new(min), Decimal.new(max), Decimal.new(tick)}
+      {
+        min |> to_decimal(),
+        max |> to_decimal(),
+        tick |> to_decimal()
+      }
     end
   end
 
@@ -60,14 +64,18 @@ defmodule Tai.VenueAdapters.Binance.Products do
   defp size_filter(filters) do
     with %{"minQty" => min, "maxQty" => max, "stepSize" => step} <-
            find_filter(filters, @size_filter) do
-      {Decimal.new(min), Decimal.new(max), Decimal.new(step)}
+      {
+        min |> to_decimal(),
+        max |> to_decimal(),
+        step |> to_decimal()
+      }
     end
   end
 
   @notional_filter "MIN_NOTIONAL"
   defp notional_filter(filters) do
     with %{"minNotional" => notional} <- find_filter(filters, @notional_filter) do
-      Decimal.new(notional)
+      notional |> to_decimal()
     end
   end
 
@@ -75,4 +83,6 @@ defmodule Tai.VenueAdapters.Binance.Products do
     filters
     |> Enum.find(fn f -> f["filterType"] == type end)
   end
+
+  defp to_decimal(val), do: val |> Decimal.new() |> Decimal.reduce()
 end
