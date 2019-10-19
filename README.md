@@ -4,12 +4,6 @@
 
 A real time market data and trade execution toolkit. Built with [Elixir](https://elixir-lang.org/), runs on the [Erlang virtual machine](http://erlang.org/faq/implementations.html)
 
-## WARNING
-
-`tai` is alpha quality software. It passes our test suite but the API is highly 
-likely to change and no effort will be made to maintain backwards compatibility at this time.
-We are working to make `tai` production quality software.
-
 [Tai on GitHub](https://github.com/fremantle-capital/tai) | [Install](#install) | [Usage](#usage) | [Advisors](#advisors) | [Configuration](#configuration) | [Commands](#commands) | [Logging](#logging)
 
 ## What Can I Do? TLDR;
