@@ -1,7 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.Products do
   def products(venue_id) do
-    with {:ok, instruments, _rate_limit} <-
-           ExBitmex.Rest.HTTPClient.non_auth_get("/instrument", %{start: 0, count: 500}) do
+    with {:ok, instruments, _rate_limit} <- ExBitmex.Rest.Instruments.all(%{start: 0, count: 500}) do
       products =
         instruments
         |> Enum.map(&build(&1, venue_id))
@@ -14,37 +13,31 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
     end
   end
 
-  defp build(%{"lotSize" => nil}, _), do: nil
+  defp build(%ExBitmex.Instrument{lot_size: nil}, _), do: nil
 
-  defp build(
-         %{
-           "symbol" => venue_symbol,
-           "state" => state,
-           "lotSize" => lot_size,
-           "tickSize" => tick_size,
-           "maxOrderQty" => max_order_qty,
-           "maxPrice" => max_price,
-           "makerFee" => maker_fee,
-           "takerFee" => taker_fee
-         },
-         venue_id
-       ) do
-    status = Tai.VenueAdapters.Bitmex.ProductStatus.normalize(state)
+  defp build(instrument, venue_id) do
+    status = Tai.VenueAdapters.Bitmex.ProductStatus.normalize(instrument.state)
+    lot_size = instrument.lot_size |> Decimal.cast()
+    tick_size = instrument.tick_size |> Decimal.cast()
+    max_order_qty = instrument.max_order_qty && instrument.max_order_qty |> Decimal.cast()
+    max_price = instrument.max_price && instrument.max_price |> Decimal.cast()
+    maker_fee = instrument.maker_fee && instrument.maker_fee |> Decimal.cast()
+    taker_fee = instrument.taker_fee && instrument.taker_fee |> Decimal.cast()
 
     %Tai.Venues.Product{
       venue_id: venue_id,
-      symbol: venue_symbol |> to_symbol,
-      venue_symbol: venue_symbol,
+      symbol: instrument.symbol |> to_symbol,
+      venue_symbol: instrument.symbol,
       status: status,
       type: :future,
-      price_increment: tick_size |> Decimal.cast(),
-      size_increment: lot_size |> Decimal.cast(),
-      min_price: tick_size |> Decimal.cast(),
-      min_size: lot_size |> Decimal.cast(),
-      max_price: max_price && max_price |> Decimal.cast(),
-      max_size: max_order_qty && max_order_qty |> Decimal.cast(),
-      maker_fee: maker_fee && maker_fee |> Decimal.cast(),
-      taker_fee: maker_fee && taker_fee |> Decimal.cast()
+      price_increment: tick_size,
+      size_increment: lot_size,
+      min_price: tick_size,
+      min_size: lot_size,
+      max_price: max_price,
+      max_size: max_order_qty,
+      maker_fee: maker_fee,
+      taker_fee: taker_fee
     }
   end
 
