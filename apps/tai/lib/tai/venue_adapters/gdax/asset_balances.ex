@@ -16,7 +16,7 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalances do
         {:error, {:credentials, reason}}
 
       {:error, reason, 503} ->
-        {:error, %Tai.ServiceUnavailableError{reason: reason}}
+        {:error, {:service_unavailable, reason}}
 
       {:error, "timeout"} ->
         {:error, :timeout}

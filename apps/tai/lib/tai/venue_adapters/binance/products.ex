@@ -27,6 +27,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
          },
          venue_id
        ) do
+    symbol = Tai.Symbol.build(base_asset, quote_asset)
     {:ok, status} = Tai.VenueAdapters.Binance.ProductStatus.normalize(exchange_status)
     {min_price, max_price, tick_size} = filters |> price_filter
     {min_size, max_size, step_size} = filters |> size_filter
@@ -34,8 +35,10 @@ defmodule Tai.VenueAdapters.Binance.Products do
 
     %Tai.Venues.Product{
       venue_id: venue_id,
-      symbol: Tai.Symbol.build(base_asset, quote_asset),
+      symbol: symbol,
       venue_symbol: venue_symbol,
+      base: base_asset,
+      quote: quote_asset,
       status: status,
       type: :spot,
       min_notional: min_notional,

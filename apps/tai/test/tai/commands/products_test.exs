@@ -14,7 +14,7 @@ defmodule Tai.Commands.ProductsTest do
   end
 
   test "show products and their trade restrictions for configured exchanges" do
-    mock_product(%Tai.Venues.Product{
+    mock_product(%{
       venue_id: :test_exchange_a,
       symbol: :btc_usd,
       venue_symbol: "BTC_USD",
@@ -31,7 +31,7 @@ defmodule Tai.Commands.ProductsTest do
       min_notional: Decimal.new("0.01000000")
     })
 
-    mock_product(%Tai.Venues.Product{
+    mock_product(%{
       venue_id: :test_exchange_b,
       symbol: :eth_usd,
       venue_symbol: "ETH_USD",

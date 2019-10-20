@@ -1,16 +1,16 @@
 defmodule Tai.VenueAdapters.Gdax.Products do
   @moduledoc """
-  Retrieves the available products on the GDAX exchange
+  Hydrates the available products on the GDAX exchange
   """
 
+  @type venue :: Tai.Venues.Adapter.venue_id()
+  @type product :: Tai.Venues.Product.t()
   @type error_reason ::
           :timeout
           | {:credentials, reason :: term}
-          | Tai.ServiceUnavailableError.t()
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type products :: Tai.Venues.Product.t()
+          | {:service_unavailable, reason :: String.t()}
 
-  @spec products(venue_id) :: {:ok, [products]} | {:error, error_reason}
+  @spec products(venue) :: {:ok, [product]} | {:error, error_reason}
   def products(venue_id) do
     with {:ok, exchange_products} <- ExGdax.list_products() do
       products = Enum.map(exchange_products, &build(&1, venue_id))
@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
         {:error, {:credentials, reason}}
 
       {:error, reason, 503} ->
-        {:error, %Tai.ServiceUnavailableError{reason: reason}}
+        {:error, {:service_unavailable, reason}}
 
       {:error, "timeout"} ->
         {:error, :timeout}
@@ -32,8 +32,8 @@ defmodule Tai.VenueAdapters.Gdax.Products do
 
   defp build(
          %{
-           "base_currency" => base_asset,
-           "quote_currency" => quote_asset,
+           "base_currency" => base_currency,
+           "quote_currency" => quote_currency,
            "id" => id,
            "status" => exchange_status,
            "base_min_size" => raw_base_min_size,
@@ -42,7 +42,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
          },
          venue_id
        ) do
-    symbol = Tai.Symbol.build(base_asset, quote_asset)
+    symbol = Tai.Symbol.build(base_currency, quote_currency)
     {:ok, status} = Tai.VenueAdapters.Gdax.ProductStatus.normalize(exchange_status)
     base_min_size = raw_base_min_size |> Decimal.cast()
     base_max_size = raw_base_max_size |> Decimal.cast()
@@ -53,6 +53,8 @@ defmodule Tai.VenueAdapters.Gdax.Products do
       venue_id: venue_id,
       symbol: symbol,
       venue_symbol: id,
+      base: base_currency,
+      quote: quote_currency,
       status: status,
       type: :spot,
       min_notional: min_notional,
