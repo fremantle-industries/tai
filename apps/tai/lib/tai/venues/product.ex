@@ -29,6 +29,9 @@ defmodule Tai.Venues.Product do
           min_notional: Decimal.t() | nil,
           max_price: Decimal.t() | nil,
           max_size: Decimal.t() | nil,
+          value: Decimal.t(),
+          is_quanto: boolean,
+          is_inverse: boolean,
           maker_fee: Decimal.t() | nil,
           taker_fee: Decimal.t() | nil
         }
@@ -62,6 +65,9 @@ defmodule Tai.Venues.Product do
     min_size
     max_size
     max_price
+    value
+    is_quanto
+    is_inverse
     maker_fee
     taker_fee
   )a
