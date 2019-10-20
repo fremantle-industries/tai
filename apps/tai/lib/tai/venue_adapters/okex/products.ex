@@ -18,6 +18,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       type: :future,
       venue_id: venue_id,
       venue_symbol: instrument.instrument_id,
+      alias: instrument.alias,
       base: instrument.underlying_index,
       quote: instrument.quote_currency,
       venue_price_increment: instrument.tick_size,
@@ -52,6 +53,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
 
   defp build_product(args) do
     venue_symbol = Keyword.fetch!(args, :venue_symbol)
+    product_alias = args |> Keyword.get(:alias)
     venue_size_increment = Keyword.fetch!(args, :venue_size_increment)
 
     symbol = venue_symbol |> to_symbol()
@@ -63,6 +65,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       venue_id: Keyword.fetch!(args, :venue_id),
       symbol: symbol,
       venue_symbol: venue_symbol,
+      alias: product_alias,
       base: Keyword.fetch!(args, :base),
       quote: Keyword.fetch!(args, :quote),
       status: :trading,

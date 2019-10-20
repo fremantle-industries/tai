@@ -17,6 +17,7 @@ defmodule Tai.Venues.Product do
           venue_id: Tai.Venues.Adapter.venue_id(),
           symbol: symbol,
           venue_symbol: venue_symbol,
+          alias: String.t() | nil,
           base: String.t(),
           quote: String.t(),
           status: status,
@@ -49,6 +50,7 @@ defmodule Tai.Venues.Product do
     venue_id
     symbol
     venue_symbol
+    alias
     base
     quote
     status
