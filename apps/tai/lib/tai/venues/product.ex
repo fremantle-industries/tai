@@ -48,6 +48,9 @@ defmodule Tai.Venues.Product do
     size_increment
     min_price
     min_size
+    value
+    is_quanto
+    is_inverse
   )a
   defstruct ~w(
     venue_id
