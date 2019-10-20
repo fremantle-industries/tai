@@ -1,70 +1,50 @@
 defmodule Tai.VenueAdapters.OkEx.Products do
+  alias ExOkex.{Futures, Swap, Spot}
+
   def products(venue_id) do
-    with {:ok, future_instruments} <- ExOkex.Futures.Public.instruments(),
-         {:ok, swap_instruments} <- ExOkex.Swap.Public.instruments(),
-         {:ok, spot_instruments} <- ExOkex.Spot.Public.instruments() do
-      future_products = future_instruments |> Enum.map(&build_future(&1, venue_id))
-      swap_products = swap_instruments |> Enum.map(&build_swap(&1, venue_id))
-      spot_products = spot_instruments |> Enum.map(&build_spot(&1, venue_id))
+    with {:ok, future_instruments} <- Futures.Public.instruments(),
+         {:ok, swap_instruments} <- Swap.Public.instruments(),
+         {:ok, spot_instruments} <- Spot.Public.instruments() do
+      future_products = future_instruments |> Enum.map(&build(&1, venue_id))
+      swap_products = swap_instruments |> Enum.map(&build(&1, venue_id))
+      spot_products = spot_instruments |> Enum.map(&build(&1, venue_id))
       products = future_products ++ swap_products ++ spot_products
       {:ok, products}
     end
   end
 
-  defp build_future(
-         %{
-           "instrument_id" => instrument_id,
-           "tick_size" => tick_size,
-           "trade_increment" => trade_increment
-         },
-         venue_id
-       ) do
-    build(
+  defp build(%Futures.Instrument{} = instrument, venue_id) do
+    build_product(
       type: :future,
       venue_id: venue_id,
-      venue_symbol: instrument_id,
-      venue_price_increment: tick_size,
-      venue_size_increment: trade_increment
+      venue_symbol: instrument.instrument_id,
+      venue_price_increment: instrument.tick_size,
+      venue_size_increment: instrument.trade_increment
     )
   end
 
-  defp build_swap(
-         %{
-           "instrument_id" => instrument_id,
-           "tick_size" => tick_size,
-           "size_increment" => size_increment
-         },
-         venue_id
-       ) do
-    build(
+  defp build(%Swap.Instrument{} = instrument, venue_id) do
+    build_product(
       type: :swap,
       venue_id: venue_id,
-      venue_symbol: instrument_id,
-      venue_price_increment: tick_size,
-      venue_size_increment: size_increment
+      venue_symbol: instrument.instrument_id,
+      venue_price_increment: instrument.tick_size,
+      venue_size_increment: instrument.size_increment
     )
   end
 
-  defp build_spot(
-         %{
-           "instrument_id" => instrument_id,
-           "tick_size" => tick_size,
-           "size_increment" => size_increment,
-           "min_size" => min_size
-         },
-         venue_id
-       ) do
-    build(
+  defp build(%Spot.Instrument{} = instrument, venue_id) do
+    build_product(
       type: :spot,
       venue_id: venue_id,
-      venue_symbol: instrument_id,
-      venue_price_increment: tick_size,
-      venue_size_increment: size_increment,
-      venue_min_size: min_size
+      venue_symbol: instrument.instrument_id,
+      venue_price_increment: instrument.tick_size,
+      venue_size_increment: instrument.size_increment,
+      venue_min_size: instrument.min_size
     )
   end
 
-  defp build(args) do
+  defp build_product(args) do
     venue_id = Keyword.fetch!(args, :venue_id)
     venue_symbol = Keyword.fetch!(args, :venue_symbol)
     type = Keyword.fetch!(args, :type)
