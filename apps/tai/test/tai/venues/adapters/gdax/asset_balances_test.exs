@@ -26,13 +26,11 @@ defmodule Tai.Venues.Adapters.Gdax.AssetBalancesTest do
 
   test "returns an error tuple when down for maintenance", %{adapter: adapter} do
     use_cassette "venue_adapters/shared/asset_balances/gdax/error_maintenance" do
-      assert Tai.Venue.asset_balances(adapter, :main) == {
-               :error,
-               %Tai.ServiceUnavailableError{
-                 reason:
-                   "GDAX is currently under maintenance. For updates please see https://status.gdax.com/"
-               }
-             }
+      assert {:error, reason} = Tai.Venue.asset_balances(adapter, :main)
+
+      assert reason ==
+               {:service_unavailable,
+                "GDAX is currently under maintenance. For updates please see https://status.gdax.com/"}
     end
   end
 end
