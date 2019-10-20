@@ -21,14 +21,7 @@ defmodule Tai.Commands.ProductsTest do
       status: :trading,
       type: :spot,
       maker_fee: Decimal.new("0.001"),
-      taker_fee: Decimal.new("0.002"),
-      min_price: Decimal.new("0.00001000"),
-      max_price: Decimal.new("100000.00000000"),
-      price_increment: Decimal.new("0.00000100"),
-      min_size: Decimal.new("0.00100000"),
-      max_size: Decimal.new("100000.00000000"),
-      size_increment: Decimal.new("0.00100000"),
-      min_notional: Decimal.new("0.01000000")
+      taker_fee: Decimal.new("0.002")
     })
 
     mock_product(%{
@@ -36,33 +29,26 @@ defmodule Tai.Commands.ProductsTest do
       symbol: :eth_usd,
       venue_symbol: "ETH_USD",
       status: :trading,
-      type: :spot,
-      min_price: Decimal.new("0.00001000"),
-      max_price: Decimal.new("100000.00000000"),
-      price_increment: Decimal.new("0.00000100"),
-      min_size: Decimal.new("0.00100000"),
-      max_size: nil,
-      size_increment: Decimal.new("0.00100000"),
-      min_notional: Decimal.new("0.01000000")
+      type: :spot
     })
 
     assert capture_io(&Tai.CommandsHelper.products/0) == """
-           +-----------------+---------+--------------+---------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+
-           |           Venue |  Symbol | Venue Symbol |  Status | Type | Maker Fee | Taker Fee | Price Increment | Size Increment | Min Price | Max Price | Min Size | Max Size | Min Notional |
-           +-----------------+---------+--------------+---------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+
-           | test_exchange_a | btc_usd |      BTC_USD | trading | spot |      0.1% |      0.2% |        0.000001 |          0.001 |   0.00001 |    100000 |    0.001 |   100000 |         0.01 |
-           | test_exchange_b | eth_usd |      ETH_USD | trading | spot |           |           |        0.000001 |          0.001 |   0.00001 |    100000 |    0.001 |          |         0.01 |
-           +-----------------+---------+--------------+---------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+\n
+           +-----------------+---------+--------------+---------+------+-----------+-----------+
+           |           Venue |  Symbol | Venue Symbol |  Status | Type | Maker Fee | Taker Fee |
+           +-----------------+---------+--------------+---------+------+-----------+-----------+
+           | test_exchange_a | btc_usd |      BTC_USD | trading | spot |      0.1% |      0.2% |
+           | test_exchange_b | eth_usd |      ETH_USD | trading | spot |           |           |
+           +-----------------+---------+--------------+---------+------+-----------+-----------+\n
            """
   end
 
   test "shows an empty table when there are no products" do
     assert capture_io(&Tai.CommandsHelper.products/0) == """
-           +-------+--------+--------------+--------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+
-           | Venue | Symbol | Venue Symbol | Status | Type | Maker Fee | Taker Fee | Price Increment | Size Increment | Min Price | Max Price | Min Size | Max Size | Min Notional |
-           +-------+--------+--------------+--------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+
-           |     - |      - |            - |      - |    - |         - |         - |               - |              - |         - |         - |        - |        - |            - |
-           +-------+--------+--------------+--------+------+-----------+-----------+-----------------+----------------+-----------+-----------+----------+----------+--------------+\n
+           +-------+--------+--------------+--------+------+-----------+-----------+
+           | Venue | Symbol | Venue Symbol | Status | Type | Maker Fee | Taker Fee |
+           +-------+--------+--------------+--------+------+-----------+-----------+
+           |     - |      - |            - |      - |    - |         - |         - |
+           +-------+--------+--------------+--------+------+-----------+-----------+\n
            """
   end
 end

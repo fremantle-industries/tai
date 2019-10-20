@@ -1,6 +1,6 @@
 defmodule Tai.Commands.Products do
   @moduledoc """
-  Display the list of products and their trade requirements for each exchange
+  Display the list of products for each venue
   """
 
   import Tai.Commands.Table, only: [render!: 2]
@@ -12,14 +12,7 @@ defmodule Tai.Commands.Products do
     "Status",
     "Type",
     "Maker Fee",
-    "Taker Fee",
-    "Price Increment",
-    "Size Increment",
-    "Min Price",
-    "Max Price",
-    "Min Size",
-    "Max Size",
-    "Min Notional"
+    "Taker Fee"
   ]
 
   @spec products :: no_return
@@ -40,14 +33,7 @@ defmodule Tai.Commands.Products do
         product.status,
         product.type,
         product.maker_fee && product.maker_fee |> to_percent,
-        product.taker_fee && product.taker_fee |> to_percent,
-        product.price_increment,
-        product.size_increment,
-        product.min_price,
-        product.max_price,
-        product.min_size,
-        product.max_size,
-        product.min_notional
+        product.taker_fee && product.taker_fee |> to_percent
       ]
       |> Enum.map(&format_col/1)
     end)
