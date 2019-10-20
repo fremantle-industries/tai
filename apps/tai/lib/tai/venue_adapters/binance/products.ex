@@ -47,7 +47,10 @@ defmodule Tai.VenueAdapters.Binance.Products do
       price_increment: tick_size,
       max_price: max_price,
       max_size: max_size,
-      size_increment: step_size
+      size_increment: step_size,
+      value: Decimal.new(1),
+      is_quanto: false,
+      is_inverse: false
     }
   end
 
