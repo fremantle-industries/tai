@@ -36,6 +36,8 @@ defmodule Tai.Venues.Product do
     venue_id
     symbol
     venue_symbol
+    base
+    quote
     status
     type
     price_increment
