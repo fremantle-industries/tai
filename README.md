@@ -31,7 +31,6 @@ Here's an example of an advisor that logs the spread between multiple products o
 | Deribit  | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | Huobi    | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | Coinflex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Poloniex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 
 [Planned Venues...](./PLANNED_VENUES.md)
 
