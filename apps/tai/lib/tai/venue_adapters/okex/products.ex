@@ -9,6 +9,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       swap_products = swap_instruments |> Enum.map(&build(&1, venue_id))
       spot_products = spot_instruments |> Enum.map(&build(&1, venue_id))
       products = future_products ++ swap_products ++ spot_products
+
       {:ok, products}
     end
   end
@@ -22,7 +23,10 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       base: instrument.underlying_index,
       quote: instrument.quote_currency,
       venue_price_increment: instrument.tick_size,
-      venue_size_increment: instrument.trade_increment
+      venue_size_increment: instrument.trade_increment,
+      value: instrument.contract_val,
+      is_quanto: false,
+      is_inverse: true
     )
   end
 
@@ -34,7 +38,10 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       base: instrument.coin,
       quote: instrument.quote_currency,
       venue_price_increment: instrument.tick_size,
-      venue_size_increment: instrument.size_increment
+      venue_size_increment: instrument.size_increment,
+      value: instrument.contract_val,
+      is_quanto: false,
+      is_inverse: true
     )
   end
 
@@ -47,7 +54,10 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       quote: instrument.quote_currency,
       venue_price_increment: instrument.tick_size,
       venue_size_increment: instrument.size_increment,
-      venue_min_size: instrument.min_size
+      venue_min_size: instrument.min_size,
+      value: 1,
+      is_quanto: false,
+      is_inverse: false
     )
   end
 
@@ -60,6 +70,7 @@ defmodule Tai.VenueAdapters.OkEx.Products do
     price_increment = args |> Keyword.fetch!(:venue_price_increment) |> Decimal.cast()
     size_increment = venue_size_increment |> Decimal.cast()
     min_size = args |> Keyword.get(:min_size, venue_size_increment) |> Decimal.cast()
+    value = args |> Keyword.fetch!(:value) |> Decimal.cast()
 
     %Tai.Venues.Product{
       venue_id: Keyword.fetch!(args, :venue_id),
@@ -73,7 +84,10 @@ defmodule Tai.VenueAdapters.OkEx.Products do
       price_increment: price_increment,
       size_increment: size_increment,
       min_price: price_increment,
-      min_size: min_size
+      min_size: min_size,
+      value: value,
+      is_quanto: Keyword.fetch!(args, :is_quanto),
+      is_inverse: Keyword.fetch!(args, :is_inverse)
     }
   end
 

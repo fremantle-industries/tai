@@ -62,7 +62,10 @@ defmodule Tai.VenueAdapters.Gdax.Products do
       min_size: base_min_size,
       max_size: base_max_size,
       price_increment: quote_increment,
-      size_increment: base_min_size
+      size_increment: base_min_size,
+      value: Decimal.new(1),
+      is_quanto: false,
+      is_inverse: false
     }
   end
 end
