@@ -35,9 +35,12 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
       price_increment: tick_size,
       size_increment: lot_size,
       min_price: tick_size,
-      min_size: lot_size,
+      min_size: Decimal.new(1),
       max_price: max_price,
       max_size: max_order_qty,
+      value: lot_size,
+      is_quanto: instrument.is_quanto,
+      is_inverse: instrument.is_inverse,
       maker_fee: maker_fee,
       taker_fee: taker_fee
     }
