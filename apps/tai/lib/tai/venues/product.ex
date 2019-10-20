@@ -17,6 +17,8 @@ defmodule Tai.Venues.Product do
           venue_id: Tai.Venues.Adapter.venue_id(),
           symbol: symbol,
           venue_symbol: venue_symbol,
+          base: String.t(),
+          quote: String.t(),
           status: status,
           type: type,
           price_increment: Decimal.t(),
@@ -45,6 +47,8 @@ defmodule Tai.Venues.Product do
     venue_id
     symbol
     venue_symbol
+    base
+    quote
     status
     type
     price_increment
