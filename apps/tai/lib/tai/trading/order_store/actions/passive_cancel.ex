@@ -15,7 +15,17 @@ defmodule Tai.Trading.OrderStore.Actions.PassiveCancel do
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PassiveCancel do
-  @required ~w(rejected open partially_filled filled expired pending_amend amend amend_error pending_cancel cancel_accepted)a
+  @required ~w(
+    rejected
+    open
+    partially_filled
+    filled expired
+    pending_amend
+    amend
+    amend_error
+    pending_cancel
+    cancel_accepted
+  )a
 
   def required(_), do: @required
 
