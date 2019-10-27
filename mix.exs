@@ -31,7 +31,7 @@ defmodule TaiMonorepo.MixProject do
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_unit_notifier, "~> 0.1", only: :test},
       {:dialyxir, "~> 1.0.0-rc.6", only: :dev, runtime: false},
-      {:mix_test_watch, "~> 0.9", only: :dev, runtime: false}
+      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}
     ]
   end
 
