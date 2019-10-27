@@ -122,6 +122,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   # Bitmex has an unpublished limit to websocket message lengths.
   @products_chunk_count 10
   def handle_info({:subscribe, :depth}, state) do
+    # > 25 quotes are experimental. It has performance issues causing message queue back pressure
     order_book_table = if state.quote_depth <= 25, do: "orderBookL2_25", else: "orderBookL2"
 
     state.products
