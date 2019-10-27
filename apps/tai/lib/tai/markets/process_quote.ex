@@ -77,8 +77,8 @@ defmodule Tai.Markets.ProcessQuote do
   defp price_points(side, depth, sort_by) do
     side
     |> Map.keys()
-    |> Enum.sort(sort_by)
     |> Enum.take(depth)
+    |> Enum.sort(sort_by)
     |> Enum.map(&%PricePoint{price: &1, size: side |> Map.fetch!(&1)})
   end
 
