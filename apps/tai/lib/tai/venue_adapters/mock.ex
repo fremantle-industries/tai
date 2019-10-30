@@ -73,6 +73,10 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
+  def bulk_amend_orders(_orders_with_attrs, _credentials) do
+    {:error, :not_supported}
+  end
+
   def cancel_order(order, _credentials) do
     with_mock_server(fn ->
       {:cancel_order, order.venue_order_id}

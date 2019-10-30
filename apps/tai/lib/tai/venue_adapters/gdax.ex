@@ -15,5 +15,6 @@ defmodule Tai.VenueAdapters.Gdax do
   def positions(_venue_id, _account_id, _credentials), do: {:error, :not_supported}
   def create_order(_order, _credentials), do: {:error, :not_implemented}
   def amend_order(_venue_order_id, _attrs, _credentials), do: {:error, :not_implemented}
+  def bulk_amend_orders(_orders_with_attrs, _credentials), do: {:error, :not_supported}
   def cancel_order(_venue_order_id, _credentials), do: {:error, :not_implemented}
 end

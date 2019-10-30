@@ -11,6 +11,7 @@ defmodule Tai.Venues.Adapter do
   @type order :: Tai.Trading.Order.t()
   @type create_response :: OrderResponses.Create.t() | OrderResponses.CreateAccepted.t()
   @type amend_response :: OrderResponses.Amend.t()
+  @type bulk_amend_response :: [amend_response]
   @type cancel_response :: OrderResponses.Cancel.t() | OrderResponses.CancelAccepted.t()
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type shared_error_reason ::
@@ -47,6 +48,8 @@ defmodule Tai.Venues.Adapter do
               {:ok, create_response} | {:error, create_order_error_reason}
   @callback amend_order(order, amend_attrs, credentials) ::
               {:ok, amend_response} | {:error, amend_order_error_reason}
+  @callback bulk_amend_orders([{order, amend_attrs}], credentials) ::
+              {:ok, bulk_amend_response} | {:error, amend_order_error_reason}
   @callback cancel_order(order, credentials) ::
               {:ok, cancel_response} | {:error, cancel_order_error_reason}
 
