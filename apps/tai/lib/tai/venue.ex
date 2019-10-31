@@ -70,6 +70,22 @@ defmodule Tai.Venue do
     venue_adapter.adapter.amend_order(order, attrs, credentials)
   end
 
+  @type bulk_amend_attrs :: Tai.Trading.Orders.BulkAmend.attrs()
+  @type bulk_amend_response :: OrderResponses.BulkAmend.t()
+  @type bulk_amend_order_error_reason ::
+          :not_implemented
+          | shared_error_reason
+
+  @spec bulk_amend_orders([{order, bulk_amend_attrs}]) ::
+          {:ok, bulk_amend_response} | {:error, bulk_amend_order_error_reason}
+  def bulk_amend_orders(
+        [{%Order{} = order, _} | _] = orders_and_attributes,
+        adapters \\ Tai.Venues.Config.parse_adapters()
+      ) do
+    {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
+    venue_adapter.adapter.bulk_amend_orders(orders_and_attributes, credentials)
+  end
+
   @type cancel_response :: OrderResponses.Cancel.t() | OrderResponses.CancelAccepted.t()
   @type cancel_order_error_reason ::
           :not_implemented
