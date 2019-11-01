@@ -14,10 +14,6 @@ defmodule Tai.Trading.Orders.BulkAmendTest do
     :ok
   end
 
-  # sets order to pend-amend
-  # amends order - > outgoing server API -> updated order status
-  # sets order to error on error
-
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
   @pending_venue_order_id "df8e6bd0-a40a-42fb-8fea-pending"
   @submission_types [

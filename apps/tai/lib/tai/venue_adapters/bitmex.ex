@@ -6,6 +6,7 @@ defmodule Tai.VenueAdapters.Bitmex do
     Positions,
     CreateOrder,
     AmendOrder,
+    BulkAmendOrders,
     CancelOrder
   }
 
@@ -18,6 +19,6 @@ defmodule Tai.VenueAdapters.Bitmex do
   defdelegate positions(venue_id, account_id, credentials), to: Positions
   defdelegate create_order(order, credentials), to: CreateOrder
   defdelegate amend_order(order, attrs, credentials), to: AmendOrder
-  def bulk_amend_orders(_orders_with_attrs, _credentials), do: {:error, :not_implemented}
+  defdelegate bulk_amend_orders(orders_with_attrs, credentials), to: BulkAmendOrders
   defdelegate cancel_order(order, credentials), to: CancelOrder
 end
