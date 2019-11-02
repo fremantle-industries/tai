@@ -29,6 +29,9 @@ defmodule Tai.TestSupport.Helpers do
   def test_venue_adapters_create_order_error_insufficient_balance,
     do: :test_venue_adapters_create_order_error_insufficient_balance |> filter()
 
+  def test_venue_adapters_amend_order,
+    do: :test_venue_adapters_amend_order |> filter()
+
   def test_venue_adapters_cancel_order,
     do: :test_venue_adapters_cancel_order |> filter()
 

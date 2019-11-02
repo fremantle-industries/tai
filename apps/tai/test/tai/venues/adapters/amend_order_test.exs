@@ -13,10 +13,9 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
     HTTPoison.start()
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters()
+  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_amend_order()
 
   @test_adapters
-  |> Enum.filter(fn {adapter_id, _} -> adapter_id == :bitmex end)
   |> Enum.map(fn {_, adapter} ->
     @adapter adapter
 
@@ -178,7 +177,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       account_id: :main,
-      symbol: venue_id |> product_symbol,
+      product_symbol: venue_id |> product_symbol,
       side: side,
       price: venue_id |> price(side),
       qty: venue_id |> qty(side),
@@ -193,7 +192,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       venue_order_id: amend_response.id,
       venue_id: order.venue_id,
       account_id: :main,
-      symbol: order.venue_id |> product_symbol,
+      product_symbol: order.venue_id |> product_symbol,
       side: order.side,
       price: order.venue_id |> price(order.side),
       qty: order.venue_id |> qty(order.side),
