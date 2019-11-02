@@ -1,4 +1,4 @@
-defmodule Tai.Venues.Adapters.BulkAmendOrderTest do
+defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
@@ -12,7 +12,7 @@ defmodule Tai.Venues.Adapters.BulkAmendOrderTest do
     HTTPoison.start()
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_bulk_amend_order()
+  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_amend_bulk_order()
 
   @test_adapters
   |> Enum.map(fn {_, adapter} ->
@@ -24,17 +24,17 @@ defmodule Tai.Venues.Adapters.BulkAmendOrderTest do
       amend_qty = amend_qty(@adapter.id, enqueued_order.side)
       attrs = amend_attrs(@adapter.id, price: amend_price, qty: amend_qty)
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/bulk_amend_price_and_qty_ok" do
+      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_bulk_price_and_qty_ok" do
         assert {:ok, create_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
 
         open_order = build_open_order(enqueued_order, create_response)
 
-        assert {:ok, bulk_amend_response} =
-                 Tai.Venue.bulk_amend_orders([{open_order, attrs}], @test_adapters)
+        assert {:ok, amend_bulk_response} =
+                 Tai.Venue.amend_bulk_orders([{open_order, attrs}], @test_adapters)
 
-        assert Enum.count(bulk_amend_response.orders) == 1
+        assert Enum.count(amend_bulk_response.orders) == 1
 
-        amend_response = Enum.at(bulk_amend_response.orders, 0)
+        amend_response = Enum.at(amend_bulk_response.orders, 0)
         assert amend_response.id == open_order.venue_order_id
         assert amend_response.status == :open
         assert amend_response.price == amend_price

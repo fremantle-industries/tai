@@ -1,4 +1,4 @@
-defmodule Tai.Trading.Orders.BulkAmend do
+defmodule Tai.Trading.Orders.AmendBulk do
   alias Tai.Trading.{NotifyOrderUpdate, OrderStore}
   alias Tai.Events
 
@@ -18,8 +18,8 @@ defmodule Tai.Trading.Orders.BulkAmend do
   @type reject_reason :: {:invalid_status, was :: status, status_required, action}
   @type response :: [{:ok, updated :: order} | {:error, reject_reason}]
 
-  @spec bulk_amend(orders_and_attributes) :: response
-  def bulk_amend(orders_and_attributes, provider \\ Provider)
+  @spec amend_bulk(orders_and_attributes) :: response
+  def amend_bulk(orders_and_attributes, provider \\ Provider)
       when is_list(orders_and_attributes) do
     pending_orders = orders_and_attributes |> Enum.map(&mark_order_pending(&1, provider))
 
@@ -52,7 +52,7 @@ defmodule Tai.Trading.Orders.BulkAmend do
     pending_orders
   end
 
-  defdelegate send_amend_orders(orders), to: Tai.Venue, as: :bulk_amend_orders
+  defdelegate send_amend_orders(orders), to: Tai.Venue, as: :amend_bulk_orders
 
   defp parse_response({:ok, %{orders: amend_responses}}, orders_and_attributes, provider) do
     amend_responses

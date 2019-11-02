@@ -18,5 +18,5 @@ defmodule Tai.VenueAdapters.OkEx do
   defdelegate cancel_order(order, credentials), to: CancelOrder
   def positions(_venue_id, _account_id, _credentials), do: {:error, :not_supported}
   def amend_order(_order, _attrs, _credentials), do: {:error, :not_supported}
-  def bulk_amend_orders(_orders_with_attrs, _credentials), do: {:error, :not_supported}
+  def amend_bulk_orders(_orders_with_attrs, _credentials), do: {:error, :not_supported}
 end

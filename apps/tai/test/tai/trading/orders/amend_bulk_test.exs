@@ -1,4 +1,4 @@
-defmodule Tai.Trading.Orders.BulkAmendTest do
+defmodule Tai.Trading.Orders.AmendBulkTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Helpers
   alias Tai.TestSupport.Mocks
@@ -83,12 +83,12 @@ defmodule Tai.Trading.Orders.BulkAmendTest do
         amend_price = Decimal.new("105.5")
         amend_qty = Decimal.new(10)
 
-        GoodTillCancel.bulk_amend_price_and_qty([
+        GoodTillCancel.amend_bulk_price_and_qty([
           {open_order, %{price: amend_price, qty: amend_qty}}
         ])
 
         assert [{:ok, %Tai.Trading.Order{} = returned_order}, {:error, amend_error}] =
-                 Tai.Trading.Orders.bulk_amend([
+                 Tai.Trading.Orders.amend_bulk([
                    {open_order, %{price: amend_price, qty: amend_qty}},
                    {pending_order, %{price: amend_price, qty: amend_qty}}
                  ])

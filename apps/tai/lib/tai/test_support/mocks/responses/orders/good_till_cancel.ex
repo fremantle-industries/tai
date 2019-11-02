@@ -142,8 +142,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     |> Mocks.Server.insert(order_response)
   end
 
-  @spec bulk_amend_price_and_qty([{order, %{}}]) :: :ok
-  def bulk_amend_price_and_qty(orders_and_attrs) do
+  @spec amend_bulk_price_and_qty([{order, %{}}]) :: :ok
+  def amend_bulk_price_and_qty(orders_and_attrs) do
     order_responses =
       Enum.map(orders_and_attrs, fn {order, attrs} ->
         %OrderResponses.Amend{
@@ -157,7 +157,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
         }
       end)
 
-    response = %OrderResponses.BulkAmend{orders: order_responses}
+    response = %OrderResponses.AmendBulk{orders: order_responses}
 
     match_attrs =
       Enum.map(orders_and_attrs, fn {order, attrs} ->
@@ -168,12 +168,12 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
         }
       end)
 
-    {:bulk_amend_orders, match_attrs}
+    {:amend_bulk_orders, match_attrs}
     |> Mocks.Server.insert(response)
   end
 
-  @spec bulk_amend_price([{order, %{}}]) :: :ok
-  def bulk_amend_price(orders_and_attrs) do
+  @spec amend_bulk_price([{order, %{}}]) :: :ok
+  def amend_bulk_price(orders_and_attrs) do
     order_responses =
       Enum.map(orders_and_attrs, fn {order, attrs} ->
         %OrderResponses.Amend{
@@ -187,14 +187,14 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
         }
       end)
 
-    response = %OrderResponses.BulkAmend{orders: order_responses}
+    response = %OrderResponses.AmendBulk{orders: order_responses}
 
     match_attrs =
       Enum.map(orders_and_attrs, fn {order, attrs} ->
         %{venue_order_id: order.venue_order_id, price: Map.get(attrs, :price)}
       end)
 
-    {:bulk_amend_orders, match_attrs}
+    {:amend_bulk_orders, match_attrs}
     |> Mocks.Server.insert(response)
   end
 

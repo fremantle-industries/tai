@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Bitmex.BulkAmendOrders do
+defmodule Tai.VenueAdapters.Bitmex.AmendBulkOrders do
   import Tai.VenueAdapters.Bitmex.OrderStatus
 
   @type credentials :: Tai.Venues.Adapter.credentials()
@@ -11,8 +11,8 @@ defmodule Tai.VenueAdapters.Bitmex.BulkAmendOrders do
           | {:nonce_not_increasing, msg :: String.t()}
           | {:unhandled, term}
 
-  @spec bulk_amend_orders([{order, attrs}], credentials) :: {:ok, response} | {:error, reason}
-  def bulk_amend_orders(orders_with_attrs, credentials) do
+  @spec amend_bulk_orders([{order, attrs}], credentials) :: {:ok, response} | {:error, reason}
+  def amend_bulk_orders(orders_with_attrs, credentials) do
     params =
       orders_with_attrs
       |> Enum.map(fn {order, attrs} ->
@@ -66,7 +66,7 @@ defmodule Tai.VenueAdapters.Bitmex.BulkAmendOrders do
         }
       end)
 
-    response = %Tai.Trading.OrderResponses.BulkAmend{orders: responses}
+    response = %Tai.Trading.OrderResponses.AmendBulk{orders: responses}
     {:ok, response}
   end
 

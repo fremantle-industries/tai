@@ -32,7 +32,7 @@ defmodule Tai.TestSupport.Helpers do
   def test_venue_adapters_amend_order,
     do: :test_venue_adapters_amend_order |> filter()
 
-  def test_venue_adapters_bulk_amend_order,
+  def test_venue_adapters_amend_bulk_order,
     do: :test_venue_adapters_amend_bulk_order |> filter()
 
   def test_venue_adapters_cancel_order,
