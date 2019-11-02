@@ -37,8 +37,8 @@ defmodule Tai.Mixfile do
       {:timex, "~> 3.6"},
       # Fixes deprecation warnings
       # {:websockex, github: "Azolo/websockex"},
-      {:websockex, "~> 0.4.0"},
-      {:confex, "~> 3.4.0"},
+      {:websockex, "~> 0.4"},
+      {:confex, "~> 3.4"},
       {:ecto, "~> 3.1"},
       {:jason, "~> 1.1"},
       {:vex, "~> 0.7"},
@@ -48,7 +48,7 @@ defmodule Tai.Mixfile do
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:echo_boy, "~> 0.6.0", only: [:dev, :test]},
       {:exvcr, "~> 0.11.0", only: [:dev, :test]},
-      {:mock, "~> 0.3.3", only: :test},
+      {:mock, "~> 0.3", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
