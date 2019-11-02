@@ -73,6 +73,23 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
+  def amend_bulk_orders(orders_with_attrs, _credentials) do
+    with_mock_server(fn ->
+      match_attrs =
+        Enum.map(orders_with_attrs, fn {order, attrs} ->
+          Map.merge(attrs, %{venue_order_id: order.venue_order_id})
+        end)
+
+      {:amend_bulk_orders, match_attrs}
+      |> Mocks.Server.eject()
+      |> case do
+        {:ok, {:raise, reason}} -> raise reason
+        {:ok, _} = response -> response
+        {:error, :not_found} -> {:error, :mock_not_found}
+      end
+    end)
+  end
+
   def cancel_order(order, _credentials) do
     with_mock_server(fn ->
       {:cancel_order, order.venue_order_id}

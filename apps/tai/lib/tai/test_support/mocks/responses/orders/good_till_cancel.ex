@@ -142,6 +142,62 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     |> Mocks.Server.insert(order_response)
   end
 
+  @spec amend_bulk_price_and_qty([{order, %{}}]) :: :ok
+  def amend_bulk_price_and_qty(orders_and_attrs) do
+    order_responses =
+      Enum.map(orders_and_attrs, fn {order, attrs} ->
+        %OrderResponses.Amend{
+          id: order.venue_order_id,
+          status: :open,
+          price: Map.get(attrs, :price),
+          leaves_qty: Map.get(attrs, :qty),
+          cumulative_qty: Decimal.new(0),
+          venue_timestamp: Timex.now(),
+          received_at: Timex.now()
+        }
+      end)
+
+    response = %OrderResponses.AmendBulk{orders: order_responses}
+
+    match_attrs =
+      Enum.map(orders_and_attrs, fn {order, attrs} ->
+        %{
+          venue_order_id: order.venue_order_id,
+          price: Map.get(attrs, :price),
+          qty: Map.get(attrs, :qty)
+        }
+      end)
+
+    {:amend_bulk_orders, match_attrs}
+    |> Mocks.Server.insert(response)
+  end
+
+  @spec amend_bulk_price([{order, %{}}]) :: :ok
+  def amend_bulk_price(orders_and_attrs) do
+    order_responses =
+      Enum.map(orders_and_attrs, fn {order, attrs} ->
+        %OrderResponses.Amend{
+          id: order.venue_order_id,
+          status: :open,
+          price: Map.get(attrs, :price),
+          leaves_qty: order.leaves_qty,
+          cumulative_qty: Decimal.new(0),
+          venue_timestamp: Timex.now(),
+          received_at: Timex.now()
+        }
+      end)
+
+    response = %OrderResponses.AmendBulk{orders: order_responses}
+
+    match_attrs =
+      Enum.map(orders_and_attrs, fn {order, attrs} ->
+        %{venue_order_id: order.venue_order_id, price: Map.get(attrs, :price)}
+      end)
+
+    {:amend_bulk_orders, match_attrs}
+    |> Mocks.Server.insert(response)
+  end
+
   @spec cancel_accepted(venue_order_id) :: :ok
   def cancel_accepted(venue_order_id) do
     order_response = %OrderResponses.CancelAccepted{
