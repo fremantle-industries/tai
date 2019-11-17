@@ -19,15 +19,11 @@ defmodule Tai.Commands.PositionsTest do
         venue_id: :venue_a,
         account_id: :account_a,
         product_symbol: :btc_usd,
-        open: true,
-        avg_entry_price: Decimal.new("10.1"),
-        qty: Decimal.new(10),
-        init_margin: Decimal.new(0),
-        init_margin_req: Decimal.new(0),
-        maint_margin: Decimal.new(0),
-        maint_margin_req: Decimal.new(0),
-        realised_pnl: Decimal.new(0),
-        unrealised_pnl: Decimal.new(0)
+        side: :long,
+        qty: Decimal.new(5),
+        entry_price: Decimal.new("3066.45"),
+        leverage: Decimal.new("20.1"),
+        margin_mode: :crossed
       )
       |> Tai.Trading.PositionStore.add()
 
@@ -37,35 +33,31 @@ defmodule Tai.Commands.PositionsTest do
         venue_id: :venue_b,
         account_id: :account_b,
         product_symbol: :ltc_usd,
-        open: true,
-        avg_entry_price: Decimal.new("0.2"),
-        qty: Decimal.new(2),
-        init_margin: Decimal.new(0),
-        init_margin_req: Decimal.new(0),
-        maint_margin: Decimal.new(0),
-        maint_margin_req: Decimal.new(0),
-        realised_pnl: Decimal.new(0),
-        unrealised_pnl: Decimal.new(0)
+        side: :short,
+        qty: Decimal.new(1),
+        entry_price: Decimal.new("24.66"),
+        leverage: Decimal.new("11.5"),
+        margin_mode: :fixed
       )
       |> Tai.Trading.PositionStore.add()
 
     assert capture_io(&Tai.CommandsHelper.positions/0) == """
-           +---------+-----------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+
-           |   Venue |   Account | Product | Open | Avg Entry Price | Qty | Init Margin | Init Margin Req | Maint Margin | Maint Margin Req | Realised Pnl | Unrealised Pnl |
-           +---------+-----------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+
-           | venue_a | account_a | btc_usd | true |            10.1 |  10 |           0 |               0 |            0 |                0 |            0 |              0 |
-           | venue_b | account_b | ltc_usd | true |             0.2 |   2 |           0 |               0 |            0 |                0 |            0 |              0 |
-           +---------+-----------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+\n
+           +---------+-----------+---------+-------+-----+-------------+----------+-------------+
+           |   Venue |   Account | Product |  Side | Qty | Entry Price | Leverage | Margin Mode |
+           +---------+-----------+---------+-------+-----+-------------+----------+-------------+
+           | venue_a | account_a | btc_usd |  long |   5 |     3066.45 |     20.1 |     crossed |
+           | venue_b | account_b | ltc_usd | short |   1 |       24.66 |     11.5 |       fixed |
+           +---------+-----------+---------+-------+-----+-------------+----------+-------------+\n
            """
   end
 
   test "shows an empty table when there are no positions" do
     assert capture_io(&Tai.CommandsHelper.positions/0) == """
-           +-------+---------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+
-           | Venue | Account | Product | Open | Avg Entry Price | Qty | Init Margin | Init Margin Req | Maint Margin | Maint Margin Req | Realised Pnl | Unrealised Pnl |
-           +-------+---------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+
-           |     - |       - |       - |    - |               - |   - |           - |               - |            - |                - |            - |              - |
-           +-------+---------+---------+------+-----------------+-----+-------------+-----------------+--------------+------------------+--------------+----------------+\n
+           +-------+---------+---------+------+-----+-------------+----------+-------------+
+           | Venue | Account | Product | Side | Qty | Entry Price | Leverage | Margin Mode |
+           +-------+---------+---------+------+-----+-------------+----------+-------------+
+           |     - |       - |       - |    - |   - |           - |        - |           - |
+           +-------+---------+---------+------+-----+-------------+----------+-------------+\n
            """
   end
 end

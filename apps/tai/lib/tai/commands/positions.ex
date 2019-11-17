@@ -9,15 +9,11 @@ defmodule Tai.Commands.Positions do
     "Venue",
     "Account",
     "Product",
-    "Open",
-    "Avg Entry Price",
+    "Side",
     "Qty",
-    "Init Margin",
-    "Init Margin Req",
-    "Maint Margin",
-    "Maint Margin Req",
-    "Realised Pnl",
-    "Unrealised Pnl"
+    "Entry Price",
+    "Leverage",
+    "Margin Mode"
   ]
 
   @spec positions :: no_return
@@ -29,15 +25,11 @@ defmodule Tai.Commands.Positions do
         position.venue_id,
         position.account_id,
         position.product_symbol,
-        position.open,
-        position.avg_entry_price,
+        position.side,
         position.qty,
-        position.init_margin,
-        position.init_margin_req,
-        position.maint_margin,
-        position.maint_margin_req,
-        position.realised_pnl,
-        position.unrealised_pnl
+        position.entry_price,
+        position.leverage,
+        position.margin_mode
       ]
     end)
     |> render!(@header)

@@ -1,0 +1,90 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "OK-ACCESS-KEY": "***",
+        "OK-ACCESS-SIGN": "***",
+        "OK-ACCESS-TIMESTAMP": "***",
+        "OK-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.okex.com/api/swap/v3/position"
+    },
+    "response": {
+      "binary": false,
+      "body": "[{\"margin_mode\":\"crossed\",\"timestamp\":\"2019-11-08T05:48:57.177Z\",\"holding\":[{\"avail_position\":\"1\",\"avg_cost\":\"185.82\",\"instrument_id\":\"ETH-USD-SWAP\",\"last\":\"186.34\",\"leverage\":\"20.00\",\"liquidation_price\":\"0.20\",\"maint_margin_ratio\":\"0.0100\",\"margin\":\"0.0026\",\"position\":\"1\",\"realized_pnl\":\"-0.0001\",\"settled_pnl\":\"0.0000\",\"settlement_price\":\"185.82\",\"side\":\"long\",\"timestamp\":\"2019-11-08T05:48:57.177Z\"},{\"avail_position\":\"1\",\"avg_cost\":\"186.14\",\"instrument_id\":\"ETH-USD-SWAP\",\"last\":\"186.34\",\"leverage\":\"20.00\",\"liquidation_price\":\"0.20\",\"maint_margin_ratio\":\"0.0100\",\"margin\":\"0.0026\",\"position\":\"1\",\"realized_pnl\":\"-0.0001\",\"settled_pnl\":\"0.0000\",\"settlement_price\":\"186.14\",\"side\":\"short\",\"timestamp\":\"2019-11-08T05:48:57.177Z\"}]}]",
+      "headers": {
+        "Date": "Fri, 08 Nov 2019 05:49:10 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d9ac0e90244ecc578fdbe08094316eea61573192149; expires=Sat, 07-Nov-20 05:49:09 GMT; path=/; domain=.okex.com; HttpOnly",
+        "Vary": "Accept-Encoding",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Frame-Options": "DENY",
+        "X-Kong-Upstream-Latency": "51",
+        "X-Kong-Proxy-Latency": "0",
+        "Via": "kong/0.12.3",
+        "Strict-Transport-Security": "max-age=63072000; includeSubdomains; preload",
+        "CF-Cache-Status": "DYNAMIC",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "53254318de398d21-PDX"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "OK-ACCESS-KEY": "***",
+        "OK-ACCESS-SIGN": "***",
+        "OK-ACCESS-TIMESTAMP": "***",
+        "OK-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.okex.com/api/futures/v3/position"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"result\":true,\"holding\":[[{\"long_qty\":\"0\",\"long_avail_qty\":\"0\",\"long_avg_cost\":\"59.27310358\",\"long_settlement_price\":\"58.932\",\"realised_pnl\":\"0\",\"short_qty\":\"0\",\"short_avail_qty\":\"0\",\"short_avg_cost\":\"0\",\"short_settlement_price\":\"0\",\"liquidation_price\":\"0.095\",\"instrument_id\":\"LTC-USD-191108\",\"leverage\":\"50\",\"created_at\":\"2019-10-29T01:43:07.978Z\",\"updated_at\":\"2019-11-07T08:00:37.864Z\",\"margin_mode\":\"crossed\",\"short_margin\":\"0.0\",\"short_pnl\":\"0.0\",\"short_pnl_ratio\":\"0.0\",\"short_unrealised_pnl\":\"0.0\",\"long_margin\":\"0.0\",\"long_pnl\":\"0.0\",\"long_pnl_ratio\":\"2.2806945\",\"long_unrealised_pnl\":\"0.0\",\"long_settled_pnl\":\"0\",\"short_settled_pnl\":\"0\",\"last\":\"62.097\"},{\"long_qty\":\"1\",\"long_avail_qty\":\"1\",\"long_avg_cost\":\"63\",\"long_settlement_price\":\"62.903\",\"realised_pnl\":\"0\",\"short_qty\":\"0\",\"short_avail_qty\":\"0\",\"short_avg_cost\":\"0\",\"short_settlement_price\":\"0\",\"liquidation_price\":\"0.095\",\"instrument_id\":\"LTC-USD-191115\",\"leverage\":\"50\",\"created_at\":\"2019-11-05T01:34:16.212Z\",\"updated_at\":\"2019-11-07T08:00:37.886Z\",\"margin_mode\":\"crossed\",\"short_margin\":\"0.0\",\"short_pnl\":\"0.0\",\"short_pnl_ratio\":\"-50.0\",\"short_unrealised_pnl\":\"0.0\",\"long_margin\":\"0.00321569\",\"long_pnl\":\"-0.00205447\",\"long_pnl_ratio\":\"-0.647158\",\"long_unrealised_pnl\":\"-0.0018097\",\"long_settled_pnl\":\"-0.00024477\",\"short_settled_pnl\":\"0\",\"last\":\"62.195\"},{\"long_qty\":\"0\",\"long_avail_qty\":\"0\",\"long_avg_cost\":\"48.9347931\",\"long_settlement_price\":\"59.61\",\"realised_pnl\":\"0\",\"short_qty\":\"0\",\"short_avail_qty\":\"0\",\"short_avg_cost\":\"0\",\"short_settlement_price\":\"0\",\"liquidation_price\":\"0.095\",\"instrument_id\":\"LTC-USD-191227\",\"leverage\":\"50\",\"created_at\":\"2019-10-23T17:36:17.586Z\",\"updated_at\":\"2019-11-07T08:00:37.911Z\",\"margin_mode\":\"crossed\",\"short_margin\":\"0.0\",\"short_pnl\":\"0.0\",\"short_pnl_ratio\":\"0.0\",\"short_unrealised_pnl\":\"0.0\",\"long_margin\":\"0.0\",\"long_pnl\":\"0.0\",\"long_pnl_ratio\":\"11.1579305\",\"long_unrealised_pnl\":\"0.0\",\"long_settled_pnl\":\"0\",\"short_settled_pnl\":\"0\",\"last\":\"62.992\"},{\"long_qty\":\"0\",\"long_avail_qty\":\"0\",\"long_avg_cost\":\"193.43734859\",\"long_settlement_price\":\"181.944\",\"realised_pnl\":\"0\",\"short_qty\":\"0\",\"short_avail_qty\":\"0\",\"short_avg_cost\":\"0\",\"short_settlement_price\":\"0\",\"liquidation_price\":\"0.000\",\"instrument_id\":\"ETH-USD-191108\",\"leverage\":\"20\",\"created_at\":\"2019-10-29T20:16:58.316Z\",\"updated_at\":\"2019-11-07T08:01:22.989Z\",\"margin_mode\":\"crossed\",\"short_margin\":\"0.0\",\"short_pnl\":\"0.0\",\"short_pnl_ratio\":\"0.0\",\"short_unrealised_pnl\":\"0.0\",\"long_margin\":\"0.0\",\"long_pnl\":\"0.0\",\"long_pnl_ratio\":\"-0.7520744\",\"long_unrealised_pnl\":\"0.0\",\"long_settled_pnl\":\"0\",\"short_settled_pnl\":\"0\",\"last\":\"186.457\"},{\"long_qty\":\"0\",\"long_avail_qty\":\"0\",\"long_avg_cost\":\"159.01052041\",\"long_settlement_price\":\"184.58\",\"realised_pnl\":\"0\",\"short_qty\":\"0\",\"short_avail_qty\":\"0\",\"short_avg_cost\":\"0\",\"short_settlement_price\":\"0\",\"liquidation_price\":\"0.000\",\"instrument_id\":\"ETH-USD-191227\",\"leverage\":\"20\",\"created_at\":\"2019-10-01T18:31:04.748Z\",\"updated_at\":\"2019-11-07T08:01:23.001Z\",\"margin_mode\":\"crossed\",\"short_margin\":\"0.0\",\"short_pnl\":\"0.0\",\"short_pnl_ratio\":\"-20.0\",\"short_unrealised_pnl\":\"0.0\",\"long_margin\":\"0.0\",\"long_pnl\":\"0.0\",\"long_pnl_ratio\":\"3.1999788\",\"long_unrealised_pnl\":\"0.0\",\"long_settled_pnl\":\"0\",\"short_settled_pnl\":\"0\",\"last\":\"189.298\"},{\"long_qty\":\"0\",\"long_avail_qty\":\"0\",\"long_avg_cost\":\"5.02936057\",\"long_settlement_price\":\"4.891\",\"realised_pnl\":\"0\",\"short_qty\":\"0\",\"short_avail_qty\":\"0\",\"short_avg_cost\":\"0\",\"short_settlement_price\":\"0\",\"liquidation_price\":\"0.000\",\"instrument_id\":\"ETC-USD-191108\",\"leverage\":\"20\",\"created_at\":\"2019-10-29T01:35:04.632Z\",\"updated_at\":\"2019-11-07T08:00:50.098Z\",\"margin_mode\":\"crossed\",\"short_margin\":\"0.0\",\"short_pnl\":\"0.0\",\"short_pnl_ratio\":\"0.0\",\"short_unrealised_pnl\":\"0.0\",\"long_margin\":\"0.0\",\"long_pnl\":\"0.0\",\"long_pnl_ratio\":\"0.748859\",\"long_unrealised_pnl\":\"0.0\",\"long_settled_pnl\":\"0\",\"short_settled_pnl\":\"0\",\"last\":\"5.22\"},{\"long_qty\":\"0\",\"long_avail_qty\":\"0\",\"long_avg_cost\":\"3.65630888\",\"long_settlement_price\":\"3.65630888\",\"realised_pnl\":\"0\",\"short_qty\":\"0\",\"short_avail_qty\":\"0\",\"short_avg_cost\":\"0\",\"short_settlement_price\":\"0\",\"liquidation_price\":\"0.000\",\"instrument_id\":\"ETC-USD-191227\",\"leverage\":\"20\",\"created_at\":\"2019-09-24T19:16:59.801Z\",\"updated_at\":\"2019-11-07T08:00:50.115Z\",\"margin_mode\":\"crossed\",\"short_margin\":\"0.0\",\"short_pnl\":\"0.0\",\"short_pnl_ratio\":\"-20.0\",\"short_unrealised_pnl\":\"0.0\",\"long_margin\":\"0.0\",\"long_pnl\":\"0.0\",\"long_pnl_ratio\":\"6.1973994\",\"long_unrealised_pnl\":\"0.0\",\"long_settled_pnl\":\"0\",\"short_settled_pnl\":\"0\",\"last\":\"5.299\"}]]}",
+      "headers": {
+        "Date": "Fri, 08 Nov 2019 05:49:10 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=dc1ea7833ea1e3c68d09590a7538f31431573192150; expires=Sat, 07-Nov-20 05:49:10 GMT; path=/; domain=.okex.com; HttpOnly",
+        "Vary": "Accept-Encoding",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Frame-Options": "DENY",
+        "X-Kong-Upstream-Latency": "223",
+        "X-Kong-Proxy-Latency": "0",
+        "Via": "kong/0.12.3",
+        "Strict-Transport-Security": "max-age=63072000; includeSubdomains; preload",
+        "CF-Cache-Status": "DYNAMIC",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "5325431aaf678d21-PDX"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

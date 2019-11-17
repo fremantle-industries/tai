@@ -28,17 +28,11 @@ defmodule Tai.Venues.Adapters.PositionsTest do
       use_cassette "venue_adapters/shared/positions/#{@adapter.id}/success" do
         assert {:ok, positions} = Tai.Venue.positions(@adapter, @account_id)
         assert Enum.count(positions) > 0
-        assert [%Tai.Trading.Position{} = position | _] = positions
+        assert [position | _] = positions
         assert position.venue_id == @adapter.id
         assert position.account_id == @account_id
-        assert position.open == false
-        assert %Decimal{} = position.qty
-        assert %Decimal{} = position.init_margin
-        assert %Decimal{} = position.init_margin_req
-        assert %Decimal{} = position.maint_margin
-        assert %Decimal{} = position.maint_margin_req
-        assert %Decimal{} = position.realised_pnl
-        assert %Decimal{} = position.unrealised_pnl
+        assert position.product_symbol != nil
+        assert Enum.all?(positions, fn %type{} -> type == Tai.Trading.Position end) == true
       end
     end
   end)
