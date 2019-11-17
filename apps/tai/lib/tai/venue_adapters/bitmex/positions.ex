@@ -3,7 +3,10 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
     venue_credentials = to_venue_credentials(credentials)
 
     with {:ok, venue_positions, _rate_limit} <- ExBitmex.Rest.Positions.all(venue_credentials) do
-      positions = Enum.map(venue_positions, &build(&1, venue_id, account_id))
+      positions =
+        venue_positions
+        |> Enum.map(&build(&1, venue_id, account_id))
+        |> Enum.filter(& &1)
 
       {:ok, positions}
     else
@@ -16,10 +19,12 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
     to: Tai.VenueAdapters.Bitmex.Credentials,
     as: :from
 
-  defp build(position, venue_id, account_id) do
+  defp build(%ExBitmex.Position{current_qty: 0}, _, _), do: nil
+
+  defp build(venue_position, venue_id, account_id) do
     # TODO: This should come from products
     product_symbol =
-      position.symbol
+      venue_position.symbol
       |> String.downcase()
       |> String.to_atom()
 
@@ -27,15 +32,24 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
       venue_id: venue_id,
       account_id: account_id,
       product_symbol: product_symbol,
-      open: position.is_open,
-      avg_entry_price: position.avg_entry_price && position.avg_entry_price |> Decimal.cast(),
-      qty: position.current_qty |> Decimal.cast(),
-      init_margin: position.init_margin |> Decimal.cast(),
-      init_margin_req: position.init_margin_req |> Decimal.cast(),
-      maint_margin: position.maint_margin |> Decimal.cast(),
-      maint_margin_req: position.maint_margin_req |> Decimal.cast(),
-      realised_pnl: position.realised_pnl |> Decimal.cast(),
-      unrealised_pnl: position.unrealised_pnl |> Decimal.cast()
+      side: venue_position |> side(),
+      qty: venue_position |> qty(),
+      entry_price: venue_position |> entry_price(),
+      leverage: venue_position |> leverage(),
+      margin_mode: venue_position |> margin_mode()
     }
   end
+
+  defp side(%ExBitmex.Position{current_qty: qty}) when qty > 0, do: :long
+  defp side(%ExBitmex.Position{current_qty: qty}) when qty < 0, do: :short
+
+  defp qty(%ExBitmex.Position{current_qty: qty}) when qty > 0, do: Decimal.new(qty)
+  defp qty(%ExBitmex.Position{current_qty: qty}) when qty < 0, do: Decimal.new(-qty)
+
+  defp entry_price(%ExBitmex.Position{avg_entry_price: p}), do: Decimal.cast(p)
+
+  defp leverage(%ExBitmex.Position{leverage: l}), do: Decimal.new(l)
+
+  defp margin_mode(%ExBitmex.Position{cross_margin: true}), do: :crossed
+  defp margin_mode(%ExBitmex.Position{cross_margin: false}), do: :fixed
 end

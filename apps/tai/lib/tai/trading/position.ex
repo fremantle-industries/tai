@@ -1,45 +1,38 @@
 defmodule Tai.Trading.Position do
+  alias __MODULE__
+
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type account_id :: Tai.Venues.Adapter.account_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
-  @type t :: %Tai.Trading.Position{
-          venue_id: atom,
-          account_id: atom,
+  @type t :: %Position{
+          venue_id: venue_id,
+          account_id: account_id,
           product_symbol: product_symbol,
-          open: boolean,
-          avg_entry_price: Decimal.t() | nil,
+          side: :long | :short,
           qty: Decimal.t(),
-          init_margin: Decimal.t(),
-          init_margin_req: Decimal.t(),
-          maint_margin: Decimal.t(),
-          maint_margin_req: Decimal.t(),
-          realised_pnl: Decimal.t(),
-          unrealised_pnl: Decimal.t()
+          entry_price: Decimal.t(),
+          leverage: Decimal.t(),
+          margin_mode: :crossed | :fixed
         }
 
   @enforce_keys ~w(
     venue_id
     account_id
     product_symbol
-    open
+    side
     qty
-    init_margin
-    init_margin_req
-    maint_margin
-    maint_margin_req
-    realised_pnl
-    unrealised_pnl
+    entry_price
+    leverage
+    margin_mode
   )a
   defstruct ~w(
     venue_id
     account_id
     product_symbol
-    open
-    avg_entry_price
+    side
     qty
-    init_margin
-    init_margin_req
-    maint_margin
-    maint_margin_req
-    realised_pnl
-    unrealised_pnl
+    entry_price
+    leverage
+    margin_mode
   )a
 end

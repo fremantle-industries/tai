@@ -4,9 +4,9 @@ defmodule Tai.Trading.PositionStore do
   """
 
   use GenServer
-  alias Tai.Trading
+  alias Tai.Trading.Position
 
-  @type position :: Trading.Position.t()
+  @type position :: Position.t()
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
