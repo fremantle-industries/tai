@@ -1,17 +1,17 @@
-defmodule Tai.Venues.AssetBalances do
-  alias Tai.Venues.AssetBalances
+defmodule Tai.Venues.AssetBalanceStore do
+  alias Tai.Venues.AssetBalanceStore
   use GenServer
 
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type account_id :: Tai.Venues.Adapter.account_id()
   @type asset :: Tai.Venues.AssetBalance.asset()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
-  @type lock_request :: AssetBalances.LockRequest.t()
+  @type lock_request :: AssetBalanceStore.LockRequest.t()
   @type lock_result ::
           {:ok, Decimal.t()}
           | {:error,
              :not_found | :insufficient_balance | :min_greater_than_max | :min_less_than_zero}
-  @type unlock_request :: AssetBalances.UnlockRequest.t()
+  @type unlock_request :: AssetBalanceStore.UnlockRequest.t()
   @type unlock_result :: :ok | {:error, :insufficient_balance | term}
   @type modify_result :: {:ok, asset_balance} | {:error, :not_found | :value_must_be_positive}
 
@@ -43,7 +43,8 @@ defmodule Tai.Venues.AssetBalances do
   end
 
   def handle_call({:lock, lock_request}, _from, state) do
-    with {:ok, {with_locked_balance, locked_qty}} <- AssetBalances.Lock.from_request(lock_request) do
+    with {:ok, {with_locked_balance, locked_qty}} <-
+           AssetBalanceStore.Lock.from_request(lock_request) do
       upsert_ets_table(with_locked_balance)
 
       Tai.Events.info(%Tai.Events.LockAssetBalanceOk{
@@ -75,7 +76,7 @@ defmodule Tai.Venues.AssetBalances do
   end
 
   def handle_call({:unlock, unlock_request}, _from, state) do
-    with {:ok, with_unlocked_balance} <- AssetBalances.Unlock.from_request(unlock_request) do
+    with {:ok, with_unlocked_balance} <- AssetBalanceStore.Unlock.from_request(unlock_request) do
       upsert_ets_table(with_unlocked_balance)
 
       Tai.Events.info(%Tai.Events.UnlockAssetBalanceOk{
@@ -173,12 +174,12 @@ defmodule Tai.Venues.AssetBalances do
   end
 
   @spec lock(lock_request) :: lock_result
-  def lock(%AssetBalances.LockRequest{} = lock_request) do
+  def lock(%AssetBalanceStore.LockRequest{} = lock_request) do
     GenServer.call(__MODULE__, {:lock, lock_request})
   end
 
   @spec unlock(unlock_request) :: unlock_result
-  def unlock(%AssetBalances.UnlockRequest{} = unlock_request) do
+  def unlock(%AssetBalanceStore.UnlockRequest{} = unlock_request) do
     GenServer.call(__MODULE__, {:unlock, unlock_request})
   end
 

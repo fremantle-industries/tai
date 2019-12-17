@@ -1,20 +1,20 @@
-defmodule Tai.Venues.AssetBalances.Unlock do
-  alias Tai.Venues.AssetBalances
+defmodule Tai.Venues.AssetBalanceStore.Unlock do
+  alias Tai.Venues.AssetBalanceStore
 
-  @type unlock_request :: AssetBalances.UnlockRequest.t()
+  @type unlock_request :: AssetBalanceStore.UnlockRequest.t()
 
   @spec from_request(unlock_request) ::
           {:ok, term}
           | {:error, :insufficient_balance}
           | {:error, :not_found}
-  def from_request(%AssetBalances.UnlockRequest{
+  def from_request(%AssetBalanceStore.UnlockRequest{
         venue_id: venue_id,
         account_id: account_id,
         asset: asset,
         qty: qty
       }) do
     with {:ok, balance} <-
-           AssetBalances.find_by(venue_id: venue_id, account_id: account_id, asset: asset) do
+           AssetBalanceStore.find_by(venue_id: venue_id, account_id: account_id, asset: asset) do
       new_free = Decimal.add(balance.free, qty)
       new_locked = Decimal.sub(balance.locked, qty)
 

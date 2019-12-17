@@ -12,7 +12,7 @@ defmodule Tai.Venues.Boot.AssetBalances do
 
   defp fetch_and_upsert({account_id, _}, :ok, adapter) do
     with {:ok, balances} <- Tai.Venue.asset_balances(adapter, account_id) do
-      Enum.each(balances, &Tai.Venues.AssetBalances.upsert/1)
+      Enum.each(balances, &Tai.Venues.AssetBalanceStore.upsert/1)
       :ok
     else
       {:error, _} = error ->

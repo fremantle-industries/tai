@@ -1,8 +1,8 @@
-defmodule Tai.Venues.AssetBalancesTest do
+defmodule Tai.Venues.AssetBalanceStoreTest do
   use ExUnit.Case
-  doctest Tai.Venues.AssetBalances
+  doctest Tai.Venues.AssetBalanceStore
 
-  alias Tai.Venues.AssetBalances
+  alias Tai.Venues.AssetBalanceStore
 
   setup do
     on_exit(fn ->
@@ -22,11 +22,11 @@ defmodule Tai.Venues.AssetBalancesTest do
           asset: :btc
         })
 
-      assert AssetBalances.upsert(balance) == :ok
+      assert AssetBalanceStore.upsert(balance) == :ok
 
       assert [{{:my_test_exchange, :my_test_account, :btc}, ^balance}] =
                :ets.lookup(
-                 AssetBalances,
+                 AssetBalanceStore,
                  {:my_test_exchange, :my_test_account, :btc}
                )
     end
@@ -42,7 +42,7 @@ defmodule Tai.Venues.AssetBalancesTest do
         locked: Decimal.new(2)
       }
 
-      :ok = AssetBalances.upsert(balance)
+      :ok = AssetBalanceStore.upsert(balance)
 
       assert_receive {Tai.Event, %Tai.Events.UpsertAssetBalance{} = event, _}
       assert event.venue_id == :my_test_exchange
@@ -55,7 +55,7 @@ defmodule Tai.Venues.AssetBalancesTest do
 
   describe ".all" do
     test "returns a list of balances" do
-      assert AssetBalances.all() == []
+      assert AssetBalanceStore.all() == []
 
       balance = %Tai.Venues.AssetBalance{
         venue_id: :my_test_exchange,
@@ -65,9 +65,9 @@ defmodule Tai.Venues.AssetBalancesTest do
         locked: Decimal.new("2.1")
       }
 
-      :ok = AssetBalances.upsert(balance)
+      :ok = AssetBalanceStore.upsert(balance)
 
-      assert [^balance] = AssetBalances.all()
+      assert [^balance] = AssetBalanceStore.all()
     end
   end
 
@@ -89,18 +89,18 @@ defmodule Tai.Venues.AssetBalancesTest do
           free: Decimal.new("2.1")
         })
 
-      :ok = AssetBalances.upsert(balance_1)
-      :ok = AssetBalances.upsert(balance_2)
+      :ok = AssetBalanceStore.upsert(balance_1)
+      :ok = AssetBalanceStore.upsert(balance_2)
 
       assert [^balance_1, ^balance_2] =
-               AssetBalances.where(
+               AssetBalanceStore.where(
                  venue_id: :my_test_exchange,
                  asset: :btc
                )
                |> Enum.sort(&(Decimal.cmp(&1.free, &2.free) == :lt))
 
       assert [^balance_1] =
-               AssetBalances.where(
+               AssetBalanceStore.where(
                  venue_id: :my_test_exchange,
                  account_id: :my_test_account_a
                )
@@ -116,10 +116,10 @@ defmodule Tai.Venues.AssetBalancesTest do
           asset: :btc
         })
 
-      :ok = AssetBalances.upsert(balance)
+      :ok = AssetBalanceStore.upsert(balance)
 
       assert {:ok, ^balance} =
-               AssetBalances.find_by(
+               AssetBalanceStore.find_by(
                  venue_id: :my_test_exchange,
                  account_id: :my_test_account_a
                )
@@ -127,7 +127,7 @@ defmodule Tai.Venues.AssetBalancesTest do
 
     test "returns an error tuple when not found" do
       assert {:error, :not_found} =
-               AssetBalances.find_by(
+               AssetBalanceStore.find_by(
                  venue_id: :my_test_exchange,
                  account_id: :my_test_account_a
                )
@@ -138,7 +138,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     setup [:init_asset_balance]
 
     defp lock(asset, min, max) do
-      AssetBalances.lock(%AssetBalances.LockRequest{
+      AssetBalanceStore.lock(%AssetBalanceStore.LockRequest{
         venue_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: asset,
@@ -150,7 +150,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns max when = free balance" do
       assert lock(:btc, 0, 2.1) == {:ok, Decimal.new("1.1")}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("0.0")
       assert balance.locked == Decimal.new("3.2")
     end
@@ -158,7 +158,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns max when < free balance" do
       assert lock(:btc, 0, 1.0) == {:ok, Decimal.new("1.0")}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("0.1")
       assert balance.locked == Decimal.new("3.1")
     end
@@ -166,7 +166,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns free balance when max >= free balance and min = free balance" do
       assert lock(:btc, 1.1, 2.2) == {:ok, Decimal.new("1.1")}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("0.0")
       assert balance.locked == Decimal.new("3.2")
     end
@@ -174,7 +174,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns free balance when max >= free balance and min < free balance" do
       assert lock(:btc, 1.0, 2.2) == {:ok, Decimal.new("1.1")}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("0.0")
       assert balance.locked == Decimal.new("3.2")
     end
@@ -182,7 +182,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns an error tuple when the asset doesn't exist" do
       assert lock(:xbt, 0.1, 2.2) == {:error, :not_found}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("1.1")
       assert balance.locked == Decimal.new("2.1")
     end
@@ -190,7 +190,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns an error tuple when min > free balance" do
       assert lock(:btc, 1.11, 2.2) == {:error, {:insufficient_balance, Decimal.new("1.1")}}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("1.1")
       assert balance.locked == Decimal.new("2.1")
     end
@@ -198,7 +198,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns an error tuple when min > max" do
       assert lock(:btc, 0.11, 0.1) == {:error, :min_greater_than_max}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("1.1")
       assert balance.locked == Decimal.new("2.1")
     end
@@ -206,7 +206,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "returns an error tuple when min < 0" do
       assert lock(:btc, -0.1, 0.1) == {:error, :min_less_than_zero}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("1.1")
       assert balance.locked == Decimal.new("2.1")
     end
@@ -244,7 +244,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     setup [:init_asset_balance]
 
     defp unlock(asset, qty) do
-      AssetBalances.unlock(%AssetBalances.UnlockRequest{
+      AssetBalanceStore.unlock(%AssetBalanceStore.UnlockRequest{
         venue_id: :my_test_exchange,
         account_id: :my_test_account,
         asset: asset,
@@ -255,7 +255,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "unlocks the balance for the asset" do
       assert unlock(:btc, 1.0) == :ok
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("2.1")
       assert balance.locked == Decimal.new("1.1")
     end
@@ -263,7 +263,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "doesn't unlock the balance if the asset doesn't exist" do
       assert unlock(:xbt, 1.0) == {:error, :not_found}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("1.1")
       assert balance.locked == Decimal.new("2.1")
     end
@@ -271,7 +271,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "doesn't unlock the quantity when there is an insufficient locked balance" do
       assert unlock(:btc, 2.11) == {:error, {:insufficient_balance, Decimal.new("2.1")}}
 
-      assert [balance] = AssetBalances.all()
+      assert [balance] = AssetBalanceStore.all()
       assert balance.free == Decimal.new("1.1")
       assert balance.locked == Decimal.new("2.1")
     end
@@ -307,7 +307,7 @@ defmodule Tai.Venues.AssetBalancesTest do
 
     test "adds to free and returns an ok tuple with the new balance" do
       assert {:ok, balance} =
-               AssetBalances.add(
+               AssetBalanceStore.add(
                  :my_test_exchange,
                  :my_test_account,
                  :btc,
@@ -317,13 +317,14 @@ defmodule Tai.Venues.AssetBalancesTest do
       assert balance.free == Decimal.new("1.2")
       assert balance.locked == Decimal.new("2.1")
 
-      assert {:ok, balance} = AssetBalances.add(:my_test_exchange, :my_test_account, :btc, 0.1)
+      assert {:ok, balance} =
+               AssetBalanceStore.add(:my_test_exchange, :my_test_account, :btc, 0.1)
 
       assert balance.free == Decimal.new("1.3")
       assert balance.locked == Decimal.new("2.1")
 
       assert {:ok, balance} =
-               AssetBalances.add(
+               AssetBalanceStore.add(
                  :my_test_exchange,
                  :my_test_account,
                  :btc,
@@ -337,7 +338,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "broadcasts an event with the updated balances" do
       Tai.Events.firehose_subscribe()
 
-      AssetBalances.add(:my_test_exchange, :my_test_account, :btc, 0.1)
+      AssetBalanceStore.add(:my_test_exchange, :my_test_account, :btc, 0.1)
 
       assert_receive {Tai.Event, %Tai.Events.AddFreeAssetBalance{asset: :btc} = event, _}
       assert event.venue_id == :my_test_exchange
@@ -348,15 +349,15 @@ defmodule Tai.Venues.AssetBalancesTest do
     end
 
     test "returns an error tuple when the asset doesn't exist" do
-      assert AssetBalances.add(:my_test_exchange, :my_test_account, :eth, 0.1) ==
+      assert AssetBalanceStore.add(:my_test_exchange, :my_test_account, :eth, 0.1) ==
                {:error, :not_found}
     end
 
     test "returns an error tuple when the value is not positive" do
-      assert AssetBalances.add(:my_test_exchange, :my_test_account, :btc, 0) ==
+      assert AssetBalanceStore.add(:my_test_exchange, :my_test_account, :btc, 0) ==
                {:error, :value_must_be_positive}
 
-      assert AssetBalances.add(:my_test_exchange, :my_test_account, :btc, -0.1) ==
+      assert AssetBalanceStore.add(:my_test_exchange, :my_test_account, :btc, -0.1) ==
                {:error, :value_must_be_positive}
     end
   end
@@ -366,7 +367,7 @@ defmodule Tai.Venues.AssetBalancesTest do
 
     test "subtracts from free and returns an ok tuple with the new balance" do
       assert {:ok, balance} =
-               AssetBalances.sub(
+               AssetBalanceStore.sub(
                  :my_test_exchange,
                  :my_test_account,
                  :btc,
@@ -376,13 +377,14 @@ defmodule Tai.Venues.AssetBalancesTest do
       assert balance.free == Decimal.new("1.0")
       assert balance.locked == Decimal.new("2.1")
 
-      assert {:ok, balance} = AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
+      assert {:ok, balance} =
+               AssetBalanceStore.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
 
       assert balance.free == Decimal.new("0.9")
       assert balance.locked == Decimal.new("2.1")
 
       assert {:ok, balance} =
-               AssetBalances.sub(
+               AssetBalanceStore.sub(
                  :my_test_exchange,
                  :my_test_account,
                  :btc,
@@ -396,7 +398,7 @@ defmodule Tai.Venues.AssetBalancesTest do
     test "broadcasts an event with the updated balances" do
       Tai.Events.firehose_subscribe()
 
-      AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
+      AssetBalanceStore.sub(:my_test_exchange, :my_test_account, :btc, 0.1)
 
       assert_receive {Tai.Event, %Tai.Events.SubFreeAssetBalance{asset: :btc} = event, _}
       assert event.venue_id == :my_test_exchange
@@ -407,22 +409,23 @@ defmodule Tai.Venues.AssetBalancesTest do
     end
 
     test "returns an error tuple when the result is less than 0" do
-      assert {:ok, _balance} = AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 1.1)
+      assert {:ok, _balance} =
+               AssetBalanceStore.sub(:my_test_exchange, :my_test_account, :btc, 1.1)
 
-      assert AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 1.1) ==
+      assert AssetBalanceStore.sub(:my_test_exchange, :my_test_account, :btc, 1.1) ==
                {:error, :result_less_then_zero}
     end
 
     test "returns an error tuple when the asset doesn't exist" do
-      assert AssetBalances.sub(:my_test_exchange, :my_test_account, :eth, 0.1) ==
+      assert AssetBalanceStore.sub(:my_test_exchange, :my_test_account, :eth, 0.1) ==
                {:error, :not_found}
     end
 
     test "returns an error tuple when the value is not positive" do
-      assert AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, 0) ==
+      assert AssetBalanceStore.sub(:my_test_exchange, :my_test_account, :btc, 0) ==
                {:error, :value_must_be_positive}
 
-      assert AssetBalances.sub(:my_test_exchange, :my_test_account, :btc, -0.1) ==
+      assert AssetBalanceStore.sub(:my_test_exchange, :my_test_account, :btc, -0.1) ==
                {:error, :value_must_be_positive}
     end
   end
@@ -438,7 +441,7 @@ defmodule Tai.Venues.AssetBalancesTest do
       locked: @locked
     }
 
-    :ok = AssetBalances.upsert(balance)
+    :ok = AssetBalanceStore.upsert(balance)
     {:ok, %{balance: balance}}
   end
 end

@@ -38,13 +38,14 @@ defmodule Tai.TestSupport.Mock do
           locked :: number | Decimal.t() | String.t()
         ) :: :ok
   def mock_asset_balance(venue_id, account_id, asset, free, locked) do
-    Tai.Venues.AssetBalances.upsert(%Tai.Venues.AssetBalance{
+    %Tai.Venues.AssetBalance{
       venue_id: venue_id,
       account_id: account_id,
       asset: asset,
       free: free |> Decimal.cast(),
       locked: locked |> Decimal.cast()
-    })
+    }
+    |> Tai.Venues.AssetBalanceStore.upsert()
   end
 
   @spec push_market_data_snapshot(location :: location, bids :: map, asks :: map) :: no_return
