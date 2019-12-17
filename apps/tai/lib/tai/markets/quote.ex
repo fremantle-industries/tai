@@ -30,7 +30,9 @@ end
 
 defimpl Stored.Item, for: Tai.Markets.Quote do
   @type market_quote :: Tai.Markets.Quote.t()
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type product_symbol :: Tai.Venues.Product.symbol()
 
-  @spec key(market_quote) :: String.t()
-  def key(q), do: "#{q.venue_id}_#{q.product_symbol}"
+  @spec key(market_quote) :: {venue_id, product_symbol}
+  def key(q), do: {q.venue_id, q.product_symbol}
 end
