@@ -1,6 +1,7 @@
 defmodule Tai.VenueAdapters.Bitmex.Products do
   def products(venue_id) do
-    with {:ok, instruments, _rate_limit} <- ExBitmex.Rest.Instruments.all(%{start: 0, count: 500}) do
+    with {:ok, instruments, _rate_limit} <-
+           ExBitmex.Rest.Instrument.Index.get(%{start: 0, count: 500}) do
       products =
         instruments
         |> Enum.map(&build(&1, venue_id))
