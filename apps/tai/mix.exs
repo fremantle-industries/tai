@@ -26,7 +26,7 @@ defmodule Tai.Mixfile do
       {:enumerati, "~> 0.0.3"},
       {:ex_binance, "~> 0.0.4"},
       # {:ex_bitmex, github: "fremantle-capital/ex_bitmex"},
-      {:ex_bitmex, "~> 0.2"},
+      {:ex_bitmex, "~> 0.4"},
       # {:ex_okex, path: "../../../ex_okex"},
       # {:ex_okex, github: "fremantle-capital/ex_okex", branch: "master"},
       {:ex_okex, "~> 0.3"},

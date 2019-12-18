@@ -2,7 +2,8 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
   def positions(venue_id, account_id, credentials) do
     venue_credentials = to_venue_credentials(credentials)
 
-    with {:ok, venue_positions, _rate_limit} <- ExBitmex.Rest.Positions.all(venue_credentials) do
+    with {:ok, venue_positions, _rate_limit} <-
+           ExBitmex.Rest.Position.Index.get(venue_credentials) do
       positions =
         venue_positions
         |> Enum.map(&build(&1, venue_id, account_id))

@@ -1,7 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.AssetBalances do
   def asset_balances(venue_id, account_id, credentials) do
-    with {:ok, wallet, _rate_limit} <-
-           ExBitmex.Rest.HTTPClient.auth_get("/user/wallet", credentials, %{currency: "XBt"}) do
+    with {:ok, wallet, _rate_limit} <- ExBitmex.Rest.User.Wallet.get(credentials) do
       balance = build(wallet, venue_id, account_id)
       {:ok, [balance]}
     end
