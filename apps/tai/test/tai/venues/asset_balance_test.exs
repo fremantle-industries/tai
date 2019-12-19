@@ -8,6 +8,7 @@ defmodule Tai.Venues.AssetBalanceTest do
         venue_id: :mock,
         account_id: :mock,
         asset: :mock,
+        type: "default",
         free: Decimal.new("0.1"),
         locked: Decimal.new("0.2")
       }

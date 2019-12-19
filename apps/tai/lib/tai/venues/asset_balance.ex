@@ -6,6 +6,7 @@ defmodule Tai.Venues.AssetBalance do
           venue_id: venue_id,
           account_id: account_id,
           asset: asset,
+          type: String.t(),
           free: Decimal.t(),
           locked: Decimal.t()
         }
@@ -14,6 +15,7 @@ defmodule Tai.Venues.AssetBalance do
     venue_id
     account_id
     asset
+    type
     free
     locked
   )a
@@ -21,6 +23,7 @@ defmodule Tai.Venues.AssetBalance do
     venue_id
     account_id
     asset
+    type
     free
     locked
   )a

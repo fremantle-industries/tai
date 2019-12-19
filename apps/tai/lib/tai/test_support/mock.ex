@@ -41,6 +41,7 @@ defmodule Tai.TestSupport.Mock do
     %Tai.Venues.AssetBalance{
       venue_id: venue_id,
       account_id: account_id,
+      type: "default",
       asset: asset,
       free: free |> Decimal.cast(),
       locked: locked |> Decimal.cast()

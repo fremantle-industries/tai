@@ -31,6 +31,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalances do
       venue_id: venue_id,
       account_id: account_id,
       asset: asset,
+      type: "default",
       free: free |> Decimal.new() |> Decimal.reduce(),
       locked: locked |> Decimal.new() |> Decimal.reduce()
     }

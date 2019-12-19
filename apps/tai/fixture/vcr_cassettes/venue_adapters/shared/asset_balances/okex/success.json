@@ -16,13 +16,13 @@
     },
     "response": {
       "binary": false,
-      "body": "{\"info\":{\"btc\":{\"equity\":\"0.00070432\",\"margin\":\"0\",\"margin_for_unfilled\":\"0\",\"margin_frozen\":\"0\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"realized_pnl\":\"0\",\"total_avail_balance\":\"0.00070432\",\"unrealized_pnl\":\"0\"},\"eth\":{\"equity\":\"48.77455302\",\"margin\":\"0\",\"margin_for_unfilled\":\"0\",\"margin_frozen\":\"0\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"realized_pnl\":\"0\",\"total_avail_balance\":\"48.77455302\",\"unrealized_pnl\":\"0\"}}}",
+      "body": "{\"info\":{\"btc\":{\"can_withdraw\":\"0.00070432\",\"currency\":\"BTC\",\"equity\":\"0.00070432\",\"liqui_fee_rate\":\"0.0004\",\"liqui_mode\":\"tier\",\"maint_margin_ratio\":\"0.005\",\"margin\":\"0\",\"margin_for_unfilled\":\"0\",\"margin_frozen\":\"0\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"realized_pnl\":\"0\",\"total_avail_balance\":\"0.00070432\",\"underlying\":\"BTC-USD\",\"unrealized_pnl\":\"0\"},\"etc\":{\"can_withdraw\":\"7.04876994\",\"currency\":\"ETC\",\"equity\":\"7.04876994\",\"liqui_fee_rate\":\"0.0004\",\"liqui_mode\":\"tier\",\"maint_margin_ratio\":\"0.015\",\"margin\":\"0\",\"margin_for_unfilled\":\"0\",\"margin_frozen\":\"0\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"realized_pnl\":\"0\",\"total_avail_balance\":\"7.04876994\",\"underlying\":\"ETC-USD\",\"unrealized_pnl\":\"0\"},\"eth\":{\"can_withdraw\":\"1.46974999\",\"currency\":\"ETH\",\"equity\":\"1.94927841\",\"liqui_fee_rate\":\"0.0004\",\"liqui_mode\":\"tier\",\"maint_margin_ratio\":\"0.01\",\"margin\":\"0.47952842\",\"margin_for_unfilled\":\"0\",\"margin_frozen\":\"0.47952842\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"8.54477806\",\"realized_pnl\":\"0\",\"total_avail_balance\":\"1.89740132\",\"underlying\":\"ETH-USD\",\"unrealized_pnl\":\"0.05187709\"},\"ltc\":{\"can_withdraw\":\"1.96223153\",\"currency\":\"LTC\",\"equity\":\"1.96223153\",\"liqui_fee_rate\":\"0.0004\",\"liqui_mode\":\"tier\",\"maint_margin_ratio\":\"0.01\",\"margin\":\"0\",\"margin_for_unfilled\":\"0\",\"margin_frozen\":\"0\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"realized_pnl\":\"0\",\"total_avail_balance\":\"1.96223153\",\"underlying\":\"LTC-USD\",\"unrealized_pnl\":\"0\"}}}",
       "headers": {
-        "Date": "Fri, 12 Apr 2019 22:29:32 GMT",
+        "Date": "Thu, 19 Dec 2019 23:56:40 GMT",
         "Content-Type": "application/json",
         "Transfer-Encoding": "chunked",
         "Connection": "keep-alive",
-        "Set-Cookie": "__cfduid=d3019b9e594ab976ef2ca20c29bc69afa1555108172; expires=Sat, 11-Apr-20 22:29:32 GMT; path=/; domain=.okex.com; HttpOnly",
+        "Set-Cookie": "__cfduid=d5f7f0bf130e89ff03c774dcace8ec8ab1576799800; expires=Sat, 18-Jan-20 23:56:40 GMT; path=/; domain=.okex.com; HttpOnly; SameSite=Lax",
         "Vary": "Accept-Encoding",
         "X-Content-Type-Options": "nosniff",
         "X-XSS-Protection": "1; mode=block",
@@ -30,12 +30,102 @@
         "Pragma": "no-cache",
         "Expires": "0",
         "X-Frame-Options": "DENY",
-        "X-Kong-Upstream-Latency": "176",
+        "X-Kong-Upstream-Latency": "50",
         "X-Kong-Proxy-Latency": "0",
         "Via": "kong/0.12.3",
+        "Strict-Transport-Security": "max-age=63072000; includeSubdomains; preload",
+        "CF-Cache-Status": "DYNAMIC",
         "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
         "Server": "cloudflare",
-        "CF-RAY": "4c68a3bc6a0b3ad8-YVR"
+        "CF-RAY": "547d507e3ff48d1b-PDX"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "OK-ACCESS-KEY": "***",
+        "OK-ACCESS-SIGN": "***",
+        "OK-ACCESS-TIMESTAMP": "***",
+        "OK-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.okex.com/api/swap/v3/accounts"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"info\":[{\"equity\":\"0.0004\",\"fixed_balance\":\"0.0000\",\"instrument_id\":\"ETH-USD-SWAP\",\"maint_margin_ratio\":\"0.0100\",\"margin\":\"0.0000\",\"margin_frozen\":\"0.0000\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"max_withdraw\":\"0.0004\",\"realized_pnl\":\"0.0000\",\"timestamp\":\"2019-11-08T22:32:06.591Z\",\"total_avail_balance\":\"0.0004\",\"unrealized_pnl\":\"0.0000\"},{\"equity\":\"0.0000\",\"fixed_balance\":\"0.0000\",\"instrument_id\":\"ETC-USD-SWAP\",\"maint_margin_ratio\":\"0.0150\",\"margin\":\"0.0000\",\"margin_frozen\":\"0.0000\",\"margin_mode\":\"crossed\",\"margin_ratio\":\"10000\",\"max_withdraw\":\"0.0000\",\"realized_pnl\":\"0.0000\",\"timestamp\":\"2019-09-24T21:09:39.692Z\",\"total_avail_balance\":\"0.0000\",\"unrealized_pnl\":\"0.0000\"}]}",
+      "headers": {
+        "Date": "Thu, 19 Dec 2019 23:56:41 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=d5f7f0bf130e89ff03c774dcace8ec8ab1576799800; expires=Sat, 18-Jan-20 23:56:40 GMT; path=/; domain=.okex.com; HttpOnly; SameSite=Lax",
+        "Vary": "Accept-Encoding",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Frame-Options": "DENY",
+        "X-Kong-Upstream-Latency": "41",
+        "X-Kong-Proxy-Latency": "0",
+        "Via": "kong/0.12.3",
+        "Strict-Transport-Security": "max-age=63072000; includeSubdomains; preload",
+        "CF-Cache-Status": "DYNAMIC",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "547d50829bc28d1b-PDX"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "OK-ACCESS-KEY": "***",
+        "OK-ACCESS-SIGN": "***",
+        "OK-ACCESS-TIMESTAMP": "***",
+        "OK-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.okex.com/api/spot/v3/accounts"
+    },
+    "response": {
+      "binary": false,
+      "body": "[{\"frozen\":\"0\",\"hold\":\"0\",\"id\":\"\",\"currency\":\"USDT\",\"balance\":\"0.48310336\",\"available\":\"0.48310336\",\"holds\":\"0\"},{\"frozen\":\"4.2176\",\"hold\":\"4.2176\",\"id\":\"\",\"currency\":\"OKB\",\"balance\":\"4.21763765\",\"available\":\"0.00003765\",\"holds\":\"4.2176\"}]",
+      "headers": {
+        "Date": "Thu, 19 Dec 2019 23:56:41 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": "__cfduid=dc609cefdf372f4de99deb46b9df556781576799801; expires=Sat, 18-Jan-20 23:56:41 GMT; path=/; domain=.okex.com; HttpOnly; SameSite=Lax",
+        "Vary": "Accept-Encoding",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Frame-Options": "DENY",
+        "X-Kong-Upstream-Latency": "6",
+        "X-Kong-Proxy-Latency": "0",
+        "Via": "kong/0.12.3",
+        "Strict-Transport-Security": "max-age=63072000; includeSubdomains; preload",
+        "CF-Cache-Status": "DYNAMIC",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare",
+        "CF-RAY": "547d50869e4f8d1b-PDX"
       },
       "status_code": 200,
       "type": "ok"

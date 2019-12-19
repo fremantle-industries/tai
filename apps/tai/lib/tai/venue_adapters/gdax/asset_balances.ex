@@ -36,6 +36,7 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalances do
     %Tai.Venues.AssetBalance{
       venue_id: venue_id,
       account_id: account_id,
+      type: "default",
       asset: asset,
       free: available |> Decimal.new() |> Decimal.reduce(),
       locked: hold |> Decimal.new() |> Decimal.reduce()

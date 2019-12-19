@@ -34,13 +34,14 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
     test "broadcasts an event" do
       Tai.Events.firehose_subscribe()
 
-      balance = %Tai.Venues.AssetBalance{
-        venue_id: :my_test_exchange,
-        account_id: :my_test_account,
-        asset: :btc,
-        free: Decimal.new("0.00000001"),
-        locked: Decimal.new(2)
-      }
+      balance =
+        struct(Tai.Venues.AssetBalance,
+          venue_id: :my_test_exchange,
+          account_id: :my_test_account,
+          asset: :btc,
+          free: Decimal.new("0.00000001"),
+          locked: Decimal.new(2)
+        )
 
       :ok = AssetBalanceStore.upsert(balance)
 
@@ -57,13 +58,14 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
     test "returns a list of balances" do
       assert AssetBalanceStore.all() == []
 
-      balance = %Tai.Venues.AssetBalance{
-        venue_id: :my_test_exchange,
-        account_id: :my_test_account,
-        asset: :btc,
-        free: Decimal.new("1.1"),
-        locked: Decimal.new("2.1")
-      }
+      balance =
+        struct(Tai.Venues.AssetBalance,
+          venue_id: :my_test_exchange,
+          account_id: :my_test_account,
+          asset: :btc,
+          free: Decimal.new("1.1"),
+          locked: Decimal.new("2.1")
+        )
 
       :ok = AssetBalanceStore.upsert(balance)
 
@@ -433,13 +435,14 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
   @free Decimal.new("1.1")
   @locked Decimal.new("2.1")
   defp init_asset_balance(_context) do
-    balance = %Tai.Venues.AssetBalance{
-      venue_id: :my_test_exchange,
-      account_id: :my_test_account,
-      asset: :btc,
-      free: @free,
-      locked: @locked
-    }
+    balance =
+      struct(Tai.Venues.AssetBalance,
+        venue_id: :my_test_exchange,
+        account_id: :my_test_account,
+        asset: :btc,
+        free: @free,
+        locked: @locked
+      )
 
     :ok = AssetBalanceStore.upsert(balance)
     {:ok, %{balance: balance}}
