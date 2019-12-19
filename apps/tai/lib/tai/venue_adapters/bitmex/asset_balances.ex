@@ -1,22 +1,31 @@
 defmodule Tai.VenueAdapters.Bitmex.AssetBalances do
   def asset_balances(venue_id, account_id, credentials) do
-    with {:ok, wallet, _rate_limit} <- ExBitmex.Rest.User.Wallet.get(credentials) do
+    with {:ok, wallet, _rate_limit} <-
+           credentials
+           |> to_venue_credentials()
+           |> ExBitmex.Rest.User.Wallet.get() do
       balance = build(wallet, venue_id, account_id)
       {:ok, [balance]}
     end
   end
 
+  @satoshis_per_btc Decimal.new(100_000_000)
+
   def build(
-        %{"currency" => "XBt", "amount" => amount},
+        %ExBitmex.Wallet{currency: "XBt", amount: amount},
         venue_id,
         account_id
       ) do
+    free = amount |> Decimal.new() |> Decimal.div(@satoshis_per_btc) |> Decimal.reduce()
+
     %Tai.Venues.AssetBalance{
       venue_id: venue_id,
       account_id: account_id,
       asset: :btc,
-      free: amount |> Decimal.new() |> Decimal.reduce(),
+      free: free,
       locked: Decimal.new(0)
     }
   end
+
+  defp to_venue_credentials(credentials), do: struct!(ExBitmex.Credentials, credentials)
 end
