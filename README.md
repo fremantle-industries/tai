@@ -1,6 +1,7 @@
 # Tai
 [![Build Status](https://github.com/fremantle-capital/tai/workflows/.github/workflows/test.yml/badge.svg)](https://github.com/fremantle-capital/tai/actions?query=workflow%3A.github%2Fworkflows%2Ftest.yml)
 [![Coverage Status](https://coveralls.io/repos/github/fremantle-capital/tai/badge.svg?branch=master)](https://coveralls.io/github/fremantle-capital/tai?branch=master)
+[![hex.pm version](https://img.shields.io/hexpm/v/tai.svg?style=flat)](https://hex.pm/packages/tai)
 
 A composable, real time, market data and trade execution toolkit. Built with [Elixir](https://elixir-lang.org/), runs on the [Erlang virtual machine](http://erlang.org/faq/implementations.html)
 
