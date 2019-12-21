@@ -3,7 +3,7 @@ defmodule Support.CustomEvent do
           hello: term
         }
 
-  defstruct [:hello]
+  defstruct ~w(hello)a
 end
 
 defimpl Tai.LogEvent, for: Support.CustomEvent do
