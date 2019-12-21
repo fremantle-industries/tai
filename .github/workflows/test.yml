@@ -66,4 +66,4 @@ jobs:
           OKEX_API_KEY: ${{secrets.OKEX_API_KEY}}
           OKEX_API_PASSPHRASE: ${{secrets.OKEX_API_PASSPHRASE}}
           OKEX_API_SECRET: ${{secrets.OKEX_API_SECRET}}
-        run: mix coveralls.github
+        run: mix coveralls.github --umbrella
