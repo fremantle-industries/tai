@@ -2,26 +2,38 @@ defmodule Tai.EventsLogger do
   use GenServer
   require Logger
 
+  defmodule State do
+    @type t :: %State{
+            id: atom,
+            events: module
+          }
+
+    @enforce_keys ~w(id events)a
+    defstruct ~w(id events)a
+  end
+
   @type event :: map
   @type level :: Tai.Events.level()
-  @type state :: :ok
 
   @default_id :default
+  @default_events Tai.Events
 
   def start_link(args) do
     id = Keyword.get(args, :id, @default_id)
     name = :"#{__MODULE__}_#{id}"
+    events = Keyword.get(args, :events, @default_events)
+    state = %State{id: id, events: events}
 
-    GenServer.start_link(__MODULE__, :ok, name: name)
+    GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  @spec init(state) :: {:ok, state}
+  @spec init(State.t()) :: {:ok, State.t()}
   def init(state) do
-    Tai.Events.firehose_subscribe()
+    state.events.firehose_subscribe()
     {:ok, state}
   end
 
-  @spec handle_info({Tai.Event, event, level}, state) :: {:noreply, state}
+  @spec handle_info({Tai.Event, event, level}, State.t()) :: {:noreply, State.t()}
   def handle_info({Tai.Event, event, :error}, state) do
     event |> Tai.Event.encode!() |> Logger.error()
     {:noreply, state}
