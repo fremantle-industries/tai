@@ -5,12 +5,17 @@ defmodule Tai.Mixfile do
     [
       app: :tai,
       version: "0.0.45",
+      build_path: "../../_build",
+      config_path: "../../config/config.exs",
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
       elixir: "~> 1.8",
       package: package(),
       start_permanent: Mix.env() == :prod,
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 

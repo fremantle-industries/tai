@@ -12,7 +12,8 @@ defmodule Examples.MixProject do
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
