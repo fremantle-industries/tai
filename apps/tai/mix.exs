@@ -21,7 +21,7 @@ defmodule Tai.Mixfile do
 
   def application do
     [
-      mod: {Tai, []},
+      mod: {Tai.Application, []},
       extra_applications: [:logger, :jason]
     ]
   end
