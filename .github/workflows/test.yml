@@ -51,3 +51,19 @@ jobs:
 
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
+
+      - name: Coveralls
+        env:
+          MIX_ENV: test
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          BINANCE_API_KEY: ${{secrets.BINANCE_API_KEY}}
+          BINANCE_API_SECRET: ${{secrets.BINANCE_API_SECRET}}
+          BITMEX_API_KEY: ${{secrets.BITMEX_API_KEY}}
+          BITMEX_API_SECRET: ${{secrets.BITMEX_API_SECRET}}
+          GDAX_API_KEY: ${{secrets.GDAX_API_KEY}}
+          GDAX_API_PASSPHRASE: ${{secrets.GDAX_API_PASSPHRASE}}
+          GDAX_API_SECRET: ${{secrets.GDAX_API_SECRET}}
+          OKEX_API_KEY: ${{secrets.OKEX_API_KEY}}
+          OKEX_API_PASSPHRASE: ${{secrets.OKEX_API_PASSPHRASE}}
+          OKEX_API_SECRET: ${{secrets.OKEX_API_SECRET}}
+        run: mix coveralls.github
