@@ -6,7 +6,14 @@ defmodule Tai.EventsLogger do
   @type level :: Tai.Events.level()
   @type state :: :ok
 
-  def start_link(_), do: GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+  @default_id :default
+
+  def start_link(args) do
+    id = Keyword.get(args, :id, @default_id)
+    name = :"#{__MODULE__}_#{id}"
+
+    GenServer.start_link(__MODULE__, :ok, name: name)
+  end
 
   @spec init(state) :: {:ok, state}
   def init(state) do
