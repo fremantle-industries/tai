@@ -7,9 +7,11 @@ defmodule Tai.Markets.Quote do
   alias Tai.Markets.PricePoint
 
   @type price_point :: PricePoint.t()
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type product_symbol :: Tai.Venues.Product.symbol()
   @type t :: %Quote{
-          venue_id: atom,
-          product_symbol: atom,
+          venue_id: venue_id,
+          product_symbol: product_symbol,
           bids: [price_point],
           asks: [price_point],
           last_received_at: DateTime.t() | nil,
