@@ -37,4 +37,10 @@ defmodule Tai.Markets.QuoteTest do
 
     assert Quote.mid_price(market_quote) == {:error, :no_inside_ask}
   end
+
+  test ".mid_price/1 returns an error when there is no inside_bid or inside ask" do
+    market_quote = struct(Quote, bids: [], asks: [])
+
+    assert Quote.mid_price(market_quote) == {:error, :no_inside_bid_or_ask}
+  end
 end

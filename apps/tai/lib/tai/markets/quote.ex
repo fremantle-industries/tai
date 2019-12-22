@@ -57,6 +57,7 @@ defmodule Tai.Markets.Quote do
 
   def mid_price(nil, %PricePoint{}), do: {:error, :no_inside_bid}
   def mid_price(%PricePoint{}, nil), do: {:error, :no_inside_ask}
+  def mid_price(nil, nil), do: {:error, :no_inside_bid_or_ask}
 end
 
 defimpl Stored.Item, for: Tai.Markets.Quote do
