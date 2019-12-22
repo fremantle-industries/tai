@@ -34,7 +34,7 @@ defmodule Tai.Markets.Quote do
 
   @spec mid_price(t) :: {:ok, Decimal.t()} | {:error, :no_inside_bid | :no_inside_ask}
   @spec mid_price(bid :: price_point, ask :: price_point) ::
-          {:ok, Decimal.t()} | {:error, :no_inside_bid | :no_inside_ask}
+          {:ok, Decimal.t()} | {:error, :no_inside_bid | :no_inside_ask | :no_inside_bid_or_ask}
   def mid_price(%Quote{} = market_quote) do
     bid = market_quote |> inside_bid
     ask = market_quote |> inside_ask
