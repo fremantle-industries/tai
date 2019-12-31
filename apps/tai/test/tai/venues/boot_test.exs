@@ -21,7 +21,7 @@ defmodule Tai.Venues.BootTest do
   @timeout 5000
 
   describe ".run success" do
-    setup [:mock_products, :mock_asset_balances, :mock_maker_taker_fees]
+    setup [:mock_products, :mock_accounts, :mock_maker_taker_fees]
 
     @venue struct(Tai.Venue, %{
              id: @venue_id,
@@ -39,31 +39,31 @@ defmodule Tai.Venues.BootTest do
       assert {:error, :not_found} = Tai.Venues.ProductStore.find({@venue_id, :ltc_usdt})
     end
 
-    test "hydrates asset balances" do
+    test "hydrates accounts" do
       assert {:ok, %Tai.Venue{}} = Tai.Venues.Boot.run(@venue)
 
-      assert {:ok, btc_balance} =
+      assert {:ok, _btc_account} =
                Tai.Venues.AccountStore.find_by(
                  venue_id: @venue_id,
                  credential_id: @credential_id,
                  asset: :btc
                )
 
-      assert {:ok, eth_balance} =
+      assert {:ok, _eth_account} =
                Tai.Venues.AccountStore.find_by(
                  venue_id: @venue_id,
                  credential_id: @credential_id,
                  asset: :eth
                )
 
-      assert {:ok, ltc_balance} =
+      assert {:ok, _ltc_account} =
                Tai.Venues.AccountStore.find_by(
                  venue_id: @venue_id,
                  credential_id: @credential_id,
                  asset: :ltc
                )
 
-      assert {:ok, usdt_balance} =
+      assert {:ok, _usdt_account} =
                Tai.Venues.AccountStore.find_by(
                  venue_id: @venue_id,
                  credential_id: :main,
@@ -115,7 +115,7 @@ defmodule Tai.Venues.BootTest do
     end
   end
 
-  describe ".run asset balances hydrate error" do
+  describe ".run accounts hydrate error" do
     setup [:mock_products, :mock_maker_taker_fees]
 
     test "returns an error" do
@@ -131,12 +131,12 @@ defmodule Tai.Venues.BootTest do
       assert {:error, result} = Tai.Venues.Boot.run(adapter)
       assert {result_adapter, reasons} = result
       assert result_adapter == adapter
-      assert reasons == [asset_balances: :mock_response_not_found]
+      assert reasons == [accounts: :mock_response_not_found]
     end
   end
 
   describe ".run fees hydrate error" do
-    setup [:mock_products, :mock_asset_balances]
+    setup [:mock_products, :mock_accounts]
 
     test "returns an error" do
       adapter =
@@ -176,7 +176,7 @@ defmodule Tai.Venues.BootTest do
     )
   end
 
-  def mock_asset_balances(_) do
+  def mock_accounts(_) do
     Tai.TestSupport.Mocks.Responses.Accounts.for_venue_and_credential(
       @venue_id,
       @credential_id,

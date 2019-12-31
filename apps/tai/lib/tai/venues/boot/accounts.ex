@@ -1,4 +1,4 @@
-defmodule Tai.Venues.Boot.AssetBalances do
+defmodule Tai.Venues.Boot.Accounts do
   @type venue :: Tai.Venue.t()
 
   @spec hydrate(venue) :: :ok | {:error, reason :: term}
@@ -11,8 +11,8 @@ defmodule Tai.Venues.Boot.AssetBalances do
   end
 
   defp fetch_and_upsert({credential_id, _}, :ok, venue) do
-    with {:ok, balances} <- Tai.Venues.Client.asset_balances(venue, credential_id) do
-      Enum.each(balances, &Tai.Venues.AccountStore.upsert/1)
+    with {:ok, accounts} <- Tai.Venues.Client.asset_balances(venue, credential_id) do
+      Enum.each(accounts, &Tai.Venues.AccountStore.upsert/1)
       :ok
     else
       {:error, _} = error ->
