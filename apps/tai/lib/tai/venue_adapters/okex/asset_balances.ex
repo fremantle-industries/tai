@@ -1,14 +1,14 @@
 defmodule Tai.VenueAdapters.OkEx.AssetBalances do
-  def asset_balances(venue_id, account_id, credentials) do
+  def asset_balances(venue_id, credential_id, credentials) do
     with venue_credentials <- credentials |> to_venue_credentials,
-         {:ok, futures} <- fetch_futures(venue_id, account_id, venue_credentials),
-         {:ok, swap} <- fetch_swap(venue_id, account_id, venue_credentials),
-         {:ok, spot} <- fetch_spot(venue_id, account_id, venue_credentials) do
+         {:ok, futures} <- fetch_futures(venue_id, credential_id, venue_credentials),
+         {:ok, swap} <- fetch_swap(venue_id, credential_id, venue_credentials),
+         {:ok, spot} <- fetch_spot(venue_id, credential_id, venue_credentials) do
       {:ok, futures ++ swap ++ spot}
     end
   end
 
-  def fetch_futures(venue_id, account_id, venue_credentials) do
+  def fetch_futures(venue_id, credential_id, venue_credentials) do
     with {:ok, %{"info" => info}} <- ExOkex.Futures.Private.list_accounts(venue_credentials) do
       balances =
         info
@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
 
           %Tai.Venues.AssetBalance{
             venue_id: venue_id,
-            account_id: account_id,
+            credential_id: credential_id,
             asset: asset |> String.to_atom(),
             type: "futures",
             free: free,
@@ -30,7 +30,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
     end
   end
 
-  def fetch_swap(venue_id, account_id, venue_credentials) do
+  def fetch_swap(venue_id, credential_id, venue_credentials) do
     with {:ok, %{"info" => swap_accounts}} <- ExOkex.Swap.Private.list_accounts(venue_credentials) do
       balances =
         swap_accounts
@@ -47,7 +47,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
 
           %Tai.Venues.AssetBalance{
             venue_id: venue_id,
-            account_id: account_id,
+            credential_id: credential_id,
             asset: asset,
             type: "swap",
             free: free,
@@ -59,7 +59,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
     end
   end
 
-  def fetch_spot(venue_id, account_id, venue_credentials) do
+  def fetch_spot(venue_id, credential_id, venue_credentials) do
     with {:ok, spot_accounts} <- ExOkex.Spot.Private.list_accounts(venue_credentials) do
       balances =
         spot_accounts
@@ -70,7 +70,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
 
           %Tai.Venues.AssetBalance{
             venue_id: venue_id,
-            account_id: account_id,
+            credential_id: credential_id,
             asset: asset,
             type: "spot",
             free: free,

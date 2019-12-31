@@ -4,7 +4,7 @@ defmodule Tai.Venues.AssetBalance do
   @type asset :: atom
   @type t :: %Tai.Venues.AssetBalance{
           venue_id: venue_id,
-          account_id: credential_id,
+          credential_id: credential_id,
           asset: asset,
           type: String.t(),
           free: Decimal.t(),
@@ -13,7 +13,7 @@ defmodule Tai.Venues.AssetBalance do
 
   @enforce_keys ~w(
     venue_id
-    account_id
+    credential_id
     asset
     type
     free
@@ -21,14 +21,14 @@ defmodule Tai.Venues.AssetBalance do
   )a
   defstruct ~w(
     venue_id
-    account_id
+    credential_id
     asset
     type
     free
     locked
   )a
 
-  @spec total(balance :: t) :: Decimal.t()
+  @spec total(t) :: Decimal.t()
   def total(%Tai.Venues.AssetBalance{free: free, locked: locked}) do
     Decimal.add(free, locked)
   end

@@ -1,26 +1,28 @@
 defmodule Tai.Events.UnlockAssetBalanceInsufficientFunds do
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type credential_id :: Tai.Venues.Adapter.credential_id()
   @type t :: %Tai.Events.UnlockAssetBalanceInsufficientFunds{
-          venue_id: atom,
-          account_id: atom,
+          venue_id: venue_id,
+          credential_id: credential_id,
           asset: atom,
           qty: Decimal.t(),
           locked: Decimal.t()
         }
 
-  @enforce_keys [
-    :venue_id,
-    :account_id,
-    :asset,
-    :qty,
-    :locked
-  ]
-  defstruct [
-    :venue_id,
-    :account_id,
-    :asset,
-    :qty,
-    :locked
-  ]
+  @enforce_keys ~w(
+    venue_id
+    credential_id
+    asset
+    qty
+    locked
+  )a
+  defstruct ~w(
+    venue_id
+    credential_id
+    asset
+    qty
+    locked
+  )a
 end
 
 defimpl Tai.LogEvent, for: Tai.Events.UnlockAssetBalanceInsufficientFunds do

@@ -4,7 +4,7 @@ defmodule Tai.Events.LockAssetBalanceInsufficientFundsTest do
   test ".to_data/1 transforms decimal data to strings" do
     event = %Tai.Events.LockAssetBalanceInsufficientFunds{
       venue_id: :my_venue,
-      account_id: :my_account,
+      credential_id: :my_credential,
       asset: :btc,
       min: Decimal.new("0.1"),
       max: Decimal.new("0.3"),
@@ -13,7 +13,7 @@ defmodule Tai.Events.LockAssetBalanceInsufficientFundsTest do
 
     assert Tai.LogEvent.to_data(event) == %{
              venue_id: :my_venue,
-             account_id: :my_account,
+             credential_id: :my_credential,
              asset: :btc,
              min: "0.1",
              max: "0.3",

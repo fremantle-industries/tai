@@ -40,7 +40,7 @@ defmodule Tai.TestSupport.Mock do
   def mock_asset_balance(venue_id, credential_id, asset, free, locked) do
     %Tai.Venues.AssetBalance{
       venue_id: venue_id,
-      account_id: credential_id,
+      credential_id: credential_id,
       type: "default",
       asset: asset,
       free: free |> Decimal.cast(),

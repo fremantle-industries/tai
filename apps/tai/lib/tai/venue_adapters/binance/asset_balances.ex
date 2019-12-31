@@ -1,9 +1,9 @@
 defmodule Tai.VenueAdapters.Binance.AssetBalances do
-  def asset_balances(venue_id, account_id, credentials) do
+  def asset_balances(venue_id, credential_id, credentials) do
     venue_credentials = struct!(ExBinance.Credentials, credentials)
 
     with {:ok, account} <- ExBinance.Private.account(venue_credentials) do
-      balances = account.balances |> Enum.map(&build(&1, venue_id, account_id))
+      balances = account.balances |> Enum.map(&build(&1, venue_id, credential_id))
       {:ok, balances}
     else
       {:error, :receive_window} = error ->
@@ -20,7 +20,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalances do
   defp build(
          %{"asset" => raw_asset, "free" => free, "locked" => locked},
          venue_id,
-         account_id
+         credential_id
        ) do
     asset =
       raw_asset
@@ -29,7 +29,7 @@ defmodule Tai.VenueAdapters.Binance.AssetBalances do
 
     %Tai.Venues.AssetBalance{
       venue_id: venue_id,
-      account_id: account_id,
+      credential_id: credential_id,
       asset: asset,
       type: "default",
       free: free |> Decimal.new() |> Decimal.reduce(),

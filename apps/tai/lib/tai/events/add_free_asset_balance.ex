@@ -1,29 +1,31 @@
 defmodule Tai.Events.AddFreeAssetBalance do
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type credential_id :: Tai.Venues.Adapter.credential_id()
   @type t :: %Tai.Events.AddFreeAssetBalance{
-          venue_id: atom,
-          account_id: atom,
+          venue_id: venue_id,
+          credential_id: credential_id,
           asset: atom,
           val: Decimal.t(),
           free: Decimal.t(),
           locked: Decimal.t()
         }
 
-  @enforce_keys [
-    :venue_id,
-    :account_id,
-    :asset,
-    :val,
-    :free,
-    :locked
-  ]
-  defstruct [
-    :venue_id,
-    :account_id,
-    :asset,
-    :val,
-    :free,
-    :locked
-  ]
+  @enforce_keys ~w(
+    venue_id
+    credential_id
+    asset
+    val
+    free
+    locked
+  )a
+  defstruct ~w(
+    venue_id
+    credential_id
+    asset
+    val
+    free
+    locked
+  )a
 end
 
 defimpl Tai.LogEvent, for: Tai.Events.AddFreeAssetBalance do

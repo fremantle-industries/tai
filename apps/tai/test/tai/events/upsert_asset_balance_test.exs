@@ -4,7 +4,7 @@ defmodule Tai.Events.UpsertAssetBalanceTest do
   test ".to_data/1 transforms decimal data to strings" do
     event = %Tai.Events.UpsertAssetBalance{
       venue_id: :my_venue,
-      account_id: :my_account,
+      credential_id: :my_credential,
       asset: :btc,
       free: Decimal.new("0.1"),
       locked: Decimal.new("0.2")
@@ -12,7 +12,7 @@ defmodule Tai.Events.UpsertAssetBalanceTest do
 
     assert Tai.LogEvent.to_data(event) == %{
              venue_id: :my_venue,
-             account_id: :my_account,
+             credential_id: :my_credential,
              asset: :btc,
              free: "0.1",
              locked: "0.2"

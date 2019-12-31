@@ -6,11 +6,11 @@ defmodule Tai.Venues.AssetBalanceStore.UnlockRequest do
   @type asset :: Tai.Venues.AssetBalance.asset()
   @type t :: %AssetBalanceStore.UnlockRequest{
           venue_id: venue_id,
-          account_id: credential_id,
+          credential_id: credential_id,
           asset: asset,
           qty: Decimal.t()
         }
 
-  @enforce_keys ~w(venue_id account_id asset qty)a
-  defstruct ~w(venue_id account_id asset qty)a
+  @enforce_keys ~w(venue_id credential_id asset qty)a
+  defstruct ~w(venue_id credential_id asset qty)a
 end

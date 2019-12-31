@@ -45,28 +45,28 @@ defmodule Tai.Venues.BootTest do
       assert {:ok, btc_balance} =
                Tai.Venues.AssetBalanceStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @credential_id,
+                 credential_id: @credential_id,
                  asset: :btc
                )
 
       assert {:ok, eth_balance} =
                Tai.Venues.AssetBalanceStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @credential_id,
+                 credential_id: @credential_id,
                  asset: :eth
                )
 
       assert {:ok, ltc_balance} =
                Tai.Venues.AssetBalanceStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @credential_id,
+                 credential_id: @credential_id,
                  asset: :ltc
                )
 
       assert {:ok, usdt_balance} =
                Tai.Venues.AssetBalanceStore.find_by(
                  venue_id: @venue_id,
-                 account_id: :main,
+                 credential_id: :main,
                  asset: :usdt
                )
     end

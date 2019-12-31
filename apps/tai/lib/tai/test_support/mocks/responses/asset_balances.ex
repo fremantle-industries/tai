@@ -15,7 +15,7 @@ defmodule Tai.TestSupport.Mocks.Responses.AssetBalances do
       |> Enum.map(fn attrs ->
         struct(
           Tai.Venues.AssetBalance,
-          Map.merge(%{venue_id: venue_id, account_id: credential_id}, attrs)
+          Map.merge(%{venue_id: venue_id, credential_id: credential_id}, attrs)
         )
       end)
 

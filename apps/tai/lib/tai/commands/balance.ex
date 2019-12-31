@@ -7,7 +7,7 @@ defmodule Tai.Commands.Balance do
 
   @header [
     "Venue",
-    "Account",
+    "Credential",
     "Asset",
     "Free",
     "Locked",
@@ -31,7 +31,7 @@ defmodule Tai.Commands.Balance do
       fn balance, acc ->
         row = {
           balance.venue_id,
-          balance.account_id,
+          balance.credential_id,
           balance.asset,
           balance.free,
           balance.locked,
@@ -52,11 +52,11 @@ defmodule Tai.Commands.Balance do
 
   defp format_rows(balances) do
     balances
-    |> Enum.map(fn {venue_id, account_id, symbol, free, locked, total} ->
+    |> Enum.map(fn {venue_id, credential_id, symbol, free, locked, total} ->
       formatted_free = Tai.Markets.Asset.new(free, symbol)
       formatted_locked = Tai.Markets.Asset.new(locked, symbol)
       formatted_total = Tai.Markets.Asset.new(total, symbol)
-      [venue_id, account_id, symbol, formatted_free, formatted_locked, formatted_total]
+      [venue_id, credential_id, symbol, formatted_free, formatted_locked, formatted_total]
     end)
   end
 end

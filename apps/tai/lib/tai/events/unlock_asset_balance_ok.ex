@@ -1,23 +1,25 @@
 defmodule Tai.Events.UnlockAssetBalanceOk do
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type credential_id :: Tai.Venues.Adapter.credential_id()
   @type t :: %Tai.Events.UnlockAssetBalanceOk{
-          venue_id: atom,
-          account_id: atom,
+          venue_id: venue_id,
+          credential_id: credential_id,
           asset: atom,
           qty: Decimal.t()
         }
 
-  @enforce_keys [
-    :venue_id,
-    :account_id,
-    :asset,
-    :qty
-  ]
-  defstruct [
-    :venue_id,
-    :account_id,
-    :asset,
-    :qty
-  ]
+  @enforce_keys ~w(
+    venue_id
+    credential_id
+    asset
+    qty
+  )a
+  defstruct ~w(
+    venue_id
+    credential_id
+    asset
+    qty
+  )a
 end
 
 defimpl Tai.LogEvent, for: Tai.Events.UnlockAssetBalanceOk do

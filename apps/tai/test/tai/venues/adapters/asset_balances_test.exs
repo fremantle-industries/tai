@@ -32,7 +32,7 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
         assert Enum.count(balances) > 0
         assert [%Tai.Venues.AssetBalance{} = balance | _] = balances
         assert balance.venue_id == @venue.id
-        assert balance.account_id == @credential_id
+        assert balance.credential_id == @credential_id
         assert Decimal.cmp(balance.free, Decimal.new(0)) != :lt
         assert Decimal.cmp(balance.locked, Decimal.new(0)) != :lt
       end
