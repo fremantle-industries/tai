@@ -104,7 +104,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
   defp build_submission do
     struct(Tai.Trading.OrderSubmissions.BuyLimitGtc,
       venue_id: :my_venue,
-      account_id: :main,
       product_symbol: :btc_usd,
       price: Decimal.new("100.1"),
       qty: Decimal.new("1.1")

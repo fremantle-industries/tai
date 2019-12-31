@@ -82,7 +82,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
   def build_submission(:buy, :gtc, post_only: post_only) do
     %Tai.Trading.OrderSubmissions.BuyLimitGtc{
       venue_id: :test_exchange_a,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("100.1"),
@@ -95,7 +95,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
   def build_submission(:sell, :gtc, post_only: post_only) do
     %Tai.Trading.OrderSubmissions.SellLimitGtc{
       venue_id: :test_exchange_a,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("50000.5"),
@@ -108,7 +108,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
   def build_submission(:buy, :fok) do
     %Tai.Trading.OrderSubmissions.BuyLimitFok{
       venue_id: :test_exchange_a,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("100.1"),
@@ -120,7 +120,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
   def build_submission(:sell, :fok) do
     %Tai.Trading.OrderSubmissions.SellLimitFok{
       venue_id: :test_exchange_a,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("50000.5"),
@@ -132,7 +132,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
   def build_submission(:buy, :ioc) do
     %Tai.Trading.OrderSubmissions.BuyLimitIoc{
       venue_id: :test_exchange_a,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("100.1"),
@@ -144,7 +144,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
   def build_submission(:sell, :ioc) do
     %Tai.Trading.OrderSubmissions.SellLimitIoc{
       venue_id: :test_exchange_a,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("50000.5"),

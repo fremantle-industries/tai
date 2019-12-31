@@ -6,7 +6,7 @@ defmodule Tai.Trading.OrderSubmissions.SellLimitFok do
   @type callback :: Tai.Trading.Order.callback()
   @type t :: %Tai.Trading.OrderSubmissions.SellLimitFok{
           venue_id: venue_id,
-          account_id: credential_id,
+          credential_id: credential_id,
           product_symbol: product_symbol,
           product_type: product_type,
           price: Decimal.t(),
@@ -17,7 +17,7 @@ defmodule Tai.Trading.OrderSubmissions.SellLimitFok do
 
   @enforce_keys ~w(
     venue_id
-    account_id
+    credential_id
     product_symbol
     product_type
     price
@@ -25,7 +25,7 @@ defmodule Tai.Trading.OrderSubmissions.SellLimitFok do
   )a
   defstruct ~w(
     venue_id
-    account_id
+    credential_id
     product_symbol
     product_type
     price

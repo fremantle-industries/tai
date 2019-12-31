@@ -16,7 +16,7 @@ defmodule Tai.Commands.OrdersTest do
     {:ok, btc_usd_order} =
       %Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: :test_exchange_a,
-        account_id: :main,
+        credential_id: :main,
         product_symbol: :btc_usd,
         product_type: :spot,
         price: Decimal.new("12999.99"),
@@ -29,7 +29,7 @@ defmodule Tai.Commands.OrdersTest do
     {:ok, ltc_usd_order} =
       %Tai.Trading.OrderSubmissions.SellLimitFok{
         venue_id: :test_exchange_b,
-        account_id: :main,
+        credential_id: :main,
         product_symbol: :ltc_usd,
         product_type: :spot,
         price: Decimal.new("75.23"),

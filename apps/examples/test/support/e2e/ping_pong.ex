@@ -3,7 +3,7 @@ defmodule ExamplesSupport.E2E.PingPong do
   import Tai.TestSupport.Mock
 
   @venue :test_exchange_a
-  @account :main
+  @credential :main
   @product :btc_usd
   @product_type :swap
   @price_increment Decimal.new("0.5")
@@ -12,9 +12,9 @@ defmodule ExamplesSupport.E2E.PingPong do
   @exit_venue_order_id "exitOrder"
 
   def seed_mock_responses(:ping_pong) do
-    Mocks.Responses.MakerTakerFees.for_venue_and_account(
+    Mocks.Responses.MakerTakerFees.for_venue_and_credential(
       @venue,
-      @account,
+      @credential,
       {Decimal.new("0.0005"), Decimal.new("0.0005")}
     )
 
@@ -26,7 +26,7 @@ defmodule ExamplesSupport.E2E.PingPong do
       @entry_venue_order_id_1,
       %Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: @venue,
-        account_id: @account,
+        credential_id: @credential,
         product_symbol: @product,
         product_type: @product_type,
         price: Decimal.new("5500.5"),
@@ -41,7 +41,7 @@ defmodule ExamplesSupport.E2E.PingPong do
       @entry_venue_order_id_2,
       %Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: @venue,
-        account_id: @account,
+        credential_id: @credential,
         product_symbol: @product,
         product_type: @product_type,
         price: Decimal.new("5504.0"),
@@ -82,7 +82,7 @@ defmodule ExamplesSupport.E2E.PingPong do
       when venue_id == @venue and product_symbol == @product do
     submission = %Tai.Trading.OrderSubmissions.SellLimitGtc{
       venue_id: @venue,
-      account_id: @account,
+      credential_id: @credential,
       product_symbol: @product,
       product_type: @product_type,
       post_only: true,
@@ -110,7 +110,7 @@ defmodule ExamplesSupport.E2E.PingPong do
         {Examples.PingPong.Config,
          %{
            product: {{@venue, @product}, :product},
-           fee: {{@venue, @product, @account}, :fee},
+           fee: {{@venue, @product, @credential}, :fee},
            max_qty: {10, :decimal}
          }}
     ]

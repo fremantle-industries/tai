@@ -5,7 +5,7 @@ defmodule Support.OrderSubmissions do
     attrs =
       %{
         venue_id: :test_exchange_a,
-        account_id: :main,
+        credential_id: :main,
         product_symbol: :btc_usd,
         price: Decimal.new("100.1"),
         qty: Decimal.new("0.1"),
