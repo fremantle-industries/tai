@@ -32,25 +32,25 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalancesTest do
         end
       }
     ] do
-      assert {:ok, balances} =
-               OkEx.AssetBalances.asset_balances(:venue_a, :account_a, @credentials)
+      assert {:ok, accounts} =
+               OkEx.AssetBalances.asset_balances(:venue_a, :credential_a, @credentials)
 
-      assert Enum.count(balances) == 3
+      assert Enum.count(accounts) == 3
 
-      assert %Tai.Venues.AssetBalance{} = futures_balance = Enum.at(balances, 0)
-      assert futures_balance.locked == Decimal.new("1.1")
-      assert futures_balance.type == "futures"
+      assert %Tai.Venues.Account{} = futures_account = Enum.at(accounts, 0)
+      assert futures_account.locked == Decimal.new("1.1")
+      assert futures_account.type == "futures"
 
-      assert %Tai.Venues.AssetBalance{} = swap_balance = Enum.at(balances, 1)
-      assert swap_balance.locked == Decimal.new("1.2")
-      assert swap_balance.asset == :btc
-      assert swap_balance.type == "swap"
+      assert %Tai.Venues.Account{} = swap_account = Enum.at(accounts, 1)
+      assert swap_account.locked == Decimal.new("1.2")
+      assert swap_account.asset == :btc
+      assert swap_account.type == "swap"
 
-      assert %Tai.Venues.AssetBalance{} = spot_balance = Enum.at(balances, 2)
-      assert spot_balance.locked == Decimal.new("0.3")
-      assert spot_balance.free == Decimal.new("1.0")
-      assert spot_balance.asset == :btc
-      assert spot_balance.type == "spot"
+      assert %Tai.Venues.Account{} = spot_account = Enum.at(accounts, 2)
+      assert spot_account.locked == Decimal.new("0.3")
+      assert spot_account.free == Decimal.new("1.0")
+      assert spot_account.asset == :btc
+      assert spot_account.type == "spot"
     end
   end
 end

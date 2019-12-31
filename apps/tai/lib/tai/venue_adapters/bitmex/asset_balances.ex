@@ -19,7 +19,7 @@ defmodule Tai.VenueAdapters.Bitmex.AssetBalances do
     free = Decimal.new(0)
     locked = amount |> Decimal.new() |> Decimal.div(@satoshis_per_btc) |> Decimal.reduce()
 
-    %Tai.Venues.AssetBalance{
+    %Tai.Venues.Account{
       venue_id: venue_id,
       credential_id: credential_id,
       asset: :btc,

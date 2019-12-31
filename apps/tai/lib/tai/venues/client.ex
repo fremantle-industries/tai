@@ -12,10 +12,10 @@ defmodule Tai.Venues.Client do
   @spec products(venue) :: {:ok, [product]} | {:error, shared_error_reason}
   def products(venue), do: venue.adapter.products(venue.id)
 
-  @type asset_balance :: Tai.Venues.AssetBalance.t()
+  @type account :: Tai.Venues.Account.t()
 
   @spec asset_balances(venue, credential_id) ::
-          {:ok, [asset_balance]} | {:error, shared_error_reason}
+          {:ok, [account]} | {:error, shared_error_reason}
   def asset_balances(venue, credential_id) do
     {:ok, credentials} = Map.fetch(venue.credentials, credential_id)
     venue.adapter.asset_balances(venue.id, credential_id, credentials)

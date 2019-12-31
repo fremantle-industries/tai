@@ -16,7 +16,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
   describe ".upsert" do
     test "inserts the balance into the ETS table" do
       balance =
-        struct(Tai.Venues.AssetBalance, %{
+        struct(Tai.Venues.Account, %{
           venue_id: :my_test_exchange,
           credential_id: :my_test_credential,
           asset: :btc
@@ -35,7 +35,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
       Tai.Events.firehose_subscribe()
 
       balance =
-        struct(Tai.Venues.AssetBalance,
+        struct(Tai.Venues.Account,
           venue_id: :my_test_exchange,
           credential_id: :my_test_credential,
           asset: :btc,
@@ -59,7 +59,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
       assert AssetBalanceStore.all() == []
 
       balance =
-        struct(Tai.Venues.AssetBalance,
+        struct(Tai.Venues.Account,
           venue_id: :my_test_exchange,
           credential_id: :my_test_credential,
           asset: :btc,
@@ -76,7 +76,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
   describe ".where" do
     test "returns a list of the matching balances" do
       balance_1 =
-        struct(Tai.Venues.AssetBalance, %{
+        struct(Tai.Venues.Account, %{
           venue_id: :my_test_exchange,
           credential_id: :my_test_credential_a,
           asset: :btc,
@@ -84,7 +84,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
         })
 
       balance_2 =
-        struct(Tai.Venues.AssetBalance, %{
+        struct(Tai.Venues.Account, %{
           venue_id: :my_test_exchange,
           credential_id: :my_test_credential_b,
           asset: :btc,
@@ -112,7 +112,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
   describe ".find_by" do
     test "returns an ok tuple with the balance" do
       balance =
-        struct(Tai.Venues.AssetBalance, %{
+        struct(Tai.Venues.Account, %{
           venue_id: :my_test_exchange,
           credential_id: :my_test_credential_a,
           asset: :btc
@@ -137,7 +137,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
   end
 
   describe ".lock" do
-    setup [:init_asset_balance]
+    setup [:init_account]
 
     defp lock(asset, min, max) do
       AssetBalanceStore.lock(%AssetBalanceStore.LockRequest{
@@ -243,7 +243,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
   end
 
   describe ".unlock" do
-    setup [:init_asset_balance]
+    setup [:init_account]
 
     defp unlock(asset, qty) do
       AssetBalanceStore.unlock(%AssetBalanceStore.UnlockRequest{
@@ -305,7 +305,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
   end
 
   describe ".add" do
-    setup [:init_asset_balance]
+    setup [:init_account]
 
     test "adds to free and returns an ok tuple with the new balance" do
       assert {:ok, balance} =
@@ -365,7 +365,7 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
   end
 
   describe ".sub" do
-    setup [:init_asset_balance]
+    setup [:init_account]
 
     test "subtracts from free and returns an ok tuple with the new balance" do
       assert {:ok, balance} =
@@ -434,9 +434,9 @@ defmodule Tai.Venues.AssetBalanceStoreTest do
 
   @free Decimal.new("1.1")
   @locked Decimal.new("2.1")
-  defp init_asset_balance(_context) do
+  defp init_account(_context) do
     balance =
-      struct(Tai.Venues.AssetBalance,
+      struct(Tai.Venues.Account,
         venue_id: :my_test_exchange,
         credential_id: :my_test_credential,
         asset: :btc,

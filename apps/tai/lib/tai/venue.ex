@@ -53,11 +53,11 @@ defmodule Tai.Venue do
     Tai.Venues.Client.products(venue_adapter)
   end
 
-  @type asset_balance :: Tai.Venues.AssetBalance.t()
+  @type account :: Tai.Venues.Account.t()
 
   @deprecated "Use Tai.Venues.Client.asset_balances/2 instead."
   @spec asset_balances(t, credential_id) ::
-          {:ok, [asset_balance]} | {:error, shared_error_reason}
+          {:ok, [account]} | {:error, shared_error_reason}
   def asset_balances(venue, credential_id) do
     Tai.Venues.Client.asset_balances(venue, credential_id)
   end

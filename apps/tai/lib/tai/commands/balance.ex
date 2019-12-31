@@ -1,6 +1,6 @@
 defmodule Tai.Commands.Balance do
   @moduledoc """
-  Display symbols on each exchange with a non-zero balance
+  Display accounts on each exchange with a non-zero balance
   """
 
   import Tai.Commands.Table, only: [render!: 2]
@@ -16,26 +16,26 @@ defmodule Tai.Commands.Balance do
 
   @spec balance :: no_return
   def balance do
-    fetch_balances()
+    fetch_accounts()
     |> format_rows()
-    |> exclude_empty_balances()
+    |> exclude_zero_balances()
     |> render!(@header)
   end
 
-  defp fetch_balances do
+  defp fetch_accounts do
     Tai.Venues.AssetBalanceStore.all()
     |> Enum.sort(&(&1.asset >= &2.asset))
     |> Enum.sort(&(&1.venue_id >= &2.venue_id))
     |> Enum.reduce(
       [],
-      fn balance, acc ->
+      fn account, acc ->
         row = {
-          balance.venue_id,
-          balance.credential_id,
-          balance.asset,
-          balance.free,
-          balance.locked,
-          Tai.Venues.AssetBalance.total(balance)
+          account.venue_id,
+          account.credential_id,
+          account.asset,
+          account.free,
+          account.locked,
+          Tai.Venues.Account.total(account)
         }
 
         [row | acc]
@@ -43,15 +43,15 @@ defmodule Tai.Commands.Balance do
     )
   end
 
-  defp exclude_empty_balances(balances) do
+  defp exclude_zero_balances(accounts) do
     Enum.reject(
-      balances,
+      accounts,
       fn [_, _, _, _, _, total] -> Tai.Markets.Asset.zero?(total) end
     )
   end
 
-  defp format_rows(balances) do
-    balances
+  defp format_rows(accounts) do
+    accounts
     |> Enum.map(fn {venue_id, credential_id, symbol, free, locked, total} ->
       formatted_free = Tai.Markets.Asset.new(free, symbol)
       formatted_locked = Tai.Markets.Asset.new(locked, symbol)

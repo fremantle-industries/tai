@@ -1,8 +1,10 @@
-defmodule Tai.Venues.AssetBalance do
+defmodule Tai.Venues.Account do
+  alias __MODULE__
+
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type asset :: atom
-  @type t :: %Tai.Venues.AssetBalance{
+  @type t :: %Account{
           venue_id: venue_id,
           credential_id: credential_id,
           asset: asset,
@@ -29,7 +31,5 @@ defmodule Tai.Venues.AssetBalance do
   )a
 
   @spec total(t) :: Decimal.t()
-  def total(%Tai.Venues.AssetBalance{free: free, locked: locked}) do
-    Decimal.add(free, locked)
-  end
+  def total(%Account{} = account), do: Decimal.add(account.free, account.locked)
 end

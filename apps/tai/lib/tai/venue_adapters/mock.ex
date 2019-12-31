@@ -20,10 +20,10 @@ defmodule Tai.VenueAdapters.Mock do
 
   def asset_balances(venue_id, credential_id, _credentials) do
     with_mock_server(fn ->
-      {:asset_balances, venue_id, credential_id}
+      {:accounts, venue_id, credential_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, asset_balances} -> {:ok, asset_balances}
+        {:ok, accounts} -> {:ok, accounts}
         {:error, :not_found} -> {:error, :mock_response_not_found}
       end
     end)

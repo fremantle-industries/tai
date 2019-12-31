@@ -16,7 +16,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
           free = Decimal.new(0)
           locked = equity |> Decimal.new() |> Decimal.reduce()
 
-          %Tai.Venues.AssetBalance{
+          %Tai.Venues.Account{
             venue_id: venue_id,
             credential_id: credential_id,
             asset: asset |> String.to_atom(),
@@ -45,7 +45,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
           free = Decimal.new(0)
           locked = equity |> Decimal.new() |> Decimal.reduce()
 
-          %Tai.Venues.AssetBalance{
+          %Tai.Venues.Account{
             venue_id: venue_id,
             credential_id: credential_id,
             asset: asset,
@@ -68,7 +68,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
           free = available |> Decimal.new()
           locked = balance |> Decimal.new() |> Decimal.sub(free) |> Decimal.reduce()
 
-          %Tai.Venues.AssetBalance{
+          %Tai.Venues.Account{
             venue_id: venue_id,
             credential_id: credential_id,
             asset: asset,

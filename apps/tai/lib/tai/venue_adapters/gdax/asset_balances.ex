@@ -1,11 +1,9 @@
 defmodule Tai.VenueAdapters.Gdax.AssetBalances do
   def asset_balances(venue_id, credential_id, credentials) do
-    with {:ok, raw_accounts} <- ExGdax.list_accounts(credentials) do
+    with {:ok, venue_accounts} <- ExGdax.list_accounts(credentials) do
       accounts =
-        Enum.map(
-          raw_accounts,
-          &build(&1, venue_id, credential_id)
-        )
+        venue_accounts
+        |> Enum.map(&build(&1, venue_id, credential_id))
 
       {:ok, accounts}
     else
@@ -33,7 +31,7 @@ defmodule Tai.VenueAdapters.Gdax.AssetBalances do
       |> String.downcase()
       |> String.to_atom()
 
-    %Tai.Venues.AssetBalance{
+    %Tai.Venues.Account{
       venue_id: venue_id,
       credential_id: credential_id,
       type: "default",
