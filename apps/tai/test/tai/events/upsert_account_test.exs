@@ -1,23 +1,21 @@
-defmodule Tai.Events.LockAssetBalanceInsufficientFundsTest do
+defmodule Tai.Events.UpsertAccountTest do
   use ExUnit.Case, async: true
 
   test ".to_data/1 transforms decimal data to strings" do
-    event = %Tai.Events.LockAssetBalanceInsufficientFunds{
+    event = %Tai.Events.UpsertAccount{
       venue_id: :my_venue,
       credential_id: :my_credential,
       asset: :btc,
-      min: Decimal.new("0.1"),
-      max: Decimal.new("0.3"),
-      free: Decimal.new("0.2")
+      free: Decimal.new("0.1"),
+      locked: Decimal.new("0.2")
     }
 
     assert Tai.LogEvent.to_data(event) == %{
              venue_id: :my_venue,
              credential_id: :my_credential,
              asset: :btc,
-             min: "0.1",
-             max: "0.3",
-             free: "0.2"
+             free: "0.1",
+             locked: "0.2"
            }
   end
 end

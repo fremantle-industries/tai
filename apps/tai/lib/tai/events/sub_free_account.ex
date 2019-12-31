@@ -1,11 +1,14 @@
-defmodule Tai.Events.UnlockAssetBalanceInsufficientFunds do
+defmodule Tai.Events.SubFreeAccount do
+  alias __MODULE__
+
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type credential_id :: Tai.Venues.Adapter.credential_id()
-  @type t :: %Tai.Events.UnlockAssetBalanceInsufficientFunds{
+  @type t :: %SubFreeAccount{
           venue_id: venue_id,
           credential_id: credential_id,
           asset: atom,
-          qty: Decimal.t(),
+          val: Decimal.t(),
+          free: Decimal.t(),
           locked: Decimal.t()
         }
 
@@ -13,19 +16,21 @@ defmodule Tai.Events.UnlockAssetBalanceInsufficientFunds do
     venue_id
     credential_id
     asset
-    qty
+    val
+    free
     locked
   )a
   defstruct ~w(
     venue_id
     credential_id
     asset
-    qty
+    val
+    free
     locked
   )a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.UnlockAssetBalanceInsufficientFunds do
+defimpl Tai.LogEvent, for: Tai.Events.SubFreeAccount do
   def to_data(event) do
     keys =
       event
@@ -34,7 +39,8 @@ defimpl Tai.LogEvent, for: Tai.Events.UnlockAssetBalanceInsufficientFunds do
 
     event
     |> Map.take(keys)
-    |> Map.put(:qty, event.qty |> Decimal.to_string(:normal))
+    |> Map.put(:val, event.val |> Decimal.to_string(:normal))
+    |> Map.put(:free, event.free |> Decimal.to_string(:normal))
     |> Map.put(:locked, event.locked |> Decimal.to_string(:normal))
   end
 end

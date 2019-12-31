@@ -1,11 +1,11 @@
-defmodule Tai.Events.LockAssetBalanceOk do
+defmodule Tai.Events.LockAccountInsufficientFunds do
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type credential_id :: Tai.Venues.Adapter.credential_id()
-  @type t :: %Tai.Events.LockAssetBalanceOk{
+  @type t :: %Tai.Events.LockAccountInsufficientFunds{
           venue_id: venue_id,
           credential_id: credential_id,
           asset: atom,
-          qty: Decimal.t(),
+          free: Decimal.t(),
           min: Decimal.t(),
           max: Decimal.t()
         }
@@ -14,7 +14,7 @@ defmodule Tai.Events.LockAssetBalanceOk do
     venue_id
     credential_id
     asset
-    qty
+    free
     min
     max
   )a
@@ -22,13 +22,13 @@ defmodule Tai.Events.LockAssetBalanceOk do
     venue_id
     credential_id
     asset
-    qty
+    free
     min
     max
   )a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.LockAssetBalanceOk do
+defimpl Tai.LogEvent, for: Tai.Events.LockAccountInsufficientFunds do
   def to_data(event) do
     keys =
       event
@@ -39,6 +39,6 @@ defimpl Tai.LogEvent, for: Tai.Events.LockAssetBalanceOk do
     |> Map.take(keys)
     |> Map.put(:min, event.min |> Decimal.to_string(:normal))
     |> Map.put(:max, event.max |> Decimal.to_string(:normal))
-    |> Map.put(:qty, event.qty |> Decimal.to_string(:normal))
+    |> Map.put(:free, event.free |> Decimal.to_string(:normal))
   end
 end

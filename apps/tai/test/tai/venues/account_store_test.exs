@@ -45,7 +45,7 @@ defmodule Tai.Venues.AccountStoreTest do
 
       :ok = AccountStore.upsert(account)
 
-      assert_receive {Tai.Event, %Tai.Events.UpsertAssetBalance{} = event, _}
+      assert_receive {Tai.Event, %Tai.Events.UpsertAccount{} = event, _}
       assert event.venue_id == :my_test_exchange
       assert event.credential_id == :my_test_credential
       assert event.asset == :btc
@@ -222,7 +222,7 @@ defmodule Tai.Venues.AccountStoreTest do
 
       lock(:btc, 0.5, 0.6)
 
-      assert_receive {Tai.Event, %Tai.Events.LockAssetBalanceOk{asset: :btc} = event, _}
+      assert_receive {Tai.Event, %Tai.Events.LockAccountOk{asset: :btc} = event, _}
       assert event.venue_id == :my_test_exchange
       assert event.credential_id == :my_test_credential
       assert event.qty == Decimal.new("0.6")
@@ -235,8 +235,7 @@ defmodule Tai.Venues.AccountStoreTest do
 
       lock(:btc, 1.2, 1.3)
 
-      assert_receive {Tai.Event,
-                      %Tai.Events.LockAssetBalanceInsufficientFunds{asset: :btc} = event, _}
+      assert_receive {Tai.Event, %Tai.Events.LockAccountInsufficientFunds{asset: :btc} = event, _}
 
       assert event.venue_id == :my_test_exchange
       assert event.credential_id == :my_test_credential
@@ -287,7 +286,7 @@ defmodule Tai.Venues.AccountStoreTest do
 
       unlock(:btc, 1.0)
 
-      assert_receive {Tai.Event, %Tai.Events.UnlockAssetBalanceOk{asset: :btc} = event, _}
+      assert_receive {Tai.Event, %Tai.Events.UnlockAccountOk{asset: :btc} = event, _}
       assert event.venue_id == :my_test_exchange
       assert event.credential_id == :my_test_credential
       assert event.qty == Decimal.new("1.0")
@@ -298,8 +297,8 @@ defmodule Tai.Venues.AccountStoreTest do
 
       unlock(:btc, 2.11)
 
-      assert_receive {Tai.Event,
-                      %Tai.Events.UnlockAssetBalanceInsufficientFunds{asset: :btc} = event, _}
+      assert_receive {Tai.Event, %Tai.Events.UnlockAccountInsufficientFunds{asset: :btc} = event,
+                      _}
 
       assert event.venue_id == :my_test_exchange
       assert event.credential_id == :my_test_credential
@@ -345,7 +344,7 @@ defmodule Tai.Venues.AccountStoreTest do
 
       AccountStore.add(:my_test_exchange, :my_test_credential, :btc, 0.1)
 
-      assert_receive {Tai.Event, %Tai.Events.AddFreeAssetBalance{asset: :btc} = event, _}
+      assert_receive {Tai.Event, %Tai.Events.AddFreeAccount{asset: :btc} = event, _}
       assert event.venue_id == :my_test_exchange
       assert event.credential_id == :my_test_credential
       assert event.val == Decimal.new("0.1")
@@ -404,7 +403,7 @@ defmodule Tai.Venues.AccountStoreTest do
 
       AccountStore.sub(:my_test_exchange, :my_test_credential, :btc, 0.1)
 
-      assert_receive {Tai.Event, %Tai.Events.SubFreeAssetBalance{asset: :btc} = event, _}
+      assert_receive {Tai.Event, %Tai.Events.SubFreeAccount{asset: :btc} = event, _}
       assert event.venue_id == :my_test_exchange
       assert event.credential_id == :my_test_credential
       assert event.val == Decimal.new("0.1")

@@ -1,7 +1,7 @@
-defmodule Tai.Events.AddFreeAssetBalance do
+defmodule Tai.Events.AddFreeAccount do
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type credential_id :: Tai.Venues.Adapter.credential_id()
-  @type t :: %Tai.Events.AddFreeAssetBalance{
+  @type t :: %Tai.Events.AddFreeAccount{
           venue_id: venue_id,
           credential_id: credential_id,
           asset: atom,
@@ -28,7 +28,7 @@ defmodule Tai.Events.AddFreeAssetBalance do
   )a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.AddFreeAssetBalance do
+defimpl Tai.LogEvent, for: Tai.Events.AddFreeAccount do
   def to_data(event) do
     keys =
       event

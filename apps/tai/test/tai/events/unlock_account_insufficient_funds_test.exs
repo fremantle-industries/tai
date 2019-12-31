@@ -1,8 +1,8 @@
-defmodule Tai.Events.UnlockAssetBalanceInsufficientFundsTest do
+defmodule Tai.Events.UnlockAccountInsufficientFundsTest do
   use ExUnit.Case, async: true
 
   test ".to_data/1 transforms decimal data to strings" do
-    event = %Tai.Events.UnlockAssetBalanceInsufficientFunds{
+    event = %Tai.Events.UnlockAccountInsufficientFunds{
       venue_id: :my_venue,
       credential_id: :my_credential,
       asset: :btc,

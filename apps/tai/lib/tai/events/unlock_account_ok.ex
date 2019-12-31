@@ -1,7 +1,9 @@
-defmodule Tai.Events.UnlockAssetBalanceOk do
+defmodule Tai.Events.UnlockAccountOk do
+  alias __MODULE__
+
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type credential_id :: Tai.Venues.Adapter.credential_id()
-  @type t :: %Tai.Events.UnlockAssetBalanceOk{
+  @type t :: %UnlockAccountOk{
           venue_id: venue_id,
           credential_id: credential_id,
           asset: atom,
@@ -22,7 +24,7 @@ defmodule Tai.Events.UnlockAssetBalanceOk do
   )a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.UnlockAssetBalanceOk do
+defimpl Tai.LogEvent, for: Tai.Events.UnlockAccountOk do
   def to_data(event) do
     keys =
       event

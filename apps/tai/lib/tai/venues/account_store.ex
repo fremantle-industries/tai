@@ -125,7 +125,7 @@ defmodule Tai.Venues.AccountStore do
   def handle_call({:upsert, balance}, _from, state) do
     upsert_ets_table(balance)
 
-    Tai.Events.info(%Tai.Events.UpsertAssetBalance{
+    Tai.Events.info(%Tai.Events.UpsertAccount{
       venue_id: balance.venue_id,
       credential_id: balance.credential_id,
       asset: balance.asset,
@@ -141,7 +141,7 @@ defmodule Tai.Venues.AccountStore do
            AccountStore.Lock.from_request(lock_request) do
       upsert_ets_table(with_locked_balance)
 
-      Tai.Events.info(%Tai.Events.LockAssetBalanceOk{
+      Tai.Events.info(%Tai.Events.LockAccountOk{
         venue_id: lock_request.venue_id,
         credential_id: lock_request.credential_id,
         asset: lock_request.asset,
@@ -153,7 +153,7 @@ defmodule Tai.Venues.AccountStore do
       {:reply, {:ok, locked_qty}, state}
     else
       {:error, {:insufficient_balance, free}} = error ->
-        Tai.Events.info(%Tai.Events.LockAssetBalanceInsufficientFunds{
+        Tai.Events.info(%Tai.Events.LockAccountInsufficientFunds{
           venue_id: lock_request.venue_id,
           credential_id: lock_request.credential_id,
           asset: lock_request.asset,
@@ -173,7 +173,7 @@ defmodule Tai.Venues.AccountStore do
     with {:ok, with_unlocked_balance} <- AccountStore.Unlock.from_request(unlock_request) do
       upsert_ets_table(with_unlocked_balance)
 
-      Tai.Events.info(%Tai.Events.UnlockAssetBalanceOk{
+      Tai.Events.info(%Tai.Events.UnlockAccountOk{
         venue_id: unlock_request.venue_id,
         credential_id: unlock_request.credential_id,
         asset: unlock_request.asset,
@@ -183,7 +183,7 @@ defmodule Tai.Venues.AccountStore do
       {:reply, :ok, state}
     else
       {:error, {:insufficient_balance, locked}} = error ->
-        Tai.Events.info(%Tai.Events.UnlockAssetBalanceInsufficientFunds{
+        Tai.Events.info(%Tai.Events.UnlockAccountInsufficientFunds{
           venue_id: unlock_request.venue_id,
           credential_id: unlock_request.credential_id,
           asset: unlock_request.asset,
@@ -242,7 +242,7 @@ defmodule Tai.Venues.AccountStore do
   end
 
   def handle_continue({:add, venue_id, credential_id, asset, val, balance}, state) do
-    Tai.Events.info(%Tai.Events.AddFreeAssetBalance{
+    Tai.Events.info(%Tai.Events.AddFreeAccount{
       venue_id: venue_id,
       credential_id: credential_id,
       asset: asset,
@@ -255,7 +255,7 @@ defmodule Tai.Venues.AccountStore do
   end
 
   def handle_continue({:sub, venue_id, credential_id, asset, val, balance}, state) do
-    Tai.Events.info(%Tai.Events.SubFreeAssetBalance{
+    Tai.Events.info(%Tai.Events.SubFreeAccount{
       venue_id: venue_id,
       credential_id: credential_id,
       asset: asset,

@@ -1,7 +1,7 @@
-defmodule Tai.Events.UpsertAssetBalance do
+defmodule Tai.Events.UpsertAccount do
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type credential_id :: Tai.Venues.Adapter.credential_id()
-  @type t :: %Tai.Events.UpsertAssetBalance{
+  @type t :: %Tai.Events.UpsertAccount{
           venue_id: venue_id,
           credential_id: credential_id,
           asset: atom,
@@ -13,7 +13,7 @@ defmodule Tai.Events.UpsertAssetBalance do
   defstruct ~w(venue_id credential_id asset free locked)a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.UpsertAssetBalance do
+defimpl Tai.LogEvent, for: Tai.Events.UpsertAccount do
   def to_data(event) do
     keys =
       event

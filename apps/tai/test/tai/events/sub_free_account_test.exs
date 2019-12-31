@@ -1,8 +1,8 @@
-defmodule Tai.Events.SubFreeAssetBalanceTest do
+defmodule Tai.Events.SubFreeAccountTest do
   use ExUnit.Case, async: true
 
   test ".to_data/1 transforms decimal data to strings" do
-    event = %Tai.Events.SubFreeAssetBalance{
+    event = %Tai.Events.SubFreeAccount{
       venue_id: :my_venue,
       credential_id: :my_credential,
       asset: :btc,
