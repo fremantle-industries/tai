@@ -55,11 +55,10 @@ defmodule Tai.Venue do
 
   @type account :: Tai.Venues.Account.t()
 
-  @deprecated "Use Tai.Venues.Client.asset_balances/2 instead."
-  @spec asset_balances(t, credential_id) ::
-          {:ok, [account]} | {:error, shared_error_reason}
-  def asset_balances(venue, credential_id) do
-    Tai.Venues.Client.asset_balances(venue, credential_id)
+  @deprecated "Use Tai.Venues.Client.accounts/2 instead."
+  @spec accounts(t, credential_id) :: {:ok, [account]} | {:error, shared_error_reason}
+  def accounts(venue, credential_id) do
+    Tai.Venues.Client.accounts(venue, credential_id)
   end
 
   @type position :: Tai.Trading.Position.t()

@@ -1,11 +1,11 @@
-defmodule Tai.VenueAdapters.OkEx.AssetBalancesTest do
+defmodule Tai.VenueAdapters.OkEx.AccountsTest do
   use ExUnit.Case, async: false
   import Mock
   alias Tai.VenueAdapters.OkEx
 
   @credentials %{api_key: "api_key", api_secret: "api_secret"}
 
-  test ".asset_balances hydrates spot, swap & futures balances" do
+  test ".accounts hydrates spot, swap & futures accounts" do
     with_mocks [
       {
         ExOkex.Futures.Private,
@@ -32,8 +32,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalancesTest do
         end
       }
     ] do
-      assert {:ok, accounts} =
-               OkEx.AssetBalances.asset_balances(:venue_a, :credential_a, @credentials)
+      assert {:ok, accounts} = OkEx.Accounts.accounts(:venue_a, :credential_a, @credentials)
 
       assert Enum.count(accounts) == 3
 

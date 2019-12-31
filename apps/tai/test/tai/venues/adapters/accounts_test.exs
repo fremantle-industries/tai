@@ -1,4 +1,4 @@
-defmodule Tai.Venues.Adapters.AssetBalancesTest do
+defmodule Tai.Venues.Adapters.AccountsTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
@@ -17,18 +17,18 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
     :ok
   end
 
-  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_asset_balances()
+  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_accounts()
 
   @test_venues
   |> Enum.map(fn {_, venue} ->
     @venue venue
     @credential_id venue.credentials |> Map.keys() |> List.first()
 
-    test "#{venue.id} returns a list of asset balances" do
+    test "#{venue.id} returns a list of accounts" do
       setup_venue(@venue.id)
 
-      use_cassette "venue_adapters/shared/asset_balances/#{@venue.id}/success" do
-        assert {:ok, accounts} = Tai.Venues.Client.asset_balances(@venue, @credential_id)
+      use_cassette "venue_adapters/shared/accounts/#{@venue.id}/success" do
+        assert {:ok, accounts} = Tai.Venues.Client.accounts(@venue, @credential_id)
         assert Enum.count(accounts) > 0
         assert [%Tai.Venues.Account{} = account | _] = accounts
         assert account.venue_id == @venue.id

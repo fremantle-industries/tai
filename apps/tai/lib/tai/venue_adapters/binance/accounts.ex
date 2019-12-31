@@ -1,10 +1,10 @@
-defmodule Tai.VenueAdapters.Binance.AssetBalances do
-  def asset_balances(venue_id, credential_id, credentials) do
+defmodule Tai.VenueAdapters.Binance.Accounts do
+  def accounts(venue_id, credential_id, credentials) do
     venue_credentials = struct!(ExBinance.Credentials, credentials)
 
-    with {:ok, account} <- ExBinance.Private.account(venue_credentials) do
-      balances = account.balances |> Enum.map(&build(&1, venue_id, credential_id))
-      {:ok, balances}
+    with {:ok, venue_account} <- ExBinance.Private.account(venue_credentials) do
+      accounts = venue_account.balances |> Enum.map(&build(&1, venue_id, credential_id))
+      {:ok, accounts}
     else
       {:error, :receive_window} = error ->
         error

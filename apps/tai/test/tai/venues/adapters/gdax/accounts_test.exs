@@ -1,4 +1,4 @@
-defmodule Tai.Venues.Adapters.Gdax.AssetBalancesTest do
+defmodule Tai.Venues.Adapters.Gdax.AccountsTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
@@ -11,22 +11,22 @@ defmodule Tai.Venues.Adapters.Gdax.AssetBalancesTest do
   end
 
   test "returns an error tuple when the passphrase is invalid", %{venue: venue} do
-    use_cassette "venue_adapters/shared/asset_balances/gdax/error_invalid_passphrase" do
-      assert {:error, {:credentials, reason}} = Tai.Venues.Client.asset_balances(venue, :main)
+    use_cassette "venue_adapters/shared/accounts/gdax/error_invalid_passphrase" do
+      assert {:error, {:credentials, reason}} = Tai.Venues.Client.accounts(venue, :main)
       assert reason == "Invalid Passphrase"
     end
   end
 
   test "returns an error tuple when the api key is invalid", %{venue: venue} do
-    use_cassette "venue_adapters/shared/asset_balances/gdax/error_invalid_api_key" do
-      assert {:error, {:credentials, reason}} = Tai.Venues.Client.asset_balances(venue, :main)
+    use_cassette "venue_adapters/shared/accounts/gdax/error_invalid_api_key" do
+      assert {:error, {:credentials, reason}} = Tai.Venues.Client.accounts(venue, :main)
       assert reason == "Invalid API Key"
     end
   end
 
   test "returns an error tuple when down for maintenance", %{venue: venue} do
-    use_cassette "venue_adapters/shared/asset_balances/gdax/error_maintenance" do
-      assert {:error, reason} = Tai.Venues.Client.asset_balances(venue, :main)
+    use_cassette "venue_adapters/shared/accounts/gdax/error_maintenance" do
+      assert {:error, reason} = Tai.Venues.Client.accounts(venue, :main)
 
       assert reason ==
                {:service_unavailable,

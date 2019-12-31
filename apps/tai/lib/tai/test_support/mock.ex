@@ -5,6 +5,7 @@ defmodule Tai.TestSupport.Mock do
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type asset :: Tai.Venues.Account.asset()
+  @type balance :: Decimal.t() | number | String.t()
 
   @spec mock_product(product | map) :: :ok
   def mock_product(%Tai.Venues.Product{} = product) do
@@ -30,14 +31,8 @@ defmodule Tai.TestSupport.Mock do
     |> Tai.Venues.FeeStore.upsert()
   end
 
-  @spec mock_asset_balance(
-          venue_id,
-          credential_id,
-          asset,
-          free :: number | Decimal.t() | String.t(),
-          locked :: number | Decimal.t() | String.t()
-        ) :: :ok
-  def mock_asset_balance(venue_id, credential_id, asset, free, locked) do
+  @spec mock_account(venue_id, credential_id, asset, balance, balance) :: :ok
+  def mock_account(venue_id, credential_id, asset, free, locked) do
     %Tai.Venues.Account{
       venue_id: venue_id,
       credential_id: credential_id,

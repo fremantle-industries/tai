@@ -1,5 +1,5 @@
-defmodule Tai.VenueAdapters.Gdax.AssetBalances do
-  def asset_balances(venue_id, credential_id, credentials) do
+defmodule Tai.VenueAdapters.Gdax.Accounts do
+  def accounts(venue_id, credential_id, credentials) do
     with {:ok, venue_accounts} <- ExGdax.list_accounts(credentials) do
       accounts =
         venue_accounts

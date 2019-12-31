@@ -14,11 +14,10 @@ defmodule Tai.Venues.Client do
 
   @type account :: Tai.Venues.Account.t()
 
-  @spec asset_balances(venue, credential_id) ::
-          {:ok, [account]} | {:error, shared_error_reason}
-  def asset_balances(venue, credential_id) do
+  @spec accounts(venue, credential_id) :: {:ok, [account]} | {:error, shared_error_reason}
+  def accounts(venue, credential_id) do
     {:ok, credentials} = Map.fetch(venue.credentials, credential_id)
-    venue.adapter.asset_balances(venue.id, credential_id, credentials)
+    venue.adapter.accounts(venue.id, credential_id, credentials)
   end
 
   @type position :: Tai.Trading.Position.t()

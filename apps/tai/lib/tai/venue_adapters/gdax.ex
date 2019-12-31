@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Gdax do
   alias Tai.VenueAdapters.Gdax.{
     StreamSupervisor,
-    AssetBalances,
+    Accounts,
     MakerTakerFees,
     Products
   }
@@ -10,7 +10,7 @@ defmodule Tai.VenueAdapters.Gdax do
 
   def stream_supervisor, do: StreamSupervisor
   defdelegate products(venue_id), to: Products
-  defdelegate asset_balances(venue_id, credential_id, credentials), to: AssetBalances
+  defdelegate accounts(venue_id, credential_id, credentials), to: Accounts
   defdelegate maker_taker_fees(venue_id, credential_id, credentials), to: MakerTakerFees
   def positions(_venue_id, _credential_id, _credentials), do: {:error, :not_supported}
   def create_order(_order, _credentials), do: {:error, :not_implemented}

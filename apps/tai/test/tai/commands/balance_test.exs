@@ -14,9 +14,9 @@ defmodule Tai.Commands.BalanceTest do
   end
 
   test "shows the symbols on each exchange with a non-zero balance" do
-    mock_asset_balance(:test_exchange_a, :main, :btc, 0.1, 1.81227740)
+    mock_account(:test_exchange_a, :main, :btc, 0.1, 1.81227740)
 
-    mock_asset_balance(
+    mock_account(
       :test_exchange_a,
       :main,
       :eth,
@@ -24,11 +24,11 @@ defmodule Tai.Commands.BalanceTest do
       "0.000000000000200000"
     )
 
-    mock_asset_balance(:test_exchange_a, :main, :ltc, "0.00000000", "0.03000000")
+    mock_account(:test_exchange_a, :main, :ltc, "0.00000000", "0.03000000")
 
-    mock_asset_balance(:test_exchange_b, :main, :btc, 0.1, 1.81227740)
+    mock_account(:test_exchange_b, :main, :btc, 0.1, 1.81227740)
 
-    mock_asset_balance(
+    mock_account(
       :test_exchange_b,
       :main,
       :eth,
@@ -36,7 +36,7 @@ defmodule Tai.Commands.BalanceTest do
       "0.000000000000200000"
     )
 
-    mock_asset_balance(:test_exchange_b, :main, :ltc, "0.00000000", "0.03000000")
+    mock_account(:test_exchange_b, :main, :ltc, "0.00000000", "0.03000000")
 
     assert capture_io(&Tai.CommandsHelper.balance/0) == """
            +-----------------+------------+-------+----------------------+----------------------+----------------------+

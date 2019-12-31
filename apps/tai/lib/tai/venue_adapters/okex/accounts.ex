@@ -1,5 +1,5 @@
-defmodule Tai.VenueAdapters.OkEx.AssetBalances do
-  def asset_balances(venue_id, credential_id, credentials) do
+defmodule Tai.VenueAdapters.OkEx.Accounts do
+  def accounts(venue_id, credential_id, credentials) do
     with venue_credentials <- credentials |> to_venue_credentials,
          {:ok, futures} <- fetch_futures(venue_id, credential_id, venue_credentials),
          {:ok, swap} <- fetch_swap(venue_id, credential_id, venue_credentials),
@@ -10,7 +10,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
 
   def fetch_futures(venue_id, credential_id, venue_credentials) do
     with {:ok, %{"info" => info}} <- ExOkex.Futures.Private.list_accounts(venue_credentials) do
-      balances =
+      accounts =
         info
         |> Enum.map(fn {asset, %{"equity" => equity}} ->
           free = Decimal.new(0)
@@ -26,13 +26,13 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
           }
         end)
 
-      {:ok, balances}
+      {:ok, accounts}
     end
   end
 
   def fetch_swap(venue_id, credential_id, venue_credentials) do
     with {:ok, %{"info" => swap_accounts}} <- ExOkex.Swap.Private.list_accounts(venue_credentials) do
-      balances =
+      accounts =
         swap_accounts
         |> Enum.map(fn %{"instrument_id" => instrument_id, "equity" => equity} ->
           asset =
@@ -55,18 +55,22 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
           }
         end)
 
-      {:ok, balances}
+      {:ok, accounts}
     end
   end
 
   def fetch_spot(venue_id, credential_id, venue_credentials) do
     with {:ok, spot_accounts} <- ExOkex.Spot.Private.list_accounts(venue_credentials) do
-      balances =
+      accounts =
         spot_accounts
-        |> Enum.map(fn %{"currency" => currency, "balance" => balance, "available" => available} ->
+        |> Enum.map(fn %{
+                         "currency" => currency,
+                         "balance" => venue_balance,
+                         "available" => available
+                       } ->
           asset = currency |> String.downcase() |> String.to_atom()
           free = available |> Decimal.new()
-          locked = balance |> Decimal.new() |> Decimal.sub(free) |> Decimal.reduce()
+          locked = venue_balance |> Decimal.new() |> Decimal.sub(free) |> Decimal.reduce()
 
           %Tai.Venues.Account{
             venue_id: venue_id,
@@ -78,7 +82,7 @@ defmodule Tai.VenueAdapters.OkEx.AssetBalances do
           }
         end)
 
-      {:ok, balances}
+      {:ok, accounts}
     end
   end
 

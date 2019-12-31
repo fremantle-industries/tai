@@ -1,22 +1,22 @@
-defmodule Tai.VenueAdapters.Bitmex.AssetBalances do
-  def asset_balances(venue_id, credential_id, credentials) do
+defmodule Tai.VenueAdapters.Bitmex.Accounts do
+  def accounts(venue_id, credential_id, credentials) do
     with {:ok, wallet, _rate_limit} <-
            credentials
            |> to_venue_credentials()
            |> ExBitmex.Rest.User.Wallet.get() do
-      balance = build(wallet, venue_id, credential_id)
-      {:ok, [balance]}
+      account = build(wallet, venue_id, credential_id)
+      {:ok, [account]}
     end
   end
 
   @satoshis_per_btc Decimal.new(100_000_000)
+  @zero Decimal.new(0)
 
   def build(
         %ExBitmex.Wallet{currency: "XBt", amount: amount},
         venue_id,
         credential_id
       ) do
-    free = Decimal.new(0)
     locked = amount |> Decimal.new() |> Decimal.div(@satoshis_per_btc) |> Decimal.reduce()
 
     %Tai.Venues.Account{
@@ -24,7 +24,7 @@ defmodule Tai.VenueAdapters.Bitmex.AssetBalances do
       credential_id: credential_id,
       asset: :btc,
       type: "default",
-      free: free,
+      free: @zero,
       locked: locked
     }
   end

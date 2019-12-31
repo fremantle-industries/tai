@@ -2,7 +2,7 @@ defmodule Tai.VenueAdapters.Bitmex do
   alias Tai.VenueAdapters.Bitmex.{
     StreamSupervisor,
     Products,
-    AssetBalances,
+    Accounts,
     Positions,
     CreateOrder,
     AmendOrder,
@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.Bitmex do
 
   def stream_supervisor, do: StreamSupervisor
   defdelegate products(venue_id), to: Products
-  defdelegate asset_balances(venue_id, credential_id, credentials), to: AssetBalances
+  defdelegate accounts(venue_id, credential_id, credentials), to: Accounts
   def maker_taker_fees(_, _, _), do: {:ok, nil}
   defdelegate positions(venue_id, credential_id, credentials), to: Positions
   defdelegate create_order(order, credentials), to: CreateOrder

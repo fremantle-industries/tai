@@ -3,7 +3,7 @@ defmodule Tai.Venues.Boot.Accounts do
 
   @spec hydrate(venue) :: :ok | {:error, reason :: term}
   def hydrate(venue) do
-    venue.accounts
+    venue.credentials
     |> Enum.reduce(
       :ok,
       &fetch_and_upsert(&1, &2, venue)
@@ -11,7 +11,7 @@ defmodule Tai.Venues.Boot.Accounts do
   end
 
   defp fetch_and_upsert({credential_id, _}, :ok, venue) do
-    with {:ok, accounts} <- Tai.Venues.Client.asset_balances(venue, credential_id) do
+    with {:ok, accounts} <- Tai.Venues.Client.accounts(venue, credential_id) do
       Enum.each(accounts, &Tai.Venues.AccountStore.upsert/1)
       :ok
     else
