@@ -29,7 +29,7 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
   @endpoint "wss://real.okex.com:8443/ws/v3"
 
   def init(venue: venue, products: products) do
-    account = venue.accounts |> Map.to_list() |> List.first()
+    credential = venue.credentials |> Map.to_list() |> List.first()
 
     market_quote_children = market_quote_children(products, venue.quote_depth)
     order_book_children = order_book_children(products)
@@ -44,7 +44,7 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
          endpoint: @endpoint,
          venue: venue.id,
          channels: venue.channels,
-         account: account,
+         credential: credential,
          products: products
        ]}
     ]

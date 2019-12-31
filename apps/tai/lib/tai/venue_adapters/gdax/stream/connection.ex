@@ -6,32 +6,32 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   defmodule State do
     @type product :: Tai.Venues.Product.t()
     @type venue_id :: Tai.Venue.id()
-    @type account_id :: Tai.Venue.account_id()
+    @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
     @type route :: :auth | :order_books | :optional_channels
     @type t :: %State{
             venue: venue_id,
             routes: %{required(route) => atom},
             channels: [channel_name],
-            account: {account_id, map} | nil,
+            credential: {credential_id, map} | nil,
             products: [product],
             opts: map
           }
 
     @enforce_keys ~w(venue routes channels products opts)a
-    defstruct ~w(venue routes channels account products opts)a
+    defstruct ~w(venue routes channels credential products opts)a
   end
 
   @type product :: Tai.Venues.Product.t()
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
-  @type account :: Tai.Venue.account()
+  @type credential_id :: Tai.Venue.credential_id()
+  @type credential :: Tai.Venue.credential()
   @type venue_msg :: map
 
   @spec start_link(
           url: String.t(),
           venue: venue_id,
-          account: {account_id, account} | nil,
+          credential: {credential_id, credential} | nil,
           products: [product],
           opts: map
         ) :: {:ok, pid} | {:error, term}
@@ -39,7 +39,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
         url: url,
         venue: venue,
         channels: channels,
-        account: account,
+        credential: credential,
         products: products,
         opts: opts
       ) do
@@ -52,7 +52,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
       venue: venue,
       routes: routes,
       channels: channels,
-      account: account,
+      credential: credential,
       products: products,
       opts: opts
     }

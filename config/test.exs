@@ -19,13 +19,13 @@ config(:tai,
     mock: [
       enabled: true,
       adapter: Tai.VenueAdapters.Mock,
-      accounts: %{main: %{}},
+      credentials: %{main: %{}},
       opts: %{}
     ],
     bitmex: [
       enabled: true,
       adapter: Tai.VenueAdapters.Bitmex,
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "BITMEX_API_KEY"},
           api_secret: {:system_file, "BITMEX_API_SECRET"}
@@ -38,7 +38,7 @@ config(:tai,
     okex: [
       enabled: true,
       adapter: Tai.VenueAdapters.OkEx,
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "OKEX_API_KEY"},
           api_secret: {:system_file, "OKEX_API_SECRET"},
@@ -50,7 +50,7 @@ config(:tai,
     okex_futures: [
       enabled: true,
       adapter: Tai.VenueAdapters.OkEx,
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "OKEX_API_KEY"},
           api_secret: {:system_file, "OKEX_API_SECRET"},
@@ -62,7 +62,7 @@ config(:tai,
     okex_swap: [
       enabled: true,
       adapter: Tai.VenueAdapters.OkEx,
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "OKEX_API_KEY"},
           api_secret: {:system_file, "OKEX_API_SECRET"},
@@ -74,7 +74,7 @@ config(:tai,
     okex_spot: [
       enabled: true,
       adapter: Tai.VenueAdapters.OkEx,
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "OKEX_API_KEY"},
           api_secret: {:system_file, "OKEX_API_SECRET"},
@@ -86,7 +86,7 @@ config(:tai,
     binance: [
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "BINANCE_API_KEY"},
           secret_key: {:system_file, "BINANCE_API_SECRET"}
@@ -96,7 +96,7 @@ config(:tai,
     gdax: [
       enabled: true,
       adapter: Tai.VenueAdapters.Gdax,
-      accounts: %{
+      credentials: %{
         main: %{
           api_url: "https://api-public.sandbox.pro.coinbase.com",
           api_key: {:system_file, "GDAX_API_KEY"},
@@ -150,13 +150,13 @@ config :tai,
       enabled: true,
       adapter: Tai.VenueAdapters.Mock,
       products: "btc_usd ltc_usd",
-      accounts: %{main: %{}}
+      credentials: %{main: %{}}
     ],
     test_exchange_b: [
       enabled: true,
       adapter: Tai.VenueAdapters.Mock,
       products: "eth_usd ltc_usd",
-      accounts: %{main: %{}}
+      credentials: %{main: %{}}
     ]
   }
 

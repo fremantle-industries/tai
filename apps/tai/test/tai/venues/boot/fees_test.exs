@@ -21,8 +21,8 @@ defmodule Tai.Venues.Boot.FeesTest do
 
   @venue_a :venue_a
   @venue_b :venue_b
-  @account_a :account_a
-  @account_b :account_b
+  @credential_a :credential_a
+  @credential_b :credential_b
   @btc_usd_product struct(Tai.Venues.Product, %{
                      venue_id: @venue_a,
                      symbol: :btc_usd,
@@ -44,12 +44,12 @@ defmodule Tai.Venues.Boot.FeesTest do
               venue_a: [
                 enabled: true,
                 adapter: AdapterWithFeeSchedule,
-                accounts: %{} |> Map.put(@account_a, %{})
+                credentials: %{} |> Map.put(@credential_a, %{})
               ],
               venue_b: [
                 enabled: true,
                 adapter: AdapterWithoutFeeSchedule,
-                accounts: %{} |> Map.put(@account_b, %{})
+                credentials: %{} |> Map.put(@credential_b, %{})
               ]
             }
           )
@@ -63,7 +63,7 @@ defmodule Tai.Venues.Boot.FeesTest do
       assert {:ok, btc_usd_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_a,
-                 account_id: @account_a,
+                 account_id: @credential_a,
                  symbol: @btc_usd_product.symbol
                )
 
@@ -79,7 +79,7 @@ defmodule Tai.Venues.Boot.FeesTest do
       assert {:ok, eth_usd_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_a,
-                 account_id: @account_a,
+                 account_id: @credential_a,
                  symbol: @eth_usd_product.symbol
                )
 
@@ -95,7 +95,7 @@ defmodule Tai.Venues.Boot.FeesTest do
       assert {:ok, ltc_usd_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_b,
-                 account_id: @account_b,
+                 account_id: @credential_b,
                  symbol: :ltc_usd
                )
 

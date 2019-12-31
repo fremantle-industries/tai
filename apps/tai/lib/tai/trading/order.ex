@@ -4,7 +4,7 @@ defmodule Tai.Trading.Order do
   @type client_id :: Ecto.UUID.t()
   @type venue_order_id :: String.t()
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
+  @type credential_id :: Tai.Venue.credential_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type product_type :: Tai.Venues.Product.type()
   @type side :: :buy | :sell
@@ -31,7 +31,7 @@ defmodule Tai.Trading.Order do
           client_id: client_id,
           venue_order_id: venue_order_id | nil,
           venue_id: venue_id,
-          account_id: account_id,
+          account_id: credential_id,
           side: side,
           status: status,
           product_symbol: product_symbol,

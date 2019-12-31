@@ -5,33 +5,33 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   defmodule State do
     @type product :: Tai.Venues.Product.t()
     @type venue_id :: Tai.Venue.id()
-    @type account_id :: Tai.Venue.account_id()
+    @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
     @type route :: :auth | :order_books | :optional_channels
     @type t :: %State{
             venue: venue_id,
             routes: %{required(route) => atom},
             channels: [channel_name],
-            account: {account_id, map} | nil,
+            credential: {credential_id, map} | nil,
             products: [product],
             quote_depth: pos_integer,
             opts: map
           }
 
     @enforce_keys ~w(venue routes channels products quote_depth opts)a
-    defstruct ~w(venue routes channels account products quote_depth opts)a
+    defstruct ~w(venue routes channels credential products quote_depth opts)a
   end
 
   @type product :: Tai.Venues.Product.t()
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
-  @type account :: Tai.Venue.account()
+  @type credential_id :: Tai.Venue.credential_id()
+  @type credential :: Tai.Venue.credential()
   @type venue_msg :: map
 
   @spec start_link(
           url: String.t(),
           venue: venue_id,
-          account: {account_id, account} | nil,
+          credential: {credential_id, credential} | nil,
           products: [product],
           quote_depth: pos_integer,
           opts: map
@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
         url: url,
         venue: venue,
         channels: channels,
-        account: account,
+        credential: credential,
         products: products,
         quote_depth: quote_depth,
         opts: opts
@@ -55,14 +55,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
       venue: venue,
       routes: routes,
       channels: channels,
-      account: account,
+      credential: credential,
       products: products,
       quote_depth: quote_depth,
       opts: opts
     }
 
     name = venue |> to_name
-    headers = auth_headers(state.account)
+    headers = auth_headers(state.credential)
     WebSockex.start_link(url, __MODULE__, state, name: name, extra_headers: headers)
   end
 
@@ -93,7 +93,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   def handle_info(:init_subscriptions, state) do
     schedule_heartbeat()
     schedule_autocancel(0)
-    if state.account, do: send(self(), :login)
+    if state.credential, do: send(self(), :login)
     send(self(), {:subscribe, :depth})
 
     state.channels
@@ -217,7 +217,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-  defp auth_headers({_account_id, %{api_key: api_key, api_secret: api_secret}}) do
+  defp auth_headers({_credential_id, %{api_key: api_key, api_secret: api_secret}}) do
     nonce = ExBitmex.Auth.nonce()
     api_signature = ExBitmex.Auth.sign(api_secret, "GET", "/realtime", nonce, "")
 

@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   @base_url "wss://stream.binance.com:9443/stream"
 
   def init(venue: venue, products: products) do
-    account = venue.accounts |> Map.to_list() |> List.first()
+    credential = venue.credentials |> Map.to_list() |> List.first()
 
     market_quote_children = market_quote_children(products, venue.quote_depth)
     order_book_children = order_book_children(products)
@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
        [
          url: url(products, venue.channels),
          venue_id: venue.id,
-         account: account,
+         credential: credential,
          products: products
        ]}
     ]

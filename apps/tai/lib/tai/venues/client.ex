@@ -3,7 +3,7 @@ defmodule Tai.Venues.Client do
   alias Tai.Trading.{Order, OrderResponses}
 
   @type venue :: Tai.Venue.t()
-  @type account_id :: Tai.Venue.account_id()
+  @type credential_id :: Tai.Venue.credential_id()
   @type order :: Order.t()
   @type shared_error_reason :: Adapter.shared_error_reason()
 
@@ -14,28 +14,28 @@ defmodule Tai.Venues.Client do
 
   @type asset_balance :: Tai.Venues.AssetBalance.t()
 
-  @spec asset_balances(venue, account_id) ::
+  @spec asset_balances(venue, credential_id) ::
           {:ok, [asset_balance]} | {:error, shared_error_reason}
-  def asset_balances(venue, account_id) do
-    {:ok, credentials} = Map.fetch(venue.accounts, account_id)
-    venue.adapter.asset_balances(venue.id, account_id, credentials)
+  def asset_balances(venue, credential_id) do
+    {:ok, credentials} = Map.fetch(venue.credentials, credential_id)
+    venue.adapter.asset_balances(venue.id, credential_id, credentials)
   end
 
   @type position :: Tai.Trading.Position.t()
   @type positions_error_reason :: Adapter.positions_error_reason()
 
-  @spec positions(venue, account_id) :: {:ok, [position]} | {:error, positions_error_reason}
-  def positions(venue, account_id) do
-    {:ok, credentials} = Map.fetch(venue.accounts, account_id)
-    venue.adapter.positions(venue.id, account_id, credentials)
+  @spec positions(venue, credential_id) :: {:ok, [position]} | {:error, positions_error_reason}
+  def positions(venue, credential_id) do
+    {:ok, credentials} = Map.fetch(venue.credentials, credential_id)
+    venue.adapter.positions(venue.id, credential_id, credentials)
   end
 
-  @spec maker_taker_fees(venue, account_id) ::
+  @spec maker_taker_fees(venue, credential_id) ::
           {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil}
           | {:error, shared_error_reason}
-  def maker_taker_fees(venue, account_id) do
-    {:ok, credentials} = Map.fetch(venue.accounts, account_id)
-    venue.adapter.maker_taker_fees(venue.id, account_id, credentials)
+  def maker_taker_fees(venue, credential_id) do
+    {:ok, credentials} = Map.fetch(venue.credentials, credential_id)
+    venue.adapter.maker_taker_fees(venue.id, credential_id, credentials)
   end
 
   @type create_response :: OrderResponses.Create.t() | OrderResponses.CreateAccepted.t()
@@ -83,7 +83,7 @@ defmodule Tai.Venues.Client do
 
   defp find_venue_and_credentials(order, venues) do
     venue = venues |> Map.fetch!(order.venue_id)
-    credentials = Map.fetch!(venue.accounts, order.account_id)
+    credentials = Map.fetch!(venue.credentials, order.account_id)
 
     {venue, credentials}
   end

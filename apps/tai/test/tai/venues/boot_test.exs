@@ -17,7 +17,7 @@ defmodule Tai.Venues.BootTest do
   end
 
   @venue_id :mock_boot
-  @account_id :main
+  @credential_id :main
   @timeout 5000
 
   describe ".run success" do
@@ -27,7 +27,7 @@ defmodule Tai.Venues.BootTest do
              id: @venue_id,
              adapter: Tai.VenueAdapters.Mock,
              products: "* -ltc_usdt",
-             accounts: %{main: %{}},
+             credentials: %{main: %{}},
              timeout: @timeout
            })
 
@@ -45,21 +45,21 @@ defmodule Tai.Venues.BootTest do
       assert {:ok, btc_balance} =
                Tai.Venues.AssetBalanceStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @account_id,
+                 account_id: @credential_id,
                  asset: :btc
                )
 
       assert {:ok, eth_balance} =
                Tai.Venues.AssetBalanceStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @account_id,
+                 account_id: @credential_id,
                  asset: :eth
                )
 
       assert {:ok, ltc_balance} =
                Tai.Venues.AssetBalanceStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @account_id,
+                 account_id: @credential_id,
                  asset: :ltc
                )
 
@@ -77,21 +77,21 @@ defmodule Tai.Venues.BootTest do
       assert {:ok, btc_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @account_id,
+                 account_id: @credential_id,
                  symbol: :btc_usdt
                )
 
       assert {:ok, eth_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @account_id,
+                 account_id: @credential_id,
                  symbol: :eth_usdt
                )
 
       assert {:error, :not_found} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @account_id,
+                 account_id: @credential_id,
                  symbol: :ltc_usdt
                )
     end
@@ -104,7 +104,7 @@ defmodule Tai.Venues.BootTest do
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",
-          accounts: %{},
+          credentials: %{},
           timeout: @timeout
         })
 
@@ -124,7 +124,7 @@ defmodule Tai.Venues.BootTest do
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",
-          accounts: %{main: %{}},
+          credentials: %{main: %{}},
           timeout: @timeout
         })
 
@@ -144,7 +144,7 @@ defmodule Tai.Venues.BootTest do
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",
-          accounts: %{main: %{}},
+          credentials: %{main: %{}},
           timeout: @timeout
         })
 
@@ -169,17 +169,17 @@ defmodule Tai.Venues.BootTest do
   end
 
   def mock_maker_taker_fees(_) do
-    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_venue_and_account(
+    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_venue_and_credential(
       @venue_id,
-      @account_id,
+      @credential_id,
       {Decimal.new("0.001"), Decimal.new("0.001")}
     )
   end
 
   def mock_asset_balances(_) do
-    Tai.TestSupport.Mocks.Responses.AssetBalances.for_venue_and_account(
+    Tai.TestSupport.Mocks.Responses.AssetBalances.for_venue_and_credential(
       @venue_id,
-      @account_id,
+      @credential_id,
       [
         %{asset: :btc, free: Decimal.new("0.1"), locked: Decimal.new("0.2")},
         %{asset: :eth, free: Decimal.new("0.3"), locked: Decimal.new("0.4")},

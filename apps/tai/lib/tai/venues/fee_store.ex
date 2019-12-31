@@ -2,7 +2,7 @@ defmodule Tai.Venues.FeeStore do
   use GenServer
 
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
+  @type credential_id :: Tai.Venue.credential_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type fee_info :: Tai.Venues.FeeInfo.t()
 
@@ -44,7 +44,7 @@ defmodule Tai.Venues.FeeStore do
     GenServer.call(__MODULE__, :clear)
   end
 
-  @spec find_by(venue_id: venue_id, account_id: account_id, symbol: product_symbol) ::
+  @spec find_by(venue_id: venue_id, account_id: credential_id, symbol: product_symbol) ::
           {:ok, fee_info} | {:error, :not_found}
   def find_by(venue_id: venue_id, account_id: account_id, symbol: symbol) do
     with key <- {venue_id, account_id, symbol},

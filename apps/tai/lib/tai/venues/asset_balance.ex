@@ -1,10 +1,10 @@
 defmodule Tai.Venues.AssetBalance do
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
+  @type credential_id :: Tai.Venue.credential_id()
   @type asset :: atom
   @type t :: %Tai.Venues.AssetBalance{
           venue_id: venue_id,
-          account_id: account_id,
+          account_id: credential_id,
           asset: asset,
           type: String.t(),
           free: Decimal.t(),

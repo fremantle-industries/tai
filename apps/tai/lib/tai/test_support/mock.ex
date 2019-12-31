@@ -3,7 +3,7 @@ defmodule Tai.TestSupport.Mock do
   @type product :: Tai.Venues.Product.t()
   @type fee_info :: Tai.Venues.FeeInfo.t()
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
+  @type credential_id :: Tai.Venue.credential_id()
   @type asset :: Tai.Venues.AssetBalance.asset()
 
   @spec mock_product(product | map) :: :ok
@@ -32,15 +32,15 @@ defmodule Tai.TestSupport.Mock do
 
   @spec mock_asset_balance(
           venue_id,
-          account_id,
+          credential_id,
           asset,
           free :: number | Decimal.t() | String.t(),
           locked :: number | Decimal.t() | String.t()
         ) :: :ok
-  def mock_asset_balance(venue_id, account_id, asset, free, locked) do
+  def mock_asset_balance(venue_id, credential_id, asset, free, locked) do
     %Tai.Venues.AssetBalance{
       venue_id: venue_id,
-      account_id: account_id,
+      account_id: credential_id,
       type: "default",
       asset: asset,
       free: free |> Decimal.cast(),

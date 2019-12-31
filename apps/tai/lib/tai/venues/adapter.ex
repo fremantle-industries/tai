@@ -3,8 +3,8 @@ defmodule Tai.Venues.Adapter do
 
   @type t :: module
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
-  @type credentials :: map
+  @type credential_id :: Tai.Venue.credential_id()
+  @type credentials :: Tai.Venue.credentials()
   @type product :: Tai.Venues.Product.t()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type position :: Tai.Trading.Position.t()
@@ -36,11 +36,11 @@ defmodule Tai.Venues.Adapter do
 
   @callback stream_supervisor :: module
   @callback products(venue_id) :: {:ok, [product]} | {:error, shared_error_reason}
-  @callback asset_balances(venue_id, account_id, credentials) ::
+  @callback asset_balances(venue_id, credential_id, credentials) ::
               {:ok, [asset_balance]} | {:error, shared_error_reason}
-  @callback positions(venue_id, account_id, credentials) ::
+  @callback positions(venue_id, credential_id, credentials) ::
               {:ok, [position]} | {:error, positions_error_reason}
-  @callback maker_taker_fees(venue_id, account_id, credentials) ::
+  @callback maker_taker_fees(venue_id, credential_id, credentials) ::
               {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil}
               | {:error, shared_error_reason}
   @callback create_order(order, credentials) ::

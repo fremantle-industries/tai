@@ -3,7 +3,7 @@ defmodule Tai.Venues.AssetBalanceStore do
   use GenServer
 
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
+  @type credential_id :: Tai.Venue.credential_id()
   @type asset :: Tai.Venues.AssetBalance.asset()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type lock_request :: AssetBalanceStore.LockRequest.t()
@@ -188,7 +188,7 @@ defmodule Tai.Venues.AssetBalanceStore do
     GenServer.call(__MODULE__, {:upsert, balance})
   end
 
-  @spec add(venue_id, account_id, asset, val :: number | String.t() | Decimal.t()) ::
+  @spec add(venue_id, credential_id, asset, val :: number | String.t() | Decimal.t()) ::
           modify_result
   def add(venue_id, account_id, asset, val)
 
@@ -203,7 +203,7 @@ defmodule Tai.Venues.AssetBalanceStore do
     add(venue_id, account_id, asset, Decimal.cast(val))
   end
 
-  @spec sub(venue_id, account_id, asset, val :: number | String.t() | Decimal.t()) ::
+  @spec sub(venue_id, credential_id, asset, val :: number | String.t() | Decimal.t()) ::
           modify_result
   def sub(venue_id, account_id, asset, val)
 

@@ -22,15 +22,15 @@ defmodule Tai.Venues.Adapters.PositionsTest do
   @test_venues
   |> Enum.map(fn {_, venue} ->
     @venue venue
-    @account_id venue.accounts |> Map.keys() |> List.first()
+    @credential_id venue.credentials |> Map.keys() |> List.first()
 
     test "#{venue.id} returns a list of positions" do
       use_cassette "venue_adapters/shared/positions/#{@venue.id}/success" do
-        assert {:ok, positions} = Tai.Venues.Client.positions(@venue, @account_id)
+        assert {:ok, positions} = Tai.Venues.Client.positions(@venue, @credential_id)
         assert Enum.count(positions) > 0
         assert [position | _] = positions
         assert position.venue_id == @venue.id
-        assert position.account_id == @account_id
+        assert position.account_id == @credential_id
         assert position.product_symbol != nil
         assert Enum.all?(positions, fn %type{} -> type == Tai.Trading.Position end) == true
       end

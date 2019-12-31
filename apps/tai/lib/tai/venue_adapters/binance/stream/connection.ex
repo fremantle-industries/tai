@@ -16,16 +16,16 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
   @type product :: Tai.Venues.Product.t()
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
-  @type account :: Tai.Venue.account()
+  @type credential_id :: Tai.Venue.credential_id()
+  @type credential :: Tai.Venue.credential()
 
   @spec start_link(
           url: String.t(),
           venue_id: venue_id,
-          account: {account_id, account} | nil,
+          credential: {credential_id, credential} | nil,
           products: [product]
         ) :: {:ok, pid}
-  def start_link(url: url, venue_id: venue_id, account: _, products: products) do
+  def start_link(url: url, venue_id: venue_id, credential: _, products: products) do
     routes = %{
       order_books: venue_id |> Stream.RouteOrderBooks.to_name(),
       optional_channels: venue_id |> Stream.ProcessOptionalChannels.to_name()

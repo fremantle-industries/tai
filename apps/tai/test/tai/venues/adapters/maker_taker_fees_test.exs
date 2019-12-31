@@ -13,20 +13,20 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
   @test_venues
   |> Enum.map(fn {_, venue} ->
     @venue venue
-    @account_id venue.accounts |> Map.keys() |> List.first()
+    @credential_id venue.credentials |> Map.keys() |> List.first()
 
     test "#{venue.id} returns a list of asset balances" do
       setup_adapter(@venue.id)
 
       use_cassette "venue_adapters/shared/maker_taker_fees/#{@venue.id}/success" do
-        assert {:ok, fees} = Tai.Venues.Client.maker_taker_fees(@venue, @account_id)
+        assert {:ok, fees} = Tai.Venues.Client.maker_taker_fees(@venue, @credential_id)
         assert {%Decimal{} = maker, %Decimal{} = taker} = fees
       end
     end
   end)
 
   def setup_adapter(:mock) do
-    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_venue_and_account(
+    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_venue_and_credential(
       :mock,
       :main,
       {Decimal.new("0.001"), Decimal.new("0.001")}
