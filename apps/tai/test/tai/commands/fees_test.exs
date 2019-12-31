@@ -13,10 +13,10 @@ defmodule Tai.Commands.FeesTest do
     :ok
   end
 
-  test "show the accounts maker/taker fees for every product on each exchange" do
+  test "show the maker/taker fees for every product on each exchange" do
     mock_fee_info(%{
       venue_id: :test_exchange_a,
-      account_id: :main,
+      credential_id: :main,
       symbol: :btc_usd,
       maker: Decimal.new("-0.0005"),
       maker_type: Tai.Venues.FeeInfo.percent(),
@@ -26,7 +26,7 @@ defmodule Tai.Commands.FeesTest do
 
     mock_fee_info(%{
       venue_id: :test_exchange_b,
-      account_id: :main,
+      credential_id: :main,
       symbol: :eth_usd,
       maker: Decimal.new(0),
       maker_type: Tai.Venues.FeeInfo.percent(),
@@ -36,7 +36,7 @@ defmodule Tai.Commands.FeesTest do
 
     assert capture_io(&Tai.CommandsHelper.fees/0) == """
            +-----------------+------------+---------+--------+-------+
-           |           Venue | Account ID |  Symbol |  Maker | Taker |
+           |           Venue | Credential |  Symbol |  Maker | Taker |
            +-----------------+------------+---------+--------+-------+
            | test_exchange_a |       main | btc_usd | -0.05% |  0.2% |
            | test_exchange_b |       main | eth_usd |     0% |  0.1% |
@@ -47,7 +47,7 @@ defmodule Tai.Commands.FeesTest do
   test "shows an empty table when there are no fees" do
     assert capture_io(&Tai.CommandsHelper.fees/0) == """
            +-------+------------+--------+-------+-------+
-           | Venue | Account ID | Symbol | Maker | Taker |
+           | Venue | Credential | Symbol | Maker | Taker |
            +-------+------------+--------+-------+-------+
            |     - |          - |      - |     - |     - |
            +-------+------------+--------+-------+-------+\n

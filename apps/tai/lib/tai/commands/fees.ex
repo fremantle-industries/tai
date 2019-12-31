@@ -7,7 +7,7 @@ defmodule Tai.Commands.Fees do
 
   @header [
     "Venue",
-    "Account ID",
+    "Credential",
     "Symbol",
     "Maker",
     "Taker"
@@ -26,7 +26,7 @@ defmodule Tai.Commands.Fees do
     |> Enum.map(fn fee_info ->
       [
         fee_info.venue_id,
-        fee_info.account_id,
+        fee_info.credential_id,
         fee_info.symbol,
         {fee_info.maker, fee_info.maker_type},
         {fee_info.taker, fee_info.taker_type}

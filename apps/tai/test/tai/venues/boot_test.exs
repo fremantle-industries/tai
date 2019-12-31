@@ -77,21 +77,21 @@ defmodule Tai.Venues.BootTest do
       assert {:ok, btc_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @credential_id,
+                 credential_id: @credential_id,
                  symbol: :btc_usdt
                )
 
       assert {:ok, eth_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @credential_id,
+                 credential_id: @credential_id,
                  symbol: :eth_usdt
                )
 
       assert {:error, :not_found} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_id,
-                 account_id: @credential_id,
+                 credential_id: @credential_id,
                  symbol: :ltc_usdt
                )
     end

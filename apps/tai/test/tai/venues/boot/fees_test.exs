@@ -63,7 +63,7 @@ defmodule Tai.Venues.Boot.FeesTest do
       assert {:ok, btc_usd_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_a,
-                 account_id: @credential_a,
+                 credential_id: @credential_a,
                  symbol: @btc_usd_product.symbol
                )
 
@@ -79,7 +79,7 @@ defmodule Tai.Venues.Boot.FeesTest do
       assert {:ok, eth_usd_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_a,
-                 account_id: @credential_a,
+                 credential_id: @credential_a,
                  symbol: @eth_usd_product.symbol
                )
 
@@ -95,7 +95,7 @@ defmodule Tai.Venues.Boot.FeesTest do
       assert {:ok, ltc_usd_fee} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: @venue_b,
-                 account_id: @credential_b,
+                 credential_id: @credential_b,
                  symbol: :ltc_usd
                )
 

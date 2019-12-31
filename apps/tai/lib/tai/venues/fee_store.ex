@@ -22,7 +22,7 @@ defmodule Tai.Venues.FeeStore do
   end
 
   def handle_call({:upsert, fee_info}, _from, state) do
-    key = {fee_info.venue_id, fee_info.account_id, fee_info.symbol}
+    key = {fee_info.venue_id, fee_info.credential_id, fee_info.symbol}
     record = {key, fee_info}
     :ets.insert(__MODULE__, record)
     {:reply, :ok, state}
@@ -44,10 +44,10 @@ defmodule Tai.Venues.FeeStore do
     GenServer.call(__MODULE__, :clear)
   end
 
-  @spec find_by(venue_id: venue_id, account_id: credential_id, symbol: product_symbol) ::
+  @spec find_by(venue_id: venue_id, credential_id: credential_id, symbol: product_symbol) ::
           {:ok, fee_info} | {:error, :not_found}
-  def find_by(venue_id: venue_id, account_id: account_id, symbol: symbol) do
-    with key <- {venue_id, account_id, symbol},
+  def find_by(venue_id: venue_id, credential_id: credential_id, symbol: symbol) do
+    with key <- {venue_id, credential_id, symbol},
          [[%Tai.Venues.FeeInfo{} = fee_info]] <- :ets.match(__MODULE__, {key, :"$1"}) do
       {:ok, fee_info}
     else

@@ -38,7 +38,7 @@ defmodule Tai.Venues.Boot.Fees do
   defp upsert_product(product, venue_id, credential_id, maker, taker) do
     %Tai.Venues.FeeInfo{
       venue_id: venue_id,
-      account_id: credential_id,
+      credential_id: credential_id,
       symbol: product.symbol,
       maker: maker,
       maker_type: :percent,

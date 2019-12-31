@@ -29,9 +29,9 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def maker_taker_fees(venue_id, account_id, _credentials) do
+  def maker_taker_fees(venue_id, credential_id, _credentials) do
     with_mock_server(fn ->
-      {:maker_taker_fees, venue_id, account_id}
+      {:maker_taker_fees, venue_id, credential_id}
       |> Mocks.Server.eject()
       |> case do
         {:ok, fees} -> {:ok, fees}

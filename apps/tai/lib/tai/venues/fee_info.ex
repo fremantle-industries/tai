@@ -5,7 +5,7 @@ defmodule Tai.Venues.FeeInfo do
   @type fee_type :: :percent
   @type t :: %Tai.Venues.FeeInfo{
           venue_id: venue_id,
-          account_id: credential_id,
+          credential_id: credential_id,
           symbol: symbol,
           maker: Decimal.t(),
           maker_type: fee_type,
@@ -15,7 +15,7 @@ defmodule Tai.Venues.FeeInfo do
 
   @enforce_keys ~w(
     venue_id
-    account_id
+    credential_id
     symbol
     maker
     maker_type
@@ -24,7 +24,7 @@ defmodule Tai.Venues.FeeInfo do
   )a
   defstruct ~w(
     venue_id
-    account_id
+    credential_id
     symbol
     maker
     maker_type
