@@ -103,7 +103,7 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def positions(_venue_id, _account_id, _credentials) do
+  def positions(_venue_id, _credential_id, _credentials) do
     {:error, :not_supported}
   end
 end

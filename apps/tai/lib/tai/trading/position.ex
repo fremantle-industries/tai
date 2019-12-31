@@ -6,7 +6,7 @@ defmodule Tai.Trading.Position do
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type t :: %Position{
           venue_id: venue_id,
-          account_id: credential_id,
+          credential_id: credential_id,
           product_symbol: product_symbol,
           side: :long | :short,
           qty: Decimal.t(),
@@ -17,7 +17,7 @@ defmodule Tai.Trading.Position do
 
   @enforce_keys ~w(
     venue_id
-    account_id
+    credential_id
     product_symbol
     side
     qty
@@ -27,7 +27,7 @@ defmodule Tai.Trading.Position do
   )a
   defstruct ~w(
     venue_id
-    account_id
+    credential_id
     product_symbol
     side
     qty

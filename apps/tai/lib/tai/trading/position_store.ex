@@ -38,7 +38,7 @@ defmodule Tai.Trading.PositionStore do
   end
 
   defp insert(position) do
-    key = {position.venue_id, position.account_id, position.product_symbol}
+    key = {position.venue_id, position.credential_id, position.product_symbol}
     record = {key, position}
     :ets.insert(__MODULE__, record)
   end

@@ -12,13 +12,13 @@ defmodule Tai.Trading.PositionStoreTest do
   end
 
   describe ".add" do
-    test "inserts the position keyed by venue id, account id & product symbol" do
+    test "inserts the position keyed by venue, credential & product symbol" do
       position = build_position()
 
       assert {:ok, %Tai.Trading.Position{}} = Tai.Trading.PositionStore.add(position)
 
-      assert [{{:my_venue, :my_account, :xbt_usd}, stored_position}] =
-               :ets.lookup(Tai.Trading.PositionStore, {:my_venue, :my_account, :xbt_usd})
+      assert [{{:my_venue, :my_credential, :xbt_usd}, stored_position}] =
+               :ets.lookup(Tai.Trading.PositionStore, {:my_venue, :my_credential, :xbt_usd})
 
       assert stored_position == position
     end
@@ -35,7 +35,7 @@ defmodule Tai.Trading.PositionStoreTest do
   defp build_position do
     struct(Tai.Trading.Position, %{
       venue_id: :my_venue,
-      account_id: :my_account,
+      credential_id: :my_credential,
       product_symbol: :xbt_usd
     })
   end

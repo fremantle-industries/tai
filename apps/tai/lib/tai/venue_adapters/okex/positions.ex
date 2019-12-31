@@ -1,14 +1,14 @@
 defmodule Tai.VenueAdapters.OkEx.Positions do
-  def positions(venue_id, account_id, credentials) do
+  def positions(venue_id, credential_id, credentials) do
     venue_credentials = to_venue_credentials(credentials)
 
     with {:ok, swap_venue_positions} <- ExOkex.Swap.Private.list_positions(venue_credentials),
          {:ok, futures_venue_positions} <-
            ExOkex.Futures.Private.list_positions(venue_credentials) do
-      swap_positions = swap_venue_positions |> Enum.map(&build_swap(&1, venue_id, account_id))
+      swap_positions = swap_venue_positions |> Enum.map(&build_swap(&1, venue_id, credential_id))
 
       futures_positions =
-        futures_venue_positions |> Enum.flat_map(&build_futures(&1, venue_id, account_id))
+        futures_venue_positions |> Enum.flat_map(&build_futures(&1, venue_id, credential_id))
 
       positions = swap_positions ++ futures_positions
 
@@ -21,10 +21,10 @@ defmodule Tai.VenueAdapters.OkEx.Positions do
 
   defp to_venue_credentials(credentials), do: struct(ExOkex.Config, credentials)
 
-  def build_swap(venue_position, venue_id, account_id) do
+  def build_swap(venue_position, venue_id, credential_id) do
     %Tai.Trading.Position{
       venue_id: venue_id,
-      account_id: account_id,
+      credential_id: credential_id,
       product_symbol: venue_position |> product_symbol(),
       side: venue_position |> swap_side(),
       qty: venue_position.position |> Decimal.new(),
@@ -34,17 +34,17 @@ defmodule Tai.VenueAdapters.OkEx.Positions do
     }
   end
 
-  defp build_futures(venue_position, venue_id, account_id) do
+  defp build_futures(venue_position, venue_id, credential_id) do
     [
-      build_long_future(venue_position, venue_id, account_id),
-      build_short_future(venue_position, venue_id, account_id)
+      build_long_future(venue_position, venue_id, credential_id),
+      build_short_future(venue_position, venue_id, credential_id)
     ]
   end
 
-  def build_long_future(venue_position, venue_id, account_id) do
+  def build_long_future(venue_position, venue_id, credential_id) do
     %Tai.Trading.Position{
       venue_id: venue_id,
-      account_id: account_id,
+      credential_id: credential_id,
       product_symbol: venue_position |> product_symbol(),
       side: :long,
       qty: venue_position |> futures_qty(:long),
@@ -54,10 +54,10 @@ defmodule Tai.VenueAdapters.OkEx.Positions do
     }
   end
 
-  def build_short_future(venue_position, venue_id, account_id) do
+  def build_short_future(venue_position, venue_id, credential_id) do
     %Tai.Trading.Position{
       venue_id: venue_id,
-      account_id: account_id,
+      credential_id: credential_id,
       product_symbol: venue_position |> product_symbol(),
       side: :short,
       qty: venue_position |> futures_qty(:short),

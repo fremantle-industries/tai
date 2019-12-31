@@ -7,7 +7,7 @@ defmodule Tai.Commands.Positions do
 
   @header [
     "Venue",
-    "Account",
+    "Credential",
     "Product",
     "Side",
     "Qty",
@@ -23,7 +23,7 @@ defmodule Tai.Commands.Positions do
     |> Enum.map(fn position ->
       [
         position.venue_id,
-        position.account_id,
+        position.credential_id,
         position.product_symbol,
         position.side,
         position.qty,

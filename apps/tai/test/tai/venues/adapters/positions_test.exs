@@ -30,7 +30,7 @@ defmodule Tai.Venues.Adapters.PositionsTest do
         assert Enum.count(positions) > 0
         assert [position | _] = positions
         assert position.venue_id == @venue.id
-        assert position.account_id == @credential_id
+        assert position.credential_id == @credential_id
         assert position.product_symbol != nil
         assert Enum.all?(positions, fn %type{} -> type == Tai.Trading.Position end) == true
       end
