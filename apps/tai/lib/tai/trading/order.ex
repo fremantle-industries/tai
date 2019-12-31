@@ -31,7 +31,7 @@ defmodule Tai.Trading.Order do
           client_id: client_id,
           venue_order_id: venue_order_id | nil,
           venue_id: venue_id,
-          account_id: credential_id,
+          credential_id: credential_id,
           side: side,
           status: status,
           product_symbol: product_symbol,
@@ -53,7 +53,7 @@ defmodule Tai.Trading.Order do
 
   @enforce_keys ~w(
     venue_id
-    account_id
+    credential_id
     client_id
     enqueued_at
     price
@@ -72,7 +72,7 @@ defmodule Tai.Trading.Order do
     client_id
     error_reason
     venue_id
-    account_id
+    credential_id
     price
     venue_order_id
     side

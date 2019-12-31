@@ -40,7 +40,7 @@ defmodule Tai.Venues.Adapters.CreateOrderCloseTest do
     struct(Tai.Trading.Order, %{
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: venue_id |> product_symbol,
       product_type: venue_id |> product_type,
       side: side,

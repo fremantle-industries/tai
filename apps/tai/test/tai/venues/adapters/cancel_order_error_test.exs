@@ -153,7 +153,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
     struct(
       Tai.Trading.Order,
       venue_id: venue_id,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: venue_id |> product_symbol,
       product_type: venue_id |> product_type,
       venue_order_id: "1"
@@ -164,7 +164,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
     struct(Tai.Trading.Order, %{
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: venue_id |> product_symbol,
       product_type: venue_id |> product_type,
       side: :buy,
@@ -180,7 +180,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
     struct(Tai.Trading.Order, %{
       venue_order_id: order_response.id,
       venue_id: order.venue_id,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: order.venue_id |> product_symbol,
       product_type: order.venue_id |> product_type,
       side: :buy,

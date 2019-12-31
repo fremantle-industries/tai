@@ -1,5 +1,7 @@
 defmodule Tai.Events.OrderUpdated do
   @type client_id :: Tai.Trading.Order.client_id()
+  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type credential_id :: Tai.Venues.Adapter.credential_id()
   @type side :: Tai.Trading.Order.side()
   @type type :: Tai.Trading.Order.type()
   @type time_in_force :: Tai.Trading.Order.time_in_force()
@@ -7,8 +9,8 @@ defmodule Tai.Events.OrderUpdated do
   @type product_type :: Tai.Venues.Product.type()
   @type t :: %Tai.Events.OrderUpdated{
           client_id: client_id,
-          venue_id: atom,
-          account_id: atom,
+          venue_id: venue_id,
+          credential_id: credential_id,
           venue_order_id: String.t() | nil,
           product_symbol: atom,
           product_type: product_type,
@@ -30,7 +32,7 @@ defmodule Tai.Events.OrderUpdated do
   @enforce_keys ~w(
     client_id
     venue_id
-    account_id
+    credential_id
     product_symbol
     product_type
     side
@@ -46,7 +48,7 @@ defmodule Tai.Events.OrderUpdated do
   defstruct ~w(
     client_id
     venue_id
-    account_id
+    credential_id
     product_symbol
     product_type
     venue_order_id

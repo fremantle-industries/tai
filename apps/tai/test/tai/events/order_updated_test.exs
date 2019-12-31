@@ -4,7 +4,7 @@ defmodule Tai.Events.OrderUpdatedTest do
   @base_attrs %{
     client_id: "my_client_id",
     venue_id: :my_venue,
-    account_id: :my_account,
+    credential_id: :my_credential,
     product_symbol: :btc,
     product_type: :spot,
     side: :buy,
@@ -28,7 +28,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert %{} = json = Tai.LogEvent.to_data(event)
     assert json.client_id == "my_client_id"
     assert json.venue_id == :my_venue
-    assert json.account_id == :my_account
+    assert json.credential_id == :my_credential
     assert json.venue_order_id == "abc123"
     assert json.last_received_at == nil
     assert json.product_symbol == :btc

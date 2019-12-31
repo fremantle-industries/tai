@@ -83,7 +83,7 @@ defmodule Tai.Venues.Client do
 
   defp find_venue_and_credentials(order, venues) do
     venue = venues |> Map.fetch!(order.venue_id)
-    credentials = Map.fetch!(venue.credentials, order.account_id)
+    credentials = Map.fetch!(venue.credentials, order.credential_id)
 
     {venue, credentials}
   end

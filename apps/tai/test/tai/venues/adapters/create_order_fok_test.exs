@@ -63,7 +63,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
     struct(Tai.Trading.Order, %{
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
-      account_id: :main,
+      credential_id: :main,
       symbol: venue_id |> product_symbol,
       side: side,
       price: venue_id |> price(side, time_in_force, action),

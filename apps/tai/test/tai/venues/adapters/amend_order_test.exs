@@ -191,7 +191,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
     struct(Tai.Trading.Order, %{
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: venue_id |> product_symbol,
       side: side,
       price: venue_id |> price(side),
@@ -206,7 +206,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
     struct(Tai.Trading.Order, %{
       venue_order_id: amend_response.id,
       venue_id: order.venue_id,
-      account_id: :main,
+      credential_id: :main,
       product_symbol: order.venue_id |> product_symbol,
       side: order.side,
       price: order.venue_id |> price(order.side),

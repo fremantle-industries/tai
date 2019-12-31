@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Auth do
   @path "/users/self/verify"
 
   def args({
-        _account_id,
+        _credential_id,
         %{api_key: api_key, api_secret: api_secret, api_passphrase: api_passphrase}
       }) do
     timestamp = ExOkex.Auth.timestamp()

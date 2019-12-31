@@ -7,7 +7,7 @@ defmodule Tai.Commands.Orders do
 
   @header [
     "Venue",
-    "Account",
+    "Credential",
     "Product Symbol",
     "Product Type",
     "Side",
@@ -34,7 +34,7 @@ defmodule Tai.Commands.Orders do
     |> Enum.map(fn order ->
       [
         order.venue_id,
-        order.account_id,
+        order.credential_id,
         order.product_symbol,
         order.product_type,
         order.side,
