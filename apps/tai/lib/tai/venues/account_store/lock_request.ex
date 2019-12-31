@@ -1,10 +1,10 @@
-defmodule Tai.Venues.AssetBalanceStore.LockRequest do
-  alias Tai.Venues.AssetBalanceStore
+defmodule Tai.Venues.AccountStore.LockRequest do
+  alias Tai.Venues.AccountStore
 
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
-  @type asset :: Tai.Venues.AssetBalance.asset()
-  @type t :: %AssetBalanceStore.LockRequest{
+  @type asset :: Tai.Venues.Account.asset()
+  @type t :: %AccountStore.LockRequest{
           venue_id: venue_id,
           credential_id: credential_id,
           asset: asset,

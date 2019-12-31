@@ -1,17 +1,17 @@
-defmodule Tai.Venues.AssetBalanceStore do
-  alias Tai.Venues.AssetBalanceStore
+defmodule Tai.Venues.AccountStore do
+  alias Tai.Venues.AccountStore
   use GenServer
 
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type asset :: Tai.Venues.Account.asset()
   @type account :: Tai.Venues.Account.t()
-  @type lock_request :: AssetBalanceStore.LockRequest.t()
+  @type lock_request :: AccountStore.LockRequest.t()
   @type lock_result ::
           {:ok, Decimal.t()}
           | {:error,
              :not_found | :insufficient_balance | :min_greater_than_max | :min_less_than_zero}
-  @type unlock_request :: AssetBalanceStore.UnlockRequest.t()
+  @type unlock_request :: AccountStore.UnlockRequest.t()
   @type unlock_result :: :ok | {:error, :insufficient_balance | term}
   @type modify_result :: {:ok, account} | {:error, :not_found | :value_must_be_positive}
 
@@ -22,12 +22,12 @@ defmodule Tai.Venues.AssetBalanceStore do
   end
 
   @spec lock(lock_request) :: lock_result
-  def lock(%AssetBalanceStore.LockRequest{} = lock_request) do
+  def lock(%AccountStore.LockRequest{} = lock_request) do
     GenServer.call(__MODULE__, {:lock, lock_request})
   end
 
   @spec unlock(unlock_request) :: unlock_result
-  def unlock(%AssetBalanceStore.UnlockRequest{} = unlock_request) do
+  def unlock(%AccountStore.UnlockRequest{} = unlock_request) do
     GenServer.call(__MODULE__, {:unlock, unlock_request})
   end
 
@@ -138,7 +138,7 @@ defmodule Tai.Venues.AssetBalanceStore do
 
   def handle_call({:lock, lock_request}, _from, state) do
     with {:ok, {with_locked_balance, locked_qty}} <-
-           AssetBalanceStore.Lock.from_request(lock_request) do
+           AccountStore.Lock.from_request(lock_request) do
       upsert_ets_table(with_locked_balance)
 
       Tai.Events.info(%Tai.Events.LockAssetBalanceOk{
@@ -170,7 +170,7 @@ defmodule Tai.Venues.AssetBalanceStore do
   end
 
   def handle_call({:unlock, unlock_request}, _from, state) do
-    with {:ok, with_unlocked_balance} <- AssetBalanceStore.Unlock.from_request(unlock_request) do
+    with {:ok, with_unlocked_balance} <- AccountStore.Unlock.from_request(unlock_request) do
       upsert_ets_table(with_unlocked_balance)
 
       Tai.Events.info(%Tai.Events.UnlockAssetBalanceOk{

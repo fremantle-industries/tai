@@ -46,7 +46,7 @@ defmodule Tai.TestSupport.Mock do
       free: free |> Decimal.cast(),
       locked: locked |> Decimal.cast()
     }
-    |> Tai.Venues.AssetBalanceStore.upsert()
+    |> Tai.Venues.AccountStore.upsert()
   end
 
   @spec push_market_data_snapshot(location :: location, bids :: map, asks :: map) :: no_return

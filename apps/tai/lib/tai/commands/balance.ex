@@ -23,7 +23,7 @@ defmodule Tai.Commands.Balance do
   end
 
   defp fetch_accounts do
-    Tai.Venues.AssetBalanceStore.all()
+    Tai.Venues.AccountStore.all()
     |> Enum.sort(&(&1.asset >= &2.asset))
     |> Enum.sort(&(&1.venue_id >= &2.venue_id))
     |> Enum.reduce(
