@@ -11,12 +11,14 @@ defmodule Tai.EventsLoggerTest do
   end
 
   test "can start multiple loggers with different ids" do
-    {:ok, _a} = Tai.EventsLogger.start_link(id: :a)
-    {:ok, _b} = Tai.EventsLogger.start_link(id: :b)
+    {:ok, a} = Tai.EventsLogger.start_link(id: :a)
+    {:ok, b} = Tai.EventsLogger.start_link(id: :b)
+    :ok = GenServer.stop(a)
+    :ok = GenServer.stop(b)
   end
 
   test "logs error events" do
-    {:ok, logger} = Tai.EventsLogger.start_link(id: __MODULE__)
+    logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
     assert capture_log(fn ->
              send(logger, {Tai.Event, @event, :error})
@@ -25,7 +27,7 @@ defmodule Tai.EventsLoggerTest do
   end
 
   test "logs warn events" do
-    {:ok, logger} = Tai.EventsLogger.start_link(id: __MODULE__)
+    logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
     assert capture_log(fn ->
              send(logger, {Tai.Event, @event, :warn})
@@ -34,7 +36,7 @@ defmodule Tai.EventsLoggerTest do
   end
 
   test "logs info events" do
-    {:ok, logger} = Tai.EventsLogger.start_link(id: __MODULE__)
+    logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
     assert capture_log(fn ->
              send(logger, {Tai.Event, @event, :info})
@@ -43,7 +45,7 @@ defmodule Tai.EventsLoggerTest do
   end
 
   test "logs debug events" do
-    {:ok, logger} = Tai.EventsLogger.start_link(id: __MODULE__)
+    logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
     assert capture_log(fn ->
              send(logger, {Tai.Event, @event, :debug})
