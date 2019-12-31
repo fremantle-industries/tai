@@ -1,5 +1,5 @@
 defmodule Tai.EventsLoggerTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   import ExUnit.CaptureLog
 
   @event %Support.CustomEvent{hello: "world"}
