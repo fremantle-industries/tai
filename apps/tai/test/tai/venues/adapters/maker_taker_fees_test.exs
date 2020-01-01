@@ -15,8 +15,8 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
     @venue venue
     @credential_id venue.credentials |> Map.keys() |> List.first()
 
-    test "#{venue.id} returns a list of asset balances" do
-      setup_adapter(@venue.id)
+    test "#{venue.id} returns the maker/taker fees" do
+      setup_venue(@venue.id)
 
       use_cassette "venue_adapters/shared/maker_taker_fees/#{@venue.id}/success" do
         assert {:ok, fees} = Tai.Venues.Client.maker_taker_fees(@venue, @credential_id)
@@ -25,7 +25,7 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
     end
   end)
 
-  def setup_adapter(:mock) do
+  def setup_venue(:mock) do
     Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_venue_and_credential(
       :mock,
       :main,
@@ -33,5 +33,5 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
     )
   end
 
-  def setup_adapter(_), do: nil
+  def setup_venue(_), do: nil
 end
