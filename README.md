@@ -17,14 +17,14 @@ Here's an example of an advisor that logs the spread between multiple products o
 
 ## Supported Venues
 
-| Venues | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
+| Venues | Live Order Book  | Accounts | Active Orders | Passive Orders | Products | Fees |
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|
 | BitMEX | [x] | [x] | [x] | [x] | [x] | [x] |
 | OkEx   | [x] | [x] | [x] | [x] | [x] | [x] |
 
 ## Venues In Progress
 
-| Venue    | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
+| Venue    | Live Order Book  | Accounts | Active Orders | Passive Orders | Products | Fees |
 |----------|:---:|:---:|:---:|:---:|:---:|:---:|
 | Binance  | [x] | [x] | [x] | [ ] | [x] | [x] |
 | GDAX     | [x] | [x] | [ ] | [ ] | [x] | [x] |
@@ -91,7 +91,7 @@ Display the available commands and usage examples
 
 ```bash
 iex(1)> help
-* balance
+* accounts
 * products
 * fees
 * markets
@@ -104,12 +104,12 @@ iex(1)> help
 * disable_send_orders
 ```
 
-#### balance
+#### accounts
 
-Display all non-zero balances across configured accounts
+Display the configured accounts with non-zero balances
 
 ```
-iex(2)> balance
+iex(2)> accounts
 +-------+------------+--------+------------+------------+------------+
 | Venue | Credential | Symbol |       Free |     Locked |    Balance |
 +-------+------------+--------+------------+------------+------------+
