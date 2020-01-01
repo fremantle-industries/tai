@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.RouteOrderBooks do
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBook
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type venue_symbol :: Tai.Venues.Product.symbol()
     @type store_name :: atom
     @type stores :: %{optional(venue_symbol) => store_name}
@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.RouteOrderBooks do
     defstruct ~w(venue_id stores)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
 
   @spec start_link(venue_id: venue_id, products: [product]) :: GenServer.on_start()

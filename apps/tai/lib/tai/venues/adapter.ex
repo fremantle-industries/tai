@@ -1,9 +1,9 @@
 defmodule Tai.Venues.Adapter do
   alias Tai.Trading.OrderResponses
 
-  @type channel :: atom
-  @type venue_id :: atom
-  @type account_id :: atom
+  @type t :: module
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
   @type credentials :: map
   @type product :: Tai.Venues.Product.t()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
@@ -33,16 +33,6 @@ defmodule Tai.Venues.Adapter do
           | :not_found
           | :not_supported
   @type cancel_order_error_reason :: shared_error_reason | :not_found
-  @type t :: %Tai.Venues.Adapter{
-          id: atom,
-          adapter: module,
-          channels: [channel],
-          products: String.t() | function,
-          accounts: map,
-          quote_depth: pos_integer,
-          timeout: non_neg_integer,
-          opts: map
-        }
 
   @callback stream_supervisor :: module
   @callback products(venue_id) :: {:ok, [product]} | {:error, shared_error_reason}
@@ -61,25 +51,4 @@ defmodule Tai.Venues.Adapter do
               {:ok, amend_bulk_response} | {:error, amend_order_error_reason}
   @callback cancel_order(order, credentials) ::
               {:ok, cancel_response} | {:error, cancel_order_error_reason}
-
-  @enforce_keys ~w(
-    id
-    adapter
-    channels
-    products
-    accounts
-    quote_depth
-    timeout
-    opts
-  )a
-  defstruct ~w(
-    id
-    adapter
-    channels
-    products
-    accounts
-    quote_depth
-    timeout
-    opts
-  )a
 end

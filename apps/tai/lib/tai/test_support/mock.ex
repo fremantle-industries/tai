@@ -2,8 +2,8 @@ defmodule Tai.TestSupport.Mock do
   @type location :: Tai.Markets.Location.t()
   @type product :: Tai.Venues.Product.t()
   @type fee_info :: Tai.Venues.FeeInfo.t()
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
   @type asset :: Tai.Venues.AssetBalance.asset()
 
   @spec mock_product(product | map) :: :ok

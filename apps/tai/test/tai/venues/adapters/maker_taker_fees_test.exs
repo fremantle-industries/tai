@@ -8,18 +8,18 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
     :ok
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_maker_taker_fees()
+  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_maker_taker_fees()
 
-  @test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
-    @account_id adapter.accounts |> Map.keys() |> List.first()
+  @test_venues
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
+    @account_id venue.accounts |> Map.keys() |> List.first()
 
-    test "#{adapter.id} returns a list of asset balances" do
-      setup_adapter(@adapter.id)
+    test "#{venue.id} returns a list of asset balances" do
+      setup_adapter(@venue.id)
 
-      use_cassette "venue_adapters/shared/maker_taker_fees/#{@adapter.id}/success" do
-        assert {:ok, fees} = Tai.Venue.maker_taker_fees(@adapter, @account_id)
+      use_cassette "venue_adapters/shared/maker_taker_fees/#{@venue.id}/success" do
+        assert {:ok, fees} = Tai.Venues.Client.maker_taker_fees(@venue, @account_id)
         assert {%Decimal{} = maker, %Decimal{} = taker} = fees
       end
     end

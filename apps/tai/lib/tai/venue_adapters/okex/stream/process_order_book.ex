@@ -3,14 +3,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
   alias Tai.Markets.OrderBook
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue: venue_id, symbol: atom}
 
     @enforce_keys ~w(venue symbol)a
     defstruct ~w(venue symbol)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type product :: Tai.Venues.Product.t()
   @type state :: State.t()

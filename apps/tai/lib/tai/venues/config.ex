@@ -1,16 +1,16 @@
 defmodule Tai.Venues.Config do
   @type config :: Tai.Config.t()
 
-  @spec parse_adapters() :: map
-  @spec parse_adapters(config) :: map
-  def parse_adapters(%Tai.Config{} = config \\ Tai.Config.parse()) do
+  @spec parse() :: map
+  @spec parse(config) :: map
+  def parse(%Tai.Config{} = config \\ Tai.Config.parse()) do
     config.venues
     |> Enum.reduce(
       %{},
       fn
         {id, params}, acc ->
           if Keyword.get(params, :enabled, false) do
-            adapter = %Tai.Venues.Adapter{
+            venue = %Tai.Venue{
               id: id,
               adapter: Keyword.fetch!(params, :adapter),
               channels: Keyword.get(params, :channels, []),
@@ -21,7 +21,7 @@ defmodule Tai.Venues.Config do
               timeout: Keyword.get(params, :timeout, config.adapter_timeout)
             }
 
-            Map.put(acc, id, adapter)
+            Map.put(acc, id, venue)
           else
             acc
           end

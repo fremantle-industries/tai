@@ -1,8 +1,8 @@
 defmodule Tai.Trading.Position do
   alias __MODULE__
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type t :: %Position{
           venue_id: venue_id,

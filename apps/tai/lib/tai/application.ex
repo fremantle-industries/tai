@@ -36,20 +36,20 @@ defmodule Tai.Application do
 
   defp boot_venues!(config) do
     config
-    |> Tai.Venues.Config.parse_adapters()
-    |> Enum.map(fn {_, adapter} ->
+    |> Tai.Venues.Config.parse()
+    |> Enum.map(fn {_, venue} ->
       task =
         Task.Supervisor.async(
           Tai.TaskSupervisor,
           Tai.Venues.Boot,
           :run,
-          [adapter],
-          timeout: adapter.timeout
+          [venue],
+          timeout: venue.timeout
         )
 
-      {task, adapter}
+      {task, venue}
     end)
-    |> Enum.map(fn {task, adapter} -> Task.await(task, adapter.timeout) end)
+    |> Enum.map(fn {task, venue} -> Task.await(task, venue.timeout) end)
     |> Enum.each(&config.venue_boot_handler.parse_response/1)
 
     {:ok, config}

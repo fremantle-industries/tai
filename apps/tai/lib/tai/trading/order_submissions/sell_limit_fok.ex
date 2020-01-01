@@ -1,6 +1,6 @@
 defmodule Tai.Trading.OrderSubmissions.SellLimitFok do
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type product_type :: Tai.Venues.Product.type()
   @type callback :: Tai.Trading.Order.callback()

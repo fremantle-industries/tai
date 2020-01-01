@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOrderBook do
   alias Tai.Markets.OrderBook
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type product_symbol :: Tai.Venues.Product.symbol()
     @type t :: %State{venue: venue_id, symbol: product_symbol}
 
@@ -11,7 +11,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOrderBook do
     defstruct ~w(venue symbol)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
   @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type state :: State.t()

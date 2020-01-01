@@ -1,90 +1,124 @@
 defmodule Tai.Venue do
+  alias __MODULE__
+
+  @type id :: atom
+  @type adapter :: Tai.Venues.Adapter.t()
+  @type channel :: atom
+  @type account_id :: atom
+  @type account :: map
+  @type accounts :: %{account_id => account}
+  @type t :: %Venue{
+          id: id,
+          adapter: adapter,
+          channels: [channel],
+          products: String.t() | function,
+          accounts: accounts,
+          quote_depth: pos_integer,
+          timeout: non_neg_integer,
+          opts: map
+        }
+
+  @enforce_keys ~w(
+    id
+    adapter
+    channels
+    products
+    accounts
+    quote_depth
+    timeout
+    opts
+  )a
+  defstruct ~w(
+    id
+    adapter
+    channels
+    products
+    accounts
+    quote_depth
+    timeout
+    opts
+  )a
+
   alias Tai.Venues.Adapter
   alias Tai.Trading.{Order, OrderResponses}
 
-  @type adapter :: Adapter.t()
-  @type account_id :: Adapter.account_id()
   @type order :: Order.t()
   @type shared_error_reason :: Adapter.shared_error_reason()
 
   @type product :: Tai.Venues.Product.t()
 
-  @spec products(adapter) :: {:ok, [product]} | {:error, shared_error_reason}
-  def products(venue_adapter), do: venue_adapter.adapter.products(venue_adapter.id)
+  @deprecated "Use Tai.Venues.Client.products/1 instead."
+  @spec products(t) :: {:ok, [product]} | {:error, shared_error_reason}
+  def products(venue_adapter) do
+    Tai.Venues.Client.products(venue_adapter)
+  end
 
   @type asset_balance :: Tai.Venues.AssetBalance.t()
 
-  @spec asset_balances(adapter, account_id) ::
+  @deprecated "Use Tai.Venues.Client.asset_balances/2 instead."
+  @spec asset_balances(t, account_id) ::
           {:ok, [asset_balance]} | {:error, shared_error_reason}
   def asset_balances(venue_adapter, account_id) do
-    {:ok, credentials} = Map.fetch(venue_adapter.accounts, account_id)
-    venue_adapter.adapter.asset_balances(venue_adapter.id, account_id, credentials)
+    Tai.Venues.Client.asset_balances(venue_adapter, account_id)
   end
 
   @type position :: Tai.Trading.Position.t()
   @type positions_error_reason :: Adapter.positions_error_reason()
 
-  @spec positions(adapter, account_id) :: {:ok, [position]} | {:error, positions_error_reason}
+  @deprecated "Use Tai.Venues.Client.positions/2 instead."
+  @spec positions(t, account_id) :: {:ok, [position]} | {:error, positions_error_reason}
   def positions(venue_adapter, account_id) do
-    {:ok, credentials} = Map.fetch(venue_adapter.accounts, account_id)
-    venue_adapter.adapter.positions(venue_adapter.id, account_id, credentials)
+    Tai.Venues.Client.positions(venue_adapter, account_id)
   end
 
-  @spec maker_taker_fees(adapter, account_id) ::
+  @deprecated "Use Tai.Venues.Client.maker_taker_fees/2 instead."
+  @spec maker_taker_fees(t, account_id) ::
           {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil}
           | {:error, shared_error_reason}
   def maker_taker_fees(venue_adapter, account_id) do
-    {:ok, credentials} = Map.fetch(venue_adapter.accounts, account_id)
-    venue_adapter.adapter.maker_taker_fees(venue_adapter.id, account_id, credentials)
+    Tai.Venues.Client.maker_taker_fees(venue_adapter, account_id)
   end
 
   @type create_response :: OrderResponses.Create.t() | OrderResponses.CreateAccepted.t()
   @type create_order_error_reason :: Adapter.create_order_error_reason()
 
+  @deprecated "Use Tai.Venues.Client.create_order/2 instead."
   @spec create_order(order) :: {:ok, create_response} | {:error, create_order_error_reason}
-  def create_order(%Order{} = order, adapters \\ Tai.Venues.Config.parse_adapters()) do
-    {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
-    venue_adapter.adapter.create_order(order, credentials)
+  def create_order(%Order{} = order, adapters \\ Tai.Venues.Config.parse()) do
+    Tai.Venues.Client.create_order(order, adapters)
   end
 
   @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
   @type amend_response :: OrderResponses.Amend.t()
   @type amend_order_error_reason :: Adapter.amend_order_error_reason()
 
+  @deprecated "Use Tai.Venues.Client.amend_order/3 instead."
   @spec amend_order(order, amend_attrs) ::
           {:ok, amend_response} | {:error, amend_order_error_reason}
-  def amend_order(%Order{} = order, attrs, adapters \\ Tai.Venues.Config.parse_adapters()) do
-    {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
-    venue_adapter.adapter.amend_order(order, attrs, credentials)
+  def amend_order(%Order{} = order, attrs, adapters \\ Tai.Venues.Config.parse()) do
+    Tai.Venues.Client.amend_order(order, attrs, adapters)
   end
 
   @type amend_bulk_attrs :: Tai.Trading.Orders.AmendBulk.attrs()
   @type amend_bulk_response :: OrderResponses.AmendBulk.t()
   @type amend_bulk_order_error_reason :: Adapter.amend_order_error_reason()
 
+  @deprecated "Use Tai.Venues.Client.amend_bulk_orders/2 instead."
   @spec amend_bulk_orders([{order, amend_bulk_attrs}]) ::
           {:ok, amend_bulk_response} | {:error, amend_bulk_order_error_reason}
   def amend_bulk_orders(
-        [{%Order{} = order, _} | _] = orders_and_attributes,
-        adapters \\ Tai.Venues.Config.parse_adapters()
+        [{%Order{} = _order, _} | _] = orders_and_attributes,
+        adapters \\ Tai.Venues.Config.parse()
       ) do
-    {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
-    venue_adapter.adapter.amend_bulk_orders(orders_and_attributes, credentials)
+    Tai.Venues.Client.amend_bulk_orders(orders_and_attributes, adapters)
   end
 
   @type cancel_response :: OrderResponses.Cancel.t() | OrderResponses.CancelAccepted.t()
   @type cancel_order_error_reason :: Adapter.cancel_order_error_reason()
 
+  @deprecated "Use Tai.Venues.Client.cancel_order/2 instead."
   @spec cancel_order(order) :: {:ok, cancel_response} | {:error, cancel_order_error_reason}
-  def cancel_order(%Order{} = order, adapters \\ Tai.Venues.Config.parse_adapters()) do
-    {venue_adapter, credentials} = find_venue_adapter_and_credentials(order, adapters)
-    venue_adapter.adapter.cancel_order(order, credentials)
-  end
-
-  defp find_venue_adapter_and_credentials(order, adapters) do
-    venue_adapter = adapters |> Map.fetch!(order.venue_id)
-    credentials = Map.fetch!(venue_adapter.accounts, order.account_id)
-
-    {venue_adapter, credentials}
+  def cancel_order(%Order{} = order, adapters \\ Tai.Venues.Config.parse()) do
+    Tai.Venues.Client.cancel_order(order, adapters)
   end
 end

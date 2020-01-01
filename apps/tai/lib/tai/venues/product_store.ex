@@ -4,7 +4,7 @@ defmodule Tai.Venues.ProductStore do
   @type product :: Tai.Venues.Product.t()
   @type symbol :: Tai.Venues.Product.symbol()
   @type venue_symbol :: Tai.Venues.Product.venue_symbol()
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, :ok, name: __MODULE__)

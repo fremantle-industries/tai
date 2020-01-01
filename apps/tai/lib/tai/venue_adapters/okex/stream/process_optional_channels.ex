@@ -3,14 +3,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels do
   alias Tai.{Events, VenueAdapters.OkEx.Stream}
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue: venue_id}
 
     @enforce_keys ~w(venue)a
     defstruct ~w(venue)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type state :: State.t()
 
   @spec start_link(venue: venue_id) :: GenServer.on_start()

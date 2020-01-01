@@ -1,16 +1,16 @@
 defmodule Tai.Venues.Boot.Fees do
-  @type adapter :: Tai.Venues.Adapter.t()
+  @type venue :: Tai.Venue.t()
   @type product :: Tai.Venues.Product.t()
 
-  @spec hydrate(adapter :: adapter, products :: [product]) :: :ok | {:error, reason :: term}
-  def hydrate(adapter, products) do
-    adapter.accounts
-    |> Enum.map(&fee_schedules(&1, adapter))
-    |> Enum.reduce(:ok, &upsert_for_account(&1, &2, adapter.id, products))
+  @spec hydrate(venue, [product]) :: :ok | {:error, reason :: term}
+  def hydrate(venue, products) do
+    venue.accounts
+    |> Enum.map(&fee_schedules(&1, venue))
+    |> Enum.reduce(:ok, &upsert_for_account(&1, &2, venue.id, products))
   end
 
-  defp fee_schedules({account_id, _}, adapter) do
-    schedule_result = Tai.Venue.maker_taker_fees(adapter, account_id)
+  defp fee_schedules({account_id, _}, venue) do
+    schedule_result = Tai.Venues.Client.maker_taker_fees(venue, account_id)
     {schedule_result, account_id}
   end
 

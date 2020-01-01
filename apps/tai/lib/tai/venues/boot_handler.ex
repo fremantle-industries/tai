@@ -1,19 +1,19 @@
 defmodule Tai.Venues.BootHandler do
   alias Tai.Events
 
-  @type adapter :: Tai.Venues.Adapter.t()
+  @type venue :: Tai.Venue.t()
   @type error_reason :: term
 
-  @spec parse_response({:ok, adapter} | {:error, {adapter, error_reason}}) :: no_return
-  def parse_response({:ok, adapter}) do
+  @spec parse_response({:ok, venue} | {:error, {venue, error_reason}}) :: no_return
+  def parse_response({:ok, venue}) do
     Events.info(%Events.VenueBoot{
-      venue: adapter.id
+      venue: venue.id
     })
   end
 
-  def parse_response({:error, {adapter, reason}}) do
+  def parse_response({:error, {venue, reason}}) do
     Events.error(%Events.VenueBootError{
-      venue: adapter.id,
+      venue: venue.id,
       reason: reason
     })
   end

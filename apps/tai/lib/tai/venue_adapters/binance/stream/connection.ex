@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   alias Tai.VenueAdapters.Binance.Stream
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type route :: :order_books | :optional_channels
     @type t :: %State{
             venue_id: venue_id,
@@ -15,13 +15,14 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   end
 
   @type product :: Tai.Venues.Product.t()
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
+  @type account :: Tai.Venue.account()
 
   @spec start_link(
           url: String.t(),
           venue_id: venue_id,
-          account: {account_id, account_config :: map} | nil,
+          account: {account_id, account} | nil,
           products: [product]
         ) :: {:ok, pid}
   def start_link(url: url, venue_id: venue_id, account: _, products: products) do

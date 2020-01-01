@@ -13,20 +13,20 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
 
   @sides [:buy, :sell]
 
-  @open_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_create_order_gtc_open()
-  @open_test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
+  @open_test_venues Tai.TestSupport.Helpers.test_venue_adapters_create_order_gtc_open()
+  @open_test_venues
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
 
     @sides
     |> Enum.each(fn side ->
       @side side
 
-      test "#{adapter.id} #{side} limit filled open" do
-        order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :filled)
+      test "#{venue.id} #{side} limit filled open" do
+        order = build_order(@venue.id, @side, :gtc, post_only: false, action: :filled)
 
-        use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_filled" do
-          assert {:ok, order_response} = Tai.Venue.create_order(order, @open_test_adapters)
+        use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_gtc_filled" do
+          assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @open_test_venues)
 
           assert order_response.id != nil
           assert %Decimal{} = order_response.original_size
@@ -38,11 +38,11 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
         end
       end
 
-      test "#{adapter.id} #{side} limit partially filled open" do
-        order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :partially_filled)
+      test "#{venue.id} #{side} limit partially filled open" do
+        order = build_order(@venue.id, @side, :gtc, post_only: false, action: :partially_filled)
 
-        use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_partially_filled" do
-          assert {:ok, order_response} = Tai.Venue.create_order(order, @open_test_adapters)
+        use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_gtc_partially_filled" do
+          assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @open_test_venues)
 
           assert order_response.id != nil
           assert %Decimal{} = order_response.original_size
@@ -56,11 +56,11 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
         end
       end
 
-      test "#{adapter.id} #{side} limit unfilled open" do
-        order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :unfilled)
+      test "#{venue.id} #{side} limit unfilled open" do
+        order = build_order(@venue.id, @side, :gtc, post_only: false, action: :unfilled)
 
-        use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_unfilled" do
-          assert {:ok, order_response} = Tai.Venue.create_order(order, @open_test_adapters)
+        use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_gtc_unfilled" do
+          assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @open_test_venues)
 
           assert order_response.id != nil
           assert order_response.status == :open
@@ -72,20 +72,21 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
     end)
   end)
 
-  @accepted_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_create_order_gtc_accepted()
-  @accepted_test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
+  @accepted_test_venues Tai.TestSupport.Helpers.test_venue_adapters_create_order_gtc_accepted()
+  @accepted_test_venues
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
 
     @sides
     |> Enum.each(fn side ->
       @side side
 
-      test "#{adapter.id} #{side} limit unfilled accepted" do
-        order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :unfilled)
+      test "#{venue.id} #{side} limit unfilled accepted" do
+        order = build_order(@venue.id, @side, :gtc, post_only: false, action: :unfilled)
 
-        use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_unfilled" do
-          assert {:ok, order_response} = Tai.Venue.create_order(order, @accepted_test_adapters)
+        use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_gtc_unfilled" do
+          assert {:ok, order_response} =
+                   Tai.Venues.Client.create_order(order, @accepted_test_venues)
 
           assert %Tai.Trading.OrderResponses.CreateAccepted{} = order_response
           assert order_response.id != nil

@@ -3,8 +3,8 @@ defmodule Tai.Trading.Order do
 
   @type client_id :: Ecto.UUID.t()
   @type venue_order_id :: String.t()
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type product_type :: Tai.Venues.Product.type()
   @type side :: :buy | :sell

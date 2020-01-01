@@ -1,7 +1,7 @@
 defmodule Tai.Advisors.MarketQuotes do
   alias Tai.Advisors.MarketQuotes
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type market_quote :: Tai.Markets.Quote.t()
   @type t :: %MarketQuotes{

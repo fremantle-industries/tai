@@ -13,22 +13,23 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
     HTTPoison.start()
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order()
-  @accepted_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_accepted()
+  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_cancel_order()
+  @accepted_test_venues Tai.TestSupport.Helpers.test_venue_adapters_cancel_order_accepted()
 
-  @test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
+  @test_venues
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
 
-    test "#{adapter.id} returns an order response with a canceled status & final quantities" do
-      enqueued_order = build_enqueued_order(@adapter.id)
+    test "#{venue.id} returns an order response with a canceled status & final quantities" do
+      enqueued_order = build_enqueued_order(@venue.id)
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_ok" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+      use_cassette "venue_adapters/shared/orders/#{@venue.id}/cancel_ok" do
+        assert {:ok, order_response} =
+                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert {:ok, order_response} = Tai.Venue.cancel_order(open_order, @test_adapters)
+        assert {:ok, order_response} = Tai.Venues.Client.cancel_order(open_order, @test_venues)
         assert order_response.id != nil
         assert order_response.status == :canceled
         assert order_response.leaves_qty == Decimal.new(0)
@@ -36,20 +37,22 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
     end
   end)
 
-  @accepted_test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
+  @accepted_test_venues
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
 
-    test "#{adapter.id} returns an order response with a canceled status & final quantities" do
-      enqueued_order = build_enqueued_order(@adapter.id)
+    test "#{venue.id} returns an order response with a canceled status & final quantities" do
+      enqueued_order = build_enqueued_order(@venue.id)
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_ok" do
+      use_cassette "venue_adapters/shared/orders/#{@venue.id}/cancel_ok" do
         assert {:ok, order_response} =
-                 Tai.Venue.create_order(enqueued_order, @accepted_test_adapters)
+                 Tai.Venues.Client.create_order(enqueued_order, @accepted_test_venues)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert {:ok, order_response} = Tai.Venue.cancel_order(open_order, @accepted_test_adapters)
+        assert {:ok, order_response} =
+                 Tai.Venues.Client.cancel_order(open_order, @accepted_test_venues)
+
         assert %OrderResponses.CancelAccepted{} = order_response
         assert order_response.id != nil
       end

@@ -1,17 +1,17 @@
 defmodule Tai.Venues.Boot.AssetBalances do
-  @type adapter :: Tai.Venues.Adapter.t()
+  @type venue :: Tai.Venue.t()
 
-  @spec hydrate(adapter :: adapter) :: :ok | {:error, reason :: term}
-  def hydrate(adapter) do
-    adapter.accounts
+  @spec hydrate(venue) :: :ok | {:error, reason :: term}
+  def hydrate(venue) do
+    venue.accounts
     |> Enum.reduce(
       :ok,
-      &fetch_and_upsert(&1, &2, adapter)
+      &fetch_and_upsert(&1, &2, venue)
     )
   end
 
-  defp fetch_and_upsert({account_id, _}, :ok, adapter) do
-    with {:ok, balances} <- Tai.Venue.asset_balances(adapter, account_id) do
+  defp fetch_and_upsert({account_id, _}, :ok, venue) do
+    with {:ok, balances} <- Tai.Venues.Client.asset_balances(venue, account_id) do
       Enum.each(balances, &Tai.Venues.AssetBalanceStore.upsert/1)
       :ok
     else

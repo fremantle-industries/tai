@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
   Hydrates the available products on the GDAX exchange
   """
 
-  @type venue :: Tai.Venues.Adapter.venue_id()
+  @type venue :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
   @type error_reason ::
           :timeout

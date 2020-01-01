@@ -3,14 +3,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
   alias Tai.VenueAdapters.Bitmex.Stream
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue: venue_id}
 
     @enforce_keys ~w(venue)a
     defstruct ~w(venue)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
 
   @spec start_link(venue_id: venue_id) :: GenServer.on_start()
   def start_link(venue_id: venue_id) do

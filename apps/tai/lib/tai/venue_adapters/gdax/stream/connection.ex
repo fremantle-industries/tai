@@ -5,8 +5,8 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
 
   defmodule State do
     @type product :: Tai.Venues.Product.t()
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
-    @type account_id :: Tai.Venues.Adapter.account_id()
+    @type venue_id :: Tai.Venue.id()
+    @type account_id :: Tai.Venue.account_id()
     @type channel_name :: atom
     @type route :: :auth | :order_books | :optional_channels
     @type t :: %State{
@@ -23,15 +23,15 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   end
 
   @type product :: Tai.Venues.Product.t()
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
-  @type account_config :: map
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
+  @type account :: Tai.Venue.account()
   @type venue_msg :: map
 
   @spec start_link(
           url: String.t(),
           venue: venue_id,
-          account: {account_id, account_config} | nil,
+          account: {account_id, account} | nil,
           products: [product],
           opts: map
         ) :: {:ok, pid} | {:error, term}

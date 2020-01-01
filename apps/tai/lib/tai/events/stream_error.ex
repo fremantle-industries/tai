@@ -1,7 +1,7 @@
 defmodule Tai.Events.StreamError do
   alias __MODULE__
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type t :: %StreamError{
           venue_id: venue_id,
           reason: term

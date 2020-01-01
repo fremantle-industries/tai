@@ -35,10 +35,10 @@ defmodule Tai.Venues.Boot.PositionsTest do
         }
       )
 
-    %{my_venue: adapter} = Tai.Venues.Config.parse_adapters(config)
+    %{my_venue: venue} = Tai.Venues.Config.parse(config)
     Tai.Events.firehose_subscribe()
 
-    Tai.Venues.Boot.Positions.hydrate(adapter)
+    Tai.Venues.Boot.Positions.hydrate(venue)
 
     assert_receive {Tai.Event, %Tai.Events.HydratePositions{} = event, _}
     assert event.venue_id == :my_venue

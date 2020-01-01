@@ -1,15 +1,15 @@
 defmodule Tai.Venues.Boot.Products do
-  @type adapter :: Tai.Venues.Adapter.t()
+  @type venue :: Tai.Venue.t()
   @type product :: Tai.Venues.Product.t()
 
-  @spec hydrate(adapter) :: {:ok, [product]} | {:error, reason :: term}
-  def hydrate(adapter) do
-    with {:ok, all_products} <- Tai.Venue.products(adapter) do
-      filtered_products = filter(all_products, adapter.products)
+  @spec hydrate(venue) :: {:ok, [product]} | {:error, reason :: term}
+  def hydrate(venue) do
+    with {:ok, all_products} <- Tai.Venues.Client.products(venue) do
+      filtered_products = filter(all_products, venue.products)
       Enum.each(filtered_products, &Tai.Venues.ProductStore.upsert/1)
 
       Tai.Events.info(%Tai.Events.HydrateProducts{
-        venue_id: adapter.id,
+        venue_id: venue.id,
         total: all_products |> Enum.count(),
         filtered: filtered_products |> Enum.count()
       })

@@ -3,14 +3,14 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOptionalChannels do
   alias Tai.VenueAdapters.Binance.Stream
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue_id: venue_id}
 
     @enforce_keys ~w(venue_id)a
     defstruct ~w(venue_id)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
 
   def start_link(venue_id: venue_id) do
     state = %State{venue_id: venue_id}

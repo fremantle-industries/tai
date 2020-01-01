@@ -12,25 +12,26 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
     HTTPoison.start()
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_amend_bulk_order()
+  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_amend_bulk_order()
 
-  @test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
+  @test_venues
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
 
-    test "#{adapter.id} can change price and qty" do
-      enqueued_order = build_enqueued_order(@adapter.id, :buy)
-      amend_price = amend_price(@adapter.id, enqueued_order.side)
-      amend_qty = amend_qty(@adapter.id, enqueued_order.side)
-      attrs = amend_attrs(@adapter.id, price: amend_price, qty: amend_qty)
+    test "#{venue.id} can change price and qty" do
+      enqueued_order = build_enqueued_order(@venue.id, :buy)
+      amend_price = amend_price(@venue.id, enqueued_order.side)
+      amend_qty = amend_qty(@venue.id, enqueued_order.side)
+      attrs = amend_attrs(@venue.id, price: amend_price, qty: amend_qty)
 
-      use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_bulk_price_and_qty_ok" do
-        assert {:ok, create_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+      use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_bulk_price_and_qty_ok" do
+        assert {:ok, create_response} =
+                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
 
         open_order = build_open_order(enqueued_order, create_response)
 
         assert {:ok, amend_bulk_response} =
-                 Tai.Venue.amend_bulk_orders([{open_order, attrs}], @test_adapters)
+                 Tai.Venues.Client.amend_bulk_orders([{open_order, attrs}], @test_venues)
 
         assert Enum.count(amend_bulk_response.orders) == 1
 

@@ -1,8 +1,8 @@
 defmodule Tai.Venues.FeeInfo do
   @type fee_type :: :percent
   @type t :: %Tai.Venues.FeeInfo{
-          venue_id: Tai.Venues.Adapter.venue_id(),
-          account_id: Tai.Venues.Adapter.account_id(),
+          venue_id: Tai.Venue.id(),
+          account_id: Tai.Venue.account_id(),
           symbol: Tai.Venues.Product.symbol(),
           maker: Decimal.t(),
           maker_type: fee_type,

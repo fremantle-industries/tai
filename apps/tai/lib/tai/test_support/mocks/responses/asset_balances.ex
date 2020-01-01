@@ -1,6 +1,6 @@
 defmodule Tai.TestSupport.Mocks.Responses.AssetBalances do
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
 
   @spec for_venue_and_account(venue_id, account_id, map) :: :ok
   def for_venue_and_account(venue_id, account_id, balances_attrs) do

@@ -2,7 +2,7 @@ defmodule Tai.Venues.ConfigTest do
   use ExUnit.Case, async: true
   doctest Tai.Venues.Config
 
-  describe ".parse_adapters" do
+  describe ".parse" do
     test "returns a map of adapters parsed from the config" do
       config =
         Tai.Config.parse(
@@ -15,35 +15,35 @@ defmodule Tai.Venues.ConfigTest do
         )
 
       assert %{
-               venue_a: adapter_a,
-               venue_b: adapter_b
-             } = Tai.Venues.Config.parse_adapters(config)
+               venue_a: venue_a,
+               venue_b: venue_b
+             } = Tai.Venues.Config.parse(config)
 
-      assert adapter_a.id == :venue_a
-      assert adapter_a.adapter == MyAdapterA
-      assert adapter_b.id == :venue_b
-      assert adapter_b.adapter == MyAdapterB
+      assert venue_a.id == :venue_a
+      assert venue_a.adapter == MyAdapterA
+      assert venue_b.id == :venue_b
+      assert venue_b.adapter == MyAdapterB
     end
 
     test "assigns all products when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
-      assert %{venue_a: adapter} = Tai.Venues.Config.parse_adapters(config)
-      assert adapter.products == "*"
+      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
+      assert venue.products == "*"
     end
 
     test "assigns empty channels when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
-      assert %{venue_a: adapter} = Tai.Venues.Config.parse_adapters(config)
-      assert adapter.channels == []
+      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
+      assert venue.channels == []
     end
 
     test "assigns a quote depth of 1 when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
-      assert %{venue_a: adapter} = Tai.Venues.Config.parse_adapters(config)
-      assert adapter.quote_depth == 1
+      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
+      assert venue.quote_depth == 1
     end
 
     test "can provide channels" do
@@ -54,8 +54,8 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{venue_a: adapter} = Tai.Venues.Config.parse_adapters(config)
-      assert adapter.channels == [:channel_a]
+      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
+      assert venue.channels == [:channel_a]
     end
 
     test "can provide a timeout" do
@@ -71,12 +71,12 @@ defmodule Tai.Venues.ConfigTest do
         )
 
       assert %{
-               venue_a: %Tai.Venues.Adapter{
+               venue_a: %Tai.Venue{
                  id: :venue_a,
                  adapter: MyAdapterA,
                  timeout: 10
                }
-             } = Tai.Venues.Config.parse_adapters(config)
+             } = Tai.Venues.Config.parse(config)
     end
 
     test "can provide a products filter" do
@@ -92,12 +92,12 @@ defmodule Tai.Venues.ConfigTest do
         )
 
       assert %{
-               venue_a: %Tai.Venues.Adapter{
+               venue_a: %Tai.Venue{
                  id: :venue_a,
                  adapter: MyAdapterA,
                  products: "-btc_usd"
                }
-             } = Tai.Venues.Config.parse_adapters(config)
+             } = Tai.Venues.Config.parse(config)
     end
 
     test "can provide accounts" do
@@ -113,12 +113,12 @@ defmodule Tai.Venues.ConfigTest do
         )
 
       assert %{
-               venue_a: %Tai.Venues.Adapter{
+               venue_a: %Tai.Venue{
                  id: :venue_a,
                  adapter: MyAdapterA,
                  accounts: %{main: %{}}
                }
-             } = Tai.Venues.Config.parse_adapters(config)
+             } = Tai.Venues.Config.parse(config)
     end
 
     test "can provide a quote depth" do
@@ -133,15 +133,15 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{venue_a: adapter} = Tai.Venues.Config.parse_adapters(config)
-      assert adapter.quote_depth == 5
+      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
+      assert venue.quote_depth == 5
     end
 
     test "raises a KeyError when there is no adapter specified" do
       config = Tai.Config.parse(venues: %{invalid_exchange_a: [enabled: true]})
 
       assert_raise KeyError, "key :adapter not found in: [enabled: true]", fn ->
-        Tai.Venues.Config.parse_adapters(config)
+        Tai.Venues.Config.parse(config)
       end
     end
   end

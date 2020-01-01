@@ -23,16 +23,16 @@ defmodule Tai.Venues.BootTest do
   describe ".run success" do
     setup [:mock_products, :mock_asset_balances, :mock_maker_taker_fees]
 
-    @adapter struct(Tai.Venues.Adapter, %{
-               id: @venue_id,
-               adapter: Tai.VenueAdapters.Mock,
-               products: "* -ltc_usdt",
-               accounts: %{main: %{}},
-               timeout: @timeout
-             })
+    @venue struct(Tai.Venue, %{
+             id: @venue_id,
+             adapter: Tai.VenueAdapters.Mock,
+             products: "* -ltc_usdt",
+             accounts: %{main: %{}},
+             timeout: @timeout
+           })
 
     test "hydrates filtered products" do
-      assert {:ok, %Tai.Venues.Adapter{}} = Tai.Venues.Boot.run(@adapter)
+      assert {:ok, %Tai.Venue{}} = Tai.Venues.Boot.run(@venue)
 
       assert {:ok, btc_usdt_product} = Tai.Venues.ProductStore.find({@venue_id, :btc_usdt})
       assert {:ok, eth_usdt_product} = Tai.Venues.ProductStore.find({@venue_id, :eth_usdt})
@@ -40,7 +40,7 @@ defmodule Tai.Venues.BootTest do
     end
 
     test "hydrates asset balances" do
-      assert {:ok, %Tai.Venues.Adapter{}} = Tai.Venues.Boot.run(@adapter)
+      assert {:ok, %Tai.Venue{}} = Tai.Venues.Boot.run(@venue)
 
       assert {:ok, btc_balance} =
                Tai.Venues.AssetBalanceStore.find_by(
@@ -72,7 +72,7 @@ defmodule Tai.Venues.BootTest do
     end
 
     test "hydrates fees" do
-      assert {:ok, %Tai.Venues.Adapter{}} = Tai.Venues.Boot.run(@adapter)
+      assert {:ok, %Tai.Venue{}} = Tai.Venues.Boot.run(@venue)
 
       assert {:ok, btc_usdt_fee} =
                Tai.Venues.FeeStore.find_by(
@@ -100,7 +100,7 @@ defmodule Tai.Venues.BootTest do
   describe ".run products hydrate error" do
     test "returns an error tuple" do
       adapter =
-        struct(Tai.Venues.Adapter, %{
+        struct(Tai.Venue, %{
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",
@@ -120,7 +120,7 @@ defmodule Tai.Venues.BootTest do
 
     test "returns an error" do
       adapter =
-        struct(Tai.Venues.Adapter, %{
+        struct(Tai.Venue, %{
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",
@@ -140,7 +140,7 @@ defmodule Tai.Venues.BootTest do
 
     test "returns an error" do
       adapter =
-        struct(Tai.Venues.Adapter, %{
+        struct(Tai.Venue, %{
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",

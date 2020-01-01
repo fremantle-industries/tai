@@ -2,7 +2,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBook do
   use GenServer
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type product_symbol :: Tai.Venues.Product.symbol()
     @type t :: %State{
             venue_id: venue_id,
@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBook do
     defstruct ~w(venue_id symbol table)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
   @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type state :: State.t()

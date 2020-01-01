@@ -40,7 +40,7 @@ defmodule Tai.Venues.Product do
   @type venue_symbol :: String.t()
   @type type :: :spot | :future | :swap | :option
   @type t :: %Tai.Venues.Product{
-          venue_id: Tai.Venues.Adapter.venue_id(),
+          venue_id: Tai.Venue.id(),
           symbol: symbol,
           venue_symbol: venue_symbol,
           alias: String.t() | nil,

@@ -1,5 +1,5 @@
 defmodule Tai.Events.StreamDisconnect do
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type t :: %Tai.Events.StreamDisconnect{venue: venue_id, reason: term}
 
   @enforce_keys ~w(venue reason)a

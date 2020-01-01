@@ -1,12 +1,12 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   use WebSockex
-  alias Tai.{Events, Venues, VenueAdapters.OkEx.Stream}
+  alias Tai.{Events, VenueAdapters.OkEx.Stream}
   alias Tai.VenueAdapters.OkEx.Stream
 
   defmodule State do
-    @type product :: Venues.Product.t()
-    @type venue_id :: Venues.Adapter.venue_id()
-    @type account_id :: Venues.Adapter.account_id()
+    @type product :: Tai.Venues.Product.t()
+    @type venue_id :: Tai.Venue.id()
+    @type account_id :: Tai.Venue.account_id()
     @type channel_name :: atom
     @type route :: :auth | :order_books | :optional_channels
     @type t :: %State{
@@ -21,12 +21,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     defstruct ~w(venue routes channels account products)a
   end
 
-  @type product :: Venues.Product.t()
-  @type channel :: Venues.Adapter.channel()
+  @type product :: Tai.Venues.Product.t()
+  @type channel :: Tai.Venue.channel()
   @type endpoint :: String.t()
-  @type venue_id :: Venues.Adapter.venue_id()
-  @type account_id :: Venues.Adapter.account_id()
-  @type account_config :: map
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
+  @type account :: Tai.Venue.account()
   @type msg :: map | String.t()
   @type state :: State.t()
 
@@ -34,7 +34,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
           endpoint: endpoint,
           venue: venue_id,
           channels: [channel],
-          account: {account_id, account_config} | nil,
+          account: {account_id, account} | nil,
           products: [product]
         ) :: {:ok, pid}
   def start_link(
