@@ -19,11 +19,19 @@ defmodule Tai.Venues.Adapter do
           | :timeout
           | :connect_timeout
           | :overloaded
+          | :rate_limited
           | {:credentials, reason :: term}
-          | {:nonce_not_increasing, msg :: String.t()}
+          | {:nonce_not_increasing, String.t()}
           | {:unhandled, reason :: term}
-  @type create_order_error_reason :: shared_error_reason | :insufficient_balance
-  @type amend_order_error_reason :: shared_error_reason | :not_found | :not_supported
+  @type positions_error_reason :: shared_error_reason | :not_supported
+  @type create_order_error_reason ::
+          shared_error_reason | :insufficient_balance | :insufficient_position
+  @type amend_order_error_reason ::
+          shared_error_reason
+          | :insufficient_balance
+          | :insufficient_position
+          | :not_found
+          | :not_supported
   @type cancel_order_error_reason :: shared_error_reason | :not_found
   @type t :: %Tai.Venues.Adapter{
           id: atom,
@@ -37,13 +45,14 @@ defmodule Tai.Venues.Adapter do
         }
 
   @callback stream_supervisor :: module
-  @callback products(venue_id) :: {:ok, [product]} | {:error, reason :: term}
+  @callback products(venue_id) :: {:ok, [product]} | {:error, shared_error_reason}
   @callback asset_balances(venue_id, account_id, credentials) ::
-              {:ok, [asset_balance]} | {:error, reason :: term}
+              {:ok, [asset_balance]} | {:error, shared_error_reason}
   @callback positions(venue_id, account_id, credentials) ::
-              {:ok, [position]} | {:error, :not_supported | shared_error_reason}
+              {:ok, [position]} | {:error, positions_error_reason}
   @callback maker_taker_fees(venue_id, account_id, credentials) ::
-              {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil} | {:error, reason :: term}
+              {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil}
+              | {:error, shared_error_reason}
   @callback create_order(order, credentials) ::
               {:ok, create_response} | {:error, create_order_error_reason}
   @callback amend_order(order, amend_attrs, credentials) ::
