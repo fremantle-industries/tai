@@ -2,8 +2,8 @@ defmodule Tai.Venues.AssetBalanceStore do
   alias Tai.Venues.AssetBalanceStore
   use GenServer
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type account_id :: Tai.Venues.Adapter.account_id()
+  @type venue_id :: Tai.Venue.id()
+  @type account_id :: Tai.Venue.account_id()
   @type asset :: Tai.Venues.AssetBalance.asset()
   @type asset_balance :: Tai.Venues.AssetBalance.t()
   @type lock_request :: AssetBalanceStore.LockRequest.t()

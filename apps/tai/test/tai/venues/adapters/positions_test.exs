@@ -17,19 +17,19 @@ defmodule Tai.Venues.Adapters.PositionsTest do
     :ok
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_with_positions()
+  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_with_positions()
 
-  @test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
-    @account_id adapter.accounts |> Map.keys() |> List.first()
+  @test_venues
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
+    @account_id venue.accounts |> Map.keys() |> List.first()
 
-    test "#{adapter.id} returns a list of positions" do
-      use_cassette "venue_adapters/shared/positions/#{@adapter.id}/success" do
-        assert {:ok, positions} = Tai.Venues.Client.positions(@adapter, @account_id)
+    test "#{venue.id} returns a list of positions" do
+      use_cassette "venue_adapters/shared/positions/#{@venue.id}/success" do
+        assert {:ok, positions} = Tai.Venues.Client.positions(@venue, @account_id)
         assert Enum.count(positions) > 0
         assert [position | _] = positions
-        assert position.venue_id == @adapter.id
+        assert position.venue_id == @venue.id
         assert position.account_id == @account_id
         assert position.product_symbol != nil
         assert Enum.all?(positions, fn %type{} -> type == Tai.Trading.Position end) == true

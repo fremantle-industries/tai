@@ -56,7 +56,7 @@ defmodule Tai.Venues.Boot.FeesTest do
 
   describe ".hydrate" do
     test "uses the lowest fee between the product or schedule" do
-      %{venue_a: adapter_a} = Tai.Venues.Config.parse_adapters(@config)
+      %{venue_a: adapter_a} = Tai.Venues.Config.parse(@config)
 
       Tai.Venues.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
@@ -72,7 +72,7 @@ defmodule Tai.Venues.Boot.FeesTest do
     end
 
     test "uses the fee schedule when product doesn't have a maker/taker fee" do
-      %{venue_a: adapter_a} = Tai.Venues.Config.parse_adapters(@config)
+      %{venue_a: adapter_a} = Tai.Venues.Config.parse(@config)
 
       Tai.Venues.Boot.Fees.hydrate(adapter_a, [@btc_usd_product, @eth_usd_product])
 
@@ -88,7 +88,7 @@ defmodule Tai.Venues.Boot.FeesTest do
     end
 
     test "uses the product fees when the venue doesn't have a fee schedule" do
-      %{venue_b: adapter_b} = Tai.Venues.Config.parse_adapters(@config)
+      %{venue_b: adapter_b} = Tai.Venues.Config.parse(@config)
 
       Tai.Venues.Boot.Fees.hydrate(adapter_b, [@ltc_usd_product])
 

@@ -7,7 +7,7 @@ defmodule Tai.Markets.OrderBook do
   alias __MODULE__
 
   defmodule ChangeSet do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type product_symbol :: Tai.Venues.Product.symbol()
     @type side :: :bid | :ask
     @type price :: number
@@ -27,7 +27,7 @@ defmodule Tai.Markets.OrderBook do
     defstruct ~w(venue symbol changes last_received_at last_venue_timestamp)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type t :: %OrderBook{

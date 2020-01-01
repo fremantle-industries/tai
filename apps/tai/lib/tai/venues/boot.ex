@@ -7,75 +7,75 @@ defmodule Tai.Venues.Boot do
   - fees
   """
 
-  alias Tai.Venues.Boot
+  alias __MODULE__
 
-  @type adapter :: Tai.Venues.Adapter.t()
+  @type venue :: Tai.Venue.t()
 
-  @spec run(adapter :: adapter) :: {:ok, adapter} | {:error, {adapter, [reason :: term]}}
-  def run(%Tai.Venues.Adapter{} = adapter) do
-    adapter
+  @spec run(venue) :: {:ok, venue} | {:error, {venue, [reason :: term]}}
+  def run(venue) do
+    venue
     |> hydrate_products_and_balances
     |> wait_for_products
     |> hydrate_fees_and_positions_and_start_streams
     |> wait_for_balances_and_fees
   end
 
-  defp hydrate_products_and_balances(adapter) do
-    t_products = Task.async(Boot.Products, :hydrate, [adapter])
-    t_balances = Task.async(Boot.AssetBalances, :hydrate, [adapter])
-    {adapter, t_products, t_balances}
+  defp hydrate_products_and_balances(venue) do
+    t_products = Task.async(Boot.Products, :hydrate, [venue])
+    t_balances = Task.async(Boot.AssetBalances, :hydrate, [venue])
+    {venue, t_products, t_balances}
   end
 
-  defp wait_for_products({adapter, t_products, t_balances}) do
+  defp wait_for_products({venue, t_products, t_balances}) do
     working_tasks = [asset_balances: t_balances]
 
-    case Task.await(t_products, adapter.timeout) do
+    case Task.await(t_products, venue.timeout) do
       {:ok, products} ->
-        {:ok, adapter, working_tasks, products}
+        {:ok, venue, working_tasks, products}
 
       {:error, reason} ->
         err_reasons = [products: reason]
-        {:error, adapter, working_tasks, err_reasons}
+        {:error, venue, working_tasks, err_reasons}
     end
   end
 
-  defp hydrate_fees_and_positions_and_start_streams({:ok, adapter, working_tasks, products}) do
-    t_fees = Task.async(Boot.Fees, :hydrate, [adapter, products])
-    t_positions = Task.async(Boot.Positions, :hydrate, [adapter])
-    t_stream = Task.async(Boot.Stream, :start, [adapter, products])
+  defp hydrate_fees_and_positions_and_start_streams({:ok, venue, working_tasks, products}) do
+    t_fees = Task.async(Boot.Fees, :hydrate, [venue, products])
+    t_positions = Task.async(Boot.Positions, :hydrate, [venue])
+    t_stream = Task.async(Boot.Stream, :start, [venue, products])
     new_working_tasks = [{:fees, t_fees} | working_tasks]
     new_working_tasks = [{:positions, t_positions} | new_working_tasks]
     new_working_tasks = [{:streams, t_stream} | new_working_tasks]
-    {:ok, adapter, new_working_tasks}
+    {:ok, venue, new_working_tasks}
   end
 
   defp hydrate_fees_and_positions_and_start_streams({:error, _, _, _} = error), do: error
 
-  defp wait_for_balances_and_fees({:ok, adapter, working_tasks}) do
-    adapter
+  defp wait_for_balances_and_fees({:ok, venue, working_tasks}) do
+    venue
     |> collect_remaining_errors(working_tasks, [])
   end
 
-  defp wait_for_balances_and_fees({:error, adapter, working_tasks, err_reasons}) do
-    adapter
+  defp wait_for_balances_and_fees({:error, venue, working_tasks, err_reasons}) do
+    venue
     |> collect_remaining_errors(working_tasks, err_reasons)
   end
 
-  defp collect_remaining_errors(adapter, [], err_reasons) do
+  defp collect_remaining_errors(venue, [], err_reasons) do
     if Enum.empty?(err_reasons) do
-      {:ok, adapter}
+      {:ok, venue}
     else
-      {:error, {adapter, err_reasons}}
+      {:error, {venue, err_reasons}}
     end
   end
 
-  defp collect_remaining_errors(adapter, [{name, working} | tasks], err_reasons) do
-    case Task.await(working, adapter.timeout) do
+  defp collect_remaining_errors(venue, [{name, working} | tasks], err_reasons) do
+    case Task.await(working, venue.timeout) do
       {:error, reason} ->
-        adapter |> collect_remaining_errors(tasks, [{name, reason} | err_reasons])
+        venue |> collect_remaining_errors(tasks, [{name, reason} | err_reasons])
 
       _ ->
-        adapter |> collect_remaining_errors(tasks, err_reasons)
+        venue |> collect_remaining_errors(tasks, err_reasons)
     end
   end
 end

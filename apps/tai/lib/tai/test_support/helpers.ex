@@ -66,7 +66,7 @@ defmodule Tai.TestSupport.Helpers do
     Confex.resolve_env!(:tai)
     test_adapters = Application.get_env(:tai, :test_venue_adapters)
     config = Tai.Config.parse(venues: test_adapters)
-    Tai.Venues.Config.parse_adapters(config)
+    Tai.Venues.Config.parse(config)
   end
 
   def fire_order_callback(pid) do

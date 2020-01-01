@@ -15,17 +15,17 @@ defmodule Tai.Venues.Adapters.CreateOrderCloseTest do
 
   @close_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_create_order_close()
   @close_test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
 
     @sides
     |> Enum.each(fn side ->
       @side side
 
-      test "#{adapter.id} #{side} returns an error when there is an insufficient open position" do
-        order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :unfilled)
+      test "#{venue.id} #{side} returns an error when there is an insufficient open position" do
+        order = build_order(@venue.id, @side, :gtc, post_only: false, action: :unfilled)
 
-        use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_close_insufficient_position" do
+        use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_close_insufficient_position" do
           assert {:error, :insufficient_position} =
                    Tai.Venues.Client.create_order(order, @close_test_adapters)
         end

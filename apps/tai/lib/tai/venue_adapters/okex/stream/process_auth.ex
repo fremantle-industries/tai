@@ -4,14 +4,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   alias Tai.VenueAdapters.OkEx.{ClientId, Stream}
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue: atom, tasks: map}
 
     @enforce_keys ~w(venue tasks)a
     defstruct ~w(venue tasks)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type state :: State.t()
 
   def start_link(venue: venue) do

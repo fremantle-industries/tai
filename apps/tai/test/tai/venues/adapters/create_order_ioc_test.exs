@@ -16,18 +16,18 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
   @sides [:buy, :sell]
 
   @test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
 
     @sides
     |> Enum.each(fn side ->
       @side side
 
-      describe "#{adapter.id} #{side} limit ioc" do
+      describe "#{venue.id} #{side} limit ioc" do
         test "filled" do
-          order = build_order(@adapter.id, @side, :ioc, action: :filled)
+          order = build_order(@venue.id, @side, :ioc, action: :filled)
 
-          use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_filled" do
+          use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_ioc_filled" do
             assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
 
             assert order_response.id != nil
@@ -41,9 +41,9 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
         end
 
         test "partially filled" do
-          order = build_order(@adapter.id, @side, :ioc, action: :partially_filled)
+          order = build_order(@venue.id, @side, :ioc, action: :partially_filled)
 
-          use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_partially_filled" do
+          use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_ioc_partially_filled" do
             assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
 
             assert order_response.id != nil
@@ -58,9 +58,9 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
         end
 
         test "unfilled" do
-          order = build_order(@adapter.id, @side, :ioc, action: :unfilled)
+          order = build_order(@venue.id, @side, :ioc, action: :unfilled)
 
-          use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_unfilled" do
+          use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_ioc_unfilled" do
             assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
 
             assert order_response.id != nil

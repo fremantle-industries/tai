@@ -7,7 +7,7 @@ defmodule Tai.Markets.Quote do
   alias Tai.Markets.PricePoint
 
   @type price_point :: PricePoint.t()
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type t :: %Quote{
           venue_id: venue_id,
@@ -62,7 +62,7 @@ end
 
 defimpl Stored.Item, for: Tai.Markets.Quote do
   @type market_quote :: Tai.Markets.Quote.t()
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type product_symbol :: Tai.Venues.Product.symbol()
 
   @spec key(market_quote) :: {venue_id, product_symbol}

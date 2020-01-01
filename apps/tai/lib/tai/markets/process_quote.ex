@@ -13,7 +13,7 @@ defmodule Tai.Markets.ProcessQuote do
     defstruct ~w(market_quote depth)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
   @type product_symbol :: Tai.Venues.Product.symbol()
 

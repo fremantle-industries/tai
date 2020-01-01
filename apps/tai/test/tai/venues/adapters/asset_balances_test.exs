@@ -17,21 +17,21 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
     :ok
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_asset_balances()
+  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_asset_balances()
 
-  @test_adapters
-  |> Enum.map(fn {_, adapter} ->
-    @adapter adapter
-    @account_id adapter.accounts |> Map.keys() |> List.first()
+  @test_venues
+  |> Enum.map(fn {_, venue} ->
+    @venue venue
+    @account_id venue.accounts |> Map.keys() |> List.first()
 
-    test "#{adapter.id} returns a list of asset balances" do
-      setup_adapter(@adapter.id)
+    test "#{venue.id} returns a list of asset balances" do
+      setup_venue(@venue.id)
 
-      use_cassette "venue_adapters/shared/asset_balances/#{@adapter.id}/success" do
-        assert {:ok, balances} = Tai.Venues.Client.asset_balances(@adapter, @account_id)
+      use_cassette "venue_adapters/shared/asset_balances/#{@venue.id}/success" do
+        assert {:ok, balances} = Tai.Venues.Client.asset_balances(@venue, @account_id)
         assert Enum.count(balances) > 0
         assert [%Tai.Venues.AssetBalance{} = balance | _] = balances
-        assert balance.venue_id == @adapter.id
+        assert balance.venue_id == @venue.id
         assert balance.account_id == @account_id
         assert Decimal.cmp(balance.free, Decimal.new(0)) != :lt
         assert Decimal.cmp(balance.locked, Decimal.new(0)) != :lt
@@ -39,7 +39,7 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
     end
   end)
 
-  def setup_adapter(:mock) do
+  def setup_venue(:mock) do
     Tai.TestSupport.Mocks.Responses.AssetBalances.for_venue_and_account(
       :mock,
       :main,
@@ -50,5 +50,5 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
     )
   end
 
-  def setup_adapter(_), do: nil
+  def setup_venue(_), do: nil
 end

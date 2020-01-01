@@ -28,10 +28,10 @@ defmodule Tai.Venues.Boot.ProductsTest do
         venues: %{my_venue: [enabled: true, adapter: MyAdapter, products: "btc_usd"]}
       )
 
-    %{my_venue: adapter} = Tai.Venues.Config.parse_adapters(config)
+    %{my_venue: venue} = Tai.Venues.Config.parse(config)
     Tai.Events.subscribe(Tai.Events.HydrateProducts)
 
-    Tai.Venues.Boot.Products.hydrate(adapter)
+    Tai.Venues.Boot.Products.hydrate(venue)
 
     assert_receive {Tai.Event,
                     %Tai.Events.HydrateProducts{
@@ -53,8 +53,8 @@ defmodule Tai.Venues.Boot.ProductsTest do
         }
       )
 
-    %{my_venue: adapter} = Tai.Venues.Config.parse_adapters(config)
-    assert {:ok, [%{symbol: :eth_usd}]} = Tai.Venues.Boot.Products.hydrate(adapter)
+    assert %{my_venue: venue} = Tai.Venues.Config.parse(config)
+    assert {:ok, [%{symbol: :eth_usd}]} = Tai.Venues.Boot.Products.hydrate(venue)
   end
 
   def custom_filter_helper(products, exact_match),

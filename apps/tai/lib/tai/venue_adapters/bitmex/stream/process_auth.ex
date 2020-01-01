@@ -3,14 +3,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
   alias __MODULE__
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue_id: venue_id, tasks: map}
 
     @enforce_keys ~w(venue_id tasks)a
     defstruct ~w(venue_id tasks)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
 
   def start_link(venue_id: venue_id) do
     state = %State{venue_id: venue_id, tasks: %{}}

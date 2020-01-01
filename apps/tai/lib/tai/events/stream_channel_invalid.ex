@@ -1,5 +1,5 @@
 defmodule Tai.Events.StreamChannelInvalid do
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
+  @type venue_id :: Tai.Venue.id()
   @type t :: %Tai.Events.StreamChannelInvalid{
           venue: venue_id,
           name: atom,

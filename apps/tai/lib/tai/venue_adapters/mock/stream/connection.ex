@@ -5,17 +5,17 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   alias Tai.Events
 
   defmodule State do
-    @type venue_id :: Tai.Venues.Adapter.venue_id()
+    @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue_id: venue_id}
 
     @enforce_keys ~w(venue_id)a
     defstruct ~w(venue_id)a
   end
 
-  @type venue_id :: Tai.Venues.Adapter.venue_id()
-  @type channel :: Tai.Venues.Adapter.channel()
-  @type account_id :: Tai.Venues.Adapter.account_id()
-  @type account_config :: map
+  @type venue_id :: Tai.Venue.id()
+  @type channel :: Tai.Venue.channel()
+  @type account_id :: Tai.Venue.account_id()
+  @type account :: Tai.Venue.account()
   @type product :: Tai.Venues.Product.t()
   @type msg :: map
 
@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
           url: String.t(),
           venue_id: venue_id,
           channels: [channel],
-          account: {account_id, account_config} | nil,
+          account: {account_id, account} | nil,
           products: [product]
         ) :: {:ok, pid}
   def start_link(url: url, venue_id: venue_id, channels: _, account: _, products: _) do
