@@ -27,7 +27,7 @@ defmodule Tai.Venues.Adapters.CreateOrderCloseTest do
 
         use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_close_insufficient_position" do
           assert {:error, :insufficient_position} =
-                   Tai.Venue.create_order(order, @close_test_adapters)
+                   Tai.Venues.Client.create_order(order, @close_test_adapters)
         end
       end
     end)

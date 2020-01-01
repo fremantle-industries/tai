@@ -27,7 +27,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
           order = build_order(@adapter.id, @side, :fok, action: :filled)
 
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_fok_filled" do
-            assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size
@@ -43,7 +43,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
           order = build_order(@adapter.id, @side, :fok, action: :expired)
 
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_fok_expired" do
-            assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size

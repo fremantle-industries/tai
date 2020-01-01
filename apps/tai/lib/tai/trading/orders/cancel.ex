@@ -43,7 +43,7 @@ defmodule Tai.Trading.Orders.Cancel do
     end
   end
 
-  defdelegate send_to_venue(order), to: Tai.Venue, as: :cancel_order
+  defdelegate send_to_venue(order), to: Tai.Venues.Client, as: :cancel_order
 
   defp parse_response({:ok, %Cancel{} = response}, order, provider) do
     %OrderStore.Actions.Cancel{

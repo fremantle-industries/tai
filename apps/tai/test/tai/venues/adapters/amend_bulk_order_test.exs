@@ -25,12 +25,13 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
       attrs = amend_attrs(@adapter.id, price: amend_price, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/amend_bulk_price_and_qty_ok" do
-        assert {:ok, create_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, create_response} =
+                 Tai.Venues.Client.create_order(enqueued_order, @test_adapters)
 
         open_order = build_open_order(enqueued_order, create_response)
 
         assert {:ok, amend_bulk_response} =
-                 Tai.Venue.amend_bulk_orders([{open_order, attrs}], @test_adapters)
+                 Tai.Venues.Client.amend_bulk_orders([{open_order, attrs}], @test_adapters)
 
         assert Enum.count(amend_bulk_response.orders) == 1
 

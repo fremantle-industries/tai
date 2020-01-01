@@ -28,7 +28,7 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
           order = build_order(@adapter.id, @side, :ioc, action: :filled)
 
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_filled" do
-            assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size
@@ -44,7 +44,7 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
           order = build_order(@adapter.id, @side, :ioc, action: :partially_filled)
 
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_partially_filled" do
-            assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size
@@ -61,7 +61,7 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
           order = build_order(@adapter.id, @side, :ioc, action: :unfilled)
 
           use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_ioc_unfilled" do
-            assert {:ok, order_response} = Tai.Venue.create_order(order, @test_adapters)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size

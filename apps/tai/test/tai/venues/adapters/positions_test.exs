@@ -26,7 +26,7 @@ defmodule Tai.Venues.Adapters.PositionsTest do
 
     test "#{adapter.id} returns a list of positions" do
       use_cassette "venue_adapters/shared/positions/#{@adapter.id}/success" do
-        assert {:ok, positions} = Tai.Venue.positions(@adapter, @account_id)
+        assert {:ok, positions} = Tai.Venues.Client.positions(@adapter, @account_id)
         assert Enum.count(positions) > 0
         assert [position | _] = positions
         assert position.venue_id == @adapter.id

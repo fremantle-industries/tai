@@ -24,11 +24,12 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       enqueued_order = build_enqueued_order(@adapter.id)
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_ok" do
-        assert {:ok, order_response} = Tai.Venue.create_order(enqueued_order, @test_adapters)
+        assert {:ok, order_response} =
+                 Tai.Venues.Client.create_order(enqueued_order, @test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert {:ok, order_response} = Tai.Venue.cancel_order(open_order, @test_adapters)
+        assert {:ok, order_response} = Tai.Venues.Client.cancel_order(open_order, @test_adapters)
         assert order_response.id != nil
         assert order_response.status == :canceled
         assert order_response.leaves_qty == Decimal.new(0)
@@ -45,11 +46,13 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_ok" do
         assert {:ok, order_response} =
-                 Tai.Venue.create_order(enqueued_order, @accepted_test_adapters)
+                 Tai.Venues.Client.create_order(enqueued_order, @accepted_test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert {:ok, order_response} = Tai.Venue.cancel_order(open_order, @accepted_test_adapters)
+        assert {:ok, order_response} =
+                 Tai.Venues.Client.cancel_order(open_order, @accepted_test_adapters)
+
         assert %OrderResponses.CancelAccepted{} = order_response
         assert order_response.id != nil
       end

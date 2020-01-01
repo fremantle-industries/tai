@@ -28,7 +28,8 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_error_not_found" do
         order = build_not_found_order(@adapter.id)
 
-        assert Tai.Venue.cancel_order(order, @not_found_test_adapters) == {:error, :not_found}
+        assert Tai.Venues.Client.cancel_order(order, @not_found_test_adapters) ==
+                 {:error, :not_found}
       end
     end
   end)
@@ -46,7 +47,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
 
         use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_#{@error_reason}" do
           assert {:ok, order_response} =
-                   Tai.Venue.create_order(enqueued_order, @timeout_test_adapters)
+                   Tai.Venues.Client.create_order(enqueued_order, @timeout_test_adapters)
 
           open_order = build_open_order(enqueued_order, order_response)
 
@@ -55,7 +56,9 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
             post: fn _url, _body, _headers ->
               {:error, %HTTPoison.Error{reason: @error_reason}}
             end do
-            assert {:error, reason} = Tai.Venue.cancel_order(open_order, @timeout_test_adapters)
+            assert {:error, reason} =
+                     Tai.Venues.Client.cancel_order(open_order, @timeout_test_adapters)
+
             assert reason == @error_reason
           end
         end
@@ -72,11 +75,11 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_overloaded_error" do
         assert {:ok, order_response} =
-                 Tai.Venue.create_order(enqueued_order, @overloaded_test_adapters)
+                 Tai.Venues.Client.create_order(enqueued_order, @overloaded_test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert Tai.Venue.cancel_order(open_order, @overloaded_test_adapters) ==
+        assert Tai.Venues.Client.cancel_order(open_order, @overloaded_test_adapters) ==
                  {:error, :overloaded}
       end
     end
@@ -91,12 +94,15 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_nonce_not_increasing_error" do
         assert {:ok, order_response} =
-                 Tai.Venue.create_order(enqueued_order, @nonce_not_increasing_test_adapters)
+                 Tai.Venues.Client.create_order(
+                   enqueued_order,
+                   @nonce_not_increasing_test_adapters
+                 )
 
         open_order = build_open_order(enqueued_order, order_response)
 
         assert {:error, {:nonce_not_increasing, msg}} =
-                 Tai.Venue.cancel_order(open_order, @nonce_not_increasing_test_adapters)
+                 Tai.Venues.Client.cancel_order(open_order, @nonce_not_increasing_test_adapters)
 
         assert msg != nil
       end
@@ -112,11 +118,11 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_rate_limited_error" do
         assert {:ok, order_response} =
-                 Tai.Venue.create_order(enqueued_order, @rate_limited_test_adapters)
+                 Tai.Venues.Client.create_order(enqueued_order, @rate_limited_test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
-        assert Tai.Venue.cancel_order(open_order, @rate_limited_test_adapters) ==
+        assert Tai.Venues.Client.cancel_order(open_order, @rate_limited_test_adapters) ==
                  {:error, :rate_limited}
       end
     end
@@ -131,12 +137,12 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
 
       use_cassette "venue_adapters/shared/orders/#{@adapter.id}/cancel_unhandled_error" do
         assert {:ok, order_response} =
-                 Tai.Venue.create_order(enqueued_order, @unhandled_test_adapters)
+                 Tai.Venues.Client.create_order(enqueued_order, @unhandled_test_adapters)
 
         open_order = build_open_order(enqueued_order, order_response)
 
         assert {:error, {:unhandled, error}} =
-                 Tai.Venue.cancel_order(open_order, @unhandled_test_adapters)
+                 Tai.Venues.Client.cancel_order(open_order, @unhandled_test_adapters)
 
         assert error != nil
       end

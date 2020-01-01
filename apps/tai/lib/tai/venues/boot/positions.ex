@@ -11,7 +11,7 @@ defmodule Tai.Venues.Boot.Positions do
   end
 
   defp fetch_and_add({account_id, _}, :ok, adapter) do
-    with {:ok, positions} <- Tai.Venue.positions(adapter, account_id) do
+    with {:ok, positions} <- Tai.Venues.Client.positions(adapter, account_id) do
       Enum.each(positions, &Tai.Trading.PositionStore.add/1)
       total = Enum.count(positions)
 

@@ -44,7 +44,7 @@ defmodule Tai.Trading.Orders.Create do
   defp notify_initial_updated_order(order), do: NotifyOrderUpdate.notify!(nil, order)
 
   defp send_to_venue(order) do
-    result = Tai.Venue.create_order(order)
+    result = Tai.Venues.Client.create_order(order)
     {result, order}
   end
 

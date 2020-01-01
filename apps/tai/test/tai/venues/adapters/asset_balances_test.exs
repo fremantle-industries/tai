@@ -28,7 +28,7 @@ defmodule Tai.Venues.Adapters.AssetBalancesTest do
       setup_adapter(@adapter.id)
 
       use_cassette "venue_adapters/shared/asset_balances/#{@adapter.id}/success" do
-        assert {:ok, balances} = Tai.Venue.asset_balances(@adapter, @account_id)
+        assert {:ok, balances} = Tai.Venues.Client.asset_balances(@adapter, @account_id)
         assert Enum.count(balances) > 0
         assert [%Tai.Venues.AssetBalance{} = balance | _] = balances
         assert balance.venue_id == @adapter.id

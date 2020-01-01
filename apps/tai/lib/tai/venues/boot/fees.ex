@@ -10,7 +10,7 @@ defmodule Tai.Venues.Boot.Fees do
   end
 
   defp fee_schedules({account_id, _}, adapter) do
-    schedule_result = Tai.Venue.maker_taker_fees(adapter, account_id)
+    schedule_result = Tai.Venues.Client.maker_taker_fees(adapter, account_id)
     {schedule_result, account_id}
   end
 

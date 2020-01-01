@@ -46,7 +46,7 @@ defmodule Tai.Trading.Orders.Amend do
     end
   end
 
-  defdelegate send_amend_order(order, attrs), to: Tai.Venue, as: :amend_order
+  defdelegate send_amend_order(order, attrs), to: Tai.Venues.Client, as: :amend_order
 
   defp parse_response({:ok, amend_response}, client_id, provider) do
     %OrderStore.Actions.Amend{

@@ -13,7 +13,7 @@ defmodule Tai.Venues.Adapters.Bitmex.ProductsTest do
 
   test "retrieves the trade rules for each product", %{adapter: adapter} do
     use_cassette "venue_adapters/shared/products/bitmex/success" do
-      assert {:ok, products} = Tai.Venue.products(adapter)
+      assert {:ok, products} = Tai.Venues.Client.products(adapter)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :xbtusd)
       assert product.venue_id == :bitmex
       assert product.venue_symbol == "XBTUSD"
@@ -27,7 +27,7 @@ defmodule Tai.Venues.Adapters.Bitmex.ProductsTest do
 
   test "bubbles errors without the rate limit", %{adapter: adapter} do
     with_mock HTTPoison, request: fn _url -> {:error, %HTTPoison.Error{reason: :timeout}} end do
-      assert Tai.Venue.products(adapter) == {:error, :timeout}
+      assert Tai.Venues.Client.products(adapter) == {:error, :timeout}
     end
   end
 

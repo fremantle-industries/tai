@@ -52,7 +52,7 @@ defmodule Tai.Trading.Orders.AmendBulk do
     pending_orders
   end
 
-  defdelegate send_amend_orders(orders), to: Tai.Venue, as: :amend_bulk_orders
+  defdelegate send_amend_orders(orders), to: Tai.Venues.Client, as: :amend_bulk_orders
 
   defp parse_response({:ok, %{orders: amend_responses}}, orders_and_attributes, provider) do
     amend_responses

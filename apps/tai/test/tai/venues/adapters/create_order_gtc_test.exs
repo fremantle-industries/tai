@@ -26,7 +26,8 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
         order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :filled)
 
         use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_filled" do
-          assert {:ok, order_response} = Tai.Venue.create_order(order, @open_test_adapters)
+          assert {:ok, order_response} =
+                   Tai.Venues.Client.create_order(order, @open_test_adapters)
 
           assert order_response.id != nil
           assert %Decimal{} = order_response.original_size
@@ -42,7 +43,8 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
         order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :partially_filled)
 
         use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_partially_filled" do
-          assert {:ok, order_response} = Tai.Venue.create_order(order, @open_test_adapters)
+          assert {:ok, order_response} =
+                   Tai.Venues.Client.create_order(order, @open_test_adapters)
 
           assert order_response.id != nil
           assert %Decimal{} = order_response.original_size
@@ -60,7 +62,8 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
         order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :unfilled)
 
         use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_unfilled" do
-          assert {:ok, order_response} = Tai.Venue.create_order(order, @open_test_adapters)
+          assert {:ok, order_response} =
+                   Tai.Venues.Client.create_order(order, @open_test_adapters)
 
           assert order_response.id != nil
           assert order_response.status == :open
@@ -85,7 +88,8 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
         order = build_order(@adapter.id, @side, :gtc, post_only: false, action: :unfilled)
 
         use_cassette "venue_adapters/shared/orders/#{@adapter.id}/#{@side}_limit_gtc_unfilled" do
-          assert {:ok, order_response} = Tai.Venue.create_order(order, @accepted_test_adapters)
+          assert {:ok, order_response} =
+                   Tai.Venues.Client.create_order(order, @accepted_test_adapters)
 
           assert %Tai.Trading.OrderResponses.CreateAccepted{} = order_response
           assert order_response.id != nil
