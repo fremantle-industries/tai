@@ -1,12 +1,11 @@
 defmodule Tai.Venues.Boot.ProductsTest do
   use ExUnit.Case, async: false
-  doctest Tai.Venues.Boot.Products
 
   defmodule MyAdapter do
     def products(_) do
       products = [
-        struct(Tai.Venues.Product, %{symbol: :btc_usd}),
-        struct(Tai.Venues.Product, %{symbol: :eth_usd})
+        struct(Tai.Venues.Product, symbol: :btc_usd),
+        struct(Tai.Venues.Product, symbol: :eth_usd)
       ]
 
       {:ok, products}
@@ -20,6 +19,22 @@ defmodule Tai.Venues.Boot.ProductsTest do
 
     {:ok, _} = Application.ensure_all_started(:tai)
     :ok
+  end
+
+  test "allows filtering with custom function" do
+    config =
+      Tai.Config.parse(
+        venues: %{
+          my_venue: [
+            enabled: true,
+            adapter: MyAdapter,
+            products: &custom_filter_helper(&1, :eth_usd)
+          ]
+        }
+      )
+
+    assert %{my_venue: venue} = Tai.Venues.Config.parse(config)
+    assert {:ok, [%{symbol: :eth_usd}]} = Tai.Venues.Boot.Products.hydrate(venue)
   end
 
   test ".hydrate broadcasts a summary event" do
@@ -39,22 +54,6 @@ defmodule Tai.Venues.Boot.ProductsTest do
                       total: 2,
                       filtered: 1
                     }, _}
-  end
-
-  test "allows filtering with custom function" do
-    config =
-      Tai.Config.parse(
-        venues: %{
-          my_venue: [
-            enabled: true,
-            adapter: MyAdapter,
-            products: &custom_filter_helper(&1, :eth_usd)
-          ]
-        }
-      )
-
-    assert %{my_venue: venue} = Tai.Venues.Config.parse(config)
-    assert {:ok, [%{symbol: :eth_usd}]} = Tai.Venues.Boot.Products.hydrate(venue)
   end
 
   def custom_filter_helper(products, exact_match),
