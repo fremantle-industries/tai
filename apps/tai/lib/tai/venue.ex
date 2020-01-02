@@ -4,15 +4,15 @@ defmodule Tai.Venue do
   @type id :: atom
   @type adapter :: Tai.Venues.Adapter.t()
   @type channel :: atom
-  @type account_id :: atom
-  @type account :: map
-  @type accounts :: %{account_id => account}
+  @type credential_id :: atom
+  @type credential :: map
+  @type credentials :: %{credential_id => account}
   @type t :: %Venue{
           id: id,
           adapter: adapter,
           channels: [channel],
           products: String.t() | function,
-          accounts: accounts,
+          credentials: credentials,
           quote_depth: pos_integer,
           timeout: non_neg_integer,
           opts: map
@@ -23,7 +23,7 @@ defmodule Tai.Venue do
     adapter
     channels
     products
-    accounts
+    credentials
     quote_depth
     timeout
     opts
@@ -33,7 +33,7 @@ defmodule Tai.Venue do
     adapter
     channels
     products
-    accounts
+    credentials
     quote_depth
     timeout
     opts
@@ -53,30 +53,29 @@ defmodule Tai.Venue do
     Tai.Venues.Client.products(venue_adapter)
   end
 
-  @type asset_balance :: Tai.Venues.AssetBalance.t()
+  @type account :: Tai.Venues.Account.t()
 
-  @deprecated "Use Tai.Venues.Client.asset_balances/2 instead."
-  @spec asset_balances(t, account_id) ::
-          {:ok, [asset_balance]} | {:error, shared_error_reason}
-  def asset_balances(venue_adapter, account_id) do
-    Tai.Venues.Client.asset_balances(venue_adapter, account_id)
+  @deprecated "Use Tai.Venues.Client.accounts/2 instead."
+  @spec accounts(t, credential_id) :: {:ok, [account]} | {:error, shared_error_reason}
+  def accounts(venue, credential_id) do
+    Tai.Venues.Client.accounts(venue, credential_id)
   end
 
   @type position :: Tai.Trading.Position.t()
   @type positions_error_reason :: Adapter.positions_error_reason()
 
   @deprecated "Use Tai.Venues.Client.positions/2 instead."
-  @spec positions(t, account_id) :: {:ok, [position]} | {:error, positions_error_reason}
-  def positions(venue_adapter, account_id) do
-    Tai.Venues.Client.positions(venue_adapter, account_id)
+  @spec positions(t, credential_id) :: {:ok, [position]} | {:error, positions_error_reason}
+  def positions(venue, credential_id) do
+    Tai.Venues.Client.positions(venue, credential_id)
   end
 
   @deprecated "Use Tai.Venues.Client.maker_taker_fees/2 instead."
-  @spec maker_taker_fees(t, account_id) ::
+  @spec maker_taker_fees(t, credential_id) ::
           {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil}
           | {:error, shared_error_reason}
-  def maker_taker_fees(venue_adapter, account_id) do
-    Tai.Venues.Client.maker_taker_fees(venue_adapter, account_id)
+  def maker_taker_fees(venue, credential_id) do
+    Tai.Venues.Client.maker_taker_fees(venue, credential_id)
   end
 
   @type create_response :: OrderResponses.Create.t() | OrderResponses.CreateAccepted.t()

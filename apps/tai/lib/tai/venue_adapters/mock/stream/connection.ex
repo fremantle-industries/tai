@@ -14,8 +14,8 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   @type venue_id :: Tai.Venue.id()
   @type channel :: Tai.Venue.channel()
-  @type account_id :: Tai.Venue.account_id()
-  @type account :: Tai.Venue.account()
+  @type credential_id :: Tai.Venue.credential_id()
+  @type credential :: Tai.Venue.credential()
   @type product :: Tai.Venues.Product.t()
   @type msg :: map
 
@@ -23,10 +23,10 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
           url: String.t(),
           venue_id: venue_id,
           channels: [channel],
-          account: {account_id, account} | nil,
+          credentials: {credential_id, credential} | nil,
           products: [product]
         ) :: {:ok, pid}
-  def start_link(url: url, venue_id: venue_id, channels: _, account: _, products: _) do
+  def start_link(url: url, venue_id: venue_id, channels: _, credentials: _, products: _) do
     conn = %State{venue_id: venue_id}
     name = venue_id |> to_name
 

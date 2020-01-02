@@ -13,7 +13,7 @@ defmodule Examples.PingPong.CreateEntryOrder do
 
     %OrderSubmissions.BuyLimitGtc{
       venue_id: market_quote.venue_id,
-      account_id: config.fee.account_id,
+      credential_id: config.fee.credential_id,
       product_symbol: config.product.symbol,
       price: price,
       qty: config.max_qty,

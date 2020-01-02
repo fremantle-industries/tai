@@ -1,12 +1,12 @@
 defmodule Tai.Trading.OrderSubmissions.BuyLimitGtc do
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
+  @type credential_id :: Tai.Venue.credential_id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type product_type :: Tai.Venues.Product.type()
   @type callback :: Tai.Trading.Order.callback()
   @type t :: %Tai.Trading.OrderSubmissions.BuyLimitGtc{
           venue_id: venue_id,
-          account_id: account_id,
+          credential_id: credential_id,
           product_symbol: product_symbol,
           product_type: product_type,
           price: Decimal.t(),
@@ -18,7 +18,7 @@ defmodule Tai.Trading.OrderSubmissions.BuyLimitGtc do
 
   @enforce_keys ~w(
     venue_id
-    account_id
+    credential_id
     product_symbol
     product_type
     price
@@ -27,7 +27,7 @@ defmodule Tai.Trading.OrderSubmissions.BuyLimitGtc do
   )a
   defstruct ~w(
     venue_id
-    account_id
+    credential_id
     product_symbol
     product_type
     price

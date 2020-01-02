@@ -3,7 +3,7 @@ defmodule Tai.Venues.Boot do
   Coordinates the asynchronous hydration of a venue:
 
   - products
-  - asset balances
+  - accounts
   - fees
   """
 
@@ -14,20 +14,20 @@ defmodule Tai.Venues.Boot do
   @spec run(venue) :: {:ok, venue} | {:error, {venue, [reason :: term]}}
   def run(venue) do
     venue
-    |> hydrate_products_and_balances
+    |> hydrate_products_and_accounts
     |> wait_for_products
     |> hydrate_fees_and_positions_and_start_streams
-    |> wait_for_balances_and_fees
+    |> wait_for_accounts_and_fees
   end
 
-  defp hydrate_products_and_balances(venue) do
+  defp hydrate_products_and_accounts(venue) do
     t_products = Task.async(Boot.Products, :hydrate, [venue])
-    t_balances = Task.async(Boot.AssetBalances, :hydrate, [venue])
-    {venue, t_products, t_balances}
+    t_accounts = Task.async(Boot.Accounts, :hydrate, [venue])
+    {venue, t_products, t_accounts}
   end
 
-  defp wait_for_products({venue, t_products, t_balances}) do
-    working_tasks = [asset_balances: t_balances]
+  defp wait_for_products({venue, t_products, t_accounts}) do
+    working_tasks = [accounts: t_accounts]
 
     case Task.await(t_products, venue.timeout) do
       {:ok, products} ->
@@ -51,12 +51,12 @@ defmodule Tai.Venues.Boot do
 
   defp hydrate_fees_and_positions_and_start_streams({:error, _, _, _} = error), do: error
 
-  defp wait_for_balances_and_fees({:ok, venue, working_tasks}) do
+  defp wait_for_accounts_and_fees({:ok, venue, working_tasks}) do
     venue
     |> collect_remaining_errors(working_tasks, [])
   end
 
-  defp wait_for_balances_and_fees({:error, venue, working_tasks, err_reasons}) do
+  defp wait_for_accounts_and_fees({:error, venue, working_tasks, err_reasons}) do
     venue
     |> collect_remaining_errors(working_tasks, err_reasons)
   end

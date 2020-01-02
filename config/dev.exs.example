@@ -30,7 +30,7 @@ config :tai,
       adapter: Tai.VenueAdapters.Bitmex,
       products: "xbtusd",
       quote_depth: 3,
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "BITMEX_API_KEY"},
           api_secret: {:system_file, "BITMEX_API_SECRET"}
@@ -44,7 +44,7 @@ config :tai,
       enabled: true,
       adapter: Tai.VenueAdapters.OkEx,
       products: "eth_usd_190419 eth_usd_190426 eth_usd_190628",
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "OKEX_API_KEY"},
           api_secret: {:system_file, "OKEX_API_SECRET"},
@@ -56,7 +56,7 @@ config :tai,
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,
       products: "btc_usdt ltc_usdt eth_usdt",
-      accounts: %{
+      credentials: %{
         main: %{
           api_key: {:system_file, "BINANCE_API_KEY"},
           secret_key: {:system_file, "BINANCE_API_SECRET"}
@@ -67,7 +67,7 @@ config :tai,
       enabled: true,
       adapter: Tai.VenueAdapters.Gdax,
       products: "btc_usd ltc_usd eth_usd",
-      accounts: %{
+      credentials: %{
         main: %{
           api_url: "https://api.pro.coinbase.com",
           api_key: {:system_file, "GDAX_API_KEY"},

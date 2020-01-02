@@ -2,8 +2,8 @@ defmodule Tai.TestSupport.Helpers do
   def test_venue_adapters_products,
     do: :test_venue_adapters_products |> filter()
 
-  def test_venue_adapters_asset_balances,
-    do: :test_venue_adapters_asset_balances |> filter()
+  def test_venue_adapters_accounts,
+    do: :test_venue_adapters_accounts |> filter()
 
   def test_venue_adapters_maker_taker_fees,
     do: :test_venue_adapters_maker_taker_fees |> filter()

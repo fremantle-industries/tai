@@ -5,7 +5,7 @@ defmodule Tai.Commands.Help do
 
   def help do
     IO.puts("""
-    * balance
+    * accounts
     * products
     * fees
     * markets

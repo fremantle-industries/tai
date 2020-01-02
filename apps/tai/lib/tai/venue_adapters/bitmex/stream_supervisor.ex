@@ -28,7 +28,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   @endpoint "wss://" <> ExBitmex.Rest.HTTPClient.domain() <> "/realtime"
 
   def init(venue: venue, products: products) do
-    account = venue.accounts |> Map.to_list() |> List.first()
+    credential = venue.credentials |> Map.to_list() |> List.first()
 
     market_quote_children = market_quote_children(products, venue.quote_depth)
     order_book_children = order_book_children(products)
@@ -43,7 +43,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
          url: @endpoint,
          venue: venue.id,
          channels: venue.channels,
-         account: account,
+         credential: credential,
          products: products,
          quote_depth: venue.quote_depth,
          opts: venue.opts

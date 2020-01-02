@@ -67,7 +67,6 @@ defmodule Tai.Trading.OrderStore.ActionsTest do
   defp build_submission do
     struct(Tai.Trading.OrderSubmissions.BuyLimitGtc,
       venue_id: :test_exchange_a,
-      account_id: :main,
       product_symbol: :btc_usd,
       price: Decimal.new("100.1"),
       qty: Decimal.new("1.1")

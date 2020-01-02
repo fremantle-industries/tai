@@ -17,7 +17,7 @@ defmodule Tai.Application do
       Tai.Markets.QuoteStore,
       Tai.Venues.ProductStore,
       Tai.Venues.FeeStore,
-      Tai.Venues.AssetBalanceStore,
+      Tai.Venues.AccountStore,
       Tai.Venues.StreamsSupervisor,
       {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},
       Tai.Advisors.Store,

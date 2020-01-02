@@ -8,7 +8,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
   defmodule TestFilledProvider do
     @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
     @venue :test_exchange_a
-    @account :main
+    @credential :main
 
     def update(%OrderStore.Actions.PendCancel{} = action) do
       open_order =
@@ -16,7 +16,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
           client_id: action.client_id,
           venue_order_id: @venue_order_id,
           venue_id: @venue,
-          account_id: @account,
+          credential_id: @credential,
           status: :open
         )
 
@@ -25,7 +25,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
           client_id: open_order.client_id,
           venue_order_id: open_order.venue_order_id,
           venue_id: open_order.venue_id,
-          account_id: open_order.account_id,
+          credential_id: open_order.credential_id,
           status: :pending_cancel
         )
 

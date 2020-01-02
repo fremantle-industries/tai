@@ -1,5 +1,5 @@
 defmodule Tai.Events.VenueBoot do
-  alias Tai.Events.VenueBoot
+  alias __MODULE__
 
   @type venue_id :: Tai.Venue.id()
   @type t :: %VenueBoot{venue: venue_id}

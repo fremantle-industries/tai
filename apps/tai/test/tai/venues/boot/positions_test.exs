@@ -29,7 +29,7 @@ defmodule Tai.Venues.Boot.PositionsTest do
           my_venue: [
             enabled: true,
             adapter: MyAdapter,
-            accounts: %{main: %{}},
+            credentials: %{main: %{}},
             products: "btc_usd"
           ]
         }

@@ -18,20 +18,20 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def asset_balances(venue_id, account_id, _credentials) do
+  def accounts(venue_id, credential_id, _credentials) do
     with_mock_server(fn ->
-      {:asset_balances, venue_id, account_id}
+      {:accounts, venue_id, credential_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, asset_balances} -> {:ok, asset_balances}
+        {:ok, accounts} -> {:ok, accounts}
         {:error, :not_found} -> {:error, :mock_response_not_found}
       end
     end)
   end
 
-  def maker_taker_fees(venue_id, account_id, _credentials) do
+  def maker_taker_fees(venue_id, credential_id, _credentials) do
     with_mock_server(fn ->
-      {:maker_taker_fees, venue_id, account_id}
+      {:maker_taker_fees, venue_id, credential_id}
       |> Mocks.Server.eject()
       |> case do
         {:ok, fees} -> {:ok, fees}
@@ -103,7 +103,7 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def positions(_venue_id, _account_id, _credentials) do
+  def positions(_venue_id, _credential_id, _credentials) do
     {:error, :not_supported}
   end
 end

@@ -1,8 +1,8 @@
 defmodule Tai.Events.StreamAuthOk do
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
-  @type t :: %Tai.Events.StreamAuthOk{venue: venue_id, account: account_id}
+  @type credential_id :: Tai.Venue.credential_id()
+  @type t :: %Tai.Events.StreamAuthOk{venue: venue_id, credential: credential_id}
 
-  @enforce_keys ~w(venue account)a
-  defstruct ~w(venue account)a
+  @enforce_keys ~w(venue credential)a
+  defstruct ~w(venue credential)a
 end

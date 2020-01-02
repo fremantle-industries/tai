@@ -16,7 +16,7 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   def init(venue: venue, products: products) do
-    account = venue.accounts |> Map.to_list() |> List.first()
+    credential = venue.credentials |> Map.to_list() |> List.first()
 
     market_quote_children = market_quote_children(products, venue.quote_depth)
     order_book_children = order_book_children(products)
@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
          url: url(),
          venue_id: venue.id,
          channels: venue.channels,
-         account: account,
+         credentials: credential,
          products: products
        ]}
     ]

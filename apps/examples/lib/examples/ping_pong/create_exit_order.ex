@@ -13,7 +13,7 @@ defmodule Examples.PingPong.CreateExitOrder do
 
     %OrderSubmissions.SellLimitGtc{
       venue_id: updated_entry_order.venue_id,
-      account_id: updated_entry_order.account_id,
+      credential_id: updated_entry_order.credential_id,
       product_symbol: updated_entry_order.product_symbol,
       price: price,
       qty: qty,

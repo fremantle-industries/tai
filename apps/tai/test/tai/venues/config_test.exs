@@ -100,14 +100,14 @@ defmodule Tai.Venues.ConfigTest do
              } = Tai.Venues.Config.parse(config)
     end
 
-    test "can provide accounts" do
+    test "can provide credentials" do
       config =
         Tai.Config.parse(
           venues: %{
             venue_a: [
               enabled: true,
               adapter: MyAdapterA,
-              accounts: %{main: %{}}
+              credentials: %{main: %{}}
             ]
           }
         )
@@ -116,7 +116,7 @@ defmodule Tai.Venues.ConfigTest do
                venue_a: %Tai.Venue{
                  id: :venue_a,
                  adapter: MyAdapterA,
-                 accounts: %{main: %{}}
+                 credentials: %{main: %{}}
                }
              } = Tai.Venues.Config.parse(config)
     end

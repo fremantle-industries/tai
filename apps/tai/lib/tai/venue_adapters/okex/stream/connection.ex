@@ -6,27 +6,27 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   defmodule State do
     @type product :: Tai.Venues.Product.t()
     @type venue_id :: Tai.Venue.id()
-    @type account_id :: Tai.Venue.account_id()
+    @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
     @type route :: :auth | :order_books | :optional_channels
     @type t :: %State{
             venue: venue_id,
             routes: %{required(route) => atom},
             channels: [channel_name],
-            account: {account_id, map},
+            credential: {credential_id, map},
             products: [product]
           }
 
-    @enforce_keys ~w(venue routes channels account products)a
-    defstruct ~w(venue routes channels account products)a
+    @enforce_keys ~w(venue routes channels credential products)a
+    defstruct ~w(venue routes channels credential products)a
   end
 
   @type product :: Tai.Venues.Product.t()
   @type channel :: Tai.Venue.channel()
   @type endpoint :: String.t()
   @type venue_id :: Tai.Venue.id()
-  @type account_id :: Tai.Venue.account_id()
-  @type account :: Tai.Venue.account()
+  @type credential_id :: Tai.Venue.credential_id()
+  @type credential :: Tai.Venue.account()
   @type msg :: map | String.t()
   @type state :: State.t()
 
@@ -34,14 +34,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
           endpoint: endpoint,
           venue: venue_id,
           channels: [channel],
-          account: {account_id, account} | nil,
+          credential: {credential_id, credential} | nil,
           products: [product]
         ) :: {:ok, pid}
   def start_link(
         endpoint: endpoint,
         venue: venue,
         channels: channels,
-        account: account,
+        credential: credential,
         products: products
       ) do
     routes = %{
@@ -54,7 +54,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       venue: venue,
       routes: routes,
       channels: channels,
-      account: account,
+      credential: credential,
       products: products
     }
 
@@ -80,7 +80,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   @optional_channels [:trades]
   def handle_info(:init_subscriptions, state) do
     schedule_heartbeat()
-    if state.account, do: send(self(), :login)
+    if state.credential, do: send(self(), :login)
     send(self(), {:subscribe, :depth})
 
     state.channels
@@ -100,7 +100,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   end
 
   def handle_info(:login, state) do
-    args = Stream.Auth.args(state.account)
+    args = Stream.Auth.args(state.credential)
     msg = %{op: "login", args: args} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
@@ -152,9 +152,9 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   defp handle_msg(
          %{"event" => "login", "success" => true},
-         %State{account: {account_id, _}} = state
+         %State{credential: {credential_id, _}} = state
        ) do
-    Events.info(%Events.StreamAuthOk{venue: state.venue, account: account_id})
+    Events.info(%Events.StreamAuthOk{venue: state.venue, credential: credential_id})
     send(self(), {:subscribe, :orders})
     {:ok, state}
   end

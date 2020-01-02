@@ -1,12 +1,12 @@
 defmodule Tai.VenueAdapters.Bitmex.Positions do
-  def positions(venue_id, account_id, credentials) do
+  def positions(venue_id, credential_id, credentials) do
     venue_credentials = to_venue_credentials(credentials)
 
     with {:ok, venue_positions, _rate_limit} <-
            ExBitmex.Rest.Position.Index.get(venue_credentials) do
       positions =
         venue_positions
-        |> Enum.map(&build(&1, venue_id, account_id))
+        |> Enum.map(&build(&1, venue_id, credential_id))
         |> Enum.filter(& &1)
 
       {:ok, positions}
@@ -22,7 +22,7 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
 
   defp build(%ExBitmex.Position{current_qty: 0}, _, _), do: nil
 
-  defp build(venue_position, venue_id, account_id) do
+  defp build(venue_position, venue_id, credential_id) do
     # TODO: This should come from products
     product_symbol =
       venue_position.symbol
@@ -31,7 +31,7 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
 
     %Tai.Trading.Position{
       venue_id: venue_id,
-      account_id: account_id,
+      credential_id: credential_id,
       product_symbol: product_symbol,
       side: venue_position |> side(),
       qty: venue_position |> qty(),

@@ -28,7 +28,7 @@ defmodule Tai.Trading.Orders.CreateEnqueuedTest do
       assert order.client_id != nil
       assert order.venue_order_id == nil
       assert order.venue_id == submission.venue_id
-      assert order.account_id == submission.account_id
+      assert order.credential_id == submission.credential_id
       assert order.product_symbol == submission.product_symbol
       assert order.product_type == submission.product_type
       assert order.side == @side

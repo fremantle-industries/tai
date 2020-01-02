@@ -13,7 +13,7 @@ defmodule Tai.Venues.FeeStoreTest do
 
   @fee_info %Tai.Venues.FeeInfo{
     venue_id: :my_exchange,
-    account_id: :main_account,
+    credential_id: :main_credential,
     symbol: :btc_usdt,
     maker: Decimal.new("0.1"),
     maker_type: Tai.Venues.FeeInfo.percent(),
@@ -25,8 +25,8 @@ defmodule Tai.Venues.FeeStoreTest do
     test "insert the fee info into the ETS table" do
       assert Tai.Venues.FeeStore.upsert(@fee_info) == :ok
 
-      assert [{{:my_exchange, :main_account, :btc_usdt}, fee_info}] =
-               :ets.lookup(Tai.Venues.FeeStore, {:my_exchange, :main_account, :btc_usdt})
+      assert [{{:my_exchange, :main_credential, :btc_usdt}, fee_info}] =
+               :ets.lookup(Tai.Venues.FeeStore, {:my_exchange, :main_credential, :btc_usdt})
 
       assert fee_info == @fee_info
     end
@@ -60,7 +60,7 @@ defmodule Tai.Venues.FeeStoreTest do
       assert {:ok, fee_info} =
                Tai.Venues.FeeStore.find_by(
                  venue_id: :my_exchange,
-                 account_id: :main_account,
+                 credential_id: :main_credential,
                  symbol: :btc_usdt
                )
 
@@ -70,7 +70,7 @@ defmodule Tai.Venues.FeeStoreTest do
     test "returns an error tuple when not found" do
       assert Tai.Venues.FeeStore.find_by(
                venue_id: :my_exchange,
-               account_id: :main_account,
+               credential_id: :main_credential,
                symbol: :idontexist
              ) == {:error, :not_found}
     end

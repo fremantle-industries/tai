@@ -1,16 +1,7 @@
 defmodule Tai.Event do
-  @type t ::
-          Tai.Events.AddFreeAssetBalance.t()
-          | Tai.Events.HydrateProducts.t()
-          | Tai.Events.LockAssetBalanceInsufficientFunds.t()
-          | Tai.Events.LockAssetBalanceOk.t()
-          | Tai.Events.SubFreeAssetBalance.t()
-          | Tai.Events.UnlockAssetBalanceInsufficientFunds.t()
-          | Tai.Events.UnlockAssetBalanceOk.t()
-          | Tai.Events.UpsertAssetBalance.t()
-          | struct
+  @type t :: struct
 
-  @spec encode!(event :: t) :: iodata | no_return
+  @spec encode!(t) :: iodata | no_return
   def encode!(event) when is_map(event) do
     %{
       type: event |> extract_type,

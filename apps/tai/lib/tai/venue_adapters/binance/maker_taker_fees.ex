@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Binance.MakerTakerFees do
-  def maker_taker_fees(_venue_id, _account_id, credentials) do
+  def maker_taker_fees(_venue_id, _credential_id, credentials) do
     venue_credentials = struct!(ExBinance.Credentials, credentials)
 
     with {:ok, account} <- ExBinance.Private.account(venue_credentials) do

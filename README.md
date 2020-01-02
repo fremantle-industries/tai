@@ -17,14 +17,14 @@ Here's an example of an advisor that logs the spread between multiple products o
 
 ## Supported Venues
 
-| Venues | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
+| Venues | Live Order Book  | Accounts | Active Orders | Passive Orders | Products | Fees |
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|
 | BitMEX | [x] | [x] | [x] | [x] | [x] | [x] |
 | OkEx   | [x] | [x] | [x] | [x] | [x] | [x] |
 
 ## Venues In Progress
 
-| Venue    | Live Order Book  | Account Balance | Active Orders | Passive Orders | Products | Fees |
+| Venue    | Live Order Book  | Accounts | Active Orders | Passive Orders | Products | Fees |
 |----------|:---:|:---:|:---:|:---:|:---:|:---:|
 | Binance  | [x] | [x] | [x] | [ ] | [x] | [x] |
 | GDAX     | [x] | [x] | [ ] | [ ] | [x] | [x] |
@@ -91,7 +91,7 @@ Display the available commands and usage examples
 
 ```bash
 iex(1)> help
-* balance
+* accounts
 * products
 * fees
 * markets
@@ -104,19 +104,19 @@ iex(1)> help
 * disable_send_orders
 ```
 
-#### balance
+#### accounts
 
-Display all non-zero balances across configured accounts
+Display the configured accounts with non-zero balances
 
 ```
-iex(2)> balance
-+-------+---------+--------+------------+------------+------------+
-| Venue | Account | Symbol |       Free |     Locked |    Balance |
-+-------+---------+--------+------------+------------+------------+
-|  gdax |    main |    btc | 0.30000000 | 0.00000000 | 0.30000000 |
-|  gdax |    main |    ltc | 1.80009170 | 1.10000000 | 2.90009170 |
-|  gdax |    main |    usd |       0.01 |       0.00 |       0.01 |
-+-------+---------+--------+------------+------------+------------+
+iex(2)> accounts
++-------+------------+--------+------------+------------+------------+
+| Venue | Credential | Symbol |       Free |     Locked |    Balance |
++-------+------------+--------+------------+------------+------------+
+|  gdax |       main |    btc | 0.30000000 | 0.00000000 | 0.30000000 |
+|  gdax |       main |    ltc | 1.80009170 | 1.10000000 | 2.90009170 |
+|  gdax |       main |    usd |       0.01 |       0.00 |       0.01 |
++-------+------------+--------+------------+------------+------------+
 ```
 
 #### products
@@ -146,7 +146,7 @@ Display the maker/taker fees for every product from configured venue accounts
 ```
 iex(4)> fees
 +---------+------------+-----------+-------+-------+
-|   Venue | Account ID |    Symbol | Maker | Taker |
+|   Venue | Credential |    Symbol | Maker | Taker |
 +---------+------------+-----------+-------+-------+
 | binance |       main |   lsk_bnb |  0.1% |  0.1% |
 | binance |       main |   rlc_eth |  0.1% |  0.1% |
@@ -193,11 +193,11 @@ view these changes by running the `orders` command again.
 
 ```
 iex(6)> orders
-+--------+---------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
-|  Venue | Account | Symbol | Side |  Type |  Price | Qty | Leaves Qty | Cumulative Qty | Time in Force | Status | Client ID | Venue Order ID |    Enqueued At | Last Received At | Last Venue Timestamp |     Updated At | Error Reason |
-+--------+---------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
-| bitmex |    main | xbtm19 |  buy | limit | 3622.5 |  15 |         15 |              0 |           gtc |   open | 78f616... |      fe7486... | 11 seconds ago |   11 seconds ago |       11 seconds ago | 11 seconds ago |              |
-+--------+---------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
++--------+------------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
+|  Venue | Credential | Symbol | Side |  Type |  Price | Qty | Leaves Qty | Cumulative Qty | Time in Force | Status | Client ID | Venue Order ID |    Enqueued At | Last Received At | Last Venue Timestamp |     Updated At | Error Reason |
++--------+------------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
+| bitmex |       main | xbtm19 |  buy | limit | 3622.5 |  15 |         15 |              0 |           gtc |   open | 78f616... |      fe7486... | 11 seconds ago |   11 seconds ago |       11 seconds ago | 11 seconds ago |              |
++--------+------------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
 ```
 
 #### settings
