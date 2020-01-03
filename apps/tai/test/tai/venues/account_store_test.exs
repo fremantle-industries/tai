@@ -15,6 +15,8 @@ defmodule Tai.Venues.AccountStoreTest do
 
   describe ".upsert" do
     test "inserts the account into the ETS table" do
+      key = {:my_test_exchange, :my_test_credential, :btc}
+
       account =
         struct(Tai.Venues.Account, %{
           venue_id: :my_test_exchange,
@@ -23,34 +25,9 @@ defmodule Tai.Venues.AccountStoreTest do
         })
 
       assert AccountStore.upsert(account) == :ok
-
-      assert [{{:my_test_exchange, :my_test_credential, :btc}, ^account}] =
-               :ets.lookup(
-                 AccountStore,
-                 {:my_test_exchange, :my_test_credential, :btc}
-               )
-    end
-
-    test "broadcasts an event" do
-      Tai.Events.firehose_subscribe()
-
-      account =
-        struct(Tai.Venues.Account,
-          venue_id: :my_test_exchange,
-          credential_id: :my_test_credential,
-          asset: :btc,
-          free: Decimal.new("0.00000001"),
-          locked: Decimal.new(2)
-        )
-
-      :ok = AccountStore.upsert(account)
-
-      assert_receive {Tai.Event, %Tai.Events.UpsertAccount{} = event, _}
-      assert event.venue_id == :my_test_exchange
-      assert event.credential_id == :my_test_credential
-      assert event.asset == :btc
-      assert event.free == Decimal.new("0.00000001")
-      assert event.locked == Decimal.new(2)
+      assert [{returned_key, returned_account}] = :ets.lookup(AccountStore, key)
+      assert key == {:my_test_exchange, :my_test_credential, :btc}
+      assert returned_account == account
     end
   end
 

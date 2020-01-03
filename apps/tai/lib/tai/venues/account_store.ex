@@ -32,8 +32,8 @@ defmodule Tai.Venues.AccountStore do
   end
 
   @spec upsert(account) :: :ok
-  def upsert(balance) do
-    GenServer.call(__MODULE__, {:upsert, balance})
+  def upsert(account) do
+    GenServer.call(__MODULE__, {:upsert, account})
   end
 
   @spec add(venue_id, credential_id, asset, val :: number | String.t() | Decimal.t()) ::
@@ -67,7 +67,7 @@ defmodule Tai.Venues.AccountStore do
     |> :ets.select([{{:_, :_}, [], [:"$_"]}])
     |> Enum.reduce(
       [],
-      fn {_, balance}, acc -> [balance | acc] end
+      fn {_, account}, acc -> [account | acc] end
     )
   end
 
@@ -76,28 +76,28 @@ defmodule Tai.Venues.AccountStore do
     all()
     |> Enum.reduce(
       [],
-      fn balance, acc ->
+      fn account, acc ->
         matched_all_filters =
           filters
           |> Keyword.keys()
           |> Enum.all?(fn filter ->
             case filter do
               :venue_id ->
-                balance.venue_id == Keyword.get(filters, filter)
+                account.venue_id == Keyword.get(filters, filter)
 
               :credential_id ->
-                balance.credential_id == Keyword.get(filters, filter)
+                account.credential_id == Keyword.get(filters, filter)
 
               :asset ->
-                balance.asset == Keyword.get(filters, filter)
+                account.asset == Keyword.get(filters, filter)
 
               _ ->
-                Map.get(balance, filter) == Keyword.get(filters, filter)
+                Map.get(account, filter) == Keyword.get(filters, filter)
             end
           end)
 
         if matched_all_filters do
-          [balance | acc]
+          [account | acc]
         else
           acc
         end
@@ -107,8 +107,8 @@ defmodule Tai.Venues.AccountStore do
 
   @spec find_by(filters :: [...]) :: {:ok, account} | {:error, :not_found}
   def find_by(filters) do
-    with %Tai.Venues.Account{} = balance <- filters |> where() |> List.first() do
-      {:ok, balance}
+    with %Tai.Venues.Account{} = account <- filters |> where() |> List.first() do
+      {:ok, account}
     else
       nil ->
         {:error, :not_found}
@@ -122,17 +122,8 @@ defmodule Tai.Venues.AccountStore do
     {:reply, :ok, state}
   end
 
-  def handle_call({:upsert, balance}, _from, state) do
-    upsert_ets_table(balance)
-
-    Tai.Events.info(%Tai.Events.UpsertAccount{
-      venue_id: balance.venue_id,
-      credential_id: balance.credential_id,
-      asset: balance.asset,
-      free: balance.free,
-      locked: balance.locked
-    })
-
+  def handle_call({:upsert, account}, _from, state) do
+    upsert_ets_table(account)
     {:reply, :ok, state}
   end
 
@@ -201,13 +192,13 @@ defmodule Tai.Venues.AccountStore do
   def handle_call({:add, venue_id, credential_id, asset, val}, _from, state) do
     if Decimal.cmp(val, Decimal.new(0)) == :gt do
       case find_by(venue_id: venue_id, credential_id: credential_id, asset: asset) do
-        {:ok, balance} ->
-          new_free = Decimal.add(balance.free, val)
-          new_balance = Map.put(balance, :free, new_free)
-          upsert_ets_table(new_balance)
-          continue = {:add, venue_id, credential_id, asset, val, new_balance}
+        {:ok, account} ->
+          new_free = Decimal.add(account.free, val)
+          new_account = Map.put(account, :free, new_free)
+          upsert_ets_table(new_account)
+          continue = {:add, venue_id, credential_id, asset, val, new_account}
 
-          {:reply, {:ok, new_balance}, state, {:continue, continue}}
+          {:reply, {:ok, new_account}, state, {:continue, continue}}
 
         {:error, _} = error ->
           {:reply, error, state}
@@ -220,17 +211,17 @@ defmodule Tai.Venues.AccountStore do
   def handle_call({:sub, venue_id, credential_id, asset, val}, _from, state) do
     if Decimal.cmp(val, Decimal.new(0)) == :gt do
       case find_by(venue_id: venue_id, credential_id: credential_id, asset: asset) do
-        {:ok, balance} ->
-          new_free = Decimal.sub(balance.free, val)
+        {:ok, account} ->
+          new_free = Decimal.sub(account.free, val)
 
           if Decimal.cmp(new_free, Decimal.new(0)) == :lt do
             {:reply, {:error, :result_less_then_zero}, state}
           else
-            new_balance = Map.put(balance, :free, new_free)
-            upsert_ets_table(new_balance)
-            continue = {:sub, venue_id, credential_id, asset, val, new_balance}
+            new_account = Map.put(account, :free, new_free)
+            upsert_ets_table(new_account)
+            continue = {:sub, venue_id, credential_id, asset, val, new_account}
 
-            {:reply, {:ok, new_balance}, state, {:continue, continue}}
+            {:reply, {:ok, new_account}, state, {:continue, continue}}
           end
 
         {:error, _} = error ->
@@ -241,34 +232,34 @@ defmodule Tai.Venues.AccountStore do
     end
   end
 
-  def handle_continue({:add, venue_id, credential_id, asset, val, balance}, state) do
+  def handle_continue({:add, venue_id, credential_id, asset, val, account}, state) do
     Tai.Events.info(%Tai.Events.AddFreeAccount{
       venue_id: venue_id,
       credential_id: credential_id,
       asset: asset,
       val: val,
-      free: balance.free,
-      locked: balance.locked
+      free: account.free,
+      locked: account.locked
     })
 
     {:noreply, state}
   end
 
-  def handle_continue({:sub, venue_id, credential_id, asset, val, balance}, state) do
+  def handle_continue({:sub, venue_id, credential_id, asset, val, account}, state) do
     Tai.Events.info(%Tai.Events.SubFreeAccount{
       venue_id: venue_id,
       credential_id: credential_id,
       asset: asset,
       val: val,
-      free: balance.free,
-      locked: balance.locked
+      free: account.free,
+      locked: account.locked
     })
 
     {:noreply, state}
   end
 
-  defp upsert_ets_table(balance) do
-    record = {{balance.venue_id, balance.credential_id, balance.asset}, balance}
+  defp upsert_ets_table(account) do
+    record = {{account.venue_id, account.credential_id, account.asset}, account}
     :ets.insert(__MODULE__, record)
   end
 

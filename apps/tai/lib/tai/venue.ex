@@ -12,6 +12,7 @@ defmodule Tai.Venue do
           adapter: adapter,
           channels: [channel],
           products: String.t() | function,
+          accounts: String.t() | function,
           credentials: credentials,
           quote_depth: pos_integer,
           timeout: non_neg_integer,
@@ -23,6 +24,7 @@ defmodule Tai.Venue do
     adapter
     channels
     products
+    accounts
     credentials
     quote_depth
     timeout
@@ -33,6 +35,7 @@ defmodule Tai.Venue do
     adapter
     channels
     products
+    accounts
     credentials
     quote_depth
     timeout

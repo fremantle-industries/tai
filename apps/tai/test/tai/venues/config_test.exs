@@ -32,6 +32,13 @@ defmodule Tai.Venues.ConfigTest do
       assert venue.products == "*"
     end
 
+    test "assigns all accounts when not provided" do
+      config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
+
+      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
+      assert venue.accounts == "*"
+    end
+
     test "assigns empty channels when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
@@ -96,6 +103,27 @@ defmodule Tai.Venues.ConfigTest do
                  id: :venue_a,
                  adapter: MyAdapterA,
                  products: "-btc_usd"
+               }
+             } = Tai.Venues.Config.parse(config)
+    end
+
+    test "can provide an accounts filter" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            venue_a: [
+              enabled: true,
+              adapter: MyAdapterA,
+              accounts: "-btc"
+            ]
+          }
+        )
+
+      assert %{
+               venue_a: %Tai.Venue{
+                 id: :venue_a,
+                 adapter: MyAdapterA,
+                 accounts: "-btc"
                }
              } = Tai.Venues.Config.parse(config)
     end
