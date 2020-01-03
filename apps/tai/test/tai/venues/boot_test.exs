@@ -1,9 +1,10 @@
 defmodule Tai.Venues.BootTest do
   use ExUnit.Case, async: false
   doctest Tai.Venues.Boot
+  alias Tai.TestSupport.Mocks
 
   setup_all do
-    start_supervised!(Tai.TestSupport.Mocks.Server)
+    start_supervised!(Mocks.Server)
     :ok
   end
 
@@ -99,7 +100,7 @@ defmodule Tai.Venues.BootTest do
 
   describe ".run products hydrate error" do
     test "returns an error tuple" do
-      adapter =
+      venue =
         struct(Tai.Venue, %{
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
@@ -108,9 +109,9 @@ defmodule Tai.Venues.BootTest do
           timeout: @timeout
         })
 
-      assert {:error, result} = Tai.Venues.Boot.run(adapter)
-      assert {result_adapter, reasons} = result
-      assert result_adapter == adapter
+      assert {:error, result} = Tai.Venues.Boot.run(venue)
+      assert {result_venue, reasons} = result
+      assert result_venue == venue
       assert reasons == [products: :mock_response_not_found]
     end
   end
@@ -119,7 +120,7 @@ defmodule Tai.Venues.BootTest do
     setup [:mock_products, :mock_maker_taker_fees]
 
     test "returns an error" do
-      adapter =
+      venue =
         struct(Tai.Venue, %{
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
@@ -128,10 +129,10 @@ defmodule Tai.Venues.BootTest do
           timeout: @timeout
         })
 
-      assert {:error, result} = Tai.Venues.Boot.run(adapter)
-      assert {result_adapter, reasons} = result
-      assert result_adapter == adapter
-      assert reasons == [accounts: :mock_response_not_found]
+      assert {:error, result} = Tai.Venues.Boot.run(venue)
+      assert {result_venue, reasons} = result
+      assert result_venue == venue
+      assert reasons == [accounts: [main: :mock_response_not_found]]
     end
   end
 
@@ -139,7 +140,7 @@ defmodule Tai.Venues.BootTest do
     setup [:mock_products, :mock_accounts]
 
     test "returns an error" do
-      adapter =
+      venue =
         struct(Tai.Venue, %{
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
@@ -148,15 +149,15 @@ defmodule Tai.Venues.BootTest do
           timeout: @timeout
         })
 
-      assert {:error, result} = Tai.Venues.Boot.run(adapter)
-      assert {result_adapter, reasons} = result
-      assert result_adapter == adapter
+      assert {:error, result} = Tai.Venues.Boot.run(venue)
+      assert {result_venue, reasons} = result
+      assert result_venue == venue
       assert reasons == [fees: :mock_response_not_found]
     end
   end
 
   def mock_products(_) do
-    Tai.TestSupport.Mocks.Responses.Products.for_venue(
+    Mocks.Responses.Products.for_venue(
       @venue_id,
       [
         %{symbol: :btc_usdt},
@@ -169,7 +170,7 @@ defmodule Tai.Venues.BootTest do
   end
 
   def mock_maker_taker_fees(_) do
-    Tai.TestSupport.Mocks.Responses.MakerTakerFees.for_venue_and_credential(
+    Mocks.Responses.MakerTakerFees.for_venue_and_credential(
       @venue_id,
       @credential_id,
       {Decimal.new("0.001"), Decimal.new("0.001")}
@@ -177,7 +178,7 @@ defmodule Tai.Venues.BootTest do
   end
 
   def mock_accounts(_) do
-    Tai.TestSupport.Mocks.Responses.Accounts.for_venue_and_credential(
+    Mocks.Responses.Accounts.for_venue_and_credential(
       @venue_id,
       @credential_id,
       [
