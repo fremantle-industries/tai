@@ -3,10 +3,10 @@ defmodule Tai.VenuesAdapters.Bitmex.ProductTest do
 
   setup do
     on_exit(fn ->
-      :ok = Application.stop(:timex)
+      :ok = Application.stop(:tzdata)
     end)
 
-    {:ok, _} = Application.ensure_all_started(:timex)
+    {:ok, _} = Application.ensure_all_started(:tzdata)
     :ok
   end
 

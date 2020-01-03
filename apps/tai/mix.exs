@@ -34,7 +34,7 @@ defmodule Tai.Mixfile do
       {:ex_bitmex, "~> 0.4"},
       # {:ex_okex, path: "../../../ex_okex"},
       # {:ex_okex, github: "fremantle-capital/ex_okex", branch: "master"},
-      {:ex_okex, "~> 0.3"},
+      {:ex_okex, "~> 0.4"},
       {:ex_gdax, "~> 0.1.6"},
       {:decimal, "~> 1.7"},
       {:httpoison, "~> 1.0"},
