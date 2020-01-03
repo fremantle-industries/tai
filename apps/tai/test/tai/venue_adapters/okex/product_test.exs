@@ -3,17 +3,17 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
 
   setup do
     on_exit(fn ->
-      :ok = Application.stop(:timex)
+      :ok = Application.stop(:tzdata)
     end)
 
-    {:ok, _} = Application.ensure_all_started(:timex)
+    {:ok, _} = Application.ensure_all_started(:tzdata)
     :ok
   end
 
   describe ".build/2" do
     test "returns a product struct from a venue futures instrument" do
       attrs = %{
-        instrument_id: "BTC-USD-200327",
+        instrument_id: "BTC-USDT-200327",
         trade_increment: "1",
         tick_size: "0.01",
         contract_val: "100",
@@ -25,8 +25,8 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
 
       product = Tai.VenueAdapters.OkEx.Product.build(instrument, :venue_a)
       assert product.venue_id == :venue_a
-      assert product.symbol == :btc_usd_200327
-      assert product.venue_symbol == "BTC-USD-200327"
+      assert product.symbol == :btc_usdt_200327
+      assert product.venue_symbol == "BTC-USDT-200327"
       assert product.status == :trading
       assert product.price_increment == Decimal.new("0.01")
       assert product.min_price == Decimal.new("0.01")
@@ -35,24 +35,26 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
       assert product.value == Decimal.new("100")
       assert %DateTime{} = product.listing
       assert %DateTime{} = product.expiry
+      assert product.is_inverse == false
     end
 
     test "returns a product struct from a venue swap instrument" do
       attrs = %{
-        instrument_id: "BTC-USD-SWAP",
+        instrument_id: "BTC-USDT-SWAP",
         size_increment: "1",
         tick_size: "0.01",
         contract_val: "100",
         listing: "2019-11-12T11:16:48.000Z",
-        delivery: "2020-01-04T08:00:00.000Z"
+        delivery: "2020-01-04T08:00:00.000Z",
+        is_inverse: false
       }
 
       instrument = struct(ExOkex.Swap.Instrument, attrs)
 
       product = Tai.VenueAdapters.OkEx.Product.build(instrument, :venue_a)
       assert product.venue_id == :venue_a
-      assert product.symbol == :btc_usd_swap
-      assert product.venue_symbol == "BTC-USD-SWAP"
+      assert product.symbol == :btc_usdt_swap
+      assert product.venue_symbol == "BTC-USDT-SWAP"
       assert product.status == :trading
       assert product.price_increment == Decimal.new("0.01")
       assert product.min_price == Decimal.new("0.01")
@@ -61,6 +63,7 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
       assert product.value == Decimal.new("100")
       assert %DateTime{} = product.listing
       assert product.expiry == nil
+      assert product.is_inverse == false
     end
 
     test "returns a product struct from a venue spot instrument" do
@@ -85,6 +88,47 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
       assert product.value == Decimal.new(1)
       assert product.listing == nil
       assert product.expiry == nil
+      assert product.is_inverse == false
+    end
+
+    test "futures products can be inverse" do
+      attrs = %{
+        instrument_id: "BTC-USD-200327",
+        trade_increment: "1",
+        tick_size: "0.01",
+        contract_val: "100",
+        listing: "2019-12-13",
+        delivery: "2020-03-27",
+        is_inverse: "true"
+      }
+
+      instrument = struct(ExOkex.Futures.Instrument, attrs)
+
+      product = Tai.VenueAdapters.OkEx.Product.build(instrument, :venue_a)
+      assert product.venue_id == :venue_a
+      assert product.symbol == :btc_usd_200327
+      assert product.venue_symbol == "BTC-USD-200327"
+      assert product.is_inverse == true
+    end
+
+    test "swap products can be inverse" do
+      attrs = %{
+        instrument_id: "BTC-USD-SWAP",
+        size_increment: "1",
+        tick_size: "0.01",
+        contract_val: "100",
+        listing: "2019-11-12T11:16:48.000Z",
+        delivery: "2020-01-04T08:00:00.000Z",
+        is_inverse: true
+      }
+
+      instrument = struct(ExOkex.Swap.Instrument, attrs)
+
+      product = Tai.VenueAdapters.OkEx.Product.build(instrument, :venue_a)
+      assert product.venue_id == :venue_a
+      assert product.symbol == :btc_usd_swap
+      assert product.venue_symbol == "BTC-USD-SWAP"
+      assert product.is_inverse == true
     end
   end
 end

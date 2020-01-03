@@ -6,6 +6,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
   def build(%Futures.Instrument{} = instrument, venue_id) do
     listing = instrument.listing |> Timex.parse!(@iso_date_format) |> DateTime.from_naive!(@zone)
     expiry = instrument.delivery |> Timex.parse!(@iso_date_format) |> DateTime.from_naive!(@zone)
+    is_inverse = instrument.is_inverse == "true"
 
     build_product(
       type: :future,
@@ -19,8 +20,8 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       venue_price_increment: instrument.tick_size,
       venue_size_increment: instrument.trade_increment,
       value: instrument.contract_val,
-      is_quanto: false,
-      is_inverse: true
+      is_inverse: is_inverse,
+      is_quanto: false
     )
   end
 
@@ -38,8 +39,8 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       venue_price_increment: instrument.tick_size,
       venue_size_increment: instrument.size_increment,
       value: instrument.contract_val,
-      is_quanto: false,
-      is_inverse: true
+      is_inverse: instrument.is_inverse,
+      is_quanto: false
     )
   end
 
@@ -54,8 +55,8 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       venue_size_increment: instrument.size_increment,
       venue_min_size: instrument.min_size,
       value: 1,
-      is_quanto: false,
-      is_inverse: false
+      is_inverse: false,
+      is_quanto: false
     )
   end
 
