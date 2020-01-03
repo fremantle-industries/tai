@@ -38,8 +38,9 @@ defmodule Tai.Venues.Boot.Accounts do
 
   defp filter(accounts, filter) do
     accounts
-    |> Enum.reduce(%{}, fn a, acc -> Map.put(acc, a.asset, a) end)
+    |> Enum.group_by(& &1.asset)
     |> Juice.squeeze(filter)
     |> Map.values()
+    |> Enum.flat_map(& &1)
   end
 end

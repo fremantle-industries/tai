@@ -37,6 +37,12 @@ defmodule Tai.Venues.Boot.AccountsTest do
     struct(Tai.Venues.Account,
       venue_id: :venue_a,
       credential_id: :credential_b,
+      asset: :btc,
+      type: :swap
+    ),
+    struct(Tai.Venues.Account,
+      venue_id: :venue_a,
+      credential_id: :credential_b,
       asset: :ltc,
       type: :spot
     )
@@ -68,7 +74,7 @@ defmodule Tai.Venues.Boot.AccountsTest do
     venue =
       struct(Tai.Venue,
         id: :venue_a,
-        accounts: "eth ltc",
+        accounts: "btc ltc",
         credentials: %{credential_a: %{}, credential_b: %{}}
       )
 
@@ -80,11 +86,13 @@ defmodule Tai.Venues.Boot.AccountsTest do
       assert :ok = Tai.Venues.Boot.Accounts.hydrate(venue)
 
       accounts = Tai.Venues.AccountStore.all()
-      assert Enum.count(accounts) == 2
+      assert Enum.count(accounts) == 4
 
       assets = Enum.map(accounts, & &1.asset)
-      assert Enum.member?(assets, :eth)
+      assert Enum.member?(assets, :btc)
       assert Enum.member?(assets, :ltc)
+      assert assets |> Enum.filter(&(&1 == :btc)) |> Enum.count() == 3
+      assert assets |> Enum.filter(&(&1 == :ltc)) |> Enum.count() == 1
     end
   end
 

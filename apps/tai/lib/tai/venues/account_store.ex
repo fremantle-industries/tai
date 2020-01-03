@@ -259,7 +259,7 @@ defmodule Tai.Venues.AccountStore do
   end
 
   defp upsert_ets_table(account) do
-    record = {{account.venue_id, account.credential_id, account.asset}, account}
+    record = {{account.venue_id, account.credential_id, account.asset, account.type}, account}
     :ets.insert(__MODULE__, record)
   end
 

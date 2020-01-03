@@ -15,18 +15,19 @@ defmodule Tai.Venues.AccountStoreTest do
 
   describe ".upsert" do
     test "inserts the account into the ETS table" do
-      key = {:my_test_exchange, :my_test_credential, :btc}
+      key = {:my_test_exchange, :my_test_credential, :btc, :spot}
 
       account =
         struct(Tai.Venues.Account, %{
           venue_id: :my_test_exchange,
           credential_id: :my_test_credential,
-          asset: :btc
+          asset: :btc,
+          type: :spot
         })
 
       assert AccountStore.upsert(account) == :ok
       assert [{returned_key, returned_account}] = :ets.lookup(AccountStore, key)
-      assert key == {:my_test_exchange, :my_test_credential, :btc}
+      assert returned_key == key
       assert returned_account == account
     end
   end
