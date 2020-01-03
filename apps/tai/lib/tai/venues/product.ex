@@ -48,6 +48,8 @@ defmodule Tai.Venues.Product do
           quote: asset,
           status: status,
           type: type,
+          listing: DateTime.t() | nil,
+          expiry: DateTime.t() | nil,
           price_increment: Decimal.t(),
           size_increment: Decimal.t(),
           min_price: Decimal.t(),
@@ -87,6 +89,8 @@ defmodule Tai.Venues.Product do
     quote
     status
     type
+    listing
+    expiry
     price_increment
     size_increment
     min_notional

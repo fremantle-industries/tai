@@ -20,15 +20,13 @@ defmodule Tai.Venues.Boot.Products do
     end
   end
 
-  defp filter(all_products, filters) when is_function(filters),
-    do: all_products |> filters.()
+  defp filter(all_products, filters) when is_function(filters) do
+    all_products |> filters.()
+  end
 
   defp filter(all_products, filters) do
     all_products
-    |> Enum.reduce(
-      %{},
-      fn p, acc -> Map.put(acc, p.symbol, p) end
-    )
+    |> Enum.reduce(%{}, fn p, acc -> Map.put(acc, p.symbol, p) end)
     |> Juice.squeeze(filters)
     |> Map.values()
   end
