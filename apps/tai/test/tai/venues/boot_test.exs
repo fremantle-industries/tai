@@ -28,6 +28,7 @@ defmodule Tai.Venues.BootTest do
              id: @venue_id,
              adapter: Tai.VenueAdapters.Mock,
              products: "* -ltc_usdt",
+             accounts: "*",
              credentials: %{main: %{}},
              timeout: @timeout
            })
@@ -105,6 +106,7 @@ defmodule Tai.Venues.BootTest do
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",
+          accounts: "*",
           credentials: %{},
           timeout: @timeout
         })
@@ -125,6 +127,7 @@ defmodule Tai.Venues.BootTest do
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",
+          accounts: "*",
           credentials: %{main: %{}},
           timeout: @timeout
         })
@@ -145,6 +148,7 @@ defmodule Tai.Venues.BootTest do
           id: :mock_boot,
           adapter: Tai.VenueAdapters.Mock,
           products: "*",
+          accounts: "*",
           credentials: %{main: %{}},
           timeout: @timeout
         })

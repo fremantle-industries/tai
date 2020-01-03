@@ -13,19 +13,33 @@ defmodule Tai.Venues.Boot.Accounts do
 
   defp fetch(credential_id, venue) do
     result = Tai.Venues.Client.accounts(venue, credential_id)
-    {credential_id, result}
+    {credential_id, venue, result}
   end
 
-  defp upsert({_credential_id, {:ok, accounts}}, acc) do
-    accounts |> Enum.each(&Tai.Venues.AccountStore.upsert/1)
+  defp upsert({_credential_id, venue, {:ok, accounts}}, acc) do
+    accounts
+    |> filter(venue.accounts)
+    |> Enum.each(&Tai.Venues.AccountStore.upsert/1)
+
     acc
   end
 
-  defp upsert({_credential_id, {:error, _reason}} = response, :ok) do
+  defp upsert({_credential_id, _venue, {:error, _reason}} = response, :ok) do
     upsert(response, {:error, []})
   end
 
-  defp upsert({credential_id, {:error, reason}}, {:error, reasons}) do
+  defp upsert({credential_id, _venue, {:error, reason}}, {:error, reasons}) do
     {:error, reasons ++ [{credential_id, reason}]}
+  end
+
+  defp filter(accounts, filter) when is_function(filter) do
+    accounts |> filter.()
+  end
+
+  defp filter(accounts, filter) do
+    accounts
+    |> Enum.reduce(%{}, fn a, acc -> Map.put(acc, a.asset, a) end)
+    |> Juice.squeeze(filter)
+    |> Map.values()
   end
 end

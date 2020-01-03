@@ -13,7 +13,34 @@ defmodule Tai.Venues.Boot.AccountsTest do
     end
   end
 
-  @venue struct(Tai.Venue, credentials: %{credential_a: %{}, credential_b: %{}})
+  @credential_a_accounts [
+    struct(Tai.Venues.Account,
+      venue_id: :venue_a,
+      credential_id: :credential_a,
+      asset: :btc,
+      type: :spot
+    ),
+    struct(Tai.Venues.Account,
+      venue_id: :venue_a,
+      credential_id: :credential_a,
+      asset: :eth,
+      type: :spot
+    )
+  ]
+  @credential_b_accounts [
+    struct(Tai.Venues.Account,
+      venue_id: :venue_a,
+      credential_id: :credential_b,
+      asset: :btc,
+      type: :spot
+    ),
+    struct(Tai.Venues.Account,
+      venue_id: :venue_a,
+      credential_id: :credential_b,
+      asset: :ltc,
+      type: :spot
+    )
+  ]
 
   setup do
     on_exit(fn ->
@@ -25,9 +52,65 @@ defmodule Tai.Venues.Boot.AccountsTest do
   end
 
   test "returns an error with the reason for each credential" do
+    venue =
+      struct(Tai.Venue,
+        id: :venue_a,
+        credentials: %{credential_a: %{}, credential_b: %{}}
+      )
+
     with_mock Tai.Venues.Client, accounts: fn _venue, _credential_id -> {:error, :timeout} end do
-      assert {:error, reasons} = Tai.Venues.Boot.Accounts.hydrate(@venue)
+      assert {:error, reasons} = Tai.Venues.Boot.Accounts.hydrate(venue)
       assert reasons == [credential_a: :timeout, credential_b: :timeout]
+    end
+  end
+
+  test "can filter accounts by asset with a juice query" do
+    venue =
+      struct(Tai.Venue,
+        id: :venue_a,
+        accounts: "eth ltc",
+        credentials: %{credential_a: %{}, credential_b: %{}}
+      )
+
+    with_mock Tai.Venues.Client,
+      accounts: fn
+        _venue, :credential_a -> {:ok, @credential_a_accounts}
+        _venue, :credential_b -> {:ok, @credential_b_accounts}
+      end do
+      assert :ok = Tai.Venues.Boot.Accounts.hydrate(venue)
+
+      accounts = Tai.Venues.AccountStore.all()
+      assert Enum.count(accounts) == 2
+
+      assets = Enum.map(accounts, & &1.asset)
+      assert Enum.member?(assets, :eth)
+      assert Enum.member?(assets, :ltc)
+    end
+  end
+
+  test "can filter accounts with a custom function" do
+    venue =
+      struct(Tai.Venue,
+        id: :venue_a,
+        accounts: fn accounts ->
+          Enum.filter(accounts, &(&1.asset == :eth or &1.asset == :ltc))
+        end,
+        credentials: %{credential_a: %{}, credential_b: %{}}
+      )
+
+    with_mock Tai.Venues.Client,
+      accounts: fn
+        _venue, :credential_a -> {:ok, @credential_a_accounts}
+        _venue, :credential_b -> {:ok, @credential_b_accounts}
+      end do
+      assert :ok = Tai.Venues.Boot.Accounts.hydrate(venue)
+
+      accounts = Tai.Venues.AccountStore.all()
+      assert Enum.count(accounts) == 2
+
+      assets = Enum.map(accounts, & &1.asset)
+      assert Enum.member?(assets, :eth)
+      assert Enum.member?(assets, :ltc)
     end
   end
 end
