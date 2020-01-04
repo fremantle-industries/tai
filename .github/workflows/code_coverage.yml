@@ -1,0 +1,61 @@
+name: Code Coverage
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+
+    strategy:
+      matrix:
+        otp: [21.x, 22.x]
+        elixir: [1.8.x, 1.9.x]
+
+    steps:
+      - uses: actions/checkout@v1.0.0
+
+      - uses: actions/setup-elixir@v1.1.0
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
+      - name: Cache Dependencies
+        uses: actions/cache@v1
+        with:
+          path: deps
+          key: deps-elixir-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-${{hashFiles('mix.lock')}}-${{github.ref}}
+          restore-keys: |
+            deps-elixir-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-${{hashFiles('mix.lock')}}-${{github.ref}}
+            deps-elixir-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-${{hashFiles('mix.lock')}}-
+
+      - name: Cache Test Build
+        uses: actions/cache@v1
+        with:
+          path: _build/test
+          key: test-build-elixir-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-${{hashFiles('mix.lock')}}-${{github.ref}}
+          restore-keys: |
+            test-build-elixir-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-${{hashFiles('mix.lock')}}-${{github.ref}}
+            test-build-elixir-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-${{hashFiles('mix.lock')}}-
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Coveralls
+        env:
+          MIX_ENV: test
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          BINANCE_API_KEY: ../../secrets/ci/binance_api_key
+          BINANCE_API_SECRET: ../../secrets/ci/binance_api_secret
+          BITMEX_API_KEY: ../../secrets/ci/bitmex_api_key
+          BITMEX_API_SECRET: ../../secrets/ci/bitmex_api_secret
+          GDAX_API_KEY: ../../secrets/ci/gdax_api_key
+          GDAX_API_PASSPHRASE: ../../secrets/ci/gdax_api_passphrase
+          GDAX_API_SECRET: ../../secrets/ci/gdax_api_secret
+          OKEX_API_KEY: ../../secrets/ci/okex_api_key
+          OKEX_API_PASSPHRASE: ../../secrets/ci/okex_api_passphrase
+          OKEX_API_SECRET: ../../secrets/ci/okex_api_secret
+        run: mix coveralls.github --umbrella

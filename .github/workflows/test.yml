@@ -1,4 +1,4 @@
-name: CI
+name: Test
 
 on:
   push:
@@ -58,33 +58,17 @@ jobs:
 
       - name: Test
         env:
-          BINANCE_API_KEY: ${{secrets.BINANCE_API_KEY}}
-          BINANCE_API_SECRET: ${{secrets.BINANCE_API_SECRET}}
-          BITMEX_API_KEY: ${{secrets.BITMEX_API_KEY}}
-          BITMEX_API_SECRET: ${{secrets.BITMEX_API_SECRET}}
-          GDAX_API_KEY: ${{secrets.GDAX_API_KEY}}
-          GDAX_API_PASSPHRASE: ${{secrets.GDAX_API_PASSPHRASE}}
-          GDAX_API_SECRET: ${{secrets.GDAX_API_SECRET}}
-          OKEX_API_KEY: ${{secrets.OKEX_API_KEY}}
-          OKEX_API_PASSPHRASE: ${{secrets.OKEX_API_PASSPHRASE}}
-          OKEX_API_SECRET: ${{secrets.OKEX_API_SECRET}}
+          BINANCE_API_KEY: ../../secrets/ci/binance_api_key
+          BINANCE_API_SECRET: ../../secrets/ci/binance_api_secret
+          BITMEX_API_KEY: ../../secrets/ci/bitmex_api_key
+          BITMEX_API_SECRET: ../../secrets/ci/bitmex_api_secret
+          GDAX_API_KEY: ../../secrets/ci/gdax_api_key
+          GDAX_API_PASSPHRASE: ../../secrets/ci/gdax_api_passphrase
+          GDAX_API_SECRET: ../../secrets/ci/gdax_api_secret
+          OKEX_API_KEY: ../../secrets/ci/okex_api_key
+          OKEX_API_PASSPHRASE: ../../secrets/ci/okex_api_passphrase
+          OKEX_API_SECRET: ../../secrets/ci/okex_api_secret
         run: mix test
 
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
-
-      - name: Coveralls
-        env:
-          MIX_ENV: test
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          BINANCE_API_KEY: ${{secrets.BINANCE_API_KEY}}
-          BINANCE_API_SECRET: ${{secrets.BINANCE_API_SECRET}}
-          BITMEX_API_KEY: ${{secrets.BITMEX_API_KEY}}
-          BITMEX_API_SECRET: ${{secrets.BITMEX_API_SECRET}}
-          GDAX_API_KEY: ${{secrets.GDAX_API_KEY}}
-          GDAX_API_PASSPHRASE: ${{secrets.GDAX_API_PASSPHRASE}}
-          GDAX_API_SECRET: ${{secrets.GDAX_API_SECRET}}
-          OKEX_API_KEY: ${{secrets.OKEX_API_KEY}}
-          OKEX_API_PASSPHRASE: ${{secrets.OKEX_API_PASSPHRASE}}
-          OKEX_API_SECRET: ${{secrets.OKEX_API_SECRET}}
-        run: mix coveralls.github --umbrella
