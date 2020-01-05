@@ -2,7 +2,7 @@
 
 ## [Back Office](https://github.com/fremantle-capital/back_office)
 
-Manage operations of a fund
+Web app starter kit to manage operations of a fund.
 
 ![back-office-chart](https://github.com/fremantle-capital/back_office/blob/master/docs/balances-chart.png)
 
