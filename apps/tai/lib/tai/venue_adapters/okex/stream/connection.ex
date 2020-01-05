@@ -9,16 +9,18 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
     @type route :: :auth | :order_books | :optional_channels
+    @type last_pong :: integer
     @type t :: %State{
             venue: venue_id,
             routes: %{required(route) => atom},
             channels: [channel_name],
             credential: {credential_id, map},
-            products: [product]
+            products: [product],
+            last_pong: pos_integer
           }
 
-    @enforce_keys ~w(venue routes channels credential products)a
-    defstruct ~w(venue routes channels credential products)a
+    @enforce_keys ~w(venue routes channels credential products last_pong)a
+    defstruct ~w(venue routes channels credential products last_pong)a
   end
 
   @type product :: Tai.Venues.Product.t()
@@ -55,7 +57,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       routes: routes,
       channels: channels,
       credential: credential,
-      products: products
+      products: products,
+      last_pong: time_now()
     }
 
     name = venue |> to_name
@@ -123,10 +126,19 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
-  @ping "ping"
+  @ping {:text, "ping"}
+  @pong_error {:local, :no_heartbeat} 
   def handle_info(:heartbeat, state) do
-    schedule_heartbeat()
-    {:reply, {:text, @ping}, state}
+    if pong_check(state) do
+      schedule_heartbeat()
+      {:reply, @ping, state}
+    else
+      Events.error(%Events.StreamDisconnect{
+        venue: state.venue,
+        reason: @pong_error
+      })
+      {:stop, @pong_error, state}
+    end
   end
 
   def handle_frame({:binary, <<43, 200, 207, 75, 7, 0>> = pong}, state) do
@@ -182,5 +194,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     state.routes
     |> Map.fetch!(to)
     |> GenServer.cast({msg, Timex.now()})
+  end
+
+  @max_pong_age_s 30
+  defp pong_check(state) do
+    (time_now() - state.last_pong) < @max_pong_age_s
+  end
+
+  defp time_now() do
+    :erlang.system_time(:seconds)
   end
 end
