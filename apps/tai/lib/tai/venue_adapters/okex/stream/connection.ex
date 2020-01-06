@@ -65,6 +65,9 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
   def handle_connect(_conn, state) do
     Events.info(%Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
@@ -127,17 +130,23 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   end
 
   @ping {:text, "ping"}
-  @pong_error {:local, :no_heartbeat} 
+  @pong_error {:local, :no_heartbeat}
   def handle_info(:heartbeat, state) do
-    if pong_check(state) do
-      schedule_heartbeat()
-      {:reply, @ping, state}
-    else
-      Events.error(%Events.StreamDisconnect{
-        venue: state.venue,
-        reason: @pong_error
-      })
-      {:stop, @pong_error, state}
+    state
+    |> pong_check()
+    |> case do
+      {:ok, now} ->
+        state = Map.put(state, :last_pong, now)
+        schedule_heartbeat()
+        {:reply, @ping, state}
+
+      {:error, :timeout} ->
+        Events.error(%Events.StreamDisconnect{
+          venue: state.venue,
+          reason: @pong_error
+        })
+
+        {:stop, @pong_error, state}
     end
   end
 
@@ -155,9 +164,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   end
 
   def handle_frame({:text, _}, state), do: {:ok, state}
-
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   @heartbeat_ms 20_000
   defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
@@ -198,7 +204,13 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   @max_pong_age_s 30
   defp pong_check(state) do
-    (time_now() - state.last_pong) < @max_pong_age_s
+    now = time_now()
+
+    if now - state.last_pong < @max_pong_age_s do
+      {:ok, now}
+    else
+      {:error, :timeout}
+    end
   end
 
   defp time_now() do
