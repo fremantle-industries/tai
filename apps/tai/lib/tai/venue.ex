@@ -7,7 +7,7 @@ defmodule Tai.Venue do
   @type account :: Tai.Venues.Account.t()
   @type credential_id :: atom
   @type credential :: map
-  @type credentials :: %{credential_id => account}
+  @type credentials :: %{optional(credential_id) => account}
   @type t :: %Venue{
           id: id,
           adapter: adapter,
