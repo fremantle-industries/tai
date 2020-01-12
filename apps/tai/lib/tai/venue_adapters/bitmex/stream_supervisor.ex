@@ -25,7 +25,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   # TODO: Make this configurable. Could this come from opts?
-  @endpoint "wss://" <> ExBitmex.Rest.HTTPClient.domain() <> "/realtime"
+  @endpoint "wss://#{ExBitmex.Rest.HTTPClient.domain()}/realtime"
 
   def init(venue: venue, products: products) do
     credential = venue.credentials |> Map.to_list() |> List.first()

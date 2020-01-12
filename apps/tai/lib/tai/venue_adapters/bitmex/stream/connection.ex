@@ -66,6 +66,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     WebSockex.start_link(url, __MODULE__, state, name: name, extra_headers: headers)
   end
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
   def handle_connect(_conn, state) do
     Events.info(%Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
@@ -213,9 +216,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   def handle_frame(_frame, state), do: {:ok, state}
-
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   defp auth_headers({_credential_id, %{api_key: api_key, api_secret: api_secret}}) do
     nonce = ExBitmex.Auth.nonce()

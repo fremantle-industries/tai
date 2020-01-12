@@ -1,0 +1,63 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://test.deribit.com/api/v2/private/get_account_summary?currency=BTC"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"jsonrpc\":\"2.0\",\"result\":{\"total_pl\":0.0,\"session_upl\":0.0,\"session_rpl\":0.0,\"session_funding\":0.0,\"portfolio_margining_enabled\":false,\"options_vega\":0.0,\"options_theta\":0.0,\"options_session_upl\":0.0,\"options_session_rpl\":0.0,\"options_pl\":0.0,\"options_gamma\":0.0,\"options_delta\":0.0,\"margin_balance\":10.0,\"maintenance_margin\":0.0,\"limits\":{\"non_matching_engine_burst\":300,\"non_matching_engine\":200,\"matching_engine_burst\":20,\"matching_engine\":2},\"initial_margin\":0.0,\"futures_session_upl\":0.0,\"futures_session_rpl\":0.0,\"futures_pl\":0.0,\"equity\":10.0,\"deposit_address\":\"2N6VBaPemfjvZsC23kPZQMivwzeMAoEgeK5\",\"delta_total\":0.0,\"currency\":\"BTC\",\"balance\":10.0,\"available_withdrawal_funds\":10.0,\"available_funds\":10.0},\"usIn\":1578815694888433,\"usOut\":1578815694890850,\"usDiff\":2417,\"testnet\":true}",
+      "headers": {
+        "Server": "nginx/1.17.6",
+        "Date": "Sun, 12 Jan 2020 07:54:54 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "793",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization,User-Agent,Range,X-Requested-With,Content-Type,Partner",
+        "Strict-Transport-Security": "max-age=15768000",
+        "X-Frame-Options": "SAMEORIGIN"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://test.deribit.com/api/v2/public/get_currencies?"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"jsonrpc\":\"2.0\",\"result\":[{\"withdrawal_priorities\":[],\"withdrawal_fee\":0.0006,\"min_withdrawal_fee\":0.0001,\"min_confirmations\":4,\"fee_precision\":4,\"currency_long\":\"Ethereum\",\"currency\":\"ETH\",\"coin_type\":\"ETHER\"},{\"withdrawal_priorities\":[{\"value\":0.15,\"name\":\"very_low\"},{\"value\":1.5,\"name\":\"very_high\"}],\"withdrawal_fee\":0.0001,\"min_withdrawal_fee\":0.0001,\"min_confirmations\":1,\"fee_precision\":4,\"currency_long\":\"Bitcoin\",\"currency\":\"BTC\",\"coin_type\":\"BITCOIN\"}],\"usIn\":1578815694700671,\"usOut\":1578815694700912,\"usDiff\":241,\"testnet\":true}",
+      "headers": {
+        "Server": "nginx/1.17.6",
+        "Date": "Sun, 12 Jan 2020 07:54:54 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "541",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization,User-Agent,Range,X-Requested-With,Content-Type,Partner",
+        "Strict-Transport-Security": "max-age=15768000",
+        "X-Frame-Options": "SAMEORIGIN"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

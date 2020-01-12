@@ -68,6 +68,8 @@ jobs:
           OKEX_API_KEY: ../../secrets/ci/okex_api_key
           OKEX_API_PASSPHRASE: ../../secrets/ci/okex_api_passphrase
           OKEX_API_SECRET: ../../secrets/ci/okex_api_secret
+          DERIBIT_CLIENT_ID: ../../secrets/ci/deribit_client_id
+          DERIBIT_CLIENT_SECRET: ../../secrets/ci/deribit_client_secret
         run: mix test
 
       - name: Dialyzer

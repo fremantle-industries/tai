@@ -93,6 +93,16 @@ config(:tai,
         }
       }
     ],
+    deribit: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.Deribit,
+      credentials: %{
+        main: %{
+          client_id: {:system_file, "DERIBIT_CLIENT_ID"},
+          client_secret: {:system_file, "DERIBIT_CLIENT_SECRET"}
+        }
+      }
+    ],
     gdax: [
       enabled: true,
       adapter: Tai.VenueAdapters.Gdax,
@@ -108,8 +118,8 @@ config(:tai,
   }
 )
 
-config(:tai, :test_venue_adapters_products, [:mock, :binance, :gdax, :okex])
-config(:tai, :test_venue_adapters_accounts, [:mock, :binance, :gdax, :okex])
+config(:tai, :test_venue_adapters_products, [:binance, :deribit, :gdax, :mock, :okex])
+config(:tai, :test_venue_adapters_accounts, [:binance, :deribit, :gdax, :mock, :okex])
 config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :gdax, :okex])
 config(:tai, :test_venue_adapters_create_order_gtc_open, [:bitmex, :binance])
 config(:tai, :test_venue_adapters_create_order_gtc_accepted, [:okex_futures, :okex_swap])
@@ -177,7 +187,9 @@ config :exvcr,
     "OK-ACCESS-KEY",
     "OK-ACCESS-SIGN",
     "OK-ACCESS-TIMESTAMP",
-    "OK-ACCESS-PASSPHRASE"
+    "OK-ACCESS-PASSPHRASE",
+    # Deribit
+    "Authorization"
   ],
   filter_sensitive_data: [
     # GDAX
@@ -190,3 +202,4 @@ config :exvcr,
 config :echo_boy, port: 4100
 
 config :ex_bitmex, domain: "testnet.bitmex.com"
+config :ex_deribit, domain: "test.deribit.com"
