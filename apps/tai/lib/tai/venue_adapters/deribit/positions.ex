@@ -58,5 +58,7 @@ defmodule Tai.VenueAdapters.Deribit.Positions do
 
   defp avg_price(position), do: Decimal.cast(position.average_price)
 
-  defp leverage(position), do: Decimal.new(position.leverage)
+  @zero Decimal.new(0)
+  defp leverage(%ExDeribit.Position{kind: "option"}), do: @zero
+  defp leverage(position), do: Decimal.cast(position.leverage)
 end

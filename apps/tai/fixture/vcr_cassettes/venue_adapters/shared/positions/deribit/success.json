@@ -13,12 +13,12 @@
     },
     "response": {
       "binary": false,
-      "body": "{\"jsonrpc\":\"2.0\",\"result\":[{\"total_profit_loss\":-8.2e-8,\"size_currency\":0.001122416,\"size\":10.0,\"settlement_price\":8850.3,\"realized_profit_loss\":0.0,\"realized_funding\":0.0,\"open_orders_margin\":0.0,\"mark_price\":8909.35,\"maintenance_margin\":0.000006173,\"leverage\":100,\"kind\":\"future\",\"instrument_name\":\"BTC-PERPETUAL\",\"initial_margin\":0.000011224,\"index_price\":8901.63,\"floating_profit_loss\":-8.2e-8,\"estimated_liquidation_price\":1.01,\"direction\":\"buy\",\"delta\":0.001122416,\"average_price\":8910.0}],\"usIn\":1579377869780255,\"usOut\":1579377869780443,\"usDiff\":188,\"testnet\":true}",
+      "body": "{\"jsonrpc\":\"2.0\",\"result\":[{\"total_profit_loss\":-1.1e-8,\"size_currency\":0.001122094,\"size\":10.0,\"settlement_price\":8850.3,\"realized_profit_loss\":-2.6e-7,\"realized_funding\":-1e-8,\"open_orders_margin\":0.0,\"mark_price\":8911.91,\"maintenance_margin\":0.000006172,\"leverage\":100,\"kind\":\"future\",\"instrument_name\":\"BTC-PERPETUAL\",\"initial_margin\":0.000011221,\"index_price\":8904.65,\"floating_profit_loss\":-1.1e-8,\"estimated_liquidation_price\":1.01,\"direction\":\"buy\",\"delta\":0.001122094,\"average_price\":8912.0},{\"total_profit_loss\":-0.003537045,\"size\":-1.0,\"settlement_price\":0.00576501,\"realized_profit_loss\":0.0,\"open_orders_margin\":0.0,\"mark_price\":0.00503705,\"maintenance_margin\":0.080037045,\"kind\":\"option\",\"instrument_name\":\"BTC-26JUN20-3000-P\",\"initial_margin\":0.105037045,\"index_price\":8904.65,\"floating_profit_loss_usd\":-31.5,\"floating_profit_loss\":-0.003537045,\"direction\":\"sell\",\"delta\":0.01746,\"average_price_usd\":13.36,\"average_price\":0.0015}],\"usIn\":1579382651710956,\"usOut\":1579382651711156,\"usDiff\":200,\"testnet\":true}",
       "headers": {
         "Server": "nginx/1.17.6",
-        "Date": "Sat, 18 Jan 2020 20:04:29 GMT",
+        "Date": "Sat, 18 Jan 2020 21:24:11 GMT",
         "Content-Type": "application/json",
-        "Content-Length": "573",
+        "Content-Length": "1024",
         "Connection": "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -43,10 +43,10 @@
     },
     "response": {
       "binary": false,
-      "body": "{\"jsonrpc\":\"2.0\",\"result\":[{\"withdrawal_priorities\":[],\"withdrawal_fee\":0.0001,\"min_withdrawal_fee\":0.0001,\"min_confirmations\":4,\"fee_precision\":4,\"currency_long\":\"Ethereum\",\"currency\":\"ETH\",\"coin_type\":\"ETHER\"},{\"withdrawal_priorities\":[{\"value\":0.15,\"name\":\"very_low\"},{\"value\":1.5,\"name\":\"very_high\"}],\"withdrawal_fee\":0.0001,\"min_withdrawal_fee\":0.0001,\"min_confirmations\":1,\"fee_precision\":4,\"currency_long\":\"Bitcoin\",\"currency\":\"BTC\",\"coin_type\":\"BITCOIN\"}],\"usIn\":1579377869435974,\"usOut\":1579377869436294,\"usDiff\":320,\"testnet\":true}",
+      "body": "{\"jsonrpc\":\"2.0\",\"result\":[{\"withdrawal_priorities\":[],\"withdrawal_fee\":0.0001,\"min_withdrawal_fee\":0.0001,\"min_confirmations\":4,\"fee_precision\":4,\"currency_long\":\"Ethereum\",\"currency\":\"ETH\",\"coin_type\":\"ETHER\"},{\"withdrawal_priorities\":[{\"value\":0.15,\"name\":\"very_low\"},{\"value\":1.5,\"name\":\"very_high\"}],\"withdrawal_fee\":0.0001,\"min_withdrawal_fee\":0.0001,\"min_confirmations\":1,\"fee_precision\":4,\"currency_long\":\"Bitcoin\",\"currency\":\"BTC\",\"coin_type\":\"BITCOIN\"}],\"usIn\":1579382651503978,\"usOut\":1579382651504204,\"usDiff\":226,\"testnet\":true}",
       "headers": {
         "Server": "nginx/1.17.6",
-        "Date": "Sat, 18 Jan 2020 20:04:29 GMT",
+        "Date": "Sat, 18 Jan 2020 21:24:11 GMT",
         "Content-Type": "application/json",
         "Content-Length": "541",
         "Connection": "keep-alive",
