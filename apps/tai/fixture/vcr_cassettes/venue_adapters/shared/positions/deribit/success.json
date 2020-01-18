@@ -1,0 +1,63 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://test.deribit.com/api/v2/private/get_positions?currency=BTC"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"jsonrpc\":\"2.0\",\"result\":[{\"total_profit_loss\":-8.2e-8,\"size_currency\":0.001122416,\"size\":10.0,\"settlement_price\":8850.3,\"realized_profit_loss\":0.0,\"realized_funding\":0.0,\"open_orders_margin\":0.0,\"mark_price\":8909.35,\"maintenance_margin\":0.000006173,\"leverage\":100,\"kind\":\"future\",\"instrument_name\":\"BTC-PERPETUAL\",\"initial_margin\":0.000011224,\"index_price\":8901.63,\"floating_profit_loss\":-8.2e-8,\"estimated_liquidation_price\":1.01,\"direction\":\"buy\",\"delta\":0.001122416,\"average_price\":8910.0}],\"usIn\":1579377869780255,\"usOut\":1579377869780443,\"usDiff\":188,\"testnet\":true}",
+      "headers": {
+        "Server": "nginx/1.17.6",
+        "Date": "Sat, 18 Jan 2020 20:04:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "573",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization,User-Agent,Range,X-Requested-With,Content-Type,Partner",
+        "Strict-Transport-Security": "max-age=15768000",
+        "X-Frame-Options": "SAMEORIGIN"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://test.deribit.com/api/v2/public/get_currencies?"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"jsonrpc\":\"2.0\",\"result\":[{\"withdrawal_priorities\":[],\"withdrawal_fee\":0.0001,\"min_withdrawal_fee\":0.0001,\"min_confirmations\":4,\"fee_precision\":4,\"currency_long\":\"Ethereum\",\"currency\":\"ETH\",\"coin_type\":\"ETHER\"},{\"withdrawal_priorities\":[{\"value\":0.15,\"name\":\"very_low\"},{\"value\":1.5,\"name\":\"very_high\"}],\"withdrawal_fee\":0.0001,\"min_withdrawal_fee\":0.0001,\"min_confirmations\":1,\"fee_precision\":4,\"currency_long\":\"Bitcoin\",\"currency\":\"BTC\",\"coin_type\":\"BITCOIN\"}],\"usIn\":1579377869435974,\"usOut\":1579377869436294,\"usDiff\":320,\"testnet\":true}",
+      "headers": {
+        "Server": "nginx/1.17.6",
+        "Date": "Sat, 18 Jan 2020 20:04:29 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "541",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization,User-Agent,Range,X-Requested-With,Content-Type,Partner",
+        "Strict-Transport-Security": "max-age=15768000",
+        "X-Frame-Options": "SAMEORIGIN"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

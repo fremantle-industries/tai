@@ -26,7 +26,9 @@ defmodule Tai.VenueAdapters.Deribit.Accounts do
     }
   end
 
-  defp to_venue_credentials(credentials), do: struct!(ExDeribit.Credentials, credentials)
+  defdelegate to_venue_credentials(credentials),
+    to: Tai.VenueAdapters.Deribit.Credentials,
+    as: :from
 
   defp fetch_summaries(currencies, venue_credentials) do
     currencies
@@ -34,7 +36,7 @@ defmodule Tai.VenueAdapters.Deribit.Accounts do
       {:ok, []},
       fn c, {:ok, existing_summaries} ->
         with {:ok, currency_summary} <-
-               ExDeribit.Accounts.Summary.get(c.currency, venue_credentials) do
+               ExDeribit.Accounts.Summary.get(venue_credentials, c.currency) do
           {:ok, existing_summaries ++ [currency_summary]}
         end
       end

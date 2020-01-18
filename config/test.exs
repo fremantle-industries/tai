@@ -152,7 +152,7 @@ config(:tai, :test_venue_adapters_cancel_order_error_overloaded, [:bitmex])
 config(:tai, :test_venue_adapters_cancel_order_error_nonce_not_increasing, [:bitmex])
 config(:tai, :test_venue_adapters_cancel_order_error_rate_limited, [:bitmex])
 config(:tai, :test_venue_adapters_cancel_order_error_unhandled, [:bitmex, :binance])
-config(:tai, :test_venue_adapters_with_positions, [:bitmex, :okex])
+config(:tai, :test_venue_adapters_with_positions, [:bitmex, :deribit, :okex])
 
 config :tai,
   venues: %{
