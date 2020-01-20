@@ -47,7 +47,10 @@ defmodule Tai.Commands.Markets do
 
   defp format_col({nil, _}), do: format_col(nil)
   defp format_col({receiver, message}), do: receiver |> get_in([message]) |> format_col
-  defp format_col(num) when is_number(num), do: num |> Decimal.cast()
+
+  defp format_col(num) when is_number(num),
+    do: num |> Decimal.cast() |> Decimal.reduce() |> Decimal.to_string(:normal)
+
   defp format_col(%DateTime{} = date), do: Timex.from_now(date)
   defp format_col(nil), do: "~"
   defp format_col(pass_through), do: pass_through

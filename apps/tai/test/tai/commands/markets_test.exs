@@ -32,14 +32,23 @@ defmodule Tai.Commands.MarketsTest do
     }
     |> Tai.Markets.QuoteStore.upsert()
 
+    %Quote{
+      venue_id: :test_exchange_b,
+      product_symbol: :btc_usdt,
+      bids: [%PricePoint{price: 12000.0, size: 1000.0}],
+      asks: [%PricePoint{price: 12050.0, size: 1300.0}]
+    }
+    |> Tai.Markets.QuoteStore.upsert()
+
     assert capture_io(&Tai.CommandsHelper.markets/0) == """
-           +-----------------+---------+-----------+-----------+----------+----------+
-           |           Venue | Product | Bid Price | Ask Price | Bid Size | Ask Size |
-           +-----------------+---------+-----------+-----------+----------+----------+
-           | test_exchange_a | btc_usd |  12999.99 |  13000.01 | 0.000021 |     1.11 |
-           | test_exchange_a | eth_usd |         ~ |    195.66 |        ~ |     0.12 |
-           | test_exchange_a | ltc_usd |    101.99 |         ~ |      1.3 |        ~ |
-           +-----------------+---------+-----------+-----------+----------+----------+\n
+           +-----------------+----------+-----------+-----------+----------+----------+
+           |           Venue |  Product | Bid Price | Ask Price | Bid Size | Ask Size |
+           +-----------------+----------+-----------+-----------+----------+----------+
+           | test_exchange_a |  btc_usd |  12999.99 |  13000.01 | 0.000021 |     1.11 |
+           | test_exchange_a |  eth_usd |         ~ |    195.66 |        ~ |     0.12 |
+           | test_exchange_a |  ltc_usd |    101.99 |         ~ |      1.3 |        ~ |
+           | test_exchange_b | btc_usdt |     12000 |     12050 |     1000 |     1300 |
+           +-----------------+----------+-----------+-----------+----------+----------+\n
            """
   end
 end
