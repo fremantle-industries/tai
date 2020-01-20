@@ -2,8 +2,12 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
   use Supervisor
 
   alias Tai.VenueAdapters.Deribit.Stream.{
-    Connection
+    Connection,
+    ProcessOrderBook,
+    RouteOrderBooks
   }
+
+  alias Tai.Markets.{OrderBook, ProcessQuote}
 
   @type venue :: Tai.Venue.t()
   @type venue_id :: Tai.Venue.id()
@@ -24,7 +28,12 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
   def init(venue: venue, products: products) do
     credential = venue.credentials |> Map.to_list() |> List.first()
 
+    market_quote_children = market_quote_children(products, venue.quote_depth)
+    order_book_children = order_book_children(products)
+    process_order_book_children = process_order_book_children(products)
+
     system = [
+      {RouteOrderBooks, [venue_id: venue.id, products: products]},
       {Connection,
        [
          url: @endpoint,
@@ -37,7 +46,37 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
        ]}
     ]
 
-    system
+    (market_quote_children ++ order_book_children ++ process_order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
+  end
+
+  defp market_quote_children(products, depth) do
+    products
+    |> Enum.map(fn p ->
+      %{
+        id: ProcessQuote.to_name(p.venue_id, p.symbol),
+        start: {ProcessQuote, :start_link, [[product: p, depth: depth]]}
+      }
+    end)
+  end
+
+  defp order_book_children(products) do
+    products
+    |> Enum.map(fn p ->
+      %{
+        id: OrderBook.to_name(p.venue_id, p.symbol),
+        start: {OrderBook, :start_link, [p]}
+      }
+    end)
+  end
+
+  defp process_order_book_children(products) do
+    products
+    |> Enum.map(fn p ->
+      %{
+        id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),
+        start: {ProcessOrderBook, :start_link, [p]}
+      }
+    end)
   end
 end

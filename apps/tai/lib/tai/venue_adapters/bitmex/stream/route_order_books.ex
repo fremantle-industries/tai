@@ -25,6 +25,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.RouteOrderBooks do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
+
   def init(state), do: {:ok, state}
 
   def handle_cast({%{"request" => _}, _received_at}, state), do: {:noreply, state}
@@ -80,9 +83,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.RouteOrderBooks do
 
     {:noreply, state}
   end
-
-  @spec to_name(venue_id) :: atom
-  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   defp build_stores(products, venue_id) do
     products

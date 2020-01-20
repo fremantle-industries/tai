@@ -3,14 +3,15 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
   alias Tai.Markets.OrderBook
 
   defmodule State do
-    @type venue_id :: Tai.Venue.id()
-    @type t :: %State{venue: venue_id, symbol: atom}
+    @type venue :: Tai.Venue.id()
+    @type product_symbol :: Tai.Venues.Product.symbol()
+    @type t :: %State{venue: venue, symbol: product_symbol}
 
     @enforce_keys ~w(venue symbol)a
     defstruct ~w(venue symbol)a
   end
 
-  @type venue_id :: Tai.Venue.id()
+  @type venue :: Tai.Venue.id()
   @type venue_symbol :: Tai.Venues.Product.venue_symbol()
   @type product :: Tai.Venues.Product.t()
   @type state :: State.t()
@@ -23,8 +24,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  @spec to_name(venue_id, venue_symbol) :: atom
-  def to_name(venue_id, venue_symbol), do: :"#{__MODULE__}_#{venue_id}_#{venue_symbol}"
+  @spec to_name(venue, venue_symbol) :: atom
+  def to_name(venue, venue_symbol), do: :"#{__MODULE__}_#{venue}_#{venue_symbol}"
 
   @spec init(state) :: {:ok, state}
   def init(state), do: {:ok, state}
