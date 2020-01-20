@@ -7,8 +7,8 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     @type venue :: Tai.Venue.id()
     @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
-    # @type route :: :auth | :order_books | :optional_channels
     @type route :: :order_books
+    @type jsonrpc_id :: integer
     @type t :: %State{
             venue: venue,
             routes: %{required(route) => atom},
@@ -16,11 +16,16 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
             credential: {credential_id, map} | nil,
             products: [product],
             quote_depth: pos_integer,
-            opts: map
+            opts: map,
+            last_heartbeat: pos_integer,
+            jsonrpc_id: jsonrpc_id,
+            jsonrpc_requests: %{
+              optional(jsonrpc_id) => pos_integer
+            }
           }
 
-    @enforce_keys ~w(venue routes channels products quote_depth opts)a
-    defstruct ~w(venue routes channels credential products quote_depth opts)a
+    @enforce_keys ~w(venue routes channels products quote_depth opts jsonrpc_id jsonrpc_requests)a
+    defstruct ~w(venue routes channels credential products quote_depth opts last_heartbeat jsonrpc_id jsonrpc_requests)a
   end
 
   @type product :: Tai.Venues.Product.t()
@@ -57,7 +62,9 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       credential: credential,
       products: products,
       quote_depth: quote_depth,
-      opts: opts
+      opts: opts,
+      jsonrpc_id: 1,
+      jsonrpc_requests: %{}
     }
 
     name = venue |> to_name
@@ -84,6 +91,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   end
 
   def handle_info(:init_subscriptions, state) do
+    send(self(), {:subscribe, :heartbeat})
     send(self(), {:subscribe, :depth})
     {:ok, state}
   end
@@ -93,29 +101,51 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
 
     msg =
       %{
-        "method" => "public/subscribe",
-        "params" => %{"channels" => channels}
+        method: "public/subscribe",
+        id: state.jsonrpc_id,
+        params: %{
+          channels: channels
+        }
       }
       |> Jason.encode!()
 
-    send(self(), {:send_msg, msg})
+    state = state |> add_jsonrpc_request()
 
-    {:ok, state}
+    {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:send_msg, msg}, state), do: {:reply, {:text, msg}, state}
+  @heartbeat_interval_s 10
+  def handle_info({:subscribe, :heartbeat}, state) do
+    msg =
+      %{
+        method: "public/set_heartbeat",
+        id: state.jsonrpc_id,
+        params: %{
+          interval: @heartbeat_interval_s
+        }
+      }
+      |> Jason.encode!()
+
+    state =
+      state
+      |> add_jsonrpc_request()
+      |> Map.put(:last_heartbeat, :os.system_time(:millisecond))
+
+    {:reply, {:text, msg}, state}
+  end
 
   def handle_frame({:text, msg}, state) do
     msg
     |> Jason.decode!()
     |> handle_msg(state)
-
-    {:ok, state}
   end
 
   def handle_frame(_frame, state), do: {:ok, state}
 
-  defp handle_msg(%{"result" => _result}, _state), do: nil
+  defp handle_msg(%{"id" => id, "result" => _}, state) do
+    state = delete_jsonrpc_request(state, id)
+    {:ok, state}
+  end
 
   defp handle_msg(
          %{
@@ -125,11 +155,62 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
          state
        ) do
     msg |> forward(:order_books, state)
+    {:ok, state}
+  end
+
+  @heartbeat_interval_timeout_ms 15000
+  defp handle_msg(
+         %{
+           "method" => "heartbeat",
+           "params" => %{"type" => "heartbeat"}
+         },
+         state
+       ) do
+    now = :os.system_time(:millisecond)
+    diff = now - state.last_heartbeat
+    state = Map.put(state, :last_heartbeat, now)
+
+    if diff > @heartbeat_interval_timeout_ms do
+      {:close, state}
+    else
+      {:ok, state}
+    end
+  end
+
+  defp handle_msg(
+         %{
+           "method" => "heartbeat",
+           "params" => %{"type" => "test_request"}
+         },
+         state
+       ) do
+    msg =
+      %{method: "public/test", id: state.jsonrpc_id}
+      |> Jason.encode!()
+
+    state = state |> add_jsonrpc_request()
+
+    {:reply, {:text, msg}, state}
   end
 
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
     |> GenServer.cast({msg, Timex.now()})
+  end
+
+  defp add_jsonrpc_request(state) do
+    jsonrpc_requests =
+      state.jsonrpc_requests
+      |> Map.put(state.jsonrpc_id, :os.system_time(:millisecond))
+
+    state
+    |> Map.put(:jsonrpc_id, state.jsonrpc_id + 1)
+    |> Map.put(:jsonrpc_requests, jsonrpc_requests)
+  end
+
+  defp delete_jsonrpc_request(state, id) do
+    jsonrpc_requests = Map.delete(state.jsonrpc_requests, id)
+    Map.put(state, :jsonrpc_requests, jsonrpc_requests)
   end
 end
