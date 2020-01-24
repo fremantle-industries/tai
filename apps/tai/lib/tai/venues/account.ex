@@ -33,3 +33,11 @@ defmodule Tai.Venues.Account do
   @spec total(t) :: Decimal.t()
   def total(%Account{} = account), do: Decimal.add(account.free, account.locked)
 end
+
+defimpl Stored.Item, for: Tai.Venues.Account do
+  @type key :: term
+  @type account :: Tai.Venues.Account.t()
+
+  @spec key(account) :: key
+  def key(a), do: {a.venue_id, a.credential_id, a.asset, a.type}
+end

@@ -45,32 +45,16 @@ defmodule Tai.Venues.BootTest do
       assert {:ok, %Tai.Venue{}} = Tai.Venues.Boot.run(@venue)
 
       assert {:ok, _btc_account} =
-               Tai.Venues.AccountStore.find_by(
-                 venue_id: @venue_id,
-                 credential_id: @credential_id,
-                 asset: :btc
-               )
+               Tai.Venues.AccountStore.find({@venue_id, @credential_id, :btc, "default"})
 
       assert {:ok, _eth_account} =
-               Tai.Venues.AccountStore.find_by(
-                 venue_id: @venue_id,
-                 credential_id: @credential_id,
-                 asset: :eth
-               )
+               Tai.Venues.AccountStore.find({@venue_id, @credential_id, :eth, "default"})
 
       assert {:ok, _ltc_account} =
-               Tai.Venues.AccountStore.find_by(
-                 venue_id: @venue_id,
-                 credential_id: @credential_id,
-                 asset: :ltc
-               )
+               Tai.Venues.AccountStore.find({@venue_id, @credential_id, :ltc, "default"})
 
       assert {:ok, _usdt_account} =
-               Tai.Venues.AccountStore.find_by(
-                 venue_id: @venue_id,
-                 credential_id: :main,
-                 asset: :usdt
-               )
+               Tai.Venues.AccountStore.find({@venue_id, :main, :usdt, "default"})
     end
 
     test "hydrates fees" do
@@ -186,10 +170,10 @@ defmodule Tai.Venues.BootTest do
       @venue_id,
       @credential_id,
       [
-        %{asset: :btc, free: Decimal.new("0.1"), locked: Decimal.new("0.2")},
-        %{asset: :eth, free: Decimal.new("0.3"), locked: Decimal.new("0.4")},
-        %{asset: :ltc, free: Decimal.new("0.5"), locked: Decimal.new("0.6")},
-        %{asset: :usdt, free: Decimal.new(0), locked: Decimal.new(0)}
+        %{asset: :btc, type: "default", free: Decimal.new("0.1"), locked: Decimal.new("0.2")},
+        %{asset: :eth, type: "default", free: Decimal.new("0.3"), locked: Decimal.new("0.4")},
+        %{asset: :ltc, type: "default", free: Decimal.new("0.5"), locked: Decimal.new("0.6")},
+        %{asset: :usdt, type: "default", free: Decimal.new(0), locked: Decimal.new(0)}
       ]
     )
 
