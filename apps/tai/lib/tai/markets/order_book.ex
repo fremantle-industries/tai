@@ -38,6 +38,7 @@ defmodule Tai.Markets.OrderBook do
           bids: %{optional(price) => qty},
           asks: %{optional(price) => qty},
           last_received_at: DateTime.t(),
+          last_change_set: ChangeSet.t(),
           last_venue_timestamp: DateTime.t() | nil
         }
 
@@ -96,7 +97,8 @@ defmodule Tai.Markets.OrderBook do
         | bids: %{},
           asks: %{},
           last_received_at: change_set.last_received_at,
-          last_venue_timestamp: change_set.last_venue_timestamp
+          last_venue_timestamp: change_set.last_venue_timestamp,
+          last_change_set: change_set
       }
       |> apply_changes(change_set.changes)
 
@@ -112,7 +114,8 @@ defmodule Tai.Markets.OrderBook do
       %{
         state
         | last_received_at: change_set.last_received_at,
-          last_venue_timestamp: change_set.last_venue_timestamp
+          last_venue_timestamp: change_set.last_venue_timestamp,
+          last_change_set: change_set
       }
       |> apply_changes(change_set.changes)
 
