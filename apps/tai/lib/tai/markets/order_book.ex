@@ -30,11 +30,13 @@ defmodule Tai.Markets.OrderBook do
   @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
   @type product_symbol :: Tai.Venues.Product.symbol()
+  @type price :: number
+  @type qty :: number
   @type t :: %OrderBook{
           venue_id: venue_id,
           product_symbol: product_symbol,
-          bids: %{(price :: number) => size :: pos_integer},
-          asks: %{(price :: number) => size :: pos_integer},
+          bids: %{optional(price) => qty},
+          asks: %{optional(price) => qty},
           last_received_at: DateTime.t(),
           last_venue_timestamp: DateTime.t() | nil
         }
