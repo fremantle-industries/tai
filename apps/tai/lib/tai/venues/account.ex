@@ -9,6 +9,7 @@ defmodule Tai.Venues.Account do
           credential_id: credential_id,
           asset: asset,
           type: String.t(),
+          equity: Decimal.t(),
           free: Decimal.t(),
           locked: Decimal.t()
         }
@@ -18,6 +19,7 @@ defmodule Tai.Venues.Account do
     credential_id
     asset
     type
+    equity
     free
     locked
   )a
@@ -26,12 +28,10 @@ defmodule Tai.Venues.Account do
     credential_id
     asset
     type
+    equity
     free
     locked
   )a
-
-  @spec total(t) :: Decimal.t()
-  def total(%Account{} = account), do: Decimal.add(account.free, account.locked)
 end
 
 defimpl Stored.Item, for: Tai.Venues.Account do

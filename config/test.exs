@@ -118,8 +118,8 @@ config(:tai,
   }
 )
 
-config(:tai, :test_venue_adapters_products, [:binance, :deribit, :gdax, :mock, :okex])
-config(:tai, :test_venue_adapters_accounts, [:binance, :deribit, :gdax, :mock, :okex])
+config(:tai, :test_venue_adapters_products, [:binance, :bitmex, :deribit, :gdax, :mock, :okex])
+config(:tai, :test_venue_adapters_accounts, [:binance, :bitmex, :deribit, :gdax, :mock, :okex])
 config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :gdax, :okex])
 config(:tai, :test_venue_adapters_create_order_gtc_open, [:bitmex, :binance])
 config(:tai, :test_venue_adapters_create_order_gtc_accepted, [:okex_futures, :okex_swap])

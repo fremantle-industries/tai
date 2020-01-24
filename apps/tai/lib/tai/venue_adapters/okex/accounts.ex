@@ -14,15 +14,16 @@ defmodule Tai.VenueAdapters.OkEx.Accounts do
         info
         |> Enum.map(fn {asset, %{"equity" => equity}} ->
           free = Decimal.new(0)
-          locked = equity |> Decimal.new() |> Decimal.reduce()
+          equity = equity |> Decimal.new() |> Decimal.reduce()
 
           %Tai.Venues.Account{
             venue_id: venue_id,
             credential_id: credential_id,
             asset: asset |> String.to_atom(),
             type: "futures",
+            equity: equity,
             free: free,
-            locked: locked
+            locked: equity
           }
         end)
 
@@ -43,15 +44,16 @@ defmodule Tai.VenueAdapters.OkEx.Accounts do
             |> String.to_atom()
 
           free = Decimal.new(0)
-          locked = equity |> Decimal.new() |> Decimal.reduce()
+          equity = equity |> Decimal.new() |> Decimal.reduce()
 
           %Tai.Venues.Account{
             venue_id: venue_id,
             credential_id: credential_id,
             asset: asset,
             type: "swap",
+            equity: equity,
             free: free,
-            locked: locked
+            locked: equity
           }
         end)
 
@@ -69,14 +71,16 @@ defmodule Tai.VenueAdapters.OkEx.Accounts do
                          "available" => available
                        } ->
           asset = currency |> String.downcase() |> String.to_atom()
+          equity = venue_balance |> Decimal.new()
           free = available |> Decimal.new()
-          locked = venue_balance |> Decimal.new() |> Decimal.sub(free) |> Decimal.reduce()
+          locked = equity |> Decimal.sub(free) |> Decimal.reduce()
 
           %Tai.Venues.Account{
             venue_id: venue_id,
             credential_id: credential_id,
             asset: asset,
             type: "spot",
+            equity: equity,
             free: free,
             locked: locked
           }

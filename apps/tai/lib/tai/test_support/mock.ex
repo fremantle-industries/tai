@@ -33,13 +33,18 @@ defmodule Tai.TestSupport.Mock do
 
   @spec mock_account(venue_id, credential_id, asset, balance, balance) :: :ok
   def mock_account(venue_id, credential_id, asset, free, locked) do
+    free = Decimal.cast(free)
+    locked = Decimal.cast(locked)
+    equity = Decimal.add(free, locked)
+
     %Tai.Venues.Account{
       venue_id: venue_id,
       credential_id: credential_id,
       type: "default",
       asset: asset,
-      free: free |> Decimal.cast(),
-      locked: locked |> Decimal.cast()
+      equity: equity,
+      free: free,
+      locked: locked
     }
     |> Tai.Venues.AccountStore.upsert()
   end
