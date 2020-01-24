@@ -33,7 +33,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       type: :swap,
       venue_id: venue_id,
       venue_symbol: instrument.instrument_id,
-      base: instrument.coin,
+      base: instrument.base_currency,
       quote: instrument.quote_currency,
       listing: listing,
       venue_price_increment: instrument.tick_size,
