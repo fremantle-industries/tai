@@ -4,7 +4,7 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
   def build(%ExBitmex.Instrument{lot_size: nil}, _), do: nil
 
   def build(instrument, venue_id) do
-    symbol = instrument.symbol |> to_symbol
+    symbol = instrument.symbol |> downcase_and_atom
     status = Tai.VenueAdapters.Bitmex.ProductStatus.normalize(instrument.state)
     listing = instrument.listing && Timex.parse!(instrument.listing, @format)
     expiry = instrument.expiry && Timex.parse!(instrument.expiry, @format)
@@ -19,8 +19,10 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
       venue_id: venue_id,
       symbol: symbol,
       venue_symbol: instrument.symbol,
-      base: instrument.underlying,
-      quote: instrument.quote_currency,
+      base: instrument.underlying |> downcase_and_atom(),
+      quote: instrument.quote_currency |> downcase_and_atom(),
+      venue_base: instrument.underlying,
+      venue_quote: instrument.quote_currency,
       status: status,
       type: :future,
       listing: listing,
@@ -39,11 +41,7 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
     }
   end
 
-  def to_symbol(venue_symbol) do
-    venue_symbol
-    |> String.downcase()
-    |> String.to_atom()
-  end
+  def downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 
   def from_symbol(symbol) do
     symbol

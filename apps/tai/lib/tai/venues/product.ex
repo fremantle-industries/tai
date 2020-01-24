@@ -16,7 +16,8 @@ defmodule Tai.Venues.Product do
   - BTC = base asset
   - USD = quote asset
   """
-  @type asset :: String.t()
+  @type asset :: atom
+  @type venue_asset :: String.t()
 
   @typedoc """
   The underlying value of the product. Spot products will always have a value = 1. Derivative products
@@ -46,6 +47,8 @@ defmodule Tai.Venues.Product do
           alias: String.t() | nil,
           base: asset,
           quote: asset,
+          venue_base: venue_asset,
+          venue_quote: venue_asset,
           status: status,
           type: type,
           listing: DateTime.t() | nil,
@@ -70,6 +73,8 @@ defmodule Tai.Venues.Product do
     venue_symbol
     base
     quote
+    venue_base
+    venue_quote
     status
     type
     price_increment
@@ -87,6 +92,8 @@ defmodule Tai.Venues.Product do
     alias
     base
     quote
+    venue_base
+    venue_quote
     status
     type
     listing

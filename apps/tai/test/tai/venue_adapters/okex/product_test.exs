@@ -14,6 +14,8 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
     test "returns a product struct from a venue futures instrument" do
       attrs = %{
         instrument_id: "BTC-USDT-200327",
+        base_currency: "BTC",
+        quote_currency: "USDT",
         trade_increment: "1",
         tick_size: "0.01",
         contract_val: "100",
@@ -27,6 +29,10 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
       assert product.venue_id == :venue_a
       assert product.symbol == :btc_usdt_200327
       assert product.venue_symbol == "BTC-USDT-200327"
+      assert product.base == :btc
+      assert product.quote == :usdt
+      assert product.venue_base == "BTC"
+      assert product.venue_quote == "USDT"
       assert product.status == :trading
       assert product.price_increment == Decimal.new("0.01")
       assert product.min_price == Decimal.new("0.01")
@@ -41,6 +47,8 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
     test "returns a product struct from a venue swap instrument" do
       attrs = %{
         instrument_id: "BTC-USDT-SWAP",
+        base_currency: "BTC",
+        quote_currency: "USDT",
         size_increment: "1",
         tick_size: "0.01",
         contract_val: "100",
@@ -55,6 +63,10 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
       assert product.venue_id == :venue_a
       assert product.symbol == :btc_usdt_swap
       assert product.venue_symbol == "BTC-USDT-SWAP"
+      assert product.base == :btc
+      assert product.quote == :usdt
+      assert product.venue_base == "BTC"
+      assert product.venue_quote == "USDT"
       assert product.status == :trading
       assert product.price_increment == Decimal.new("0.01")
       assert product.min_price == Decimal.new("0.01")
@@ -69,6 +81,8 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
     test "returns a product struct from a venue spot instrument" do
       attrs = %{
         instrument_id: "BTC-USDT",
+        base_currency: "BTC",
+        quote_currency: "USDT",
         size_increment: "0.00000001",
         min_size: "0.001",
         tick_size: "0.1"
@@ -80,6 +94,10 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
       assert product.venue_id == :venue_a
       assert product.symbol == :btc_usdt
       assert product.venue_symbol == "BTC-USDT"
+      assert product.base == :btc
+      assert product.quote == :usdt
+      assert product.venue_base == "BTC"
+      assert product.venue_quote == "USDT"
       assert product.status == :trading
       assert product.price_increment == Decimal.new("0.1")
       assert product.min_price == Decimal.new("0.1")
@@ -94,6 +112,8 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
     test "futures products can be inverse" do
       attrs = %{
         instrument_id: "BTC-USD-200327",
+        base_currency: "BTC",
+        quote_currency: "USDT",
         trade_increment: "1",
         tick_size: "0.01",
         contract_val: "100",
@@ -114,6 +134,8 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
     test "swap products can be inverse" do
       attrs = %{
         instrument_id: "BTC-USD-SWAP",
+        base_currency: "BTC",
+        quote_currency: "USDT",
         size_increment: "1",
         tick_size: "0.01",
         contract_val: "100",

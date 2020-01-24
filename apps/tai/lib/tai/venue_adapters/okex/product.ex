@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       venue_id: venue_id,
       venue_symbol: instrument.instrument_id,
       alias: instrument.alias,
-      base: instrument.underlying_index,
+      base: instrument.base_currency,
       quote: instrument.quote_currency,
       listing: listing,
       expiry: expiry,
@@ -63,8 +63,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
   def to_symbol(instrument_id) do
     instrument_id
     |> String.replace("-", "_")
-    |> String.downcase()
-    |> String.to_atom()
+    |> downcase_and_atom
   end
 
   def from_symbol(symbol) do
@@ -73,6 +72,8 @@ defmodule Tai.VenueAdapters.OkEx.Product do
     |> String.replace("_", "-")
     |> String.upcase()
   end
+
+  defp downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 
   defp build_product(args) do
     venue_symbol = Keyword.fetch!(args, :venue_symbol)
@@ -86,14 +87,18 @@ defmodule Tai.VenueAdapters.OkEx.Product do
     value = args |> Keyword.fetch!(:value) |> Decimal.cast()
     listing = args |> Keyword.get(:listing)
     expiry = args |> Keyword.get(:expiry)
+    base_asset = Keyword.fetch!(args, :base)
+    quote_asset = Keyword.fetch!(args, :quote)
 
     %Tai.Venues.Product{
       venue_id: Keyword.fetch!(args, :venue_id),
       symbol: symbol,
       venue_symbol: venue_symbol,
       alias: product_alias,
-      base: Keyword.fetch!(args, :base),
-      quote: Keyword.fetch!(args, :quote),
+      base: base_asset |> downcase_and_atom(),
+      quote: quote_asset |> downcase_and_atom(),
+      venue_base: base_asset,
+      venue_quote: quote_asset,
       status: :trading,
       type: Keyword.fetch!(args, :type),
       listing: listing,

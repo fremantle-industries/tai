@@ -53,8 +53,10 @@ defmodule Tai.VenueAdapters.Gdax.Products do
       venue_id: venue_id,
       symbol: symbol,
       venue_symbol: id,
-      base: base_currency,
-      quote: quote_currency,
+      base: base_currency |> downcase_and_atom(),
+      quote: quote_currency |> downcase_and_atom(),
+      venue_base: base_currency,
+      venue_quote: quote_currency,
       status: status,
       type: :spot,
       min_notional: min_notional,
@@ -68,4 +70,6 @@ defmodule Tai.VenueAdapters.Gdax.Products do
       is_inverse: false
     }
   end
+
+  defp downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 end

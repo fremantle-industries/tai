@@ -37,8 +37,10 @@ defmodule Tai.VenueAdapters.Binance.Products do
       venue_id: venue_id,
       symbol: symbol,
       venue_symbol: venue_symbol,
-      base: base_asset,
-      quote: quote_asset,
+      base: base_asset |> downcase_and_atom(),
+      quote: quote_asset |> downcase_and_atom(),
+      venue_base: base_asset,
+      venue_quote: quote_asset,
       status: status,
       type: :spot,
       min_notional: min_notional,
@@ -53,6 +55,8 @@ defmodule Tai.VenueAdapters.Binance.Products do
       is_inverse: false
     }
   end
+
+  defp downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 
   @price_filter "PRICE_FILTER"
   defp price_filter(filters) do

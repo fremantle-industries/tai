@@ -13,6 +13,8 @@ defmodule Tai.VenuesAdapters.Bitmex.ProductTest do
   describe ".build/2" do
     @base_attrs %{
       symbol: "XBTUSD",
+      underlying: "XBT",
+      quote_currency: "USD",
       state: "Open",
       lot_size: 1,
       tick_size: 0.5

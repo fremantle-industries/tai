@@ -17,8 +17,10 @@ defmodule Tai.VenueAdapters.Deribit.Product do
       venue_id: venue_id,
       symbol: symbol,
       venue_symbol: instrument.instrument_name,
-      base: instrument.base_currency,
-      quote: instrument.quote_currency,
+      base: instrument.base_currency |> downcase_and_atom(),
+      quote: instrument.quote_currency |> downcase_and_atom(),
+      venue_base: instrument.base_currency,
+      venue_quote: instrument.quote_currency,
       status: status,
       type: type,
       listing: listing,
@@ -38,8 +40,7 @@ defmodule Tai.VenueAdapters.Deribit.Product do
   def to_symbol(venue_symbol) do
     venue_symbol
     |> String.replace("-", "_")
-    |> String.downcase()
-    |> String.to_atom()
+    |> downcase_and_atom()
   end
 
   def from_symbol(symbol) do
@@ -47,6 +48,8 @@ defmodule Tai.VenueAdapters.Deribit.Product do
     |> Atom.to_string()
     |> String.upcase()
   end
+
+  defp downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 
   defp to_status(%ExDeribit.Instrument{is_active: true}), do: :trading
   defp to_status(%ExDeribit.Instrument{is_active: false}), do: :halt
