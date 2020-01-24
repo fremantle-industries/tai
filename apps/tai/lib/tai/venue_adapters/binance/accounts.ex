@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.Binance.Accounts do
   end
 
   defp build(
-         %{"asset" => raw_asset, "free" => free, "locked" => locked},
+         %{"asset" => raw_asset, "free" => venue_free, "locked" => venue_locked},
          venue_id,
          credential_id
        ) do
@@ -27,13 +27,18 @@ defmodule Tai.VenueAdapters.Binance.Accounts do
       |> String.downcase()
       |> String.to_atom()
 
+    free = venue_free |> Decimal.new() |> Decimal.reduce()
+    locked = venue_locked |> Decimal.new() |> Decimal.reduce()
+    equity = Decimal.add(free, locked)
+
     %Tai.Venues.Account{
       venue_id: venue_id,
       credential_id: credential_id,
       asset: asset,
       type: "default",
-      free: free |> Decimal.new() |> Decimal.reduce(),
-      locked: locked |> Decimal.new() |> Decimal.reduce()
+      equity: equity,
+      free: free,
+      locked: locked
     }
   end
 end

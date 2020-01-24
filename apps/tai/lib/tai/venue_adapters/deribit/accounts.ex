@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.Deribit.Accounts do
   @zero Decimal.new(0)
 
   def build(account_summary, venue_id, credential_id) do
-    locked = account_summary.equity |> Decimal.cast()
+    equity = account_summary.equity |> Decimal.cast()
     asset = account_summary.currency |> String.downcase() |> String.to_atom()
 
     %Tai.Venues.Account{
@@ -21,8 +21,9 @@ defmodule Tai.VenueAdapters.Deribit.Accounts do
       credential_id: credential_id,
       asset: asset,
       type: "default",
+      equity: equity,
       free: @zero,
-      locked: locked
+      locked: equity
     }
   end
 

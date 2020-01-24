@@ -11,7 +11,7 @@ defmodule Tai.Commands.Accounts do
     "Asset",
     "Free",
     "Locked",
-    "Balance"
+    "Equity"
   ]
 
   @spec accounts :: no_return
@@ -35,7 +35,7 @@ defmodule Tai.Commands.Accounts do
           account.asset,
           account.free,
           account.locked,
-          Tai.Venues.Account.total(account)
+          account.equity
         }
 
         [row | acc]

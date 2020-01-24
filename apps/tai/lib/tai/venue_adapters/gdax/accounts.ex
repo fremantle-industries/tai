@@ -31,13 +31,18 @@ defmodule Tai.VenueAdapters.Gdax.Accounts do
       |> String.downcase()
       |> String.to_atom()
 
+    free = available |> Decimal.new() |> Decimal.reduce()
+    locked = hold |> Decimal.new() |> Decimal.reduce()
+    equity = Decimal.add(free, locked)
+
     %Tai.Venues.Account{
       venue_id: venue_id,
       credential_id: credential_id,
       type: "default",
       asset: asset,
-      free: available |> Decimal.new() |> Decimal.reduce(),
-      locked: hold |> Decimal.new() |> Decimal.reduce()
+      equity: equity,
+      free: free,
+      locked: locked
     }
   end
 end

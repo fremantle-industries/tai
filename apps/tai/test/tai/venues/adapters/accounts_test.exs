@@ -33,6 +33,7 @@ defmodule Tai.Venues.Adapters.AccountsTest do
         assert [%Tai.Venues.Account{} = account | _] = accounts
         assert account.venue_id == @venue.id
         assert account.credential_id == @credential_id
+        assert Decimal.cmp(account.equity, Decimal.new(0)) != :lt
         assert Decimal.cmp(account.free, Decimal.new(0)) != :lt
         assert Decimal.cmp(account.locked, Decimal.new(0)) != :lt
       end
@@ -44,8 +45,18 @@ defmodule Tai.Venues.Adapters.AccountsTest do
       :mock,
       :main,
       [
-        %{asset: :btc, free: Decimal.new("0.1"), locked: Decimal.new("0.2")},
-        %{asset: :ltc, free: Decimal.new("0.3"), locked: Decimal.new("0.4")}
+        %{
+          asset: :btc,
+          equity: Decimal.new("0.3"),
+          free: Decimal.new("0.1"),
+          locked: Decimal.new("0.2")
+        },
+        %{
+          asset: :ltc,
+          equity: Decimal.new("0.7"),
+          free: Decimal.new("0.3"),
+          locked: Decimal.new("0.4")
+        }
       ]
     )
   end
