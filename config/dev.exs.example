@@ -1,6 +1,7 @@
 use Mix.Config
 
 config :tai, send_orders: false
+config :tai, :broadcast_change_set, true
 
 config :tai,
   advisor_groups: %{
@@ -36,6 +37,7 @@ config :tai,
           api_secret: {:system_file, "BITMEX_API_SECRET"}
         }
       },
+      broadcast_change_set: true,
       opts: %{
         autocancel: %{ping_interval_ms: 15_000, cancel_after_ms: 60_000}
       }
