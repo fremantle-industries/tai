@@ -60,8 +60,18 @@ defmodule Tai.Markets.OrderBook do
     last_venue_timestamp
   )a
 
-  @spec start_link(product) :: GenServer.on_start()
-  def start_link(product, opts \\ []) do
+  @spec child_spec(product, boolean) :: Supervisor.child_spec()
+  def child_spec(product, broadcast_change_set) do
+    %{
+      id: to_name(product.venue_id, product.symbol),
+      start:
+        {__MODULE__, :start_link,
+         [[product: product, broadcast_change_set: broadcast_change_set]]}
+    }
+  end
+
+  @spec start_link(product: product, broadcast_change_set: boolean) :: GenServer.on_start()
+  def start_link(product: product, broadcast_change_set: broadcast_change_set) do
     name = to_name(product.venue_id, product.symbol)
 
     state = %OrderBook{
@@ -69,7 +79,7 @@ defmodule Tai.Markets.OrderBook do
       product_symbol: product.symbol,
       bids: %{},
       asks: %{},
-      broadcast_change_set: !!Keyword.get(opts, :broadcast_change_set)
+      broadcast_change_set: broadcast_change_set
     }
 
     GenServer.start_link(__MODULE__, state, name: name)

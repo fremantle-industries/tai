@@ -13,7 +13,7 @@ defmodule Tai.Markets.OrderBookTest do
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)
-    book_pid = start_supervised!({OrderBook, @product})
+    book_pid = start_supervised!(OrderBook.child_spec(@product, false))
 
     %{book_pid: book_pid}
   end
@@ -149,6 +149,28 @@ defmodule Tai.Markets.OrderBookTest do
       assert forwarded_book.asks == %{}
 
       assert forwarded_change_set == change_set_2
+    end
+
+    test "broadcasts change_set", %{book_pid: book_pid} do
+      book_pid |> :sys.replace_state(fn state -> %{state | broadcast_change_set: true} end)
+      Tai.PubSub.subscribe(:change_set)
+
+      changes = [
+        {:upsert, :bid, 100.0, 1.0},
+        {:upsert, :ask, 102.0, 11.0}
+      ]
+
+      change_set = %OrderBook.ChangeSet{
+        venue: @venue,
+        symbol: @symbol,
+        changes: changes,
+        last_venue_timestamp: Timex.now(),
+        last_received_at: Timex.now()
+      }
+
+      OrderBook.apply(change_set)
+
+      assert_receive {:change_set, change_set}
     end
   end
 end
