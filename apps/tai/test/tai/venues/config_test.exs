@@ -165,6 +165,22 @@ defmodule Tai.Venues.ConfigTest do
       assert venue.quote_depth == 5
     end
 
+    test "can provide broadcast_change_set" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            venue_a: [
+              enabled: true,
+              adapter: MyAdapterA,
+              broadcast_change_set: true
+            ]
+          }
+        )
+
+      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
+      assert venue.broadcast_change_set
+    end
+
     test "raises a KeyError when there is no adapter specified" do
       config = Tai.Config.parse(venues: %{invalid_exchange_a: [enabled: true]})
 

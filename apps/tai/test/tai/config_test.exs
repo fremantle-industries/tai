@@ -12,6 +12,7 @@ defmodule Tai.ConfigTest do
                venues: %{},
                advisor_groups: %{},
                adapter_timeout: 10_000,
+               broadcast_change_set: false,
                event_registry_partitions: ^schedulers_online,
                pub_sub_registry_partitions: ^schedulers_online
              } = Tai.Config.parse([])
@@ -45,6 +46,11 @@ defmodule Tai.ConfigTest do
     test "can set advisor_groups" do
       assert config = Tai.Config.parse(advisor_groups: :advisor_groups)
       assert config.advisor_groups == :advisor_groups
+    end
+
+    test "can set broadcast_change_set" do
+      assert config = Tai.Config.parse(broadcast_change_set: true)
+      assert config.broadcast_change_set
     end
   end
 end

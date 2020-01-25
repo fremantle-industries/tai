@@ -33,6 +33,7 @@ defmodule Tai.Markets.OrderBook do
   @type price :: number
   @type qty :: number
   @type t :: %OrderBook{
+          broadcast_change_set: boolean,
           venue_id: venue_id,
           product_symbol: product_symbol,
           bids: %{optional(price) => qty},
@@ -49,6 +50,7 @@ defmodule Tai.Markets.OrderBook do
     asks
   )a
   defstruct ~w(
+    broadcast_change_set
     venue_id
     product_symbol
     bids
@@ -59,14 +61,15 @@ defmodule Tai.Markets.OrderBook do
   )a
 
   @spec start_link(product) :: GenServer.on_start()
-  def start_link(product) do
+  def start_link(product, opts \\ []) do
     name = to_name(product.venue_id, product.symbol)
 
     state = %OrderBook{
       venue_id: product.venue_id,
       product_symbol: product.symbol,
       bids: %{},
-      asks: %{}
+      asks: %{},
+      broadcast_change_set: !!Keyword.get(opts, :broadcast_change_set)
     }
 
     GenServer.start_link(__MODULE__, state, name: name)
@@ -107,7 +110,7 @@ defmodule Tai.Markets.OrderBook do
     |> Tai.Markets.ProcessQuote.to_name(change_set.symbol)
     |> GenServer.cast({:order_book_snapshot, new_state, change_set})
 
-    if broadcast_change_set?() do
+    if new_state.broadcast_change_set do
       {:noreply, new_state, {:continue, :broadcast_change_set}}
     else
       {:noreply, new_state}
@@ -128,7 +131,7 @@ defmodule Tai.Markets.OrderBook do
     |> Tai.Markets.ProcessQuote.to_name(change_set.symbol)
     |> GenServer.cast({:order_book_apply, new_state, change_set})
 
-    if broadcast_change_set?() do
+    if new_state.broadcast_change_set do
       {:noreply, new_state, {:continue, :broadcast_change_set}}
     else
       {:noreply, new_state}
@@ -169,9 +172,5 @@ defmodule Tai.Markets.OrderBook do
           Map.put(acc, :asks, new_asks)
       end
     )
-  end
-
-  defp broadcast_change_set? do
-    Application.get_env(:tai, :broadcast_change_set, false)
   end
 end
