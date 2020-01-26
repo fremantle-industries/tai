@@ -7,9 +7,9 @@ defmodule Tai.VenueAdapters.Bitmex.AccountsTest do
   @rate_limit struct(ExBitmex.RateLimit)
 
   test ".accounts normalizes the amount from satoshis to btc" do
-    with_mock ExBitmex.Rest.User.Wallet,
+    with_mock ExBitmex.Rest.User.Margin,
       get: fn _venue_credentials ->
-        wallet = struct(ExBitmex.Wallet, currency: "XBt", amount: 133_558_082)
+        wallet = struct(ExBitmex.Margin, currency: "XBt", amount: 133_558_082)
         {:ok, wallet, @rate_limit}
       end do
       assert {:ok, accounts} = Bitmex.Accounts.accounts(:venue_a, :account_a, @credentials)

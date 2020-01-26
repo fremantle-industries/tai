@@ -1,7 +1,7 @@
 [
   {
     "request": {
-      "body": "{\"currency\":\"XBt\"}",
+      "body": "{}",
       "headers": {
         "Content-Type": "application/json",
         "api-nonce": "***",
@@ -11,21 +11,22 @@
       "method": "get",
       "options": [],
       "request_body": "",
-      "url": "https://testnet.bitmex.com/api/v1/user/wallet"
+      "url": "https://testnet.bitmex.com/api/v1/user/margin"
     },
     "response": {
       "binary": false,
-      "body": "{\"account\":158677,\"currency\":\"XBt\",\"prevDeposited\":33982562,\"prevWithdrawn\":0,\"prevTransferIn\":1000000,\"prevTransferOut\":0,\"prevAmount\":24409869,\"prevTimestamp\":\"2018-12-27T12:00:00.000Z\",\"deltaDeposited\":0,\"deltaWithdrawn\":0,\"deltaTransferIn\":0,\"deltaTransferOut\":0,\"deltaAmount\":-3710,\"deposited\":33982562,\"withdrawn\":0,\"transferIn\":1000000,\"transferOut\":0,\"amount\":24406159,\"pendingCredit\":0,\"pendingDebit\":0,\"confirmedDebit\":0,\"timestamp\":\"2018-12-27T12:00:01.691Z\",\"addr\":\"2NBMEXveLBR18TYSNA5MDiP6jEnVjzVyb3C\",\"script\":\"5321022e967760b5fb2c2a1545d24143c85895803f7b3cf59271c50903967baedadcd92102c10be2f0dc20f4285c25156aa22a0c46d2b89ccc4d1c8eaed92ea0c1a8f40c002102ceba29da1af96a0f2ef7cda6950b8be2baeb1adf12c0d5efebb70dbcaa086ba02103d5a42b90e9d7156155661979530a09d2e12e252ef4104e5611274a7ae7e2b09454ae\",\"withdrawalLock\":[]}",
+      "body": "{\"account\":158677,\"currency\":\"XBt\",\"riskLimit\":1000000000000,\"prevState\":\"\",\"state\":\"\",\"action\":\"\",\"amount\":133558082,\"pendingCredit\":0,\"pendingDebit\":0,\"confirmedDebit\":0,\"prevRealisedPnl\":-47,\"prevUnrealisedPnl\":0,\"grossComm\":0,\"grossOpenCost\":0,\"grossOpenPremium\":0,\"grossExecCost\":0,\"grossMarkValue\":0,\"riskValue\":0,\"taxableMargin\":0,\"initMargin\":0,\"maintMargin\":0,\"sessionMargin\":0,\"targetExcessMargin\":0,\"varMargin\":0,\"realisedPnl\":0,\"unrealisedPnl\":0,\"indicativeTax\":0,\"unrealisedProfit\":0,\"syntheticMargin\":null,\"walletBalance\":133558082,\"marginBalance\":133558082,\"marginBalancePcnt\":1,\"marginLeverage\":0,\"marginUsedPcnt\":0,\"excessMargin\":133558082,\"excessMarginPcnt\":1,\"availableMargin\":133558082,\"withdrawableMargin\":133558082,\"timestamp\":\"2019-11-26T12:15:15.520Z\",\"grossLastValue\":0,\"commission\":null}",
       "headers": {
-        "Date": "Fri, 28 Dec 2018 02:20:57 GMT",
+        "Date": "Sun, 26 Jan 2020 23:37:59 GMT",
         "Content-Type": "application/json; charset=utf-8",
-        "Content-Length": "825",
+        "Content-Length": "813",
         "Connection": "keep-alive",
-        "X-RateLimit-Limit": "300",
-        "X-RateLimit-Remaining": "299",
-        "X-RateLimit-Reset": "1545963658",
+        "Set-Cookie": "AWSALB=GyiZN4EIAwlViRIUmv3kl57FCwojl7zFjKYphSWwyJ5On9ra5fH6x7ZLg43Qst1xluVhYHSpQhBx9OJ8uSewAPmxblUOtd2u4R+3qCcPdRFsgOuJZbtAtqAhll7z; Expires=Sun, 02 Feb 2020 23:37:58 GMT; Path=/",
+        "X-RateLimit-Limit": "60",
+        "X-RateLimit-Remaining": "59",
+        "X-RateLimit-Reset": "1580081880",
         "X-Powered-By": "Profit",
-        "ETag": "W/\"339-7CGiDqB0s0YS4OOGu/3ot4j6qjw\"",
+        "ETag": "W/\"32d-Ijj9YpPN3f3z0bntF1ECO4vw/lc\"",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
       },
       "status_code": 200,

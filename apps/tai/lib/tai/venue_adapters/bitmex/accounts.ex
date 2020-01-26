@@ -1,10 +1,10 @@
 defmodule Tai.VenueAdapters.Bitmex.Accounts do
   def accounts(venue_id, credential_id, credentials) do
-    with {:ok, wallet, _rate_limit} <-
+    with {:ok, margin, _rate_limit} <-
            credentials
            |> to_venue_credentials()
-           |> ExBitmex.Rest.User.Wallet.get() do
-      account = build(wallet, venue_id, credential_id)
+           |> ExBitmex.Rest.User.Margin.get() do
+      account = build(margin, venue_id, credential_id)
       {:ok, [account]}
     end
   end
@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.Bitmex.Accounts do
   @zero Decimal.new(0)
 
   def build(
-        %ExBitmex.Wallet{currency: "XBt", amount: amount},
+        %ExBitmex.Margin{currency: "XBt", amount: amount},
         venue_id,
         credential_id
       ) do
