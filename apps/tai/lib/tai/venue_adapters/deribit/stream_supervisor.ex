@@ -29,7 +29,7 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
     credential = venue.credentials |> Map.to_list() |> List.first()
 
     market_quote_children = market_quote_children(products, venue.quote_depth)
-    order_book_children = order_book_children(products)
+    order_book_children = order_book_children(products, venue.broadcast_change_set)
     process_order_book_children = process_order_book_children(products)
 
     system = [
@@ -60,14 +60,9 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
     end)
   end
 
-  defp order_book_children(products) do
+  defp order_book_children(products, broadcast_change_set) do
     products
-    |> Enum.map(fn p ->
-      %{
-        id: OrderBook.to_name(p.venue_id, p.symbol),
-        start: {OrderBook, :start_link, [p]}
-      }
-    end)
+    |> Enum.map(&OrderBook.child_spec(&1, broadcast_change_set))
   end
 
   defp process_order_book_children(products) do

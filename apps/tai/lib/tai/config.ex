@@ -6,6 +6,7 @@ defmodule Tai.Config do
   @type t :: %Tai.Config{
           adapter_timeout: integer,
           advisor_groups: map,
+          broadcast_change_set: boolean,
           venue_boot_handler: module,
           event_registry_partitions: pos_integer,
           pub_sub_registry_partitions: pos_integer,
@@ -25,6 +26,7 @@ defmodule Tai.Config do
   defstruct ~w(
     adapter_timeout
     advisor_groups
+    broadcast_change_set
     event_registry_partitions
     pub_sub_registry_partitions
     venue_boot_handler
@@ -35,6 +37,7 @@ defmodule Tai.Config do
   def parse(env \\ Application.get_all_env(:tai)) do
     adapter_timeout = Keyword.get(env, :adapter_timeout, 10_000)
     advisor_groups = Keyword.get(env, :advisor_groups, %{})
+    broadcast_change_set = !!Keyword.get(env, :broadcast_change_set)
     venue_boot_handler = Keyword.get(env, :venue_boot_handler, Tai.Venues.BootHandler)
     send_orders = !!Keyword.get(env, :send_orders)
     venues = Keyword.get(env, :venues, %{})
@@ -48,6 +51,7 @@ defmodule Tai.Config do
     %Tai.Config{
       adapter_timeout: adapter_timeout,
       advisor_groups: advisor_groups,
+      broadcast_change_set: broadcast_change_set,
       event_registry_partitions: event_registry_partitions,
       pub_sub_registry_partitions: pub_sub_registry_partitions,
       venue_boot_handler: venue_boot_handler,
