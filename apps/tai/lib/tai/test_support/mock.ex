@@ -46,7 +46,7 @@ defmodule Tai.TestSupport.Mock do
       free: free,
       locked: locked
     }
-    |> Tai.Venues.AccountStore.upsert()
+    |> Tai.Venues.AccountStore.put()
   end
 
   @spec push_market_data_snapshot(location :: location, bids :: map, asks :: map) :: no_return

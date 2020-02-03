@@ -8,7 +8,7 @@ defmodule Tai.Venues.Boot.Accounts do
     venue.credentials
     |> Map.keys()
     |> Enum.map(&fetch(&1, venue))
-    |> Enum.reduce(:ok, &upsert/2)
+    |> Enum.reduce(:ok, &put/2)
   end
 
   defp fetch(credential_id, venue) do
@@ -16,19 +16,19 @@ defmodule Tai.Venues.Boot.Accounts do
     {credential_id, venue, result}
   end
 
-  defp upsert({_credential_id, venue, {:ok, accounts}}, acc) do
+  defp put({_credential_id, venue, {:ok, accounts}}, acc) do
     accounts
     |> filter(venue.accounts)
-    |> Enum.each(&Tai.Venues.AccountStore.upsert/1)
+    |> Enum.each(&Tai.Venues.AccountStore.put/1)
 
     acc
   end
 
-  defp upsert({_credential_id, _venue, {:error, _reason}} = response, :ok) do
-    upsert(response, {:error, []})
+  defp put({_credential_id, _venue, {:error, _reason}} = response, :ok) do
+    put(response, {:error, []})
   end
 
-  defp upsert({credential_id, _venue, {:error, reason}}, {:error, reasons}) do
+  defp put({credential_id, _venue, {:error, reason}}, {:error, reasons}) do
     {:error, reasons ++ [{credential_id, reason}]}
   end
 

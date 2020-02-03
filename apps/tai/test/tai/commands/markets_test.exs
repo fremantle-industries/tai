@@ -16,21 +16,21 @@ defmodule Tai.Commands.MarketsTest do
       bids: [%PricePoint{price: 12_999.99, size: 0.000021}],
       asks: [%PricePoint{price: 13_000.01, size: 1.11}]
     }
-    |> Tai.Markets.QuoteStore.upsert()
+    |> Tai.Markets.QuoteStore.put()
 
     %Quote{
       venue_id: :test_exchange_a,
       product_symbol: :ltc_usd,
       bids: [%PricePoint{price: 101.99, size: 1.3}]
     }
-    |> Tai.Markets.QuoteStore.upsert()
+    |> Tai.Markets.QuoteStore.put()
 
     %Quote{
       venue_id: :test_exchange_a,
       product_symbol: :eth_usd,
       asks: [%PricePoint{price: 195.66, size: 0.12}]
     }
-    |> Tai.Markets.QuoteStore.upsert()
+    |> Tai.Markets.QuoteStore.put()
 
     %Quote{
       venue_id: :test_exchange_b,
@@ -38,7 +38,7 @@ defmodule Tai.Commands.MarketsTest do
       bids: [%PricePoint{price: 12000.0, size: 1000.0}],
       asks: [%PricePoint{price: 12050.0, size: 1300.0}]
     }
-    |> Tai.Markets.QuoteStore.upsert()
+    |> Tai.Markets.QuoteStore.put()
 
     assert capture_io(&Tai.CommandsHelper.markets/0) == """
            +-----------------+----------+-----------+-----------+----------+----------+
