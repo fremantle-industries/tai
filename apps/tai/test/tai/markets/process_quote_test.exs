@@ -20,7 +20,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
   describe "#order_book_snapshot" do
     test "publishes the inside quote on an unscoped channel", %{pid: pid} do
-      Tai.PubSub.subscribe(:market_quote)
+      Tai.PubSub.subscribe(:market_quote_stote)
 
       change_set_1 =
         struct(Tai.Markets.OrderBook.ChangeSet,

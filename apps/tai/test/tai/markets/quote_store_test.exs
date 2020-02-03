@@ -16,11 +16,10 @@ defmodule Tai.Markets.QuoteStoreTest do
     Tai.PubSub.subscribe(:market_quote_store)
     market_quote = struct(Tai.Markets.Quote, venue_id: @venue, product_symbol: @symbol)
 
-    Tai.PubSub.broadcast(:market_quote, {:tai, market_quote})
+    Tai.Markets.QuoteStore.put(market_quote, @test_store_id)
 
-    assert_receive {:market_quote_store_upserted, upserted_market_quote}
-
+    assert_receive {:after_put_market_quote, new_market_quote}
     assert Tai.Markets.QuoteStore.all(@test_store_id) == [market_quote]
-    assert upserted_market_quote == market_quote
+    assert new_market_quote == market_quote
   end
 end
