@@ -6,6 +6,8 @@ defmodule Tai.TestSupport.Mock do
   @type credential_id :: Tai.Venue.credential_id()
   @type asset :: Tai.Venues.Account.asset()
   @type balance :: Decimal.t() | number | String.t()
+  @type record :: Stored.Backend.record()
+  @type record_key :: Stored.Backend.key()
 
   @spec mock_product(product | map) :: :ok
   def mock_product(%Tai.Venues.Product{} = product) do
@@ -31,7 +33,8 @@ defmodule Tai.TestSupport.Mock do
     |> Tai.Venues.FeeStore.upsert()
   end
 
-  @spec mock_account(venue_id, credential_id, asset, balance, balance) :: :ok
+  @spec mock_account(venue_id, credential_id, asset, balance, balance) ::
+          {:ok, {record_key, record}}
   def mock_account(venue_id, credential_id, asset, free, locked) do
     free = Decimal.cast(free)
     locked = Decimal.cast(locked)
