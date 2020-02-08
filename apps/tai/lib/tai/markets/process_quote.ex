@@ -32,32 +32,22 @@ defmodule Tai.Markets.ProcessQuote do
 
   def handle_cast({:order_book_snapshot, order_book, change_set}, state) do
     new_market_quote = build_market_quote(order_book, change_set, state.depth)
-    new_state = state |> Map.put(:market_quote, new_market_quote)
+    new_state = Map.put(state, :market_quote, new_market_quote)
+    Tai.Markets.QuoteStore.put(new_market_quote)
 
-    {:noreply, new_state, {:continue, :broadcast_market_quote}}
+    {:noreply, new_state}
   end
 
   def handle_cast({:order_book_apply, order_book, change_set}, state) do
     new_market_quote = build_market_quote(order_book, change_set, state.depth)
 
     if market_quote_changed?(state.market_quote, new_market_quote) do
-      new_state = state |> Map.put(:market_quote, new_market_quote)
-      {:noreply, new_state, {:continue, :broadcast_market_quote}}
+      new_state = Map.put(state, :market_quote, new_market_quote)
+      Tai.Markets.QuoteStore.put(new_market_quote)
+      {:noreply, new_state}
     else
       {:noreply, state}
     end
-  end
-
-  def handle_continue(:broadcast_market_quote, state) do
-    msg = {:tai, state.market_quote}
-
-    {:market_quote, state.market_quote.venue_id, state.market_quote.product_symbol}
-    |> Tai.PubSub.broadcast(msg)
-
-    :market_quote
-    |> Tai.PubSub.broadcast(msg)
-
-    {:noreply, state}
   end
 
   defp build_market_quote(order_book, change_set, depth) do

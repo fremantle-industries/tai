@@ -71,7 +71,7 @@ defmodule Tai.Advisor do
 
       def init(state), do: {:ok, state, {:continue, :started}}
 
-      def handle_info({:tai, %Quote{} = event}, state) do
+      def handle_info({:market_quote_store, :after_put, %Quote{} = event}, state) do
         key = {event.venue_id, event.product_symbol}
         new_data = Map.put(state.market_quotes.data, key, event)
         new_market_quotes = Map.put(state.market_quotes, :data, new_data)
@@ -89,7 +89,7 @@ defmodule Tai.Advisor do
         new_state = Map.put(state, :store, new_run_store)
 
         state.products
-        |> Enum.each(&Tai.PubSub.subscribe({:market_quote, &1.venue_id, &1.symbol}))
+        |> Enum.each(&Tai.PubSub.subscribe({:market_quote_store, {&1.venue_id, &1.symbol}}))
 
         {:noreply, new_state}
       end

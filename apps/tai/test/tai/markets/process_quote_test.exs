@@ -13,14 +13,15 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
   setup do
     start_supervised!({Tai.PubSub, 1})
+    start_supervised!(Tai.Markets.QuoteStore)
     {:ok, pid} = start_supervised({Tai.Markets.ProcessQuote, product: @product, depth: 1})
 
     {:ok, %{pid: pid}}
   end
 
   describe "#order_book_snapshot" do
-    test "publishes the inside quote on an unscoped channel", %{pid: pid} do
-      Tai.PubSub.subscribe(:market_quote)
+    test "saves the market quote", %{pid: pid} do
+      Tai.PubSub.subscribe({:market_quote_store, {@venue, @symbol}})
 
       change_set_1 =
         struct(Tai.Markets.OrderBook.ChangeSet,
@@ -30,7 +31,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
       GenServer.cast(pid, {:order_book_snapshot, @order_book, change_set_1})
 
-      assert_receive {:tai, %Tai.Markets.Quote{} = market_quote}
+      assert_receive {:market_quote_store, :after_put, %Tai.Markets.Quote{} = market_quote}
 
       assert market_quote.venue_id == @venue
       assert market_quote.product_symbol == @symbol
@@ -55,20 +56,11 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
       GenServer.cast(pid, {:order_book_snapshot, @order_book, change_set_2})
 
-      assert_receive {:tai, %Tai.Markets.Quote{}}
-    end
-
-    test "publishes the inside quote on a scoped channel", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote, @venue, @symbol})
-      change_set = struct(Tai.Markets.OrderBook.ChangeSet)
-
-      GenServer.cast(pid, {:order_book_snapshot, @order_book, change_set})
-
-      assert_receive {:tai, %Tai.Markets.Quote{}}
+      assert_receive {:market_quote_store, :after_put, %Tai.Markets.Quote{}}
     end
 
     test "can quote a nil bid", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote, @venue, @symbol})
+      Tai.PubSub.subscribe({:market_quote_store, {@venue, @symbol}})
       change_set = struct(Tai.Markets.OrderBook.ChangeSet)
 
       order_book =
@@ -81,7 +73,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
       GenServer.cast(pid, {:order_book_snapshot, order_book, change_set})
 
-      assert_receive {:tai, %Tai.Markets.Quote{} = market_quote}
+      assert_receive {:market_quote_store, :after_put, %Tai.Markets.Quote{} = market_quote}
 
       assert Enum.count(market_quote.bids) == 0
 
@@ -90,7 +82,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
     end
 
     test "can quote a nil ask", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote, @venue, @symbol})
+      Tai.PubSub.subscribe({:market_quote_store, {@venue, @symbol}})
       change_set = struct(Tai.Markets.OrderBook.ChangeSet)
 
       order_book =
@@ -103,7 +95,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
       GenServer.cast(pid, {:order_book_snapshot, order_book, change_set})
 
-      assert_receive {:tai, %Tai.Markets.Quote{} = market_quote}
+      assert_receive {:market_quote_store, :after_put, %Tai.Markets.Quote{} = market_quote}
 
       assert Enum.count(market_quote.bids) == 1
       assert %Tai.Markets.PricePoint{} = market_quote.bids |> hd()
@@ -114,7 +106,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
   describe "#order_book_apply" do
     test "publishes the inside quote when the bid or ask price points change", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote, @venue, @symbol})
+      Tai.PubSub.subscribe({:market_quote_store, {@venue, @symbol}})
 
       order_book_1 =
         struct(Tai.Markets.OrderBook,
@@ -133,7 +125,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
       GenServer.cast(pid, {:order_book_apply, order_book_1, change_set_1})
 
-      assert_receive {:tai, %Tai.Markets.Quote{} = market_quote_1}
+      assert_receive {:market_quote_store, :after_put, %Tai.Markets.Quote{} = market_quote_1}
 
       assert Enum.count(market_quote_1.bids) == 1
       assert %Tai.Markets.PricePoint{} = inside_bid = market_quote_1.bids |> hd()
@@ -162,7 +154,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
       GenServer.cast(pid, {:order_book_apply, order_book_2, change_set_2})
 
-      assert_receive {:tai, %Tai.Markets.Quote{} = market_quote_2}
+      assert_receive {:market_quote_store, :after_put, %Tai.Markets.Quote{} = market_quote_2}
 
       assert market_quote_2.last_venue_timestamp == change_set_2.last_venue_timestamp
       assert market_quote_2.last_received_at == change_set_2.last_received_at
@@ -184,11 +176,11 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
       GenServer.cast(pid, {:order_book_apply, order_book_3, change_set_3})
 
-      refute_receive {:tai, %Tai.Markets.Quote{}}
+      refute_receive {:market_quote_store, :after_put, %Tai.Markets.Quote{}}
     end
 
     test "publishes the inside quote there is currently no quote", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote, @venue, @symbol})
+      Tai.PubSub.subscribe({:market_quote_store, {@venue, @symbol}})
 
       change_set =
         struct(Tai.Markets.OrderBook.ChangeSet,
@@ -199,7 +191,7 @@ defmodule Tai.Markets.ProcessQuoteTest do
 
       GenServer.cast(pid, {:order_book_apply, @order_book, change_set})
 
-      assert_receive {:tai, %Tai.Markets.Quote{} = market_quote}
+      assert_receive {:market_quote_store, :after_put, %Tai.Markets.Quote{}}
     end
   end
 end
