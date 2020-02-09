@@ -4,7 +4,7 @@ defmodule Tai.Markets.OrderBook do
   """
 
   use GenServer
-  alias __MODULE__
+  alias Tai.Markets.{OrderBook, PricePoint, Quote}
 
   defmodule ChangeSet do
     @type venue_id :: Tai.Venue.id()
@@ -27,58 +27,84 @@ defmodule Tai.Markets.OrderBook do
     defstruct ~w(venue symbol changes last_received_at last_venue_timestamp)a
   end
 
+  defmodule State do
+    @type venue_id :: Tai.Venue.id()
+    @type product :: Tai.Venues.Product.t()
+    @type product_symbol :: Tai.Venues.Product.symbol()
+    @type price :: number
+    @type qty :: number
+    @type quote_depth :: pos_integer
+    @type market_quote :: Tai.Markets.Quote.t()
+    @type t :: %State{
+            broadcast_change_set: boolean,
+            venue_id: venue_id,
+            product_symbol: product_symbol,
+            bids: %{optional(price) => qty},
+            asks: %{optional(price) => qty},
+            quote_depth: quote_depth,
+            last_market_quote: market_quote | nil,
+            last_change_set: ChangeSet.t(),
+            last_received_at: DateTime.t(),
+            last_venue_timestamp: DateTime.t() | nil
+          }
+
+    @enforce_keys ~w(
+      venue_id
+      product_symbol
+      bids
+      asks
+      quote_depth
+    )a
+    defstruct ~w(
+      broadcast_change_set
+      venue_id
+      product_symbol
+      bids
+      asks
+      quote_depth
+      last_market_quote
+      last_change_set
+      last_received_at
+      last_venue_timestamp
+    )a
+  end
+
+  @type t :: State.t()
   @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
   @type product_symbol :: Tai.Venues.Product.symbol()
-  @type price :: number
-  @type qty :: number
-  @type t :: %OrderBook{
-          broadcast_change_set: boolean,
-          venue_id: venue_id,
-          product_symbol: product_symbol,
-          bids: %{optional(price) => qty},
-          asks: %{optional(price) => qty},
-          last_change_set: ChangeSet.t(),
-          last_received_at: DateTime.t(),
-          last_venue_timestamp: DateTime.t() | nil
-        }
+  @type quote_depth :: State.quote_depth()
 
-  @enforce_keys ~w(
-    venue_id
-    product_symbol
-    bids
-    asks
-  )a
-  defstruct ~w(
-    broadcast_change_set
-    venue_id
-    product_symbol
-    bids
-    asks
-    last_change_set
-    last_received_at
-    last_venue_timestamp
-  )a
-
-  @spec child_spec(product, boolean) :: Supervisor.child_spec()
-  def child_spec(product, broadcast_change_set) do
+  @spec child_spec(product, quote_depth, boolean) :: Supervisor.child_spec()
+  def child_spec(product, quote_depth, broadcast_change_set) do
     %{
       id: to_name(product.venue_id, product.symbol),
-      start:
-        {__MODULE__, :start_link,
-         [[product: product, broadcast_change_set: broadcast_change_set]]}
+      start: {
+        __MODULE__,
+        :start_link,
+        [[product: product, quote_depth: quote_depth, broadcast_change_set: broadcast_change_set]]
+      }
     }
   end
 
-  @spec start_link(product: product, broadcast_change_set: boolean) :: GenServer.on_start()
-  def start_link(product: product, broadcast_change_set: broadcast_change_set) do
+  @spec start_link(
+          product: product,
+          quote_depth: quote_depth,
+          broadcast_change_set: boolean
+        ) :: GenServer.on_start()
+  def start_link(
+        product: product,
+        quote_depth: quote_depth,
+        broadcast_change_set: broadcast_change_set
+      ) do
     name = to_name(product.venue_id, product.symbol)
 
-    state = %OrderBook{
+    state = %State{
       venue_id: product.venue_id,
       product_symbol: product.symbol,
       bids: %{},
       asks: %{},
+      quote_depth: quote_depth,
       broadcast_change_set: broadcast_change_set
     }
 
@@ -115,10 +141,9 @@ defmodule Tai.Markets.OrderBook do
           last_venue_timestamp: change_set.last_venue_timestamp
       }
       |> apply_changes(change_set.changes)
+      |> calculate_market_quote(change_set)
 
-    change_set.venue
-    |> Tai.Markets.ProcessQuote.to_name(change_set.symbol)
-    |> GenServer.cast({:order_book_snapshot, new_state, change_set})
+    {:ok, _} = Tai.Markets.QuoteStore.put(new_state.last_market_quote)
 
     if new_state.broadcast_change_set do
       {:noreply, new_state, {:continue, :broadcast_change_set}}
@@ -128,6 +153,8 @@ defmodule Tai.Markets.OrderBook do
   end
 
   def handle_cast({:apply, change_set}, state) do
+    last_market_quote = state.last_market_quote
+
     new_state =
       %{
         state
@@ -136,10 +163,11 @@ defmodule Tai.Markets.OrderBook do
           last_venue_timestamp: change_set.last_venue_timestamp
       }
       |> apply_changes(change_set.changes)
+      |> calculate_market_quote(change_set)
 
-    change_set.venue
-    |> Tai.Markets.ProcessQuote.to_name(change_set.symbol)
-    |> GenServer.cast({:order_book_apply, new_state, change_set})
+    if market_quote_changed?(last_market_quote, new_state.last_market_quote) do
+      {:ok, _} = Tai.Markets.QuoteStore.put(new_state.last_market_quote)
+    end
 
     if new_state.broadcast_change_set do
       {:noreply, new_state, {:continue, :broadcast_change_set}}
@@ -160,10 +188,10 @@ defmodule Tai.Markets.OrderBook do
     {:noreply, state}
   end
 
-  defp apply_changes(book, changes) do
+  defp apply_changes(state, changes) do
     changes
     |> Enum.reduce(
-      book,
+      state,
       fn
         {:upsert, :bid, price, size}, acc ->
           new_bids = acc.bids |> Map.put(price, size)
@@ -182,5 +210,40 @@ defmodule Tai.Markets.OrderBook do
           Map.put(acc, :asks, new_asks)
       end
     )
+  end
+
+  defp calculate_market_quote(state, change_set) do
+    bids = price_points(state.bids, state.quote_depth, &(&1 > &2))
+    asks = price_points(state.asks, state.quote_depth, &(&1 < &2))
+
+    market_quote = %Quote{
+      venue_id: state.venue_id,
+      product_symbol: state.product_symbol,
+      last_venue_timestamp: change_set.last_venue_timestamp,
+      last_received_at: change_set.last_received_at,
+      bids: bids,
+      asks: asks
+    }
+
+    Map.put(state, :last_market_quote, market_quote)
+  end
+
+  defp price_points(side, quote_depth, sort_by) do
+    side
+    |> Map.keys()
+    |> Enum.sort(sort_by)
+    |> Enum.take(quote_depth)
+    |> Enum.map(&%PricePoint{price: &1, size: side |> Map.fetch!(&1)})
+  end
+
+  defp market_quote_changed?(nil, %Quote{}), do: true
+
+  defp market_quote_changed?(current_market_quote, new_market_quote) do
+    inside_price_point_changed?(current_market_quote.bids, new_market_quote.bids) ||
+      inside_price_point_changed?(current_market_quote.asks, new_market_quote.asks)
+  end
+
+  defp inside_price_point_changed?(current, new) do
+    current |> List.first() != new |> List.first()
   end
 end
