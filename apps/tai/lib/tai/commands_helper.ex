@@ -28,22 +28,16 @@ defmodule Tai.CommandsHelper do
   defdelegate settings, to: Tai.Commands.Settings
 
   @spec advisors() :: no_return
-  defdelegate advisors(), to: Tai.Commands.Advisors, as: :list
-
   @spec advisors(list) :: no_return
-  defdelegate advisors(args), to: Tai.Commands.Advisors, as: :list
+  defdelegate advisors(args \\ []), to: Tai.Commands.Advisors, as: :list
 
   @spec start_advisors() :: no_return
-  defdelegate start_advisors(), to: Tai.Commands.Advisors, as: :start
-
   @spec start_advisors(list) :: no_return
-  defdelegate start_advisors(args), to: Tai.Commands.Advisors, as: :start
+  defdelegate start_advisors(args \\ []), to: Tai.Commands.Advisors, as: :start
 
   @spec stop_advisors() :: no_return
-  defdelegate stop_advisors(), to: Tai.Commands.Advisors, as: :stop
-
   @spec stop_advisors(list) :: no_return
-  defdelegate stop_advisors(args), to: Tai.Commands.Advisors, as: :stop
+  defdelegate stop_advisors(args \\ []), to: Tai.Commands.Advisors, as: :stop
 
   @spec enable_send_orders :: no_return
   defdelegate enable_send_orders, to: Tai.Commands.SendOrders, as: :enable

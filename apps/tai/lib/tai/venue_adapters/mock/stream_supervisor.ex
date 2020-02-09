@@ -1,6 +1,6 @@
 defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
   use Supervisor
-  alias Tai.Markets.{OrderBook, ProcessQuote}
+  alias Tai.Markets.OrderBook
 
   @type venue :: Tai.Venue.t()
   @type venue_id :: Tai.Venue.id()
@@ -18,8 +18,8 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
   def init(venue: venue, products: products) do
     credential = venue.credentials |> Map.to_list() |> List.first()
 
-    market_quote_children = market_quote_children(products, venue.quote_depth)
-    order_book_children = order_book_children(products, venue.broadcast_change_set)
+    order_book_children =
+      order_book_children(products, venue.quote_depth, venue.broadcast_change_set)
 
     system = [
       {Tai.VenueAdapters.Mock.Stream.Connection,
@@ -32,23 +32,13 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
        ]}
     ]
 
-    (market_quote_children ++ order_book_children ++ system)
+    (order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp market_quote_children(products, depth) do
+  defp order_book_children(products, quote_depth, broadcast_change_set) do
     products
-    |> Enum.map(fn p ->
-      %{
-        id: ProcessQuote.to_name(p.venue_id, p.symbol),
-        start: {ProcessQuote, :start_link, [[product: p, depth: depth]]}
-      }
-    end)
-  end
-
-  defp order_book_children(products, broadcast_change_set) do
-    products
-    |> Enum.map(&OrderBook.child_spec(&1, broadcast_change_set))
+    |> Enum.map(&OrderBook.child_spec(&1, quote_depth, broadcast_change_set))
   end
 
   # TODO: Make this configurable

@@ -9,7 +9,7 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
     RouteOrderBooks
   }
 
-  alias Tai.Markets.{OrderBook, ProcessQuote}
+  alias Tai.Markets.OrderBook
 
   @type venue :: Tai.Venue.t()
   @type venue_id :: Tai.Venue.id()
@@ -31,8 +31,9 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
   def init(venue: venue, products: products) do
     credential = venue.credentials |> Map.to_list() |> List.first()
 
-    market_quote_children = market_quote_children(products, venue.quote_depth)
-    order_book_children = order_book_children(products, venue.broadcast_change_set)
+    order_book_children =
+      order_book_children(products, venue.quote_depth, venue.broadcast_change_set)
+
     process_order_book_children = process_order_book_children(products)
 
     system = [
@@ -49,23 +50,13 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
        ]}
     ]
 
-    (market_quote_children ++ order_book_children ++ process_order_book_children ++ system)
+    (order_book_children ++ process_order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp order_book_children(products, broadcast_change_set) do
+  defp order_book_children(products, quote_depth, broadcast_change_set) do
     products
-    |> Enum.map(&OrderBook.child_spec(&1, broadcast_change_set))
-  end
-
-  defp market_quote_children(products, depth) do
-    products
-    |> Enum.map(fn p ->
-      %{
-        id: ProcessQuote.to_name(p.venue_id, p.symbol),
-        start: {ProcessQuote, :start_link, [[product: p, depth: depth]]}
-      }
-    end)
+    |> Enum.map(&OrderBook.child_spec(&1, quote_depth, broadcast_change_set))
   end
 
   defp process_order_book_children(products) do

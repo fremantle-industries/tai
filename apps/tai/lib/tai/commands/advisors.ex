@@ -8,9 +8,15 @@ defmodule Tai.Commands.Advisors do
     "PID"
   ]
 
-  @spec list() :: no_return
-  @spec list(list) :: no_return
-  def list(args \\ []) do
+  @type store_id_opt :: {:store_id, atom}
+  @type where_opt :: {:where, list}
+  @type order_opt :: {:order, list}
+  @type list_options :: store_id_opt | where_opt | order_opt
+  @type start_options :: store_id_opt | where_opt
+  @type stop_options :: store_id_opt | where_opt
+
+  @spec list([list_options]) :: no_return
+  def list(args) do
     store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
     filters = Keyword.get(args, :where, [])
     order_by = Keyword.get(args, :order, [:group_id, :advisor_id])
@@ -22,9 +28,8 @@ defmodule Tai.Commands.Advisors do
     |> render!(@header)
   end
 
-  @spec start() :: no_return
-  @spec start(list) :: no_return
-  def start(args \\ []) do
+  @spec start([start_options]) :: no_return
+  def start(args) do
     store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
     filters = Keyword.get(args, :where, [])
 
@@ -37,9 +42,8 @@ defmodule Tai.Commands.Advisors do
     IEx.dont_display_result()
   end
 
-  @spec stop() :: no_return
-  @spec stop(list) :: no_return
-  def stop(args \\ []) do
+  @spec stop([stop_options]) :: no_return
+  def stop(args) do
     store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
     filters = Keyword.get(args, :where, [])
 
