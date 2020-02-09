@@ -8,9 +8,8 @@ defmodule Tai.Commands.Advisors do
     "PID"
   ]
 
-  @spec list() :: no_return
   @spec list(list) :: no_return
-  def list(args \\ []) do
+  def list(args) do
     store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
     filters = Keyword.get(args, :where, [])
     order_by = Keyword.get(args, :order, [:group_id, :advisor_id])
@@ -22,9 +21,8 @@ defmodule Tai.Commands.Advisors do
     |> render!(@header)
   end
 
-  @spec start() :: no_return
   @spec start(list) :: no_return
-  def start(args \\ []) do
+  def start(args) do
     store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
     filters = Keyword.get(args, :where, [])
 
@@ -37,9 +35,8 @@ defmodule Tai.Commands.Advisors do
     IEx.dont_display_result()
   end
 
-  @spec stop() :: no_return
   @spec stop(list) :: no_return
-  def stop(args \\ []) do
+  def stop(args) do
     store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
     filters = Keyword.get(args, :where, [])
 
