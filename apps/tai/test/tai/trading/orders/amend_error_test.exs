@@ -1,12 +1,13 @@
 defmodule Tai.Trading.Orders.AmendErrorTest do
   use ExUnit.Case, async: false
+  import Tai.TestSupport.Mock
   alias Tai.Trading.OrderSubmissions.SellLimitGtc
   alias Tai.Trading.{Order, Orders, OrderStore}
   alias Tai.TestSupport.Mocks
 
   defmodule TestFilledProvider do
     @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
-    @venue :test_exchange_a
+    @venue :venue_a
     @credential :main
 
     def update(%OrderStore.Actions.PendAmend{} = action) do
@@ -37,17 +38,20 @@ defmodule Tai.Trading.Orders.AmendErrorTest do
   end
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
+  @venue :venue_a
+  @credential :main
+  @credentials Map.put(%{}, @credential, %{})
+  @submission_attrs %{venue_id: @venue, credential_id: @credential}
 
   setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
-
     start_supervised!(Mocks.Server)
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!({TaiEvents, 1})
+    start_supervised!({Tai.Settings, Tai.Config.parse()})
+    start_supervised!(Tai.Trading.OrderStore)
+    start_supervised!(Tai.Venues.VenueStore)
 
-    submission = Support.OrderSubmissions.build_with_callback(SellLimitGtc)
+    mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
+    submission = Support.OrderSubmissions.build_with_callback(SellLimitGtc, @submission_attrs)
 
     {:ok, %{submission: submission}}
   end

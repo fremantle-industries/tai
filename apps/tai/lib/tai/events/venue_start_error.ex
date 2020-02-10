@@ -1,14 +1,14 @@
-defmodule Tai.Events.VenueBootError do
-  alias Tai.Events.VenueBootError
+defmodule Tai.Events.VenueStartError do
+  alias __MODULE__
 
   @type venue_id :: Tai.Venue.id()
-  @type t :: %VenueBootError{venue: venue_id, reason: term}
+  @type t :: %VenueStartError{venue: venue_id, reason: term}
 
   @enforce_keys ~w(venue reason)a
   defstruct ~w(venue reason)a
 end
 
-defimpl TaiEvents.LogEvent, for: Tai.Events.VenueBootError do
+defimpl TaiEvents.LogEvent, for: Tai.Events.VenueStartError do
   def to_data(event) do
     keys =
       event

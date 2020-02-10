@@ -13,12 +13,16 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
     HTTPoison.start()
   end
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_create_order_ioc()
   @sides [:buy, :sell]
 
-  @test_adapters
-  |> Enum.map(fn {_, venue} ->
+  Tai.TestSupport.Helpers.test_venue_adapters_create_order_ioc()
+  |> Enum.map(fn venue ->
     @venue venue
+
+    setup do
+      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
+      :ok
+    end
 
     @sides
     |> Enum.each(fn side ->
@@ -29,7 +33,7 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
           order = build_order(@venue.id, @side, :ioc, action: :filled)
 
           use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_ioc_filled" do
-            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size
@@ -45,7 +49,7 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
           order = build_order(@venue.id, @side, :ioc, action: :partially_filled)
 
           use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_ioc_partially_filled" do
-            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size
@@ -62,7 +66,7 @@ defmodule Tai.Venues.Adapters.CreateOrderIocTest do
           order = build_order(@venue.id, @side, :ioc, action: :unfilled)
 
           use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_ioc_unfilled" do
-            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size

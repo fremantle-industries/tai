@@ -10,17 +10,34 @@ defmodule Tai.TestSupport.E2ECase do
         on_exit(fn -> stop_app() end)
 
         start_mock_server()
-        before_app_start()
+        before_start_app()
         start_app()
-        after_app_start()
+        after_start_app()
+
+        receive do
+          {TaiEvents.Event, %Tai.Events.BootAdvisors{}, :info} ->
+            after_boot_app()
+
+          {TaiEvents.Event, %Tai.Events.BootAdvisorsError{} = event, :error} ->
+            after_boot_app_error(event)
+        after
+          5000 -> flunk("Time out waiting 5000ms for tai to boot")
+        end
+
         :ok
       end
 
-      @spec before_app_start :: no_return
-      def before_app_start, do: nil
+      @spec before_start_app :: no_return
+      def before_start_app, do: nil
 
-      @spec after_app_start :: no_return
-      def after_app_start, do: nil
+      @spec after_start_app :: no_return
+      def after_start_app, do: nil
+
+      @spec after_boot_app :: no_return
+      def after_boot_app, do: nil
+
+      @spec after_boot_app_error(error :: struct) :: no_return
+      def after_boot_app_error(_error), do: nil
 
       def start_mock_server do
         start_supervised!(Tai.TestSupport.Mocks.Server)
@@ -44,6 +61,11 @@ defmodule Tai.TestSupport.E2ECase do
       def seed_mock_responses(scenario_name) do
         scenario = fetch_mod!(scenario_name)
         scenario.seed_mock_responses(scenario_name)
+      end
+
+      def seed_venues(scenario_name) do
+        scenario = fetch_mod!(scenario_name)
+        scenario.seed_venues(scenario_name)
       end
 
       def push_stream_market_data({scenario_name, _, _, _} = args) do
@@ -70,6 +92,20 @@ defmodule Tai.TestSupport.E2ECase do
         capture_io(fn -> Tai.CommandsHelper.start_advisors(args) end)
       end
 
+      def start_venue(venue_id) do
+        capture_io(fn -> Tai.CommandsHelper.start_venue(venue_id) end)
+
+        receive do
+          {TaiEvents.Event, %Tai.Events.VenueStart{}, :info} ->
+            nil
+
+          {TaiEvents.Event, %Tai.Events.VenueStartError{} = event, :error} ->
+            flunk("Error starting venue: #{inspect(event.reason)}")
+        after
+          5000 -> flunk("Time out waiting 5000ms for venue to start")
+        end
+      end
+
       defp e2e_app, do: Application.fetch_env!(:tai, :e2e_app)
 
       defp fetch_mod!(scenario_name) do
@@ -78,7 +114,10 @@ defmodule Tai.TestSupport.E2ECase do
         |> Map.fetch!(scenario_name)
       end
 
-      defoverridable before_app_start: 0, after_app_start: 0
+      defoverridable before_start_app: 0,
+                     after_start_app: 0,
+                     after_boot_app: 0,
+                     after_boot_app_error: 1
     end
   end
 end

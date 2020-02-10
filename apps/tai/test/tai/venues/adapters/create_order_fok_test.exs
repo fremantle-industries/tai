@@ -12,12 +12,16 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
     HTTPoison.start()
   end
 
-  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_create_order_fok()
   @sides [:buy, :sell]
 
-  @test_venues
-  |> Enum.map(fn {_, venue} ->
+  Tai.TestSupport.Helpers.test_venue_adapters_create_order_fok()
+  |> Enum.map(fn venue ->
     @venue venue
+
+    setup do
+      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
+      :ok
+    end
 
     @sides
     |> Enum.each(fn side ->
@@ -28,7 +32,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
           order = build_order(@venue.id, @side, :fok, action: :filled)
 
           use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_fok_filled" do
-            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_venues)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size
@@ -44,7 +48,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
           order = build_order(@venue.id, @side, :fok, action: :expired)
 
           use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_fok_expired" do
-            assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_venues)
+            assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
             assert order_response.id != nil
             assert %Decimal{} = order_response.original_size

@@ -12,11 +12,12 @@ defmodule Tai.Venue do
           id: id,
           adapter: adapter,
           channels: [channel],
-          products: String.t() | function,
-          accounts: String.t() | function,
+          products: String.t() | {module, func_name :: atom},
+          accounts: String.t() | {module, func_name :: atom},
           credentials: credentials,
           quote_depth: pos_integer,
           timeout: non_neg_integer,
+          start_on_boot: boolean,
           broadcast_change_set: boolean,
           opts: map
         }
@@ -30,6 +31,7 @@ defmodule Tai.Venue do
     credentials
     quote_depth
     timeout
+    start_on_boot
     opts
   )a
   defstruct ~w(
@@ -41,7 +43,16 @@ defmodule Tai.Venue do
     credentials
     quote_depth
     timeout
+    start_on_boot
     broadcast_change_set
     opts
   )a
+end
+
+defimpl Stored.Item, for: Tai.Venue do
+  @type key :: Tai.Venue.id()
+  @type venue :: Tai.Venue.t()
+
+  @spec key(venue) :: key
+  def key(v), do: v.id
 end

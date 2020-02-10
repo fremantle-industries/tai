@@ -3,13 +3,16 @@ defmodule Tai.Config do
   Convert the application environment into a struct
   """
 
+  @type func_name :: atom
+  @type boot_args :: term
   @type t :: %Tai.Config{
           adapter_timeout: pos_integer,
           advisor_groups: map,
+          after_boot: {module, func_name} | {module, func_name, boot_args} | nil,
+          after_boot_error: {module, func_name} | {module, func_name, boot_args} | nil,
           broadcast_change_set: boolean,
           send_orders: boolean,
           system_bus_registry_partitions: pos_integer,
-          venue_boot_handler: module,
           venues: map
         }
 
@@ -18,16 +21,16 @@ defmodule Tai.Config do
     advisor_groups
     send_orders
     system_bus_registry_partitions
-    venue_boot_handler
     venues
   )a
   defstruct ~w(
     adapter_timeout
     advisor_groups
+    after_boot
+    after_boot_error
     broadcast_change_set
     send_orders
     system_bus_registry_partitions
-    venue_boot_handler
     venues
   )a
 
@@ -37,11 +40,12 @@ defmodule Tai.Config do
     %Tai.Config{
       adapter_timeout: get(env, :adapter_timeout, 10_000),
       advisor_groups: get(env, :advisor_groups, %{}),
+      after_boot: get(env, :after_boot),
+      after_boot_error: get(env, :after_boot_error),
       broadcast_change_set: !!get(env, :broadcast_change_set),
       send_orders: !!get(env, :send_orders),
       system_bus_registry_partitions:
         get(env, :system_bus_registry_partitions, schedulers_online),
-      venue_boot_handler: get(env, :venue_boot_handler, Tai.Venues.BootHandler),
       venues: get(env, :venues, %{})
     }
   end

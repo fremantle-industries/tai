@@ -8,10 +8,14 @@ defmodule Tai.Advisors.Groups do
   @spec from_config(map, provider) :: {:ok, [advisor_group]} | {:error, map}
   def from_config(advisor_groups, provider \\ Groups.RichConfigProvider) do
     venue_indexed_symbols = Tai.Transforms.ProductSymbolsByVenue.all(provider.products)
-    groups = advisor_groups |> Enum.map(&build(&1, provider, venue_indexed_symbols))
-    errors = groups |> Enum.reduce(%{}, &validate/2)
+    groups = Enum.map(advisor_groups, &build(&1, provider, venue_indexed_symbols))
+    errors = Enum.reduce(groups, %{}, &validate/2)
 
-    if Enum.empty?(errors), do: {:ok, groups}, else: {:error, errors}
+    if Enum.empty?(errors) do
+      {:ok, groups}
+    else
+      {:error, errors}
+    end
   end
 
   defp build({id, group_config}, provider, venue_indexed_symbols) do

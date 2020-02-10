@@ -4,8 +4,6 @@ defmodule Support.OrderSubmissions do
   def build(type, extra_attrs \\ %{}) do
     attrs =
       %{
-        venue_id: :test_exchange_a,
-        credential_id: :main,
         product_symbol: :btc_usd,
         price: Decimal.new("100.1"),
         qty: Decimal.new("0.1"),

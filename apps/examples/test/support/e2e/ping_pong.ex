@@ -12,15 +12,34 @@ defmodule ExamplesSupport.E2E.PingPong do
   @exit_venue_order_id "exitOrder"
 
   def seed_mock_responses(:ping_pong) do
+    Mocks.Responses.Products.for_venue(@venue, [
+      %{symbol: @product, type: @product_type, price_increment: @price_increment}
+    ])
+
+    Tai.TestSupport.Mocks.Responses.Accounts.for_venue_and_credential(
+      @venue,
+      @credential,
+      [
+        %{
+          asset: :btc,
+          equity: Decimal.new("0.3"),
+          free: Decimal.new("0.1"),
+          locked: Decimal.new("0.2")
+        },
+        %{
+          asset: :usd,
+          equity: Decimal.new("10000"),
+          free: Decimal.new("10000"),
+          locked: Decimal.new("0")
+        }
+      ]
+    )
+
     Mocks.Responses.MakerTakerFees.for_venue_and_credential(
       @venue,
       @credential,
       {Decimal.new("0.0005"), Decimal.new("0.0005")}
     )
-
-    Mocks.Responses.Products.for_venue(@venue, [
-      %{symbol: @product, type: @product_type, price_increment: @price_increment}
-    ])
 
     Mocks.Responses.Orders.GoodTillCancel.open(
       @entry_venue_order_id_1,
@@ -49,6 +68,21 @@ defmodule ExamplesSupport.E2E.PingPong do
         post_only: true
       }
     )
+  end
+
+  def seed_venues(:ping_pong) do
+    {:ok, _} =
+      Tai.Venue
+      |> struct(
+        id: @venue,
+        adapter: Tai.VenueAdapters.Mock,
+        credentials: Map.put(%{}, @credential, %{}),
+        accounts: "*",
+        products: "*",
+        quote_depth: 1,
+        timeout: 1000
+      )
+      |> Tai.Venues.VenueStore.put()
   end
 
   def push_stream_market_data({:ping_pong, :snapshot, venue_id, product_symbol})

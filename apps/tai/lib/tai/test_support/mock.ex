@@ -1,5 +1,6 @@
 defmodule Tai.TestSupport.Mock do
   @type location :: Tai.Markets.Location.t()
+  @type venue :: Tai.Venue.t()
   @type product :: Tai.Venues.Product.t()
   @type fee_info :: Tai.Venues.FeeInfo.t()
   @type venue_id :: Tai.Venue.id()
@@ -9,7 +10,19 @@ defmodule Tai.TestSupport.Mock do
   @type record :: Stored.Backend.record()
   @type record_key :: Stored.Backend.key()
 
-  @spec mock_product(product | map) :: :ok
+  @spec mock_venue(venue | map | [{atom, term}]) :: {:ok, {key :: term, resource :: struct}}
+  def mock_venue(%Tai.Venue{} = venue) do
+    venue
+    |> Tai.Venues.VenueStore.put()
+  end
+
+  def mock_venue(attrs) do
+    Tai.Venue
+    |> struct(attrs)
+    |> mock_venue
+  end
+
+  @spec mock_product(product | map | [{atom, term}]) :: :ok
   def mock_product(%Tai.Venues.Product{} = product) do
     product
     |> Tai.Venues.ProductStore.upsert()
@@ -18,7 +31,7 @@ defmodule Tai.TestSupport.Mock do
   def mock_product(attrs) when is_map(attrs) or is_list(attrs) do
     Tai.Venues.Product
     |> struct(attrs)
-    |> Tai.Venues.ProductStore.upsert()
+    |> mock_product
   end
 
   @spec mock_fee_info(fee_info | map) :: :ok
