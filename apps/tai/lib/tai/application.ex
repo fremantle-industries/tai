@@ -24,17 +24,12 @@ defmodule Tai.Application do
       Tai.Advisors.Supervisor
     ]
 
-    {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)
-
-    config
-    |> boot_venues!()
-    |> hydrate_advisors!()
-    |> boot_advisors!()
-
-    {:ok, pid}
+    Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)
   end
 
-  defp boot_venues!(config) do
+  def start_phase(:venues, _start_type, _phase_args) do
+    config = Tai.Config.parse()
+
     config
     |> Tai.Venues.Config.parse()
     |> Enum.map(fn {_, venue} ->
@@ -52,20 +47,18 @@ defmodule Tai.Application do
     |> Enum.map(fn {task, venue} -> Task.await(task, venue.timeout) end)
     |> Enum.each(&config.venue_boot_handler.parse_response/1)
 
-    {:ok, config}
+    :ok
   end
 
-  defp hydrate_advisors!({:ok, config}) do
-    config
+  def start_phase(:advisors, _start_type, _phase_args) do
+    Tai.Config.parse()
     |> Tai.Advisors.Specs.from_config()
     |> Enum.map(&Tai.Advisors.Instance.from_spec/1)
     |> Enum.map(&Tai.Advisors.Store.upsert/1)
-  end
-
-  defp boot_advisors!(upsert_results) do
-    upsert_results
     |> Enum.map(fn {:ok, instance} -> instance end)
     |> Enum.filter(fn instance -> instance.start_on_boot end)
     |> Tai.Advisors.Instances.start()
+
+    :ok
   end
 end

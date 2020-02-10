@@ -22,6 +22,7 @@ defmodule Tai.Mixfile do
   def application do
     [
       mod: {Tai.Application, []},
+      start_phases: [venues: [], advisors: []],
       extra_applications: [:logger, :jason]
     ]
   end
