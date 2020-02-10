@@ -1,34 +1,23 @@
 defmodule Tai.SettingsTest do
   use ExUnit.Case, async: false
 
-  test ".from_config returns a settings struct with send_orders from the config" do
-    config = Tai.Config.parse(send_orders: true)
-
-    assert Tai.Settings.from_config(config) == %Tai.Settings{
-             send_orders: true
-           }
-  end
-
   test ".start_link stores the settings in an ETS table" do
     config = Tai.Config.parse(send_orders: true)
-    settings = Tai.Settings.from_config(config)
-    start_supervised!({Tai.Settings, settings})
+    start_supervised!({Tai.Settings, config})
 
     assert :ets.lookup(Tai.Settings, :send_orders) == [{:send_orders, true}]
   end
 
   test ".send_orders? returns the value from the ETS table" do
     config = Tai.Config.parse(send_orders: true)
-    settings = Tai.Settings.from_config(config)
-    start_supervised!({Tai.Settings, settings})
+    start_supervised!({Tai.Settings, config})
 
     assert Tai.Settings.send_orders?() == true
   end
 
   test ".enable_send_orders! updates the value in the ETS table" do
     config = Tai.Config.parse(send_orders: false)
-    settings = Tai.Settings.from_config(config)
-    start_supervised!({Tai.Settings, settings})
+    start_supervised!({Tai.Settings, config})
 
     :ok = Tai.Settings.enable_send_orders!()
 
@@ -37,8 +26,7 @@ defmodule Tai.SettingsTest do
 
   test ".disable_send_orders! updates the value in the ETS table" do
     config = Tai.Config.parse(send_orders: true)
-    settings = Tai.Settings.from_config(config)
-    start_supervised!({Tai.Settings, settings})
+    start_supervised!({Tai.Settings, config})
 
     :ok = Tai.Settings.disable_send_orders!()
 
@@ -47,8 +35,7 @@ defmodule Tai.SettingsTest do
 
   test ".all returns a struct with the values from the ETS table" do
     config = Tai.Config.parse(send_orders: true)
-    settings = Tai.Settings.from_config(config)
-    start_supervised!({Tai.Settings, settings})
+    start_supervised!({Tai.Settings, config})
 
     settings = Tai.Settings.all()
 

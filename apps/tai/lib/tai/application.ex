@@ -5,13 +5,12 @@ defmodule Tai.Application do
     Confex.resolve_env!(:tai)
 
     config = Tai.Config.parse()
-    settings = Tai.Settings.from_config(config)
 
     children = [
       {Tai.PubSub, config.pub_sub_registry_partitions},
       {Tai.Events, config.event_registry_partitions},
       Tai.EventsLogger,
-      {Tai.Settings, settings},
+      {Tai.Settings, config},
       Tai.Trading.PositionStore,
       Tai.Trading.OrderStore,
       Tai.Markets.QuoteStore,
