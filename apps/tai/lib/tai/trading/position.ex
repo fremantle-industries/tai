@@ -36,3 +36,13 @@ defmodule Tai.Trading.Position do
     margin_mode
   )a
 end
+
+defimpl Stored.Item, for: Tai.Trading.Position do
+  @type position :: Tai.Trading.Position.t()
+  @type venue_id :: Tai.Venue.id()
+  @type credential_id :: Tai.Venue.credential_id()
+  @type product_symbol :: Tai.Venues.Product.symbol()
+
+  @spec key(position) :: {venue_id, credential_id, product_symbol}
+  def key(p), do: {p.venue_id, p.credential_id, p.product_symbol}
+end

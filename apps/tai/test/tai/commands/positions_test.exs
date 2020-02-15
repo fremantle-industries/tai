@@ -25,7 +25,7 @@ defmodule Tai.Commands.PositionsTest do
         leverage: Decimal.new("20.1"),
         margin_mode: :crossed
       )
-      |> Tai.Trading.PositionStore.add()
+      |> Tai.Trading.PositionStore.put()
 
     {:ok, _} =
       Tai.Trading.Position
@@ -39,7 +39,7 @@ defmodule Tai.Commands.PositionsTest do
         leverage: Decimal.new("11.5"),
         margin_mode: :fixed
       )
-      |> Tai.Trading.PositionStore.add()
+      |> Tai.Trading.PositionStore.put()
 
     assert capture_io(&Tai.CommandsHelper.positions/0) == """
            +---------+--------------+---------+-------+-----+-------------+----------+-------------+

@@ -12,7 +12,7 @@ defmodule Tai.Venues.Boot.Positions do
 
   defp fetch_and_add({credential_id, _}, :ok, venue) do
     with {:ok, positions} <- Tai.Venues.Client.positions(venue, credential_id) do
-      Enum.each(positions, &Tai.Trading.PositionStore.add/1)
+      Enum.each(positions, &Tai.Trading.PositionStore.put/1)
       total = Enum.count(positions)
 
       Tai.Events.info(%Tai.Events.HydratePositions{
