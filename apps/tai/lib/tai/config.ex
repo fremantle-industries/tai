@@ -4,23 +4,23 @@ defmodule Tai.Config do
   """
 
   @type t :: %Tai.Config{
-          adapter_timeout: integer,
+          adapter_timeout: pos_integer,
           advisor_groups: map,
           broadcast_change_set: boolean,
-          venue_boot_handler: module,
           event_registry_partitions: pos_integer,
-          system_bus_registry_partitions: pos_integer,
           send_orders: boolean,
+          system_bus_registry_partitions: pos_integer,
+          venue_boot_handler: module,
           venues: map
         }
 
   @enforce_keys ~w(
     adapter_timeout
     advisor_groups
-    venue_boot_handler
     event_registry_partitions
-    system_bus_registry_partitions
     send_orders
+    system_bus_registry_partitions
+    venue_boot_handler
     venues
   )a
   defstruct ~w(
@@ -28,9 +28,9 @@ defmodule Tai.Config do
     advisor_groups
     broadcast_change_set
     event_registry_partitions
+    send_orders
     system_bus_registry_partitions
     venue_boot_handler
-    send_orders
     venues
   )a
 
