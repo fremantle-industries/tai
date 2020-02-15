@@ -4,7 +4,7 @@ defmodule Tai.Commands.MarketsTest do
   alias Tai.Markets.{Quote, PricePoint}
 
   setup do
-    start_supervised!({Tai.PubSub, 1})
+    start_supervised!({Tai.SystemBus, 1})
     start_supervised!(Tai.Markets.QuoteStore)
     :ok
   end

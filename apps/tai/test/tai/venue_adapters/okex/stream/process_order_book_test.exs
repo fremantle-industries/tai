@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
 
   setup do
     Process.register(self(), @order_book_name)
-    start_supervised!({Tai.PubSub, 1})
+    start_supervised!({Tai.SystemBus, 1})
     start_supervised!(Tai.Markets.QuoteStore)
     start_supervised!(OrderBook.child_spec(@product, @quote_depth, false))
     {:ok, pid} = start_supervised({ProcessOrderBook, @product})
@@ -24,7 +24,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
 
   describe "snapshot" do
     test "can snapshot the order book without liquidations", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       data = %{
         "timestamp" => "2019-01-05T02:03:06.309Z",
@@ -42,7 +42,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
     end
 
     test "can snapshot the order book with liquidations", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       data = %{
         "timestamp" => "2019-01-05T02:03:06.309Z",
@@ -62,7 +62,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
 
   describe "insert" do
     test "can insert the order book without liquidations", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       data = %{
         "timestamp" => "2019-01-05T02:03:07.456Z",
@@ -80,7 +80,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
     end
 
     test "can insert the order book with liquidations", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       data = %{
         "timestamp" => "2019-01-05T02:03:07.456Z",
@@ -100,7 +100,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
 
   describe "update" do
     test "can update the order book without liquidations", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       data = %{
         "timestamp" => "2019-01-05T02:03:07.456Z",
@@ -128,7 +128,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
     end
 
     test "can update the order book with liquidations", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       data = %{
         "timestamp" => "2019-01-05T02:03:07.456Z",
@@ -158,7 +158,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
 
   describe "delete" do
     test "can delete existing price points from the order book without liquidations", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       data = %{
         "timestamp" => "2019-01-05T02:03:07.456Z",
@@ -184,7 +184,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
     end
 
     test "can delete existing price points from the order book with liquidations", %{pid: pid} do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       data = %{
         "timestamp" => "2019-01-05T02:03:07.456Z",

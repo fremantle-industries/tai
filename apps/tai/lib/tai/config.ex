@@ -9,7 +9,7 @@ defmodule Tai.Config do
           broadcast_change_set: boolean,
           venue_boot_handler: module,
           event_registry_partitions: pos_integer,
-          pub_sub_registry_partitions: pos_integer,
+          system_bus_registry_partitions: pos_integer,
           send_orders: boolean,
           venues: map
         }
@@ -19,7 +19,7 @@ defmodule Tai.Config do
     advisor_groups
     venue_boot_handler
     event_registry_partitions
-    pub_sub_registry_partitions
+    system_bus_registry_partitions
     send_orders
     venues
   )a
@@ -28,7 +28,7 @@ defmodule Tai.Config do
     advisor_groups
     broadcast_change_set
     event_registry_partitions
-    pub_sub_registry_partitions
+    system_bus_registry_partitions
     venue_boot_handler
     send_orders
     venues
@@ -45,15 +45,15 @@ defmodule Tai.Config do
     event_registry_partitions =
       Keyword.get(env, :event_registry_partitions, System.schedulers_online())
 
-    pub_sub_registry_partitions =
-      Keyword.get(env, :pub_sub_registry_partitions, System.schedulers_online())
+    system_bus_registry_partitions =
+      Keyword.get(env, :system_bus_registry_partitions, System.schedulers_online())
 
     %Tai.Config{
       adapter_timeout: adapter_timeout,
       advisor_groups: advisor_groups,
       broadcast_change_set: broadcast_change_set,
       event_registry_partitions: event_registry_partitions,
-      pub_sub_registry_partitions: pub_sub_registry_partitions,
+      system_bus_registry_partitions: system_bus_registry_partitions,
       venue_boot_handler: venue_boot_handler,
       send_orders: send_orders,
       venues: venues

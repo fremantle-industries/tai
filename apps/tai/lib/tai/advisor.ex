@@ -89,7 +89,7 @@ defmodule Tai.Advisor do
         new_state = Map.put(state, :store, new_run_store)
 
         state.products
-        |> Enum.each(&Tai.PubSub.subscribe({:market_quote_store, {&1.venue_id, &1.symbol}}))
+        |> Enum.each(&Tai.SystemBus.subscribe({:market_quote_store, {&1.venue_id, &1.symbol}}))
 
         {:noreply, new_state}
       end

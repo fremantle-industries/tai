@@ -7,7 +7,7 @@ defmodule Tai.Application do
     config = Tai.Config.parse()
 
     children = [
-      {Tai.PubSub, config.pub_sub_registry_partitions},
+      {Tai.SystemBus, config.system_bus_registry_partitions},
       {Tai.Events, config.event_registry_partitions},
       Tai.EventsLogger,
       {Tai.Settings, config},

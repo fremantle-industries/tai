@@ -1,4 +1,4 @@
-defmodule Tai.PubSub do
+defmodule Tai.SystemBus do
   @type partitions :: pos_integer
 
   @spec child_spec(opts :: term) :: Supervisor.child_spec()

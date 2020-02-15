@@ -8,14 +8,14 @@ defmodule Tai.Markets.OrderBookTest do
 
   setup do
     start_supervised!(Tai.Markets.QuoteStore)
-    start_supervised!({Tai.PubSub, 1})
+    start_supervised!({Tai.SystemBus, 1})
     start_supervised!(OrderBook.child_spec(@product, @quote_depth, false))
     :ok
   end
 
   describe ".replace/1" do
     test "saves the market quote from the change set" do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
       last_venue_timestamp = Timex.now()
       last_received_at = Timex.now()
 
@@ -50,7 +50,7 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "can quote a nil bid" do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       change_set =
         struct(OrderBook.ChangeSet,
@@ -72,7 +72,7 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "can quote a nil ask" do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       change_set =
         struct(OrderBook.ChangeSet,
@@ -94,7 +94,7 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "broadcasts change_set when enabled" do
-      Tai.PubSub.subscribe(:change_set)
+      Tai.SystemBus.subscribe(:change_set)
       other_product = struct(Tai.Venues.Product, venue_id: :other_venue, symbol: :other_symbol)
       start_supervised!(OrderBook.child_spec(other_product, @quote_depth, true))
 
@@ -130,7 +130,7 @@ defmodule Tai.Markets.OrderBookTest do
 
   describe ".apply/1" do
     test "saves a market quote when the change set results in a new quote" do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       venue_timestamp_1 = Timex.now()
       received_at_1 = Timex.now()
@@ -194,7 +194,7 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "can delete existing bids & asks" do
-      Tai.PubSub.subscribe({:market_quote_store, @topic})
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       change_set_1 = %OrderBook.ChangeSet{
         venue: @product.venue_id,
@@ -229,7 +229,7 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "broadcasts change_set when enabled" do
-      Tai.PubSub.subscribe(:change_set)
+      Tai.SystemBus.subscribe(:change_set)
       other_product = struct(Tai.Venues.Product, venue_id: :other_venue, symbol: :other_symbol)
       start_supervised!(OrderBook.child_spec(other_product, @quote_depth, true))
 

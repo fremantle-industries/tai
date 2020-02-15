@@ -180,10 +180,10 @@ defmodule Tai.Markets.OrderBook do
     msg = {:change_set, state.last_change_set}
 
     {:change_set, state.venue_id, state.product_symbol}
-    |> Tai.PubSub.broadcast(msg)
+    |> Tai.SystemBus.broadcast(msg)
 
     :change_set
-    |> Tai.PubSub.broadcast(msg)
+    |> Tai.SystemBus.broadcast(msg)
 
     {:noreply, state}
   end

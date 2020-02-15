@@ -4,18 +4,15 @@ defmodule Tai.ConfigTest do
 
   describe ".parse" do
     test "returns a default representation" do
-      schedulers_online = System.schedulers_online()
-
-      assert %Tai.Config{
-               send_orders: false,
-               venue_boot_handler: Tai.Venues.BootHandler,
-               venues: %{},
-               advisor_groups: %{},
-               adapter_timeout: 10_000,
-               broadcast_change_set: false,
-               event_registry_partitions: ^schedulers_online,
-               pub_sub_registry_partitions: ^schedulers_online
-             } = Tai.Config.parse([])
+      assert %Tai.Config{} = config = Tai.Config.parse([])
+      assert config.send_orders == false
+      assert config.venue_boot_handler == Tai.Venues.BootHandler
+      assert config.venues == %{}
+      assert config.advisor_groups == %{}
+      assert config.adapter_timeout == 10_000
+      assert config.broadcast_change_set == false
+      assert config.event_registry_partitions == System.schedulers_online()
+      assert config.system_bus_registry_partitions == System.schedulers_online()
     end
 
     test "can set send_orders" do

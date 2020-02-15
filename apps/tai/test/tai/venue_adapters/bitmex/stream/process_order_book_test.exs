@@ -15,7 +15,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBookTest do
 
   setup do
     Process.register(self(), @order_book_name)
-    start_supervised!({Tai.PubSub, 1})
+    start_supervised!({Tai.SystemBus, 1})
     start_supervised!(Tai.Markets.QuoteStore)
     start_supervised!(OrderBook.child_spec(@product, @quote_depth, false))
     {:ok, pid} = start_supervised({ProcessOrderBook, @product})
@@ -24,7 +24,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBookTest do
   end
 
   test "can snapshot the order book", %{pid: pid} do
-    Tai.PubSub.subscribe({:market_quote_store, @topic})
+    Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
     data = [
       %{"id" => "a", "price" => 101, "side" => "Sell", "size" => 10},
@@ -43,7 +43,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBookTest do
   end
 
   test "can insert price points into the order book", %{pid: pid} do
-    Tai.PubSub.subscribe({:market_quote_store, @topic})
+    Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
     data = [
       %{"id" => "a", "price" => 101, "side" => "Sell", "size" => 10},
@@ -62,7 +62,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBookTest do
   end
 
   test "can update existing price points in the order book", %{pid: pid} do
-    Tai.PubSub.subscribe({:market_quote_store, @topic})
+    Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
     data = [
       %{"id" => "a", "price" => 101, "side" => "Sell", "size" => 10},
@@ -90,7 +90,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBookTest do
   end
 
   test "can delete existing price points from the order book", %{pid: pid} do
-    Tai.PubSub.subscribe({:market_quote_store, @topic})
+    Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
     data = [
       %{"id" => "a", "price" => 101, "side" => "Sell", "size" => 10},
