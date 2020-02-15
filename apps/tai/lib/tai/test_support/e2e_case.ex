@@ -61,8 +61,7 @@ defmodule Tai.TestSupport.E2ECase do
         Tai.Config
         |> struct(advisor_groups: Map.put(%{}, scenario_name, advisor_group_config))
         |> Tai.Advisors.Specs.from_config()
-        |> Enum.map(&Tai.Advisors.Instance.from_spec/1)
-        |> Enum.map(&Tai.Advisors.Store.upsert/1)
+        |> Enum.map(&Tai.Advisors.SpecStore.put/1)
       end
 
       def start_advisors(args) do

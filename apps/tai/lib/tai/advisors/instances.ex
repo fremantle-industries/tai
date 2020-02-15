@@ -1,13 +1,13 @@
 defmodule Tai.Advisors.Instances do
-  alias Tai.Advisors.{Instance, Store, Spec}
+  alias Tai.Advisors.{Instance, SpecStore, Spec}
 
-  @type store_id :: Store.store_id()
+  @type store_id :: SpecStore.store_id()
   @type instance :: Instance.t()
 
   @spec where(list, store_id) :: [instance]
   def where(filters, store_id) do
     store_id
-    |> Store.all()
+    |> SpecStore.all()
     |> Enum.map(&Instance.from_spec/1)
     |> Enumerati.filter(filters)
   end

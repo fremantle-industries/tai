@@ -54,3 +54,12 @@ defmodule Tai.Advisors.Spec do
     }
   end
 end
+
+defimpl Stored.Item, for: Tai.Advisors.Spec do
+  @type spec :: Tai.Advisors.Spec.t()
+  @type group_id :: Tai.AdvisorGroup.id()
+  @type advisor_id :: Tai.Advisor.id()
+
+  @spec key(spec) :: {group_id, advisor_id}
+  def key(spec), do: {spec.group_id, spec.advisor_id}
+end

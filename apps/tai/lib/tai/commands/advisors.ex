@@ -17,7 +17,7 @@ defmodule Tai.Commands.Advisors do
 
   @spec list([list_options]) :: no_return
   def list(args) do
-    store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
+    store_id = Keyword.get(args, :store_id, Tai.Advisors.SpecStore.default_store_id())
     filters = Keyword.get(args, :where, [])
     order_by = Keyword.get(args, :order, [:group_id, :advisor_id])
 
@@ -30,7 +30,7 @@ defmodule Tai.Commands.Advisors do
 
   @spec start([start_options]) :: no_return
   def start(args) do
-    store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
+    store_id = Keyword.get(args, :store_id, Tai.Advisors.SpecStore.default_store_id())
     filters = Keyword.get(args, :where, [])
 
     {started, already_started} =
@@ -44,7 +44,7 @@ defmodule Tai.Commands.Advisors do
 
   @spec stop([stop_options]) :: no_return
   def stop(args) do
-    store_id = Keyword.get(args, :store_id, Tai.Advisors.Store.default_store_id())
+    store_id = Keyword.get(args, :store_id, Tai.Advisors.SpecStore.default_store_id())
     filters = Keyword.get(args, :where, [])
 
     {stopped, already_stopped} =

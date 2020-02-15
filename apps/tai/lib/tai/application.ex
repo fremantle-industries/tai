@@ -19,7 +19,7 @@ defmodule Tai.Application do
       Tai.Venues.AccountStore,
       Tai.Venues.StreamsSupervisor,
       {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},
-      Tai.Advisors.Store,
+      Tai.Advisors.SpecStore,
       Tai.Advisors.Supervisor
     ]
 
@@ -52,9 +52,9 @@ defmodule Tai.Application do
   def start_phase(:advisors, _start_type, _phase_args) do
     Tai.Config.parse()
     |> Tai.Advisors.Specs.from_config()
+    |> Enum.map(&Tai.Advisors.SpecStore.put/1)
+    |> Enum.map(fn {:ok, {_, spec}} -> spec end)
     |> Enum.map(&Tai.Advisors.Instance.from_spec/1)
-    |> Enum.map(&Tai.Advisors.Store.upsert/1)
-    |> Enum.map(fn {:ok, instance} -> instance end)
     |> Enum.filter(fn instance -> instance.start_on_boot end)
     |> Tai.Advisors.Instances.start()
 

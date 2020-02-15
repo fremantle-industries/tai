@@ -4,7 +4,7 @@ defmodule Support.Advisors do
 
     Tai.Advisors.Spec
     |> struct(required_attrs)
-    |> Tai.Advisors.Store.upsert(store_id)
+    |> Tai.Advisors.SpecStore.put(store_id)
   end
 
   defp build_attrs(attrs) do

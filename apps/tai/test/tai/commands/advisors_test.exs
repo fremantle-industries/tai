@@ -6,7 +6,7 @@ defmodule Tai.Commands.AdvisorsTest do
   @test_store_id __MODULE__
 
   setup do
-    start_supervised!({Tai.Advisors.Store, id: @test_store_id})
+    start_supervised!({Tai.Advisors.SpecStore, id: @test_store_id})
     :ok
   end
 
