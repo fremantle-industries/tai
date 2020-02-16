@@ -39,31 +39,31 @@ defmodule Tai.Markets.OrderBook do
             broadcast_change_set: boolean,
             venue_id: venue_id,
             product_symbol: product_symbol,
-            bids: %{optional(price) => qty},
-            asks: %{optional(price) => qty},
             quote_depth: quote_depth,
-            last_market_quote: market_quote | nil,
-            last_received_at: DateTime.t(),
-            last_venue_timestamp: DateTime.t() | nil
+            last_quote_bids: [{price, qty}],
+            last_quote_asks: [{price, qty}],
+            bids: %{optional(price) => qty},
+            asks: %{optional(price) => qty}
           }
 
     @enforce_keys ~w(
       venue_id
       product_symbol
+      quote_depth
+      last_quote_bids
+      last_quote_asks
       bids
       asks
-      quote_depth
     )a
     defstruct ~w(
       broadcast_change_set
       venue_id
       product_symbol
+      quote_depth
+      last_quote_bids
+      last_quote_asks
       bids
       asks
-      quote_depth
-      last_market_quote
-      last_received_at
-      last_venue_timestamp
     )a
   end
 
@@ -85,11 +85,8 @@ defmodule Tai.Markets.OrderBook do
     }
   end
 
-  @spec start_link(
-          product: product,
-          quote_depth: quote_depth,
-          broadcast_change_set: boolean
-        ) :: GenServer.on_start()
+  @spec start_link(product: product, quote_depth: quote_depth, broadcast_change_set: boolean) ::
+          GenServer.on_start()
   def start_link(
         product: product,
         quote_depth: quote_depth,
@@ -100,9 +97,11 @@ defmodule Tai.Markets.OrderBook do
     state = %State{
       venue_id: product.venue_id,
       product_symbol: product.symbol,
+      quote_depth: quote_depth,
+      last_quote_bids: [],
+      last_quote_asks: [],
       bids: %{},
       asks: %{},
-      quote_depth: quote_depth,
       broadcast_change_set: broadcast_change_set
     }
 
@@ -126,49 +125,47 @@ defmodule Tai.Markets.OrderBook do
     |> GenServer.cast({:apply, change_set})
   end
 
-  def init(state), do: {:ok, state}
+  def init(state) do
+    {:ok, state}
+  end
 
-  def handle_cast({:replace, %OrderBook.ChangeSet{} = change_set}, state) do
-    new_state =
-      %{
-        state
-        | bids: %{},
-          asks: %{},
-          last_received_at: change_set.last_received_at,
-          last_venue_timestamp: change_set.last_venue_timestamp
-      }
+  def handle_cast({:replace, change_set}, state) do
+    {bids, asks} =
+      state
+      |> delete_all
       |> apply_changes(change_set.changes)
-      |> calculate_market_quote(change_set)
+      |> latest
 
-    {:ok, _} = Tai.Markets.QuoteStore.put(new_state.last_market_quote)
+    market_quote = build_market_quote(change_set, bids, asks)
+    {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
+    state = %{state | last_quote_bids: bids, last_quote_asks: asks}
 
-    if new_state.broadcast_change_set do
-      {:noreply, new_state, {:continue, {:broadcast_change_set, change_set}}}
+    if state.broadcast_change_set do
+      {:noreply, state, {:continue, {:broadcast_change_set, change_set}}}
     else
-      {:noreply, new_state}
+      {:noreply, state}
     end
   end
 
   def handle_cast({:apply, change_set}, state) do
-    last_market_quote = state.last_market_quote
-
-    new_state =
-      %{
-        state
-        | last_received_at: change_set.last_received_at,
-          last_venue_timestamp: change_set.last_venue_timestamp
-      }
+    {bids, asks} =
+      state
       |> apply_changes(change_set.changes)
-      |> calculate_market_quote(change_set)
+      |> latest
 
-    if market_quote_changed?(last_market_quote, new_state.last_market_quote) do
-      {:ok, _} = Tai.Markets.QuoteStore.put(new_state.last_market_quote)
-    end
+    state =
+      if market_quote_changed?(bids, asks, state) do
+        market_quote = build_market_quote(change_set, bids, asks)
+        {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
+        %{state | last_quote_bids: bids, last_quote_asks: asks}
+      else
+        state
+      end
 
-    if new_state.broadcast_change_set do
-      {:noreply, new_state, {:continue, {:broadcast_change_set, change_set}}}
+    if state.broadcast_change_set do
+      {:noreply, state, {:continue, {:broadcast_change_set, change_set}}}
     else
-      {:noreply, new_state}
+      {:noreply, state}
     end
   end
 
@@ -182,6 +179,10 @@ defmodule Tai.Markets.OrderBook do
     |> Tai.SystemBus.broadcast(msg)
 
     {:noreply, state}
+  end
+
+  defp delete_all(state) do
+    %{state | bids: %{}, asks: %{}}
   end
 
   defp apply_changes(state, changes) do
@@ -208,38 +209,42 @@ defmodule Tai.Markets.OrderBook do
     )
   end
 
-  defp calculate_market_quote(state, change_set) do
-    bids = price_points(state.bids, state.quote_depth, &(&1 > &2))
-    asks = price_points(state.asks, state.quote_depth, &(&1 < &2))
+  defp latest(state) do
+    {latest_bids(state), latest_asks(state)}
+  end
 
-    market_quote = %Quote{
-      venue_id: state.venue_id,
-      product_symbol: state.product_symbol,
+  defp latest_bids(state) do
+    state.bids
+    |> Map.keys()
+    |> Enum.sort(&(&1 > &2))
+    |> Enum.take(state.quote_depth)
+    |> Enum.map(fn p -> {p, Map.get(state.bids, p)} end)
+  end
+
+  defp latest_asks(state) do
+    state.asks
+    |> Map.keys()
+    |> Enum.sort(&(&1 < &2))
+    |> Enum.take(state.quote_depth)
+    |> Enum.map(fn p -> {p, Map.get(state.asks, p)} end)
+  end
+
+  defp market_quote_changed?(bids, asks, state) do
+    bids != state.last_quote_bids || asks != state.last_quote_asks
+  end
+
+  defp build_market_quote(change_set, bids, asks) do
+    %Quote{
+      venue_id: change_set.venue,
+      product_symbol: change_set.symbol,
       last_venue_timestamp: change_set.last_venue_timestamp,
       last_received_at: change_set.last_received_at,
-      bids: bids,
-      asks: asks
+      bids: price_points(bids),
+      asks: price_points(asks)
     }
-
-    Map.put(state, :last_market_quote, market_quote)
   end
 
-  defp price_points(side, quote_depth, sort_by) do
-    side
-    |> Map.keys()
-    |> Enum.sort(sort_by)
-    |> Enum.take(quote_depth)
-    |> Enum.map(&%PricePoint{price: &1, size: side |> Map.fetch!(&1)})
-  end
-
-  defp market_quote_changed?(nil, %Quote{}), do: true
-
-  defp market_quote_changed?(current_market_quote, new_market_quote) do
-    inside_price_point_changed?(current_market_quote.bids, new_market_quote.bids) ||
-      inside_price_point_changed?(current_market_quote.asks, new_market_quote.asks)
-  end
-
-  defp inside_price_point_changed?(current, new) do
-    current |> List.first() != new |> List.first()
+  defp price_points(side) do
+    Enum.map(side, fn {p, s} -> %PricePoint{price: p, size: s} end)
   end
 end
