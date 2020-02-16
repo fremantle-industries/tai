@@ -3,6 +3,10 @@ defmodule Tai.Markets.OrderBookTest do
   alias Tai.Markets.{OrderBook, PricePoint}
 
   @product struct(Tai.Venues.Product, venue_id: :venue_a, symbol: :btc_usd)
+  @broadcast_enabled_product struct(Tai.Venues.Product,
+                               venue_id: :other_venue,
+                               symbol: :other_symbol
+                             )
   @topic {@product.venue_id, @product.symbol}
   @quote_depth 2
 
@@ -95,24 +99,24 @@ defmodule Tai.Markets.OrderBookTest do
 
     test "broadcasts change_set when enabled" do
       Tai.SystemBus.subscribe(:change_set)
-      other_product = struct(Tai.Venues.Product, venue_id: :other_venue, symbol: :other_symbol)
-      start_supervised!(OrderBook.child_spec(other_product, @quote_depth, true))
+      start_supervised!(OrderBook.child_spec(@broadcast_enabled_product, @quote_depth, true))
 
-      change_set_1 =
+      broadcast_enabled_change_set =
         struct(OrderBook.ChangeSet,
-          venue: other_product.venue_id,
-          symbol: other_product.symbol,
+          venue: @broadcast_enabled_product.venue_id,
+          symbol: @broadcast_enabled_product.symbol,
           changes: [
             {:upsert, :bid, 100.0, 1.0},
             {:upsert, :ask, 102.0, 11.0}
           ]
         )
 
-      OrderBook.replace(change_set_1)
+      OrderBook.replace(broadcast_enabled_change_set)
 
-      assert_receive {:change_set, change_set_1}
+      assert_receive {:change_set, received_change_set}
+      assert received_change_set == broadcast_enabled_change_set
 
-      change_set_2 =
+      broadcast_disabled_change_set =
         struct(OrderBook.ChangeSet,
           venue: @product.venue_id,
           symbol: @product.symbol,
@@ -122,7 +126,7 @@ defmodule Tai.Markets.OrderBookTest do
           ]
         )
 
-      OrderBook.replace(change_set_2)
+      OrderBook.replace(broadcast_disabled_change_set)
 
       refute_receive {:change_set, _}
     end
@@ -230,24 +234,24 @@ defmodule Tai.Markets.OrderBookTest do
 
     test "broadcasts change_set when enabled" do
       Tai.SystemBus.subscribe(:change_set)
-      other_product = struct(Tai.Venues.Product, venue_id: :other_venue, symbol: :other_symbol)
-      start_supervised!(OrderBook.child_spec(other_product, @quote_depth, true))
+      start_supervised!(OrderBook.child_spec(@broadcast_enabled_product, @quote_depth, true))
 
-      change_set_1 =
+      broadcast_enabled_change_set =
         struct(OrderBook.ChangeSet,
-          venue: other_product.venue_id,
-          symbol: other_product.symbol,
+          venue: @broadcast_enabled_product.venue_id,
+          symbol: @broadcast_enabled_product.symbol,
           changes: [
             {:upsert, :bid, 100.0, 1.0},
             {:upsert, :ask, 102.0, 11.0}
           ]
         )
 
-      OrderBook.apply(change_set_1)
+      OrderBook.apply(broadcast_enabled_change_set)
 
-      assert_receive {:change_set, change_set_1}
+      assert_receive {:change_set, received_change_set}
+      assert received_change_set == broadcast_enabled_change_set
 
-      change_set_2 =
+      broadcast_disabled_change_set =
         struct(OrderBook.ChangeSet,
           venue: @product.venue_id,
           symbol: @product.symbol,
@@ -257,7 +261,7 @@ defmodule Tai.Markets.OrderBookTest do
           ]
         )
 
-      OrderBook.apply(change_set_2)
+      OrderBook.apply(broadcast_disabled_change_set)
 
       refute_receive {:change_set, _}
     end
