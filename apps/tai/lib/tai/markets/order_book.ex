@@ -43,7 +43,6 @@ defmodule Tai.Markets.OrderBook do
             asks: %{optional(price) => qty},
             quote_depth: quote_depth,
             last_market_quote: market_quote | nil,
-            last_change_set: ChangeSet.t(),
             last_received_at: DateTime.t(),
             last_venue_timestamp: DateTime.t() | nil
           }
@@ -63,7 +62,6 @@ defmodule Tai.Markets.OrderBook do
       asks
       quote_depth
       last_market_quote
-      last_change_set
       last_received_at
       last_venue_timestamp
     )a
@@ -136,7 +134,6 @@ defmodule Tai.Markets.OrderBook do
         state
         | bids: %{},
           asks: %{},
-          last_change_set: change_set,
           last_received_at: change_set.last_received_at,
           last_venue_timestamp: change_set.last_venue_timestamp
       }
@@ -146,7 +143,7 @@ defmodule Tai.Markets.OrderBook do
     {:ok, _} = Tai.Markets.QuoteStore.put(new_state.last_market_quote)
 
     if new_state.broadcast_change_set do
-      {:noreply, new_state, {:continue, :broadcast_change_set}}
+      {:noreply, new_state, {:continue, {:broadcast_change_set, change_set}}}
     else
       {:noreply, new_state}
     end
@@ -158,8 +155,7 @@ defmodule Tai.Markets.OrderBook do
     new_state =
       %{
         state
-        | last_change_set: change_set,
-          last_received_at: change_set.last_received_at,
+        | last_received_at: change_set.last_received_at,
           last_venue_timestamp: change_set.last_venue_timestamp
       }
       |> apply_changes(change_set.changes)
@@ -170,14 +166,14 @@ defmodule Tai.Markets.OrderBook do
     end
 
     if new_state.broadcast_change_set do
-      {:noreply, new_state, {:continue, :broadcast_change_set}}
+      {:noreply, new_state, {:continue, {:broadcast_change_set, change_set}}}
     else
       {:noreply, new_state}
     end
   end
 
-  def handle_continue(:broadcast_change_set, state) do
-    msg = {:change_set, state.last_change_set}
+  def handle_continue({:broadcast_change_set, change_set}, state) do
+    msg = {:change_set, change_set}
 
     {:change_set, state.venue_id, state.product_symbol}
     |> Tai.SystemBus.broadcast(msg)
