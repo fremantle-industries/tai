@@ -40,30 +40,30 @@ defmodule Tai.Markets.OrderBook do
             venue: venue_id,
             symbol: product_symbol,
             quote_depth: quote_depth,
+            bids_table: atom,
+            asks_table: atom,
             last_quote_bids: [{price, qty}],
-            last_quote_asks: [{price, qty}],
-            bids: %{optional(price) => qty},
-            asks: %{optional(price) => qty}
+            last_quote_asks: [{price, qty}]
           }
 
     @enforce_keys ~w(
       venue
       symbol
       quote_depth
+      bids_table
+      asks_table
       last_quote_bids
       last_quote_asks
-      bids
-      asks
     )a
     defstruct ~w(
       broadcast_change_set
       venue
       symbol
       quote_depth
+      bids_table
+      asks_table
       last_quote_bids
       last_quote_asks
-      bids
-      asks
     )a
   end
 
@@ -98,10 +98,10 @@ defmodule Tai.Markets.OrderBook do
       venue: product.venue_id,
       symbol: product.symbol,
       quote_depth: quote_depth,
+      bids_table: table_name(:bids, product),
+      asks_table: table_name(:asks, product),
       last_quote_bids: [],
       last_quote_asks: [],
-      bids: %{},
-      asks: %{},
       broadcast_change_set: broadcast_change_set
     }
 
@@ -126,16 +126,17 @@ defmodule Tai.Markets.OrderBook do
   end
 
   def init(state) do
+    create_price_point_ets_table(state.bids_table)
+    create_price_point_ets_table(state.asks_table)
     {:ok, state}
   end
 
   def handle_cast({:replace, change_set}, state) do
-    state =
+    {bids, asks} =
       state
       |> delete_all
       |> apply_changes(change_set.changes)
-
-    {bids, asks} = state |> latest_quotes
+      |> latest_quote
 
     market_quote = build_market_quote(change_set, bids, asks)
     {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
@@ -149,8 +150,10 @@ defmodule Tai.Markets.OrderBook do
   end
 
   def handle_cast({:apply, change_set}, state) do
-    state = state |> apply_changes(change_set.changes)
-    {bids, asks} = state |> latest_quotes
+    {bids, asks} =
+      state
+      |> apply_changes(change_set.changes)
+      |> latest_quote
 
     state =
       if market_quote_changed?(
@@ -183,51 +186,60 @@ defmodule Tai.Markets.OrderBook do
     {:noreply, state}
   end
 
+  defp create_price_point_ets_table(name) do
+    :ets.new(name, [:ordered_set, :protected, :named_table])
+  end
+
+  defp table_name(side, product) do
+    :"#{__MODULE__}_#{product.venue_id}_#{product.symbol}_#{side}"
+  end
+
   defp delete_all(state) do
-    %{state | bids: %{}, asks: %{}}
+    :ets.delete_all_objects(state.bids_table)
+    :ets.delete_all_objects(state.asks_table)
+    state
   end
 
   defp apply_changes(state, changes) do
-    {bids, asks} =
-      changes
-      |> Enum.reduce(
-        {state.bids, state.asks},
-        fn
-          {:upsert, :bid, price, size}, {bids, asks} ->
-            {Map.put(bids, price, size), asks}
+    changes
+    |> Enum.each(fn
+      {:upsert, :bid, price, size} ->
+        true = :ets.insert(state.bids_table, {price, size})
 
-          {:upsert, :ask, price, size}, {bids, asks} ->
-            {bids, Map.put(asks, price, size)}
+      {:upsert, :ask, price, size} ->
+        true = :ets.insert(state.asks_table, {price, size})
 
-          {:delete, :bid, price}, {bids, asks} ->
-            {Map.delete(bids, price), asks}
+      {:delete, :bid, price} ->
+        true = :ets.delete(state.bids_table, price)
 
-          {:delete, :ask, price}, {bids, asks} ->
-            {bids, Map.delete(asks, price)}
-        end
-      )
+      {:delete, :ask, price} ->
+        true = :ets.delete(state.asks_table, price)
+    end)
 
-    %{state | bids: bids, asks: asks}
+    state
   end
 
-  defp latest_quotes(state) do
+  @select_all [{:"$1", [], [:"$1"]}]
+  defp latest_quote(state) do
     {latest_bids(state), latest_asks(state)}
   end
 
   defp latest_bids(state) do
-    state.bids
-    |> Map.keys()
-    |> Enum.sort(&(&1 > &2))
-    |> Enum.take(state.quote_depth)
-    |> Enum.map(fn p -> {p, Map.get(state.bids, p)} end)
+    state.bids_table
+    |> :ets.select_reverse(@select_all, state.quote_depth)
+    |> case do
+      {bids, _continuation} -> bids
+      :"$end_of_table" -> []
+    end
   end
 
   defp latest_asks(state) do
-    state.asks
-    |> Map.keys()
-    |> Enum.sort(&(&1 < &2))
-    |> Enum.take(state.quote_depth)
-    |> Enum.map(fn p -> {p, Map.get(state.asks, p)} end)
+    state.asks_table
+    |> :ets.select(@select_all, state.quote_depth)
+    |> case do
+      {asks, _continuation} -> asks
+      :"$end_of_table" -> []
+    end
   end
 
   defp market_quote_changed?({prev_bids, latest_bids}, {prev_asks, latest_asks}) do
