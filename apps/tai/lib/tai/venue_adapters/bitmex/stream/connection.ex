@@ -24,6 +24,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   @type product :: Tai.Venues.Product.t()
   @type venue_id :: Tai.Venue.id()
+  @type channel :: Tai.Venue.channel()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
   @type venue_msg :: map
@@ -31,6 +32,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   @spec start_link(
           url: String.t(),
           venue: venue_id,
+          channels: [channel],
           credential: {credential_id, credential} | nil,
           products: [product],
           quote_depth: pos_integer,
@@ -120,7 +122,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:send_msg, msg}, state), do: {:reply, {:text, msg}, state}
+  def handle_info({:send_msg, msg}, state) do
+    {:reply, {:text, msg}, state}
+  end
 
   # Bitmex has an unpublished limit to websocket message lengths.
   @products_chunk_count 10

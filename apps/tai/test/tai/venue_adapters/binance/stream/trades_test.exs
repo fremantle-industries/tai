@@ -24,7 +24,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.TradesTest do
     Events.firehose_subscribe()
     venue_trade_id = 42
 
-    trade = %{
+    msg = %{
       "e" => "trade",
       "E" => venue_trade_id,
       "s" => product.venue_symbol,
@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.TradesTest do
 
     product.venue_id
     |> ProcessOptionalChannels.to_name()
-    |> GenServer.cast({%{"data" => trade}, :ignore})
+    |> GenServer.cast({msg, :ignore})
 
     assert_event(%Events.Trade{venue_trade_id: venue_trade_id})
   end

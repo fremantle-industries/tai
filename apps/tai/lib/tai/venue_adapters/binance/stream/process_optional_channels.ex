@@ -19,12 +19,15 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOptionalChannels do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  def init(state), do: {:ok, state}
-
   @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
-  def handle_cast({%{"data" => %{"e" => "trade"} = trade}, received_at}, state) do
+  def init(state), do: {:ok, state}
+
+  def handle_cast(
+        {%{"e" => "trade"} = trade, received_at},
+        state
+      ) do
     Stream.Trades.broadcast(trade, state.venue_id, received_at)
     {:noreply, state}
   end

@@ -16,23 +16,20 @@ defmodule Tai.VenueAdapters.Binance.Stream.RouteOrderBooksTest do
   end
 
   test "forwards an update message to the order book store for the product", %{pid: pid} do
-    venue_msg = %{
-      "data" => %{
-        "e" => "depthUpdate",
-        "E" => 1_569_051_459_755,
-        "s" => @venue_symbol,
-        "U" => "ignore",
-        "u" => "ignore",
-        "b" => [],
-        "a" => []
-      },
-      "stream" => "ignore"
+    msg = %{
+      "e" => "depthUpdate",
+      "E" => 1_569_051_459_755,
+      "s" => @venue_symbol,
+      "U" => "ignore",
+      "u" => "ignore",
+      "b" => [],
+      "a" => []
     }
 
-    GenServer.cast(pid, {venue_msg, @received_at})
+    GenServer.cast(pid, {msg, @received_at})
 
-    assert_receive {:"$gen_cast", {:update, data, received_at}}
-    assert %{"E" => 1_569_051_459_755} = data
+    assert_receive {:"$gen_cast", {:update, received_msg, received_at}}
+    assert received_msg == msg
     assert received_at == @received_at
   end
 end

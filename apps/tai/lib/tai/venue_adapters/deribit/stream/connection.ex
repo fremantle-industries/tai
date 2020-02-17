@@ -8,7 +8,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
     @type route :: :order_books
-    @type jsonrpc_id :: integer
+    @type jsonrpc_id :: non_neg_integer
     @type t :: %State{
             venue: venue,
             routes: %{required(route) => atom},

@@ -25,23 +25,25 @@ defmodule Tai.VenueAdapters.Binance.Stream.RouteOrderBooks do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  def init(state), do: {:ok, state}
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
+  def init(state) do
+    {:ok, state}
+  end
 
   def handle_cast(
-        {%{
-           "data" => %{"e" => "depthUpdate", "s" => venue_symbol} = data,
-           "stream" => _stream_name
-         }, received_at},
+        {
+          %{"e" => "depthUpdate", "s" => venue_symbol} = msg,
+          received_at
+        },
         state
       ) do
     {state, venue_symbol}
-    |> forward({:update, data, received_at})
+    |> forward({:update, msg, received_at})
 
     {:noreply, state}
   end
-
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   defp build_stores(products) do
     products
