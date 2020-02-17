@@ -133,7 +133,56 @@ defmodule Tai.Markets.OrderBookTest do
   end
 
   describe ".apply/1" do
-    test "saves a market quote when the change set results in a new quote" do
+    test "saves a market quote when the change set results in a new quote after replace" do
+      Tai.SystemBus.subscribe({:market_quote_store, @topic})
+
+      change_set_1 = %OrderBook.ChangeSet{
+        venue: @product.venue_id,
+        symbol: @product.symbol,
+        last_venue_timestamp: Timex.now(),
+        last_received_at: Timex.now(),
+        changes: [
+          {:upsert, :bid, 100.0, 1.0},
+          {:upsert, :ask, 102.0, 11.0}
+        ]
+      }
+
+      OrderBook.replace(change_set_1)
+      assert_receive {:market_quote_store, :after_put, _}
+
+      venue_timestamp_2 = Timex.now()
+      received_at_2 = Timex.now()
+
+      change_set_2 = %OrderBook.ChangeSet{
+        venue: @product.venue_id,
+        symbol: @product.symbol,
+        last_venue_timestamp: venue_timestamp_2,
+        last_received_at: received_at_2,
+        changes: [
+          {:upsert, :bid, 100.0, 5.0},
+          {:upsert, :ask, 102.0, 7.0}
+        ]
+      }
+
+      OrderBook.apply(change_set_2)
+      assert_receive {:market_quote_store, :after_put, market_quote_2}
+
+      assert market_quote_2.last_venue_timestamp == venue_timestamp_2
+      assert market_quote_2.last_received_at == received_at_2
+      assert Enum.count(market_quote_2.bids) == 1
+      assert %PricePoint{} = inside_bid_2 = Enum.at(market_quote_2.bids, 0)
+      assert inside_bid_2.price == 100.0
+      assert inside_bid_2.size == 5.0
+      assert Enum.count(market_quote_2.asks) == 1
+      assert %PricePoint{} = inside_ask_2 = Enum.at(market_quote_2.asks, 0)
+      assert inside_ask_2.price == 102.0
+      assert inside_ask_2.size == 7.0
+
+      OrderBook.apply(change_set_2)
+      refute_receive {:market_quote_store, :after_put, _}
+    end
+
+    test "saves a market quote when the change set results in a new quote after apply" do
       Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       venue_timestamp_1 = Timex.now()

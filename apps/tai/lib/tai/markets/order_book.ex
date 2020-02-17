@@ -134,10 +134,12 @@ defmodule Tai.Markets.OrderBook do
       state
       |> delete_all
       |> apply_changes(change_set.changes)
-      |> with_latest_quotes
 
-    market_quote = build_market_quote(change_set, state.last_quote_bids, state.last_quote_asks)
+    {bids, asks} = state |> latest_quotes
+
+    market_quote = build_market_quote(change_set, bids, asks)
     {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
+    state = %{state | last_quote_bids: bids, last_quote_asks: asks}
 
     if state.broadcast_change_set do
       {:noreply, state, {:continue, {:broadcast_change_set, change_set}}}
@@ -147,21 +149,20 @@ defmodule Tai.Markets.OrderBook do
   end
 
   def handle_cast({:apply, change_set}, state) do
-    prev_quote_bids = state.last_quote_bids
-    prev_quote_asks = state.last_quote_asks
+    state = state |> apply_changes(change_set.changes)
+    {bids, asks} = state |> latest_quotes
 
     state =
-      state
-      |> apply_changes(change_set.changes)
-      |> with_latest_quotes
-
-    if market_quote_changed?(
-         {prev_quote_bids, state.last_quote_bids},
-         {prev_quote_asks, state.last_quote_asks}
-       ) do
-      market_quote = build_market_quote(change_set, state.last_quote_bids, state.last_quote_asks)
-      {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
-    end
+      if market_quote_changed?(
+           {state.last_quote_bids, bids},
+           {state.last_quote_asks, asks}
+         ) do
+        market_quote = build_market_quote(change_set, bids, asks)
+        {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
+        %{state | last_quote_bids: bids, last_quote_asks: asks}
+      else
+        state
+      end
 
     if state.broadcast_change_set do
       {:noreply, state, {:continue, {:broadcast_change_set, change_set}}}
@@ -187,35 +188,30 @@ defmodule Tai.Markets.OrderBook do
   end
 
   defp apply_changes(state, changes) do
-    changes
-    |> Enum.reduce(
-      state,
-      fn
-        {:upsert, :bid, price, size}, acc ->
-          new_bids = acc.bids |> Map.put(price, size)
-          Map.put(acc, :bids, new_bids)
+    {bids, asks} =
+      changes
+      |> Enum.reduce(
+        {state.bids, state.asks},
+        fn
+          {:upsert, :bid, price, size}, {bids, asks} ->
+            {Map.put(bids, price, size), asks}
 
-        {:upsert, :ask, price, size}, acc ->
-          new_bids = acc.asks |> Map.put(price, size)
-          Map.put(acc, :asks, new_bids)
+          {:upsert, :ask, price, size}, {bids, asks} ->
+            {bids, Map.put(asks, price, size)}
 
-        {:delete, :bid, price}, acc ->
-          new_bids = acc.bids |> Map.delete(price)
-          Map.put(acc, :bids, new_bids)
+          {:delete, :bid, price}, {bids, asks} ->
+            {Map.delete(bids, price), asks}
 
-        {:delete, :ask, price}, acc ->
-          new_asks = acc.asks |> Map.delete(price)
-          Map.put(acc, :asks, new_asks)
-      end
-    )
+          {:delete, :ask, price}, {bids, asks} ->
+            {bids, Map.delete(asks, price)}
+        end
+      )
+
+    %{state | bids: bids, asks: asks}
   end
 
-  defp with_latest_quotes(state) do
-    %{
-      state
-      | last_quote_bids: latest_bids(state),
-        last_quote_asks: latest_asks(state)
-    }
+  defp latest_quotes(state) do
+    {latest_bids(state), latest_asks(state)}
   end
 
   defp latest_bids(state) do
