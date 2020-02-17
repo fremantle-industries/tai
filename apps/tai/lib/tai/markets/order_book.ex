@@ -37,8 +37,8 @@ defmodule Tai.Markets.OrderBook do
     @type market_quote :: Tai.Markets.Quote.t()
     @type t :: %State{
             broadcast_change_set: boolean,
-            venue_id: venue_id,
-            product_symbol: product_symbol,
+            venue: venue_id,
+            symbol: product_symbol,
             quote_depth: quote_depth,
             last_quote_bids: [{price, qty}],
             last_quote_asks: [{price, qty}],
@@ -47,8 +47,8 @@ defmodule Tai.Markets.OrderBook do
           }
 
     @enforce_keys ~w(
-      venue_id
-      product_symbol
+      venue
+      symbol
       quote_depth
       last_quote_bids
       last_quote_asks
@@ -57,8 +57,8 @@ defmodule Tai.Markets.OrderBook do
     )a
     defstruct ~w(
       broadcast_change_set
-      venue_id
-      product_symbol
+      venue
+      symbol
       quote_depth
       last_quote_bids
       last_quote_asks
@@ -95,8 +95,8 @@ defmodule Tai.Markets.OrderBook do
     name = to_name(product.venue_id, product.symbol)
 
     state = %State{
-      venue_id: product.venue_id,
-      product_symbol: product.symbol,
+      venue: product.venue_id,
+      symbol: product.symbol,
       quote_depth: quote_depth,
       last_quote_bids: [],
       last_quote_asks: [],
@@ -172,7 +172,7 @@ defmodule Tai.Markets.OrderBook do
   def handle_continue({:broadcast_change_set, change_set}, state) do
     msg = {:change_set, change_set}
 
-    {:change_set, state.venue_id, state.product_symbol}
+    {:change_set, state.venue, state.symbol}
     |> Tai.SystemBus.broadcast(msg)
 
     :change_set
