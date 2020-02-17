@@ -2,6 +2,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOrderBookTest do
   use ExUnit.Case, async: false
   alias Tai.VenueAdapters.Gdax.Stream.ProcessOrderBook
   alias Tai.Markets.{OrderBook, PricePoint}
+  alias Tai.Markets.OrderBooks.ChangeSet
 
   @product struct(Tai.Venues.Product,
              venue_id: :venue_a,
