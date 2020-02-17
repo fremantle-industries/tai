@@ -130,15 +130,14 @@ defmodule Tai.Markets.OrderBook do
   end
 
   def handle_cast({:replace, change_set}, state) do
-    {bids, asks} =
+    state =
       state
       |> delete_all
       |> apply_changes(change_set.changes)
-      |> latest
+      |> with_latest_quotes
 
-    market_quote = build_market_quote(change_set, bids, asks)
+    market_quote = build_market_quote(change_set, state.last_quote_bids, state.last_quote_asks)
     {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
-    state = %{state | last_quote_bids: bids, last_quote_asks: asks}
 
     if state.broadcast_change_set do
       {:noreply, state, {:continue, {:broadcast_change_set, change_set}}}
@@ -148,19 +147,21 @@ defmodule Tai.Markets.OrderBook do
   end
 
   def handle_cast({:apply, change_set}, state) do
-    {bids, asks} =
-      state
-      |> apply_changes(change_set.changes)
-      |> latest
+    prev_quote_bids = state.last_quote_bids
+    prev_quote_asks = state.last_quote_asks
 
     state =
-      if market_quote_changed?(bids, asks, state) do
-        market_quote = build_market_quote(change_set, bids, asks)
-        {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
-        %{state | last_quote_bids: bids, last_quote_asks: asks}
-      else
-        state
-      end
+      state
+      |> apply_changes(change_set.changes)
+      |> with_latest_quotes
+
+    if market_quote_changed?(
+         {prev_quote_bids, state.last_quote_bids},
+         {prev_quote_asks, state.last_quote_asks}
+       ) do
+      market_quote = build_market_quote(change_set, state.last_quote_bids, state.last_quote_asks)
+      {:ok, _} = Tai.Markets.QuoteStore.put(market_quote)
+    end
 
     if state.broadcast_change_set do
       {:noreply, state, {:continue, {:broadcast_change_set, change_set}}}
@@ -209,8 +210,12 @@ defmodule Tai.Markets.OrderBook do
     )
   end
 
-  defp latest(state) do
-    {latest_bids(state), latest_asks(state)}
+  defp with_latest_quotes(state) do
+    %{
+      state
+      | last_quote_bids: latest_bids(state),
+        last_quote_asks: latest_asks(state)
+    }
   end
 
   defp latest_bids(state) do
@@ -229,8 +234,8 @@ defmodule Tai.Markets.OrderBook do
     |> Enum.map(fn p -> {p, Map.get(state.asks, p)} end)
   end
 
-  defp market_quote_changed?(bids, asks, state) do
-    bids != state.last_quote_bids || asks != state.last_quote_asks
+  defp market_quote_changed?({prev_bids, latest_bids}, {prev_asks, latest_asks}) do
+    prev_bids != latest_bids || prev_asks != latest_asks
   end
 
   defp build_market_quote(change_set, bids, asks) do
