@@ -9,7 +9,7 @@ defmodule Tai.Commands.ProductsTest do
   end
 
   test "show products and their trade restrictions for configured exchanges" do
-    mock_product(%{
+    mock_product(
       venue_id: :test_exchange_a,
       symbol: :btc_usd,
       venue_symbol: "BTC_USD",
@@ -17,15 +17,15 @@ defmodule Tai.Commands.ProductsTest do
       type: :spot,
       maker_fee: Decimal.new("0.001"),
       taker_fee: Decimal.new("0.002")
-    })
+    )
 
-    mock_product(%{
+    mock_product(
       venue_id: :test_exchange_b,
       symbol: :eth_usd,
       venue_symbol: "ETH_USD",
       status: :trading,
       type: :spot
-    })
+    )
 
     assert capture_io(&Tai.CommandsHelper.products/0) == """
            +-----------------+---------+--------------+---------+------+-----------+-----------+

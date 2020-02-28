@@ -15,7 +15,7 @@ defmodule Tai.TestSupport.Mock do
     |> Tai.Venues.ProductStore.upsert()
   end
 
-  def mock_product(attrs) when is_map(attrs) do
+  def mock_product(attrs) when is_map(attrs) or is_list(attrs) do
     Tai.Venues.Product
     |> struct(attrs)
     |> Tai.Venues.ProductStore.upsert()
