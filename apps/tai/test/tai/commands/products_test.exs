@@ -1,15 +1,10 @@
 defmodule Tai.Commands.ProductsTest do
   use ExUnit.Case, async: false
-
   import ExUnit.CaptureIO
   import Tai.TestSupport.Mock
 
   setup do
-    on_exit(fn ->
-      Application.stop(:tai)
-    end)
-
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!(Tai.Venues.ProductStore)
     :ok
   end
 
