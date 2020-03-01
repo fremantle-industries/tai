@@ -18,7 +18,6 @@ defmodule Tai.Commands.Accounts do
   def accounts do
     fetch_accounts()
     |> format_rows()
-    |> exclude_zero_balances()
     |> render!(@header)
   end
 
@@ -40,13 +39,6 @@ defmodule Tai.Commands.Accounts do
 
         [row | acc]
       end
-    )
-  end
-
-  defp exclude_zero_balances(accounts) do
-    Enum.reject(
-      accounts,
-      fn [_, _, _, _, _, total] -> Tai.Markets.Asset.zero?(total) end
     )
   end
 

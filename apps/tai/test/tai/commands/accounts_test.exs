@@ -14,7 +14,7 @@ defmodule Tai.Commands.AccountsTest do
     :ok
   end
 
-  test "shows the accounts for each venue with a non-zero balance" do
+  test "shows each account" do
     mock_account(:test_exchange_a, :main, :btc, 0.1, 1.81227740)
 
     mock_account(
