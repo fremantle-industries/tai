@@ -12,7 +12,7 @@ defmodule Tai.Events.AdvisorHandleEventErrorTest do
 
     event = struct(Tai.Events.AdvisorHandleEventError, attrs)
 
-    assert %{} = json = Tai.LogEvent.to_data(event)
+    assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.event == "{:event, :some_event}"
     assert json.error == "%RuntimeError{message: \"!!!This is an ERROR!!!\"}"
 

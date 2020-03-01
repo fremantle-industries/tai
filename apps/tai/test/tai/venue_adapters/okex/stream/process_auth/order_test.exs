@@ -3,10 +3,10 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.OkEx.Stream.ProcessAuth
   alias Tai.VenueAdapters.OkEx.ClientId
-  alias Tai.Events
 
   setup do
     on_exit(fn ->
+      :ok = Application.stop(:tai_events)
       :ok = Application.stop(:tai)
     end)
 
@@ -17,7 +17,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
   end
 
   test "broadcasts an event when the order can't be found" do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     accept_create_client_id = Ecto.UUID.generate()
     open_client_id = Ecto.UUID.generate()
     canceled_client_id = Ecto.UUID.generate()
@@ -64,7 +64,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     |> GenServer.cast({%{"table" => "futures/order", "data" => venue_orders}, :ignore})
 
     assert_event(
-      %Events.OrderUpdateNotFound{
+      %Tai.Events.OrderUpdateNotFound{
         action: Tai.Trading.OrderStore.Actions.AcceptCreate
       } = accept_create_not_found_event
     )
@@ -72,7 +72,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     assert accept_create_not_found_event.client_id == accept_create_client_id
 
     assert_event(
-      %Events.OrderUpdateNotFound{
+      %Tai.Events.OrderUpdateNotFound{
         action: Tai.Trading.OrderStore.Actions.Open
       } = open_not_found_event
     )
@@ -80,7 +80,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     assert open_not_found_event.client_id == open_client_id
 
     assert_event(
-      %Events.OrderUpdateNotFound{
+      %Tai.Events.OrderUpdateNotFound{
         action: Tai.Trading.OrderStore.Actions.PassiveCancel
       } = canceled_not_found_event
     )
@@ -88,7 +88,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     assert canceled_not_found_event.client_id == canceled_client_id
 
     assert_event(
-      %Events.OrderUpdateNotFound{
+      %Tai.Events.OrderUpdateNotFound{
         action: Tai.Trading.OrderStore.Actions.PassivePartialFill
       } = partially_filled_not_found_event
     )
@@ -96,7 +96,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     assert partially_filled_not_found_event.client_id == partially_filled_client_id
 
     assert_event(
-      %Events.OrderUpdateNotFound{
+      %Tai.Events.OrderUpdateNotFound{
         action: Tai.Trading.OrderStore.Actions.PassiveFill
       } = filled_not_found_event
     )
@@ -105,7 +105,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
   end
 
   test "emits a warning when the venue message can't be handled" do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     venue_orders = [%{"unhandled" => true}]
 
     :my_venue
@@ -114,11 +114,11 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
       {%{"table" => "order", "action" => "update", "data" => venue_orders}, :ignore}
     )
 
-    assert_receive {Tai.Event, %Events.StreamMessageUnhandled{}, :warn}
+    assert_receive {TaiEvents.Event, %Tai.Events.StreamMessageUnhandled{}, :warn}
   end
 
   test "emits a warning when there is an error processing the venue message" do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     client_id = Ecto.UUID.generate()
 
     venue_orders = [
@@ -134,7 +134,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     |> ProcessAuth.to_name()
     |> GenServer.cast({%{"table" => "futures/order", "data" => venue_orders}, :ignore})
 
-    assert_receive {Tai.Event, %Events.StreamError{} = event, :error}
+    assert_receive {TaiEvents.Event, %Tai.Events.StreamError{} = event, :error}
     assert {:function_clause, _} = event.reason
   end
 end

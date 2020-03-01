@@ -1,6 +1,8 @@
 defmodule Tai.Events.StreamChannelInvalid do
+  alias __MODULE__
+
   @type venue_id :: Tai.Venue.id()
-  @type t :: %Tai.Events.StreamChannelInvalid{
+  @type t :: %StreamChannelInvalid{
           venue: venue_id,
           name: atom,
           available: [atom]
@@ -10,7 +12,7 @@ defmodule Tai.Events.StreamChannelInvalid do
   defstruct ~w(venue name available)a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.StreamChannelInvalid do
+defimpl TaiEvents.LogEvent, for: Tai.Events.StreamChannelInvalid do
   def to_data(event) do
     keys =
       event

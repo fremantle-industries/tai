@@ -2,7 +2,6 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
   use ExUnit.Case, async: false
   alias Tai.Trading.OrderSubmissions.SellLimitGtc
   alias Tai.Trading.{Order, Orders, OrderStore}
-  alias Tai.Events
   alias Tai.TestSupport.Mocks
 
   defmodule TestFilledProvider do
@@ -41,7 +40,8 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
 
   setup do
     on_exit(fn ->
-      Application.stop(:tai)
+      :ok = Application.stop(:tai_events)
+      :ok = Application.stop(:tai)
     end)
 
     start_supervised!(Mocks.Server)
@@ -70,12 +70,12 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
     end
 
     test "emits an invalid status warning", %{order: order} do
-      Tai.Events.firehose_subscribe()
+      TaiEvents.firehose_subscribe()
 
       Orders.cancel(order)
 
       assert_receive {
-        Tai.Event,
+        TaiEvents.Event,
         %Tai.Events.OrderUpdateInvalidStatus{} = pending_cancel_invalid_event,
         :warn
       }
@@ -96,13 +96,13 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
   test "invalid cancel status emits an event" do
     open_order = struct(Order, client_id: "abc123", venue_order_id: @venue_order_id)
     Mocks.Responses.Orders.GoodTillCancel.canceled(@venue_order_id)
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
 
     Orders.cancel(open_order, TestFilledProvider)
 
     assert_receive {
-      Tai.Event,
-      %Events.OrderUpdateInvalidStatus{} = cancel_invalid_event,
+      TaiEvents.Event,
+      %Tai.Events.OrderUpdateInvalidStatus{} = cancel_invalid_event,
       :warn
     }
 
@@ -117,14 +117,16 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
   end
 
   test "venue error updates status and records the reason", %{submission: submission} do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
     {:ok, order} = Tai.Trading.Orders.create(submission)
-    assert_receive {Tai.Event, %Events.OrderUpdated{status: :open} = open_event, _}
+    assert_receive {TaiEvents.Event, %Tai.Events.OrderUpdated{status: :open} = open_event, _}
 
     assert {:ok, _} = Tai.Trading.Orders.cancel(order)
 
-    assert_receive {Tai.Event, %Events.OrderUpdated{status: :cancel_error} = error_event, _}
+    assert_receive {TaiEvents.Event,
+                    %Tai.Events.OrderUpdated{status: :cancel_error} = error_event, _}
+
     assert error_event.last_received_at != open_event.last_received_at
     assert error_event.error_reason == :mock_not_found
   end

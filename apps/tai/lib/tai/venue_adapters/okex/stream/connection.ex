@@ -1,6 +1,5 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   use WebSockex
-  alias Tai.{Events, VenueAdapters.OkEx.Stream}
   alias Tai.VenueAdapters.OkEx.Stream
 
   defmodule State do
@@ -69,13 +68,13 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   def handle_connect(_conn, state) do
-    Events.info(%Events.StreamConnect{venue: state.venue})
+    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    Events.error(%Events.StreamDisconnect{
+    TaiEvents.error(%Tai.Events.StreamDisconnect{
       venue: state.venue,
       reason: conn_status.reason
     })
@@ -94,7 +93,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       if Enum.member?(@optional_channels, c) do
         send(self(), {:subscribe, c})
       else
-        Events.warn(%Events.StreamChannelInvalid{
+        TaiEvents.warn(%Tai.Events.StreamChannelInvalid{
           venue: state.venue,
           name: c,
           available: @optional_channels
@@ -141,7 +140,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
         {:reply, @ping, state}
 
       {:error, :timeout} ->
-        Events.error(%Events.StreamDisconnect{
+        TaiEvents.error(%Tai.Events.StreamDisconnect{
           venue: state.venue,
           reason: @pong_error
         })
@@ -172,7 +171,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
          %{"event" => "login", "success" => true},
          %State{credential: {credential_id, _}} = state
        ) do
-    Events.info(%Events.StreamAuthOk{venue: state.venue, credential: credential_id})
+    TaiEvents.info(%Tai.Events.StreamAuthOk{venue: state.venue, credential: credential_id})
     send(self(), {:subscribe, :orders})
     {:ok, state}
   end

@@ -4,13 +4,13 @@ defmodule Tai.Trading.NotifyOrderUpdateTest do
   alias Tai.Trading.{NotifyOrderUpdate, Order}
 
   setup do
-    start_supervised!({Tai.Events, 1})
+    start_supervised!({TaiEvents, 1})
     :ok
   end
 
   describe ".notify!" do
     test "broadcasts an order update event" do
-      Tai.Events.firehose_subscribe()
+      TaiEvents.firehose_subscribe()
       updated_order = struct(Order, client_id: "abc123")
 
       NotifyOrderUpdate.notify!(nil, updated_order)

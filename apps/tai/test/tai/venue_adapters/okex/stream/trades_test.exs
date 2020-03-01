@@ -2,12 +2,11 @@ defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels
-  alias Tai.Events
 
   setup do
-    start_supervised!({Tai.Events, 1})
+    start_supervised!({TaiEvents, 1})
     start_supervised!({ProcessOptionalChannels, [venue: :my_venue]})
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     %{venue_trade_id: Ecto.UUID.generate()}
   end
 
@@ -32,7 +31,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
        }, :ignore}
     )
 
-    assert_event(trade = %Events.Trade{venue_trade_id: venue_trade_id})
+    assert_event(trade = %Tai.Events.Trade{venue_trade_id: venue_trade_id})
     assert trade.qty == Decimal.cast(5)
     assert trade.price == Decimal.cast(5556.91)
     assert trade.side == :buy
@@ -59,7 +58,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
        }, :ignore}
     )
 
-    assert_event(trade = %Events.Trade{venue_trade_id: venue_trade_id})
+    assert_event(trade = %Tai.Events.Trade{venue_trade_id: venue_trade_id})
     assert trade.qty == Decimal.cast(5)
     assert trade.price == Decimal.cast(5556.91)
     assert trade.side == :buy
@@ -86,7 +85,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
        }, :ignore}
     )
 
-    assert_event(trade = %Events.Trade{venue_trade_id: venue_trade_id})
+    assert_event(trade = %Tai.Events.Trade{venue_trade_id: venue_trade_id})
     assert trade.qty == Decimal.cast(5)
     assert trade.price == Decimal.cast(5556.91)
     assert trade.side == :buy

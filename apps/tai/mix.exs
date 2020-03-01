@@ -23,7 +23,7 @@ defmodule Tai.Mixfile do
     [
       mod: {Tai.Application, []},
       start_phases: [venues: [], advisors: []],
-      extra_applications: [:logger, :jason]
+      extra_applications: [:logger, :jason, :tai_events]
     ]
   end
 
@@ -32,11 +32,10 @@ defmodule Tai.Mixfile do
       {:enumerati, "~> 0.0.3"},
       {:ex2ms, "~> 1.0"},
       {:ex_binance, "~> 0.0.4"},
-      # {:ex_bitmex, github: "fremantle-capital/ex_bitmex"},
+      # {:ex_bitmex, github: "fremantle-capital/ex_bitmex", branch: "master"},
       {:ex_bitmex, "~> 0.5"},
       # {:ex_deribit, github: "fremantle-capital/ex_deribit", branch: "master"},
       {:ex_deribit, "~> 0.0.4"},
-      # {:ex_okex, path: "../../../ex_okex"},
       # {:ex_okex, github: "fremantle-capital/ex_okex", branch: "master"},
       {:ex_okex, "~> 0.4"},
       {:ex_gdax, "~> 0.1.6"},
@@ -53,6 +52,8 @@ defmodule Tai.Mixfile do
       {:jason, "~> 1.1"},
       {:vex, "~> 0.7"},
       {:stored, "~> 0.0.4"},
+      # {:tai_events, path: "../../packages/tai_events"},
+      {:tai_events, "~> 0.0.1"},
       {:logger_file_backend_with_formatters, "~> 0.0.1", only: [:dev, :test]},
       {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.4", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},

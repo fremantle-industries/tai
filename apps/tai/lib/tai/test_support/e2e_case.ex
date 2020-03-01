@@ -28,13 +28,15 @@ defmodule Tai.TestSupport.E2ECase do
 
       def start_app do
         {:ok, _} = Application.ensure_all_started(:echo_boy)
+        {:ok, _} = Application.ensure_all_started(:tai_events)
+        TaiEvents.firehose_subscribe()
         {:ok, _} = e2e_app() |> Application.ensure_all_started()
         Tai.Settings.enable_send_orders!()
-        Tai.Events.firehose_subscribe()
       end
 
       def stop_app do
         :ok = Application.stop(:echo_boy)
+        :ok = Application.stop(:tai_events)
         :ok = Application.stop(:tai)
         :ok = e2e_app() |> Application.stop()
       end

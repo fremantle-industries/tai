@@ -6,6 +6,7 @@ defmodule Tai.Trading.Orders.AmendBulkTest do
 
   setup do
     on_exit(fn ->
+      :ok = Application.stop(:tai_events)
       :ok = Application.stop(:tai)
     end)
 

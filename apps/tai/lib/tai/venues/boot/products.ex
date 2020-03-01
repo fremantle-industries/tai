@@ -8,7 +8,7 @@ defmodule Tai.Venues.Boot.Products do
       filtered_products = filter(all_products, venue.products)
       Enum.each(filtered_products, &Tai.Venues.ProductStore.upsert/1)
 
-      Tai.Events.info(%Tai.Events.HydrateProducts{
+      TaiEvents.info(%Tai.Events.HydrateProducts{
         venue_id: venue.id,
         total: all_products |> Enum.count(),
         filtered: filtered_products |> Enum.count()

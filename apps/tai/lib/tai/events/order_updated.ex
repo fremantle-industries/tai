@@ -69,7 +69,7 @@ defmodule Tai.Events.OrderUpdated do
   )a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.OrderUpdated do
+defimpl TaiEvents.LogEvent, for: Tai.Events.OrderUpdated do
   def to_data(event) do
     keys =
       event

@@ -6,7 +6,7 @@ defmodule Tai.Events.StreamDisconnect do
   defstruct ~w(venue reason)a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.StreamDisconnect do
+defimpl TaiEvents.LogEvent, for: Tai.Events.StreamDisconnect do
   def to_data(event) do
     keys =
       event

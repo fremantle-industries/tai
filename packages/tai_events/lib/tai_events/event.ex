@@ -1,11 +1,11 @@
-defmodule Tai.Event do
+defmodule TaiEvents.Event do
   @type t :: struct
 
   @spec encode!(t) :: iodata | no_return
   def encode!(event) when is_map(event) do
     %{
       type: event |> extract_type,
-      data: event |> Tai.LogEvent.to_data()
+      data: event |> TaiEvents.LogEvent.to_data()
     }
     |> Jason.encode!()
   end
@@ -15,6 +15,5 @@ defmodule Tai.Event do
     |> Map.fetch!(:__struct__)
     |> Atom.to_string()
     |> String.replace("Elixir.", "")
-    |> String.replace("Tai.Events.", "Tai.")
   end
 end

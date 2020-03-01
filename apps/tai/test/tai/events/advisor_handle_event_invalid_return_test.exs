@@ -5,7 +5,7 @@ defmodule Tai.Events.AdvisorHandleEventInvalidReturnTest do
     attrs = [event: {:some, :event}, return_value: {:some, :return}]
     event = struct(Tai.Events.AdvisorHandleEventInvalidReturn, attrs)
 
-    assert %{} = json = Tai.LogEvent.to_data(event)
+    assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.event == "{:some, :event}"
     assert json.return_value == "{:some, :return}"
   end

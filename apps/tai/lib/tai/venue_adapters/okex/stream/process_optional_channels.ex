@@ -1,6 +1,6 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels do
   use GenServer
-  alias Tai.{Events, VenueAdapters.OkEx.Stream}
+  alias Tai.VenueAdapters.OkEx.Stream
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
@@ -40,12 +40,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels do
   end
 
   def handle_cast({msg, received_at}, state) do
-    %Events.StreamMessageUnhandled{
+    %Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: received_at
     }
-    |> Events.warn()
+    |> TaiEvents.warn()
 
     {:noreply, state}
   end

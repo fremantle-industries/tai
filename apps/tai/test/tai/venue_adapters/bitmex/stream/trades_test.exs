@@ -2,16 +2,15 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.TradeTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels
-  alias Tai.Events
 
   setup do
-    start_supervised!({Tai.Events, 1})
+    start_supervised!({TaiEvents, 1})
     start_supervised!({ProcessOptionalChannels, [venue_id: :my_venue]})
     :ok
   end
 
   test "broadcasts an event when public trade is received" do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     venue_trade_id = Ecto.UUID.generate()
 
     venue_trades = [
@@ -35,6 +34,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.TradeTest do
       {%{"table" => "trade", "action" => "insert", "data" => venue_trades}, :ignore}
     )
 
-    assert_event(%Events.Trade{venue_trade_id: venue_trade_id})
+    assert_event(%Tai.Events.Trade{venue_trade_id: venue_trade_id})
   end
 end

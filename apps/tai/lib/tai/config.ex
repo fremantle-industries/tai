@@ -7,7 +7,6 @@ defmodule Tai.Config do
           adapter_timeout: pos_integer,
           advisor_groups: map,
           broadcast_change_set: boolean,
-          event_registry_partitions: pos_integer,
           send_orders: boolean,
           system_bus_registry_partitions: pos_integer,
           venue_boot_handler: module,
@@ -17,7 +16,6 @@ defmodule Tai.Config do
   @enforce_keys ~w(
     adapter_timeout
     advisor_groups
-    event_registry_partitions
     send_orders
     system_bus_registry_partitions
     venue_boot_handler
@@ -27,7 +25,6 @@ defmodule Tai.Config do
     adapter_timeout
     advisor_groups
     broadcast_change_set
-    event_registry_partitions
     send_orders
     system_bus_registry_partitions
     venue_boot_handler
@@ -41,7 +38,6 @@ defmodule Tai.Config do
       adapter_timeout: get(env, :adapter_timeout, 10_000),
       advisor_groups: get(env, :advisor_groups, %{}),
       broadcast_change_set: !!get(env, :broadcast_change_set),
-      event_registry_partitions: get(env, :event_registry_partitions, schedulers_online),
       send_orders: !!get(env, :send_orders),
       system_bus_registry_partitions:
         get(env, :system_bus_registry_partitions, schedulers_online),

@@ -2,7 +2,6 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   use WebSockex
   alias Tai.Trading.OrderStore
   alias Tai.Markets.OrderBook
-  alias Tai.Events
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
@@ -36,18 +35,18 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
   def handle_connect(_conn, state) do
-    %Events.StreamConnect{venue: state.venue_id}
-    |> Events.info()
+    %Tai.Events.StreamConnect{venue: state.venue_id}
+    |> TaiEvents.info()
 
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    %Events.StreamDisconnect{
+    %Tai.Events.StreamDisconnect{
       venue: state.venue_id,
       reason: conn_status.reason
     }
-    |> Events.info()
+    |> TaiEvents.info()
 
     {:ok, state}
   end
@@ -149,12 +148,12 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   end
 
   defp handle_msg(msg, state) do
-    %Events.StreamMessageUnhandled{
+    %Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue_id,
       msg: msg,
       received_at: Timex.now()
     }
-    |> Events.warn()
+    |> TaiEvents.warn()
   end
 
   defp normalize_snapshot_changes(venue_price_points, side) do

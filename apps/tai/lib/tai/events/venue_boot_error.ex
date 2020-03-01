@@ -8,7 +8,7 @@ defmodule Tai.Events.VenueBootError do
   defstruct ~w(venue reason)a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.VenueBootError do
+defimpl TaiEvents.LogEvent, for: Tai.Events.VenueBootError do
   def to_data(event) do
     keys =
       event

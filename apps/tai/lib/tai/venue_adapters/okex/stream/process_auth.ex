@@ -1,6 +1,5 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   use GenServer
-  alias Tai.Events
   alias Tai.VenueAdapters.OkEx.{ClientId, Stream}
 
   defmodule State do
@@ -53,12 +52,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   end
 
   def handle_cast({msg, received_at}, state) do
-    %Events.StreamMessageUnhandled{
+    %Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: received_at
     }
-    |> Events.warn()
+    |> TaiEvents.warn()
 
     {:noreply, state}
   end
@@ -75,11 +74,11 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   end
 
   def handle_info({:DOWN, reference, :process, _pid, reason}, state) do
-    %Events.StreamError{
+    %Tai.Events.StreamError{
       venue_id: state.venue,
       reason: reason
     }
-    |> Events.error()
+    |> TaiEvents.error()
 
     new_tasks = state.tasks |> Map.delete(reference)
     new_state = state |> Map.put(:tasks, new_tasks)
@@ -95,7 +94,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   end
 
   defp notify({:error, {:invalid_status, was, required, %action_name{} = action}}) do
-    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
+    TaiEvents.warn(%Tai.Events.OrderUpdateInvalidStatus{
       was: was,
       required: required,
       client_id: action.client_id,
@@ -104,7 +103,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
   end
 
   defp notify({:error, {:not_found, %action_name{} = action}}) do
-    Tai.Events.warn(%Tai.Events.OrderUpdateNotFound{
+    TaiEvents.warn(%Tai.Events.OrderUpdateNotFound{
       client_id: action.client_id,
       action: action_name
     })

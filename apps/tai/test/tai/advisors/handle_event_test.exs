@@ -51,6 +51,7 @@ defmodule Tai.Advisors.HandleEventTest do
 
   setup do
     on_exit(fn ->
+      :ok = Application.stop(:tai_events)
       :ok = Application.stop(:tai)
     end)
 
@@ -80,13 +81,13 @@ defmodule Tai.Advisors.HandleEventTest do
   end
 
   test "emits an event and maintains state between callbacks when return is invalid" do
-    Tai.Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
 
     send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {
-      Tai.Event,
+      TaiEvents.Event,
       %Tai.Events.AdvisorHandleEventInvalidReturn{} = event,
       :warn
     }
@@ -98,18 +99,18 @@ defmodule Tai.Advisors.HandleEventTest do
 
     send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
 
-    assert_receive {Tai.Event, %Tai.Events.AdvisorHandleEventInvalidReturn{} = event_2, _}
+    assert_receive {TaiEvents.Event, %Tai.Events.AdvisorHandleEventInvalidReturn{} = event_2, _}
     assert event_2.return_value == {:unknown, :return_val}
   end
 
   test "emits an event and maintains state between callbacks when an error is raised" do
-    Tai.Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     start_advisor!(MyAdvisor, %{error: "!!!This is an ERROR!!!"})
 
     send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {
-      Tai.Event,
+      TaiEvents.Event,
       %Tai.Events.AdvisorHandleEventError{} = event_1,
       :warn
     }
@@ -130,7 +131,7 @@ defmodule Tai.Advisors.HandleEventTest do
     send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {
-      Tai.Event,
+      TaiEvents.Event,
       %Tai.Events.AdvisorHandleEventError{} = event_2,
       :warn
     }

@@ -1,7 +1,6 @@
 defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   use WebSockex
   alias Tai.VenueAdapters.Gdax.Stream
-  alias Tai.Events
 
   defmodule State do
     @type product :: Tai.Venues.Product.t()
@@ -62,13 +61,13 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   end
 
   def handle_connect(_conn, state) do
-    Events.info(%Events.StreamConnect{venue: state.venue})
+    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    Events.info(%Events.StreamDisconnect{
+    TaiEvents.info(%Tai.Events.StreamDisconnect{
       venue: state.venue,
       reason: conn_status.reason
     })

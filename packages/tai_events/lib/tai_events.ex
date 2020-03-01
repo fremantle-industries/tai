@@ -1,5 +1,5 @@
-defmodule Tai.Events do
-  @type event :: Tai.Event.t()
+defmodule TaiEvents do
+  @type event :: TaiEvents.Event.t()
   @type event_type :: module
   @type partitions :: pos_integer
   @type level :: :debug | :info | :warn | :error
@@ -43,7 +43,7 @@ defmodule Tai.Events do
   @spec broadcast(event, level) :: :ok
   def broadcast(event, level) do
     event_type = Map.fetch!(event, :__struct__)
-    msg = {Tai.Event, event, level}
+    msg = {TaiEvents.Event, event, level}
 
     Registry.dispatch(__MODULE__, event_type, fn entries ->
       for {pid, _} <- entries, do: send(pid, msg)

@@ -13,10 +13,10 @@ defmodule Tai.EventsLogger do
   end
 
   @type event :: map
-  @type level :: Tai.Events.level()
+  @type level :: TaiEvents.level()
 
   @default_id :default
-  @default_events Tai.Events
+  @default_events TaiEvents
 
   def start_link(args) do
     id = Keyword.get(args, :id, @default_id)
@@ -33,24 +33,24 @@ defmodule Tai.EventsLogger do
     {:ok, state}
   end
 
-  @spec handle_info({Tai.Event, event, level}, State.t()) :: {:noreply, State.t()}
-  def handle_info({Tai.Event, event, :error}, state) do
-    event |> Tai.Event.encode!() |> Logger.error()
+  @spec handle_info({TaiEvents.Event, event, level}, State.t()) :: {:noreply, State.t()}
+  def handle_info({TaiEvents.Event, event, :error}, state) do
+    event |> TaiEvents.Event.encode!() |> Logger.error()
     {:noreply, state}
   end
 
-  def handle_info({Tai.Event, event, :warn}, state) do
-    event |> Tai.Event.encode!() |> Logger.warn()
+  def handle_info({TaiEvents.Event, event, :warn}, state) do
+    event |> TaiEvents.Event.encode!() |> Logger.warn()
     {:noreply, state}
   end
 
-  def handle_info({Tai.Event, event, :info}, state) do
-    event |> Tai.Event.encode!() |> Logger.info()
+  def handle_info({TaiEvents.Event, event, :info}, state) do
+    event |> TaiEvents.Event.encode!() |> Logger.info()
     {:noreply, state}
   end
 
-  def handle_info({Tai.Event, event, :debug}, state) do
-    event |> Tai.Event.encode!() |> Logger.debug()
+  def handle_info({TaiEvents.Event, event, :debug}, state) do
+    event |> TaiEvents.Event.encode!() |> Logger.debug()
     {:noreply, state}
   end
 end

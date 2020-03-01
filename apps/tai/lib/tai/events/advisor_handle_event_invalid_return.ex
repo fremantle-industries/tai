@@ -14,7 +14,7 @@ defmodule Tai.Events.AdvisorHandleEventInvalidReturn do
   defstruct ~w(advisor_id group_id event return_value)a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.AdvisorHandleEventInvalidReturn do
+defimpl TaiEvents.LogEvent, for: Tai.Events.AdvisorHandleEventInvalidReturn do
   def to_data(event) do
     keys =
       event

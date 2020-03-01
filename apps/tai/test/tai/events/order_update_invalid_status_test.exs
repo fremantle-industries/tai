@@ -15,7 +15,7 @@ defmodule Tai.Events.OrderUpdateInvalidStatusTest do
         last_venue_timestamp: last_venue_timestamp
       )
 
-    assert %{} = json = Tai.LogEvent.to_data(event)
+    assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.client_id == "my_client_id"
     assert json.action == MyAction
     assert json.was == :was_status

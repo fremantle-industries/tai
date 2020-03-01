@@ -7,7 +7,7 @@ defmodule Tai.Events.VenueBootErrorTest do
       reason: [accounts: :mock_not_found]
     }
 
-    assert Tai.LogEvent.to_data(event) == %{
+    assert TaiEvents.LogEvent.to_data(event) == %{
              venue: :my_venue,
              reason: "[accounts: :mock_not_found]"
            }

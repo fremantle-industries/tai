@@ -18,7 +18,7 @@ defmodule Tai.Events.TradeTest do
         venue_trade_id: venue_trade_id
       })
 
-    assert %{} = json = Tai.LogEvent.to_data(event)
+    assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.venue_id == :my_venue
     assert json.symbol == :btc_usd
     assert json.received_at == received_at

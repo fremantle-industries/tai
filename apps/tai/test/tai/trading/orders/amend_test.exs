@@ -6,6 +6,7 @@ defmodule Tai.Trading.Orders.AmendTest do
 
   setup do
     on_exit(fn ->
+      :ok = Application.stop(:tai_events)
       :ok = Application.stop(:tai)
     end)
 
@@ -57,7 +58,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         amend_price = Decimal.new("105.5")
         amend_qty = Decimal.new(10)
         GoodTillCancel.amend_price_and_qty(open_order, amend_price, amend_qty)
-        Tai.Events.firehose_subscribe()
+        TaiEvents.firehose_subscribe()
 
         assert {:ok, %Tai.Trading.Order{} = returned_order} =
                  Tai.Trading.Orders.amend(open_order, %{
@@ -142,7 +143,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         amend_price = Decimal.new("105.5")
         amend_qty = Decimal.new(10)
         GoodTillCancel.amend_price_and_qty(open_order, amend_price, amend_qty)
-        Tai.Events.firehose_subscribe()
+        TaiEvents.firehose_subscribe()
 
         assert {:ok, %Tai.Trading.Order{} = returned_order} =
                  Tai.Trading.Orders.amend(open_order, %{

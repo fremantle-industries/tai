@@ -37,7 +37,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOptionalChannels do
       venue_symbols: venue_symbols,
       received_at: received_at
     }
-    |> Tai.Events.info()
+    |> TaiEvents.info()
 
     {:noreply, state}
   end
@@ -48,7 +48,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOptionalChannels do
       msg: msg,
       received_at: received_at
     }
-    |> Tai.Events.warn()
+    |> TaiEvents.warn()
 
     {:noreply, state}
   end

@@ -1,4 +1,4 @@
-defmodule Tai.EventsTest do
+defmodule TaiEventsTest do
   use ExUnit.Case, async: false
 
   defmodule MyEvent do
@@ -11,11 +11,11 @@ defmodule Tai.EventsTest do
 
   describe ".firehose_subscribe/0" do
     test "creates a registry entry for the :firehose topic" do
-      start_supervised!({Tai.Events, 1})
+      start_supervised!({TaiEvents, 1})
 
-      Tai.Events.firehose_subscribe()
+      TaiEvents.firehose_subscribe()
 
-      Registry.dispatch(Tai.Events, :firehose, fn entries ->
+      Registry.dispatch(TaiEvents, :firehose, fn entries ->
         for {pid, _} <- entries, do: send(pid, :firehose)
       end)
 
@@ -27,15 +27,15 @@ defmodule Tai.EventsTest do
     test "creates a registry entry for all events of the given type" do
       event = %MyEvent{}
       other_event = %MyOtherEvent{}
-      start_supervised!({Tai.Events, 1})
+      start_supervised!({TaiEvents, 1})
 
-      Tai.Events.subscribe(MyEvent)
+      TaiEvents.subscribe(MyEvent)
 
-      Registry.dispatch(Tai.Events, MyEvent, fn entries ->
+      Registry.dispatch(TaiEvents, MyEvent, fn entries ->
         for {pid, _} <- entries, do: send(pid, event)
       end)
 
-      Registry.dispatch(Tai.Events, MyOtherEvent, fn entries ->
+      Registry.dispatch(TaiEvents, MyOtherEvent, fn entries ->
         for {pid, _} <- entries, do: send(pid, other_event)
       end)
 
@@ -53,30 +53,30 @@ defmodule Tai.EventsTest do
         level = @level
         event = %MyEvent{}
         other_event = %MyOtherEvent{}
-        start_supervised!({Tai.Events, 1})
+        start_supervised!({TaiEvents, 1})
 
-        Registry.register(Tai.Events, MyEvent, [])
+        Registry.register(TaiEvents, MyEvent, [])
 
-        apply(Tai.Events, @level, [event])
-        apply(Tai.Events, @level, [other_event])
+        apply(TaiEvents, @level, [event])
+        apply(TaiEvents, @level, [other_event])
 
-        assert_receive {Tai.Event, %MyEvent{}, ^level}
-        refute_receive {Tai.Event, %MyOtherEvent{}, ^level}
+        assert_receive {TaiEvents.Event, %MyEvent{}, ^level}
+        refute_receive {TaiEvents.Event, %MyOtherEvent{}, ^level}
       end
 
       test "sends the event to firehose subscribers" do
         level = @level
         event = %MyEvent{}
         other_event = %MyOtherEvent{}
-        start_supervised!({Tai.Events, 1})
+        start_supervised!({TaiEvents, 1})
 
-        Registry.register(Tai.Events, :firehose, [])
+        Registry.register(TaiEvents, :firehose, [])
 
-        apply(Tai.Events, level, [event])
-        apply(Tai.Events, level, [other_event])
+        apply(TaiEvents, level, [event])
+        apply(TaiEvents, level, [other_event])
 
-        assert_receive {Tai.Event, %MyEvent{}, ^level}
-        assert_receive {Tai.Event, %MyOtherEvent{}, ^level}
+        assert_receive {TaiEvents.Event, %MyEvent{}, ^level}
+        assert_receive {TaiEvents.Event, %MyOtherEvent{}, ^level}
       end
     end
   end)

@@ -1,6 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   use WebSockex
-  alias Tai.{Events, VenueAdapters.Bitmex.Stream}
+  alias Tai.VenueAdapters.Bitmex.Stream
 
   defmodule State do
     @type product :: Tai.Venues.Product.t()
@@ -72,13 +72,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   def handle_connect(_conn, state) do
-    Events.info(%Events.StreamConnect{venue: state.venue})
+    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    Events.info(%Events.StreamDisconnect{
+    TaiEvents.info(%Tai.Events.StreamDisconnect{
       venue: state.venue,
       reason: conn_status.reason
     })
@@ -106,7 +106,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
       if Enum.member?(@optional_channels, c) do
         send(self(), {:subscribe, c})
       else
-        Events.warn(%Events.StreamChannelInvalid{
+        TaiEvents.warn(%Tai.Events.StreamChannelInvalid{
           venue: state.venue,
           name: c,
           available: @optional_channels
@@ -244,7 +244,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   defp handle_msg(msg, state)
 
   defp handle_msg(%{"limit" => %{"remaining" => remaining}, "version" => _}, state) do
-    Events.info(%Events.BitmexStreamConnectionLimitDetails{
+    TaiEvents.info(%Tai.Events.BitmexStreamConnectionLimitDetails{
       venue_id: state.venue,
       remaining: remaining
     })

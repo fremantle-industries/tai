@@ -4,7 +4,8 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
 
   setup_all do
     on_exit(fn ->
-      Application.stop(:tai)
+      :ok = Application.stop(:tai)
+      :ok = Application.stop(:tai_events)
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)

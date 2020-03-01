@@ -2,7 +2,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.TradesTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Binance.Stream.ProcessOptionalChannels
-  alias Tai.{Events, Venues}
+  alias Tai.Venues
 
   setup do
     product =
@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.TradesTest do
         venue_symbol: "BNBBTC"
       })
 
-    start_supervised!({Tai.Events, 1})
+    start_supervised!({TaiEvents, 1})
     start_supervised!({ProcessOptionalChannels, [venue_id: product.venue_id]})
     start_supervised!(Venues.ProductStore)
     Venues.ProductStore.upsert(product)
@@ -21,7 +21,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.TradesTest do
   end
 
   test "broadcasts an event when public trade is received", %{product: product} do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
     venue_trade_id = 42
 
     msg = %{
@@ -42,6 +42,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.TradesTest do
     |> ProcessOptionalChannels.to_name()
     |> GenServer.cast({msg, :ignore})
 
-    assert_event(%Events.Trade{venue_trade_id: venue_trade_id})
+    assert_event(%Tai.Events.Trade{venue_trade_id: venue_trade_id})
   end
 end

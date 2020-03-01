@@ -8,7 +8,6 @@ defmodule Tai.Application do
 
     children = [
       {Tai.SystemBus, config.system_bus_registry_partitions},
-      {Tai.Events, config.event_registry_partitions},
       Tai.EventsLogger,
       {Tai.Settings, config},
       Tai.Trading.PositionStore,

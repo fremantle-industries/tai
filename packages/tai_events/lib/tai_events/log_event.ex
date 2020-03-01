@@ -1,9 +1,9 @@
-defprotocol Tai.LogEvent do
+defprotocol TaiEvents.LogEvent do
   @fallback_to_any true
   def to_data(event)
 end
 
-defimpl Tai.LogEvent, for: Any do
+defimpl TaiEvents.LogEvent, for: Any do
   def to_data(event) do
     keys =
       event

@@ -11,7 +11,6 @@ defmodule Tai.ConfigTest do
       assert config.advisor_groups == %{}
       assert config.adapter_timeout == 10_000
       assert config.broadcast_change_set == false
-      assert config.event_registry_partitions == System.schedulers_online()
       assert config.system_bus_registry_partitions == System.schedulers_online()
     end
 
@@ -23,11 +22,6 @@ defmodule Tai.ConfigTest do
     test "can set adapter_timeout" do
       assert config = Tai.Config.parse(adapter_timeout: 5000)
       assert config.adapter_timeout == 5000
-    end
-
-    test "can set event_registry_partitions" do
-      assert config = Tai.Config.parse(event_registry_partitions: 1)
-      assert config.event_registry_partitions == 1
     end
 
     test "can set venue_boot_handler" do

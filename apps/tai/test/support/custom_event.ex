@@ -6,6 +6,6 @@ defmodule Support.CustomEvent do
   defstruct ~w(hello)a
 end
 
-defimpl Tai.LogEvent, for: Support.CustomEvent do
+defimpl TaiEvents.LogEvent, for: Support.CustomEvent do
   def to_data(_event), do: %{hello: :custom}
 end

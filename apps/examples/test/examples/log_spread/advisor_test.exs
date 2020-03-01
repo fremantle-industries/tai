@@ -13,7 +13,7 @@ defmodule Examples.LogSpread.AdvisorTest do
   test "logs the bid/ask spread via a custom event" do
     push_stream_market_data({@scenario, :snapshot, :test_exchange_a, :btc_usd})
 
-    assert_receive {Tai.Event, %Examples.LogSpread.Events.Spread{} = event, _}
+    assert_receive {TaiEvents.Event, %Examples.LogSpread.Events.Spread{} = event, _}
     assert event.venue_id == :test_exchange_a
     assert event.product_symbol == :btc_usd
     assert event.bid_price == Decimal.new("6500.1")

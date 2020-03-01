@@ -15,7 +15,8 @@ defmodule Tai.Venues.Boot.PositionsTest do
 
   setup do
     on_exit(fn ->
-      Application.stop(:tai)
+      :ok = Application.stop(:tai_events)
+      :ok = Application.stop(:tai)
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)
@@ -36,11 +37,11 @@ defmodule Tai.Venues.Boot.PositionsTest do
       )
 
     %{my_venue: venue} = Tai.Venues.Config.parse(config)
-    Tai.Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
 
     Tai.Venues.Boot.Positions.hydrate(venue)
 
-    assert_receive {Tai.Event, %Tai.Events.HydratePositions{} = event, _}
+    assert_receive {TaiEvents.Event, %Tai.Events.HydratePositions{} = event, _}
     assert event.venue_id == :my_venue
     assert event.total == 2
   end

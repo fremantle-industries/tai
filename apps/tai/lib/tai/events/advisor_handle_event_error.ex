@@ -27,7 +27,7 @@ defmodule Tai.Events.AdvisorHandleEventError do
   )a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.AdvisorHandleEventError do
+defimpl TaiEvents.LogEvent, for: Tai.Events.AdvisorHandleEventError do
   def to_data(event) do
     keys =
       event
