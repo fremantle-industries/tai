@@ -75,6 +75,10 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   @spec to_name(venue) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
+  def terminate(close_reason, state) do
+    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+  end
+
   def handle_connect(_conn, state) do
     TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
