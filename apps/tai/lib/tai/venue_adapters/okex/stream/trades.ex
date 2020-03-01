@@ -1,5 +1,4 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
-  alias Tai.Events
   import Tai.VenueAdapters.OkEx.Products, only: [to_symbol: 1]
 
   def broadcast(
@@ -14,7 +13,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
         venue_id,
         received_at
       ) do
-    Events.info(%Events.Trade{
+    TaiEvents.info(%Tai.Events.Trade{
       venue_id: venue_id,
       symbol: instrument_id |> to_symbol,
       received_at: received_at,
@@ -38,7 +37,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
         venue_id,
         received_at
       ) do
-    Events.info(%Events.Trade{
+    TaiEvents.info(%Tai.Events.Trade{
       venue_id: venue_id,
       symbol: instrument_id |> to_symbol,
       received_at: received_at,

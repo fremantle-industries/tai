@@ -11,7 +11,7 @@ defmodule Tai.Events.StreamError do
   defstruct ~w(venue_id reason)a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.StreamError do
+defimpl TaiEvents.LogEvent, for: Tai.Events.StreamError do
   def to_data(event) do
     keys =
       event

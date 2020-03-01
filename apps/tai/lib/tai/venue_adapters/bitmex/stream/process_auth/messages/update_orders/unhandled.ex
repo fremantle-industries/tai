@@ -11,7 +11,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
       msg: message.data,
       received_at: received_at
     }
-    |> Tai.Events.warn()
+    |> TaiEvents.warn()
 
     :ok
   end

@@ -50,7 +50,7 @@ defmodule Tai.AdvisorTest do
     trades = Keyword.get(opts, :trades, [])
     run_store = Keyword.get(opts, :store, %{})
 
-    start_supervised!({Tai.Events, 1})
+    start_supervised!({TaiEvents, 1})
 
     start_supervised!(
       {advisor,

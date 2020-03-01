@@ -2,7 +2,6 @@ defmodule Tai.Trading.Orders.AmendErrorTest do
   use ExUnit.Case, async: false
   alias Tai.Trading.OrderSubmissions.SellLimitGtc
   alias Tai.Trading.{Order, Orders, OrderStore}
-  alias Tai.Events
   alias Tai.TestSupport.Mocks
 
   defmodule TestFilledProvider do
@@ -41,6 +40,7 @@ defmodule Tai.Trading.Orders.AmendErrorTest do
 
   setup do
     on_exit(fn ->
+      :ok = Application.stop(:tai_events)
       :ok = Application.stop(:tai)
     end)
 
@@ -68,11 +68,11 @@ defmodule Tai.Trading.Orders.AmendErrorTest do
     end
 
     test "emits an invalid status warning", %{order: order} do
-      Tai.Events.firehose_subscribe()
+      TaiEvents.firehose_subscribe()
 
       Orders.amend(order, %{})
 
-      assert_receive {Tai.Event, %Tai.Events.OrderUpdateInvalidStatus{} = event, :warn}
+      assert_receive {TaiEvents.Event, %Tai.Events.OrderUpdateInvalidStatus{} = event, :warn}
       assert event.action == OrderStore.Actions.PendAmend
     end
   end
@@ -80,7 +80,7 @@ defmodule Tai.Trading.Orders.AmendErrorTest do
   test "invalid amend status emits an event" do
     open_order = struct(Order, client_id: "abc123", venue_order_id: @venue_order_id)
     Mocks.Responses.Orders.GoodTillCancel.amend_price(open_order, Decimal.new(1))
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
 
     Orders.amend(
       open_order,
@@ -89,8 +89,8 @@ defmodule Tai.Trading.Orders.AmendErrorTest do
     )
 
     assert_receive {
-      Tai.Event,
-      %Events.OrderUpdateInvalidStatus{} = amend_invalid_event,
+      TaiEvents.Event,
+      %Tai.Events.OrderUpdateInvalidStatus{} = amend_invalid_event,
       :warn
     }
 

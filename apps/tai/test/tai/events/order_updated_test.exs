@@ -25,7 +25,7 @@ defmodule Tai.Events.OrderUpdatedTest do
 
     event = struct!(Tai.Events.OrderUpdated, attrs)
 
-    assert %{} = json = Tai.LogEvent.to_data(event)
+    assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.client_id == "my_client_id"
     assert json.venue_id == :my_venue
     assert json.credential_id == :my_credential
@@ -61,7 +61,7 @@ defmodule Tai.Events.OrderUpdatedTest do
 
     event = struct!(Tai.Events.OrderUpdated, attrs)
 
-    assert %{} = json = Tai.LogEvent.to_data(event)
+    assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.venue_order_id == nil
     assert json.enqueued_at == "2013-01-23T23:50:07.123Z"
     assert json.last_received_at == "2014-01-23T23:50:07.123Z"

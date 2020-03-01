@@ -26,7 +26,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
         {%{"table" => "publicNotifications", "data" => data, "action" => action}, _received_at},
         state
       ) do
-    Tai.Events.info(%Tai.Events.Bitmex.PublicNotifications{
+    TaiEvents.info(%Tai.Events.Bitmex.PublicNotifications{
       venue_id: state.venue,
       action: action,
       data: data
@@ -92,7 +92,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
       msg: msg,
       received_at: received_at
     }
-    |> Tai.Events.warn()
+    |> TaiEvents.warn()
 
     {:noreply, state}
   end

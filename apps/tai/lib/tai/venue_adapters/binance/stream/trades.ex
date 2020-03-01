@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Trades do
     {:ok, product} = Tai.Venues.ProductStore.find_by_venue_symbol({venue_id, venue_symbol})
     {:ok, timestamp} = DateTime.from_unix(unix_timestamp, :millisecond)
 
-    Tai.Events.info(%Tai.Events.Trade{
+    TaiEvents.info(%Tai.Events.Trade{
       venue_id: venue_id,
       symbol: product.symbol,
       received_at: received_at,

@@ -5,6 +5,7 @@ defmodule Tai.Trading.Orders.CreateOpenTest do
 
   setup do
     on_exit(fn ->
+      :ok = Application.stop(:tai_events)
       :ok = Application.stop(:tai)
     end)
 

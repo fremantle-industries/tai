@@ -10,7 +10,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Funding do
         venue_id,
         received_at
       ) do
-    Tai.Events.info(%Tai.Events.Funding{
+    TaiEvents.info(%Tai.Events.Funding{
       venue_id: venue_id,
       # TODO: The list of products or a map of exchange symbol to symbol should be passed in
       symbol: venue_symbol |> normalize_symbol,

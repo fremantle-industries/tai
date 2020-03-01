@@ -93,7 +93,7 @@ defmodule Tai.Trading.Orders.Cancel do
   end
 
   defp warn_invalid_status(was, required, %action_name{} = action) do
-    Tai.Events.warn(%Tai.Events.OrderUpdateInvalidStatus{
+    TaiEvents.warn(%Tai.Events.OrderUpdateInvalidStatus{
       was: was,
       required: required,
       client_id: action.client_id,

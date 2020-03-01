@@ -1,5 +1,4 @@
 defmodule Tai.Trading.NotifyOrderUpdate do
-  alias Tai.Events
   alias Tai.Trading.Order
 
   @type order :: Order.t()
@@ -17,7 +16,7 @@ defmodule Tai.Trading.NotifyOrderUpdate do
   end
 
   defp broadcast(order) do
-    %Events.OrderUpdated{
+    %Tai.Events.OrderUpdated{
       client_id: order.client_id,
       venue_id: order.venue_id,
       credential_id: order.credential_id,
@@ -39,7 +38,7 @@ defmodule Tai.Trading.NotifyOrderUpdate do
       updated_at: order.updated_at,
       close: order.close
     }
-    |> Events.info()
+    |> TaiEvents.info()
   end
 
   defp callback(_, %Order{order_updated_callback: nil}), do: :ok

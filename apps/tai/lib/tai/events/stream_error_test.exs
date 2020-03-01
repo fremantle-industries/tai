@@ -7,7 +7,7 @@ defmodule Tai.Events.StreamErrorTest do
       reason: {:function_clause, "Some error"}
     }
 
-    assert Tai.LogEvent.to_data(event) == %{
+    assert TaiEvents.LogEvent.to_data(event) == %{
              venue_id: :my_venue,
              reason: ~s({:function_clause, "Some error"})
            }

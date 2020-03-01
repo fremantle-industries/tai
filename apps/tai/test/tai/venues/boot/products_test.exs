@@ -14,7 +14,8 @@ defmodule Tai.Venues.Boot.ProductsTest do
 
   setup do
     on_exit(fn ->
-      Application.stop(:tai)
+      :ok = Application.stop(:tai_events)
+      :ok = Application.stop(:tai)
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)
@@ -44,11 +45,11 @@ defmodule Tai.Venues.Boot.ProductsTest do
       )
 
     %{my_venue: venue} = Tai.Venues.Config.parse(config)
-    Tai.Events.subscribe(Tai.Events.HydrateProducts)
+    TaiEvents.subscribe(Tai.Events.HydrateProducts)
 
     Tai.Venues.Boot.Products.hydrate(venue)
 
-    assert_receive {Tai.Event,
+    assert_receive {TaiEvents.Event,
                     %Tai.Events.HydrateProducts{
                       venue_id: :my_venue,
                       total: 2,

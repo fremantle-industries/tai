@@ -5,7 +5,7 @@ defmodule Tai.EventsLoggerTest do
   @event %Support.CustomEvent{hello: "world"}
 
   setup do
-    start_supervised!({Tai.Events, 1})
+    start_supervised!({TaiEvents, 1})
 
     :ok
   end
@@ -21,7 +21,7 @@ defmodule Tai.EventsLoggerTest do
     logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
     assert capture_log(fn ->
-             send(logger, {Tai.Event, @event, :error})
+             send(logger, {TaiEvents.Event, @event, :error})
              :timer.sleep(100)
            end) =~ "[error] {\"data\":{\"hello\":\"custom\"},\"type\":\"Support.CustomEvent\"}"
   end
@@ -30,7 +30,7 @@ defmodule Tai.EventsLoggerTest do
     logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
     assert capture_log(fn ->
-             send(logger, {Tai.Event, @event, :warn})
+             send(logger, {TaiEvents.Event, @event, :warn})
              :timer.sleep(100)
            end) =~ "[warn]  {\"data\":{\"hello\":\"custom\"},\"type\":\"Support.CustomEvent\"}"
   end
@@ -39,7 +39,7 @@ defmodule Tai.EventsLoggerTest do
     logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
     assert capture_log(fn ->
-             send(logger, {Tai.Event, @event, :info})
+             send(logger, {TaiEvents.Event, @event, :info})
              :timer.sleep(100)
            end) =~ "[info]  {\"data\":{\"hello\":\"custom\"},\"type\":\"Support.CustomEvent\"}"
   end
@@ -48,7 +48,7 @@ defmodule Tai.EventsLoggerTest do
     logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
     assert capture_log(fn ->
-             send(logger, {Tai.Event, @event, :debug})
+             send(logger, {TaiEvents.Event, @event, :debug})
              :timer.sleep(100)
            end) =~ "[debug] {\"data\":{\"hello\":\"custom\"},\"type\":\"Support.CustomEvent\"}"
   end

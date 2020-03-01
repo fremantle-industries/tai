@@ -31,7 +31,7 @@ defmodule Examples.LogSpread.Events.Spread do
   )a
 end
 
-defimpl Tai.LogEvent, for: Examples.LogSpread.Events.Spread do
+defimpl TaiEvents.LogEvent, for: Examples.LogSpread.Events.Spread do
   def to_data(event) do
     keys =
       event

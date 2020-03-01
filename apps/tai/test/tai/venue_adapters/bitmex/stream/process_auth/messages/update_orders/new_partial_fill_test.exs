@@ -4,7 +4,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
   alias Tai.VenueAdapters.Bitmex.ClientId
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
   alias Tai.Trading.OrderStore
-  alias Tai.Events
 
   setup do
     on_exit(fn ->
@@ -12,7 +11,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
     end)
 
     {:ok, _} = Application.ensure_all_started(:tzdata)
-    start_supervised!({Tai.Events, 1})
+    start_supervised!({TaiEvents, 1})
     start_supervised!(Tai.Trading.OrderStore)
 
     :ok
@@ -24,7 +23,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
   @state struct(ProcessAuth.State, venue_id: :my_venue)
 
   test ".process/3 passively fills the order" do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
 
     assert {:ok, order} = enqueue()
 
@@ -47,7 +46,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
 
     ProcessAuth.Message.process(msg, @received_at, @state)
 
-    assert_event(%Events.OrderUpdated{status: :partially_filled} = partially_filled_event)
+    assert_event(%Tai.Events.OrderUpdated{status: :partially_filled} = partially_filled_event)
     assert partially_filled_event.client_id == order.client_id
     assert partially_filled_event.venue_id == :my_venue
     assert partially_filled_event.cumulative_qty == Decimal.new(15)
@@ -58,7 +57,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
   end
 
   test ".process/3 broadcasts an invalid status warning" do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
 
     assert {:ok, order} = enqueue()
 
@@ -75,7 +74,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
 
     ProcessAuth.Message.process(msg, @received_at, @state)
 
-    assert_event(%Events.OrderUpdateInvalidStatus{} = invalid_status_event)
+    assert_event(%Tai.Events.OrderUpdateInvalidStatus{} = invalid_status_event)
     assert invalid_status_event.action == Tai.Trading.OrderStore.Actions.PassivePartialFill
     assert invalid_status_event.was == :skip
 
@@ -91,7 +90,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
   end
 
   test ".process/3 broadcasts a not found warning" do
-    Events.firehose_subscribe()
+    TaiEvents.firehose_subscribe()
 
     msg =
       struct(ProcessAuth.Messages.UpdateOrders.NewPartialFill,
@@ -103,7 +102,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
 
     ProcessAuth.Message.process(msg, @received_at, @state)
 
-    assert_event(%Events.OrderUpdateNotFound{} = not_found_event)
+    assert_event(%Tai.Events.OrderUpdateNotFound{} = not_found_event)
     assert not_found_event.client_id != @venue_client_id
     assert not_found_event.action == Tai.Trading.OrderStore.Actions.PassivePartialFill
   end

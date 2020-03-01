@@ -10,6 +10,7 @@ defmodule Tai.Venues.Adapters.AccountsTest do
 
   setup do
     on_exit(fn ->
+      :ok = Application.stop(:tai_events)
       :ok = Application.stop(:tai)
     end)
 

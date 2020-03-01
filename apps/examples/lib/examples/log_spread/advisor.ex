@@ -25,7 +25,7 @@ defmodule Examples.LogSpread.Advisor do
       ask_size: ask_size,
       spread: spread
     }
-    |> Tai.Events.info()
+    |> TaiEvents.info()
 
     {:ok, state.store}
   end

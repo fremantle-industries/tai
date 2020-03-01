@@ -1,7 +1,6 @@
 defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   use WebSockex
   alias Tai.VenueAdapters.Binance.Stream
-  alias Tai.Events
 
   defmodule State do
     @type product :: Tai.Venues.Product.t()
@@ -72,13 +71,14 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   end
 
   def handle_connect(_conn, state) do
-    Events.info(%Events.StreamConnect{venue: state.venue_id})
+    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue_id})
     send(self(), :init_subscriptions)
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    Events.info(%Events.StreamDisconnect{venue: state.venue_id, reason: conn_status.reason})
+    TaiEvents.info(%Tai.Events.StreamDisconnect{venue: state.venue_id, reason: conn_status.reason})
+
     {:ok, state}
   end
 
@@ -101,7 +101,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
       if Enum.member?(@optional_channels, c) do
         send(self(), {:subscribe, c})
       else
-        Events.warn(%Events.StreamChannelInvalid{
+        TaiEvents.warn(%Tai.Events.StreamChannelInvalid{
           venue: state.venue,
           name: c,
           available: @optional_channels

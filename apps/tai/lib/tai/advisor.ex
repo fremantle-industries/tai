@@ -107,7 +107,7 @@ defmodule Tai.Advisor do
                   event: event,
                   return_value: unhandled
                 }
-                |> Tai.Events.warn()
+                |> TaiEvents.warn()
 
                 state
             end
@@ -120,7 +120,7 @@ defmodule Tai.Advisor do
                 error: e,
                 stacktrace: __STACKTRACE__
               }
-              |> Tai.Events.warn()
+              |> TaiEvents.warn()
 
               state
           end

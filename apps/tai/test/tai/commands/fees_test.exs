@@ -6,7 +6,8 @@ defmodule Tai.Commands.FeesTest do
 
   setup do
     on_exit(fn ->
-      Application.stop(:tai)
+      :ok = Application.stop(:tai_events)
+      :ok = Application.stop(:tai)
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)

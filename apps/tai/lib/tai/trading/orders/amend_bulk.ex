@@ -1,6 +1,5 @@
 defmodule Tai.Trading.Orders.AmendBulk do
   alias Tai.Trading.{NotifyOrderUpdate, OrderStore}
-  alias Tai.Events
 
   defmodule Provider do
     defdelegate update(action), to: OrderStore
@@ -99,7 +98,7 @@ defmodule Tai.Trading.Orders.AmendBulk do
   end
 
   defp warn_invalid_status(was, required, %action_name{} = action) do
-    Events.warn(%Events.OrderUpdateInvalidStatus{
+    TaiEvents.warn(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: action.client_id,
       action: action_name,
       last_received_at: action |> Map.get(:last_received_at),

@@ -26,7 +26,7 @@ defmodule Tai.Events.OrderUpdateInvalidStatus do
   )a
 end
 
-defimpl Tai.LogEvent, for: Tai.Events.OrderUpdateInvalidStatus do
+defimpl TaiEvents.LogEvent, for: Tai.Events.OrderUpdateInvalidStatus do
   def to_data(event) do
     keys =
       event

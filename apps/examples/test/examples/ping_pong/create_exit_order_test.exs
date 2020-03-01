@@ -3,7 +3,7 @@ defmodule Examples.PingPong.CreateExitOrderTest do
   alias Examples.PingPong.CreateExitOrder
 
   setup do
-    start_supervised!({Tai.Events, 1})
+    start_supervised!({TaiEvents, 1})
     start_supervised!(Tai.Trading.OrderStore)
 
     :ok

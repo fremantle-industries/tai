@@ -15,7 +15,7 @@ defmodule Tai.Venues.Boot.Positions do
       Enum.each(positions, &Tai.Trading.PositionStore.put/1)
       total = Enum.count(positions)
 
-      Tai.Events.info(%Tai.Events.HydratePositions{
+      TaiEvents.info(%Tai.Events.HydratePositions{
         venue_id: venue.id,
         total: total
       })

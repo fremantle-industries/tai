@@ -9,7 +9,7 @@ defmodule Tai.Events.StreamDisconnectTest do
   test ".to_data/1 transforms reason to a string" do
     event = struct!(Tai.Events.StreamDisconnect, @base_attrs)
 
-    assert %{} = json = Tai.LogEvent.to_data(event)
+    assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.venue == :venue_a
     assert json.reason == "{:remote, :normal}"
   end

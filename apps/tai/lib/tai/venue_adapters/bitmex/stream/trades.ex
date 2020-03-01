@@ -11,10 +11,10 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Trades do
         venue_id,
         received_at
       ) do
-    Tai.Events.info(%Tai.Events.Trade{
+    TaiEvents.info(%Tai.Events.Trade{
       venue_id: venue_id,
-      # TODO: 
-      # The list of products or a map of exchange symbol to symbol should be 
+      # TODO:
+      # The list of products or a map of exchange symbol to symbol should be
       # passed in. This currently doesn't support _ within the symbol
       symbol: venue_symbol |> String.downcase() |> String.to_atom(),
       received_at: received_at,
