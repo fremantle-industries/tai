@@ -97,9 +97,10 @@ defmodule Tai.Venues.Start do
 
   def handle_info({:start, {:fees, :positions, :stream}}, state) do
     {:ok, products} = state.products_reply
+    {:ok, accounts} = state.accounts_reply
     t_fees = Task.async(Tai.Venues.Start.Fees, :hydrate, [state.venue, products])
     t_positions = Task.async(Tai.Venues.Start.Positions, :hydrate, [state.venue])
-    t_stream = Task.async(Tai.Venues.Start.Stream, :start, [state.venue, products])
+    t_stream = Task.async(Tai.Venues.Start.Stream, :start, [state.venue, products, accounts])
 
     state = %{
       state

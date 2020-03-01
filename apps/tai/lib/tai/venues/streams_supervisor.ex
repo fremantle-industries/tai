@@ -3,14 +3,17 @@ defmodule Tai.Venues.StreamsSupervisor do
 
   @type venue :: Tai.Venue.t()
   @type product :: Tai.Venues.Product.t()
+  @type account :: Tai.Venues.Account.t()
 
   def start_link(_) do
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
-  @spec start(venue, [product]) :: DynamicSupervisor.on_start_child()
-  def start(venue, products) do
-    spec = {venue.adapter.stream_supervisor, [venue: venue, products: products]}
+  @spec start(venue, [product], [account]) :: DynamicSupervisor.on_start_child()
+  def start(venue, products, accounts) do
+    spec =
+      {venue.adapter.stream_supervisor, [venue: venue, products: products, accounts: accounts]}
+
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 

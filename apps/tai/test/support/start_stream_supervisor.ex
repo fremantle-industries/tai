@@ -1,7 +1,7 @@
 defmodule Support.StartStreamSupervisor do
   use Supervisor
 
-  def start_link(venue: venue, products: _) do
+  def start_link(venue: venue, products: _, accounts: _) do
     name = venue.id |> to_name()
     Supervisor.start_link(__MODULE__, :ok, name: name)
   end
