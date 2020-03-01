@@ -65,6 +65,17 @@ config :tai,
         }
       }
     ],
+    deribit: [
+      start_on_boot: true,
+      adapter: Tai.VenueAdapters.Binance,
+      products: "btc_perpetual",
+      credentials: %{
+        main: %{
+          client_id: {:system_file, "DERIBIT_CLIENT_ID"},
+          client_secret: {:system_file, "DERIBIT_CLIENT_SECRET"}
+        }
+      }
+    ],
     gdax: [
       enabled: true,
       adapter: Tai.VenueAdapters.Gdax,
