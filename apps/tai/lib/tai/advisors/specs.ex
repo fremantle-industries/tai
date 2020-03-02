@@ -1,6 +1,7 @@
 defmodule Tai.Advisors.Specs do
-  alias Tai.Advisors.{Groups, Spec}
+  alias Tai.Advisors.{Groups, Spec, SpecStore}
 
+  @type store_id :: SpecStore.store_id()
   @type config :: Tai.Config.t()
   @type spec :: Spec.t()
 
@@ -12,5 +13,12 @@ defmodule Tai.Advisors.Specs do
     |> Enum.flat_map(fn group ->
       group.factory.advisor_specs(group)
     end)
+  end
+
+  @spec where(list, store_id) :: [spec]
+  def where(filters, store_id) do
+    store_id
+    |> SpecStore.all()
+    |> Enumerati.filter(filters)
   end
 end
