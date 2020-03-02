@@ -5,7 +5,7 @@ defmodule Tai.Venues.AccountStore do
 
   def after_put(account) do
     Tai.SystemBus.broadcast(
-      {@topic_namespace, {account.venue_id, account.credential_id, account.asset, account.type}},
+      @topic_namespace,
       {@topic_namespace, :after_put, account}
     )
   end

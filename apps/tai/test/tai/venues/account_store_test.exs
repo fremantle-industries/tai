@@ -3,9 +3,6 @@ defmodule Tai.Venues.AccountStoreTest do
 
   @test_store_id __MODULE__
   @venue :venue_a
-  @credential :main
-  @asset :btc
-  @account_type "default"
 
   setup do
     start_supervised!({Tai.SystemBus, 1})
@@ -15,15 +12,8 @@ defmodule Tai.Venues.AccountStoreTest do
   end
 
   test "broadcasts a message namespaced to the venue/credential/asset/type after it's stored" do
-    Tai.SystemBus.subscribe({:account_store, {@venue, @credential, @asset, @account_type}})
-
-    account =
-      struct(Tai.Venues.Account,
-        venue_id: @venue,
-        credential_id: @credential,
-        asset: @asset,
-        type: @account_type
-      )
+    Tai.SystemBus.subscribe(:account_store)
+    account = struct(Tai.Venues.Account, venue_id: @venue)
 
     assert {:ok, _} = Tai.Venues.AccountStore.put(account, @test_store_id)
     assert_receive {:account_store, :after_put, stored_account}
