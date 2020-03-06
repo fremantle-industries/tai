@@ -17,7 +17,7 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
   @spec start_link(venue: venue, products: [product], accounts: [account]) ::
           Supervisor.on_start()
   def start_link([venue: venue, products: _, accounts: _] = args) do
-    name = venue.id |> to_name()
+    name = to_name(venue.id)
     Supervisor.start_link(__MODULE__, args, name: name)
   end
 
@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
   # TODO: Make this configurable
   @endpoint "wss://#{ExDeribit.HTTPClient.domain()}/ws#{ExDeribit.HTTPClient.api_path()}"
 
-  def init(venue: venue, products: products, accounts: _) do
+  def init(venue: venue, products: products, accounts: accounts) do
     credential = venue.credentials |> Map.to_list() |> List.first()
 
     order_book_children =
@@ -44,6 +44,7 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
          channels: venue.channels,
          credential: credential,
          products: products,
+         accounts: accounts,
          quote_depth: venue.quote_depth,
          opts: venue.opts
        ]}

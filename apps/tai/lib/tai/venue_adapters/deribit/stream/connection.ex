@@ -4,9 +4,11 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
 
   defmodule State do
     @type product :: Tai.Venues.Product.t()
+    @type account :: Tai.Venues.Account.t()
     @type venue :: Tai.Venue.id()
     @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
+    @type portfolio_channel :: String.t()
     @type route :: :order_books
     @type jsonrpc_id :: non_neg_integer
     @type t :: %State{
@@ -15,6 +17,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
             channels: [channel_name],
             credential: {credential_id, map} | nil,
             products: [product],
+            account_channels: %{optional(portfolio_channel) => account},
             quote_depth: pos_integer,
             opts: map,
             last_heartbeat: pos_integer,
@@ -24,11 +27,33 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
             }
           }
 
-    @enforce_keys ~w(venue routes channels products quote_depth opts jsonrpc_id jsonrpc_requests)a
-    defstruct ~w(venue routes channels credential products quote_depth opts last_heartbeat jsonrpc_id jsonrpc_requests)a
+    @enforce_keys ~w(
+      venue
+      routes
+      channels
+      products
+      account_channels
+      quote_depth
+      opts
+      jsonrpc_id
+      jsonrpc_requests
+    )a
+    defstruct ~w(
+      venue routes
+      channels
+      credential
+      products
+      account_channels
+      quote_depth
+      opts
+      last_heartbeat
+      jsonrpc_id
+      jsonrpc_requests
+    )a
   end
 
   @type product :: Tai.Venues.Product.t()
+  @type account :: Tai.Venues.Account.t()
   @type venue :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
@@ -39,6 +64,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
           venue: venue,
           credential: {credential_id, credential} | nil,
           products: [product],
+          accounts: [account],
           quote_depth: pos_integer,
           opts: map
         ) :: {:ok, pid} | {:error, term}
@@ -48,6 +74,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
         channels: channels,
         credential: credential,
         products: products,
+        accounts: accounts,
         quote_depth: quote_depth,
         opts: opts
       ) do
@@ -61,6 +88,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       channels: channels,
       credential: credential,
       products: products,
+      account_channels: account_channels(accounts),
       quote_depth: quote_depth,
       opts: opts,
       jsonrpc_id: 1,
@@ -97,25 +125,8 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   def handle_info(:init_subscriptions, state) do
     send(self(), {:subscribe, :heartbeat})
     send(self(), {:subscribe, :depth})
+    if state.credential, do: send(self(), {:subscribe, :authenticate})
     {:ok, state}
-  end
-
-  def handle_info({:subscribe, :depth}, state) do
-    channels = state.products |> Enum.map(&"book.#{&1.venue_symbol}.none.20.100ms")
-
-    msg =
-      %{
-        method: "public/subscribe",
-        id: state.jsonrpc_id,
-        params: %{
-          channels: channels
-        }
-      }
-      |> Jason.encode!()
-
-    state = state |> add_jsonrpc_request()
-
-    {:reply, {:text, msg}, state}
   end
 
   @heartbeat_interval_s 10
@@ -138,6 +149,51 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
+  def handle_info({:subscribe, :depth}, state) do
+    channels = state.products |> Enum.map(&"book.#{&1.venue_symbol}.none.20.100ms")
+
+    msg =
+      %{
+        method: "public/subscribe",
+        id: state.jsonrpc_id,
+        params: %{
+          channels: channels
+        }
+      }
+      |> Jason.encode!()
+
+    state = state |> add_jsonrpc_request()
+
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :authenticate}, state) do
+    data = ""
+    timestamp = ExDeribit.Auth.timestamp()
+    nonce = ExDeribit.Auth.nonce()
+    {_, credential} = state.credential
+    signature = ExDeribit.Auth.sign(credential.client_secret, timestamp, nonce, data)
+
+    msg =
+      %{
+        method: "public/auth",
+        id: state.jsonrpc_id,
+        params: %{
+          grant_type: "client_signature",
+          client_id: credential.client_id,
+          timestamp: timestamp,
+          signature: signature,
+          nonce: nonce,
+          data: data
+        }
+      }
+      |> Jason.encode!()
+
+    state = state |> add_jsonrpc_request()
+
+    {:reply, {:text, msg}, state}
+  end
+
   def handle_frame({:text, msg}, state) do
     msg
     |> Jason.decode!()
@@ -145,6 +201,29 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   end
 
   def handle_frame(_frame, state), do: {:ok, state}
+
+  defp handle_msg(
+         %{"id" => id, "result" => %{"access_token" => access_token}},
+         state
+       ) do
+    msg =
+      %{
+        method: "private/subscribe",
+        id: state.jsonrpc_id,
+        params: %{
+          access_token: access_token,
+          channels: state.account_channels |> Map.keys()
+        }
+      }
+      |> Jason.encode!()
+
+    state =
+      state
+      |> delete_jsonrpc_request(id)
+      |> add_jsonrpc_request()
+
+    {:reply, {:text, msg}, state}
+  end
 
   defp handle_msg(%{"id" => id, "result" => _}, state) do
     state = delete_jsonrpc_request(state, id)
@@ -197,6 +276,28 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
+  defp handle_msg(
+         %{
+           "params" => %{
+             "data" => %{"equity" => venue_equity},
+             "channel" => channel
+           },
+           "method" => "subscription"
+         },
+         state
+       ) do
+    equity = Decimal.cast(venue_equity)
+    account = state.account_channels |> Map.fetch!(channel)
+    account = %{account | equity: equity, locked: equity}
+    {:ok, _} = Tai.Venues.AccountStore.put(account)
+
+    {:ok, state}
+  end
+
+  defp handle_msg(_msg, state) do
+    {:ok, state}
+  end
+
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
@@ -216,5 +317,16 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   defp delete_jsonrpc_request(state, id) do
     jsonrpc_requests = Map.delete(state.jsonrpc_requests, id)
     Map.put(state, :jsonrpc_requests, jsonrpc_requests)
+  end
+
+  defp account_channels(accounts) do
+    accounts
+    |> Enum.map(&{&1.asset |> portfolio_channel(), &1})
+    |> Map.new()
+  end
+
+  defp portfolio_channel(asset) do
+    a = asset |> Atom.to_string() |> String.downcase()
+    "user.portfolio.#{a}"
   end
 end
