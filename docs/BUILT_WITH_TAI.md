@@ -1,10 +1,10 @@
 # Built with Tai
 
-## [Back Office](https://github.com/fremantle-capital/back_office)
+## [Back Office](https://github.com/fremantle-industries/back_office)
 
 Web app starter kit to manage operations of a fund.
 
-![back-office-chart](https://github.com/fremantle-capital/back_office/blob/master/docs/balances-chart.png)
+![back-office-chart](https://github.com/fremantle-industries/back_office/blob/master/docs/balances-chart.png)
 
 ## [Oliya](https://github.com/blacksmith-capital/oliya)
 
