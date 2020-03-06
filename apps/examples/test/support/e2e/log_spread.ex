@@ -15,6 +15,21 @@ defmodule ExamplesSupport.E2E.LogSpread do
     )
   end
 
+  def seed_venues(:log_spread) do
+    {:ok, _} =
+      Tai.Venue
+      |> struct(
+        id: @venue,
+        adapter: Tai.VenueAdapters.Mock,
+        credentials: %{},
+        accounts: "*",
+        products: "*",
+        quote_depth: 1,
+        timeout: 1000
+      )
+      |> Tai.Venues.VenueStore.put()
+  end
+
   def push_stream_market_data({:log_spread, :snapshot, venue_id, product_symbol})
       when venue_id == @venue and product_symbol == @product_symbol do
     push_market_data_snapshot(

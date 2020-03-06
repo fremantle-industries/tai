@@ -1,22 +1,30 @@
 defmodule Tai.Trading.Orders.CreateExpiredTest do
   use ExUnit.Case, async: false
+  import Tai.TestSupport.Mock
   alias Tai.TestSupport.Mocks
   alias Tai.Trading.{Order, Orders, OrderSubmissions}
 
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
+  @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
+  @venue :venue_a
+  @credential :main
+  @credentials Map.put(%{}, @credential, %{})
 
+  setup do
     start_supervised!(Mocks.Server)
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!({TaiEvents, 1})
+    start_supervised!({Tai.Settings, Tai.Config.parse()})
+    start_supervised!(Tai.Trading.OrderStore)
+    start_supervised!(Tai.Venues.VenueStore)
+
+    mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
+
     :ok
   end
 
-  @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
-
-  [{:buy, OrderSubmissions.BuyLimitIoc}, {:sell, OrderSubmissions.SellLimitIoc}]
+  [
+    {:buy, OrderSubmissions.BuyLimitIoc},
+    {:sell, OrderSubmissions.SellLimitIoc}
+  ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
 
@@ -25,7 +33,11 @@ defmodule Tai.Trading.Orders.CreateExpiredTest do
       cumulative_qty = Decimal.new(3)
 
       submission =
-        Support.OrderSubmissions.build_with_callback(@submission_type, %{qty: original_qty})
+        Support.OrderSubmissions.build_with_callback(@submission_type, %{
+          venue_id: @venue,
+          credential_id: @credential,
+          qty: original_qty
+        })
 
       Mocks.Responses.Orders.ImmediateOrCancel.expired(@venue_order_id, submission, %{
         cumulative_qty: cumulative_qty

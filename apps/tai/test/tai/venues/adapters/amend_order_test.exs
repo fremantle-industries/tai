@@ -13,11 +13,14 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
     HTTPoison.start()
   end
 
-  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_amend_order()
-
-  @test_venues
-  |> Enum.map(fn {_, venue} ->
+  Tai.TestSupport.Helpers.test_venue_adapters_amend_order()
+  |> Enum.map(fn venue ->
     @venue venue
+
+    setup do
+      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
+      :ok
+    end
 
     test "#{venue.id} can change price and qty" do
       enqueued_order = build_enqueued_order(@venue.id, :buy)
@@ -26,14 +29,11 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       attrs = amend_attrs(@venue.id, price: amend_price, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_price_and_qty_ok" do
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.create_order(enqueued_order)
 
         open_order = build_open_order(enqueued_order, amend_response)
 
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.amend_order(open_order, attrs, @test_venues)
-
+        assert {:ok, amend_response} = Tai.Venues.Client.amend_order(open_order, attrs)
         assert amend_response.id == open_order.venue_order_id
         assert amend_response.status == :open
         assert amend_response.price == amend_price
@@ -50,13 +50,11 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       attrs = amend_attrs(@venue.id, price: amend_price)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_price_ok" do
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.create_order(enqueued_order)
 
         open_order = build_open_order(enqueued_order, amend_response)
 
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.amend_order(open_order, attrs, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.amend_order(open_order, attrs)
 
         assert amend_response.id == open_order.venue_order_id
         assert amend_response.status == :open
@@ -74,13 +72,11 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       attrs = amend_attrs(@venue.id, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_qty_ok" do
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.create_order(enqueued_order)
 
         open_order = build_open_order(enqueued_order, amend_response)
 
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.amend_order(open_order, attrs, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.amend_order(open_order, attrs)
 
         assert amend_response.id == open_order.venue_order_id
         assert amend_response.status == :open
@@ -102,15 +98,13 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
         attrs = amend_attrs(@venue.id, qty: amend_qty)
 
         use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_#{@error_reason}" do
-          assert {:ok, amend_response} =
-                   Tai.Venues.Client.create_order(enqueued_order, @test_venues)
+          assert {:ok, amend_response} = Tai.Venues.Client.create_order(enqueued_order)
 
           open_order = build_open_order(enqueued_order, amend_response)
 
           with_mock HTTPoison,
             request: fn _url -> {:error, %HTTPoison.Error{reason: @error_reason}} end do
-            assert {:error, reason} =
-                     Tai.Venues.Client.amend_order(open_order, attrs, @test_venues)
+            assert {:error, reason} = Tai.Venues.Client.amend_order(open_order, attrs)
 
             assert reason == @error_reason
           end
@@ -124,13 +118,12 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       attrs = amend_attrs(@venue.id, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_nonce_not_increasing" do
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.create_order(enqueued_order)
 
         open_order = build_open_order(enqueued_order, amend_response)
 
         assert {:error, {:nonce_not_increasing, msg}} =
-                 Tai.Venues.Client.amend_order(open_order, attrs, @test_venues)
+                 Tai.Venues.Client.amend_order(open_order, attrs)
 
         assert msg =~ ~r/Nonce is not increasing/
       end
@@ -142,12 +135,11 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       attrs = amend_attrs(@venue.id, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_overloaded_error" do
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.create_order(enqueued_order)
 
         open_order = build_open_order(enqueued_order, amend_response)
 
-        assert Tai.Venues.Client.amend_order(open_order, attrs, @test_venues) ==
+        assert Tai.Venues.Client.amend_order(open_order, attrs) ==
                  {:error, :overloaded}
       end
     end
@@ -158,12 +150,11 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       attrs = amend_attrs(@venue.id, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_rate_limited_error" do
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.create_order(enqueued_order)
 
         open_order = build_open_order(enqueued_order, amend_response)
 
-        assert Tai.Venues.Client.amend_order(open_order, attrs, @test_venues) ==
+        assert Tai.Venues.Client.amend_order(open_order, attrs) ==
                  {:error, :rate_limited}
       end
     end
@@ -174,13 +165,11 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
       attrs = amend_attrs(@venue.id, qty: amend_qty)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/amend_unhandled_error" do
-        assert {:ok, amend_response} =
-                 Tai.Venues.Client.create_order(enqueued_order, @test_venues)
+        assert {:ok, amend_response} = Tai.Venues.Client.create_order(enqueued_order)
 
         open_order = build_open_order(enqueued_order, amend_response)
 
-        assert {:error, {:unhandled, error}} =
-                 Tai.Venues.Client.amend_order(open_order, attrs, @test_venues)
+        assert {:error, {:unhandled, error}} = Tai.Venues.Client.amend_order(open_order, attrs)
 
         assert error != nil
       end

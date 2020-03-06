@@ -14,10 +14,14 @@ defmodule Tai.Venues.Adapters.CreateOrderCloseTest do
 
   @sides [:buy, :sell]
 
-  @close_test_adapters Tai.TestSupport.Helpers.test_venue_adapters_create_order_close()
-  @close_test_adapters
-  |> Enum.map(fn {_, venue} ->
+  Tai.TestSupport.Helpers.test_venue_adapters_create_order_close()
+  |> Enum.map(fn venue ->
     @venue venue
+
+    setup do
+      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
+      :ok
+    end
 
     @sides
     |> Enum.each(fn side ->
@@ -27,8 +31,7 @@ defmodule Tai.Venues.Adapters.CreateOrderCloseTest do
         order = build_order(@venue.id, @side, :gtc, post_only: false, action: :unfilled)
 
         use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_close_insufficient_position" do
-          assert {:error, :insufficient_position} =
-                   Tai.Venues.Client.create_order(order, @close_test_adapters)
+          assert {:error, :insufficient_position} = Tai.Venues.Client.create_order(order)
         end
       end
     end)

@@ -3,7 +3,6 @@ defmodule Tai.Application do
 
   def start(_type, _args) do
     Confex.resolve_env!(:tai)
-
     config = Tai.Config.parse()
 
     children = [
@@ -16,46 +15,27 @@ defmodule Tai.Application do
       Tai.Venues.ProductStore,
       Tai.Venues.FeeStore,
       Tai.Venues.AccountStore,
+      Tai.Venues.VenueStore,
       Tai.Venues.StreamsSupervisor,
-      {Task.Supervisor, name: Tai.TaskSupervisor, restart: :transient},
+      Tai.Venues.Supervisor,
       Tai.Advisors.SpecStore,
-      Tai.Advisors.Supervisor
+      Tai.Advisors.Supervisor,
+      Tai.Boot
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Tai.Supervisor)
   end
 
   def start_phase(:venues, _start_type, _phase_args) do
-    config = Tai.Config.parse()
+    Tai.Venues.Config.parse()
+    |> Enum.map(&Tai.Venues.VenueStore.put/1)
+    |> Enum.map(fn {:ok, {_, v}} -> v end)
+    |> Enumerati.filter(start_on_boot: true)
+    |> Enum.map(&Tai.Boot.register_venue/1)
+    |> Enum.map(fn {:ok, v} -> v end)
+    |> Enum.map(&Tai.Venues.Supervisor.start(&1))
 
-    config
-    |> Tai.Venues.Config.parse()
-    |> Enum.map(fn {_, venue} ->
-      task =
-        Task.Supervisor.async(
-          Tai.TaskSupervisor,
-          Tai.Venues.Boot,
-          :run,
-          [venue],
-          timeout: venue.timeout
-        )
-
-      {task, venue}
-    end)
-    |> Enum.map(fn {task, venue} -> Task.await(task, venue.timeout) end)
-    |> Enum.each(&config.venue_boot_handler.parse_response/1)
-
-    :ok
-  end
-
-  def start_phase(:advisors, _start_type, _phase_args) do
-    Tai.Config.parse()
-    |> Tai.Advisors.Specs.from_config()
-    |> Enum.map(&Tai.Advisors.SpecStore.put/1)
-    |> Enum.map(fn {:ok, {_, spec}} -> spec end)
-    |> Enum.map(&Tai.Advisors.Instance.from_spec/1)
-    |> Enum.filter(fn instance -> instance.start_on_boot end)
-    |> Tai.Advisors.Instances.start()
+    Tai.Boot.close_registration()
 
     :ok
   end

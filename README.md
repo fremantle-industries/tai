@@ -96,10 +96,13 @@ iex(1)> help
 * fees
 * markets
 * orders
-* settings
+* venues [where: [...], order: [...]]
+* start_venue :venue_id
+* stop_venue :venue_id
 * advisors [where: [...], order: [...]]
 * start_advisors [where: [...]]
 * stop_advisors [where: [...]]
+* settings
 * enable_send_orders
 * disable_send_orders
 ```
@@ -125,18 +128,17 @@ Display the products provided by configured venues
 
 ```
 iex(3)> products
-+----------+----------+--------------+---------+-----------+-----------+
-|    Venue |   Symbol | Venue Symbol |  Status | Maker Fee | Taker Fee |
-+----------+----------+--------------+---------+-----------+-----------+
-|     gdax |  btc_usd |      BTC-USD | trading |           |           |
-|  binance | btc_usdt |      BTCUSDT | trading |           |           |
-| poloniex | btc_usdt |     USDT_BTC | trading |           |           |
-|     gdax |  ltc_usd |      LTC-USD | trading |           |           |
-| poloniex | ltc_usdt |     USDT_LTC | trading |           |           |
-|  binance | ltc_usdt |      LTCUSDT | trading |           |           |
-|   bitmex |   xbth19 |       XBTH19 | trading |   -0.025% |    0.075% |
-|   bitmex |   xbtz18 |       XBTZ18 | trading |   -0.025% |    0.075% |
-+----------+----------+--------------+---------+-----------+-----------+
++---------+----------+--------------+---------+--------+-----------+-----------+
+|   Venue |   Symbol | Venue Symbol |  Status |   Type | Maker Fee | Taker Fee |
++---------+----------+--------------+---------+--------+-----------+-----------+ 
+|    gdax |  btc_usd |      BTC-USD | trading |   spot |           |           |
+| binance | btc_usdt |      BTCUSDT | trading |   spot |           |           |
+|    gdax |  eth_usd |      ETH-USD | trading |   spot |           |           | 
+| binance | eth_usdt |      ETHUSDT | trading |   spot |           |           |
+|    gdax |  ltc_usd |      LTC-USD | trading |   spot |           |           |
+| binance | ltc_usdt |      LTCUSDT | trading |   spot |           |           | 
+|  bitmex |   xbtusd |       XBTUSD | trading | future |   -0.025% |    0.075% |
++---------+----------+--------------+---------+--------+-----------+-----------+
 ```
 
 #### fees
@@ -196,8 +198,41 @@ iex(6)> orders
 +--------+------------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
 |  Venue | Credential | Symbol | Side |  Type |  Price | Qty | Leaves Qty | Cumulative Qty | Time in Force | Status | Client ID | Venue Order ID |    Enqueued At | Last Received At | Last Venue Timestamp |     Updated At | Error Reason |
 +--------+------------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
-| bitmex |       main | xbtm19 |  buy | limit | 3622.5 |  15 |         15 |              0 |           gtc |   open | 78f616... |      fe7486... | 11 seconds ago |   11 seconds ago |       11 seconds ago | 11 seconds ago |              |
+| bitmex |       main | xbtusd |  buy | limit | 3622.5 |  15 |         15 |              0 |           gtc |   open | 78f616... |      fe7486... | 11 seconds ago |   11 seconds ago |       11 seconds ago | 11 seconds ago |              |
 +--------+------------+--------+------+-------+--------+-----+------------+----------------+---------------+--------+-----------+----------------+----------------+------------------+----------------------+----------------+--------------+
+```
+
+#### venues
+
+List venues that can optionally be filtered and ordered
+
+```
+iex(7)> venues
++---------+-------------+---------+----------+-------------+---------+---------------+
+|      ID | Credentials |  Status | Channels | Quote Depth | Timeout | Start On Boot |
++---------+-------------+---------+----------+-------------+---------+---------------+
+| binance |           - | running |        - |           1 |   10000 |          true |
+|  bitmex |           - | running |        - |           3 |   10000 |          true |
+|    gdax |           - | running |        - |           1 |   10000 |          true |
++---------+-------------+---------+----------+-------------+---------+---------------+
+```
+
+### stop_venue
+
+Stops the given venue
+
+```
+iex(8)> stop_venue :bitmex
+stopped successfully
+```
+
+### start_venue
+
+Starts the given venue
+
+```
+iex(9)> start_venue :bitmex
+starting...
 ```
 
 #### settings
@@ -205,7 +240,7 @@ iex(6)> orders
 Displays the current runtime settings
 
 ```
-iex(7)> settings
+iex(10)> settings
 +-------------+-------+
 |        Name | Value |
 +-------------+-------+
@@ -219,7 +254,7 @@ List advisors that can optionally be filtered and ordered
 
 
 ```
-iex(8)> advisors where: [status: :unstarted], order: [:group_id]
+iex(11)> advisors where: [status: :unstarted], order: [:group_id]
 +---------------------------------+-------------------+-----------+-----+
 |                        Group ID |        Advisor ID |    Status | PID |
 +---------------------------------+-------------------+-----------+-----+
@@ -227,7 +262,7 @@ iex(8)> advisors where: [status: :unstarted], order: [:group_id]
 |             fill_or_kill_orders |  binance_btc_usdt | unstarted |   - |
 |                      log_spread |  binance_btc_usdt | unstarted |   - |
 |                      log_spread |      gdax_btc_usd | unstarted |   - |
-|                      log_spread | poloniex_btc_usdt | unstarted |   - |
+|                      log_spread |     bitmex_xbtusd | unstarted |   - |
 +---------------------------------+-------------------+-----------+-----+
 ```
 
@@ -236,7 +271,7 @@ iex(8)> advisors where: [status: :unstarted], order: [:group_id]
 Starts advisors with an optional filter
 
 ```
-iex(9)> start_advisors where: [status: :unstarted]
+iex(12)> start_advisors where: [status: :unstarted]
 Started advisors: 5 new, 0 already running
 ```
 
@@ -245,7 +280,7 @@ Started advisors: 5 new, 0 already running
 Stops advisors with an optional filter
 
 ```
-iex(10)> stop_advisors where: [status: :running]
+iex(13)> stop_advisors where: [status: :running]
 Stopped advisors: 5 new, 0 already stopped
 ```
 

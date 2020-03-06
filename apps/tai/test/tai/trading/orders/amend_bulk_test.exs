@@ -1,28 +1,32 @@
 defmodule Tai.Trading.Orders.AmendBulkTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Helpers
+  import Tai.TestSupport.Mock
   alias Tai.TestSupport.Mocks
   alias Mocks.Responses.Orders.GoodTillCancel
 
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
+  @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
+  @pending_venue_order_id "df8e6bd0-a40a-42fb-8fea-pending"
+  @venue :venue_a
+  @credential :main
+  @credentials Map.put(%{}, @credential, %{})
 
+  setup do
     start_supervised!(Mocks.Server)
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!({TaiEvents, 1})
+    start_supervised!({Tai.Settings, Tai.Config.parse()})
+    start_supervised!(Tai.Trading.OrderStore)
+    start_supervised!(Tai.Venues.VenueStore)
+
+    mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
+
     :ok
   end
 
-  @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
-  @pending_venue_order_id "df8e6bd0-a40a-42fb-8fea-pending"
-  @submission_types [
+  [
     {:buy, Tai.Trading.OrderSubmissions.BuyLimitGtc},
     {:sell, Tai.Trading.OrderSubmissions.SellLimitGtc}
   ]
-
-  @submission_types
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
     @original_price Decimal.new(100)
@@ -32,10 +36,11 @@ defmodule Tai.Trading.Orders.AmendBulkTest do
       setup do
         {:ok, enqueued_order} =
           @submission_type
-          |> Support.OrderSubmissions.build(%{
+          |> Support.OrderSubmissions.build_with_callback(%{
+            venue_id: @venue,
+            credential_id: @credential,
             price: @original_price,
-            qty: @original_qty,
-            order_updated_callback: fire_order_callback(self())
+            qty: @original_qty
           })
           |> Tai.Trading.OrderStore.enqueue()
 

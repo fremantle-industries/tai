@@ -2,7 +2,7 @@ defmodule Tai.Advisors.Groups.RichConfig do
   alias Tai.Advisors.Groups.RichConfigProvider
 
   @type config :: map
-  @type provider :: atom
+  @type provider :: module
 
   @spec parse(config, provider) :: config
   def parse(raw_config, provider \\ RichConfigProvider) do

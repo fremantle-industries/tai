@@ -27,7 +27,7 @@ config :tai,
 config :tai,
   venues: %{
     bitmex: [
-      enabled: true,
+      start_on_boot: true,
       adapter: Tai.VenueAdapters.Bitmex,
       products: "xbtusd",
       quote_depth: 3,
@@ -43,7 +43,7 @@ config :tai,
       }
     ],
     okex: [
-      enabled: true,
+      start_on_boot: true,
       adapter: Tai.VenueAdapters.OkEx,
       products: "eth_usd_190419 eth_usd_190426 eth_usd_190628",
       credentials: %{
@@ -55,7 +55,7 @@ config :tai,
       }
     ],
     binance: [
-      enabled: true,
+      start_on_boot: true,
       adapter: Tai.VenueAdapters.Binance,
       products: "btc_usdt ltc_usdt eth_usdt",
       credentials: %{
@@ -77,7 +77,7 @@ config :tai,
       }
     ],
     gdax: [
-      enabled: true,
+      start_on_boot: true,
       adapter: Tai.VenueAdapters.Gdax,
       products: "btc_usd ltc_usd eth_usd",
       credentials: %{

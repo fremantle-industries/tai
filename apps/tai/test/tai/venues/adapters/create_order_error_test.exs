@@ -13,27 +13,33 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
     HTTPoison.start()
   end
 
-  @insufficient_balance_venues Tai.TestSupport.Helpers.test_venue_adapters_create_order_error_insufficient_balance()
-  @insufficient_balance_venues
-  |> Enum.map(fn {_, venue} ->
+  Tai.TestSupport.Helpers.test_venue_adapters_create_order_error_insufficient_balance()
+  |> Enum.map(fn venue ->
     @venue venue
+
+    setup do
+      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
+      :ok
+    end
 
     test "#{venue.id} insufficient balance" do
       order = build_order(@venue.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/create_order_insufficient_balance" do
-        assert {:error, reason} =
-                 Tai.Venues.Client.create_order(order, @insufficient_balance_venues)
-
+        assert {:error, reason} = Tai.Venues.Client.create_order(order)
         assert reason == :insufficient_balance
       end
     end
   end)
 
-  @test_adapters Tai.TestSupport.Helpers.test_venue_adapters_create_order_error()
-  @test_adapters
-  |> Enum.map(fn {_, venue} ->
+  Tai.TestSupport.Helpers.test_venue_adapters_create_order_error()
+  |> Enum.map(fn venue ->
     @venue venue
+
+    setup do
+      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
+      :ok
+    end
 
     [:timeout, :connect_timeout]
     |> Enum.map(fn error_reason ->
@@ -46,7 +52,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
         with_mock HTTPoison,
           request: fn _url -> error end,
           post: fn _url, _body, _headers -> error end do
-          assert {:error, reason} = Tai.Venues.Client.create_order(order, @test_adapters)
+          assert {:error, reason} = Tai.Venues.Client.create_order(order)
           assert reason == @error_reason
         end
       end
@@ -56,7 +62,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       order = build_order(@venue.id, :buy, :gtc, post_only: true, action: :rejected)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/rejected" do
-        assert {:ok, order_response} = Tai.Venues.Client.create_order(order, @test_adapters)
+        assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
         assert order_response.id != nil
         assert %Decimal{} = order_response.original_size
@@ -71,7 +77,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       order = build_order(@venue.id, :buy, :gtc, action: :unfilled)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/create_order_rate_limited" do
-        assert Tai.Venues.Client.create_order(order, @test_adapters) == {:error, :rate_limited}
+        assert Tai.Venues.Client.create_order(order) == {:error, :rate_limited}
       end
     end
 
@@ -79,9 +85,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       order = build_order(@venue.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/create_order_unhandled_error" do
-        assert {:error, {:unhandled, reason}} =
-                 Tai.Venues.Client.create_order(order, @test_adapters)
-
+        assert {:error, {:unhandled, reason}} = Tai.Venues.Client.create_order(order)
         assert reason != nil
       end
     end
@@ -90,9 +94,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       order = build_order(@venue.id, :buy, :gtc, action: :insufficient_balance)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/create_order_nonce_not_increasing" do
-        assert {:error, {:nonce_not_increasing, msg}} =
-                 Tai.Venues.Client.create_order(order, @test_adapters)
-
+        assert {:error, {:nonce_not_increasing, msg}} = Tai.Venues.Client.create_order(order)
         assert msg != nil
       end
     end
@@ -101,7 +103,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
       order = build_order(@venue.id, :buy, :gtc, action: :unfilled)
 
       use_cassette "venue_adapters/shared/orders/#{@venue.id}/create_order_overloaded" do
-        assert Tai.Venues.Client.create_order(order, @test_adapters) == {:error, :overloaded}
+        assert Tai.Venues.Client.create_order(order) == {:error, :overloaded}
       end
     end
   end)
