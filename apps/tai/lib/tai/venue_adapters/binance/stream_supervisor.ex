@@ -13,9 +13,11 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   @type venue :: Tai.Venue.t()
   @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
+  @type account :: Tai.Venues.Account.t()
 
-  @spec start_link(venue: venue, products: [product]) :: Supervisor.on_start()
-  def start_link([venue: venue, products: _] = args) do
+  @spec start_link(venue: venue, products: [product], accounts: [account]) ::
+          Supervisor.on_start()
+  def start_link([venue: venue, products: _, accounts: _] = args) do
     name = venue.id |> to_name()
     Supervisor.start_link(__MODULE__, args, name: name)
   end
@@ -26,7 +28,7 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   # TODO: Make this configurable
   @url "wss://stream.binance.com:9443/ws"
 
-  def init(venue: venue, products: products) do
+  def init(venue: venue, products: products, accounts: _) do
     credential = venue.credentials |> Map.to_list() |> List.first()
 
     order_book_children =

@@ -39,7 +39,7 @@ defmodule Tai.Venues.InstanceTest do
 
   describe ".find_stream/1" do
     test "returns the pid of the stream" do
-      {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@venue, [])
+      {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@venue, [], [])
 
       assert {:ok, pid} = Tai.Venues.Instance.find_stream(@venue)
       assert pid == stream_pid
@@ -53,7 +53,7 @@ defmodule Tai.Venues.InstanceTest do
   describe ".stop/1" do
     test "stops the stream and start venue processes" do
       {:ok, start_pid} = Tai.Venues.Supervisor.start(@venue)
-      {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@venue, [])
+      {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@venue, [], [])
 
       assert Tai.Venues.Instance.stop(@venue) == :ok
       assert Process.alive?(start_pid) == false
