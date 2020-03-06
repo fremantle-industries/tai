@@ -1,25 +1,37 @@
 defmodule Tai.Trading.Orders.CreateErrorTest do
   use ExUnit.Case, async: false
+  import Tai.TestSupport.Mock
   alias Tai.TestSupport.Mocks
   alias Tai.Trading.{Order, Orders, OrderSubmissions}
 
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
+  @venue :venue_a
+  @credential :main
+  @credentials Map.put(%{}, @credential, %{})
+  @submission_attrs %{venue_id: @venue, credential_id: @credential}
 
+  setup do
     start_supervised!(Mocks.Server)
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!({TaiEvents, 1})
+    start_supervised!({Tai.Settings, Tai.Config.parse()})
+    start_supervised!(Tai.Trading.OrderStore)
+    start_supervised!(Tai.Venues.VenueStore)
+
+    mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
+
     :ok
   end
 
-  [{:buy, OrderSubmissions.BuyLimitGtc}, {:sell, OrderSubmissions.SellLimitGtc}]
+  [
+    {:buy, OrderSubmissions.BuyLimitGtc},
+    {:sell, OrderSubmissions.SellLimitGtc}
+  ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
 
     test "#{side} records the error reason" do
-      submission = Support.OrderSubmissions.build_with_callback(@submission_type)
+      submission =
+        Support.OrderSubmissions.build_with_callback(@submission_type, @submission_attrs)
+
       {:ok, _} = Orders.create(submission)
 
       assert_receive {
@@ -39,7 +51,9 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
     end
 
     test "#{side} rescues adapter errors" do
-      submission = Support.OrderSubmissions.build_with_callback(@submission_type)
+      submission =
+        Support.OrderSubmissions.build_with_callback(@submission_type, @submission_attrs)
+
       Mocks.Responses.Orders.Error.create_raise(submission, "Venue Adapter Create Raised Error")
       {:ok, _} = Orders.create(submission)
 

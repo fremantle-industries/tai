@@ -16,7 +16,7 @@ defmodule Tai.Venues.Client do
 
   @spec accounts(venue, credential_id) :: {:ok, [account]} | {:error, shared_error_reason}
   def accounts(venue, credential_id) do
-    {:ok, credentials} = Map.fetch(venue.credentials, credential_id)
+    {:ok, credentials} = find_credentials(venue, credential_id)
     venue.adapter.accounts(venue.id, credential_id, credentials)
   end
 
@@ -25,7 +25,7 @@ defmodule Tai.Venues.Client do
 
   @spec positions(venue, credential_id) :: {:ok, [position]} | {:error, positions_error_reason}
   def positions(venue, credential_id) do
-    {:ok, credentials} = Map.fetch(venue.credentials, credential_id)
+    {:ok, credentials} = find_credentials(venue, credential_id)
     venue.adapter.positions(venue.id, credential_id, credentials)
   end
 
@@ -33,7 +33,7 @@ defmodule Tai.Venues.Client do
           {:ok, {maker :: Decimal.t(), taker :: Decimal.t()} | nil}
           | {:error, shared_error_reason}
   def maker_taker_fees(venue, credential_id) do
-    {:ok, credentials} = Map.fetch(venue.credentials, credential_id)
+    {:ok, credentials} = find_credentials(venue, credential_id)
     venue.adapter.maker_taker_fees(venue.id, credential_id, credentials)
   end
 
@@ -41,8 +41,9 @@ defmodule Tai.Venues.Client do
   @type create_order_error_reason :: Adapter.create_order_error_reason()
 
   @spec create_order(order) :: {:ok, create_response} | {:error, create_order_error_reason}
-  def create_order(%Order{} = order, venues \\ Tai.Venues.Config.parse()) do
-    {venue, credentials} = find_venue_and_credentials(order, venues)
+  def create_order(%Order{} = order, venue_provider \\ Tai.Venues.VenueStore) do
+    {:ok, venue} = venue_provider.find(order.venue_id)
+    {:ok, credentials} = find_credentials(venue, order.credential_id)
     venue.adapter.create_order(order, credentials)
   end
 
@@ -52,8 +53,9 @@ defmodule Tai.Venues.Client do
 
   @spec amend_order(order, amend_attrs) ::
           {:ok, amend_response} | {:error, amend_order_error_reason}
-  def amend_order(%Order{} = order, attrs, venues \\ Tai.Venues.Config.parse()) do
-    {venue, credentials} = find_venue_and_credentials(order, venues)
+  def amend_order(%Order{} = order, attrs, venue_provider \\ Tai.Venues.VenueStore) do
+    {:ok, venue} = venue_provider.find(order.venue_id)
+    {:ok, credentials} = find_credentials(venue, order.credential_id)
     venue.adapter.amend_order(order, attrs, credentials)
   end
 
@@ -65,9 +67,10 @@ defmodule Tai.Venues.Client do
           {:ok, amend_bulk_response} | {:error, amend_bulk_order_error_reason}
   def amend_bulk_orders(
         [{%Order{} = order, _} | _] = orders_and_attributes,
-        venues \\ Tai.Venues.Config.parse()
+        venue_provider \\ Tai.Venues.VenueStore
       ) do
-    {venue, credentials} = find_venue_and_credentials(order, venues)
+    {:ok, venue} = venue_provider.find(order.venue_id)
+    {:ok, credentials} = find_credentials(venue, order.credential_id)
     venue.adapter.amend_bulk_orders(orders_and_attributes, credentials)
   end
 
@@ -75,15 +78,18 @@ defmodule Tai.Venues.Client do
   @type cancel_order_error_reason :: Adapter.cancel_order_error_reason()
 
   @spec cancel_order(order) :: {:ok, cancel_response} | {:error, cancel_order_error_reason}
-  def cancel_order(%Order{} = order, venues \\ Tai.Venues.Config.parse()) do
-    {venue, credentials} = find_venue_and_credentials(order, venues)
+  def cancel_order(%Order{} = order, venue_provider \\ Tai.Venues.VenueStore) do
+    {:ok, venue} = venue_provider.find(order.venue_id)
+    {:ok, credentials} = find_credentials(venue, order.credential_id)
     venue.adapter.cancel_order(order, credentials)
   end
 
-  defp find_venue_and_credentials(order, venues) do
-    venue = venues |> Map.fetch!(order.venue_id)
-    credentials = Map.fetch!(venue.credentials, order.credential_id)
-
-    {venue, credentials}
+  defp find_credentials(venue, credential_id) do
+    venue.credentials
+    |> Map.get(credential_id)
+    |> case do
+      nil -> {:error, :not_found}
+      credentials -> {:ok, credentials}
+    end
   end
 end

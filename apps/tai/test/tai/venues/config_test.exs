@@ -7,50 +7,53 @@ defmodule Tai.Venues.ConfigTest do
       config =
         Tai.Config.parse(
           venues: %{
-            venue_a: [enabled: true, adapter: MyAdapterA],
-            venue_b: [enabled: true, adapter: MyAdapterB],
-            venue_c: [enabled: false, adapter: MyAdapterC]
+            venue_a: [start_on_boot: true, adapter: MyAdapterA],
+            venue_b: [start_on_boot: true, adapter: MyAdapterB],
+            venue_c: [start_on_boot: false, adapter: MyAdapterC]
           },
           adapter_timeout: 100
         )
 
-      assert %{
-               venue_a: venue_a,
-               venue_b: venue_b
-             } = Tai.Venues.Config.parse(config)
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.count(venues) == 3
 
-      assert venue_a.id == :venue_a
-      assert venue_a.adapter == MyAdapterA
-      assert venue_b.id == :venue_b
-      assert venue_b.adapter == MyAdapterB
+      assert Enum.at(venues, 0).id == :venue_a
+      assert Enum.at(venues, 0).adapter == MyAdapterA
+      assert Enum.at(venues, 0).start_on_boot == true
+      assert Enum.at(venues, 1).id == :venue_b
+      assert Enum.at(venues, 1).adapter == MyAdapterB
+      assert Enum.at(venues, 1).start_on_boot == true
+      assert Enum.at(venues, 2).id == :venue_c
+      assert Enum.at(venues, 2).adapter == MyAdapterC
+      assert Enum.at(venues, 2).start_on_boot == false
     end
 
     test "assigns all products when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
-      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
-      assert venue.products == "*"
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).products == "*"
     end
 
     test "assigns all accounts when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
-      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
-      assert venue.accounts == "*"
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).accounts == "*"
     end
 
     test "assigns empty channels when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
-      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
-      assert venue.channels == []
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).channels == []
     end
 
     test "assigns a quote depth of 1 when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
-      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
-      assert venue.quote_depth == 1
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).quote_depth == 1
     end
 
     test "can provide channels" do
@@ -61,8 +64,8 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
-      assert venue.channels == [:channel_a]
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).channels == [:channel_a]
     end
 
     test "can provide a timeout" do
@@ -77,13 +80,8 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{
-               venue_a: %Tai.Venue{
-                 id: :venue_a,
-                 adapter: MyAdapterA,
-                 timeout: 10
-               }
-             } = Tai.Venues.Config.parse(config)
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).timeout == 10
     end
 
     test "can provide a products filter" do
@@ -98,13 +96,8 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{
-               venue_a: %Tai.Venue{
-                 id: :venue_a,
-                 adapter: MyAdapterA,
-                 products: "-btc_usd"
-               }
-             } = Tai.Venues.Config.parse(config)
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).products == "-btc_usd"
     end
 
     test "can provide an accounts filter" do
@@ -119,13 +112,8 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{
-               venue_a: %Tai.Venue{
-                 id: :venue_a,
-                 adapter: MyAdapterA,
-                 accounts: "-btc"
-               }
-             } = Tai.Venues.Config.parse(config)
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).accounts == "-btc"
     end
 
     test "can provide credentials" do
@@ -140,13 +128,8 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{
-               venue_a: %Tai.Venue{
-                 id: :venue_a,
-                 adapter: MyAdapterA,
-                 credentials: %{main: %{}}
-               }
-             } = Tai.Venues.Config.parse(config)
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).credentials == %{main: %{}}
     end
 
     test "can provide a quote depth" do
@@ -161,8 +144,8 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
-      assert venue.quote_depth == 5
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).quote_depth == 5
     end
 
     test "can provide broadcast_change_set" do
@@ -177,14 +160,14 @@ defmodule Tai.Venues.ConfigTest do
           }
         )
 
-      assert %{venue_a: venue} = Tai.Venues.Config.parse(config)
-      assert venue.broadcast_change_set
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).broadcast_change_set
     end
 
     test "raises a KeyError when there is no adapter specified" do
-      config = Tai.Config.parse(venues: %{invalid_exchange_a: [enabled: true]})
+      config = Tai.Config.parse(venues: %{invalid_exchange_a: [start_on_boot: true]})
 
-      assert_raise KeyError, "key :adapter not found in: [enabled: true]", fn ->
+      assert_raise KeyError, "key :adapter not found in: [start_on_boot: true]", fn ->
         Tai.Venues.Config.parse(config)
       end
     end

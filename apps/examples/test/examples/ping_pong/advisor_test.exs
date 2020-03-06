@@ -6,9 +6,12 @@ defmodule Examples.PingPong.AdvisorTest do
   @venue :test_exchange_a
   @product :btc_usd
 
-  def before_app_start, do: seed_mock_responses(@scenario)
+  def before_start_app, do: seed_mock_responses(@scenario)
 
-  def after_app_start do
+  def after_start_app, do: seed_venues(@scenario)
+
+  def after_boot_app do
+    start_venue(@venue)
     configure_advisor_group(@scenario)
     start_advisors(where: [group_id: @scenario])
   end

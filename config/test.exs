@@ -9,7 +9,6 @@ config :examples, :e2e_mappings, %{
 
 config :tai,
   send_orders: true,
-  venue_boot_handler: Tai.TestSupport.VenueBootHandler,
   e2e_app: :examples
 
 config :tai, advisor_groups: %{}
@@ -154,21 +153,7 @@ config(:tai, :test_venue_adapters_cancel_order_error_rate_limited, [:bitmex])
 config(:tai, :test_venue_adapters_cancel_order_error_unhandled, [:bitmex, :binance])
 config(:tai, :test_venue_adapters_with_positions, [:bitmex, :deribit, :okex])
 
-config :tai,
-  venues: %{
-    test_exchange_a: [
-      enabled: true,
-      adapter: Tai.VenueAdapters.Mock,
-      products: "btc_usd ltc_usd",
-      credentials: %{main: %{}}
-    ],
-    test_exchange_b: [
-      enabled: true,
-      adapter: Tai.VenueAdapters.Mock,
-      products: "eth_usd ltc_usd",
-      credentials: %{main: %{}}
-    ]
-  }
+config :tai, venues: %{}
 
 config :exvcr,
   filter_request_headers: [

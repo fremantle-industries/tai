@@ -11,7 +11,7 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
   @test_venues Tai.TestSupport.Helpers.test_venue_adapters_maker_taker_fees()
 
   @test_venues
-  |> Enum.map(fn {_, venue} ->
+  |> Enum.map(fn venue ->
     @venue venue
     @credential_id venue.credentials |> Map.keys() |> List.first()
 

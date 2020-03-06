@@ -21,7 +21,7 @@ defmodule Tai.Venues.Adapters.PositionsTest do
   @test_venues Tai.TestSupport.Helpers.test_venue_adapters_with_positions()
 
   @test_venues
-  |> Enum.map(fn {_, venue} ->
+  |> Enum.map(fn venue ->
     @venue venue
     @credential_id venue.credentials |> Map.keys() |> List.first()
 

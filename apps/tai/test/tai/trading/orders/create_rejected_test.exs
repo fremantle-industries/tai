@@ -1,27 +1,38 @@
 defmodule Tai.Trading.Orders.CreateRejectedTest do
   use ExUnit.Case, async: false
+  import Tai.TestSupport.Mock
   alias Tai.TestSupport.Mocks
   alias Tai.Trading.{Order, Orders, OrderSubmissions}
 
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
+  @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
+  @venue :venue_a
+  @credential :main
+  @credentials Map.put(%{}, @credential, %{})
+  @submission_attrs %{venue_id: @venue, credential_id: @credential}
 
+  setup do
     start_supervised!(Mocks.Server)
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!({TaiEvents, 1})
+    start_supervised!({Tai.Settings, Tai.Config.parse()})
+    start_supervised!(Tai.Trading.OrderStore)
+    start_supervised!(Tai.Venues.VenueStore)
+
+    mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
+
     :ok
   end
 
-  @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
-
-  [{:buy, OrderSubmissions.BuyLimitGtc}, {:sell, OrderSubmissions.SellLimitGtc}]
+  [
+    {:buy, OrderSubmissions.BuyLimitGtc},
+    {:sell, OrderSubmissions.SellLimitGtc}
+  ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
 
     test "#{side} updates the relevant attributes" do
-      submission = Support.OrderSubmissions.build_with_callback(@submission_type)
+      submission =
+        Support.OrderSubmissions.build_with_callback(@submission_type, @submission_attrs)
+
       Mocks.Responses.Orders.GoodTillCancel.rejected(@venue_order_id, submission)
       {:ok, _} = Orders.create(submission)
 
