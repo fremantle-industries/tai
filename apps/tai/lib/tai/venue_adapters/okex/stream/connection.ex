@@ -22,8 +22,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     defstruct ~w(venue routes channels credential products last_pong)a
   end
 
-  @type product :: Tai.Venues.Product.t()
-  @type channel :: Tai.Venue.channel()
+  @type stream :: Tai.Venues.Stream.t()
   @type endpoint :: String.t()
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
@@ -33,39 +32,35 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   @spec start_link(
           endpoint: endpoint,
-          venue: venue_id,
-          channels: [channel],
-          credential: {credential_id, credential} | nil,
-          products: [product]
+          stream: stream,
+          credential: {credential_id, credential} | nil
         ) :: {:ok, pid}
-  def start_link(
-        endpoint: endpoint,
-        venue: venue,
-        channels: channels,
-        credential: credential,
-        products: products
-      ) do
+  def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      auth: venue |> Stream.ProcessAuth.to_name(),
-      order_books: venue |> Stream.RouteOrderBooks.to_name(),
-      optional_channels: venue |> Stream.ProcessOptionalChannels.to_name()
+      auth: stream.venue.id |> Stream.ProcessAuth.to_name(),
+      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
     state = %State{
-      venue: venue,
+      venue: stream.venue.id,
       routes: routes,
-      channels: channels,
+      channels: stream.venue.channels,
       credential: credential,
-      products: products,
+      products: stream.products,
       last_pong: time_now()
     }
 
-    name = venue |> to_name
+    name = to_name(stream.venue.id)
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
+  def terminate(close_reason, state) do
+    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+  end
 
   def handle_connect(_conn, state) do
     TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})

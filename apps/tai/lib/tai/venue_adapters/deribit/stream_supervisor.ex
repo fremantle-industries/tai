@@ -21,9 +21,6 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-  # TODO: Make this configurable
-  @endpoint "wss://#{ExDeribit.HTTPClient.domain()}/ws#{ExDeribit.HTTPClient.api_path()}"
-
   def init(stream) do
     credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
@@ -38,22 +35,15 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
 
     system = [
       {RouteOrderBooks, [venue_id: stream.venue.id, products: stream.products]},
-      {Connection,
-       [
-         url: @endpoint,
-         venue: stream.venue.id,
-         channels: stream.venue.channels,
-         credential: credential,
-         products: stream.products,
-         accounts: stream.accounts,
-         quote_depth: stream.venue.quote_depth,
-         opts: stream.venue.opts
-       ]}
+      {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
     ]
 
     (order_book_children ++ process_order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
+
+  # TODO: Make this configurable
+  defp endpoint, do: "wss://#{ExDeribit.HTTPClient.domain()}/ws#{ExDeribit.HTTPClient.api_path()}"
 
   defp order_book_children(products, quote_depth, broadcast_change_set) do
     products

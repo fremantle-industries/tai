@@ -22,54 +22,45 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     defstruct ~w(venue routes channels credential products quote_depth opts)a
   end
 
-  @type product :: Tai.Venues.Product.t()
+  @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
-  @type channel :: Tai.Venue.channel()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
   @type venue_msg :: map
 
   @spec start_link(
-          url: String.t(),
-          venue: venue_id,
-          channels: [channel],
-          credential: {credential_id, credential} | nil,
-          products: [product],
-          quote_depth: pos_integer,
-          opts: map
+          endpoint: String.t(),
+          stream: stream,
+          credential: {credential_id, credential} | nil
         ) :: {:ok, pid} | {:error, term}
-  def start_link(
-        url: url,
-        venue: venue,
-        channels: channels,
-        credential: credential,
-        products: products,
-        quote_depth: quote_depth,
-        opts: opts
-      ) do
+  def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      auth: venue |> Stream.ProcessAuth.to_name(),
-      order_books: venue |> Stream.RouteOrderBooks.to_name(),
-      optional_channels: venue |> Stream.ProcessOptionalChannels.to_name()
+      auth: stream.venue.id |> Stream.ProcessAuth.to_name(),
+      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
     state = %State{
-      venue: venue,
+      venue: stream.venue.id,
       routes: routes,
-      channels: channels,
+      channels: stream.venue.channels,
       credential: credential,
-      products: products,
-      quote_depth: quote_depth,
-      opts: opts
+      products: stream.products,
+      quote_depth: stream.venue.quote_depth,
+      opts: stream.venue.opts
     }
 
-    name = venue |> to_name
+    name = to_name(stream.venue.id)
     headers = auth_headers(state.credential)
-    WebSockex.start_link(url, __MODULE__, state, name: name, extra_headers: headers)
+    WebSockex.start_link(endpoint, __MODULE__, state, name: name, extra_headers: headers)
   end
 
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
+  def terminate(close_reason, state) do
+    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+  end
 
   def handle_connect(_conn, state) do
     TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})

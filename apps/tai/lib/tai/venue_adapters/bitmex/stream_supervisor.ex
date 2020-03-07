@@ -42,16 +42,7 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
       {RouteOrderBooks, [venue_id: stream.venue.id, products: stream.products]},
       {ProcessAuth, [venue_id: stream.venue.id]},
       {ProcessOptionalChannels, [venue_id: stream.venue.id]},
-      {Connection,
-       [
-         url: @endpoint,
-         venue: stream.venue.id,
-         channels: stream.venue.channels,
-         credential: credential,
-         products: stream.products,
-         quote_depth: stream.venue.quote_depth,
-         opts: stream.venue.opts
-       ]}
+      {Connection, [endpoint: @endpoint, stream: stream, credential: credential]}
     ]
 
     (order_book_children ++ process_order_book_children ++ system)

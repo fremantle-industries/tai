@@ -5,37 +5,40 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
-    @type t :: %State{venue_id: venue_id}
+    @type t :: %State{venue: venue_id}
 
-    @enforce_keys ~w(venue_id)a
-    defstruct ~w(venue_id)a
+    @enforce_keys ~w(venue)a
+    defstruct ~w(venue)a
   end
 
+  @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
-  @type channel :: Tai.Venue.channel()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
-  @type product :: Tai.Venues.Product.t()
   @type msg :: map
 
   @spec start_link(
-          url: String.t(),
-          venue_id: venue_id,
-          channels: [channel],
-          credentials: {credential_id, credential} | nil,
-          products: [product]
+          endpoint: String.t(),
+          stream: stream,
+          credential: {credential_id, credential} | nil
         ) :: {:ok, pid}
-  def start_link(url: url, venue_id: venue_id, channels: _, credentials: _, products: _) do
-    conn = %State{venue_id: venue_id}
-    name = venue_id |> to_name
-
-    WebSockex.start_link(url, __MODULE__, conn, name: name)
+  def start_link(endpoint: endpoint, stream: stream, credential: _) do
+    state = %State{venue: stream.venue.id}
+    name = to_name(stream.venue.id)
+    WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
-  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
+  @spec to_name(venue_id) :: atom
+  def to_name(venue) do
+    :"#{__MODULE__}_#{venue}"
+  end
+
+  def terminate(close_reason, state) do
+    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+  end
 
   def handle_connect(_conn, state) do
-    %Tai.Events.StreamConnect{venue: state.venue_id}
+    %Tai.Events.StreamConnect{venue: state.venue}
     |> TaiEvents.info()
 
     {:ok, state}
@@ -43,7 +46,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   def handle_disconnect(conn_status, state) do
     %Tai.Events.StreamDisconnect{
-      venue: state.venue_id,
+      venue: state.venue,
       reason: conn_status.reason
     }
     |> TaiEvents.info()
@@ -74,7 +77,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     normalized_asks = asks |> normalize_snapshot_changes(:ask)
 
     %OrderBook.ChangeSet{
-      venue: state.venue_id,
+      venue: state.venue,
       symbol: String.to_atom(symbol_str),
       last_received_at: Timex.now(),
       changes: Enum.concat(normalized_bids, normalized_asks)
@@ -149,7 +152,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   defp handle_msg(msg, state) do
     %Tai.Events.StreamMessageUnhandled{
-      venue_id: state.venue_id,
+      venue_id: state.venue,
       msg: msg,
       received_at: Timex.now()
     }

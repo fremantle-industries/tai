@@ -23,9 +23,6 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-  # TODO: Make this configurable
-  @endpoint "wss://real.okex.com:8443/ws/v3"
-
   def init(stream) do
     credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
@@ -42,19 +39,15 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
       {RouteOrderBooks, [venue: stream.venue.id, products: stream.products]},
       {ProcessAuth, [venue: stream.venue.id]},
       {ProcessOptionalChannels, [venue: stream.venue.id]},
-      {Connection,
-       [
-         endpoint: @endpoint,
-         venue: stream.venue.id,
-         channels: stream.venue.channels,
-         credential: credential,
-         products: stream.products
-       ]}
+      {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
     ]
 
     (order_book_children ++ process_order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
+
+  # TODO: Make this configurable
+  defp endpoint, do: "wss://real.okex.com:8443/ws/v3"
 
   defp order_book_children(products, quote_depth, broadcast_change_set) do
     products

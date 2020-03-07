@@ -52,55 +52,41 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     )a
   end
 
-  @type product :: Tai.Venues.Product.t()
-  @type account :: Tai.Venues.Account.t()
-  @type venue :: Tai.Venue.id()
+  @type stream :: Tai.Venues.Stream.t()
+  @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
   @type venue_msg :: map
 
   @spec start_link(
-          url: String.t(),
-          venue: venue,
-          credential: {credential_id, credential} | nil,
-          products: [product],
-          accounts: [account],
-          quote_depth: pos_integer,
-          opts: map
+          endpoint: String.t(),
+          stream: stream,
+          credential: {credential_id, credential} | nil
         ) :: {:ok, pid} | {:error, term}
-  def start_link(
-        url: url,
-        venue: venue,
-        channels: channels,
-        credential: credential,
-        products: products,
-        accounts: accounts,
-        quote_depth: quote_depth,
-        opts: opts
-      ) do
+  def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      order_books: venue |> Stream.RouteOrderBooks.to_name()
+      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name()
     }
 
     state = %State{
-      venue: venue,
+      venue: stream.venue.id,
       routes: routes,
-      channels: channels,
+      channels: stream.venue.channels,
       credential: credential,
-      products: products,
-      account_channels: account_channels(accounts),
-      quote_depth: quote_depth,
-      opts: opts,
+      products: stream.products,
+      account_channels: account_channels(stream.accounts),
+      quote_depth: stream.venue.quote_depth,
+      opts: stream.venue.opts,
       jsonrpc_id: 1,
       jsonrpc_requests: %{}
     }
 
-    name = venue |> to_name
+    name = to_name(stream.venue.id)
     headers = []
-    WebSockex.start_link(url, __MODULE__, state, name: name, extra_headers: headers)
+    WebSockex.start_link(endpoint, __MODULE__, state, name: name, extra_headers: headers)
   end
 
-  @spec to_name(venue) :: atom
+  @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   def terminate(close_reason, state) do

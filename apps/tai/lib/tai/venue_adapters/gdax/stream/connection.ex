@@ -21,43 +21,38 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
     defstruct ~w(venue routes channels credential products opts)a
   end
 
-  @type product :: Tai.Venues.Product.t()
+  @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
   @type venue_msg :: map
 
   @spec start_link(
-          url: String.t(),
-          venue: venue_id,
-          credential: {credential_id, credential} | nil,
-          products: [product],
-          opts: map
+          endpoint: String.t(),
+          stream: venue_id,
+          credential: {credential_id, credential} | nil
         ) :: {:ok, pid} | {:error, term}
-  def start_link(
-        url: url,
-        venue: venue,
-        channels: channels,
-        credential: credential,
-        products: products,
-        opts: opts
-      ) do
+  def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      order_books: venue |> Stream.RouteOrderBooks.to_name(),
-      optional_channels: venue |> Stream.ProcessOptionalChannels.to_name()
+      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
     state = %State{
-      venue: venue,
+      venue: stream.venue.id,
       routes: routes,
-      channels: channels,
+      channels: stream.venue.channels,
       credential: credential,
-      products: products,
-      opts: opts
+      products: stream.products,
+      opts: stream.venue.opts
     }
 
-    name = venue |> to_name
-    WebSockex.start_link(url, __MODULE__, state, name: name)
+    name = to_name(stream.venue.id)
+    WebSockex.start_link(endpoint, __MODULE__, state, name: name)
+  end
+
+  def terminate(close_reason, state) do
+    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
   end
 
   def handle_connect(_conn, state) do

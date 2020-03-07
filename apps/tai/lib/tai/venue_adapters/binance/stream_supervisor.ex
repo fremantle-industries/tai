@@ -22,9 +22,6 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-  # TODO: Make this configurable
-  @url "wss://stream.binance.com:9443/ws"
-
   def init(stream) do
     credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
@@ -40,20 +37,15 @@ defmodule Tai.VenueAdapters.Binance.StreamSupervisor do
     system = [
       {RouteOrderBooks, [venue_id: stream.venue.id, products: stream.products]},
       {ProcessOptionalChannels, [venue_id: stream.venue.id]},
-      {Connection,
-       [
-         url: @url,
-         venue: stream.venue.id,
-         channels: stream.venue.channels,
-         credential: credential,
-         products: stream.products,
-         opts: stream.venue.opts
-       ]}
+      {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
     ]
 
     (order_book_children ++ process_order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
   end
+
+  # TODO: Make this configurable
+  defp endpoint, do: "wss://stream.binance.com:9443/ws"
 
   defp order_book_children(products, quote_depth, broadcast_change_set) do
     products

@@ -9,7 +9,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     @type route :: :order_books | :optional_channels
     @type request_id :: non_neg_integer
     @type t :: %State{
-            venue_id: venue_id,
+            venue: venue_id,
             products: [product],
             channels: [channel],
             routes: %{required(route) => atom},
@@ -19,65 +19,63 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
             }
           }
 
-    @enforce_keys ~w(venue_id products channels routes request_id requests)a
-    defstruct ~w(venue_id products channels routes request_id requests)a
+    @enforce_keys ~w(venue products channels routes request_id requests)a
+    defstruct ~w(venue products channels routes request_id requests)a
   end
 
-  @type product :: Tai.Venues.Product.t()
+  @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
-  @type channel :: Tai.Venue.channel()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
 
   @default_snapshot_depth 50
 
   @spec start_link(
-          url: String.t(),
-          venue: venue_id,
-          channels: [channel],
-          credential: {credential_id, credential} | nil,
-          products: [product],
-          opts: map
+          endpoint: String.t(),
+          stream: stream,
+          credential: {credential_id, credential} | nil
         ) :: {:ok, pid}
-  def start_link(
-        url: url,
-        venue: venue,
-        channels: channels,
-        credential: _,
-        products: products,
-        opts: opts
-      ) do
-    name = :"#{__MODULE__}_#{venue}"
-    snapshot_depth = Map.get(opts, :snapshot_depth, @default_snapshot_depth)
+  def start_link(endpoint: endpoint, stream: stream, credential: _) do
+    name = :"#{__MODULE__}_#{stream.venue.id}"
+    snapshot_depth = Map.get(stream.venue.opts, :snapshot_depth, @default_snapshot_depth)
 
     routes = %{
-      order_books: venue |> Stream.RouteOrderBooks.to_name(),
-      optional_channels: venue |> Stream.ProcessOptionalChannels.to_name()
+      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
     state = %State{
-      venue_id: venue,
-      products: products,
-      channels: channels,
+      venue: stream.venue.id,
+      products: stream.products,
+      channels: stream.venue.channels,
       routes: routes,
       request_id: 1,
       requests: %{}
     }
 
-    {:ok, pid} = WebSockex.start_link(url, __MODULE__, state, name: name)
+    {:ok, pid} = WebSockex.start_link(endpoint, __MODULE__, state, name: name)
 
-    snapshot_order_books(products, snapshot_depth)
+    snapshot_order_books(stream.products, snapshot_depth)
     {:ok, pid}
   end
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue) do
+    :"#{__MODULE__}_#{venue}"
+  end
+
+  def terminate(close_reason, state) do
+    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+  end
+
   def handle_connect(_conn, state) do
-    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue_id})
+    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    TaiEvents.info(%Tai.Events.StreamDisconnect{venue: state.venue_id, reason: conn_status.reason})
+    TaiEvents.info(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
 
     {:ok, state}
   end
