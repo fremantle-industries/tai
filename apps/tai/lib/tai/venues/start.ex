@@ -4,8 +4,8 @@ defmodule Tai.Venues.Start do
   defmodule State do
     @type status ::
             :init
-            | {:wait, {:products, :accounts}}
-            | {:wait, {:fees, :positions, :stream}}
+            | {:wait, {:products, :accounts, :positions}}
+            | {:wait, {:fees, :stream}}
             | :success
             | {:error, :timeout | term}
 
@@ -27,18 +27,20 @@ defmodule Tai.Venues.Start do
     )a
   end
 
-  @type venue :: Tai.Venue.id()
+  @type venue :: Tai.Venue.t()
+  @type venue_id :: Tai.Venue.id()
 
+  @spec start_link(venue) :: GenServer.on_start()
   def start_link(venue) do
     name = to_name(venue.id)
     state = %State{venue: venue, status: :init}
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  @spec to_name(venue) :: atom
+  @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
-  @spec status(venue) :: State.status()
+  @spec status(venue_id) :: State.status()
   def status(venue_id) do
     venue_id
     |> to_name
@@ -49,64 +51,69 @@ defmodule Tai.Venues.Start do
     {
       :ok,
       state,
-      {:continue, {:start, {:products, :accounts}}}
+      {:continue, {:start, {:products, :accounts, :positions}}}
     }
   end
 
-  def handle_continue({:start, {:products, :accounts}}, state) do
+  def handle_continue({:start, {:products, :accounts, :positions} = group}, state) do
     t_products = Task.async(Tai.Venues.Start.Products, :hydrate, [state.venue])
     t_accounts = Task.async(Tai.Venues.Start.Accounts, :hydrate, [state.venue])
+    t_positions = Task.async(Tai.Venues.Start.Positions, :hydrate, [state.venue])
     timer = Process.send_after(self(), :timeout, state.venue.timeout)
 
     state = %{
       state
-      | status: {:wait, {:products, :accounts}},
+      | status: {:wait, group},
         timer: timer,
         products_task: t_products.ref,
-        accounts_task: t_accounts.ref
+        accounts_task: t_accounts.ref,
+        positions_task: t_positions.ref
     }
 
     {:noreply, state}
   end
 
-  def handle_call(:status, _from, state) do
-    {:reply, state.status, state}
-  end
-
   def handle_info(
         {ref, reply},
-        %State{status: {:wait, {:products, :accounts}}} = state
+        %State{status: {:wait, {:products, :accounts, :positions} = group}} = state
       )
       when is_reference(ref) do
     state = state |> save_reply(ref, reply)
-    replies = [state.products_reply, state.accounts_reply]
+    replies = [state.products_reply, state.accounts_reply, state.positions_reply]
 
     cond do
       Enum.any?(replies, &awaiting_reply?/1) ->
         {:noreply, state}
 
       Enum.all?(replies, &reply_ok?/1) ->
-        send(self(), {:start, {:fees, :positions, :stream}})
+        send(self(), {:start, {:fees, :stream}})
         {:noreply, state}
 
       Enum.any?(replies, &reply_error?/1) ->
-        send(self(), {:error, {:products, :accounts}})
+        send(self(), {:error, group})
         {:noreply, state}
     end
   end
 
-  def handle_info({:start, {:fees, :positions, :stream}}, state) do
+  def handle_info({:start, {:fees, :stream} = group}, state) do
     {:ok, products} = state.products_reply
     {:ok, accounts} = state.accounts_reply
+    {:ok, positions} = state.positions_reply
+
+    stream = %Tai.Venues.Stream{
+      venue: state.venue,
+      products: products,
+      accounts: accounts,
+      positions: positions
+    }
+
     t_fees = Task.async(Tai.Venues.Start.Fees, :hydrate, [state.venue, products])
-    t_positions = Task.async(Tai.Venues.Start.Positions, :hydrate, [state.venue])
-    t_stream = Task.async(Tai.Venues.Start.Stream, :start, [state.venue, products, accounts])
+    t_stream = Task.async(Tai.Venues.Start.Stream, :start, [stream])
 
     state = %{
       state
-      | status: {:wait, {:fees, :positions, :stream}},
+      | status: {:wait, group},
         fees_task: t_fees.ref,
-        positions_task: t_positions.ref,
         stream_task: t_stream.ref
     }
 
@@ -115,29 +122,29 @@ defmodule Tai.Venues.Start do
 
   def handle_info(
         {ref, reply},
-        %State{status: {:wait, {:fees, :positions, :stream}}} = state
+        %State{status: {:wait, {:fees, :stream} = group}} = state
       )
       when is_reference(ref) do
     state = state |> save_reply(ref, reply)
-    replies = [state.fees_reply, state.positions_reply, state.stream_reply]
+    replies = [state.fees_reply, state.stream_reply]
 
     cond do
       Enum.any?(replies, &awaiting_reply?/1) ->
         {:noreply, state}
 
       Enum.all?(replies, &reply_ok?/1) ->
-        send(self(), {:ok, {:fees, :positions, :stream}})
+        send(self(), {:ok, group})
         {:noreply, state}
 
       Enum.any?(replies, &reply_error?/1) ->
-        send(self(), {:error, {:fees, :positions, :stream}})
+        send(self(), {:error, group})
         {:noreply, state}
     end
 
     {:noreply, state}
   end
 
-  def handle_info({:ok, {:fees, :positions, :stream}}, state) do
+  def handle_info({:ok, {:fees, :stream}}, state) do
     Process.cancel_timer(state.timer)
 
     %Tai.Events.VenueStart{
@@ -153,9 +160,9 @@ defmodule Tai.Venues.Start do
     {:noreply, state}
   end
 
-  def handle_info({:error, {:products, :accounts}}, state) do
+  def handle_info({:error, {:products, :accounts, :positions}}, state) do
     Process.cancel_timer(state.timer)
-    reasons = [:products, :accounts] |> collect_error_reasons(state)
+    reasons = [:products, :accounts, :positions] |> collect_error_reasons(state)
 
     %Tai.Events.VenueStartError{
       venue: state.venue.id,
@@ -171,9 +178,9 @@ defmodule Tai.Venues.Start do
     {:noreply, state}
   end
 
-  def handle_info({:error, {:fees, :positions, :stream}}, state) do
+  def handle_info({:error, {:fees, :stream}}, state) do
     Process.cancel_timer(state.timer)
-    reasons = [:fees, :positions, :stream] |> collect_error_reasons(state)
+    reasons = [:fees, :stream] |> collect_error_reasons(state)
 
     %Tai.Events.VenueStartError{
       venue: state.venue.id,
@@ -216,12 +223,16 @@ defmodule Tai.Venues.Start do
     {:noreply, state}
   end
 
+  def handle_call(:status, _from, state) do
+    {:reply, state.status, state}
+  end
+
   defp save_reply(state, ref, reply) do
     cond do
       ref == state.products_task -> %{state | products_reply: reply}
       ref == state.accounts_task -> %{state | accounts_reply: reply}
-      ref == state.fees_task -> %{state | fees_reply: reply}
       ref == state.positions_task -> %{state | positions_reply: reply}
+      ref == state.fees_task -> %{state | fees_reply: reply}
       ref == state.stream_task -> %{state | stream_reply: reply}
     end
   end

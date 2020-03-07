@@ -11,17 +11,13 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
 
   alias Tai.Markets.OrderBook
 
-  @type venue :: Tai.Venue.t()
+  @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
-  @type channel :: Tai.Venue.channel()
-  @type product :: Tai.Venues.Product.t()
-  @type account :: Tai.Venues.Account.t()
 
-  @spec start_link(venue: venue, products: [product], accounts: [account]) ::
-          Supervisor.on_start()
-  def start_link([venue: venue, products: _, accounts: _] = args) do
-    name = venue.id |> to_name()
-    Supervisor.start_link(__MODULE__, args, name: name)
+  @spec start_link(stream) :: Supervisor.on_start()
+  def start_link(stream) do
+    name = to_name(stream.venue.id)
+    Supervisor.start_link(__MODULE__, stream, name: name)
   end
 
   @spec to_name(venue_id) :: atom
@@ -30,25 +26,29 @@ defmodule Tai.VenueAdapters.OkEx.StreamSupervisor do
   # TODO: Make this configurable
   @endpoint "wss://real.okex.com:8443/ws/v3"
 
-  def init(venue: venue, products: products, accounts: _) do
-    credential = venue.credentials |> Map.to_list() |> List.first()
+  def init(stream) do
+    credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
     order_book_children =
-      order_book_children(products, venue.quote_depth, venue.broadcast_change_set)
+      order_book_children(
+        stream.products,
+        stream.venue.quote_depth,
+        stream.venue.broadcast_change_set
+      )
 
-    process_order_book_children = process_order_book_children(products)
+    process_order_book_children = process_order_book_children(stream.products)
 
     system = [
-      {RouteOrderBooks, [venue: venue.id, products: products]},
-      {ProcessAuth, [venue: venue.id]},
-      {ProcessOptionalChannels, [venue: venue.id]},
+      {RouteOrderBooks, [venue: stream.venue.id, products: stream.products]},
+      {ProcessAuth, [venue: stream.venue.id]},
+      {ProcessOptionalChannels, [venue: stream.venue.id]},
       {Connection,
        [
          endpoint: @endpoint,
-         venue: venue.id,
-         channels: venue.channels,
+         venue: stream.venue.id,
+         channels: stream.venue.channels,
          credential: credential,
-         products: products
+         products: stream.products
        ]}
     ]
 

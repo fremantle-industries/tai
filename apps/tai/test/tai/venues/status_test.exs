@@ -42,7 +42,8 @@ defmodule Tai.Venues.StatusTest do
   end
 
   test ".status/1 is :running when there is a stream" do
-    Tai.Venues.StreamsSupervisor.start(@venue, [], [])
+    stream = struct(Tai.Venues.Stream, venue: @venue)
+    Tai.Venues.StreamsSupervisor.start(stream)
     assert Tai.Venues.Status.status(@venue) == :running
   end
 

@@ -11,16 +11,13 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
 
   alias Tai.Markets.OrderBook
 
-  @type venue :: Tai.Venue.t()
+  @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
-  @type product :: Tai.Venues.Product.t()
-  @type account :: Tai.Venues.Account.t()
 
-  @spec start_link(venue: venue, products: [product], accounts: [account]) ::
-          Supervisor.on_start()
-  def start_link([venue: venue, products: _, accounts: _] = args) do
-    name = venue.id |> to_name()
-    Supervisor.start_link(__MODULE__, args, name: name)
+  @spec start_link(stream) :: Supervisor.on_start()
+  def start_link(stream) do
+    name = to_name(stream.venue.id)
+    Supervisor.start_link(__MODULE__, stream, name: name)
   end
 
   @spec to_name(venue_id) :: atom
@@ -29,27 +26,31 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   # TODO: Make this configurable. Could this come from opts?
   @endpoint "wss://#{ExBitmex.Rest.HTTPClient.domain()}/realtime"
 
-  def init(venue: venue, products: products, accounts: _) do
-    credential = venue.credentials |> Map.to_list() |> List.first()
+  def init(stream) do
+    credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
     order_book_children =
-      order_book_children(products, venue.quote_depth, venue.broadcast_change_set)
+      order_book_children(
+        stream.products,
+        stream.venue.quote_depth,
+        stream.venue.broadcast_change_set
+      )
 
-    process_order_book_children = process_order_book_children(products)
+    process_order_book_children = process_order_book_children(stream.products)
 
     system = [
-      {RouteOrderBooks, [venue_id: venue.id, products: products]},
-      {ProcessAuth, [venue_id: venue.id]},
-      {ProcessOptionalChannels, [venue_id: venue.id]},
+      {RouteOrderBooks, [venue_id: stream.venue.id, products: stream.products]},
+      {ProcessAuth, [venue_id: stream.venue.id]},
+      {ProcessOptionalChannels, [venue_id: stream.venue.id]},
       {Connection,
        [
          url: @endpoint,
-         venue: venue.id,
-         channels: venue.channels,
+         venue: stream.venue.id,
+         channels: stream.venue.channels,
          credential: credential,
-         products: products,
-         quote_depth: venue.quote_depth,
-         opts: venue.opts
+         products: stream.products,
+         quote_depth: stream.venue.quote_depth,
+         opts: stream.venue.opts
        ]}
     ]
 

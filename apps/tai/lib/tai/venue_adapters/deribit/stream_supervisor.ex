@@ -9,16 +9,13 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
 
   alias Tai.Markets.OrderBook
 
-  @type venue :: Tai.Venue.t()
+  @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
-  @type product :: Tai.Venues.Product.t()
-  @type account :: Tai.Venues.Account.t()
 
-  @spec start_link(venue: venue, products: [product], accounts: [account]) ::
-          Supervisor.on_start()
-  def start_link([venue: venue, products: _, accounts: _] = args) do
-    name = to_name(venue.id)
-    Supervisor.start_link(__MODULE__, args, name: name)
+  @spec start_link(stream) :: Supervisor.on_start()
+  def start_link(stream) do
+    name = to_name(stream.venue.id)
+    Supervisor.start_link(__MODULE__, stream, name: name)
   end
 
   @spec to_name(venue_id) :: atom
@@ -27,26 +24,30 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
   # TODO: Make this configurable
   @endpoint "wss://#{ExDeribit.HTTPClient.domain()}/ws#{ExDeribit.HTTPClient.api_path()}"
 
-  def init(venue: venue, products: products, accounts: accounts) do
-    credential = venue.credentials |> Map.to_list() |> List.first()
+  def init(stream) do
+    credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
     order_book_children =
-      order_book_children(products, venue.quote_depth, venue.broadcast_change_set)
+      order_book_children(
+        stream.products,
+        stream.venue.quote_depth,
+        stream.venue.broadcast_change_set
+      )
 
-    process_order_book_children = process_order_book_children(products)
+    process_order_book_children = process_order_book_children(stream.products)
 
     system = [
-      {RouteOrderBooks, [venue_id: venue.id, products: products]},
+      {RouteOrderBooks, [venue_id: stream.venue.id, products: stream.products]},
       {Connection,
        [
          url: @endpoint,
-         venue: venue.id,
-         channels: venue.channels,
+         venue: stream.venue.id,
+         channels: stream.venue.channels,
          credential: credential,
-         products: products,
-         accounts: accounts,
-         quote_depth: venue.quote_depth,
-         opts: venue.opts
+         products: stream.products,
+         accounts: stream.accounts,
+         quote_depth: stream.venue.quote_depth,
+         opts: stream.venue.opts
        ]}
     ]
 
