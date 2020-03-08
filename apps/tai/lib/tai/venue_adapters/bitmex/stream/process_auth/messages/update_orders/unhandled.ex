@@ -7,7 +7,7 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
   for: Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Unhandled do
   def process(message, received_at, state) do
     %Tai.Events.StreamMessageUnhandled{
-      venue_id: state.venue_id,
+      venue_id: state.venue,
       msg: message.data,
       received_at: received_at
     }

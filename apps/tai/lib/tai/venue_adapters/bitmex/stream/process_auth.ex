@@ -4,21 +4,26 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
-    @type t :: %State{venue_id: venue_id, tasks: map}
+    @type t :: %State{venue: venue_id, tasks: map}
 
-    @enforce_keys ~w(venue_id tasks)a
-    defstruct ~w(venue_id tasks)a
+    @enforce_keys ~w(venue tasks)a
+    defstruct ~w(venue tasks)a
   end
 
   @type venue_id :: Tai.Venue.id()
 
-  def start_link(venue_id: venue_id) do
-    state = %State{venue_id: venue_id, tasks: %{}}
-    name = venue_id |> to_name()
+  def start_link(venue_id: venue) do
+    state = %State{venue: venue, tasks: %{}}
+    name = to_name(venue)
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  def init(state), do: {:ok, state}
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
+  def init(state) do
+    {:ok, state}
+  end
 
   def handle_cast({venue_msg, received_at}, state) do
     {:ok, new_state} =
@@ -31,15 +36,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
 
   def handle_info({ref, :ok}, state) when is_reference(ref) do
     new_tasks = Map.delete(state.tasks, ref)
-    new_state = Map.put(state, :tasks, new_tasks)
-
+    new_state = %{state | tasks: new_tasks}
     {:noreply, new_state}
   end
 
-  def handle_info(_msg, state), do: {:noreply, state}
-
-  @spec to_name(venue_id) :: atom
-  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
+  def handle_info(_msg, state) do
+    {:noreply, state}
+  end
 
   defdelegate extract(msg), to: ProcessAuth.VenueMessage
 
@@ -55,8 +58,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
       )
 
     new_tasks = Map.merge(state.tasks, message_tasks)
-    new_state = Map.put(state, :tasks, new_tasks)
-
+    new_state = %{state | tasks: new_tasks}
     {:ok, new_state}
   end
 end

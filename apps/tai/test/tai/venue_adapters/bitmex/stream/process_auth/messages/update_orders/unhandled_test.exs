@@ -11,7 +11,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Unha
   test ".process/3 broadcasts an unhandled message warning" do
     msg = struct(ProcessAuth.Messages.UpdateOrders.Unhandled, data: "my-msg")
     received_at = Timex.now()
-    state = struct(ProcessAuth.State, venue_id: :my_venue)
+    state = struct(ProcessAuth.State, venue: :my_venue)
     TaiEvents.firehose_subscribe()
 
     ProcessAuth.Message.process(msg, received_at, state)
