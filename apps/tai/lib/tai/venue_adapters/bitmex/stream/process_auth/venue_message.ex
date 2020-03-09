@@ -1,29 +1,44 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.VenueMessage do
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
 
-  defmodule DefaultProvider do
-    @empty []
-
-    def update_orders(data), do: ProcessAuth.VenueMessages.UpdateOrders.extract(data)
-    def empty, do: @empty
-    def unhandled(msg), do: [%ProcessAuth.Messages.Unhandled{msg: msg}]
-  end
-
   @type venue_message :: map
-  @type provider :: module
 
-  @spec extract(venue_message, provider) :: [struct]
-  def extract(msg, provider \\ DefaultProvider)
+  @empty []
 
-  def extract(%{"table" => "order", "action" => "update", "data" => data}, provider) do
-    provider.update_orders(data)
+  @spec extract(venue_message) :: [struct]
+  def extract(msg)
+
+  def extract(%{"table" => "order", "action" => action, "data" => data}) do
+    action
+    |> case do
+      "update" -> ProcessAuth.VenueMessages.UpdateOrders.extract(data)
+      _ -> @empty
+    end
   end
 
-  def extract(%{"table" => "order", "action" => "insert"}, provider), do: provider.empty
-  def extract(%{"table" => "transact"}, provider), do: provider.empty
-  def extract(%{"table" => "execution"}, provider), do: provider.empty
-  def extract(%{"table" => "wallet"}, provider), do: provider.empty
-  def extract(%{"table" => "margin"}, provider), do: provider.empty
-  def extract(%{"table" => "position"}, provider), do: provider.empty
-  def extract(msg, provider), do: provider.unhandled(msg)
+  def extract(%{"table" => "position", "action" => action, "data" => data}) do
+    action
+    |> case do
+      "insert" -> data |> Enum.map(fn d -> %ProcessAuth.Messages.InsertPosition{data: d} end)
+      "update" -> data |> Enum.map(fn d -> %ProcessAuth.Messages.UpdatePosition{data: d} end)
+      _ -> @empty
+    end
+  end
+
+  def extract(%{"table" => "margin", "action" => action, "data" => data}) do
+    action
+    |> case do
+      "update" -> data |> Enum.map(fn d -> %ProcessAuth.Messages.UpdateAccount{data: d} end)
+      _ -> @empty
+    end
+  end
+
+  @empty_tables ~w(transact execution wallet)
+  def extract(%{"table" => table}) when table in @empty_tables do
+    @empty
+  end
+
+  def extract(msg) do
+    [%ProcessAuth.Messages.Unhandled{msg: msg}]
+  end
 end

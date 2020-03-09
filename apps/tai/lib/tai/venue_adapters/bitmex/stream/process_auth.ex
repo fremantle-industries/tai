@@ -4,16 +4,22 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
-    @type t :: %State{venue: venue_id}
+    @type credential_id :: Tai.Venue.credential_id()
+    @type t :: %State{
+            venue: venue_id,
+            credential_id: credential_id
+          }
 
-    @enforce_keys ~w(venue)a
-    defstruct ~w(venue)a
+    @enforce_keys ~w(venue credential_id)a
+    defstruct ~w(venue credential_id)a
   end
 
   @type venue_id :: Tai.Venue.id()
+  @type credential :: Tai.Venue.credential()
 
-  def start_link(venue_id: venue) do
-    state = %State{venue: venue}
+  @spec start_link(venue: venue_id, credential: credential) :: GenServer.on_start()
+  def start_link(venue: venue, credential: {credential_id, _}) do
+    state = %State{venue: venue, credential_id: credential_id}
     name = to_name(venue)
     GenServer.start_link(__MODULE__, state, name: name)
   end
@@ -33,7 +39,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
     {:noreply, state}
   end
 
-  defdelegate extract(msg), to: ProcessAuth.VenueMessage
+  def extract(msg) do
+    ProcessAuth.VenueMessage.extract(msg)
+  end
 
   defp process(messages, received_at, state) do
     messages

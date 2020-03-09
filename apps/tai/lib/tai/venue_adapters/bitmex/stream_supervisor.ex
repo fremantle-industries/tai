@@ -27,25 +27,32 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
   @endpoint "wss://#{ExBitmex.Rest.HTTPClient.domain()}/realtime"
 
   def init(stream) do
-    credential = stream.venue.credentials |> Map.to_list() |> List.first()
+    venue = stream.venue
+    credential = venue.credentials |> Map.to_list() |> List.first()
 
-    order_book_children =
-      order_book_children(
-        stream.products,
-        stream.venue.quote_depth,
-        stream.venue.broadcast_change_set
+    children =
+      []
+      |> Enum.concat(
+        order_book_children(stream.products, venue.quote_depth, venue.broadcast_change_set)
       )
+      |> Enum.concat(process_order_book_children(stream.products))
+      |> Enum.concat([{RouteOrderBooks, [venue_id: venue.id, products: stream.products]}])
 
-    process_order_book_children = process_order_book_children(stream.products)
+    children =
+      if credential != nil do
+        children ++ [{ProcessAuth, [venue: venue.id, credential: credential]}]
+      else
+        children
+      end
 
-    system = [
-      {RouteOrderBooks, [venue_id: stream.venue.id, products: stream.products]},
-      {ProcessAuth, [venue_id: stream.venue.id]},
-      {ProcessOptionalChannels, [venue_id: stream.venue.id]},
-      {Connection, [endpoint: @endpoint, stream: stream, credential: credential]}
-    ]
+    children =
+      children
+      |> Enum.concat([
+        {ProcessOptionalChannels, [venue_id: venue.id]},
+        {Connection, [endpoint: @endpoint, stream: stream, credential: credential]}
+      ])
 
-    (order_book_children ++ process_order_book_children ++ system)
+    children
     |> Supervisor.init(strategy: :one_for_one)
   end
 
