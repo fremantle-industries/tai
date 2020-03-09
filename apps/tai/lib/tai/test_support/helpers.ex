@@ -7,6 +7,10 @@ defmodule Tai.TestSupport.Helpers do
     :test_venue_adapters_accounts |> filter()
   end
 
+  def test_venue_adapters_accounts_error do
+    :test_venue_adapters_accounts_error |> filter()
+  end
+
   def test_venue_adapters_maker_taker_fees do
     :test_venue_adapters_maker_taker_fees |> filter()
   end

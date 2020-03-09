@@ -18,9 +18,7 @@ defmodule Tai.Venues.Adapters.AccountsTest do
     :ok
   end
 
-  @test_venues Tai.TestSupport.Helpers.test_venue_adapters_accounts()
-
-  @test_venues
+  Tai.TestSupport.Helpers.test_venue_adapters_accounts()
   |> Enum.map(fn venue ->
     @venue venue
     @credential_id venue.credentials |> Map.keys() |> List.first()
