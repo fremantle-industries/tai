@@ -88,6 +88,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
     if state.credential do
       send(self(), :login)
+      send(self(), {:subscribe, :margin})
       send(self(), {:subscribe, :positions})
     end
 
@@ -149,6 +150,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   def handle_info({:subscribe, :positions}, state) do
     msg = %{"op" => "subscribe", "args" => ["position"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :margin}, state) do
+    msg = %{"op" => "subscribe", "args" => ["margin"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
