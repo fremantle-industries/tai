@@ -44,10 +44,10 @@ defmodule Tai.VenueAdapters.Gdax.Products do
        ) do
     symbol = Tai.Symbol.build(base_currency, quote_currency)
     {:ok, status} = Tai.VenueAdapters.Gdax.ProductStatus.normalize(exchange_status)
-    base_min_size = raw_base_min_size |> Decimal.cast()
-    base_max_size = raw_base_max_size |> Decimal.cast()
-    quote_increment = raw_quote_increment |> Decimal.cast()
-    min_notional = Decimal.mult(base_min_size, quote_increment)
+    base_min_size = raw_base_min_size |> Decimal.cast() |> Decimal.reduce()
+    base_max_size = raw_base_max_size |> Decimal.cast() |> Decimal.reduce()
+    quote_increment = raw_quote_increment |> Decimal.cast() |> Decimal.reduce()
+    min_notional = Decimal.mult(base_min_size, quote_increment) |> Decimal.reduce()
 
     %Tai.Venues.Product{
       venue_id: venue_id,
