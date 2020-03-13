@@ -28,7 +28,7 @@ defmodule Examples.PingPong.ManageOrderUpdate do
       ) do
     advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
 
-    market_quote =
+    {:ok, market_quote} =
       Tai.Advisors.MarketQuotes.for(
         state.market_quotes,
         entry_order.venue_id,
