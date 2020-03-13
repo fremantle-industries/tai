@@ -3,10 +3,13 @@ defmodule Tai.Markets.Asset do
   Arbitratry precision arithmetic for assets
   """
 
-  alias Tai.Markets.Asset
+  alias __MODULE__
 
-  @enforce_keys [:val, :symbol]
-  defstruct [:val, :symbol]
+  @type symbol :: atom
+  @type t :: %Asset{val: Decimal.t(), symbol: symbol}
+
+  @enforce_keys ~w(val symbol)a
+  defstruct ~w(val symbol)a
 
   def new(val, symbol) do
     asset_val = val |> Decimal.cast()

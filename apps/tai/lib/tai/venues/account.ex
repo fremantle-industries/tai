@@ -3,7 +3,7 @@ defmodule Tai.Venues.Account do
 
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
-  @type asset :: atom
+  @type asset :: Tai.Markets.Asset.symbol()
   @type t :: %Account{
           venue_id: venue_id,
           credential_id: credential_id,
