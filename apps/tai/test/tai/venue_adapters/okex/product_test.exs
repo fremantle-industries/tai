@@ -54,7 +54,7 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
         contract_val: "100",
         listing: "2019-11-12T11:16:48.000Z",
         delivery: "2020-01-04T08:00:00.000Z",
-        is_inverse: false
+        is_inverse: "false"
       }
 
       instrument = struct(ExOkex.Swap.Instrument, attrs)
@@ -141,7 +141,7 @@ defmodule Tai.VenuesAdapters.OkEx.ProductTest do
         contract_val: "100",
         listing: "2019-11-12T11:16:48.000Z",
         delivery: "2020-01-04T08:00:00.000Z",
-        is_inverse: true
+        is_inverse: "true"
       }
 
       instrument = struct(ExOkex.Swap.Instrument, attrs)

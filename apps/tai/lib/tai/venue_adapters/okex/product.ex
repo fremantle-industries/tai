@@ -28,6 +28,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
   @iso_extended_format "{ISO:Extended}"
   def build(%Swap.Instrument{} = instrument, venue_id) do
     listing = Timex.parse!(instrument.listing, @iso_extended_format)
+    is_inverse = instrument.is_inverse == "true"
 
     build_product(
       type: :swap,
@@ -39,7 +40,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       venue_price_increment: instrument.tick_size,
       venue_size_increment: instrument.size_increment,
       value: instrument.contract_val,
-      is_inverse: instrument.is_inverse,
+      is_inverse: is_inverse,
       is_quanto: false
     )
   end
