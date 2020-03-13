@@ -11,7 +11,7 @@ defmodule Tai.Venues.AccountStoreTest do
     :ok
   end
 
-  test "broadcasts a message namespaced to the venue/credential/asset/type after it's stored" do
+  test "broadcasts a message after the record is stored" do
     Tai.SystemBus.subscribe(:account_store)
     account = struct(Tai.Venues.Account, venue_id: @venue)
 

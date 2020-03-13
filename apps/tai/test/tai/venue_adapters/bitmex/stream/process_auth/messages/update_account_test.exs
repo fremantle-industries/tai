@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateAccountTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
 
   @venue :venue_a

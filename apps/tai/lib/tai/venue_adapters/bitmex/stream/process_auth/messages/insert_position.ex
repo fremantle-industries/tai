@@ -8,7 +8,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.InsertPosition do
   defstruct ~w(data)a
 
   defimpl ProcessAuth.Message do
-    def process(message, _received_at, _state) do
+    def process(_message, _received_at, _state) do
       :ok
     end
   end
