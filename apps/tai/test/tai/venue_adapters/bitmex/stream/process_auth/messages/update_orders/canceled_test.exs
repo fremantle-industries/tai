@@ -20,7 +20,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
   @venue_client_id "gtc-TCRG7aPSQsmj1Z8jXfbovg=="
   @received_at Timex.now()
   @timestamp "2019-09-07T06:00:04.808Z"
-  @state struct(ProcessAuth.State, venue_id: :my_venue)
+  @state struct(ProcessAuth.State)
 
   test ".process/3 passively cancels the order" do
     TaiEvents.firehose_subscribe()

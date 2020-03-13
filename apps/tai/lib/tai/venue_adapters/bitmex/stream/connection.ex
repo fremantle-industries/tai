@@ -85,7 +85,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   def handle_info(:init_subscriptions, state) do
     schedule_heartbeat()
     schedule_autocancel(0)
-    if state.credential, do: send(self(), :login)
+
+    if state.credential do
+      send(self(), :login)
+      send(self(), {:subscribe, :margin})
+      send(self(), {:subscribe, :positions})
+    end
+
     send(self(), {:subscribe, :depth})
 
     state.channels
@@ -140,6 +146,16 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     end)
 
     {:ok, state}
+  end
+
+  def handle_info({:subscribe, :positions}, state) do
+    msg = %{"op" => "subscribe", "args" => ["position"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
+  end
+
+  def handle_info({:subscribe, :margin}, state) do
+    msg = %{"op" => "subscribe", "args" => ["margin"]} |> Jason.encode!()
+    {:reply, {:text, msg}, state}
   end
 
   def handle_info({:subscribe, :connected_stats}, state) do
@@ -221,8 +237,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   defp auth_headers(nil), do: []
 
-  defp schedule_autocancel(after_ms),
-    do: Process.send_after(self(), :ping_autocancel, after_ms)
+  defp schedule_autocancel(after_ms) do
+    Process.send_after(self(), :ping_autocancel, after_ms)
+  end
 
   @heartbeat_ms 20_000
   defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
