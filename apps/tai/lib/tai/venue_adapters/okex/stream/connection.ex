@@ -59,7 +59,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   def terminate(close_reason, state) do
-    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
   end
 
   def handle_connect(_conn, state) do
@@ -69,7 +69,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   end
 
   def handle_disconnect(conn_status, state) do
-    TaiEvents.error(%Tai.Events.StreamDisconnect{
+    TaiEvents.warn(%Tai.Events.StreamDisconnect{
       venue: state.venue,
       reason: conn_status.reason
     })

@@ -52,7 +52,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   end
 
   def terminate(close_reason, state) do
-    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
   end
 
   def handle_connect(_conn, state) do
@@ -62,11 +62,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   end
 
   def handle_disconnect(conn_status, state) do
-    TaiEvents.info(%Tai.Events.StreamDisconnect{
-      venue: state.venue,
-      reason: conn_status.reason
-    })
-
+    TaiEvents.warn(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
     {:ok, state}
   end
 

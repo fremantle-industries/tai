@@ -34,23 +34,16 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   end
 
   def terminate(close_reason, state) do
-    TaiEvents.error(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
   end
 
   def handle_connect(_conn, state) do
-    %Tai.Events.StreamConnect{venue: state.venue}
-    |> TaiEvents.info()
-
+    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
-    %Tai.Events.StreamDisconnect{
-      venue: state.venue,
-      reason: conn_status.reason
-    }
-    |> TaiEvents.info()
-
+    TaiEvents.warn(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
     {:ok, state}
   end
 
