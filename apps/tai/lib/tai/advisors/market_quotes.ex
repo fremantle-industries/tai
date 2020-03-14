@@ -34,4 +34,10 @@ defmodule Tai.Advisors.MarketQuotes do
     market_quotes.data
     |> Enum.map(fn {_k, q} -> callback.(q) end)
   end
+
+  @spec flat_map(t, (market_quote -> term)) :: [term]
+  def flat_map(market_quotes, callback) do
+    market_quotes.data
+    |> Enum.flat_map(fn {_k, q} -> callback.(q) end)
+  end
 end

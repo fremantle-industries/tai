@@ -42,7 +42,15 @@ defmodule Tai.Advisors.MarketQuotesTest do
   end
 
   test ".map/1 iterates each market quote an return a list of the return value of each function call" do
-    assert result = MarketQuotes.map(@market_quotes, & &1)
+    result = MarketQuotes.map(@market_quotes, & &1)
+
+    assert Enum.count(result) == 2
+    assert Enum.at(result, 0) == @market_quote_a
+    assert Enum.at(result, 1) == @market_quote_b
+  end
+
+  test ".flat_map/1 iterates each market quote and flattens the returned list of each function call" do
+    result = MarketQuotes.flat_map(@market_quotes, fn q -> [q] end)
 
     assert Enum.count(result) == 2
     assert Enum.at(result, 0) == @market_quote_a
