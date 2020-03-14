@@ -34,6 +34,22 @@ defmodule Tai.VenuesAdapters.Bitmex.ProductTest do
       assert product.value == Decimal.new(1)
     end
 
+    test "type is :future when there is an expiry" do
+      attrs = Map.merge(@base_attrs, %{expiry: "2020-06-26T12:00:00.000Z"})
+      instrument = struct(ExBitmex.Instrument, attrs)
+
+      product = Tai.VenueAdapters.Bitmex.Product.build(instrument, :venue_a)
+      assert product.type == :future
+    end
+
+    test "type is :swap when there is no expiry" do
+      attrs = Map.merge(@base_attrs, %{expiry: nil})
+      instrument = struct(ExBitmex.Instrument, attrs)
+
+      product = Tai.VenueAdapters.Bitmex.Product.build(instrument, :venue_a)
+      assert product.type == :swap
+    end
+
     test "assigns maker/taker fee when present" do
       attrs = Map.merge(@base_attrs, %{maker_fee: "-0.025", taker_fee: "0.05"})
       instrument = struct(ExBitmex.Instrument, attrs)
