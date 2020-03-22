@@ -29,8 +29,8 @@ Here's an example of an advisor that logs the spread between multiple products o
 | Binance  | [x] | [x] | [x] | [ ] | [x] | [x] |
 | Deribit  | [x] | [x] | [ ] | [ ] | [x] | [x] |
 | GDAX     | [x] | [x] | [ ] | [ ] | [x] | [x] |
+| Huobi    | [x] | [ ] | [ ] | [ ] | [x] | [ ] |
 | FTX      | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Huobi    | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | Coinflex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 
 [Planned Venues...](./PLANNED_VENUES.md)

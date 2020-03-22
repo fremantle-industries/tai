@@ -1,6 +1,7 @@
 defmodule Tai.Venues.Product do
   @type status ::
-          :pre_trading
+          :unknown
+          | :pre_trading
           | :trading
           | :post_trading
           | :end_of_day

@@ -54,6 +54,11 @@ config :tai,
         }
       }
     ],
+    huobi: [
+      start_on_boot: true,
+      adapter: Tai.VenueAdapters.Huobi,
+      products: "btc200626 ltc200626 eth200626"
+    ],
     binance: [
       start_on_boot: true,
       adapter: Tai.VenueAdapters.Binance,

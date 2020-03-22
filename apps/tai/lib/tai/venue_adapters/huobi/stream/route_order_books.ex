@@ -1,6 +1,6 @@
-defmodule Tai.VenueAdapters.OkEx.Stream.RouteOrderBooks do
+defmodule Tai.VenueAdapters.Huobi.Stream.RouteOrderBooks do
   use GenServer
-  alias Tai.VenueAdapters.OkEx.Stream.ProcessOrderBook
+  alias Tai.VenueAdapters.Huobi.Stream
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
@@ -22,7 +22,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.RouteOrderBooks do
     stores = products |> build_stores()
     state = %State{venue: venue, stores: stores}
     name = venue |> to_name()
-
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
@@ -30,30 +29,32 @@ defmodule Tai.VenueAdapters.OkEx.Stream.RouteOrderBooks do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   @spec init(state) :: {:ok, state}
-  def init(state), do: {:ok, state}
+  def init(state) do
+    {:ok, state}
+  end
 
   def handle_cast(
-        {%{"action" => "partial", "data" => data}, received_at},
+        {
+          %{"ch" => "market." <> channel, "tick" => %{"event" => "snapshot"} = tick},
+          received_at
+        },
         state
       ) do
-    data
-    |> Enum.each(fn %{"instrument_id" => venue_symbol} = msg ->
-      {state, venue_symbol}
-      |> forward({:snapshot, msg, received_at})
-    end)
+    {state, channel_symbol(channel)}
+    |> forward({:snapshot, tick, received_at})
 
     {:noreply, state}
   end
 
   def handle_cast(
-        {%{"action" => "update", "data" => data}, received_at},
+        {
+          %{"ch" => "market." <> channel, "tick" => %{"event" => "update"} = tick},
+          received_at
+        },
         state
       ) do
-    data
-    |> Enum.each(fn %{"instrument_id" => venue_symbol} = msg ->
-      {state, venue_symbol}
-      |> forward({:update, msg, received_at})
-    end)
+    {state, channel_symbol(channel)}
+    |> forward({:update, tick, received_at})
 
     {:noreply, state}
   end
@@ -62,13 +63,23 @@ defmodule Tai.VenueAdapters.OkEx.Stream.RouteOrderBooks do
     products
     |> Enum.reduce(
       %{},
-      &Map.put(&2, &1.venue_symbol, &1.venue_id |> ProcessOrderBook.to_name(&1.venue_symbol))
+      fn p, acc ->
+        name = Stream.ProcessOrderBook.to_name(p.venue_id, p.venue_symbol)
+        channel_symbol = Stream.Channels.depth_symbol(p)
+        Map.put(acc, channel_symbol, name)
+      end
     )
   end
 
-  defp forward({state, venue_symbol}, msg) do
+  defp channel_symbol(channel) do
+    channel
+    |> String.split(".")
+    |> List.first()
+  end
+
+  defp forward({state, channel_symbol}, msg) do
     state.stores
-    |> Map.fetch!(venue_symbol)
+    |> Map.fetch!(channel_symbol)
     |> GenServer.cast(msg)
   end
 end

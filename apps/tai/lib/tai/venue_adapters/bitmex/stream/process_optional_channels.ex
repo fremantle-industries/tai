@@ -20,6 +20,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
+
   def init(state), do: {:ok, state}
 
   def handle_cast(
@@ -96,7 +99,4 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
 
     {:noreply, state}
   end
-
-  @spec to_name(venue_id) :: atom
-  def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 end

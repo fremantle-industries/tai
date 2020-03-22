@@ -86,6 +86,16 @@ config(:tai,
       },
       opts: %{}
     ],
+    huobi: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.Huobi,
+      opts: %{}
+    ],
+    huobi_futures: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.Huobi,
+      opts: %{}
+    ],
     binance: [
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,
@@ -121,7 +131,16 @@ config(:tai,
   }
 )
 
-config(:tai, :test_venue_adapters_products, [:binance, :bitmex, :deribit, :gdax, :mock, :okex])
+config(:tai, :test_venue_adapters_products, [
+  :binance,
+  :bitmex,
+  :deribit,
+  :gdax,
+  :mock,
+  :okex,
+  :huobi
+])
+
 config(:tai, :test_venue_adapters_accounts, [:binance, :bitmex, :deribit, :gdax, :mock, :okex])
 config(:tai, :test_venue_adapters_accounts_error, [:bitmex])
 config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :gdax, :okex])
