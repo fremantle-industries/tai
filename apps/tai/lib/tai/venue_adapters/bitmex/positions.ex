@@ -49,7 +49,7 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
 
   defp entry_price(%ExBitmex.Position{avg_entry_price: p}), do: Decimal.cast(p)
 
-  defp leverage(%ExBitmex.Position{leverage: l}), do: Decimal.new(l)
+  defp leverage(%ExBitmex.Position{leverage: l}), do: Decimal.cast(l)
 
   defp margin_mode(%ExBitmex.Position{cross_margin: true}), do: :crossed
   defp margin_mode(%ExBitmex.Position{cross_margin: false}), do: :fixed
