@@ -4,17 +4,17 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
-    @type t :: %State{venue: atom, tasks: map}
+    @type t :: %State{venue: atom}
 
-    @enforce_keys ~w(venue tasks)a
-    defstruct ~w(venue tasks)a
+    @enforce_keys ~w(venue)a
+    defstruct ~w(venue)a
   end
 
   @type venue_id :: Tai.Venue.id()
   @type state :: State.t()
 
   def start_link(venue: venue) do
-    state = %State{venue: venue, tasks: %{}}
+    state = %State{venue: venue}
     name = venue |> to_name()
     GenServer.start_link(__MODULE__, state, name: name)
   end
@@ -34,30 +34,22 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
         state
       )
       when table in @product_types do
-    new_tasks =
-      orders
-      |> Enum.map(fn %{"client_oid" => venue_client_id} = venue_order ->
-        Task.async(fn ->
-          venue_client_id
-          |> ClientId.from_base32()
-          |> Stream.UpdateOrder.update(venue_order, received_at)
-        end)
-      end)
-      |> Enum.reduce(%{}, fn t, acc -> Map.put(acc, t.ref, true) end)
-      |> Map.merge(state.tasks)
+    orders
+    |> Enum.each(fn %{"client_oid" => venue_client_id} = venue_order ->
+      venue_client_id
+      |> ClientId.from_base32()
+      |> Stream.UpdateOrder.update(venue_order, received_at)
+    end)
 
-    new_state = state |> Map.put(:tasks, new_tasks)
-
-    {:noreply, new_state}
+    {:noreply, state}
   end
 
   def handle_cast({msg, received_at}, state) do
-    %Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: received_at
-    }
-    |> TaiEvents.warn()
+    })
 
     {:noreply, state}
   end
@@ -66,26 +58,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
     response |> notify
     {:noreply, state}
   end
-
-  def handle_info({:DOWN, reference, :process, _pid, :normal}, state) do
-    new_tasks = state.tasks |> Map.delete(reference)
-    new_state = state |> Map.put(:tasks, new_tasks)
-    {:noreply, new_state}
-  end
-
-  def handle_info({:DOWN, reference, :process, _pid, reason}, state) do
-    %Tai.Events.StreamError{
-      venue_id: state.venue,
-      reason: reason
-    }
-    |> TaiEvents.error()
-
-    new_tasks = state.tasks |> Map.delete(reference)
-    new_state = state |> Map.put(:tasks, new_tasks)
-    {:noreply, new_state}
-  end
-
-  def handle_info({:EXIT, _, _}, state), do: {:noreply, state}
 
   defp notify(:ok), do: nil
 
