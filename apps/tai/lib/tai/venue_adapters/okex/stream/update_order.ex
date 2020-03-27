@@ -12,7 +12,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   def update(
         client_id,
         %{"status" => status, "timestamp" => timestamp},
-        received_at
+        received_at,
+        _state
       )
       when status == @canceled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
@@ -23,6 +24,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       last_venue_timestamp: venue_timestamp
     }
     |> OrderStore.update()
+    |> notify()
   end
 
   def update(
@@ -32,7 +34,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
           "order_id" => venue_order_id,
           "timestamp" => timestamp
         },
-        received_at
+        received_at,
+        _state
       )
       when status == @submitting do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
@@ -44,6 +47,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       last_venue_timestamp: venue_timestamp
     }
     |> OrderStore.update()
+    |> notify()
   end
 
   def update(
@@ -55,7 +59,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
           "timestamp" => timestamp,
           "size" => size
         },
-        received_at
+        received_at,
+        _state
       )
       when status == @pending do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
@@ -71,6 +76,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       last_venue_timestamp: venue_timestamp
     }
     |> OrderStore.update()
+    |> notify()
   end
 
   def update(
@@ -81,7 +87,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
           "timestamp" => timestamp,
           "size" => size
         },
-        received_at
+        received_at,
+        _state
       )
       when status == @partially_filled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
@@ -96,6 +103,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       last_venue_timestamp: venue_timestamp
     }
     |> OrderStore.update()
+    |> notify()
   end
 
   def update(
@@ -105,7 +113,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
           "filled_qty" => filled_qty,
           "timestamp" => timestamp
         },
-        received_at
+        received_at,
+        _state
       )
       when status == @fully_filled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
@@ -118,5 +127,34 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       last_venue_timestamp: venue_timestamp
     }
     |> OrderStore.update()
+    |> notify()
+  end
+
+  def update(_client_id, msg, received_at, state) do
+    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
+      venue_id: state.venue,
+      msg: msg,
+      received_at: received_at
+    })
+  end
+
+  defp notify({:ok, {old, updated}}) do
+    Tai.Trading.NotifyOrderUpdate.notify!(old, updated)
+  end
+
+  defp notify({:error, {:invalid_status, was, required, %action_name{} = action}}) do
+    TaiEvents.warn(%Tai.Events.OrderUpdateInvalidStatus{
+      was: was,
+      required: required,
+      client_id: action.client_id,
+      action: action_name
+    })
+  end
+
+  defp notify({:error, {:not_found, %action_name{} = action}}) do
+    TaiEvents.warn(%Tai.Events.OrderUpdateNotFound{
+      client_id: action.client_id,
+      action: action_name
+    })
   end
 end

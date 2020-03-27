@@ -106,18 +106,17 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
 
   test "emits a warning when the venue message can't be handled" do
     TaiEvents.firehose_subscribe()
-    venue_orders = [%{"unhandled" => true}]
 
     :my_venue
     |> ProcessAuth.to_name()
     |> GenServer.cast(
-      {%{"table" => "order", "action" => "update", "data" => venue_orders}, :ignore}
+      {%{"table" => "order", "action" => "update", "data" => [%{"unhandled" => true}]}, :ignore}
     )
 
-    assert_receive {TaiEvents.Event, %Tai.Events.StreamMessageUnhandled{}, :warn}
+    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
   end
 
-  test "emits a warning when there is an error processing the venue message" do
+  test "emits a warning when the order message can't be handled" do
     TaiEvents.firehose_subscribe()
     client_id = Ecto.UUID.generate()
 
@@ -134,7 +133,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     |> ProcessAuth.to_name()
     |> GenServer.cast({%{"table" => "futures/order", "data" => venue_orders}, :ignore})
 
-    assert_receive {TaiEvents.Event, %Tai.Events.StreamError{} = event, :error}
-    assert {:function_clause, _} = event.reason
+    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
   end
 end
