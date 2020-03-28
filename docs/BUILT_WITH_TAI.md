@@ -1,5 +1,7 @@
 # Built with Tai
 
+[Built with Tai](./BUILT_WITH_TAI.md) | [Install](../README.md#install) | [Usage](../README.md#usage) | [Commands](./COMMANDS.md) | [Architecture](./ARCHITECTURE.md) | [Configuration](./CONFIGURATION.md)
+
 ## [Back Office](https://github.com/fremantle-industries/back_office)
 
 Web app starter kit to manage operations of a fund.

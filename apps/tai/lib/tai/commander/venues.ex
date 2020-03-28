@@ -18,7 +18,25 @@ defmodule Tai.Commander.Venues do
 
     store_id
     |> Tai.Venues.VenueStore.all()
+    |> Enum.map(&to_instance/1)
     |> Enumerati.filter(filters)
     |> Enumerati.order(order_by)
+  end
+
+  defp to_instance(venue) do
+    %Tai.Venues.Instance{
+      id: venue.id,
+      adapter: venue.adapter,
+      channels: venue.channels,
+      products: venue.products,
+      accounts: venue.accounts,
+      credentials: venue.credentials,
+      quote_depth: venue.quote_depth,
+      timeout: venue.timeout,
+      start_on_boot: venue.start_on_boot,
+      broadcast_change_set: venue.broadcast_change_set,
+      opts: venue.opts,
+      status: Tai.Venues.Status.status(venue)
+    }
   end
 end

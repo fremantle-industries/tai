@@ -25,17 +25,17 @@ defmodule Tai.IEx.Commands.Venues do
     |> render!(@header)
   end
 
-  defp format_rows(venues) do
-    venues
-    |> Enum.map(fn venue ->
+  defp format_rows(instances) do
+    instances
+    |> Enum.map(fn i ->
       [
-        venue.id,
-        venue.credentials |> Map.keys(),
-        venue |> Tai.Venues.Status.status(),
-        venue.channels,
-        venue.quote_depth,
-        venue.timeout,
-        venue.start_on_boot
+        i.id,
+        i.credentials |> Map.keys(),
+        i.status,
+        i.channels,
+        i.quote_depth,
+        i.timeout,
+        i.start_on_boot
       ]
       |> Enum.map(&format_col/1)
     end)

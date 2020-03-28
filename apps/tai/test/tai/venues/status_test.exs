@@ -17,7 +17,7 @@ defmodule Tai.Venues.StatusTest do
   @test_store_id __MODULE__
   @venue struct(
            Tai.Venue,
-           id: :venue_a,
+           id: :status_venue,
            adapter: VenueAdapter,
            credentials: %{main: %{}},
            accounts: "*",

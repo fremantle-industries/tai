@@ -10,7 +10,7 @@ defmodule Tai.Venues.Status do
   end
 
   defp find_stream(venue) do
-    result = Tai.Venues.Instance.find_stream(venue)
+    result = Tai.Venues.Instances.find_stream(venue)
     {result, venue}
   end
 
@@ -19,7 +19,7 @@ defmodule Tai.Venues.Status do
   end
 
   defp check_stream({{:error, :not_found}, venue}) do
-    result = Tai.Venues.Instance.find(venue)
+    result = Tai.Venues.Instances.find(venue)
     {result, venue}
   end
 

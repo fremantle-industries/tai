@@ -19,6 +19,6 @@ defmodule Tai.Commander.StopVenue do
     Tai.Venues.VenueStore.find(venue_id, store_id)
   end
 
-  defp stop_instance({:ok, venue}), do: Tai.Venues.Instance.stop(venue)
+  defp stop_instance({:ok, venue}), do: Tai.Venues.Instances.stop(venue)
   defp stop_instance({:error, :not_found} = error), do: error
 end

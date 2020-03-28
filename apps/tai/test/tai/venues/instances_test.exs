@@ -1,4 +1,4 @@
-defmodule Tai.Venues.InstanceTest do
+defmodule Tai.Venues.InstancesTest do
   use ExUnit.Case, async: false
 
   defmodule VenueAdapter do
@@ -29,12 +29,12 @@ defmodule Tai.Venues.InstanceTest do
     test "returns the pid of the start venue process" do
       start_pid = start_supervised!({MockStart, @venue})
 
-      assert {:ok, pid} = Tai.Venues.Instance.find(@venue)
+      assert {:ok, pid} = Tai.Venues.Instances.find(@venue)
       assert pid == start_pid
     end
 
     test "returns an error when the process is stopped" do
-      assert Tai.Venues.Instance.find(@venue) == {:error, :not_found}
+      assert Tai.Venues.Instances.find(@venue) == {:error, :not_found}
     end
   end
 
@@ -42,12 +42,12 @@ defmodule Tai.Venues.InstanceTest do
     test "returns the pid of the stream" do
       {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@stream)
 
-      assert {:ok, pid} = Tai.Venues.Instance.find_stream(@venue)
+      assert {:ok, pid} = Tai.Venues.Instances.find_stream(@venue)
       assert pid == stream_pid
     end
 
     test "returns an error when the stream is stopped" do
-      assert Tai.Venues.Instance.find_stream(@venue) == {:error, :not_found}
+      assert Tai.Venues.Instances.find_stream(@venue) == {:error, :not_found}
     end
   end
 
@@ -56,13 +56,13 @@ defmodule Tai.Venues.InstanceTest do
       {:ok, start_pid} = Tai.Venues.Supervisor.start(@venue)
       {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@stream)
 
-      assert Tai.Venues.Instance.stop(@venue) == :ok
+      assert Tai.Venues.Instances.stop(@venue) == :ok
       assert Process.alive?(start_pid) == false
       assert Process.alive?(stream_pid) == false
     end
 
     test "returns an error when the stream or start venue process can't be found" do
-      assert Tai.Venues.Instance.stop(@venue) == {:error, :already_stopped}
+      assert Tai.Venues.Instances.stop(@venue) == {:error, :already_stopped}
     end
   end
 end

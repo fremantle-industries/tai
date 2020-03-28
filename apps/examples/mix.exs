@@ -19,13 +19,15 @@ defmodule Examples.MixProject do
 
   def application do
     [
+      mod: {Examples.Application, []},
       extra_applications: [:logger]
     ]
   end
 
   defp deps do
     [
-      {:tai, in_umbrella: true}
+      {:tai, in_umbrella: true},
+      {:libcluster, "~> 3.2"}
     ]
   end
 
