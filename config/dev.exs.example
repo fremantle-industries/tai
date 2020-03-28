@@ -95,5 +95,3 @@ config :tai,
       }
     ]
   }
-
-config :echo_boy, port: 4200
