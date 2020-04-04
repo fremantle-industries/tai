@@ -89,11 +89,11 @@ defmodule Tai.TestSupport.E2ECase do
       end
 
       def start_advisors(args) do
-        capture_io(fn -> Tai.CommandsHelper.start_advisors(args) end)
+        capture_io(fn -> Tai.IEx.start_advisors(args) end)
       end
 
       def start_venue(venue_id) do
-        capture_io(fn -> Tai.CommandsHelper.start_venue(venue_id) end)
+        capture_io(fn -> Tai.IEx.start_venue(venue_id) end)
 
         receive do
           {TaiEvents.Event, %Tai.Events.VenueStart{}, :info} ->
