@@ -32,8 +32,10 @@ Here's an example of an advisor that logs the spread between multiple products o
 | Huobi    | [x] | [ ] | [ ] | [ ] | [x] | [ ] |
 | FTX      | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | Coinflex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-
-[Planned Venues...](./PLANNED_VENUES.md)
+| Bybit    | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| bitFlyer | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| Kraken   | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| Bitfinex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 
 ## Install
 
@@ -346,7 +348,7 @@ drop us an email or open a Github issue.
 
 ## Authors
 
-* Alex Kwiatkowski - alex+git@rival-studios.com
+* Alex Kwiatkowski - alex+git@fremantle.io
 
 ## License
 
