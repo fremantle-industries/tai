@@ -6,6 +6,10 @@ defmodule Tai.Settings do
   use GenServer
   alias __MODULE__
 
+  @type t :: %Settings{
+          send_orders: boolean
+        }
+
   @enforce_keys ~w(send_orders)a
   defstruct ~w(send_orders)a
 

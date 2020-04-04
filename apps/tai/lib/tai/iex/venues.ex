@@ -15,18 +15,12 @@ defmodule Tai.IEx.Commands.Venues do
   @type store_id_opt :: {:store_id, store_id}
   @type where_opt :: {:where, [{atom, term}]}
   @type order_opt :: {:order, [atom]}
-  @type list_options :: store_id_opt | where_opt | order_opt
+  @type options :: [store_id_opt | where_opt | order_opt]
 
-  @spec list([list_options]) :: no_return
-  def list(args) do
-    store_id = Keyword.get(args, :store_id, Tai.Venues.VenueStore.default_store_id())
-    filters = Keyword.get(args, :where, [])
-    order_by = Keyword.get(args, :order, [:id])
-
-    store_id
-    |> Tai.Venues.VenueStore.all()
-    |> Enumerati.filter(filters)
-    |> Enumerati.order(order_by)
+  @spec list(options) :: no_return
+  def list(options) do
+    options
+    |> Tai.Commander.venues()
     |> format_rows()
     |> render!(@header)
   end

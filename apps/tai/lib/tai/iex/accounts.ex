@@ -22,9 +22,7 @@ defmodule Tai.IEx.Commands.Accounts do
   end
 
   defp fetch_accounts do
-    Tai.Venues.AccountStore.all()
-    |> Enum.sort(&(&1.asset >= &2.asset))
-    |> Enum.sort(&(&1.venue_id >= &2.venue_id))
+    Tai.Commander.accounts()
     |> Enum.reduce(
       [],
       fn account, acc ->

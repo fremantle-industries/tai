@@ -15,21 +15,20 @@ defmodule Tai.IEx.Commands.Fees do
 
   @spec fees :: no_return
   def fees do
-    Tai.Venues.FeeStore.all()
-    |> Enum.sort(&(&1.venue_id < &2.venue_id))
+    Tai.Commander.fees()
     |> format_rows
     |> render!(@header)
   end
 
   defp format_rows(fees) do
     fees
-    |> Enum.map(fn fee_info ->
+    |> Enum.map(fn f ->
       [
-        fee_info.venue_id,
-        fee_info.credential_id,
-        fee_info.symbol,
-        {fee_info.maker, fee_info.maker_type},
-        {fee_info.taker, fee_info.taker_type}
+        f.venue_id,
+        f.credential_id,
+        f.symbol,
+        {f.maker, f.maker_type},
+        {f.taker, f.taker_type}
       ]
       |> Enum.map(&format_col/1)
     end)

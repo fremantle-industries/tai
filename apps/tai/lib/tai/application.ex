@@ -20,6 +20,7 @@ defmodule Tai.Application do
       Tai.Venues.Supervisor,
       Tai.Advisors.SpecStore,
       Tai.Advisors.Supervisor,
+      Tai.Commander,
       Tai.Boot
     ]
 

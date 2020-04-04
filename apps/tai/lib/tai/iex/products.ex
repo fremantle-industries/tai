@@ -17,8 +17,7 @@ defmodule Tai.IEx.Commands.Products do
 
   @spec products :: no_return
   def products do
-    Tai.Venues.ProductStore.all()
-    |> Enum.sort(&(&1.symbol < &2.symbol))
+    Tai.Commander.products()
     |> format_rows
     |> render!(@header)
   end

@@ -17,7 +17,7 @@ defmodule Tai.IEx.Commands.Markets do
 
   @spec markets :: no_return
   def markets do
-    Tai.Markets.QuoteStore.all()
+    Tai.Commander.markets()
     |> format_rows
     |> sort_rows
     |> render!(@header)

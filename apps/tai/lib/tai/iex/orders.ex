@@ -29,8 +29,7 @@ defmodule Tai.IEx.Commands.Orders do
 
   @spec orders :: no_return
   def orders do
-    Tai.Trading.OrderStore.all()
-    |> Enum.sort(&(DateTime.compare(&1.enqueued_at, &2.enqueued_at) == :lt))
+    Tai.Commander.orders()
     |> Enum.map(fn order ->
       [
         order.venue_id,

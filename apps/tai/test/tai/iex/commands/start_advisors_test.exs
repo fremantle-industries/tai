@@ -8,6 +8,8 @@ defmodule Tai.IEx.Commands.StartAdvisorsTest do
   setup do
     start_supervised!({Tai.Advisors.Supervisor, []})
     start_supervised!({Tai.Advisors.SpecStore, id: @test_store_id})
+    start_supervised!(Tai.Commander)
+
     insert_spec(%{group_id: :group_a, advisor_id: :main}, @test_store_id)
     insert_spec(%{group_id: :group_b, advisor_id: :main}, @test_store_id)
     :ok

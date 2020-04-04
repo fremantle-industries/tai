@@ -7,6 +7,7 @@ defmodule Tai.IEx.Commands.AdvisorsTest do
 
   setup do
     start_supervised!({Tai.Advisors.SpecStore, id: @test_store_id})
+    start_supervised!(Tai.Commander)
     :ok
   end
 

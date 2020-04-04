@@ -5,7 +5,7 @@ defmodule Tai.IEx.Commands.Settings do
 
   @spec settings :: no_return
   def settings do
-    Tai.Settings.all()
+    Tai.Commander.settings()
     |> Map.to_list()
     |> Enum.filter(fn {k, _} -> k != :__struct__ end)
     |> Enum.map(&Tuple.to_list/1)

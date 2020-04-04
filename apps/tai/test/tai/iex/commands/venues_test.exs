@@ -7,6 +7,7 @@ defmodule Tai.IEx.Commands.VenuesTest do
   setup do
     start_supervised!(Tai.Venues.StreamsSupervisor)
     start_supervised!({Tai.Venues.VenueStore, id: @test_store_id})
+    start_supervised!(Tai.Commander)
     :ok
   end
 

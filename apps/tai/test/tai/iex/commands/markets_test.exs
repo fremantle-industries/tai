@@ -6,6 +6,7 @@ defmodule Tai.IEx.MarketsTest do
   setup do
     start_supervised!({Tai.SystemBus, 1})
     start_supervised!(Tai.Markets.QuoteStore)
+    start_supervised!(Tai.Commander)
     :ok
   end
 

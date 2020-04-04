@@ -5,6 +5,7 @@ defmodule Tai.IEx.Commands.ProductsTest do
 
   setup do
     start_supervised!(Tai.Venues.ProductStore)
+    start_supervised!(Tai.Commander)
     :ok
   end
 

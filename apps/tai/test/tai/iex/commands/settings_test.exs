@@ -3,12 +3,12 @@ defmodule Tai.IEx.Commands.SettingsTest do
   import ExUnit.CaptureIO
 
   setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
+    config =
+      Tai.Config.parse()
+      |> Map.put(:send_orders, true)
 
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!({Tai.Settings, config})
+    start_supervised!(Tai.Commander)
     :ok
   end
 

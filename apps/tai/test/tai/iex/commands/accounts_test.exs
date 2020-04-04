@@ -4,12 +4,9 @@ defmodule Tai.IEx.Commands.AccountsTest do
   import Tai.TestSupport.Mock
 
   setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
-
-    {:ok, _} = Application.ensure_all_started(:tai)
+    start_supervised!({Tai.SystemBus, 1})
+    start_supervised!(Tai.Venues.AccountStore)
+    start_supervised!(Tai.Commander)
     :ok
   end
 
