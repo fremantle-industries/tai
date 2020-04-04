@@ -96,6 +96,11 @@ config(:tai,
       adapter: Tai.VenueAdapters.Huobi,
       opts: %{}
     ],
+    huobi_swap: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.Huobi,
+      opts: %{}
+    ],
     binance: [
       enabled: true,
       adapter: Tai.VenueAdapters.Binance,

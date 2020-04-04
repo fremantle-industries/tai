@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Huobi.Product do
-  alias ExHuobi.Futures
+  alias ExHuobi.{Futures, Swaps}
 
   @date_format "{YYYY}{0M}{0D}"
   @date_time_format "#{@date_format} {h24}:{m}"
@@ -19,6 +19,27 @@ defmodule Tai.VenueAdapters.Huobi.Product do
       venue_id: venue_id,
       venue_symbol: contract.contract_code,
       alias: contract.contract_type,
+      base: contract.symbol,
+      quote: "USD",
+      listing: listing,
+      expiry: expiry,
+      venue_status: contract.contract_status,
+      venue_price_increment: contract.price_tick,
+      venue_size_increment: 1,
+      value: contract.contract_size,
+      is_inverse: true,
+      is_quanto: false
+    )
+  end
+
+  def build(%Swaps.Contract{} = contract, venue_id) do
+    listing = contract.create_date |> Timex.parse!(@date_format) |> DateTime.from_naive!(@zone)
+    expiry = contract.settlement_date |> String.to_integer() |> Timex.from_unix(:millisecond)
+
+    build_product(
+      type: :swap,
+      venue_id: venue_id,
+      venue_symbol: contract.contract_code,
       base: contract.symbol,
       quote: "USD",
       listing: listing,

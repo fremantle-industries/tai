@@ -4,8 +4,12 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Channels do
     |> Enum.join(".")
   end
 
-  def depth_symbol(product) do
+  def depth_symbol(%Tai.Venues.Product{type: :future} = product) do
     "#{product.venue_base}_#{contract_suffix(product.alias)}"
+  end
+
+  def depth_symbol(product) do
+    product.venue_symbol
   end
 
   defp contract_suffix("this_week"), do: "CW"
