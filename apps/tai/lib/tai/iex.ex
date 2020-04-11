@@ -45,6 +45,10 @@ defmodule Tai.IEx do
     to: Commands.StopVenue,
     as: :stop
 
+  @spec advisor_groups() :: no_return
+  @spec advisor_groups(Commands.AdvisorGroups.options()) :: no_return
+  defdelegate advisor_groups(options \\ []), to: Commands.AdvisorGroups, as: :list
+
   @spec advisors() :: no_return
   @spec advisors(Commands.Advisors.options()) :: no_return
   defdelegate advisors(options \\ []), to: Commands.Advisors, as: :list

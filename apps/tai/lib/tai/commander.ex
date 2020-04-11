@@ -37,6 +37,10 @@ defmodule Tai.Commander do
     options |> to_dest |> GenServer.call({:stop_venue, venue_id, options})
   end
 
+  def advisor_groups(options \\ []) do
+    options |> to_dest |> GenServer.call({:advisor_groups, options})
+  end
+
   def advisors(options \\ []) do
     options |> to_dest |> GenServer.call({:advisors, options})
   end
@@ -95,6 +99,10 @@ defmodule Tai.Commander do
 
   def handle_call({:stop_venue, venue_id, store_id}, _from, state) do
     {:reply, Tai.Commander.StopVenue.execute(venue_id, store_id), state}
+  end
+
+  def handle_call({:advisor_groups, options}, _from, state) do
+    {:reply, Tai.Commander.AdvisorGroups.get(options), state}
   end
 
   def handle_call({:advisors, options}, _from, state) do
