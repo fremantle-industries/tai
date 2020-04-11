@@ -1,4 +1,5 @@
-# Tai
+# Tai - Orchestrate Your Trading
+
 [![Build Status](https://github.com/fremantle-capital/tai/workflows/Test/badge.svg?branch=master)](https://github.com/fremantle-capital/tai/actions?query=workflow%3ATest)
 [![Coverage Status](https://coveralls.io/repos/github/fremantle-capital/tai/badge.svg?branch=master)](https://coveralls.io/github/fremantle-capital/tai?branch=master)
 [![hex.pm version](https://img.shields.io/hexpm/v/tai.svg?style=flat)](https://hex.pm/packages/tai)
