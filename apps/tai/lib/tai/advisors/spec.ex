@@ -27,39 +27,15 @@ defmodule Tai.Advisors.Spec do
           trades: trades | nil
         }
 
-  @enforce_keys ~w(mod start_on_boot restart shutdown group_id advisor_id products config)a
-  defstruct ~w(mod start_on_boot restart shutdown group_id advisor_id products config run_store trades)a
+  @enforce_keys ~w[mod start_on_boot restart shutdown group_id advisor_id products config]a
+  defstruct ~w[mod start_on_boot restart shutdown group_id advisor_id products config run_store trades]a
 
-  @spec to_child_spec(t) :: Supervisor.child_spec()
-  def to_child_spec(spec) do
-    run_store = spec.run_store || %{}
-    trades = spec.trades || []
-    name = Tai.Advisor.to_name(spec.group_id, spec.advisor_id)
+  defimpl Stored.Item do
+    @type spec :: Tai.Advisors.Spec.t()
+    @type group_id :: Tai.AdvisorGroup.id()
+    @type advisor_id :: Tai.Advisor.id()
 
-    start_opts = [
-      group_id: spec.group_id,
-      advisor_id: spec.advisor_id,
-      products: spec.products,
-      config: spec.config,
-      store: run_store,
-      trades: trades
-    ]
-
-    %{
-      id: name,
-      start: {spec.mod, :start_link, [start_opts]},
-      restart: spec.restart,
-      shutdown: spec.shutdown,
-      type: :worker
-    }
+    @spec key(spec) :: {group_id, advisor_id}
+    def key(spec), do: {spec.group_id, spec.advisor_id}
   end
-end
-
-defimpl Stored.Item, for: Tai.Advisors.Spec do
-  @type spec :: Tai.Advisors.Spec.t()
-  @type group_id :: Tai.AdvisorGroup.id()
-  @type advisor_id :: Tai.Advisor.id()
-
-  @spec key(spec) :: {group_id, advisor_id}
-  def key(spec), do: {spec.group_id, spec.advisor_id}
 end

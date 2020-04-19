@@ -26,7 +26,7 @@ defmodule Tai.Advisors.HandleEventTest do
   @symbol :btc_usd
   @group_id :group_a
   @advisor_id :my_advisor
-  @advisor_name Tai.Advisor.to_name(@group_id, @advisor_id)
+  @advisor_process Tai.Advisor.process_name(@group_id, @advisor_id)
   @product struct(Tai.Venues.Product, %{venue_id: @venue, symbol: @symbol})
   @market_quote %Quote{
     venue_id: @venue,
@@ -64,7 +64,7 @@ defmodule Tai.Advisors.HandleEventTest do
   test "fires the handle_event callback for market quotes" do
     start_advisor!(MyAdvisor)
 
-    send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {:handle_event_called, received_market_quote}
 
@@ -84,7 +84,7 @@ defmodule Tai.Advisors.HandleEventTest do
     TaiEvents.firehose_subscribe()
     start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
 
-    send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {
       TaiEvents.Event,
@@ -97,7 +97,7 @@ defmodule Tai.Advisors.HandleEventTest do
     assert event.event == @market_quote
     assert event.return_value == {:unknown, :return_val}
 
-    send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {TaiEvents.Event, %Tai.Events.AdvisorHandleEventInvalidReturn{} = event_2, _}
     assert event_2.return_value == {:unknown, :return_val}
@@ -107,7 +107,7 @@ defmodule Tai.Advisors.HandleEventTest do
     TaiEvents.firehose_subscribe()
     start_advisor!(MyAdvisor, %{error: "!!!This is an ERROR!!!"})
 
-    send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {
       TaiEvents.Event,
@@ -128,7 +128,7 @@ defmodule Tai.Advisors.HandleEventTest do
              [file: _, line: _]
            } = stack_1
 
-    send(@advisor_name, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {
       TaiEvents.Event,

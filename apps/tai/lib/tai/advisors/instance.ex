@@ -17,8 +17,8 @@ defmodule Tai.Advisors.Instance do
           status: status
         }
 
-  @enforce_keys ~w(mod start_on_boot restart shutdown group_id advisor_id products config pid status)a
-  defstruct ~w(mod start_on_boot restart shutdown group_id advisor_id products config trades run_store pid status)a
+  @enforce_keys ~w[mod start_on_boot restart shutdown group_id advisor_id products config pid status]a
+  defstruct ~w[mod start_on_boot restart shutdown group_id advisor_id products config trades run_store pid status]a
 
   @spec from_spec(spec) :: t
   def from_spec(spec) do
@@ -58,7 +58,7 @@ defmodule Tai.Advisors.Instance do
   end
 
   defp whereis(spec) do
-    name = Tai.Advisor.to_name(spec.group_id, spec.advisor_id)
+    name = Tai.Advisor.process_name(spec.group_id, spec.advisor_id)
     Process.whereis(name)
   end
 

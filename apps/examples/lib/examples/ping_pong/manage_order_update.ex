@@ -26,7 +26,7 @@ defmodule Examples.PingPong.ManageOrderUpdate do
         state,
         order_provider
       ) do
-    advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
+    advisor_process = Tai.Advisor.process_name(state.group_id, state.advisor_id)
 
     {:ok, market_quote} =
       Tai.Advisors.MarketQuotes.for(
@@ -35,7 +35,9 @@ defmodule Examples.PingPong.ManageOrderUpdate do
         entry_order.product_symbol
       )
 
-    {:ok, entry_order} = order_provider.create_entry_order(advisor_id, market_quote, state.config)
+    {:ok, entry_order} =
+      order_provider.create_entry_order(advisor_process, market_quote, state.config)
+
     new_run_store = Map.put(run_store, :entry_order, entry_order)
 
     {:ok, new_run_store}
@@ -47,10 +49,10 @@ defmodule Examples.PingPong.ManageOrderUpdate do
         state,
         order_provider
       ) do
-    advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
+    advisor_process = Tai.Advisor.process_name(state.group_id, state.advisor_id)
 
     {:ok, exit_order} =
-      order_provider.create_exit_order(advisor_id, prev, entry_order, state.config)
+      order_provider.create_exit_order(advisor_process, prev, entry_order, state.config)
 
     new_run_store = Map.put(run_store, :exit_order, exit_order)
 
@@ -63,10 +65,10 @@ defmodule Examples.PingPong.ManageOrderUpdate do
         state,
         order_provider
       ) do
-    advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
+    advisor_process = Tai.Advisor.process_name(state.group_id, state.advisor_id)
 
     {:ok, exit_order} =
-      order_provider.create_exit_order(advisor_id, prev, entry_order, state.config)
+      order_provider.create_exit_order(advisor_process, prev, entry_order, state.config)
 
     new_run_store = Map.put(run_store, :exit_order, exit_order)
 

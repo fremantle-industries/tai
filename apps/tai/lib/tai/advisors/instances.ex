@@ -1,5 +1,5 @@
 defmodule Tai.Advisors.Instances do
-  alias Tai.Advisors.{Instance, SpecStore, Spec}
+  alias Tai.Advisors.{Instance, SpecStore}
 
   @type store_id :: SpecStore.store_id()
   @type instance :: Instance.t()
@@ -16,7 +16,7 @@ defmodule Tai.Advisors.Instances do
   def start(instances) do
     instances
     |> Enum.map(&Instance.to_spec/1)
-    |> Enum.map(&Spec.to_child_spec/1)
+    |> Enum.map(&Tai.Advisor.child_spec/1)
     |> Enum.map(&Tai.Advisors.Supervisor.start_advisor/1)
     |> Enum.reduce(
       {0, 0},

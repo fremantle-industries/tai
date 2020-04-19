@@ -2,13 +2,13 @@ defmodule Examples.PingPong.CreateEntryOrder do
   alias Examples.PingPong.{Config, EntryPrice}
   alias Tai.Trading.{Orders, OrderSubmissions}
 
-  @type advisor_name :: Tai.Advisor.advisor_name()
+  @type advisor_process :: Tai.Advisor.advisor_name()
   @type market_quote :: Tai.Markets.Quote.t()
   @type config :: Config.t()
   @type order :: Tai.Trading.Order.t()
 
-  @spec create(advisor_name, market_quote, config) :: {:ok, order}
-  def create(advisor_name, market_quote, config, orders_provider \\ Orders) do
+  @spec create(advisor_process, market_quote, config) :: {:ok, order}
+  def create(advisor_process, market_quote, config, orders_provider \\ Orders) do
     price = EntryPrice.calculate(market_quote, config.product)
 
     %OrderSubmissions.BuyLimitGtc{
@@ -19,7 +19,7 @@ defmodule Examples.PingPong.CreateEntryOrder do
       qty: config.max_qty,
       product_type: config.product.type,
       post_only: true,
-      order_updated_callback: {advisor_name, :entry_order}
+      order_updated_callback: {advisor_process, :entry_order}
     }
     |> orders_provider.create()
   end

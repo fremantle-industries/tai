@@ -20,8 +20,8 @@ defmodule Tai.Advisor do
             trades: list
           }
 
-    @enforce_keys ~w(advisor_id config group_id products store trades)a
-    defstruct ~w(advisor_id config group_id market_quotes products store trades)a
+    @enforce_keys ~w[advisor_id config group_id products store trades]a
+    defstruct ~w[advisor_id config group_id market_quotes products store trades]a
   end
 
   alias Tai.Markets.Quote
@@ -32,12 +32,41 @@ defmodule Tai.Advisor do
   @type event :: term
   @type run_store :: State.run_store()
   @type state :: State.t()
+  @type advisor_spec :: Tai.Advisors.Spec.t()
 
   @callback after_start(state) :: {:ok, run_store}
   @callback handle_event(event, state) :: {:ok, run_store}
 
+  @spec process_name(group_id, id) :: advisor_name
+  def process_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
+
+  @deprecated "Use Tai.Advisor.process_name/2 instead."
   @spec to_name(group_id, id) :: advisor_name
-  def to_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
+  def to_name(group_id, advisor_id), do: process_name(group_id, advisor_id)
+
+  @spec child_spec(advisor_spec) :: Supervisor.child_spec()
+  def child_spec(advisor_spec) do
+    run_store = advisor_spec.run_store || %{}
+    trades = advisor_spec.trades || []
+    name = process_name(advisor_spec.group_id, advisor_spec.advisor_id)
+
+    start_opts = [
+      group_id: advisor_spec.group_id,
+      advisor_id: advisor_spec.advisor_id,
+      products: advisor_spec.products,
+      config: advisor_spec.config,
+      store: run_store,
+      trades: trades
+    ]
+
+    %{
+      id: name,
+      start: {advisor_spec.mod, :start_link, [start_opts]},
+      restart: advisor_spec.restart,
+      shutdown: advisor_spec.shutdown,
+      type: :worker
+    }
+  end
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -53,7 +82,7 @@ defmodule Tai.Advisor do
             store: store,
             trades: trades
           ) do
-        name = Tai.Advisor.to_name(group_id, advisor_id)
+        name = Tai.Advisor.process_name(group_id, advisor_id)
         market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
 
         state = %State{

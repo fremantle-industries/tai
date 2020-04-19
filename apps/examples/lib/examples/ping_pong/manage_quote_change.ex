@@ -52,7 +52,7 @@ defmodule Examples.PingPong.ManageQuoteChange do
   end
 
   def manage_entry_order({:ok, market_quote}, state, orders_provider) do
-    advisor_id = Tai.Advisor.to_name(state.group_id, state.advisor_id)
+    advisor_id = Tai.Advisor.process_name(state.group_id, state.advisor_id)
 
     {:ok, entry_order} =
       CreateEntryOrder.create(advisor_id, market_quote, state.config, orders_provider)
