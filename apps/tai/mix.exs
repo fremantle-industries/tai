@@ -44,7 +44,7 @@ defmodule Tai.Mixfile do
       {:decimal, "~> 1.7"},
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},
-      {:table_rex, "~> 2.0"},
+      {:table_rex, "~> 3.0"},
       {:timex, "~> 3.6"},
       # Fixes deprecation warnings
       # {:websockex, github: "Azolo/websockex"},
