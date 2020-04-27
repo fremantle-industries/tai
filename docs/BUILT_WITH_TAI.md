@@ -2,11 +2,11 @@
 
 [Built with Tai](./BUILT_WITH_TAI.md) | [Install](../README.md#install) | [Usage](../README.md#usage) | [Commands](./COMMANDS.md) | [Architecture](./ARCHITECTURE.md) | [Configuration](./CONFIGURATION.md)
 
-## [Back Office](https://github.com/fremantle-industries/back_office)
+## [Workbench](https://github.com/fremantle-industries/workbench)
 
-Web app starter kit to manage operations of a fund.
+Manage & explore your trading operation across a globally distributed cluster.
 
-![back-office-chart](https://github.com/fremantle-industries/back_office/blob/master/docs/balances-chart.png)
+[![back-office-chart](https://github.com/fremantle-industries/workbench/blob/master/docs/live-balance-snapshots.png)](https://github.com/fremantle-industries/workbench)
 
 ## [Oliya](https://github.com/blacksmith-capital/oliya)
 
