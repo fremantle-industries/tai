@@ -33,7 +33,9 @@ defmodule Tai.VenueAdapters.Deribit.Product do
       is_quanto: false,
       is_inverse: true,
       maker_fee: maker_fee,
-      taker_fee: taker_fee
+      taker_fee: taker_fee,
+      option_type: instrument.option_type |> option_type,
+      strike: instrument.strike |> strike_price
     }
   end
 
@@ -65,4 +67,11 @@ defmodule Tai.VenueAdapters.Deribit.Product do
       _ -> :future
     end
   end
+
+  defp option_type("put"), do: :put
+  defp option_type("call"), do: :call
+  defp option_type(_), do: nil
+
+  defp strike_price(price) when is_number(price), do: Decimal.cast(price)
+  defp strike_price(_), do: nil
 end
