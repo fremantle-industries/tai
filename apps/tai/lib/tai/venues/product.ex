@@ -65,10 +65,12 @@ defmodule Tai.Venues.Product do
           is_quanto: quanto,
           is_inverse: inverse,
           maker_fee: Decimal.t() | nil,
-          taker_fee: Decimal.t() | nil
+          taker_fee: Decimal.t() | nil,
+          strike: Decimal.t() | nil,
+          option_type: :call | :put | nil
         }
 
-  @enforce_keys ~w(
+  @enforce_keys ~w[
     venue_id
     symbol
     venue_symbol
@@ -85,8 +87,8 @@ defmodule Tai.Venues.Product do
     value
     is_quanto
     is_inverse
-  )a
-  defstruct ~w(
+  ]a
+  defstruct ~w[
     venue_id
     symbol
     venue_symbol
@@ -111,5 +113,7 @@ defmodule Tai.Venues.Product do
     is_inverse
     maker_fee
     taker_fee
-  )a
+    strike
+    option_type
+  ]a
 end
