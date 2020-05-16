@@ -1,6 +1,6 @@
 defmodule Tai.Markets.OrderBook do
   @moduledoc """
-  Manage price points for a venue's order book
+  Manage price points for the order book of a product
   """
 
   use GenServer
@@ -19,12 +19,12 @@ defmodule Tai.Markets.OrderBook do
             venue: venue_id,
             symbol: product_symbol,
             changes: [change],
-            last_received_at: DateTime.t(),
+            last_received_at: integer,
             last_venue_timestamp: DateTime.t() | nil
           }
 
-    @enforce_keys ~w(venue symbol changes last_received_at)a
-    defstruct ~w(venue symbol changes last_received_at last_venue_timestamp)a
+    @enforce_keys ~w[venue symbol changes last_received_at]a
+    defstruct ~w[venue symbol changes last_received_at last_venue_timestamp]a
   end
 
   defmodule State do

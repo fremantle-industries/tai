@@ -72,7 +72,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     %OrderBook.ChangeSet{
       venue: state.venue,
       symbol: String.to_atom(symbol_str),
-      last_received_at: Timex.now(),
+      last_received_at: System.monotonic_time(),
       changes: Enum.concat(normalized_bids, normalized_asks)
     }
     |> OrderBook.replace()
@@ -95,7 +95,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
         client_id: client_id,
         cumulative_qty: cumulative_qty,
         leaves_qty: leaves_qty,
-        last_received_at: Timex.now(),
+        last_received_at: System.monotonic_time(),
         last_venue_timestamp: Timex.now()
       }
       |> OrderStore.update()
@@ -117,7 +117,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
       %OrderStore.Actions.PassiveFill{
         client_id: client_id,
         cumulative_qty: cumulative_qty,
-        last_received_at: Timex.now(),
+        last_received_at: System.monotonic_time(),
         last_venue_timestamp: Timex.now()
       }
       |> OrderStore.update()
@@ -135,7 +135,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     {:ok, {prev_order, updated_order}} =
       %OrderStore.Actions.PassiveCancel{
         client_id: client_id,
-        last_received_at: Timex.now(),
+        last_received_at: System.monotonic_time(),
         last_venue_timestamp: Timex.now()
       }
       |> OrderStore.update()

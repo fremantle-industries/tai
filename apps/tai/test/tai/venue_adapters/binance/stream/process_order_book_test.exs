@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
     assert Enum.count(market_quote.asks) == 1
     assert Enum.at(market_quote.asks, 0) == %PricePoint{price: 101.0, size: 11.0}
     assert %DateTime{} = market_quote.last_venue_timestamp
-    assert %DateTime{} = market_quote.last_received_at
+    assert market_quote.last_received_at != nil
   end
 
   test "can update existing price points in the order book", %{pid: pid} do
@@ -75,7 +75,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
     assert Enum.count(market_quote.asks) == 1
     assert Enum.at(market_quote.asks, 0) == %PricePoint{price: 101.0, size: 11.0}
     assert %DateTime{} = market_quote.last_venue_timestamp
-    assert %DateTime{} = market_quote.last_received_at
+    assert market_quote.last_received_at != nil
   end
 
   test "can delete existing price points from the order book", %{pid: pid} do
@@ -108,6 +108,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
     assert Enum.count(market_quote.bids) == 0
     assert Enum.count(market_quote.asks) == 0
     assert %DateTime{} = market_quote.last_venue_timestamp
-    assert %DateTime{} = market_quote.last_received_at
+    assert market_quote.last_received_at != nil
   end
 end

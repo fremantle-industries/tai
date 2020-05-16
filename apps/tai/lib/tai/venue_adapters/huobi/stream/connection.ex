@@ -20,11 +20,13 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
             next_request_id: request_id,
             requests: %{
               optional(request_id) => pos_integer
-            }
+            },
+            heartbeat_timer: reference | nil,
+            heartbeat_timeout_timer: reference | nil
           }
 
-    @enforce_keys ~w(venue routes channels credential products last_pong next_request_id requests)a
-    defstruct ~w(venue routes channels credential products last_pong next_request_id requests)a
+    @enforce_keys ~w[venue routes channels credential products last_pong next_request_id requests]a
+    defstruct ~w[venue routes channels credential products last_pong next_request_id requests heartbeat_timer heartbeat_timeout_timer]a
   end
 
   @type stream :: Tai.Venues.Stream.t()
@@ -64,10 +66,6 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-  def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
-  end
-
   def handle_connect(_conn, state) do
     TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
@@ -83,8 +81,13 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
     {:ok, state}
   end
 
+  def terminate(close_reason, state) do
+    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+  end
+
   def handle_info(:init_subscriptions, state) do
     state.products |> Enum.each(&send(self(), {:subscribe, :depth, &1}))
+    state = state |> schedule_heartbeat()
     {:ok, state}
   end
 
@@ -101,6 +104,24 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
+  def handle_info(:heartbeat, state) do
+    state = state |> schedule_heartbeat_timeout()
+    {:reply, :ping, state}
+  end
+
+  def handle_info(:heartbeat_timeout, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
+  end
+
+  def handle_pong(:pong, state) do
+    state =
+      state
+      |> cancel_heartbeat_timeout()
+      |> schedule_heartbeat()
+
+    {:ok, state}
+  end
+
   def handle_frame({:binary, compressed_data}, state) do
     compressed_data
     |> :zlib.gunzip()
@@ -109,6 +130,23 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
   end
 
   def handle_frame({:text, _}, state), do: {:ok, state}
+
+  @heartbeat_ms 5_000
+  defp schedule_heartbeat(state) do
+    timer = Process.send_after(self(), :heartbeat, @heartbeat_ms)
+    %{state | heartbeat_timer: timer}
+  end
+
+  @heartbeat_timeout_ms 3_000
+  defp schedule_heartbeat_timeout(state) do
+    timer = Process.send_after(self(), :heartbeat_timeout, @heartbeat_timeout_ms)
+    %{state | heartbeat_timeout_timer: timer}
+  end
+
+  defp cancel_heartbeat_timeout(state) do
+    Process.cancel_timer(state.heartbeat_timeout_timer)
+    %{state | heartbeat_timeout_timer: nil}
+  end
 
   defp handle_msg(%{"ch" => "market." <> _} = msg, state) do
     msg |> forward(:order_books, state)
@@ -139,7 +177,7 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, Timex.now()})
+    |> GenServer.cast({msg, System.monotonic_time()})
   end
 
   defp time_now() do

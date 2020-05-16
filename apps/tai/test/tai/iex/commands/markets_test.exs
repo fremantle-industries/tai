@@ -15,21 +15,26 @@ defmodule Tai.IEx.MarketsTest do
       venue_id: :test_exchange_a,
       product_symbol: :btc_usd,
       bids: [%PricePoint{price: 12_999.99, size: 0.000021}],
-      asks: [%PricePoint{price: 13_000.01, size: 1.11}]
+      asks: [%PricePoint{price: 13_000.01, size: 1.11}],
+      last_received_at: System.monotonic_time()
     }
     |> Tai.Markets.QuoteStore.put()
 
     %Quote{
       venue_id: :test_exchange_a,
       product_symbol: :ltc_usd,
-      bids: [%PricePoint{price: 101.99, size: 1.3}]
+      bids: [%PricePoint{price: 101.99, size: 1.3}],
+      asks: [],
+      last_received_at: System.monotonic_time()
     }
     |> Tai.Markets.QuoteStore.put()
 
     %Quote{
       venue_id: :test_exchange_a,
       product_symbol: :eth_usd,
-      asks: [%PricePoint{price: 195.66, size: 0.12}]
+      bids: [],
+      asks: [%PricePoint{price: 195.66, size: 0.12}],
+      last_received_at: System.monotonic_time()
     }
     |> Tai.Markets.QuoteStore.put()
 
@@ -37,7 +42,8 @@ defmodule Tai.IEx.MarketsTest do
       venue_id: :test_exchange_b,
       product_symbol: :btc_usdt,
       bids: [%PricePoint{price: 12000.0, size: 1000.0}],
-      asks: [%PricePoint{price: 12050.0, size: 1300.0}]
+      asks: [%PricePoint{price: 12050.0, size: 1300.0}],
+      last_received_at: System.monotonic_time()
     }
     |> Tai.Markets.QuoteStore.put()
 

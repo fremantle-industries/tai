@@ -17,8 +17,8 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
             opts: map
           }
 
-    @enforce_keys ~w(venue routes channels products opts)a
-    defstruct ~w(venue routes channels credential products opts)a
+    @enforce_keys ~w[venue routes channels products opts]a
+    defstruct ~w[venue routes channels credential products opts]a
   end
 
   @type stream :: Tai.Venues.Stream.t()
@@ -109,6 +109,6 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, Timex.now()})
+    |> GenServer.cast({msg, System.monotonic_time()})
   end
 end

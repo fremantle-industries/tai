@@ -8,18 +8,18 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
     @type route :: :auth | :order_books | :optional_channels
-    @type last_pong :: integer
     @type t :: %State{
             venue: venue_id,
             routes: %{required(route) => atom},
             channels: [channel_name],
             credential: {credential_id, map},
             products: [product],
-            last_pong: pos_integer
+            heartbeat_timer: reference | nil,
+            heartbeat_timeout_timer: reference | nil
           }
 
-    @enforce_keys ~w(venue routes channels credential products last_pong)a
-    defstruct ~w(venue routes channels credential products last_pong)a
+    @enforce_keys ~w[venue routes channels credential products]a
+    defstruct ~w[venue routes channels credential products heartbeat_timer heartbeat_timeout_timer]a
   end
 
   @type stream :: Tai.Venues.Stream.t()
@@ -47,8 +47,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
-      last_pong: time_now()
+      products: stream.products
     }
 
     name = to_name(stream.venue.id)
@@ -79,7 +78,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   @optional_channels [:trades]
   def handle_info(:init_subscriptions, state) do
-    schedule_heartbeat()
     if state.credential, do: send(self(), :login)
     send(self(), {:subscribe, :depth})
 
@@ -95,6 +93,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
         })
       end
     end)
+
+    state = state |> schedule_heartbeat()
 
     {:ok, state}
   end
@@ -123,25 +123,22 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
-  @ping {:text, "ping"}
-  @pong_error {:local, :no_heartbeat}
   def handle_info(:heartbeat, state) do
-    state
-    |> pong_check()
-    |> case do
-      {:ok, now} ->
-        state = Map.put(state, :last_pong, now)
-        schedule_heartbeat()
-        {:reply, @ping, state}
+    state = state |> schedule_heartbeat_timeout()
+    {:reply, :ping, state}
+  end
 
-      {:error, :timeout} ->
-        TaiEvents.error(%Tai.Events.StreamDisconnect{
-          venue: state.venue,
-          reason: @pong_error
-        })
+  def handle_info(:heartbeat_timeout, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
+  end
 
-        {:stop, @pong_error, state}
-    end
+  def handle_pong(:pong, state) do
+    state =
+      state
+      |> cancel_heartbeat_timeout()
+      |> schedule_heartbeat()
+
+    {:ok, state}
   end
 
   def handle_frame({:binary, <<43, 200, 207, 75, 7, 0>> = pong}, state) do
@@ -159,8 +156,22 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   def handle_frame({:text, _}, state), do: {:ok, state}
 
-  @heartbeat_ms 20_000
-  defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
+  @heartbeat_ms 5_000
+  defp schedule_heartbeat(state) do
+    timer = Process.send_after(self(), :heartbeat, @heartbeat_ms)
+    %{state | heartbeat_timer: timer}
+  end
+
+  @heartbeat_timeout_ms 3_000
+  defp schedule_heartbeat_timeout(state) do
+    timer = Process.send_after(self(), :heartbeat_timeout, @heartbeat_timeout_ms)
+    %{state | heartbeat_timeout_timer: timer}
+  end
+
+  defp cancel_heartbeat_timeout(state) do
+    Process.cancel_timer(state.heartbeat_timeout_timer)
+    %{state | heartbeat_timeout_timer: nil}
+  end
 
   defp handle_msg(
          %{"event" => "login", "success" => true},
@@ -193,21 +204,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, Timex.now()})
-  end
-
-  @max_pong_age_s 30
-  defp pong_check(state) do
-    now = time_now()
-
-    if now - state.last_pong < @max_pong_age_s do
-      {:ok, now}
-    else
-      {:error, :timeout}
-    end
-  end
-
-  defp time_now() do
-    :erlang.system_time(:seconds)
+    |> GenServer.cast({msg, System.monotonic_time()})
   end
 end

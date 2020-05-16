@@ -21,7 +21,7 @@ defmodule Tai.Markets.OrderBookTest do
     test "saves the market quote from the change set" do
       Tai.SystemBus.subscribe({:market_quote_store, @topic})
       last_venue_timestamp = Timex.now()
-      last_received_at = Timex.now()
+      last_received_at = System.monotonic_time()
 
       change_set = %OrderBook.ChangeSet{
         venue: @product.venue_id,
@@ -140,7 +140,7 @@ defmodule Tai.Markets.OrderBookTest do
         venue: @product.venue_id,
         symbol: @product.symbol,
         last_venue_timestamp: Timex.now(),
-        last_received_at: Timex.now(),
+        last_received_at: System.monotonic_time(),
         changes: [
           {:upsert, :bid, 100.0, 1.0},
           {:upsert, :ask, 102.0, 11.0}
@@ -186,7 +186,7 @@ defmodule Tai.Markets.OrderBookTest do
       Tai.SystemBus.subscribe({:market_quote_store, @topic})
 
       venue_timestamp_1 = Timex.now()
-      received_at_1 = Timex.now()
+      received_at_1 = System.monotonic_time()
 
       change_set_1 = %OrderBook.ChangeSet{
         venue: @product.venue_id,
@@ -214,7 +214,7 @@ defmodule Tai.Markets.OrderBookTest do
       assert inside_ask_1.size == 11.0
 
       venue_timestamp_2 = Timex.now()
-      received_at_2 = Timex.now()
+      received_at_2 = System.monotonic_time()
 
       change_set_2 = %OrderBook.ChangeSet{
         venue: @product.venue_id,
@@ -253,7 +253,7 @@ defmodule Tai.Markets.OrderBookTest do
         venue: @product.venue_id,
         symbol: @product.symbol,
         last_venue_timestamp: Timex.now(),
-        last_received_at: Timex.now(),
+        last_received_at: System.monotonic_time(),
         changes: [
           {:upsert, :bid, 100.0, 1.0},
           {:upsert, :ask, 102.0, 11.0}

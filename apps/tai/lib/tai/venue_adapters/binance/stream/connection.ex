@@ -16,11 +16,13 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
             request_id: request_id,
             requests: %{
               optional(request_id) => pos_integer
-            }
+            },
+            heartbeat_timer: reference | nil,
+            heartbeat_timeout_timer: reference | nil
           }
 
-    @enforce_keys ~w(venue products channels routes request_id requests)a
-    defstruct ~w(venue products channels routes request_id requests)a
+    @enforce_keys ~w[venue products channels routes request_id requests]a
+    defstruct ~w[venue products channels routes request_id requests heartbeat_timer heartbeat_timeout_timer]a
   end
 
   @type stream :: Tai.Venues.Stream.t()
@@ -64,20 +66,20 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     :"#{__MODULE__}_#{venue}"
   end
 
-  def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
-  end
-
   def handle_connect(_conn, state) do
     TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
+    state = state |> schedule_heartbeat()
     {:ok, state}
   end
 
   def handle_disconnect(conn_status, state) do
     TaiEvents.warn(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
-
     {:ok, state}
+  end
+
+  def terminate(close_reason, state) do
+    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
   end
 
   def handle_frame({:text, msg}, state) do
@@ -146,6 +148,41 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
+  def handle_info(:heartbeat, state) do
+    state = state |> schedule_heartbeat_timeout()
+    {:reply, :ping, state}
+  end
+
+  def handle_info(:heartbeat_timeout, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
+  end
+
+  def handle_pong(:pong, state) do
+    state =
+      state
+      |> cancel_heartbeat_timeout()
+      |> schedule_heartbeat()
+
+    {:ok, state}
+  end
+
+  @heartbeat_timer 5_000
+  defp schedule_heartbeat(state) do
+    timer = Process.send_after(self(), :heartbeat, @heartbeat_timer)
+    %{state | heartbeat_timer: timer}
+  end
+
+  @heartbeat_timeout_timer 3_000
+  defp schedule_heartbeat_timeout(state) do
+    timer = Process.send_after(self(), :heartbeat_timeout, @heartbeat_timeout_timer)
+    %{state | heartbeat_timeout_timer: timer}
+  end
+
+  defp cancel_heartbeat_timeout(state) do
+    Process.cancel_timer(state.heartbeat_timeout_timer)
+    %{state | heartbeat_timeout_timer: nil}
+  end
+
   defp snapshot_order_books(products, depth) do
     products
     |> Enum.map(fn product ->
@@ -164,7 +201,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   end
 
   defp add_request(state) do
-    requests = Map.put(state.requests, state.request_id, :os.system_time(:millisecond))
+    requests = Map.put(state.requests, state.request_id, System.monotonic_time())
     %{state | request_id: state.request_id + 1, requests: requests}
   end
 
@@ -187,6 +224,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, Timex.now()})
+    |> GenServer.cast({msg, System.monotonic_time()})
   end
 end

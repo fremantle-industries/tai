@@ -35,10 +35,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
-  def handle_cast({"pong", _received_at}, state) do
-    {:noreply, state}
-  end
-
   def handle_cast({msg, received_at}, state) do
     %Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,

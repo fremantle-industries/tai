@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBookTest do
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessOrderBook
   alias Tai.Markets.{OrderBook, PricePoint}
 
-  @last_received_at Timex.now()
+  @last_received_at System.monotonic_time()
   @product struct(Tai.Venues.Product,
              venue_id: :venue_a,
              symbol: :xbtusd,

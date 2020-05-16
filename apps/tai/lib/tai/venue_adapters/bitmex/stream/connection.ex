@@ -15,11 +15,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
             credential: {credential_id, map} | nil,
             products: [product],
             quote_depth: pos_integer,
-            opts: map
+            opts: map,
+            heartbeat_timer: reference | nil,
+            heartbeat_timeout_timer: reference | nil
           }
 
-    @enforce_keys ~w(venue routes channels products quote_depth opts)a
-    defstruct ~w(venue routes channels credential products quote_depth opts)a
+    @enforce_keys ~w[venue routes channels products quote_depth opts]a
+    defstruct ~w[venue routes channels credential products quote_depth opts heartbeat_timer heartbeat_timeout_timer]a
   end
 
   @type stream :: Tai.Venues.Stream.t()
@@ -69,7 +71,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   def handle_disconnect(conn_status, state) do
-    TaiEvents.warn(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
+    TaiEvents.warn(%Tai.Events.StreamDisconnect{
+      venue: state.venue,
+      reason: conn_status.reason
+    })
+
     {:ok, state}
   end
 
@@ -83,9 +89,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     :settlement
   ]
   def handle_info(:init_subscriptions, state) do
-    schedule_heartbeat()
-    schedule_autocancel(0)
-
     if state.credential do
       send(self(), :login)
       send(self(), {:subscribe, :margin})
@@ -106,6 +109,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
         })
       end
     end)
+
+    schedule_autocancel(0)
+    state = state |> schedule_heartbeat()
 
     {:ok, state}
   end
@@ -188,10 +194,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info(:heartbeat, state) do
-    {:reply, :ping, state}
-  end
-
   def handle_info(
         :ping_autocancel,
         %{
@@ -209,8 +211,21 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   def handle_info(:ping_autocancel, state), do: {:ok, state}
 
+  def handle_info(:heartbeat, state) do
+    state = state |> schedule_heartbeat_timeout()
+    {:reply, :ping, state}
+  end
+
+  def handle_info(:heartbeat_timeout, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
+  end
+
   def handle_pong(:pong, state) do
-    schedule_heartbeat()
+    state =
+      state
+      |> cancel_heartbeat_timeout()
+      |> schedule_heartbeat()
+
     {:ok, state}
   end
 
@@ -222,7 +237,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:ok, state}
   end
 
-  def handle_frame(_frame, state), do: {:ok, state}
+  def handle_frame(_frame, state) do
+    {:ok, state}
+  end
 
   defp auth_headers({_credential_id, %{api_key: api_key, api_secret: api_secret}}) do
     nonce = ExBitmex.Auth.nonce()
@@ -241,8 +258,22 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     Process.send_after(self(), :ping_autocancel, after_ms)
   end
 
-  @heartbeat_ms 20_000
-  defp schedule_heartbeat, do: Process.send_after(self(), :heartbeat, @heartbeat_ms)
+  @heartbeat_ms 5_000
+  defp schedule_heartbeat(state) do
+    timer = Process.send_after(self(), :heartbeat, @heartbeat_ms)
+    %{state | heartbeat_timer: timer}
+  end
+
+  @heartbeat_timeout_ms 3_000
+  defp schedule_heartbeat_timeout(state) do
+    timer = Process.send_after(self(), :heartbeat_timeout, @heartbeat_timeout_ms)
+    %{state | heartbeat_timeout_timer: timer}
+  end
+
+  defp cancel_heartbeat_timeout(state) do
+    Process.cancel_timer(state.heartbeat_timeout_timer)
+    %{state | heartbeat_timeout_timer: nil}
+  end
 
   @spec handle_msg(venue_msg, State.t()) :: no_return
   defp handle_msg(msg, state)
@@ -275,6 +306,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, Timex.now()})
+    |> GenServer.cast({msg, System.monotonic_time()})
   end
 end

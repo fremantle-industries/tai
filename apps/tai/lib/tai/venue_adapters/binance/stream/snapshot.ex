@@ -7,7 +7,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Snapshot do
   @spec fetch(product, pos_integer) :: {:ok, change_set}
   def fetch(product, depth) do
     with {:ok, venue_book} <- ExBinance.Public.depth(product.venue_symbol, depth) do
-      received_at = Timex.now()
+      received_at = System.monotonic_time()
       bids = venue_book.bids |> normalize_changes(:bid)
       asks = venue_book.asks |> normalize_changes(:ask)
 

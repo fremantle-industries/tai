@@ -89,10 +89,6 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   @spec to_name(venue_id) :: atom
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-  def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
-  end
-
   def handle_connect(_conn, state) do
     TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
     send(self(), :init_subscriptions)
@@ -106,6 +102,10 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     })
 
     {:ok, state}
+  end
+
+  def terminate(close_reason, state) do
+    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
   end
 
   def handle_info(:init_subscriptions, state) do
@@ -130,7 +130,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     state =
       state
       |> add_jsonrpc_request()
-      |> Map.put(:last_heartbeat, :os.system_time(:millisecond))
+      |> Map.put(:last_heartbeat, heartbeat_timestamp())
 
     {:reply, {:text, msg}, state}
   end
@@ -227,7 +227,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     {:ok, state}
   end
 
-  @heartbeat_interval_timeout_ms 15000
+  @heartbeat_interval_timeout_ms 12_000
   defp handle_msg(
          %{
            "method" => "heartbeat",
@@ -235,12 +235,12 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
          },
          state
        ) do
-    now = :os.system_time(:millisecond)
+    now = heartbeat_timestamp()
     diff = now - state.last_heartbeat
     state = Map.put(state, :last_heartbeat, now)
 
     if diff > @heartbeat_interval_timeout_ms do
-      {:close, state}
+      {:close, {1000, "heartbeat timeout"}, state}
     else
       {:ok, state}
     end
@@ -284,16 +284,18 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     {:ok, state}
   end
 
+  defp heartbeat_timestamp, do: System.monotonic_time(:millisecond)
+
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, Timex.now()})
+    |> GenServer.cast({msg, System.monotonic_time()})
   end
 
   defp add_jsonrpc_request(state) do
     jsonrpc_requests =
       state.jsonrpc_requests
-      |> Map.put(state.jsonrpc_id, :os.system_time(:millisecond))
+      |> Map.put(state.jsonrpc_id, System.monotonic_time())
 
     state
     |> Map.put(:jsonrpc_id, state.jsonrpc_id + 1)

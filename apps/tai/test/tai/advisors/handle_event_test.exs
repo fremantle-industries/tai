@@ -32,7 +32,8 @@ defmodule Tai.Advisors.HandleEventTest do
     venue_id: @venue,
     product_symbol: @symbol,
     bids: [%PricePoint{price: 101.2, size: 1.0}],
-    asks: [%PricePoint{price: 101.3, size: 0.1}]
+    asks: [%PricePoint{price: 101.3, size: 0.1}],
+    last_received_at: System.monotonic_time()
   }
 
   defp start_advisor!(advisor, config \\ %{}) do

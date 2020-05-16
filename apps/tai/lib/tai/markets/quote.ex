@@ -14,11 +14,11 @@ defmodule Tai.Markets.Quote do
           product_symbol: product_symbol,
           bids: [price_point],
           asks: [price_point],
-          last_received_at: DateTime.t() | nil,
+          last_received_at: integer,
           last_venue_timestamp: DateTime.t() | nil
         }
 
-  @enforce_keys ~w(venue_id product_symbol)a
+  @enforce_keys ~w[venue_id product_symbol bids asks last_received_at]a
   defstruct venue_id: nil,
             product_symbol: nil,
             bids: [],
@@ -58,13 +58,13 @@ defmodule Tai.Markets.Quote do
   def mid_price(nil, %PricePoint{}), do: {:error, :no_inside_bid}
   def mid_price(%PricePoint{}, nil), do: {:error, :no_inside_ask}
   def mid_price(nil, nil), do: {:error, :no_inside_bid_or_ask}
-end
 
-defimpl Stored.Item, for: Tai.Markets.Quote do
-  @type market_quote :: Tai.Markets.Quote.t()
-  @type venue_id :: Tai.Venue.id()
-  @type product_symbol :: Tai.Venues.Product.symbol()
+  defimpl Stored.Item do
+    @type market_quote :: Tai.Markets.Quote.t()
+    @type venue_id :: Tai.Venue.id()
+    @type product_symbol :: Tai.Venues.Product.symbol()
 
-  @spec key(market_quote) :: {venue_id, product_symbol}
-  def key(q), do: {q.venue_id, q.product_symbol}
+    @spec key(market_quote) :: {venue_id, product_symbol}
+    def key(q), do: {q.venue_id, q.product_symbol}
+  end
 end
