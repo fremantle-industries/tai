@@ -17,7 +17,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       venue_id: venue_id,
       symbol: instrument_id |> to_symbol,
       received_at: received_at,
-      timestamp: timestamp,
+      timestamp: timestamp |> normalize_timestamp(),
       price: price |> Decimal.cast(),
       qty: qty |> Decimal.cast(),
       side: side |> normalize_side,
@@ -41,7 +41,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       venue_id: venue_id,
       symbol: instrument_id |> to_symbol,
       received_at: received_at,
-      timestamp: timestamp,
+      timestamp: timestamp |> normalize_timestamp(),
       price: price |> Decimal.cast(),
       qty: size |> Decimal.cast(),
       side: side |> normalize_side,
@@ -51,4 +51,9 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
 
   defp normalize_side("buy"), do: :buy
   defp normalize_side("sell"), do: :sell
+
+  defp normalize_timestamp(ts) do
+    {:ok, datetime, _offset} = DateTime.from_iso8601(ts)
+    datetime
+  end
 end
