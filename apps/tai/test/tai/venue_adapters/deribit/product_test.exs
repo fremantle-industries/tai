@@ -82,8 +82,8 @@ defmodule Tai.VenuesAdapters.Deribit.ProductTest do
       assert product.option_type == :put
     end
 
-    test "assigns the strike price as a decimal" do
-      attrs = Map.merge(@base_attrs, %{strike: 10_000})
+    test "assigns the strike price as a normal reduced decimal " do
+      attrs = Map.merge(@base_attrs, %{strike: 10_000.0})
       instrument = struct(ExDeribit.Instrument, attrs)
 
       product = Tai.VenueAdapters.Deribit.Product.build(instrument, :venue_a)

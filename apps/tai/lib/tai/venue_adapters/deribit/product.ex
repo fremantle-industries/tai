@@ -72,6 +72,13 @@ defmodule Tai.VenueAdapters.Deribit.Product do
   defp option_type("call"), do: :call
   defp option_type(_), do: nil
 
-  defp strike_price(price) when is_number(price), do: Decimal.cast(price)
+  defp strike_price(price) when is_number(price) do
+    price
+    |> Decimal.cast()
+    |> Decimal.reduce()
+    |> Decimal.to_string(:normal)
+    |> Decimal.new()
+  end
+
   defp strike_price(_), do: nil
 end
