@@ -3,7 +3,7 @@ defmodule Tai.Events.Trade do
           venue_id: atom,
           symbol: atom,
           received_at: DateTime.t(),
-          timestamp: DateTime.t() | String.t(),
+          timestamp: DateTime.t(),
           price: Decimal.t() | number,
           qty: Decimal.t() | number,
           side: atom,
