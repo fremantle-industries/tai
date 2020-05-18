@@ -6,7 +6,7 @@ defmodule Tai.Events.Trade do
           timestamp: DateTime.t(),
           price: Decimal.t() | number,
           qty: Decimal.t() | number,
-          side: atom,
+          side: :buy | :sell,
           venue_trade_id: String.t()
         }
 
