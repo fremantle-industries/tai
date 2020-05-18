@@ -34,7 +34,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Trades do
       timestamp: timestamp,
       price: price,
       qty: qty,
-      side: side |> normalize_side,
+      taker_side: side |> normalize_side,
       venue_trade_id: venue_trade_id
     })
   end

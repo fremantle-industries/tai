@@ -14,7 +14,7 @@ defmodule Tai.Events.TradeTest do
         timestamp: timestamp,
         price: 1000.5 |> Decimal.cast(),
         qty: 5 |> Decimal.cast(),
-        side: :buy,
+        taker_side: :buy,
         venue_trade_id: venue_trade_id
       })
 
@@ -25,7 +25,7 @@ defmodule Tai.Events.TradeTest do
     assert json.timestamp == timestamp
     assert json.price == Decimal.cast(1000.5)
     assert json.qty == Decimal.cast(5)
-    assert json.side == :buy
+    assert json.taker_side == :buy
     assert json.venue_trade_id == venue_trade_id
   end
 end

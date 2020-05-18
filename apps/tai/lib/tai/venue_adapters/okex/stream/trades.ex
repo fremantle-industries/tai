@@ -20,7 +20,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       timestamp: timestamp |> normalize_timestamp(),
       price: price |> Decimal.cast(),
       qty: qty |> Decimal.cast(),
-      side: side |> normalize_side,
+      taker_side: side |> normalize_side,
       venue_trade_id: venue_trade_id
     })
   end
@@ -44,7 +44,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       timestamp: timestamp |> normalize_timestamp(),
       price: price |> Decimal.cast(),
       qty: size |> Decimal.cast(),
-      side: side |> normalize_side,
+      taker_side: side |> normalize_side,
       venue_trade_id: venue_trade_id
     })
   end

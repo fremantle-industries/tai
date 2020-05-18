@@ -6,7 +6,7 @@ defmodule Tai.Events.Trade do
           timestamp: DateTime.t(),
           price: Decimal.t() | number,
           qty: Decimal.t() | number,
-          side: :buy | :sell,
+          taker_side: :buy | :sell,
           venue_trade_id: String.t()
         }
 
@@ -17,7 +17,7 @@ defmodule Tai.Events.Trade do
     timestamp
     price
     qty
-    side
+    taker_side
   )a
   defstruct ~w(
     venue_id
@@ -26,7 +26,7 @@ defmodule Tai.Events.Trade do
     timestamp
     price
     qty
-    side
+    taker_side
     venue_trade_id
   )a
 end
