@@ -21,7 +21,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Trades do
       timestamp: timestamp |> normalize_timestamp(),
       price: price,
       qty: qty,
-      side: side |> normalize_side,
+      taker_side: side |> normalize_side,
       venue_trade_id: venue_trade_id
     })
   end

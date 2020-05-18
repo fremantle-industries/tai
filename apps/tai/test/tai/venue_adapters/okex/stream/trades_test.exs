@@ -34,7 +34,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
     assert_event(trade = %Tai.Events.Trade{venue_trade_id: venue_trade_id})
     assert trade.qty == Decimal.cast(5)
     assert trade.price == Decimal.cast(5556.91)
-    assert trade.side == :buy
+    assert trade.taker_side == :buy
   end
 
   test "broadcasts an event when public trade is received from swap/trade", %{
@@ -61,7 +61,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
     assert_event(trade = %Tai.Events.Trade{venue_trade_id: venue_trade_id})
     assert trade.qty == Decimal.cast(5)
     assert trade.price == Decimal.cast(5556.91)
-    assert trade.side == :buy
+    assert trade.taker_side == :buy
   end
 
   test "broadcasts an event when public trade is received from spot/trade", %{
@@ -88,6 +88,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
     assert_event(trade = %Tai.Events.Trade{venue_trade_id: venue_trade_id})
     assert trade.qty == Decimal.cast(5)
     assert trade.price == Decimal.cast(5556.91)
-    assert trade.side == :buy
+    assert trade.taker_side == :buy
   end
 end
