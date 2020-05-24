@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v1.0.0
 
       - name: set environment variables
-        uses: allenevans/set-env@v1.0.0
+        uses: allenevans/set-env@v1.1.0
         with:
           CACHE_VERSION: 'Fc2TkIVZ2yVGdEEP'
 
