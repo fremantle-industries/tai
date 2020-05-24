@@ -1,6 +1,6 @@
 # Tai - Orchestrate Your Trading
 
-[![Build Status](https://github.com/fremantle-capital/tai/workflows/Test/badge.svg?branch=master)](https://github.com/fremantle-capital/tai/actions?query=workflow%3ATest)
+[![Build Status](https://github.com/fremantle-capital/tai/workflows/test/badge.svg?branch=master)](https://github.com/fremantle-capital/tai/actions?query=workflow%3Atest)
 [![Coverage Status](https://coveralls.io/repos/github/fremantle-capital/tai/badge.svg?branch=master)](https://coveralls.io/github/fremantle-capital/tai?branch=master)
 [![hex.pm version](https://img.shields.io/hexpm/v/tai.svg?style=flat)](https://hex.pm/packages/tai)
 
@@ -18,25 +18,25 @@ Here's an example of an advisor that logs the spread between multiple products o
 
 ## Supported Venues
 
-| Venues | Live Order Book  | Accounts | Active Orders | Passive Orders | Products | Fees |
-|--------|:---:|:---:|:---:|:---:|:---:|:---:|
-| BitMEX | [x] | [x] | [x] | [x] | [x] | [x] |
-| OkEx   | [x] | [x] | [x] | [x] | [x] | [x] |
+| Venues | Live Order Book | Accounts | Active Orders | Passive Orders | Products | Fees |
+| ------ | :-------------: | :------: | :-----------: | :------------: | :------: | :--: |
+| BitMEX |       [x]       |   [x]    |      [x]      |      [x]       |   [x]    | [x]  |
+| OkEx   |       [x]       |   [x]    |      [x]      |      [x]       |   [x]    | [x]  |
 
 ## Venues In Progress
 
-| Venue    | Live Order Book  | Accounts | Active Orders | Passive Orders | Products | Fees |
-|----------|:---:|:---:|:---:|:---:|:---:|:---:|
-| Binance  | [x] | [x] | [x] | [ ] | [x] | [x] |
-| Deribit  | [x] | [x] | [ ] | [ ] | [x] | [x] |
-| GDAX     | [x] | [x] | [ ] | [ ] | [x] | [x] |
-| Huobi    | [x] | [ ] | [ ] | [ ] | [x] | [ ] |
-| FTX      | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Coinflex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Bybit    | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| bitFlyer | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Kraken   | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Bitfinex | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| Venue    | Live Order Book | Accounts | Active Orders | Passive Orders | Products | Fees |
+| -------- | :-------------: | :------: | :-----------: | :------------: | :------: | :--: |
+| Binance  |       [x]       |   [x]    |      [x]      |      [ ]       |   [x]    | [x]  |
+| Deribit  |       [x]       |   [x]    |      [ ]      |      [ ]       |   [x]    | [x]  |
+| GDAX     |       [x]       |   [x]    |      [ ]      |      [ ]       |   [x]    | [x]  |
+| Huobi    |       [x]       |   [ ]    |      [ ]      |      [ ]       |   [x]    | [ ]  |
+| FTX      |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| Coinflex |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| Bybit    |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| bitFlyer |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| Kraken   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| Bitfinex |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 
 ## Install
 
@@ -61,7 +61,7 @@ import Tai.IEx
 
 `tai` runs as an OTP application.
 
-During development we can leverage `mix` to compile and run our application with an 
+During development we can leverage `mix` to compile and run our application with an
 interactive Elixir shell that imports the set of `tai` helper [commands](./docs/COMMANDS.md).
 
 ```bash
@@ -70,13 +70,13 @@ iex -S mix
 
 ## Help Wanted :)
 
-If you think this `tai` thing might be worthwhile and you don't see a feature 
-or venue listed we would love your contributions to add them! Feel free to 
+If you think this `tai` thing might be worthwhile and you don't see a feature
+or venue listed we would love your contributions to add them! Feel free to
 drop us an email or open a Github issue.
 
 ## Authors
 
-* Alex Kwiatkowski - alex+git@fremantle.io
+- Alex Kwiatkowski - alex+git@fremantle.io
 
 ## License
 
