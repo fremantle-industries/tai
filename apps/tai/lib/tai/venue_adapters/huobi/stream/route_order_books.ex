@@ -64,8 +64,8 @@ defmodule Tai.VenueAdapters.Huobi.Stream.RouteOrderBooks do
     |> Enum.reduce(
       %{},
       fn p, acc ->
+        {:ok, channel_symbol} = Stream.Channels.channel_symbol(p)
         name = Stream.ProcessOrderBook.to_name(p.venue_id, p.venue_symbol)
-        channel_symbol = Stream.Channels.depth_symbol(p)
         Map.put(acc, channel_symbol, name)
       end
     )

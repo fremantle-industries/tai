@@ -92,16 +92,21 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
   end
 
   def handle_info({:subscribe, :depth, product}, state) do
-    msg =
-      %{
-        sub: Stream.Channels.depth(product),
-        data_type: "incremental",
-        id: Integer.to_string(state.next_request_id)
-      }
-      |> Jason.encode!()
+    with {:ok, sub} <- Stream.Channels.market_depth(product) do
+      msg =
+        %{
+          sub: sub,
+          data_type: "incremental",
+          id: Integer.to_string(state.next_request_id)
+        }
+        |> Jason.encode!()
 
-    state = add_request(state)
-    {:reply, {:text, msg}, state}
+      state = add_request(state)
+      {:reply, {:text, msg}, state}
+    else
+      _ ->
+        {:noreply, state}
+    end
   end
 
   def handle_info(:heartbeat, state) do

@@ -24,9 +24,9 @@ jobs:
       - name: set environment variables
         uses: allenevans/set-env@v1.1.0
         with:
-          CACHE_VERSION: 'Fc2TkIVZ2yVGdEEP'
+          CACHE_VERSION: 'kqY3/N+/7OrXUbQJ'
 
-      - uses: actions/setup-elixir@v1.2.0
+      - uses: actions/setup-elixir@v1.3.0
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
