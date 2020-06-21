@@ -46,7 +46,7 @@ defmodule Tai.Markets.OrderBook do
             last_quote_asks: [{price, qty}]
           }
 
-    @enforce_keys ~w(
+    @enforce_keys ~w[
       venue
       symbol
       quote_depth
@@ -54,8 +54,8 @@ defmodule Tai.Markets.OrderBook do
       asks_table
       last_quote_bids
       last_quote_asks
-    )a
-    defstruct ~w(
+    ]a
+    defstruct ~w[
       broadcast_change_set
       venue
       symbol
@@ -64,7 +64,7 @@ defmodule Tai.Markets.OrderBook do
       asks_table
       last_quote_bids
       last_quote_asks
-    )a
+    ]a
   end
 
   @type t :: State.t()
