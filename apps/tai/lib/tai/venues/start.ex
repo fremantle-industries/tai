@@ -9,8 +9,8 @@ defmodule Tai.Venues.Start do
             | :success
             | {:error, :timeout | term}
 
-    @enforce_keys ~w(venue status)a
-    defstruct ~w(
+    @enforce_keys ~w[venue status]a
+    defstruct ~w[
       venue
       status
       timer
@@ -24,7 +24,7 @@ defmodule Tai.Venues.Start do
       fees_reply
       positions_reply
       stream_reply
-    )a
+    ]a
   end
 
   @type venue :: Tai.Venue.t()
