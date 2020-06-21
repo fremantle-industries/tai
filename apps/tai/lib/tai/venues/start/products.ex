@@ -53,8 +53,27 @@ defmodule Tai.Venues.Start.Products do
 
   defp apply_filter(products, query) when is_binary(query) do
     products
-    |> Enum.reduce(%{}, fn p, acc -> Map.put(acc, p.symbol, p) end)
+    |> index_products()
     |> Juice.squeeze(query)
     |> Map.values()
+    |> Enum.uniq()
+  end
+
+  defp index_products(products) do
+    symbol_products =
+      products
+      |> Enum.reduce(
+        %{},
+        fn p, acc -> Map.put(acc, p.symbol, p) end
+      )
+
+    alias_products =
+      products
+      |> Enum.filter(& &1.alias)
+      |> Enum.reduce(%{}, fn p, acc ->
+        Map.put(acc, "#{p.base}_#{p.quote}_#{p.alias}", p)
+      end)
+
+    Map.merge(alias_products, symbol_products)
   end
 end

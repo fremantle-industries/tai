@@ -15,9 +15,17 @@ defmodule Tai.Venues.Start.ProductsTest do
                  venue_id: :venue_a,
                  symbol: :eth_usdt
                )
+    @product_c struct(
+                 Tai.Venues.Product,
+                 venue_id: :venue_a,
+                 symbol: :ltc_usdt_200925,
+                 base: :ltc,
+                 quote: :usdt,
+                 alias: "weekly"
+               )
 
     def products(_venue_id) do
-      {:ok, [@product_a, @product_b]}
+      {:ok, [@product_a, @product_b, @product_c]}
     end
   end
 
@@ -37,8 +45,8 @@ defmodule Tai.Venues.Start.ProductsTest do
     end
   end
 
-  defmodule VenueProducts do
-    def filter(products), do: Enum.filter(products, &(&1.symbol == :btc_usdt))
+  defmodule ProductsFilter do
+    def run(products), do: Enum.filter(products, &(&1.symbol == :btc_usdt))
   end
 
   @base_venue struct(
@@ -61,7 +69,7 @@ defmodule Tai.Venues.Start.ProductsTest do
     :ok
   end
 
-  test "can filter products with a juice query" do
+  test "can filter products by symbol with a juice query" do
     venue = @base_venue |> Map.put(:products, "eth_usdt")
     TaiEvents.firehose_subscribe()
 
@@ -73,8 +81,20 @@ defmodule Tai.Venues.Start.ProductsTest do
     assert Enum.at(products, 0).symbol == :eth_usdt
   end
 
+  test "can filter products by base, quote & alias with a juice query" do
+    venue = @base_venue |> Map.put(:products, "ltc_usdt_weekly")
+    TaiEvents.firehose_subscribe()
+
+    start_supervised!({Tai.Venues.Start, venue})
+    assert_event(%Tai.Events.VenueStart{}, :info)
+
+    products = Tai.Venues.ProductStore.all()
+    assert Enum.count(products) == 1
+    assert Enum.at(products, 0).symbol == :ltc_usdt_200925
+  end
+
   test "can filter products with a module function" do
-    venue = @base_venue |> Map.put(:products, {VenueProducts, :filter})
+    venue = @base_venue |> Map.put(:products, {ProductsFilter, :run})
     TaiEvents.firehose_subscribe()
 
     start_supervised!({Tai.Venues.Start, venue})
@@ -85,16 +105,16 @@ defmodule Tai.Venues.Start.ProductsTest do
     assert Enum.at(products, 0).symbol == :btc_usdt
   end
 
-  test "broadcasts a summary event" do
-    venue = @base_venue |> Map.put(:products, {VenueProducts, :filter})
+  test "broadcasts a summary event of unique products matching the filter" do
+    venue = @base_venue |> Map.put(:products, "*")
     TaiEvents.firehose_subscribe()
 
     start_supervised!({Tai.Venues.Start, venue})
 
     assert_event(%Tai.Events.HydrateProducts{} = event, :info)
     assert event.venue_id == venue.id
-    assert event.total == 2
-    assert event.filtered == 1
+    assert event.total == 3
+    assert event.filtered == 3
   end
 
   test "broadcasts a start error event when the adapter returns an error" do

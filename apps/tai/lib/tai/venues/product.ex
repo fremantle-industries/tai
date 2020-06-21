@@ -17,7 +17,7 @@ defmodule Tai.Venues.Product do
   - BTC = base asset
   - USD = quote asset
   """
-  @type asset :: atom
+  @type asset :: Tai.Markets.Asset.symbol()
   @type venue_asset :: String.t()
 
   @typedoc """
