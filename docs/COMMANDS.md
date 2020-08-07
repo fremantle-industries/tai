@@ -1,6 +1,6 @@
 # Commands
 
-[Built with Tai](./BUILT_WITH_TAI.md) | [Install](../README.md#install) | [Usage](../README.md#usage) | [Commands](./COMMANDS.md) | [Architecture](./ARCHITECTURE.md) | [Configuration](./CONFIGURATION.md)
+[Built with Tai](./BUILT_WITH_TAI.md) | [Install](../README.md#install) | [Usage](../README.md#usage) | [Commands](./COMMANDS.md) | [Architecture](./ARCHITECTURE.md) | [Examples](../apps/examples/README.md) | [Configuration](./CONFIGURATION.md)
 
 To monitor your instance, `tai` provides the following set of IEx commands.
 
@@ -49,13 +49,13 @@ Display the products provided by configured venues
 iex(3)> products
 +---------+----------+--------------+---------+--------+-----------+-----------+
 |   Venue |   Symbol | Venue Symbol |  Status |   Type | Maker Fee | Taker Fee |
-+---------+----------+--------------+---------+--------+-----------+-----------+ 
++---------+----------+--------------+---------+--------+-----------+-----------+
 |    gdax |  btc_usd |      BTC-USD | trading |   spot |           |           |
 | binance | btc_usdt |      BTCUSDT | trading |   spot |           |           |
-|    gdax |  eth_usd |      ETH-USD | trading |   spot |           |           | 
+|    gdax |  eth_usd |      ETH-USD | trading |   spot |           |           |
 | binance | eth_usdt |      ETHUSDT | trading |   spot |           |           |
 |    gdax |  ltc_usd |      LTC-USD | trading |   spot |           |           |
-| binance | ltc_usdt |      LTCUSDT | trading |   spot |           |           | 
+| binance | ltc_usdt |      LTCUSDT | trading |   spot |           |           |
 |  bitmex |   xbtusd |       XBTUSD | trading | future |   -0.025% |    0.075% |
 +---------+----------+--------------+---------+--------+-----------+-----------+
 ```
@@ -86,8 +86,8 @@ iex(4)> fees
 
 ## markets
 
-Displays the live top of the order book for the configured feeds. It includes 
-the time they were processed locally and if supported, the time they were sent 
+Displays the live top of the order book for the configured feeds. It includes
+the time they were processed locally and if supported, the time they were sent
 from the venue. This allows you to monitor if a feed is under backpressure and
 starting to fall behind as it updates it's order books.
 
@@ -109,7 +109,7 @@ iex(5)> markets
 
 Displays the list of orders and their details.
 
-As the lifecycle of the order changes it's details will be updated. You can 
+As the lifecycle of the order changes it's details will be updated. You can
 view these changes by running the `orders` command again.
 
 ```
@@ -170,7 +170,6 @@ iex(10)> settings
 ## advisors
 
 List advisors that can optionally be filtered and ordered
-
 
 ```
 iex(11)> advisors where: [status: :unstarted], order: [:group_id]
