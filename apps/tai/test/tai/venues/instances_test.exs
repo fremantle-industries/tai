@@ -14,14 +14,12 @@ defmodule Tai.Venues.InstancesTest do
     end
   end
 
-  @test_store_id __MODULE__
   @venue struct(Tai.Venue, id: :venue_a, adapter: VenueAdapter)
   @stream struct(Tai.Venues.Stream, venue: @venue)
 
   setup do
     start_supervised!(Tai.Venues.StreamsSupervisor)
     start_supervised!(Tai.Venues.Supervisor)
-    start_supervised!({Tai.Venues.VenueStore, id: @test_store_id})
     :ok
   end
 
