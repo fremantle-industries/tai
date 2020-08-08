@@ -52,7 +52,7 @@ defmodule Tai.Venues.InstancesTest do
   end
 
   describe ".stop/1" do
-    test "stops the stream and start venue processes" do
+    test "stops the supervised processes for a venue" do
       {:ok, start_pid} = Tai.Venues.Supervisor.start(@venue)
       {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@stream)
 

@@ -13,6 +13,7 @@ defmodule Tai.Venues.StreamsSupervisor do
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 
+  @spec stop(pid) :: :ok | {:error, :not_found}
   def stop(pid) when is_pid(pid) do
     DynamicSupervisor.terminate_child(__MODULE__, pid)
   end
