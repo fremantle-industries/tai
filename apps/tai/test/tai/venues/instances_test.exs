@@ -51,8 +51,8 @@ defmodule Tai.Venues.InstancesTest do
 
   describe ".stop/1" do
     test "stops the supervised processes for a venue" do
-      {:ok, start_pid} = Tai.Venues.Supervisor.start(@venue)
-      {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@stream)
+      assert {:ok, start_pid} = Tai.Venues.Supervisor.start(@venue)
+      assert {:ok, stream_pid} = Tai.Venues.StreamsSupervisor.start(@stream)
 
       assert Tai.Venues.Instances.stop(@venue) == :ok
       assert Process.alive?(start_pid) == false
