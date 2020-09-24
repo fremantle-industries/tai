@@ -10,6 +10,7 @@ defmodule Tai.ConfigTest do
       assert config.after_boot == nil
       assert config.after_boot_error == nil
       assert config.broadcast_change_set == false
+      assert config.logger == nil
       assert config.send_orders == false
       assert config.system_bus_registry_partitions == System.schedulers_online()
       assert config.venues == %{}
@@ -43,6 +44,11 @@ defmodule Tai.ConfigTest do
     test "can set system_bus_registry_partitions" do
       assert config = Tai.Config.parse(system_bus_registry_partitions: 1)
       assert config.system_bus_registry_partitions == 1
+    end
+
+    test "can set logger" do
+      assert config = Tai.Config.parse(logger: CustomLogger)
+      assert config.logger == CustomLogger
     end
 
     test "can set send_orders" do
