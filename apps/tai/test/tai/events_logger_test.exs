@@ -52,4 +52,21 @@ defmodule Tai.EventsLoggerTest do
              :timer.sleep(100)
            end) =~ "[debug] {\"data\":{\"hello\":\"custom\"},\"type\":\"Support.CustomEvent\"}"
   end
+
+  test "logs with custom logger" do
+    defmodule CustomLogger do
+      require Logger
+
+      def log(level, _event) do
+        Logger.log(level, "message from custom logger")
+      end
+    end
+
+    logger = start_supervised!({Tai.EventsLogger, id: __MODULE__, logger: CustomLogger})
+
+    assert capture_log(fn ->
+             send(logger, {TaiEvents.Event, @event, :info})
+             :timer.sleep(100)
+           end) =~ "[info]  message from custom logger"
+  end
 end

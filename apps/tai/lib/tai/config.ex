@@ -44,6 +44,7 @@ defmodule Tai.Config do
           after_boot: {handler, func_name} | {handler, func_name, boot_args} | nil,
           after_boot_error: {handler, func_name} | {handler, func_name, boot_args} | nil,
           broadcast_change_set: boolean,
+          logger: module,
           send_orders: boolean,
           system_bus_registry_partitions: pos_integer,
           venues: map
@@ -62,6 +63,7 @@ defmodule Tai.Config do
     after_boot
     after_boot_error
     broadcast_change_set
+    logger
     send_orders
     system_bus_registry_partitions
     venues
@@ -76,6 +78,7 @@ defmodule Tai.Config do
       after_boot: get(env, :after_boot),
       after_boot_error: get(env, :after_boot_error),
       broadcast_change_set: !!get(env, :broadcast_change_set),
+      logger: get(env, :logger),
       send_orders: !!get(env, :send_orders),
       system_bus_registry_partitions:
         get(env, :system_bus_registry_partitions, System.schedulers_online()),

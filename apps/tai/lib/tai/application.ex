@@ -7,7 +7,7 @@ defmodule Tai.Application do
 
     children = [
       {Tai.SystemBus, config.system_bus_registry_partitions},
-      Tai.EventsLogger,
+      {Tai.EventsLogger, [logger: config.logger]},
       {Tai.Settings, config},
       Tai.Trading.PositionStore,
       Tai.Trading.OrderStore,
