@@ -60,7 +60,7 @@ defmodule Tai.Mixfile do
       {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.4", only: [:dev, :test]},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:echo_boy, "~> 0.6", runtime: false, optional: true},
-      {:exvcr, "~> 0.11.0", only: [:dev, :test]},
+      {:exvcr, "~> 0.12.1", only: [:dev, :test]},
       {:mock, "~> 0.3", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
