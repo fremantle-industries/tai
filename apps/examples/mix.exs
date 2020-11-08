@@ -4,7 +4,7 @@ defmodule Examples.MixProject do
   def project do
     [
       app: :examples,
-      version: "0.0.57",
+      version: "0.0.58",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
