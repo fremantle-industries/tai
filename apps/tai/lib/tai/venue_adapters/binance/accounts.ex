@@ -27,8 +27,8 @@ defmodule Tai.VenueAdapters.Binance.Accounts do
       |> String.downcase()
       |> String.to_atom()
 
-    free = venue_free |> Decimal.new() |> Decimal.reduce()
-    locked = venue_locked |> Decimal.new() |> Decimal.reduce()
+    free = venue_free |> Decimal.new() |> Decimal.normalize()
+    locked = venue_locked |> Decimal.new() |> Decimal.normalize()
     equity = Decimal.add(free, locked)
 
     %Tai.Venues.Account{

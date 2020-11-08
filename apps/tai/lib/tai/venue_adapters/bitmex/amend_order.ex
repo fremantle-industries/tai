@@ -52,7 +52,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
     response = %Tai.Trading.OrderResponses.Amend{
       id: venue_order.order_id,
       status: venue_order.ord_status |> from_venue_status(:ignore),
-      price: Decimal.cast(venue_order.price),
+      price: Tai.Utils.Decimal.cast!(venue_order.price),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
       cumulative_qty: Decimal.new(venue_order.cum_qty),
       received_at: Timex.now(),

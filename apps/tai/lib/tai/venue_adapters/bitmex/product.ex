@@ -9,12 +9,12 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
     status = Tai.VenueAdapters.Bitmex.ProductStatus.normalize(instrument.state)
     listing = instrument.listing && Timex.parse!(instrument.listing, @format)
     expiry = instrument.expiry && Timex.parse!(instrument.expiry, @format)
-    lot_size = instrument.lot_size |> Decimal.cast()
-    tick_size = instrument.tick_size |> Decimal.cast()
-    max_order_qty = instrument.max_order_qty && instrument.max_order_qty |> Decimal.cast()
-    max_price = instrument.max_price && instrument.max_price |> Decimal.cast()
-    maker_fee = instrument.maker_fee && instrument.maker_fee |> Decimal.cast()
-    taker_fee = instrument.taker_fee && instrument.taker_fee |> Decimal.cast()
+    lot_size = instrument.lot_size |> Tai.Utils.Decimal.cast!()
+    tick_size = instrument.tick_size |> Tai.Utils.Decimal.cast!()
+    max_order_qty = instrument.max_order_qty && instrument.max_order_qty |> Tai.Utils.Decimal.cast!()
+    max_price = instrument.max_price && instrument.max_price |> Tai.Utils.Decimal.cast!()
+    maker_fee = instrument.maker_fee && instrument.maker_fee |> Tai.Utils.Decimal.cast!()
+    taker_fee = instrument.taker_fee && instrument.taker_fee |> Tai.Utils.Decimal.cast!()
 
     %Tai.Venues.Product{
       venue_id: venue_id,

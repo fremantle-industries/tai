@@ -53,12 +53,12 @@ defmodule Tai.VenueAdapters.Deribit.Positions do
   defp side(%ExDeribit.Position{direction: "buy"}), do: :long
   defp side(%ExDeribit.Position{direction: "sell"}), do: :short
 
-  defp qty(%ExDeribit.Position{size: size}) when size > 0, do: Decimal.cast(size)
-  defp qty(%ExDeribit.Position{size: size}) when size < 0, do: Decimal.cast(-size)
+  defp qty(%ExDeribit.Position{size: size}) when size > 0, do: Tai.Utils.Decimal.cast!(size)
+  defp qty(%ExDeribit.Position{size: size}) when size < 0, do: Tai.Utils.Decimal.cast!(-size)
 
-  defp avg_price(position), do: Decimal.cast(position.average_price)
+  defp avg_price(position), do: Tai.Utils.Decimal.cast!(position.average_price)
 
   @zero Decimal.new(0)
   defp leverage(%ExDeribit.Position{kind: "option"}), do: @zero
-  defp leverage(position), do: Decimal.cast(position.leverage)
+  defp leverage(position), do: Tai.Utils.Decimal.cast!(position.leverage)
 end

@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.Bitmex.NormalizeAccount do
   def satoshis_to_btc(satoshis) do
     satoshis
     |> Decimal.div(@satoshis_per_btc)
-    |> Decimal.reduce()
+    |> Decimal.normalize()
   end
 
   @spec build(margin, venue_id, credential_id) ::

@@ -10,10 +10,10 @@ defmodule Examples.LogSpread.Advisor do
         %Tai.Markets.Quote{bids: [inside_bid | _], asks: [inside_ask | _]} = market_quote,
         state
       ) do
-    bid_price = inside_bid.price |> Decimal.cast()
-    bid_size = inside_bid.size |> Decimal.cast()
-    ask_price = inside_ask.price |> Decimal.cast()
-    ask_size = inside_ask.size |> Decimal.cast()
+    bid_price = inside_bid.price |> Tai.Utils.Decimal.cast!()
+    bid_size = inside_bid.size |> Tai.Utils.Decimal.cast!()
+    ask_price = inside_ask.price |> Tai.Utils.Decimal.cast!()
+    ask_size = inside_ask.size |> Tai.Utils.Decimal.cast!()
     spread = Decimal.sub(ask_price, bid_price)
 
     %Examples.LogSpread.Events.Spread{

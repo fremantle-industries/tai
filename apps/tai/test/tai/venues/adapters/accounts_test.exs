@@ -32,9 +32,9 @@ defmodule Tai.Venues.Adapters.AccountsTest do
         assert [%Tai.Venues.Account{} = account | _] = accounts
         assert account.venue_id == @venue.id
         assert account.credential_id == @credential_id
-        assert Decimal.cmp(account.equity, Decimal.new(0)) != :lt
-        assert Decimal.cmp(account.free, Decimal.new(0)) != :lt
-        assert Decimal.cmp(account.locked, Decimal.new(0)) != :lt
+        assert Decimal.compare(account.equity, Decimal.new(0)) != :lt
+        assert Decimal.compare(account.free, Decimal.new(0)) != :lt
+        assert Decimal.compare(account.locked, Decimal.new(0)) != :lt
       end
     end
   end)

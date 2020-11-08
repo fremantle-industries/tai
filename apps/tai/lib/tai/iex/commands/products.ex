@@ -40,12 +40,12 @@ defmodule Tai.IEx.Commands.Products do
 
   @hundred Decimal.new(100)
   defp to_percent(%Decimal{} = val) do
-    "#{val |> Decimal.mult(@hundred) |> Decimal.reduce()}%"
+    "#{val |> Decimal.mult(@hundred) |> Decimal.normalize()}%"
   end
 
   defp format_col(%Decimal{} = val) do
     val
-    |> Decimal.reduce()
+    |> Decimal.normalize()
     |> Decimal.to_string(:normal)
   end
 

@@ -49,8 +49,8 @@ defmodule Tai.TestSupport.Mock do
   @spec mock_account(venue_id, credential_id, asset, balance, balance) ::
           {:ok, {record_key, record}}
   def mock_account(venue_id, credential_id, asset, free, locked) do
-    free = Decimal.cast(free)
-    locked = Decimal.cast(locked)
+    free = Tai.Utils.Decimal.cast!(free)
+    locked = Tai.Utils.Decimal.cast!(locked)
     equity = Decimal.add(free, locked)
 
     %Tai.Venues.Account{

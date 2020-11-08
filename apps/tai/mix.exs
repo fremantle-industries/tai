@@ -29,7 +29,7 @@ defmodule Tai.Mixfile do
 
   defp deps do
     [
-      {:enumerati, "~> 0.0.6"},
+      {:enumerati, "~> 0.0.8"},
       {:ex2ms, "~> 1.0"},
       {:ex_binance, "~> 0.0.4"},
       # {:ex_bitmex, github: "fremantle-capital/ex_bitmex", branch: "master"},
@@ -41,7 +41,7 @@ defmodule Tai.Mixfile do
       {:ex_gdax, "~> 0.1.6"},
       # {:ex_huobi, github: "fremantle-capital/ex_huobi", branch: "master"},
       {:ex_huobi, "~> 0.0.2"},
-      {:decimal, "~> 1.7"},
+      {:decimal, "~> 2.0"},
       {:httpoison, "~> 1.0"},
       {:juice, "~> 0.0.3"},
       {:table_rex, "~> 3.0"},

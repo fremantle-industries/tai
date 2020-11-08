@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.OkEx.Accounts do
         info
         |> Enum.map(fn {asset, %{"equity" => equity}} ->
           free = Decimal.new(0)
-          equity = equity |> Decimal.new() |> Decimal.reduce()
+          equity = equity |> Decimal.new() |> Decimal.normalize()
 
           %Tai.Venues.Account{
             venue_id: venue_id,
@@ -44,7 +44,7 @@ defmodule Tai.VenueAdapters.OkEx.Accounts do
             |> String.to_atom()
 
           free = Decimal.new(0)
-          equity = equity |> Decimal.new() |> Decimal.reduce()
+          equity = equity |> Decimal.new() |> Decimal.normalize()
 
           %Tai.Venues.Account{
             venue_id: venue_id,
@@ -73,7 +73,7 @@ defmodule Tai.VenueAdapters.OkEx.Accounts do
           asset = currency |> String.downcase() |> String.to_atom()
           equity = venue_balance |> Decimal.new()
           free = available |> Decimal.new()
-          locked = equity |> Decimal.sub(free) |> Decimal.reduce()
+          locked = equity |> Decimal.sub(free) |> Decimal.normalize()
 
           %Tai.Venues.Account{
             venue_id: venue_id,
