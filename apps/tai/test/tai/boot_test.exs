@@ -59,7 +59,7 @@ defmodule Tai.BootTest do
     refute_event(%Tai.Events.BootAdvisors{}, :info)
 
     assert Tai.Boot.close_registration(@test_id) == :ok
-    assert_event(%Tai.Events.BootAdvisors{} = event, :info, 1000)
+    assert_event(%Tai.Events.BootAdvisors{} , :info, 1000)
   end
 
   describe "when all venues successfully start" do
@@ -88,7 +88,7 @@ defmodule Tai.BootTest do
       refute_event(%Tai.Events.BootAdvisors{}, :info)
 
       %Tai.Events.VenueStart{venue: @venue_a.id} |> TaiEvents.broadcast(:info)
-      assert_event(%Tai.Events.BootAdvisors{} = event, :info, 1000)
+      assert_event(%Tai.Events.BootAdvisors{} , :info, 1000)
       assert_receive :after_boot_no_args_hook
     end
 
@@ -105,7 +105,7 @@ defmodule Tai.BootTest do
       refute_event(%Tai.Events.BootAdvisors{}, :info)
 
       %Tai.Events.VenueStart{venue: @venue_a.id} |> TaiEvents.broadcast(:info)
-      assert_event(%Tai.Events.BootAdvisors{} = event, :info, 1000)
+      assert_event(%Tai.Events.BootAdvisors{}, :info, 1000)
       assert_receive {:after_boot_args_hook, arg1: :hello, arg2: :world}
     end
   end
@@ -159,7 +159,7 @@ defmodule Tai.BootTest do
     pid = start_supervised!({Tai.Boot, [id: @test_id, config: @config]})
 
     assert Tai.Boot.close_registration(@test_id) == :ok
-    assert_event(%Tai.Events.BootAdvisors{} = event, :info, 1000)
+    assert_event(%Tai.Events.BootAdvisors{} , :info, 1000)
     assert Process.alive?(pid) == false
   end
 end

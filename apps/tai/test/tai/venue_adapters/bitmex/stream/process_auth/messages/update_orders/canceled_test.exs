@@ -28,7 +28,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
     assert {:ok, order} = enqueue()
 
     action = struct(Tai.Trading.OrderStore.Actions.Reject, client_id: order.client_id)
-    assert {:ok, {old, updated}} = OrderStore.update(action)
+    assert {:ok, {_old, _updated}} = OrderStore.update(action)
 
     msg =
       struct(ProcessAuth.Messages.UpdateOrders.Canceled,
@@ -52,7 +52,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
     assert {:ok, order} = enqueue()
 
     action = struct(Tai.Trading.OrderStore.Actions.Skip, client_id: order.client_id)
-    assert {:ok, {old, updated}} = OrderStore.update(action)
+    assert {:ok, {_old, _updated}} = OrderStore.update(action)
 
     msg =
       struct(ProcessAuth.Messages.UpdateOrders.Canceled,

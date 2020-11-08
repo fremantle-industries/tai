@@ -31,7 +31,7 @@ defmodule Tai.Venues.Start.StatusTest do
 
     start_supervised!({Tai.Venues.Start, @venue})
 
-    assert_event(%Tai.Events.VenueStart{} = event, :info)
+    assert_event(%Tai.Events.VenueStart{} , :info)
     assert Tai.Venues.Start.status(@venue.id) == :success
   end
 end

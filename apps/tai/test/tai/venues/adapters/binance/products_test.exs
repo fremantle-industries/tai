@@ -34,7 +34,7 @@ defmodule Tai.Venues.Adapters.Binance.ProductsTest do
     test "returns an error tuple when the api key is invalid" do
       use_cassette "venue_adapters/shared/products/binance/error_invalid_api_key" do
         assert {:error, {:credentials, reason}} = Tai.Venues.Client.products(@venue)
-        assert reason = "API-key format invalid."
+        assert reason == "API-key format invalid."
       end
     end
 
