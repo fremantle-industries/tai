@@ -27,8 +27,8 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
       "gtc-" <> id ->
         client_id = Bitmex.ClientId.from_base64(id)
         venue_timestamp = message.timestamp |> Timex.parse!(@date_format)
-        leaves_qty = message.leaves_qty |> Decimal.cast()
-        cumulative_qty = message.cum_qty |> Decimal.cast()
+        leaves_qty = message.leaves_qty |> Tai.Utils.Decimal.cast!()
+        cumulative_qty = message.cum_qty |> Tai.Utils.Decimal.cast!()
 
         %Tai.Trading.OrderStore.Actions.PassivePartialFill{
           client_id: client_id,

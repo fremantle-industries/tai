@@ -47,9 +47,9 @@ defmodule Tai.VenueAdapters.Bitmex.Positions do
   defp qty(%ExBitmex.Position{current_qty: qty}) when qty > 0, do: Decimal.new(qty)
   defp qty(%ExBitmex.Position{current_qty: qty}) when qty < 0, do: Decimal.new(-qty)
 
-  defp entry_price(%ExBitmex.Position{avg_entry_price: p}), do: Decimal.cast(p)
+  defp entry_price(%ExBitmex.Position{avg_entry_price: p}), do: Tai.Utils.Decimal.cast!(p)
 
-  defp leverage(%ExBitmex.Position{leverage: l}), do: Decimal.cast(l)
+  defp leverage(%ExBitmex.Position{leverage: l}), do: Tai.Utils.Decimal.cast!(l)
 
   defp margin_mode(%ExBitmex.Position{cross_margin: true}), do: :crossed
   defp margin_mode(%ExBitmex.Position{cross_margin: false}), do: :fixed

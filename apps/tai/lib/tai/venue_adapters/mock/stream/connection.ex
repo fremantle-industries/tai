@@ -87,8 +87,8 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          },
          _state
        ) do
-    cumulative_qty = raw_cumulative_qty |> Decimal.cast()
-    leaves_qty = raw_leaves_qty |> Decimal.cast()
+    cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.cast!()
+    leaves_qty = raw_leaves_qty |> Tai.Utils.Decimal.cast!()
 
     {:ok, {prev_order, updated_order}} =
       %OrderStore.Actions.PassivePartialFill{
@@ -111,7 +111,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          },
          _state
        ) do
-    cumulative_qty = raw_cumulative_qty |> Decimal.cast()
+    cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.cast!()
 
     {:ok, {prev_order, updated_order}} =
       %OrderStore.Actions.PassiveFill{

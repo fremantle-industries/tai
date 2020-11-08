@@ -38,7 +38,7 @@ defmodule Tai.IEx.Commands.Fees do
     percent =
       val
       |> Decimal.mult(Decimal.new(100))
-      |> Decimal.reduce()
+      |> Decimal.normalize()
       |> Decimal.to_string(:normal)
 
     "#{percent}%"
@@ -46,7 +46,7 @@ defmodule Tai.IEx.Commands.Fees do
 
   defp format_col({val, _type}) do
     val
-    |> Decimal.reduce()
+    |> Decimal.normalize()
     |> Decimal.to_string(:normal)
   end
 

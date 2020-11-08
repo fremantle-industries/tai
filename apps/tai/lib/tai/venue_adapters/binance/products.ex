@@ -94,5 +94,5 @@ defmodule Tai.VenueAdapters.Binance.Products do
     |> Enum.find(fn f -> f["filterType"] == type end)
   end
 
-  defp to_decimal(val), do: val |> Decimal.new() |> Decimal.reduce()
+  defp to_decimal(val), do: val |> Decimal.new() |> Decimal.normalize()
 end

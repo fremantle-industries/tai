@@ -48,17 +48,16 @@ defmodule Tai.VenueAdapters.Huobi.Product do
     symbol = venue_symbol |> to_symbol()
 
     price_increment =
-      args |> Keyword.fetch!(:venue_price_increment) |> Decimal.cast() |> Decimal.reduce()
+      args |> Keyword.fetch!(:venue_price_increment) |> Tai.Utils.Decimal.cast!(:normalize)
 
-    size_increment = venue_size_increment |> Decimal.cast() |> Decimal.reduce()
+    size_increment = venue_size_increment |> Tai.Utils.Decimal.cast!(:normalize)
 
     min_size =
       args
       |> Keyword.get(:venue_min_size, venue_size_increment)
-      |> Decimal.cast()
-      |> Decimal.reduce()
+      |> Tai.Utils.Decimal.cast!(:normalize)
 
-    value = args |> Keyword.fetch!(:value) |> Decimal.cast() |> Decimal.reduce()
+    value = args |> Keyword.fetch!(:value) |> Tai.Utils.Decimal.cast!(:normalize)
     listing = args |> Keyword.get(:listing)
     expiry = args |> Keyword.get(:expiry)
     base_asset = Keyword.fetch!(args, :base)

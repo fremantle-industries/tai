@@ -14,13 +14,13 @@ defmodule Tai.Venues.Adapters.Binance.ProductsTest do
       use_cassette "venue_adapters/shared/products/binance/success" do
         assert {:ok, products} = Tai.Venues.Client.products(@venue)
         assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :ltc_btc)
-        assert Decimal.cmp(product.min_notional, Decimal.new("0.001")) == :eq
-        assert Decimal.cmp(product.min_price, Decimal.new("0.000001")) == :eq
-        assert Decimal.cmp(product.min_size, Decimal.new("0.01")) == :eq
-        assert Decimal.cmp(product.price_increment, Decimal.new("0.000001")) == :eq
-        assert Decimal.cmp(product.max_price, Decimal.new("100000.0")) == :eq
-        assert Decimal.cmp(product.max_size, Decimal.new("100000.0")) == :eq
-        assert Decimal.cmp(product.size_increment, Decimal.new("0.01")) == :eq
+        assert Decimal.compare(product.min_notional, Decimal.new("0.001")) == :eq
+        assert Decimal.compare(product.min_price, Decimal.new("0.000001")) == :eq
+        assert Decimal.compare(product.min_size, Decimal.new("0.01")) == :eq
+        assert Decimal.compare(product.price_increment, Decimal.new("0.000001")) == :eq
+        assert Decimal.compare(product.max_price, Decimal.new("100000.0")) == :eq
+        assert Decimal.compare(product.max_size, Decimal.new("100000.0")) == :eq
+        assert Decimal.compare(product.size_increment, Decimal.new("0.01")) == :eq
       end
     end
 

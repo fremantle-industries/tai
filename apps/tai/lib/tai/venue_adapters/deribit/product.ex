@@ -7,11 +7,11 @@ defmodule Tai.VenueAdapters.Deribit.Product do
     type = instrument |> to_type
     listing = Timex.from_unix(instrument.creation_timestamp, @time_unit)
     expiry = Timex.from_unix(instrument.expiration_timestamp, @time_unit)
-    min_trade_amount = instrument.min_trade_amount |> Decimal.cast() |> Decimal.reduce()
-    tick_size = instrument.tick_size |> Decimal.cast()
-    contract_size = instrument.contract_size |> Decimal.cast() |> Decimal.reduce()
-    maker_fee = instrument.maker_commission |> Decimal.cast()
-    taker_fee = instrument.taker_commission |> Decimal.cast()
+    min_trade_amount = instrument.min_trade_amount |> Tai.Utils.Decimal.cast!(:normalize)
+    tick_size = instrument.tick_size |> Tai.Utils.Decimal.cast!()
+    contract_size = instrument.contract_size |> Tai.Utils.Decimal.cast!(:normalize)
+    maker_fee = instrument.maker_commission |> Tai.Utils.Decimal.cast!()
+    taker_fee = instrument.taker_commission |> Tai.Utils.Decimal.cast!()
 
     %Tai.Venues.Product{
       venue_id: venue_id,
@@ -74,8 +74,7 @@ defmodule Tai.VenueAdapters.Deribit.Product do
 
   defp strike_price(price) when is_number(price) do
     price
-    |> Decimal.cast()
-    |> Decimal.reduce()
+    |> Tai.Utils.Decimal.cast!(:normalize)
     |> Decimal.to_string(:normal)
     |> Decimal.new()
   end

@@ -18,8 +18,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       symbol: instrument_id |> to_symbol,
       received_at: received_at,
       timestamp: timestamp |> normalize_timestamp(),
-      price: price |> Decimal.cast(),
-      qty: qty |> Decimal.cast(),
+      price: price |> Tai.Utils.Decimal.cast!(),
+      qty: qty |> Tai.Utils.Decimal.cast!(),
       taker_side: side |> normalize_side,
       venue_trade_id: venue_trade_id
     })
@@ -42,8 +42,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Trades do
       symbol: instrument_id |> to_symbol,
       received_at: received_at,
       timestamp: timestamp |> normalize_timestamp(),
-      price: price |> Decimal.cast(),
-      qty: size |> Decimal.cast(),
+      price: price |> Tai.Utils.Decimal.cast!(),
+      qty: size |> Tai.Utils.Decimal.cast!(),
       taker_side: side |> normalize_side,
       venue_trade_id: venue_trade_id
     })

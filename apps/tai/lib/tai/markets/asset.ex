@@ -12,7 +12,7 @@ defmodule Tai.Markets.Asset do
   defstruct ~w(val symbol)a
 
   def new(val, symbol) do
-    asset_val = val |> Decimal.cast()
+    asset_val = val |> Tai.Utils.Decimal.cast!()
     %Asset{val: asset_val, symbol: symbol}
   end
 
@@ -36,7 +36,7 @@ defmodule Tai.Markets.Asset do
   end
 
   @zero Decimal.new(0)
-  def zero?(%Asset{val: val}), do: val |> Decimal.cmp(@zero) == :eq
+  def zero?(%Asset{val: val}), do: val |> Decimal.compare(@zero) == :eq
 end
 
 defimpl String.Chars, for: Tai.Markets.Asset do

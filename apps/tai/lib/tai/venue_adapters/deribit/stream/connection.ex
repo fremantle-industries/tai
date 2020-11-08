@@ -272,7 +272,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
          },
          state
        ) do
-    equity = Decimal.cast(venue_equity)
+    equity = Tai.Utils.Decimal.cast!(venue_equity)
     account = state.account_channels |> Map.fetch!(channel)
     account = %{account | equity: equity, locked: equity}
     {:ok, _} = Tai.Venues.AccountStore.put(account)

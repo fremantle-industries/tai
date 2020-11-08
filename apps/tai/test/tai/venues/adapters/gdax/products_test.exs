@@ -13,12 +13,12 @@ defmodule Tai.Venues.Adapters.Gdax.ProductsTest do
     use_cassette "venue_adapters/shared/products/gdax/success" do
       assert {:ok, products} = Tai.Venues.Client.products(@venue)
       assert %Tai.Venues.Product{} = product = find_product_by_symbol(products, :ltc_btc)
-      assert Decimal.cmp(product.min_notional, Decimal.new("0.000001")) == :eq
-      assert Decimal.cmp(product.min_price, Decimal.new("0.00001")) == :eq
-      assert Decimal.cmp(product.min_size, Decimal.new("0.1")) == :eq
-      assert Decimal.cmp(product.max_size, Decimal.new(2000)) == :eq
-      assert Decimal.cmp(product.price_increment, Decimal.new("0.00001")) == :eq
-      assert Decimal.cmp(product.size_increment, Decimal.new("0.1")) == :eq
+      assert Decimal.compare(product.min_notional, Decimal.new("0.000001")) == :eq
+      assert Decimal.compare(product.min_price, Decimal.new("0.00001")) == :eq
+      assert Decimal.compare(product.min_size, Decimal.new("0.1")) == :eq
+      assert Decimal.compare(product.max_size, Decimal.new(2000)) == :eq
+      assert Decimal.compare(product.price_increment, Decimal.new("0.00001")) == :eq
+      assert Decimal.compare(product.size_increment, Decimal.new("0.1")) == :eq
     end
   end
 

@@ -13,7 +13,7 @@ defmodule Tai.VenueAdapters.Deribit.Accounts do
   @zero Decimal.new(0)
 
   def build(account_summary, venue_id, credential_id) do
-    equity = account_summary.equity |> Decimal.cast()
+    equity = account_summary.equity |> Tai.Utils.Decimal.cast!()
     asset = account_summary.currency |> String.downcase() |> String.to_atom()
 
     %Tai.Venues.Account{

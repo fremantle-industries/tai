@@ -2,6 +2,23 @@ defmodule Tai.Utils.DecimalTest do
   use ExUnit.Case, async: true
   doctest Tai.Utils.Decimal
 
+  describe ".cast!/2" do
+    test "returns a decimal when the value can be successfully converted" do
+      assert Tai.Utils.Decimal.cast!(1) == Decimal.new(1)
+      assert Tai.Utils.Decimal.cast!(1.0) == Decimal.new("1.0")
+      assert Tai.Utils.Decimal.cast!("1.00000") == Decimal.new("1.00000")
+      assert Tai.Utils.Decimal.cast!("1.1") == Decimal.new("1.1")
+    end
+
+    test "can normalize the decimal value" do
+      assert Tai.Utils.Decimal.cast!("1.00000", :normalize) == Decimal.new("1")
+    end
+
+    test "raises an error when the value can't be converted" do
+      assert_raise RuntimeError, "\"one\" cannot be converted to Decimal", fn -> Tai.Utils.Decimal.cast!("one") end
+    end
+  end
+
   describe ".round_up/2" do
     test "rounds the value up to the nearest increment" do
       assert Tai.Utils.Decimal.round_up(Decimal.new("3001.700"), Decimal.new("0.5")) ==

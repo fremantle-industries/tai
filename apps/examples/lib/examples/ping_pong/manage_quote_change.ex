@@ -34,7 +34,7 @@ defmodule Examples.PingPong.ManageQuoteChange do
 
     entry_price = EntryPrice.calculate(market_quote, state.config.product)
 
-    if Decimal.cmp(entry_order.price, entry_price) == :eq do
+    if Decimal.compare(entry_order.price, entry_price) == :eq do
       {:ok, state.store}
     else
       {:ok, pending_cancel_order} = orders_provider.cancel(entry_order)

@@ -1,4 +1,18 @@
 defmodule Tai.Utils.Decimal do
+
+  @spec cast!(term, :normalize | term) :: Decimal.t | no_return
+  def cast!(value, normalize \\ :ignore) do
+    with {:ok, d} <- Decimal.cast(value) do
+      case normalize do
+        :normalize -> Decimal.normalize(d)
+        _ -> d
+      end
+    else
+      :error ->
+        raise("#{inspect value} cannot be converted to Decimal")
+    end
+  end
+
   @spec round_up(Decimal.t(), Decimal.t()) :: Decimal.t()
   def round_up(val, increment) do
     {vc, ic, e} = same_order_of(val, increment)

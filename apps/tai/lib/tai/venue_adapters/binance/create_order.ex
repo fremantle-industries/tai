@@ -41,8 +41,8 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     received_at = Timex.now()
     venue_order_id = binance_response.order_id |> Integer.to_string()
     status = binance_response.status |> OrderStatus.from_venue()
-    original_size = binance_response.orig_qty |> Decimal.new() |> Decimal.reduce()
-    cumulative_qty = binance_response.executed_qty |> Decimal.new() |> Decimal.reduce()
+    original_size = binance_response.orig_qty |> Decimal.new() |> Decimal.normalize()
+    cumulative_qty = binance_response.executed_qty |> Decimal.new() |> Decimal.normalize()
     leaves_qty = leaves_qty(status, original_size, cumulative_qty)
     venue_timestamp = binance_response.transact_time |> DateTime.from_unix!(:millisecond)
 
