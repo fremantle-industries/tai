@@ -102,7 +102,7 @@ defmodule Tai.Venues.Start.FeesTest do
 
     start_supervised!({Tai.Venues.Start, venue})
 
-    assert_event(%Tai.Events.VenueStart{} = event, :info)
+    assert_event(%Tai.Events.VenueStart{} , :info)
 
     fees = Tai.Venues.FeeStore.all()
     assert Enum.count(fees) == 1
@@ -116,7 +116,7 @@ defmodule Tai.Venues.Start.FeesTest do
 
     start_supervised!({Tai.Venues.Start, venue})
 
-    assert_event(%Tai.Events.VenueStart{} = event, :info)
+    assert_event(%Tai.Events.VenueStart{} , :info)
 
     fees = Tai.Venues.FeeStore.all()
     assert Enum.count(fees) == 1
@@ -130,7 +130,7 @@ defmodule Tai.Venues.Start.FeesTest do
 
     start_supervised!({Tai.Venues.Start, venue})
 
-    assert_event(%Tai.Events.VenueStart{} = event, :info)
+    assert_event(%Tai.Events.VenueStart{} , :info)
 
     fees = Tai.Venues.FeeStore.all()
     assert Enum.count(fees) == 1

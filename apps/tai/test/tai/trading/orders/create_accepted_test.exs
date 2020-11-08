@@ -44,7 +44,7 @@ defmodule Tai.Trading.Orders.CreateAcceptedTest do
 
       assert_receive {
         :callback_fired,
-        %Order{status: :enqueued} = enqueued_order,
+        %Order{status: :enqueued},
         %Order{status: :create_accepted} = accepted_order
       }
 

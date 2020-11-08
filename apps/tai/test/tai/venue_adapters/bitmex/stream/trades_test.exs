@@ -34,6 +34,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.TradeTest do
       {%{"table" => "trade", "action" => "insert", "data" => venue_trades}, :ignore}
     )
 
-    assert_event(%Tai.Events.Trade{venue_trade_id: venue_trade_id})
+    assert_event(%Tai.Events.Trade{} = event)
+    assert event.venue_trade_id == venue_trade_id
   end
 end

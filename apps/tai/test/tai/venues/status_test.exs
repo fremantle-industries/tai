@@ -53,7 +53,7 @@ defmodule Tai.Venues.StatusTest do
     venue = Map.merge(@venue, %{adapter: ErrorVenueAdapter})
     start_supervised!({Tai.Venues.Start, venue})
 
-    assert_event(%Tai.Events.VenueStartError{} = event, :error)
+    assert_event(%Tai.Events.VenueStartError{} , :error)
     assert Tai.Venues.Status.status(venue) == :error
   end
 end

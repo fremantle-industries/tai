@@ -20,7 +20,7 @@ defmodule Tai.Venues.Adapters.MakerTakerFeesTest do
 
       use_cassette "venue_adapters/shared/maker_taker_fees/#{@venue.id}/success" do
         assert {:ok, fees} = Tai.Venues.Client.maker_taker_fees(@venue, @credential_id)
-        assert {%Decimal{} = maker, %Decimal{} = taker} = fees
+        assert {%Decimal{} = _maker, %Decimal{} = _taker} = fees
       end
     end
   end)

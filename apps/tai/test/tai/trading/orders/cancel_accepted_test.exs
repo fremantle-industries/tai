@@ -48,13 +48,13 @@ defmodule Tai.Trading.Orders.CancelAcceptedTest do
       assert_receive {
         :callback_fired,
         %Order{status: :open},
-        %Order{status: :pending_cancel} = pending_cancel_order
+        %Order{status: :pending_cancel}
       }
 
       assert_receive {
         :callback_fired,
         %Order{status: :pending_cancel},
-        %Order{status: :cancel_accepted} = cancel_accepted_order
+        %Order{status: :cancel_accepted}
       }
     end
   end)
