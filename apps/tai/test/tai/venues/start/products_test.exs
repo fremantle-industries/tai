@@ -49,6 +49,10 @@ defmodule Tai.Venues.Start.ProductsTest do
     def run(products), do: Enum.filter(products, &(&1.symbol == :btc_usdt))
   end
 
+  defmodule ArgumentedProductsFilter do
+    def run(products, symbol), do: Enum.filter(products, &(&1.symbol == symbol))
+  end
+
   @base_venue struct(
                 Tai.Venue,
                 adapter: TestAdapter,
@@ -95,6 +99,19 @@ defmodule Tai.Venues.Start.ProductsTest do
 
   test "can filter products with a module function" do
     venue = @base_venue |> Map.put(:products, {ProductsFilter, :run})
+    TaiEvents.firehose_subscribe()
+
+    start_supervised!({Tai.Venues.Start, venue})
+    assert_event(%Tai.Events.VenueStart{}, :info)
+
+    products = Tai.Venues.ProductStore.all()
+    assert Enum.count(products) == 1
+    assert Enum.at(products, 0).symbol == :btc_usdt
+  end
+
+  test "can filter products with a module function with arguments" do
+    venue = @base_venue |> Map.put(:products, {ArgumentedProductsFilter, :run, [:btc_usdt]})
+
     TaiEvents.firehose_subscribe()
 
     start_supervised!({Tai.Venues.Start, venue})

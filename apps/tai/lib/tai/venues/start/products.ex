@@ -51,6 +51,10 @@ defmodule Tai.Venues.Start.Products do
     apply(mod, func_name, [products])
   end
 
+  defp apply_filter(products, {mod, func_name, args}) do
+    apply(mod, func_name, [products] ++ args)
+  end
+
   defp apply_filter(products, query) when is_binary(query) do
     products
     |> index_products()
