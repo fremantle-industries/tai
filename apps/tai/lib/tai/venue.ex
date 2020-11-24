@@ -12,7 +12,10 @@ defmodule Tai.Venue do
           id: id,
           adapter: adapter,
           channels: [channel],
-          products: String.t() | {module, func_name :: atom},
+          products:
+            String.t()
+            | {module, func_name :: atom}
+            | {module, func_name :: atom, func_args :: list},
           accounts: String.t() | {module, func_name :: atom},
           credentials: credentials,
           quote_depth: pos_integer,
