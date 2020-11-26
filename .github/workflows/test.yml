@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1.0.0
 
-      - uses: actions/setup-elixir@v1.5.0
+      - uses: actions/setup-elixir@v1.5
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
