@@ -29,7 +29,7 @@ defmodule TaiMonorepo.MixProject do
   defp deps do
     [
       {:excoveralls, "~> 0.8", only: :test},
-      {:ex_unit_notifier, "~> 0.1", only: :test},
+      {:ex_unit_notifier, "~> 1.0", only: :test},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}
     ]
