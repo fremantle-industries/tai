@@ -3,6 +3,7 @@ defmodule Tai.Venues.Product do
           :unknown
           | :pre_trading
           | :trading
+          | :restricted
           | :post_trading
           | :end_of_day
           | :halt

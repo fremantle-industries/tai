@@ -1,6 +1,5 @@
-defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels do
+defmodule Tai.VenueAdapters.Ftx.Stream.ProcessOptionalChannels do
   use GenServer
-  alias Tai.VenueAdapters.OkEx.Stream
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
@@ -25,17 +24,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels do
 
   @impl true
   def init(state), do: {:ok, state}
-
-  @impl true
-  def handle_cast({%{"event" => "subscribe"}, _}, state), do: {:noreply, state}
-
-  @impl true
-  @accepted_trade_types ~w(futures spot swap) |> Enum.map(&"#{&1}/trade")
-  def handle_cast({%{"table" => table, "data" => data}, received_at}, state)
-      when table in @accepted_trade_types do
-    data |> Enum.each(&Stream.Trades.broadcast(&1, state.venue, received_at))
-    {:noreply, state}
-  end
 
   @impl true
   def handle_cast({msg, received_at}, state) do
