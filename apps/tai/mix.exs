@@ -38,7 +38,7 @@ defmodule Tai.Mixfile do
       {:ex_deribit, "~> 0.0.7"},
       # {:ex_ftx, "~> 0.0.1"},
       # {:ex_ftx, path: "~/workspace/fremantle-capital/ex_ftx"},
-      {:ex_ftx, github: "fremantle-capital/ex_ftx"},
+      {:ex_ftx, github: "fremantle-capital/ex_ftx", branch: "main"},
       # {:ex_okex, github: "fremantle-capital/ex_okex", branch: "master"},
       {:ex_okex, "~> 0.4"},
       {:ex_gdax, "~> 0.1.6"},
