@@ -1,7 +1,8 @@
 defmodule Tai.VenueAdapters.Ftx do
   alias Tai.VenueAdapters.Ftx.{
     StreamSupervisor,
-    Products
+    Products,
+    MakerTakerFees
   }
 
   @behaviour Tai.Venues.Adapter
@@ -9,7 +10,7 @@ defmodule Tai.VenueAdapters.Ftx do
   def stream_supervisor, do: StreamSupervisor
   defdelegate products(venue_id), to: Products
   def accounts(_venue_id, _credential_id, _credentials), do: {:error, :not_implemented}
-  def maker_taker_fees(_venue_id, _credential_id, _credentials), do: {:error, :not_implemented}
+  defdelegate maker_taker_fees(venue_id, credential_id, credentials), to: MakerTakerFees
   def positions(_venue_id, _credential_id, _credentials), do: {:error, :not_implemented}
   def create_order(_order, _credentials), do: {:error, :not_implemented}
   def amend_order(_order, _attrs, _credentials), do: {:error, :not_supported}

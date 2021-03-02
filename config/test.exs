@@ -154,7 +154,7 @@ config(:tai, :test_venue_adapters_products, [
 
 config(:tai, :test_venue_adapters_accounts, [:binance, :bitmex, :deribit, :gdax, :mock, :okex])
 config(:tai, :test_venue_adapters_accounts_error, [:bitmex])
-config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :gdax, :okex])
+config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :gdax, :okex, :ftx])
 config(:tai, :test_venue_adapters_create_order_gtc_open, [:bitmex, :binance])
 config(:tai, :test_venue_adapters_create_order_gtc_accepted, [:okex_futures, :okex_swap])
 config(:tai, :test_venue_adapters_create_order_fok, [:bitmex, :binance])
@@ -209,14 +209,29 @@ config :exvcr,
     "OK-ACCESS-TIMESTAMP",
     "OK-ACCESS-PASSPHRASE",
     # Deribit
-    "Authorization"
+    "Authorization",
+    # FTX
+    "FTX-KEY",
+    "FTX-SIGN",
+    "FTX-TS"
   ],
   filter_sensitive_data: [
     # GDAX
     [pattern: "\"id\":\"[a-z0-9-]{36,36}\"", placeholder: "\"id\":\"***\""],
     [pattern: "\"profile_id\":\"[a-z0-9-]{36,36}\"", placeholder: "\"profile_id\":\"***\""],
     # Binance
-    [pattern: "signature=[A-Z0-9]+", placeholder: "signature=***"]
+    [pattern: "signature=[A-Z0-9]+", placeholder: "signature=***"],
+    # FTX
+    [pattern: "username\":\"[a-zA-Z0-9@.]+\"", placeholder: "username\":\"***\""]
+  ],
+  response_headers_blacklist: [
+    # Shared
+    "Set-Cookie",
+    "ETag",
+    "cf-request-id",
+    "CF-RAY",
+    # FTX
+    "account-id"
   ]
 
 config :echo_boy, port: 4100
