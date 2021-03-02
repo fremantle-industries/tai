@@ -55,6 +55,8 @@ jobs:
           OKEX_API_SECRET: ../../secrets/ci/okex_api_secret
           DERIBIT_CLIENT_ID: ../../secrets/ci/deribit_client_id
           DERIBIT_CLIENT_SECRET: ../../secrets/ci/deribit_client_secret
+          FTX_API_KEY: ../../secrets/ci/ftx_api_key
+          FTX_API_SECRET: ../../secrets/ci/ftx_api_secret
         run: mix test
 
       - uses: actions/upload-artifact@v2
@@ -113,6 +115,8 @@ jobs:
           OKEX_API_SECRET: ../../secrets/ci/okex_api_secret
           DERIBIT_CLIENT_ID: ../../secrets/ci/deribit_client_id
           DERIBIT_CLIENT_SECRET: ../../secrets/ci/deribit_client_secret
+          FTX_API_KEY: ../../secrets/ci/ftx_api_key
+          FTX_API_SECRET: ../../secrets/ci/ftx_api_secret
         run: mix test
 
       - uses: actions/upload-artifact@v2

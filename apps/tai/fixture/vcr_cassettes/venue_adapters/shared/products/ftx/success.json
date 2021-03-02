@@ -8,7 +8,7 @@
       "method": "get",
       "options": [],
       "request_body": "",
-      "url": "https://ftx.com/api/markets?"
+      "url": "https://ftx.com/api/markets"
     },
     "response": {
       "binary": false,
