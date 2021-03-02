@@ -30,7 +30,9 @@ defmodule Tai.Venues.Adapters.ProductsTest do
         assert product.symbol != nil
         assert product.status != nil
         assert %Decimal{} = product.min_size
+        assert %Decimal{} = product.min_price
         assert %Decimal{} = product.size_increment
+        assert %Decimal{} = product.price_increment
       end
     end
   end)
@@ -45,7 +47,8 @@ defmodule Tai.Venues.Adapters.ProductsTest do
           min_notional: Decimal.new("0.0001"),
           min_size: Decimal.new("0.0001"),
           min_price: Decimal.new("0.01"),
-          size_increment: Decimal.new("0.001")
+          size_increment: Decimal.new("0.001"),
+          price_increment: Decimal.new("0.01"),
         },
         %{
           symbol: :ltc_usd,
@@ -53,7 +56,8 @@ defmodule Tai.Venues.Adapters.ProductsTest do
           min_notional: Decimal.new("0.0001"),
           min_size: Decimal.new("0.0001"),
           min_price: Decimal.new("0.01"),
-          size_increment: Decimal.new("0.001")
+          size_increment: Decimal.new("0.001"),
+          price_increment: Decimal.new("0.01"),
         }
       ]
     )

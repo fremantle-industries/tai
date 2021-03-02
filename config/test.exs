@@ -127,6 +127,16 @@ config(:tai,
           api_passphrase: {:system_file, "GDAX_API_PASSPHRASE"}
         }
       }
+    ],
+    ftx: [
+      enabled: true,
+      adapter: Tai.VenueAdapters.Ftx,
+      credentials: %{
+        main: %{
+          api_key: {:system_file, "FTX_API_KEY"},
+          api_secret: {:system_file, "FTX_API_SECRET"}
+        }
+      }
     ]
   }
 )
@@ -138,7 +148,8 @@ config(:tai, :test_venue_adapters_products, [
   :gdax,
   :mock,
   :okex,
-  :huobi
+  :huobi,
+  :ftx
 ])
 
 config(:tai, :test_venue_adapters_accounts, [:binance, :bitmex, :deribit, :gdax, :mock, :okex])

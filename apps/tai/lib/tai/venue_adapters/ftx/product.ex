@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Ftx.Product do
 
   def build(%Market{} = market, venue_id) do
     # TODO: Figure out what this should be
-    value = 1000000 |> Tai.Utils.Decimal.cast!()
+    value = 1_000_000 |> Tai.Utils.Decimal.cast!()
 
     %Tai.Venues.Product{
       venue_id: venue_id,
@@ -18,10 +18,10 @@ defmodule Tai.VenueAdapters.Ftx.Product do
       type: market |> type(),
       listing: nil,
       expiry: nil,
-      price_increment: market.price_increment,
-      size_increment: market.size_increment,
-      min_price: market.price_increment,
-      min_size: market.size_increment,
+      price_increment: market.price_increment |> Tai.Utils.Decimal.cast!(),
+      size_increment: market.size_increment |> Tai.Utils.Decimal.cast!(),
+      min_price: market.price_increment |> Tai.Utils.Decimal.cast!(),
+      min_size: market.size_increment |> Tai.Utils.Decimal.cast!(),
       value: value,
       is_quanto: false,
       is_inverse: false
