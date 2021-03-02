@@ -32,11 +32,16 @@ Here's an example of an advisor that logs the spread between multiple products o
 | GDAX     |       [x]       |   [x]    |      [ ]      |      [ ]       |   [x]    | [x]  |
 | Huobi    |       [x]       |   [ ]    |      [ ]      |      [ ]       |   [x]    | [ ]  |
 | FTX      |       [x]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [x]  |
-| Coinflex |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | Bybit    |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
-| bitFlyer |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
-| Kraken   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | Bitfinex |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| BTSE     |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| Kraken   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| KuCoin   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| MXC      |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| PrimeXBT |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| Gate.io  |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| Coinflex |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| bitFlyer |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 
 ## Install
 
