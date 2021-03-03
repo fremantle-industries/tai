@@ -1,0 +1,37 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json",
+        "FTX-KEY": "***",
+        "FTX-SIGN": "***",
+        "FTX-TS": "***"
+      },
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "https://ftx.com/api/positions?showAvgPrice=true"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"result\":[{\"collateralUsed\":0.0,\"cost\":0.0,\"cumulativeBuySize\":null,\"cumulativeSellSize\":null,\"entryPrice\":11.66,\"estimatedLiquidationPrice\":null,\"future\":\"BADGER-PERP\",\"initialMarginRequirement\":0.1,\"longOrderSize\":-0.0,\"maintenanceMarginRequirement\":0.03,\"netSize\":0.0,\"openSize\":0.0,\"realizedPnl\":69.80007512,\"recentAverageOpenPrice\":null,\"recentBreakEvenPrice\":null,\"recentPnl\":null,\"shortOrderSize\":0.0,\"side\":\"buy\",\"size\":0.0,\"unrealizedPnl\":0.0}],\"success\":true}\n",
+      "headers": {
+        "Date": "Wed, 03 Mar 2021 00:19:13 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "private, max-age=0, no-cache",
+        "CF-Cache-Status": "MISS",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Server": "cloudflare",
+        "alt-svc": "h3-27=\":443\"; ma=86400, h3-28=\":443\"; ma=86400, h3-29=\":443\"; ma=86400"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]
