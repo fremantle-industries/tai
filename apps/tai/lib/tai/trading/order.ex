@@ -2,7 +2,7 @@ defmodule Tai.Trading.Order do
   alias Tai.Trading.Order
 
   @type client_id :: Ecto.UUID.t()
-  @type venue_order_id :: String.t()
+  @type venue_order_id :: number | String.t()
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type venue_product_symbol :: Tai.Venues.Product.venue_symbol()

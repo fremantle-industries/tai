@@ -1,0 +1,37 @@
+[
+  {
+    "request": {
+      "body": "{\"clientId\":\"4fb08c0f-8b0d-4f67-adc6-52b7e87e2885\",\"ioc\":true,\"market\":\"BTC/USD\",\"postOnly\":false,\"price\":\"25000.5\",\"reduceOnly\":false,\"side\":\"buy\",\"size\":\"0.0001\",\"type\":\"limit\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "FTX-KEY": "***",
+        "FTX-SIGN": "***",
+        "FTX-TS": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://ftx.com/api/orders"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"result\":{\"avgFillPrice\":null,\"clientId\":\"4fb08c0f-8b0d-4f67-adc6-52b7e87e2885\",\"createdAt\":\"2021-03-04T17:01:17.042613+00:00\",\"filledSize\":0.0,\"future\":null,\"id\":31918045423,\"ioc\":true,\"liquidation\":false,\"market\":\"BTC/USD\",\"postOnly\":false,\"price\":25000.0,\"reduceOnly\":false,\"remainingSize\":0.0001,\"side\":\"buy\",\"size\":0.0001,\"status\":\"new\",\"type\":\"limit\"},\"success\":true}\n",
+      "headers": {
+        "Date": "Thu, 04 Mar 2021 17:01:17 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "private, max-age=0, no-cache",
+        "CF-Cache-Status": "DYNAMIC",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Server": "cloudflare",
+        "alt-svc": "h3-27=\":443\"; ma=86400, h3-28=\":443\"; ma=86400, h3-29=\":443\"; ma=86400"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

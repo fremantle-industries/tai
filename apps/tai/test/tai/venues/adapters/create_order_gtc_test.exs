@@ -40,6 +40,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
           assert order_response.cumulative_qty == order_response.original_size
           assert order_response.status == :filled
           assert %DateTime{} = order_response.venue_timestamp
+          assert %DateTime{} = order_response.received_at
         end
       end
 
@@ -58,6 +59,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
           assert order_response.leaves_qty != order_response.original_size
           assert order_response.status == :open
           assert %DateTime{} = order_response.venue_timestamp
+          assert %DateTime{} = order_response.received_at
         end
       end
 
@@ -72,6 +74,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
           assert order_response.leaves_qty == order_response.original_size
           assert order_response.cumulative_qty == Decimal.new(0)
           assert %DateTime{} = order_response.venue_timestamp
+          assert %DateTime{} = order_response.received_at
         end
       end
     end)
@@ -98,6 +101,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
 
           assert %Tai.Trading.OrderResponses.CreateAccepted{} = order_response
           assert order_response.id != nil
+          assert %DateTime{} = order_response.received_at
         end
       end
     end)
@@ -111,6 +115,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       credential_id: :main,
+      venue_product_symbol: venue_id |> venue_product_symbol,
       product_symbol: venue_id |> product_symbol,
       product_type: venue_id |> product_type,
       side: side,
@@ -122,9 +127,16 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
     })
   end
 
+  defp venue_product_symbol(:bitmex), do: "XBTH19"
+  defp venue_product_symbol(:okex_futures), do: "ETH-USD-190628"
+  defp venue_product_symbol(:okex_swap), do: "ETH-USD-SWAP"
+  defp venue_product_symbol(:ftx), do: "BTC/USD"
+  defp venue_product_symbol(_), do: "LTC-BTC"
+
   defp product_symbol(:bitmex), do: :xbth19
   defp product_symbol(:okex_futures), do: :eth_usd_190628
   defp product_symbol(:okex_swap), do: :eth_usd_swap
+  defp product_symbol(:ftx), do: :"btc/usd"
   defp product_symbol(_), do: :ltc_btc
 
   defp product_type(:okex_swap), do: :swap
@@ -138,6 +150,8 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
   defp price(:okex_futures, :sell, :gtc, :unfilled), do: Decimal.new("290.5")
   defp price(:okex_swap, :buy, :gtc, :unfilled), do: Decimal.new("70.5")
   defp price(:okex_swap, :sell, :gtc, :unfilled), do: Decimal.new("290.5")
+  defp price(:ftx, :buy, :gtc, :unfilled), do: Decimal.new("25000.5")
+  defp price(:ftx, :sell, :gtc, :unfilled), do: Decimal.new("75000.5")
   defp price(:bitmex, :buy, :gtc, :partially_filled), do: Decimal.new("4130")
   defp price(:bitmex, :sell, :gtc, :partially_filled), do: Decimal.new("3795.5")
   defp price(_, :buy, _, _), do: Decimal.new("0.007")
@@ -154,6 +168,8 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
   defp qty(:okex_futures, :sell, _, _), do: Decimal.new(1)
   defp qty(:okex_swap, :buy, _, _), do: Decimal.new(1)
   defp qty(:okex_swap, :sell, _, _), do: Decimal.new(1)
+  defp qty(:ftx, :buy, :gtc, :unfilled), do: Decimal.new("0.0001")
+  defp qty(:ftx, :sell, :gtc, :unfilled), do: Decimal.new("0.0001")
   defp qty(_, _, :gtc, :insufficient_balance), do: Decimal.new(1_000)
   defp qty(_, :buy, _, _), do: Decimal.new("0.2")
   defp qty(_, :sell, _, _), do: Decimal.new("0.1")

@@ -41,6 +41,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
             assert order_response.cumulative_qty == order_response.original_size
             assert order_response.status == :filled
             assert %DateTime{} = order_response.venue_timestamp
+            assert %DateTime{} = order_response.received_at
           end
         end
 
@@ -56,6 +57,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
             assert order_response.cumulative_qty == Decimal.new(0)
             assert order_response.status == :expired
             assert %DateTime{} = order_response.venue_timestamp
+            assert %DateTime{} = order_response.received_at
           end
         end
       end
@@ -69,7 +71,8 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       credential_id: :main,
-      symbol: venue_id |> product_symbol,
+      venue_product_symbol: venue_id |> venue_product_symbol,
+      product_symbol: venue_id |> product_symbol,
       side: side,
       price: venue_id |> price(side, time_in_force, action),
       qty: venue_id |> qty(side, time_in_force, action),
@@ -78,6 +81,9 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
       post_only: false
     })
   end
+
+  defp venue_product_symbol(:bitmex), do: "XBTH19"
+  defp venue_product_symbol(_), do: "LTC-BTC"
 
   defp product_symbol(:bitmex), do: :xbth19
   defp product_symbol(_), do: :ltc_btc

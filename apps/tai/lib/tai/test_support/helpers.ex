@@ -31,6 +31,10 @@ defmodule Tai.TestSupport.Helpers do
     :test_venue_adapters_create_order_ioc |> filter()
   end
 
+  def test_venue_adapters_create_order_ioc_accepted do
+    :test_venue_adapters_create_order_ioc_accepted |> filter()
+  end
+
   def test_venue_adapters_create_order_close do
     :test_venue_adapters_create_order_close |> filter()
   end
