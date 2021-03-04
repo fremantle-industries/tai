@@ -13,10 +13,6 @@ defmodule Tai.VenueAdapters.Binance.Products do
     end
   end
 
-  @spec to_symbol(atom) :: String.t()
-  def to_symbol(symbol),
-    do: symbol |> Atom.to_string() |> String.replace("_", "") |> String.upcase()
-
   defp build(
          %{
            "baseAsset" => base_asset,

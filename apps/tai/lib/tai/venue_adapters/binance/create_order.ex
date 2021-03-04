@@ -12,8 +12,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     venue_side = side |> Atom.to_string() |> String.upcase()
     credentials = struct!(ExBinance.Credentials, credentials)
 
-    order.product_symbol
-    |> to_venue_symbol
+    order.venue_product_symbol
     |> ExBinance.Private.create_order(
       venue_side,
       @limit,
@@ -24,10 +23,6 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     )
     |> parse_response(order)
   end
-
-  defdelegate to_venue_symbol(product_symbol),
-    to: Tai.VenueAdapters.Binance.Products,
-    as: :to_symbol
 
   defp to_venue_time_in_force(:gtc), do: "GTC"
   defp to_venue_time_in_force(:fok), do: "FOK"

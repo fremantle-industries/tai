@@ -4,15 +4,10 @@ defmodule Tai.VenueAdapters.Binance.CancelOrder do
   def cancel_order(order, credentials) do
     venue_credentials = struct!(ExBinance.Credentials, credentials)
 
-    order.product_symbol
-    |> to_venue_symbol()
+    order.venue_product_symbol
     |> send_to_venue(order.venue_order_id, venue_credentials)
     |> parse_response()
   end
-
-  defdelegate to_venue_symbol(product_symbol),
-    to: Tai.VenueAdapters.Binance.Products,
-    as: :to_symbol
 
   defdelegate send_to_venue(venue_symbol, order_id, credentials),
     to: ExBinance.Private,
