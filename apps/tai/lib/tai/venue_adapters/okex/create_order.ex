@@ -30,7 +30,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
 
   defp build_params(%Tai.Trading.Order{product_type: :future} = order) do
     %{
-      instrument_id: order.product_symbol |> to_venue_symbol,
+      instrument_id: order.venue_product_symbol,
       leverage: 20,
       orders_data: [
         order |> build_order_params()
@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
 
   defp build_params(%Tai.Trading.Order{product_type: :swap} = order) do
     %{
-      instrument_id: order.product_symbol |> to_venue_symbol,
+      instrument_id: order.venue_product_symbol,
       leverage: 20,
       order_data: [
         order |> build_order_params()
@@ -62,10 +62,6 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
   defdelegate to_venue_config(credentials),
     to: Tai.VenueAdapters.OkEx.Credentials,
     as: :from
-
-  defdelegate to_venue_symbol(symbols),
-    to: Tai.VenueAdapters.OkEx.Products,
-    as: :from_symbol
 
   defp to_decimal_string(price), do: price |> Decimal.to_string(:normal)
 

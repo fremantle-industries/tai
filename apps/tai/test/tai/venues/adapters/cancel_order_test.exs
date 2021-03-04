@@ -68,6 +68,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       credential_id: :main,
+      venue_product_symbol: venue_id |> venue_product_symbol,
       product_symbol: venue_id |> product_symbol,
       product_type: venue_id |> product_type,
       side: :buy,
@@ -84,6 +85,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       venue_order_id: order_response.id,
       venue_id: order.venue_id,
       credential_id: :main,
+      venue_product_symbol: order.venue_id |> venue_product_symbol,
       product_symbol: order.venue_id |> product_symbol,
       product_type: order.venue_id |> product_type,
       side: :buy,
@@ -94,6 +96,11 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
       post_only: true
     })
   end
+
+  defp venue_product_symbol(:bitmex), do: "XBTH19"
+  defp venue_product_symbol(:okex_swap), do: "ETH-USD-SWAP"
+  defp venue_product_symbol(:okex_futures), do: "ETH-USD-190426"
+  defp venue_product_symbol(_), do: "LTC-BTC"
 
   defp product_symbol(:bitmex), do: :xbth19
   defp product_symbol(:okex_swap), do: :eth_usd_swap

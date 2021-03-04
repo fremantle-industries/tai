@@ -68,13 +68,6 @@ defmodule Tai.VenueAdapters.OkEx.Product do
     |> downcase_and_atom
   end
 
-  def from_symbol(symbol) do
-    symbol
-    |> Atom.to_string()
-    |> String.replace("_", "-")
-    |> String.upcase()
-  end
-
   defp downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 
   defp build_product(args) do

@@ -7,7 +7,6 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
   across these products are inconsistent.
   """
 
-  alias Tai.VenueAdapters.OkEx.Products
   alias Tai.Trading.OrderResponses.CancelAccepted
 
   @type order :: Tai.Trading.Order.t()
@@ -24,7 +23,7 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
 
   def send_to_venue({order, credentials}) do
     venue_config = credentials |> to_venue_credentials
-    venue_symbol = order.product_symbol |> Products.from_symbol()
+    venue_symbol = order.venue_product_symbol
     mod = order |> module_for()
     mod.cancel_orders(venue_symbol, [order.venue_order_id], %{}, venue_config)
   end

@@ -21,5 +21,4 @@ defmodule Tai.VenueAdapters.OkEx.Products do
   end
 
   defdelegate to_symbol(instrument_id), to: Tai.VenueAdapters.OkEx.Product
-  defdelegate from_symbol(symbol), to: Tai.VenueAdapters.OkEx.Product
 end
