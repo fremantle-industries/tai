@@ -3,8 +3,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   Create orders for the Bitmex adapter
   """
 
-  alias Tai.VenueAdapters.Bitmex.{ClientId, Products}
-  import Tai.VenueAdapters.Bitmex.OrderStatus
+  alias Tai.VenueAdapters.Bitmex.{ClientId, OrderStatus}
 
   @type credentials :: Tai.Venues.Adapter.credentials()
   @type order :: Tai.Trading.Order.t()
@@ -35,7 +34,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
       clOrdID: venue_client_order_id,
       side: order.side |> to_venue_side,
       ordType: @limit,
-      symbol: order.product_symbol |> to_venue_symbol,
+      symbol: order.venue_product_symbol,
       orderQty: order.qty,
       price: order.price,
       timeInForce: order.time_in_force |> to_venue_time_in_force
@@ -61,8 +60,6 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   defp to_venue_side(:buy), do: @buy
   defp to_venue_side(:sell), do: @sell
 
-  defdelegate to_venue_symbol(symbol), to: Products, as: :from_symbol
-
   defp to_venue_time_in_force(:gtc), do: "GoodTillCancel"
   defp to_venue_time_in_force(:ioc), do: "ImmediateOrCancel"
   defp to_venue_time_in_force(:fok), do: "FillOrKill"
@@ -76,7 +73,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
 
     response = %Tai.Trading.OrderResponses.Create{
       id: venue_order.order_id,
-      status: venue_order.ord_status |> from_venue_status(order),
+      status: OrderStatus.from_venue_status(venue_order.ord_status, order),
       original_size: Decimal.new(venue_order.order_qty),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
       cumulative_qty: Decimal.new(venue_order.cum_qty),

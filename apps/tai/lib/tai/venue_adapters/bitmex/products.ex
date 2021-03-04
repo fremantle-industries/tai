@@ -17,6 +17,4 @@ defmodule Tai.VenueAdapters.Bitmex.Products do
   defdelegate to_symbol(venue_symbol),
     to: Tai.VenueAdapters.Bitmex.Product,
     as: :downcase_and_atom
-
-  defdelegate from_symbol(symbol), to: Tai.VenueAdapters.Bitmex.Product
 end

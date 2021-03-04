@@ -44,12 +44,6 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
 
   def downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 
-  def from_symbol(symbol) do
-    symbol
-    |> Atom.to_string()
-    |> String.upcase()
-  end
-
   defp type(nil), do: :swap
   defp type(_), do: :future
 end
