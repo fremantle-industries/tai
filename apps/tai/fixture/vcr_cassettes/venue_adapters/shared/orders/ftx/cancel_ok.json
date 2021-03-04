@@ -1,0 +1,72 @@
+[
+  {
+    "request": {
+      "body": "{\"clientId\":\"f5559e85-7a3c-4c07-94d8-5e7a74079733\",\"ioc\":false,\"market\":\"BTC/USD\",\"postOnly\":true,\"price\":\"25000.5\",\"reduceOnly\":false,\"side\":\"buy\",\"size\":\"0.0001\",\"type\":\"limit\"}",
+      "headers": {
+        "Content-Type": "application/json",
+        "FTX-KEY": "***",
+        "FTX-SIGN": "***",
+        "FTX-TS": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://ftx.com/api/orders"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"result\":{\"avgFillPrice\":null,\"clientId\":\"f5559e85-7a3c-4c07-94d8-5e7a74079733\",\"createdAt\":\"2021-03-04T22:53:16.255364+00:00\",\"filledSize\":0.0,\"future\":null,\"id\":31973311165,\"ioc\":false,\"liquidation\":false,\"market\":\"BTC/USD\",\"postOnly\":true,\"price\":25000.0,\"reduceOnly\":false,\"remainingSize\":0.0001,\"side\":\"buy\",\"size\":0.0001,\"status\":\"new\",\"type\":\"limit\"},\"success\":true}\n",
+      "headers": {
+        "Date": "Thu, 04 Mar 2021 22:53:16 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "private, max-age=0, no-cache",
+        "CF-Cache-Status": "DYNAMIC",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Server": "cloudflare",
+        "alt-svc": "h3-27=\":443\"; ma=86400, h3-28=\":443\"; ma=86400, h3-29=\":443\"; ma=86400"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  },
+  {
+    "request": {
+      "body": "{}",
+      "headers": {
+        "Content-Type": "application/json",
+        "FTX-KEY": "***",
+        "FTX-SIGN": "***",
+        "FTX-TS": "***"
+      },
+      "method": "delete",
+      "options": [],
+      "request_body": "",
+      "url": "https://ftx.com/api/orders/by_client_id/f5559e85-7a3c-4c07-94d8-5e7a74079733"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"result\":\"Order queued for cancellation\",\"success\":true}\n",
+      "headers": {
+        "Date": "Thu, 04 Mar 2021 22:53:16 GMT",
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Vary": "Accept-Encoding",
+        "Cache-Control": "private, max-age=0, no-cache",
+        "CF-Cache-Status": "DYNAMIC",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "Server": "cloudflare",
+        "alt-svc": "h3-27=\":443\"; ma=86400, h3-28=\":443\"; ma=86400, h3-29=\":443\"; ma=86400"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

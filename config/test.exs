@@ -182,7 +182,7 @@ config(:tai, :test_venue_adapters_create_order_error, [:bitmex])
 config(:tai, :test_venue_adapters_amend_order, [:bitmex])
 config(:tai, :test_venue_adapters_amend_bulk_order, [:bitmex])
 config(:tai, :test_venue_adapters_cancel_order, [:bitmex, :binance])
-config(:tai, :test_venue_adapters_cancel_order_accepted, [:okex_futures, :okex_swap])
+config(:tai, :test_venue_adapters_cancel_order_accepted, [:okex_futures, :okex_swap, :ftx])
 
 config(:tai, :test_venue_adapters_cancel_order_error_not_found, [
   :binance,

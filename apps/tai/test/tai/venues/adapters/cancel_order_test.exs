@@ -65,7 +65,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
 
   defp build_enqueued_order(venue_id) do
     struct(Tai.Trading.Order, %{
-      client_id: Ecto.UUID.generate(),
+      client_id: "f5559e85-7a3c-4c07-94d8-5e7a74079733",
       venue_id: venue_id,
       credential_id: :main,
       venue_product_symbol: venue_id |> venue_product_symbol,
@@ -82,6 +82,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
 
   defp build_open_order(order, order_response) do
     struct(Tai.Trading.Order, %{
+      client_id: order.client_id,
       venue_order_id: order_response.id,
       venue_id: order.venue_id,
       credential_id: :main,
@@ -100,11 +101,13 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   defp venue_product_symbol(:bitmex), do: "XBTH19"
   defp venue_product_symbol(:okex_swap), do: "ETH-USD-SWAP"
   defp venue_product_symbol(:okex_futures), do: "ETH-USD-190426"
+  defp venue_product_symbol(:ftx), do: "BTC/USD"
   defp venue_product_symbol(_), do: "LTC-BTC"
 
   defp product_symbol(:bitmex), do: :xbth19
   defp product_symbol(:okex_swap), do: :eth_usd_swap
   defp product_symbol(:okex_futures), do: :eth_usd_190426
+  defp product_symbol(:ftx), do: :btc_usd
   defp product_symbol(_), do: :ltc_btc
 
   defp product_type(:bitmex), do: :future
@@ -115,10 +118,12 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   defp price(:bitmex), do: Decimal.new("100.5")
   defp price(:okex_swap), do: Decimal.new("100.5")
   defp price(:okex_futures), do: Decimal.new("100.5")
+  defp price(:ftx), do: Decimal.new("25000.5")
   defp price(_), do: Decimal.new("0.007")
 
   defp qty(:bitmex), do: Decimal.new(1)
   defp qty(:okex_swap), do: Decimal.new(5)
   defp qty(:okex_futures), do: Decimal.new(5)
+  defp qty(:ftx), do: Decimal.new("0.0001")
   defp qty(_), do: Decimal.new("0.5")
 end
