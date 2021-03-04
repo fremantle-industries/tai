@@ -4,6 +4,7 @@ defmodule ExamplesSupport.E2E.PingPong do
 
   @venue :test_exchange_a
   @credential :main
+  @venue_product "BTC-USD"
   @product :btc_usd
   @product_type :swap
   @price_increment Decimal.new("0.5")
@@ -46,6 +47,7 @@ defmodule ExamplesSupport.E2E.PingPong do
       %Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: @venue,
         credential_id: @credential,
+        venue_product_symbol: @venue_product,
         product_symbol: @product,
         product_type: @product_type,
         price: Decimal.new("5500.5"),
@@ -61,6 +63,7 @@ defmodule ExamplesSupport.E2E.PingPong do
       %Tai.Trading.OrderSubmissions.BuyLimitGtc{
         venue_id: @venue,
         credential_id: @credential,
+        venue_product_symbol: @venue_product,
         product_symbol: @product,
         product_type: @product_type,
         price: Decimal.new("5504.0"),
@@ -117,6 +120,7 @@ defmodule ExamplesSupport.E2E.PingPong do
     submission = %Tai.Trading.OrderSubmissions.SellLimitGtc{
       venue_id: @venue,
       credential_id: @credential,
+      venue_product_symbol: @venue_product,
       product_symbol: @product,
       product_type: @product_type,
       post_only: true,

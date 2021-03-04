@@ -5,6 +5,7 @@ defmodule Tai.Trading.Order do
   @type venue_order_id :: String.t()
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
+  @type venue_product_symbol :: Tai.Venues.Product.venue_symbol()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type product_type :: Tai.Venues.Product.type()
   @type side :: :buy | :sell
@@ -34,6 +35,7 @@ defmodule Tai.Trading.Order do
           credential_id: credential_id,
           side: side,
           status: status,
+          venue_product_symbol: venue_product_symbol,
           product_symbol: product_symbol,
           product_type: product_type,
           time_in_force: time_in_force,
@@ -62,6 +64,7 @@ defmodule Tai.Trading.Order do
     leaves_qty
     cumulative_qty
     status
+    venue_product_symbol
     product_symbol
     product_type
     time_in_force
@@ -80,6 +83,7 @@ defmodule Tai.Trading.Order do
     leaves_qty
     cumulative_qty
     status
+    venue_product_symbol
     product_symbol
     product_type
     time_in_force

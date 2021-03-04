@@ -17,6 +17,7 @@ defmodule Tai.IEx.Commands.OrdersTest do
       %Tai.Trading.OrderSubmissions.BuyLimitFok{
         venue_id: :test_exchange_a,
         credential_id: :main,
+        venue_product_symbol: "BTC-USD",
         product_symbol: :btc_usd,
         product_type: :spot,
         price: Decimal.new("12999.99"),
@@ -30,6 +31,7 @@ defmodule Tai.IEx.Commands.OrdersTest do
       %Tai.Trading.OrderSubmissions.SellLimitFok{
         venue_id: :test_exchange_b,
         credential_id: :main,
+        venue_product_symbol: "LTC-USD",
         product_symbol: :ltc_usd,
         product_type: :spot,
         price: Decimal.new("75.23"),

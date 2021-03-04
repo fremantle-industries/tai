@@ -29,6 +29,7 @@ defmodule Tai.Trading.OrderSubmissions.Factory do
       client_id: Ecto.UUID.generate(),
       venue_id: submission.venue_id,
       credential_id: submission.credential_id,
+      venue_product_symbol: submission.venue_product_symbol,
       product_symbol: submission.product_symbol,
       product_type: submission.product_type,
       side: submission |> side,

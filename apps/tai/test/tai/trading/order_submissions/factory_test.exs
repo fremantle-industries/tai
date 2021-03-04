@@ -19,6 +19,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.time_in_force == :gtc
         assert order.venue_id == :test_exchange_a
         assert order.credential_id == :main
+        assert order.venue_product_symbol == "BTC-USD"
         assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
@@ -42,6 +43,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.time_in_force == :fok
         assert order.venue_id == :test_exchange_a
         assert order.credential_id == :main
+        assert order.venue_product_symbol == "BTC-USD"
         assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
@@ -65,6 +67,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
         assert order.post_only == false
         assert order.venue_id == :test_exchange_a
         assert order.credential_id == :main
+        assert order.venue_product_symbol == "BTC-USD"
         assert order.product_symbol == :btc_usd
         assert order.product_type == :spot
         assert %Decimal{} = order.price
@@ -83,6 +86,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
     %Tai.Trading.OrderSubmissions.BuyLimitGtc{
       venue_id: :test_exchange_a,
       credential_id: :main,
+      venue_product_symbol: "BTC-USD",
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("100.1"),
@@ -96,6 +100,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
     %Tai.Trading.OrderSubmissions.SellLimitGtc{
       venue_id: :test_exchange_a,
       credential_id: :main,
+      venue_product_symbol: "BTC-USD",
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("50000.5"),
@@ -109,6 +114,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
     %Tai.Trading.OrderSubmissions.BuyLimitFok{
       venue_id: :test_exchange_a,
       credential_id: :main,
+      venue_product_symbol: "BTC-USD",
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("100.1"),
@@ -121,6 +127,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
     %Tai.Trading.OrderSubmissions.SellLimitFok{
       venue_id: :test_exchange_a,
       credential_id: :main,
+      venue_product_symbol: "BTC-USD",
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("50000.5"),
@@ -133,6 +140,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
     %Tai.Trading.OrderSubmissions.BuyLimitIoc{
       venue_id: :test_exchange_a,
       credential_id: :main,
+      venue_product_symbol: "BTC-USD",
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("100.1"),
@@ -145,6 +153,7 @@ defmodule Tai.Trading.OrderSubmissions.FactoryTest do
     %Tai.Trading.OrderSubmissions.SellLimitIoc{
       venue_id: :test_exchange_a,
       credential_id: :main,
+      venue_product_symbol: "BTC-USD",
       product_symbol: :btc_usd,
       product_type: :spot,
       price: Decimal.new("50000.5"),
