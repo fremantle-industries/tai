@@ -19,7 +19,7 @@ jobs:
         elixir: [1.8.x, 1.9.x, 1.10.x]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
 
       - uses: erlef/setup-elixir@v1.6.0
         with:
@@ -27,7 +27,7 @@ jobs:
           elixir-version: ${{matrix.elixir}}
 
       - name: Cache Dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: |
             deps
@@ -67,7 +67,7 @@ jobs:
             apps/examples/log
 
       - name: Dialyzer
-        run: mix dialyzer --halt-exit-status
+        run: mix dialyzer
 
   test-elixir-gte-1-11:
     runs-on: ubuntu-latest
@@ -79,7 +79,7 @@ jobs:
         elixir: [1.11.x]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
 
       - uses: erlef/setup-elixir@v1.6.0
         with:
@@ -87,7 +87,7 @@ jobs:
           elixir-version: ${{matrix.elixir}}
 
       - name: Cache Dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: |
             deps
@@ -127,4 +127,4 @@ jobs:
             apps/examples/log
 
       - name: Dialyzer
-        run: mix dialyzer --halt-exit-status
+        run: mix dialyzer
