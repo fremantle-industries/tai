@@ -13,6 +13,7 @@ defmodule Tai.VenueAdapters.OkEx do
 
   def stream_supervisor, do: StreamSupervisor
   defdelegate products(venue_id), to: Products
+  def funding_rates(_venue_id), do: {:error, :not_implemented}
   defdelegate accounts(venue_id, credential_id, credentials), to: Accounts
   defdelegate maker_taker_fees(venue_id, credential_id, credentials), to: MakerTakerFees
   defdelegate positions(venue_id, credential_id, credentials), to: Positions

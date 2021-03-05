@@ -12,6 +12,11 @@ defmodule Tai.Venues.Client do
   @spec products(venue) :: {:ok, [product]} | {:error, shared_error_reason}
   def products(venue), do: venue.adapter.products(venue.id)
 
+  @type funding_rate :: Tai.Venues.FundingRate.t()
+
+  @spec funding_rates(venue) :: {:ok, [funding_rate]} | {:error, shared_error_reason}
+  def funding_rates(venue), do: venue.adapter.funding_rates(venue.id)
+
   @type account :: Tai.Venues.Account.t()
 
   @spec accounts(venue, credential_id) :: {:ok, [account]} | {:error, shared_error_reason}

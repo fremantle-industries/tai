@@ -18,6 +18,17 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
+  def funding_rates(venue_id) do
+    with_mock_server(fn ->
+      {:funding_rates, venue_id}
+      |> Mocks.Server.eject()
+      |> case do
+        {:ok, funding_rates} -> {:ok, funding_rates}
+        {:error, :not_found} -> {:error, :mock_response_not_found}
+      end
+    end)
+  end
+
   def accounts(venue_id, credential_id, _credentials) do
     with_mock_server(fn ->
       {:accounts, venue_id, credential_id}
