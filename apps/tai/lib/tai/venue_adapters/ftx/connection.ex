@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   use Tai.Venues.Streams.ConnectionAdapter
   alias Tai.VenueAdapters.Ftx.Stream
-
+  require Logger
 
   @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
@@ -47,6 +47,12 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     :trades,
   ]
   def handle_info(:init_subscriptions, state) do
+    if state.credential do
+      send(self(), :login)
+      send(self(), {:subscribe, :orders})
+      send(self(), {:subscribe, :fills})
+    end
+
     send(self(), {:subscribe, :orderbook})
 
     state.channels
@@ -64,6 +70,37 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
 
     state = state |> schedule_heartbeat()
 
+    {:ok, state}
+  end
+
+  def handle_info(:login, state) do
+    Logger.info "----------------- LOGIN"
+    {_credential_id, credentials} = state.credential
+    credential = struct!(ExFtx.Credentials, credentials)
+    api_key = credential.api_key
+    api_secret = credential.api_secret
+    ts = ExFtx.Auth.timestamp()
+    signature = ExFtx.Auth.sign(api_secret, ts, "websocket_login", "", "")
+    msg = %{
+      "op" => "login",
+      "args" => %{
+        "key" => api_key,
+        "sign" => signature,
+        "time" => ts
+      }
+    }
+    encoded_msg = msg |> Jason.encode!()
+
+    {:reply, {:text, encoded_msg}, state}
+  end
+
+  def handle_info({:subscribe, :orders}, state) do
+    Logger.info "********** SUBSCRIBE orders"
+    {:ok, state}
+  end
+
+  def handle_info({:subscribe, :fills}, state) do
+    Logger.info "********** SUBSCRIBE fills"
     {:ok, state}
   end
 
