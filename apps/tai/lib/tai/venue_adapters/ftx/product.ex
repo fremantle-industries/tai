@@ -18,6 +18,7 @@ defmodule Tai.VenueAdapters.Ftx.Product do
       type: type,
       listing: nil,
       expiry: expiry,
+      collateral: false,
       price_increment: market.price_increment |> Tai.Utils.Decimal.cast!(),
       size_increment: market.size_increment |> Tai.Utils.Decimal.cast!(),
       min_price: market.price_increment |> Tai.Utils.Decimal.cast!(),

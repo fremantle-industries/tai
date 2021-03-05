@@ -25,6 +25,7 @@ defmodule Tai.VenueAdapters.Deribit.Product do
       type: type,
       listing: listing,
       expiry: expiry,
+      collateral: false,
       price_increment: tick_size,
       size_increment: min_trade_amount,
       min_price: tick_size,

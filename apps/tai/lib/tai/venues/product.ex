@@ -55,6 +55,7 @@ defmodule Tai.Venues.Product do
           type: type,
           listing: DateTime.t() | nil,
           expiry: DateTime.t() | nil,
+          collateral: boolean,
           price_increment: Decimal.t(),
           size_increment: Decimal.t(),
           min_price: Decimal.t(),
@@ -81,6 +82,7 @@ defmodule Tai.Venues.Product do
     venue_quote
     status
     type
+    collateral
     price_increment
     size_increment
     min_price
@@ -102,6 +104,7 @@ defmodule Tai.Venues.Product do
     type
     listing
     expiry
+    collateral
     price_increment
     size_increment
     min_notional

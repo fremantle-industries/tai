@@ -28,6 +28,7 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
       type: type,
       listing: listing,
       expiry: expiry,
+      collateral: false,
       price_increment: tick_size,
       size_increment: lot_size,
       min_price: tick_size,

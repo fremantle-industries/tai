@@ -77,6 +77,7 @@ defmodule Tai.VenueAdapters.Huobi.Product do
       type: Keyword.fetch!(args, :type),
       listing: listing,
       expiry: expiry,
+      collateral: false,
       price_increment: price_increment,
       size_increment: size_increment,
       min_price: price_increment,
