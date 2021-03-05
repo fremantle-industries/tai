@@ -1,7 +1,18 @@
 defmodule Tai.VenueAdapters.Ftx.Product do
   alias ExFtx.Market
 
-  def build(%Market{} = market, venue_id, type, expiry) do
+  defmodule Options do
+    @type t :: %Options{
+      type: Tai.Venues.Product.type(),
+      collateral: Tai.Venues.Product.collateral(),
+      expiry: Tai.Venues.Product.expiry()
+    }
+
+    @enforce_keys ~w[type collateral]a
+    defstruct ~w[type collateral expiry]a
+  end
+
+  def build(%Market{} = market, venue_id, options) do
     # TODO: Figure out what this should be
     value = 1_000_000 |> Tai.Utils.Decimal.cast!()
 
@@ -15,10 +26,10 @@ defmodule Tai.VenueAdapters.Ftx.Product do
       venue_base: market.base_currency,
       venue_quote: market.quote_currency,
       status: market |> status(),
-      type: type,
+      type: options.type,
       listing: nil,
-      expiry: expiry,
-      collateral: false,
+      expiry: options.expiry,
+      collateral: options.collateral,
       price_increment: market.price_increment |> Tai.Utils.Decimal.cast!(),
       size_increment: market.size_increment |> Tai.Utils.Decimal.cast!(),
       min_price: market.price_increment |> Tai.Utils.Decimal.cast!(),

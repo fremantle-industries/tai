@@ -30,6 +30,11 @@ defmodule Tai.Venues.Product do
   @type value :: Decimal.t()
 
   @typedoc """
+  Whether or not the product can be used as collateral for a portfolios balance
+  """
+  @type collateral :: true | false
+
+  @typedoc """
   A derivative contract where PnL settlement is a different asset to the base or quote assets.
   """
   @type quanto :: true | false
@@ -38,6 +43,11 @@ defmodule Tai.Venues.Product do
   A derivative contract where the PnL settlement is in the base asset, e.g. XBTUSD settles PnL in XBT
   """
   @type inverse :: true | false
+
+  @typedoc """
+  The expiration date
+  """
+  @type expiry :: DateTime.t | nil
 
   @type symbol :: atom
   @type venue_symbol :: String.t()
@@ -54,8 +64,8 @@ defmodule Tai.Venues.Product do
           status: status,
           type: type,
           listing: DateTime.t() | nil,
-          expiry: DateTime.t() | nil,
-          collateral: boolean,
+          expiry: expiry,
+          collateral: collateral,
           price_increment: Decimal.t(),
           size_increment: Decimal.t(),
           min_price: Decimal.t(),
