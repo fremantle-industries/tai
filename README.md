@@ -27,11 +27,11 @@ Here's an example of an advisor that logs the spread between multiple products o
 
 | Venue    | Live Order Book | Accounts | Active Orders | Passive Orders | Products | Fees |
 | -------- | :-------------: | :------: | :-----------: | :------------: | :------: | :--: |
+| FTX      |       [x]       |   [x]    |      [x]      |      [ ]       |   [x]    | [x]  |
 | Binance  |       [x]       |   [x]    |      [x]      |      [ ]       |   [x]    | [x]  |
 | Deribit  |       [x]       |   [x]    |      [ ]      |      [ ]       |   [x]    | [x]  |
 | GDAX     |       [x]       |   [x]    |      [ ]      |      [ ]       |   [x]    | [x]  |
 | Huobi    |       [x]       |   [ ]    |      [ ]      |      [ ]       |   [x]    | [ ]  |
-| FTX      |       [x]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [x]  |
 | Bybit    |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | Bitfinex |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | BTSE     |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
