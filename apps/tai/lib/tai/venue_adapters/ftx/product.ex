@@ -36,9 +36,14 @@ defmodule Tai.VenueAdapters.Ftx.Product do
   defp status(%Market{enabled: true, restricted: true}), do: :restricted
   defp status(%Market{enabled: false}), do: :halt
 
-  defp type(%Market{type: "spot"}), do: :spot
-  defp type(%Market{type: "perpetual"}), do: :swap
-  defp type(%Market{type: "future"}), do: :future
+  defp type(%Market{type: type, name: name}) do
+    cond do
+      type == "spot" -> :spot
+      type == "future" && String.ends_with?(name, "-PERP") -> :swap
+      type == "future" -> :future
+      true -> :unknown
+    end
+  end
 
   defp base_currency(%Market{type: "spot"} = m), do: m.base_currency |> downcase_and_atom()
   defp base_currency(%Market{type: "future"} = m), do: m.underlying |> downcase_and_atom()
