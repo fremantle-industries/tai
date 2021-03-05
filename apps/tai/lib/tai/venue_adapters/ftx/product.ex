@@ -5,11 +5,12 @@ defmodule Tai.VenueAdapters.Ftx.Product do
     @type t :: %Options{
       type: Tai.Venues.Product.type(),
       collateral: Tai.Venues.Product.collateral(),
+      collateral_weight: Tai.Venues.Product.collateral_weight(),
       expiry: Tai.Venues.Product.expiry()
     }
 
     @enforce_keys ~w[type collateral]a
-    defstruct ~w[type collateral expiry]a
+    defstruct ~w[type collateral collateral_weight expiry]a
   end
 
   def build(%Market{} = market, venue_id, options) do
@@ -30,6 +31,7 @@ defmodule Tai.VenueAdapters.Ftx.Product do
       listing: nil,
       expiry: options.expiry,
       collateral: options.collateral,
+      collateral_weight: options.collateral_weight,
       price_increment: market.price_increment |> Tai.Utils.Decimal.cast!(),
       size_increment: market.size_increment |> Tai.Utils.Decimal.cast!(),
       min_price: market.price_increment |> Tai.Utils.Decimal.cast!(),

@@ -12,7 +12,8 @@ defmodule Tai.VenueAdapters.Ftx.Products do
                  |> Enum.map(fn
                    %Market{type: "spot"} = market ->
                      coin = Enum.find(coins, fn coin -> coin.id == market.base_currency end)
-                     options = %Ftx.Product.Options{type: :spot, collateral: coin.collateral}
+                     collateral_weight = coin.collateral_weight |> Tai.Utils.Decimal.cast!(:normalize)
+                     options = %Ftx.Product.Options{type: :spot, collateral: coin.collateral, collateral_weight: collateral_weight}
                      Ftx.Product.build(market, venue_id, options)
 
                    market ->

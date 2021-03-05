@@ -35,6 +35,11 @@ defmodule Tai.Venues.Product do
   @type collateral :: true | false
 
   @typedoc """
+  The ratio of balance of the quote asset that is used as collateral in the portfolio balance
+  """
+  @type collateral_weight :: Decimal.t | nil
+
+  @typedoc """
   A derivative contract where PnL settlement is a different asset to the base or quote assets.
   """
   @type quanto :: true | false
@@ -66,6 +71,7 @@ defmodule Tai.Venues.Product do
           listing: DateTime.t() | nil,
           expiry: expiry,
           collateral: collateral,
+          collateral_weight: collateral_weight,
           price_increment: Decimal.t(),
           size_increment: Decimal.t(),
           min_price: Decimal.t(),
@@ -115,6 +121,7 @@ defmodule Tai.Venues.Product do
     listing
     expiry
     collateral
+    collateral_weight
     price_increment
     size_increment
     min_notional
