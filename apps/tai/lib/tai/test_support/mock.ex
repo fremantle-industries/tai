@@ -2,6 +2,8 @@ defmodule Tai.TestSupport.Mock do
   @type location :: Tai.Markets.Location.t()
   @type venue :: Tai.Venue.t()
   @type product :: Tai.Venues.Product.t()
+  @type funding_rate :: Tai.Venues.FundingRate.t()
+  @type estimated_funding_rate :: Tai.Venues.EstimatedFundingRate.t()
   @type fee_info :: Tai.Venues.FeeInfo.t()
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
@@ -44,6 +46,31 @@ defmodule Tai.TestSupport.Mock do
     Tai.Venues.FeeInfo
     |> struct(attrs)
     |> Tai.Venues.FeeStore.upsert()
+  end
+
+  @spec mock_funding_rate(funding_rate | map | [{atom, term}]) :: {:ok, {record_key, record}}
+  def mock_funding_rate(%Tai.Venues.FundingRate{} = funding_rate) do
+    funding_rate
+    |> Tai.Venues.FundingRateStore.put()
+  end
+
+  def mock_funding_rate(attrs) when is_map(attrs) or is_list(attrs) do
+    Tai.Venues.FundingRate
+    |> struct(attrs)
+    |> mock_funding_rate
+  end
+
+  @spec mock_estimated_funding_rate(estimated_funding_rate | map | [{atom, term}]) ::
+          {:ok, {record_key, record}}
+  def mock_estimated_funding_rate(%Tai.Venues.EstimatedFundingRate{} = estimated_funding_rate) do
+    estimated_funding_rate
+    |> Tai.Venues.EstimatedFundingRateStore.put()
+  end
+
+  def mock_estimated_funding_rate(attrs) when is_map(attrs) or is_list(attrs) do
+    Tai.Venues.EstimatedFundingRate
+    |> struct(attrs)
+    |> mock_estimated_funding_rate
   end
 
   @spec mock_account(venue_id, credential_id, asset, balance, balance) ::

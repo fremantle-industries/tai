@@ -104,7 +104,9 @@ defmodule Tai.Venues.Start do
       venue: state.venue,
       products: products,
       accounts: accounts,
-      positions: positions
+      positions: positions,
+      funding_rates_enabled: state.venue.funding_rates_enabled,
+      funding_rate_poll_interval: state.venue.funding_rate_poll_interval
     }
 
     t_fees = Task.async(Tai.Venues.Start.Fees, :hydrate, [state.venue, products])

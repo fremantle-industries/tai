@@ -13,6 +13,8 @@ defmodule Tai.Application do
       Tai.Trading.OrderStore,
       Tai.Markets.QuoteStore,
       Tai.Venues.ProductStore,
+      Tai.Venues.FundingRateStore,
+      Tai.Venues.EstimatedFundingRateStore,
       Tai.Venues.FeeStore,
       Tai.Venues.AccountStore,
       Tai.Venues.VenueStore,

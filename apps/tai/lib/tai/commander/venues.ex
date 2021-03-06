@@ -32,6 +32,7 @@ defmodule Tai.Commander.Venues do
       accounts: venue.accounts,
       credentials: venue.credentials,
       quote_depth: venue.quote_depth,
+      funding_rates_enabled: venue.funding_rates_enabled,
       timeout: venue.timeout,
       start_on_boot: venue.start_on_boot,
       broadcast_change_set: venue.broadcast_change_set,

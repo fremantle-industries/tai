@@ -35,6 +35,20 @@ defmodule Tai.Venues.ConfigTest do
       assert Enum.at(venues, 0).products == "*"
     end
 
+    test "disables funding rates when not provided" do
+      config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).funding_rates_enabled == false
+    end
+
+    test "assigns a default funding rate poll interval when not provided" do
+      config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).funding_rate_poll_interval == 60_000
+    end
+
     test "assigns all accounts when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
@@ -112,6 +126,38 @@ defmodule Tai.Venues.ConfigTest do
 
       venues = Tai.Venues.Config.parse(config)
       assert Enum.at(venues, 0).products == "-btc_usd"
+    end
+
+    test "can provide funding rates enabled" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            venue_a: [
+              enabled: true,
+              adapter: MyAdapterA,
+              funding_rates_enabled: true
+            ]
+          }
+        )
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).funding_rates_enabled == true
+    end
+
+    test "can provide a funding rate poll interval" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            venue_a: [
+              enabled: true,
+              adapter: MyAdapterA,
+              funding_rate_poll_interval: 100_000
+            ]
+          }
+        )
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).funding_rate_poll_interval == 100_000
     end
 
     test "can provide an accounts filter" do

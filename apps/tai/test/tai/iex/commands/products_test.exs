@@ -9,7 +9,7 @@ defmodule Tai.IEx.Commands.ProductsTest do
     :ok
   end
 
-  test "show products and their trade restrictions for configured exchanges" do
+  test "show products and their trade restrictions for configured venues" do
     mock_product(
       venue_id: :test_exchange_a,
       symbol: :btc_usd,

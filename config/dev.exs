@@ -17,13 +17,13 @@ config :tai,
     ftx: [
       start_on_boot: true,
       adapter: Tai.VenueAdapters.Ftx,
-      products: "btc/usd btc-perp btc-0326",
-      credentials: %{
-        main: %{
-          api_key: {:system_file, "FTX_API_KEY"},
-          api_secret: {:system_file, "FTX_API_SECRET"}
-        }
-      }
+      products: "btc/usd btc-perp btc-0326"
+      # credentials: %{
+      #   main: %{
+      #     api_key: {:system_file, "FTX_API_KEY"},
+      #     api_secret: {:system_file, "FTX_API_SECRET"}
+      #   }
+      # }
     ],
     binance: [
       start_on_boot: true,

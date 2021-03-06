@@ -13,8 +13,16 @@ defmodule Tai.Commander do
     options |> to_dest() |> GenServer.call(:products)
   end
 
+  def estimated_funding_rates(options \\ []) do
+    options |> to_dest() |> GenServer.call(:estimated_funding_rates)
+  end
+
   def fees(options \\ []) do
     options |> to_dest() |> GenServer.call(:fees)
+  end
+
+  def funding_rates(options \\ []) do
+    options |> to_dest() |> GenServer.call(:funding_rates)
   end
 
   def markets(options \\ []) do
@@ -73,8 +81,16 @@ defmodule Tai.Commander do
     {:reply, Tai.Commander.Products.get(), state}
   end
 
+  def handle_call(:estimated_funding_rates, _from, state) do
+    {:reply, Tai.Commander.EstimatedFundingRates.get(), state}
+  end
+
   def handle_call(:fees, _from, state) do
     {:reply, Tai.Commander.Fees.get(), state}
+  end
+
+  def handle_call(:funding_rates, _from, state) do
+    {:reply, Tai.Commander.FundingRates.get(), state}
   end
 
   def handle_call(:markets, _from, state) do

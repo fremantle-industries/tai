@@ -17,6 +17,8 @@ defmodule Tai.Venue do
             | {module, func_name :: atom}
             | {module, func_name :: atom, func_args :: list},
           accounts: String.t() | {module, func_name :: atom},
+          funding_rates_enabled: boolean,
+          funding_rate_poll_interval: non_neg_integer,
           credentials: credentials,
           quote_depth: pos_integer,
           timeout: pos_integer,
@@ -27,12 +29,14 @@ defmodule Tai.Venue do
           opts: map
         }
 
-  @enforce_keys ~w(
+  @enforce_keys ~w[
     id
     adapter
     channels
     products
     accounts
+    funding_rates_enabled
+    funding_rate_poll_interval
     credentials
     quote_depth
     timeout
@@ -40,13 +44,15 @@ defmodule Tai.Venue do
     stream_heartbeat_timeout
     start_on_boot
     opts
-  )a
-  defstruct ~w(
+  ]a
+  defstruct ~w[
     id
     adapter
     channels
     products
     accounts
+    funding_rates_enabled
+    funding_rate_poll_interval
     credentials
     quote_depth
     timeout
@@ -55,7 +61,7 @@ defmodule Tai.Venue do
     start_on_boot
     broadcast_change_set
     opts
-  )a
+  ]a
 
   defimpl Stored.Item do
     @type key :: Tai.Venue.id()

@@ -75,6 +75,13 @@ config :tai,
       # Juice query syntax is described in more detail at https://github.com/rupurt/juice#usage
       accounts: "*",
 
+      # [default: false] [optional] Stream the estimated & historical funding rates for supported products
+      funding_rates_enabled: true,
+
+      # [default: 60_000] [optional] Poll the venue at this cadence to retrieve the estimated & historical
+      # funding rates for supported products
+      funding_rate_poll_interval: 120_000,
+
       # [default: %{}] [optional] `Map` of named credentials to use private API's on the venue
       credentials: %{
         main: %{

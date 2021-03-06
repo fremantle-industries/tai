@@ -8,7 +8,8 @@ defmodule Tai.IEx.Commands.Venues do
     "Channels",
     "Quote Depth",
     "Timeout",
-    "Start On Boot"
+    "Start On Boot",
+    "Funding Rates Enabled"
   ]
 
   @type store_id :: Tai.Venues.VenueStore.store_id()
@@ -35,7 +36,8 @@ defmodule Tai.IEx.Commands.Venues do
         i.channels,
         i.quote_depth,
         i.timeout,
-        i.start_on_boot
+        i.start_on_boot,
+        i.funding_rates_enabled
       ]
       |> Enum.map(&format_col/1)
     end)

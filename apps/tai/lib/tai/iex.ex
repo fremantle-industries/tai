@@ -20,6 +20,12 @@ defmodule Tai.IEx do
   @spec fees :: no_return
   defdelegate fees, to: Commands.Fees
 
+  @spec funding_rates :: no_return
+  defdelegate funding_rates, to: Commands.FundingRates
+
+  @spec estimated_funding_rates :: no_return
+  defdelegate estimated_funding_rates, to: Commands.EstimatedFundingRates
+
   @spec markets :: no_return
   defdelegate markets, to: Commands.Markets
 

@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Mock do
       {:products, venue_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, products} -> {:ok, products}
+        {:ok, _products} = result -> result
         {:error, :not_found} -> {:error, :mock_response_not_found}
       end
     end)
@@ -23,7 +23,18 @@ defmodule Tai.VenueAdapters.Mock do
       {:funding_rates, venue_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, funding_rates} -> {:ok, funding_rates}
+        {:ok, _funding_rates} = result -> result
+        {:error, :not_found} -> {:error, :mock_response_not_found}
+      end
+    end)
+  end
+
+  def estimated_funding_rates(venue_id) do
+    with_mock_server(fn ->
+      {:estimated_funding_rates, venue_id}
+      |> Mocks.Server.eject()
+      |> case do
+        {:ok, _estimated_funding_rates} = result -> result
         {:error, :not_found} -> {:error, :mock_response_not_found}
       end
     end)
@@ -45,7 +56,7 @@ defmodule Tai.VenueAdapters.Mock do
       {:maker_taker_fees, venue_id, credential_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, fees} -> {:ok, fees}
+        {:ok, _fees} = result -> result
         {:error, :not_found} -> {:error, :mock_response_not_found}
       end
     end)
@@ -78,7 +89,7 @@ defmodule Tai.VenueAdapters.Mock do
       |> Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} -> raise reason
-        {:ok, _} = response -> response
+        {:ok, _} = result -> result
         {:error, :not_found} -> {:error, :mock_not_found}
       end
     end)
@@ -95,7 +106,7 @@ defmodule Tai.VenueAdapters.Mock do
       |> Mocks.Server.eject()
       |> case do
         {:ok, {:raise, reason}} -> raise reason
-        {:ok, _} = response -> response
+        {:ok, _} = result -> result
         {:error, :not_found} -> {:error, :mock_not_found}
       end
     end)

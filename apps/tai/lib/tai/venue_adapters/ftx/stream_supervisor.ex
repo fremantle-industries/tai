@@ -23,8 +23,6 @@ defmodule Tai.VenueAdapters.Ftx.StreamSupervisor do
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   def init(stream) do
-    credential = stream.venue.credentials |> Map.to_list() |> List.first()
-
     order_book_children =
       order_book_children(
         stream.products,
@@ -34,11 +32,7 @@ defmodule Tai.VenueAdapters.Ftx.StreamSupervisor do
 
     process_order_book_children = process_order_book_children(stream.products)
 
-    system = [
-      {RouteOrderBooks, [venue: stream.venue.id, products: stream.products]},
-      {ProcessOptionalChannels, [venue: stream.venue.id]},
-      {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
-    ]
+    system = system_children(stream)
 
     (order_book_children ++ process_order_book_children ++ system)
     |> Supervisor.init(strategy: :one_for_one)
@@ -60,5 +54,21 @@ defmodule Tai.VenueAdapters.Ftx.StreamSupervisor do
         start: {ProcessOrderBook, :start_link, [p]}
       }
     end)
+  end
+
+  defp system_children(stream) do
+    credential = stream.venue.credentials |> Map.to_list() |> List.first()
+
+    children = [
+      {RouteOrderBooks, [venue: stream.venue.id, products: stream.products]},
+      {ProcessOptionalChannels, [venue: stream.venue.id]},
+      {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
+    ]
+
+    if stream.funding_rates_enabled do
+      children ++ [{FundingRatePoller, [poll_interval: stream.funding_rate_poll_interval]}]
+    else
+      children
+    end
   end
 end

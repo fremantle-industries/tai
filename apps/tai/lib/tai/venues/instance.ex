@@ -17,6 +17,7 @@ defmodule Tai.Venues.Instance do
           accounts: String.t() | {module, func_name :: atom},
           credentials: credentials,
           quote_depth: pos_integer,
+          funding_rates_enabled: boolean,
           timeout: non_neg_integer,
           start_on_boot: boolean,
           broadcast_change_set: boolean,
@@ -32,6 +33,7 @@ defmodule Tai.Venues.Instance do
     accounts
     credentials
     quote_depth
+    funding_rates_enabled
     timeout
     start_on_boot
     opts
@@ -45,6 +47,7 @@ defmodule Tai.Venues.Instance do
     accounts
     credentials
     quote_depth
+    funding_rates_enabled
     timeout
     start_on_boot
     broadcast_change_set

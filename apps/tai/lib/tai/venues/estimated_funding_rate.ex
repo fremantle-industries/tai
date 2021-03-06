@@ -1,34 +1,34 @@
-defmodule Tai.Venues.FundingRate do
+defmodule Tai.Venues.EstimatedFundingRate do
   alias __MODULE__
 
-  @type t :: %FundingRate{
+  @type t :: %EstimatedFundingRate{
           venue: Tai.Venue.id(),
           venue_product_symbol: Tai.Venues.Product.venue_symbol(),
           product_symbol: Tai.Venues.Product.symbol(),
-          time: DateTime.t(),
-          rate: Decimal.t()
+          next_time: DateTime.t(),
+          next_rate: Decimal.t()
         }
 
   @enforce_keys ~w[
     venue
     venue_product_symbol
     product_symbol
-    time
-    rate
+    next_time
+    next_rate
   ]a
   defstruct ~w[
     venue
     venue_product_symbol
     product_symbol
-    time
-    rate
+    next_time
+    next_rate
   ]a
 
   defimpl Stored.Item do
     @type key :: {Tai.Venue.id(), Tai.Venues.Product.symbol()}
-    @type funding_rate :: Tai.Venues.FundingRate.t()
+    @type estimated_funding_rate :: Tai.Venues.EstimatedFundingRate.t()
 
-    @spec key(funding_rate) :: key
+    @spec key(estimated_funding_rate) :: key
     def key(r), do: {r.venue, r.product_symbol}
   end
 end

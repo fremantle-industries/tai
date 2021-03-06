@@ -154,6 +154,8 @@ config(:tai, :test_venue_adapters_products, [
 
 config(:tai, :test_venue_adapters_funding_rates, [:mock, :ftx])
 
+config(:tai, :test_venue_adapters_estimated_funding_rates, [:mock, :ftx])
+
 config(:tai, :test_venue_adapters_accounts, [
   :binance,
   :bitmex,

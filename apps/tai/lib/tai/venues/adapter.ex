@@ -7,6 +7,7 @@ defmodule Tai.Venues.Adapter do
   @type credentials :: Tai.Venue.credentials()
   @type product :: Tai.Venues.Product.t()
   @type funding_rate :: Tai.Venues.FundingRate.t()
+  @type estimated_funding_rate :: Tai.Venues.EstimatedFundingRate.t()
   @type account :: Tai.Venues.Account.t()
   @type position :: Tai.Trading.Position.t()
   @type order :: Tai.Trading.Order.t()
@@ -38,6 +39,7 @@ defmodule Tai.Venues.Adapter do
   @callback stream_supervisor :: module
   @callback products(venue_id) :: {:ok, [product]} | {:error, shared_error_reason}
   @callback funding_rates(venue_id) :: {:ok, [funding_rate]} | {:error, shared_error_reason}
+  @callback estimated_funding_rates(venue_id) :: {:ok, [estimated_funding_rate]} | {:error, shared_error_reason}
   @callback accounts(venue_id, credential_id, credentials) ::
               {:ok, [account]} | {:error, shared_error_reason}
   @callback positions(venue_id, credential_id, credentials) ::

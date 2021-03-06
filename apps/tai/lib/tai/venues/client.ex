@@ -17,6 +17,11 @@ defmodule Tai.Venues.Client do
   @spec funding_rates(venue) :: {:ok, [funding_rate]} | {:error, shared_error_reason}
   def funding_rates(venue), do: venue.adapter.funding_rates(venue.id)
 
+  @type estimated_funding_rate :: Tai.Venues.EstimatedFundingRate.t()
+
+  @spec estimated_funding_rates(venue) :: {:ok, [estimated_funding_rate]} | {:error, shared_error_reason}
+  def estimated_funding_rates(venue), do: venue.adapter.estimated_funding_rates(venue.id)
+
   @type account :: Tai.Venues.Account.t()
 
   @spec accounts(venue, credential_id) :: {:ok, [account]} | {:error, shared_error_reason}

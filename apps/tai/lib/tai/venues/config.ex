@@ -38,6 +38,13 @@ defmodule Tai.Venues.Config do
         # Juice query syntax is described in more detail at https://github.com/rupurt/juice#usage
         accounts: "*",
 
+        # [default: false] [optional] Stream the estimated & historical funding rates for supported products
+        funding_rates_enabled: true,
+
+        # [default: 60_000] [optional] Poll the venue at this cadence to retrieve the estimated & historical
+        # funding rates for supported products
+        funding_rate_poll_interval: 120_000,
+
         # [default: %{}] [optional] `Map` of named credentials to use private API's on the venue
         credentials: %{
           main: %{
@@ -68,6 +75,8 @@ defmodule Tai.Venues.Config do
         channels: get(params, :channels, []),
         products: get(params, :products, "*"),
         accounts: get(params, :accounts, "*"),
+        funding_rates_enabled: get(params, :funding_rates_enabled, false),
+        funding_rate_poll_interval: get(params, :funding_rate_poll_interval, 60_000),
         credentials: get(params, :credentials, %{}),
         quote_depth: get(params, :quote_depth, 1),
         start_on_boot: get(params, :start_on_boot, true),

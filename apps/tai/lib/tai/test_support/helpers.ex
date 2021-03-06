@@ -7,6 +7,10 @@ defmodule Tai.TestSupport.Helpers do
     :test_venue_adapters_funding_rates |> filter()
   end
 
+  def test_venue_adapters_estimated_funding_rates do
+    :test_venue_adapters_estimated_funding_rates |> filter()
+  end
+
   def test_venue_adapters_accounts do
     :test_venue_adapters_accounts |> filter()
   end
