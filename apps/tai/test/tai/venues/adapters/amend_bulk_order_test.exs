@@ -4,8 +4,8 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
 
   setup_all do
     on_exit(fn ->
-      :ok = Application.stop(:tai)
       :ok = Application.stop(:tai_events)
+      :ok = Application.stop(:tai)
     end)
 
     {:ok, _} = Application.ensure_all_started(:tai)

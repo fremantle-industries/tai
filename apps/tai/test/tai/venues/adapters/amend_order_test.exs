@@ -5,6 +5,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
 
   setup_all do
     on_exit(fn ->
+      Application.stop(:tai_events)
       Application.stop(:tai)
     end)
 
