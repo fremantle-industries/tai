@@ -22,7 +22,8 @@ defmodule Tai.Venues.Adapters.ProductsTest do
     test "#{venue.id} retrieves the product information for the exchange" do
       setup_adapter(@venue.id)
 
-      use_cassette "venue_adapters/shared/products/#{@venue.id}/success" do
+      use_cassette "venue_adapters/shared/products/#{@venue.id}/success",
+        match_requests_on: [:request_body] do
         assert {:ok, products} = Tai.Venues.Client.products(@venue)
         assert Enum.count(products) > 0
         assert [%Tai.Venues.Product{} = product | _] = products
