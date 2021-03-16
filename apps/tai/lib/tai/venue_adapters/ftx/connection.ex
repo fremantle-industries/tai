@@ -2,50 +2,6 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   use Tai.Venues.Streams.ConnectionAdapter
   alias Tai.VenueAdapters.Ftx.Stream
 
-  defmodule State do
-    @type product :: Tai.Venues.Product.t()
-    @type venue_id :: Tai.Venue.id()
-    @type credential_id :: Tai.Venue.credential_id()
-    @type channel_name :: atom
-    @type route :: :auth | :order_books | :optional_channels
-    @type t :: %State{
-            venue: venue_id,
-            routes: %{required(route) => atom},
-            channels: [channel_name],
-            credential: {credential_id, map} | nil,
-            products: [product],
-            quote_depth: pos_integer,
-            opts: map,
-            heartbeat_interval: pos_integer,
-            heartbeat_timeout: pos_integer,
-            heartbeat_timer: reference | nil,
-            heartbeat_timeout_timer: reference | nil
-          }
-
-    @enforce_keys ~w[
-      venue
-      routes
-      channels
-      products
-      quote_depth
-      heartbeat_interval
-      heartbeat_timeout
-      opts
-    ]a
-    defstruct ~w[
-      venue
-      routes
-      channels
-      credential
-      products
-      quote_depth
-      heartbeat_interval
-      heartbeat_timeout
-      heartbeat_timer
-      heartbeat_timeout_timer
-      opts
-    ]a
-  end
 
   @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
@@ -64,7 +20,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
-    state = %State{
+    state = %Tai.Venues.Streams.ConnectionAdapter.State{
       venue: stream.venue.id,
       routes: routes,
       channels: stream.venue.channels,
@@ -76,7 +32,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
       opts: stream.venue.opts
     }
 
-    name = to_name(stream.venue.id)
+    name = process_name(stream.venue.id)
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 

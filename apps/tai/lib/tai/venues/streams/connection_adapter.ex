@@ -7,6 +7,51 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
   @callback on_disconnect(WebSockex.connection_status_map, state) :: :ok
   @callback on_msg(msg, state) :: :ok
 
+  defmodule State do
+    @type product :: Tai.Venues.Product.t()
+    @type venue_id :: Tai.Venue.id()
+    @type credential_id :: Tai.Venue.credential_id()
+    @type channel_name :: atom
+    @type route :: :auth | :order_books | :optional_channels
+    @type t :: %State{
+            venue: venue_id,
+            routes: %{required(route) => atom},
+            channels: [channel_name],
+            credential: {credential_id, map} | nil,
+            products: [product],
+            quote_depth: pos_integer,
+            opts: map,
+            heartbeat_interval: pos_integer,
+            heartbeat_timeout: pos_integer,
+            heartbeat_timer: reference | nil,
+            heartbeat_timeout_timer: reference | nil
+          }
+
+    @enforce_keys ~w[
+      venue
+      routes
+      channels
+      products
+      quote_depth
+      heartbeat_interval
+      heartbeat_timeout
+      opts
+    ]a
+    defstruct ~w[
+      venue
+      routes
+      channels
+      credential
+      products
+      quote_depth
+      heartbeat_interval
+      heartbeat_timeout
+      heartbeat_timer
+      heartbeat_timeout_timer
+      opts
+    ]a
+  end
+
   defmacro __using__(_) do
     quote location: :keep do
       use WebSockex
