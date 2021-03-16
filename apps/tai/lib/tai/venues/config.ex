@@ -73,6 +73,8 @@ defmodule Tai.Venues.Config do
         start_on_boot: get(params, :start_on_boot, true),
         opts: get(params, :opts, %{}),
         timeout: get(params, :timeout, config.adapter_timeout),
+        stream_heartbeat_interval: get(params, :stream_heartbeat_interval, 5000),
+        stream_heartbeat_timeout: get(params, :stream_heartbeat_timeout, 3000),
         broadcast_change_set: get(params, :broadcast_change_set, config.broadcast_change_set)
       }
     end)

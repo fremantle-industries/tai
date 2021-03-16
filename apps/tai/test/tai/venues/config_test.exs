@@ -56,6 +56,20 @@ defmodule Tai.Venues.ConfigTest do
       assert Enum.at(venues, 0).quote_depth == 1
     end
 
+    test "assigns a stream heartbeat interval when not provided" do
+      config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).stream_heartbeat_interval == 5000
+    end
+
+    test "assigns a stream heartbeat timeout when not provided" do
+      config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).stream_heartbeat_timeout == 3000
+    end
+
     test "can provide channels" do
       config =
         Tai.Config.parse(
@@ -162,6 +176,38 @@ defmodule Tai.Venues.ConfigTest do
 
       venues = Tai.Venues.Config.parse(config)
       assert Enum.at(venues, 0).broadcast_change_set
+    end
+
+    test "can provide a stream heartbeat interval" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            venue_a: [
+              enabled: true,
+              adapter: MyAdapterA,
+              stream_heartbeat_interval: 10_000
+            ]
+          }
+        )
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).stream_heartbeat_interval == 10_000
+    end
+
+    test "can provide a stream heartbeat timeout" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            venue_a: [
+              enabled: true,
+              adapter: MyAdapterA,
+              stream_heartbeat_timeout: 7_000
+            ]
+          }
+        )
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).stream_heartbeat_timeout == 7_000
     end
 
     test "raises a KeyError when there is no adapter specified" do

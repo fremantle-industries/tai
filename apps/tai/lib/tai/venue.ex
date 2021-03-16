@@ -19,7 +19,9 @@ defmodule Tai.Venue do
           accounts: String.t() | {module, func_name :: atom},
           credentials: credentials,
           quote_depth: pos_integer,
-          timeout: non_neg_integer,
+          timeout: pos_integer,
+          stream_heartbeat_interval: pos_integer,
+          stream_heartbeat_timeout: pos_integer,
           start_on_boot: boolean,
           broadcast_change_set: boolean,
           opts: map
@@ -34,6 +36,8 @@ defmodule Tai.Venue do
     credentials
     quote_depth
     timeout
+    stream_heartbeat_interval
+    stream_heartbeat_timeout
     start_on_boot
     opts
   )a
@@ -46,16 +50,18 @@ defmodule Tai.Venue do
     credentials
     quote_depth
     timeout
+    stream_heartbeat_interval
+    stream_heartbeat_timeout
     start_on_boot
     broadcast_change_set
     opts
   )a
-end
 
-defimpl Stored.Item, for: Tai.Venue do
-  @type key :: Tai.Venue.id()
-  @type venue :: Tai.Venue.t()
+  defimpl Stored.Item do
+    @type key :: Tai.Venue.id()
+    @type venue :: Tai.Venue.t()
 
-  @spec key(venue) :: key
-  def key(v), do: v.id
+    @spec key(venue) :: key
+    def key(v), do: v.id
+  end
 end
