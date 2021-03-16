@@ -16,12 +16,35 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
             products: [product],
             quote_depth: pos_integer,
             opts: map,
+            heartbeat_interval: pos_integer,
+            heartbeat_timeout: pos_integer,
             heartbeat_timer: reference | nil,
             heartbeat_timeout_timer: reference | nil
           }
 
-    @enforce_keys ~w[venue routes channels products quote_depth opts]a
-    defstruct ~w[venue routes channels credential products quote_depth opts heartbeat_timer heartbeat_timeout_timer]a
+    @enforce_keys ~w[
+      venue
+      routes
+      channels
+      products
+      quote_depth
+      heartbeat_interval
+      heartbeat_timeout
+      opts
+    ]a
+    defstruct ~w[
+      venue
+      routes
+      channels
+      credential
+      products
+      quote_depth
+      heartbeat_interval
+      heartbeat_timeout
+      heartbeat_timer
+      heartbeat_timeout_timer
+      opts
+    ]a
   end
 
   @type stream :: Tai.Venues.Stream.t()
@@ -48,6 +71,8 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
       credential: credential,
       products: stream.products,
       quote_depth: stream.venue.quote_depth,
+      heartbeat_interval: stream.venue.stream_heartbeat_interval,
+      heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
       opts: stream.venue.opts
     }
 
@@ -126,15 +151,13 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     msg |> forward(:optional_channels, state)
   end
 
-  @heartbeat_ms 5_000
   defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), :heartbeat, @heartbeat_ms)
+    timer = Process.send_after(self(), :heartbeat, state.heartbeat_interval)
     %{state | heartbeat_timer: timer}
   end
 
-  @heartbeat_timeout_ms 3_000
   defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), :heartbeat_timeout, @heartbeat_timeout_ms)
+    timer = Process.send_after(self(), :heartbeat_timeout, state.heartbeat_timeout)
     %{state | heartbeat_timeout_timer: timer}
   end
 
