@@ -20,11 +20,13 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
             credential: {credential_id, map} | nil,
             products: [product],
             quote_depth: pos_integer,
-            opts: map,
             heartbeat_interval: pos_integer,
             heartbeat_timeout: pos_integer,
             heartbeat_timer: reference | nil,
-            heartbeat_timeout_timer: reference | nil
+            heartbeat_timeout_timer: reference | nil,
+            connect_total: non_neg_integer,
+            disconnect_total: non_neg_integer,
+            opts: map,
           }
 
     @enforce_keys ~w[
@@ -35,6 +37,8 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       quote_depth
       heartbeat_interval
       heartbeat_timeout
+      connect_total
+      disconnect_total
       opts
     ]a
     defstruct ~w[
@@ -48,8 +52,41 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       heartbeat_timeout
       heartbeat_timer
       heartbeat_timeout_timer
+      connect_total
+      disconnect_total
       opts
     ]a
+  end
+
+  defmodule Telemetry do
+    def connect(state) do
+      :telemetry.execute(
+        [:tai, :venues, :stream, :connect],
+        %{total: state.connect_total},
+        %{venue: state.venue}
+      )
+    end
+
+    def disconnect(state) do
+      :telemetry.execute(
+        [:tai, :venues, :stream, :disconnect],
+        %{total: state.disconnect_total},
+        %{venue: state.venue}
+      )
+    end
+  end
+
+  defmodule Events do
+    def connect(state) do
+      TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
+    end
+
+    def disconnect(conn_status, state) do
+      TaiEvents.warn(%Tai.Events.StreamDisconnect{
+        venue: state.venue,
+        reason: conn_status.reason
+      })
+    end
   end
 
   defmacro __using__(_) do
@@ -71,16 +108,18 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       end
 
       def handle_connect(conn, state) do
-        TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
+        state = %{state | connect_total: state.connect_total + 1}
+        Telemetry.connect(state)
+        Events.connect(state)
         on_connect(conn, state)
+
         {:ok, state}
       end
 
       def handle_disconnect(conn_status, state) do
-        TaiEvents.warn(%Tai.Events.StreamDisconnect{
-          venue: state.venue,
-          reason: conn_status.reason
-        })
+        state = %{state | disconnect_total: state.disconnect_total + 1}
+        Telemetry.disconnect(state)
+        Events.disconnect(conn_status, state)
         on_disconnect(conn_status, state)
 
         {:ok, state}
