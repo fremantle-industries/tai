@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
-  use WebSockex
+  use Tai.Venues.Streams.ConnectionAdapter
   alias Tai.VenueAdapters.Ftx.Stream
 
   defmodule State do
@@ -55,26 +55,9 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
-
-  def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
-  end
-
-  def handle_connect(_conn, state) do
-    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
+  def on_connect(_conn, _state) do
     send(self(), :init_subscriptions)
-    {:ok, state}
-  end
-
-  def handle_disconnect(conn_status, state) do
-    TaiEvents.warn(%Tai.Events.StreamDisconnect{
-      venue: state.venue,
-      reason: conn_status.reason
-    })
-
-    {:ok, state}
+    :ok
   end
 
   @optional_channels [
@@ -117,6 +100,10 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     {:reply, :ping, state}
   end
 
+  def handle_info(:heartbeat_timeout, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
+  end
+
   def handle_info({:send_msg, msg}, state) do
     json_msg = Jason.encode!(msg)
     {:reply, {:text, json_msg}, state}
@@ -131,12 +118,12 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     {:ok, state}
   end
 
-  def handle_frame({:text, msg}, state) do
-    msg
-    |> Jason.decode!()
-    |> handle_msg(state)
+  def on_msg(%{"channel" => "orderbook"} = msg, state) do
+    msg |> forward(:order_books, state)
+  end
 
-    {:ok, state}
+  def on_msg(msg, state) do
+    msg |> forward(:optional_channels, state)
   end
 
   @heartbeat_ms 5_000
@@ -154,16 +141,6 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   defp cancel_heartbeat_timeout(state) do
     Process.cancel_timer(state.heartbeat_timeout_timer)
     %{state | heartbeat_timeout_timer: nil}
-  end
-
-  defp handle_msg(msg, state)
-
-  defp handle_msg(%{"channel" => "orderbook"} = msg, state) do
-    msg |> forward(:order_books, state)
-  end
-
-  defp handle_msg(msg, state) do
-    msg |> forward(:optional_channels, state)
   end
 
   defp forward(msg, to, state) do

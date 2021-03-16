@@ -158,9 +158,7 @@ defmodule Tai.Advisor do
       end
 
       def after_start(state), do: {:ok, state.store}
-
       def handle_event(_, state), do: {:ok, state.store}
-
       defoverridable after_start: 1, handle_event: 2
     end
   end

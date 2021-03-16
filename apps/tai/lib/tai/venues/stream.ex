@@ -12,6 +12,6 @@ defmodule Tai.Venues.Stream do
           positions: [position]
         }
 
-  @enforce_keys ~w(venue products accounts positions)a
-  defstruct ~w(venue products accounts positions)a
+  @enforce_keys ~w[venue products accounts positions]a
+  defstruct ~w[venue products accounts positions]a
 end
