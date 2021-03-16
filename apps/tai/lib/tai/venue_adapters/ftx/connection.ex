@@ -105,7 +105,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   def handle_info({:subscribe, :orderbook}, state) do
     state.products
     |> Enum.each(fn p ->
-      msg = @subscribe_orderbook_request |> Map.put("market", p.venue_symbol) |> Jason.encode!()
+      msg = @subscribe_orderbook_request |> Map.put("market", p.venue_symbol)
       send(self(), {:send_msg, msg})
     end)
 
@@ -118,7 +118,8 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   end
 
   def handle_info({:send_msg, msg}, state) do
-    {:reply, {:text, msg}, state}
+    json_msg = Jason.encode!(msg)
+    {:reply, {:text, json_msg}, state}
   end
 
   def handle_pong(:pong, state) do
