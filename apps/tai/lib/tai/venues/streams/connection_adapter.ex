@@ -139,12 +139,23 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
         {:ok, state}
       end
 
+      def handle_frame({:binary, <<43, 200, 207, 75, 7, 0>> = pong}, state) do
+        pong
+        |> :zlib.unzip()
+        |> on_msg(state)
+      end
+
+      def handle_frame({:binary, compressed_data}, state) do
+        compressed_data
+        |> :zlib.unzip()
+        |> Jason.decode!()
+        |> on_msg(state)
+      end
+
       def handle_frame({:text, msg}, state) do
         msg
         |> Jason.decode!()
         |> on_msg(state)
-
-        {:ok, state}
       end
 
       def on_terminate(_, _), do: :ok
