@@ -127,12 +127,6 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
     %{state | heartbeat_timeout_timer: nil}
   end
 
-  defp add_request(state) do
-    pending_requests = Map.put(state.requests.pending_requests, state.requests.next_request_id, :os.system_time(:millisecond))
-    requests = %{state.requests | next_request_id: state.requests.next_request_id, pending_requests: pending_requests}
-    %{state | requests: requests}
-  end
-
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)

@@ -163,24 +163,18 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     |> Enum.map(&String.downcase/1)
   end
 
-  defp add_request(state) do
-    pending_requests = Map.put(state.requests, state.requests.next_request_id, System.monotonic_time())
-    requests = %{state.requests | next_request_id: state.requests.next_request_id + 1, pending_requests: pending_requests}
-    %{state | requests: requests}
-  end
-
-  defp on_msg(%{"id" => id, "result" => nil}, state) do
+  def on_msg(%{"id" => id, "result" => nil}, state) do
     requests = Map.delete(state.requests, id)
     state = %{state | requests: requests}
     {:ok, state}
   end
 
-  defp on_msg(%{"e" => "depthUpdate"} = msg, state) do
+  def on_msg(%{"e" => "depthUpdate"} = msg, state) do
     msg |> forward(:order_books, state)
     {:ok, state}
   end
 
-  defp on_msg(msg, state) do
+  def on_msg(msg, state) do
     msg |> forward(:optional_channels, state)
     {:ok, state}
   end

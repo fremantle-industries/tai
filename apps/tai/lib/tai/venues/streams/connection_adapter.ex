@@ -151,6 +151,12 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       def on_disconnect(_, state), do: {:ok, state}
       def on_msg(_, state), do: {:ok, state}
       defoverridable on_terminate: 2, on_connect: 2, on_disconnect: 2, on_msg: 2
+
+      defp add_request(state) do
+        pending_requests = Map.put(state.requests, state.requests.next_request_id, System.monotonic_time())
+        requests = %{state.requests | next_request_id: state.requests.next_request_id + 1, pending_requests: pending_requests}
+        %{state | requests: requests}
+      end
     end
   end
 end
