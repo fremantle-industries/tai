@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
     send(self(), {:heartbeat, :start})
     send(self(), {:subscribe, :init})
     if state.credential, do: send(self(), :login)
-    :ok
+    {:ok, state}
   end
 
   def handle_pong(:pong, state) do

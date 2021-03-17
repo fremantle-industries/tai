@@ -35,10 +35,10 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
-  def on_connect(_conn, _state) do
+  def on_connect(_conn, state) do
     send(self(), {:heartbeat, :start})
     send(self(), {:subscribe, :init})
-    :ok
+    {:ok, state}
   end
 
   def handle_pong(:pong, state) do

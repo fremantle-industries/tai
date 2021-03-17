@@ -45,10 +45,10 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:ok, pid}
   end
 
-  def on_connect(_conn, _state) do
+  def on_connect(_conn, state) do
     send(self(), {:heartbeat, :start})
     send(self(), {:subscribe, :init})
-    :ok
+    {:ok, state}
   end
 
   def handle_pong(:pong, state) do
