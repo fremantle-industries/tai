@@ -1,6 +1,8 @@
 # Examples
 
-[Built with Tai](../../docs/BUILT_WITH_TAI.md) | [Install](../../README.md#install) | [Usage](../../README.md#usage) | [Commands](../../docs/COMMANDS.md) | [Architecture](../../docs/ARCHITECTURE.md) | [Examples](./README.md) | [Configuration](../../docs/CONFIGURATION.md)
+[Built with Tai](../../docs/BUILT_WITH_TAI.md) | [Install](../../README.md#install) | [Usage](../../README.md#usage) | [Commands](../../docs/COMMANDS.md) | [Architecture](../../docs/ARCHITECTURE.md) | [Examples](./README.md) | [Configuration](../../docs/CONFIGURATION.md) | [Observability](../../docs/OBSERVABILITY.md)
+
+
 
 ### [Log the spread of every order book](./lib/examples/log_spread)
 

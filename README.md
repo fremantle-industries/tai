@@ -6,7 +6,7 @@
 
 A composable, real time, market data and trade execution toolkit. Built with [Elixir](https://elixir-lang.org/), runs on the [Erlang virtual machine](http://erlang.org/faq/implementations.html)
 
-[Built with Tai](./docs/BUILT_WITH_TAI.md) | [Install](#install) | [Usage](#usage) | [Commands](./docs/COMMANDS.md) | [Architecture](./docs/ARCHITECTURE.md) | [Examples](./apps/examples) | [Configuration](./docs/CONFIGURATION.md)
+[Built with Tai](./docs/BUILT_WITH_TAI.md) | [Install](#install) | [Usage](#usage) | [Commands](./docs/COMMANDS.md) | [Architecture](./docs/ARCHITECTURE.md) | [Examples](./apps/examples) | [Configuration](./docs/CONFIGURATION.md) | [Observability](./docs/OBSERVABILITY.md)
 
 ## What Can I Do? TLDR;
 
