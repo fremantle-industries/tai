@@ -1,25 +1,6 @@
 defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
-  use WebSockex
+  use Tai.Venues.Streams.ConnectionAdapter
   alias Tai.VenueAdapters.Gdax.Stream
-
-  defmodule State do
-    @type product :: Tai.Venues.Product.t()
-    @type venue_id :: Tai.Venue.id()
-    @type credential_id :: Tai.Venue.credential_id()
-    @type channel_name :: atom
-    @type route :: :auth | :order_books | :optional_channels
-    @type t :: %State{
-            venue: venue_id,
-            routes: %{required(route) => atom},
-            channels: [channel_name],
-            credential: {credential_id, map} | nil,
-            products: [product],
-            opts: map
-          }
-
-    @enforce_keys ~w[venue routes channels products opts]a
-    defstruct ~w[venue routes channels credential products opts]a
-  end
 
   @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
@@ -38,37 +19,52 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
-    state = %State{
+    state = %Tai.Venues.Streams.ConnectionAdapter.State{
       venue: stream.venue.id,
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
       products: stream.products,
+      quote_depth: stream.venue.quote_depth,
+      heartbeat_interval: stream.venue.stream_heartbeat_interval,
+      heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
       opts: stream.venue.opts
     }
 
-    name = to_name(stream.venue.id)
+    name = process_name(stream.venue.id)
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
-  def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
-  end
-
-  def handle_connect(_conn, state) do
-    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
-    send(self(), :init_subscriptions)
+  def on_connect(_conn, state) do
+    send(self(), {:heartbeat, :start})
+    send(self(), {:subscribe, :init})
     {:ok, state}
   end
 
-  def handle_disconnect(conn_status, state) do
-    TaiEvents.warn(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
+  def handle_pong(:pong, state) do
+    state =
+      state
+      |> cancel_heartbeat_timeout()
+      |> schedule_heartbeat()
+
     {:ok, state}
   end
 
-  def handle_info(:init_subscriptions, state) do
+  def handle_info({:heartbeat, :start}, state) do
+    {:ok, schedule_heartbeat(state)}
+  end
+
+  def handle_info({:heartbeat, :ping}, state) do
+    state = state |> schedule_heartbeat_timeout()
+    {:reply, :ping, state}
+  end
+
+  def handle_info({:heartbeat, :timeout}, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
+  end
+
+  def handle_info({:subscribe, :init}, state) do
     send(self(), {:subscribe, :level2})
-
     {:ok, state}
   end
 
@@ -86,24 +82,30 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
 
   def handle_info({:send_msg, msg}, state), do: {:reply, {:text, msg}, state}
 
-  def handle_frame({:text, msg}, state) do
-    msg
-    |> Jason.decode!()
-    |> handle_msg(state)
+  defp schedule_heartbeat(state) do
+    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
+    %{state | heartbeat_timer: timer}
+  end
 
+  defp schedule_heartbeat_timeout(state) do
+    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
+    %{state | heartbeat_timeout_timer: timer}
+  end
+
+  defp cancel_heartbeat_timeout(state) do
+    Process.cancel_timer(state.heartbeat_timeout_timer)
+    %{state | heartbeat_timeout_timer: nil}
+  end
+
+  @order_book_msg_types ~w(l2update snapshot)
+  defp on_msg(%{"type" => type} = msg, state) when type in @order_book_msg_types do
+    msg |> forward(:order_books, state)
     {:ok, state}
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
-
-  @order_book_msg_types ~w(l2update snapshot)
-  defp handle_msg(%{"type" => type} = msg, state) when type in @order_book_msg_types do
-    msg |> forward(:order_books, state)
-  end
-
-  defp handle_msg(msg, state) do
+  defp on_msg(msg, state) do
     msg |> forward(:optional_channels, state)
+    {:ok, state}
   end
 
   defp forward(msg, to, state) do
