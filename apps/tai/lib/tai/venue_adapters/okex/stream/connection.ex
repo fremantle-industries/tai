@@ -31,6 +31,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
       connect_total: 0,
       disconnect_total: 0,
+      terminate_total: 0,
       opts: stream.venue.opts
     }
 

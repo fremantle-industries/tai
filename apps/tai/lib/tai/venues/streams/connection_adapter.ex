@@ -38,6 +38,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
             heartbeat_timeout_timer: reference | nil,
             connect_total: non_neg_integer,
             disconnect_total: non_neg_integer,
+            terminate_total: non_neg_integer,
             requests: Requests.t | nil,
             opts: map,
           }
@@ -52,6 +53,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       heartbeat_timeout
       connect_total
       disconnect_total
+      terminate_total
       opts
     ]a
     defstruct ~w[
@@ -67,6 +69,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       heartbeat_timeout_timer
       connect_total
       disconnect_total
+      terminate_total
       requests
       opts
     ]a
@@ -88,6 +91,14 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
         %{venue: state.venue}
       )
     end
+
+    def terminate(state) do
+      :telemetry.execute(
+        [:tai, :venues, :stream, :terminate],
+        %{total: state.terminate_total},
+        %{venue: state.venue}
+      )
+    end
   end
 
   defmodule Events do
@@ -100,6 +111,10 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
         venue: state.venue,
         reason: conn_status.reason
       })
+    end
+
+    def terminate(close_reason, state) do
+      TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
     end
   end
 
@@ -117,11 +132,16 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 
       def terminate(close_reason, state) do
-        TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+        state = %{state | terminate_total: state.terminate_total + 1}
+        Telemetry.terminate(state)
+        Events.terminate(close_reason, state)
         on_terminate(close_reason, state)
+
+        {:ok, state}
       end
 
       def handle_connect(conn, state) do
+        Process.flag(:trap_exit, true)
         state = %{state | connect_total: state.connect_total + 1}
         Telemetry.connect(state)
         Events.connect(state)
@@ -158,9 +178,9 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
         |> on_msg(state)
       end
 
-      def on_terminate(_, _), do: :ok
-      def on_connect(_, _), do: :ok
-      def on_disconnect(_, _), do: :ok
+      def on_terminate(_, state), do: {:ok, state}
+      def on_connect(_, state), do: {:ok, state}
+      def on_disconnect(_, state), do: {:ok, state}
       def on_msg(_, state), do: {:ok, state}
       defoverridable on_terminate: 2, on_connect: 2, on_disconnect: 2, on_msg: 2
     end
