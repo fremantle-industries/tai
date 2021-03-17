@@ -102,10 +102,6 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       @spec process_name(venue) :: atom
       def process_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-      @deprecated "Use Tai.Venues.Streams.ConnectionAdapter.process_name/1 instead."
-      @spec to_name(venue) :: atom
-      def to_name(venue), do: :"#{__MODULE__}_#{venue}"
-
       def handle_connect(conn, state) do
         Process.flag(:trap_exit, true)
         Topics.broadcast(state.venue, :connect)
