@@ -40,40 +40,12 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
-  def on_connect(_conn, state) do
-    send(self(), {:heartbeat, :start})
-    send(self(), {:subscribe, :init})
+  def subscribe(:init, state) do
+    state.products |> Enum.each(&send(self(), {:subscribe, {:depth, &1}}))
     {:ok, state}
   end
 
-  def handle_pong(:pong, state) do
-    state =
-      state
-      |> cancel_heartbeat_timeout()
-      |> schedule_heartbeat()
-
-    {:ok, state}
-  end
-
-  def handle_info({:heartbeat, :start}, state) do
-    {:ok, schedule_heartbeat(state)}
-  end
-
-  def handle_info({:heartbeat, :ping}, state) do
-    state = state |> schedule_heartbeat_timeout()
-    {:reply, :ping, state}
-  end
-
-  def handle_info({:heartbeat, :timeout}, state) do
-    {:close, {1000, "heartbeat timeout"}, state}
-  end
-
-  def handle_info({:subscribe, :init}, state) do
-    state.products |> Enum.each(&send(self(), {:subscribe, :depth, &1}))
-    {:ok, state}
-  end
-
-  def handle_info({:subscribe, :depth, product}, state) do
+  def subscribe({:depth, product}, state) do
     with {:ok, sub} <- Stream.Channels.market_depth(product) do
       msg =
         %{
@@ -110,21 +82,6 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
   def on_msg(msg, state) do
     msg |> forward(:optional_channels, state)
     {:ok, state}
-  end
-
-  defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
-    %{state | heartbeat_timer: timer}
-  end
-
-  defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
-    %{state | heartbeat_timeout_timer: timer}
-  end
-
-  defp cancel_heartbeat_timeout(state) do
-    Process.cancel_timer(state.heartbeat_timeout_timer)
-    %{state | heartbeat_timeout_timer: nil}
   end
 
   defp forward(msg, to, state) do

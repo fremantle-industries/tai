@@ -6,7 +6,6 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
-  @type venue_msg :: map
 
   @spec start_link(
           endpoint: String.t(),
@@ -35,75 +34,25 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
-  def on_connect(_conn, state) do
-    send(self(), {:heartbeat, :start})
-    send(self(), {:subscribe, :init})
-    {:ok, state}
-  end
-
-  def handle_pong(:pong, state) do
-    state =
-      state
-      |> cancel_heartbeat_timeout()
-      |> schedule_heartbeat()
-
-    {:ok, state}
-  end
-
-  def handle_info({:heartbeat, :start}, state) do
-    {:ok, schedule_heartbeat(state)}
-  end
-
-  def handle_info({:heartbeat, :ping}, state) do
-    state = state |> schedule_heartbeat_timeout()
-    {:reply, :ping, state}
-  end
-
-  def handle_info({:heartbeat, :timeout}, state) do
-    {:close, {1000, "heartbeat timeout"}, state}
-  end
-
-  def handle_info({:subscribe, :init}, state) do
+  def subscribe(:init, state) do
     send(self(), {:subscribe, :level2})
     {:ok, state}
   end
 
-  def handle_info({:subscribe, :level2}, state) do
+  def subscribe(:level2, state) do
     product_ids = state.products |> Enum.map(& &1.venue_symbol)
-
-    msg =
-      %{"type" => "subscribe", "channels" => ["level2"], "product_ids" => product_ids}
-      |> Jason.encode!()
-
+    msg = %{"type" => "subscribe", "channels" => ["level2"], "product_ids" => product_ids}
     send(self(), {:send_msg, msg})
-
     {:ok, state}
   end
 
-  def handle_info({:send_msg, msg}, state), do: {:reply, {:text, msg}, state}
-
-  defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
-    %{state | heartbeat_timer: timer}
-  end
-
-  defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
-    %{state | heartbeat_timeout_timer: timer}
-  end
-
-  defp cancel_heartbeat_timeout(state) do
-    Process.cancel_timer(state.heartbeat_timeout_timer)
-    %{state | heartbeat_timeout_timer: nil}
-  end
-
   @order_book_msg_types ~w(l2update snapshot)
-  defp on_msg(%{"type" => type} = msg, state) when type in @order_book_msg_types do
+  def on_msg(%{"type" => type} = msg, state) when type in @order_book_msg_types do
     msg |> forward(:order_books, state)
     {:ok, state}
   end
 
-  defp on_msg(msg, state) do
+  def on_msg(msg, state) do
     msg |> forward(:optional_channels, state)
     {:ok, state}
   end

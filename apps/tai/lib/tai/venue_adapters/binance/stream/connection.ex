@@ -45,38 +45,10 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:ok, pid}
   end
 
-  def on_connect(_conn, state) do
-    send(self(), {:heartbeat, :start})
-    send(self(), {:subscribe, :init})
-    {:ok, state}
-  end
-
-  def handle_pong(:pong, state) do
-    state =
-      state
-      |> cancel_heartbeat_timeout()
-      |> schedule_heartbeat()
-
-    {:ok, state}
-  end
-
-  def handle_info({:heartbeat, :start}, state) do
-    {:ok, schedule_heartbeat(state)}
-  end
-
-  def handle_info({:heartbeat, :ping}, state) do
-    state = state |> schedule_heartbeat_timeout()
-    {:reply, :ping, state}
-  end
-
-  def handle_info({:heartbeat, :timeout}, state) do
-    {:close, {1000, "heartbeat timeout"}, state}
-  end
-
   @optional_channels [
     :trades
   ]
-  def handle_info({:subscribe, :init}, state) do
+  def subscribe(:init, state) do
     send(self(), {:subscribe, :depth})
 
     state.channels
@@ -95,7 +67,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:ok, state}
   end
 
-  def handle_info({:subscribe, :depth}, state) do
+  def subscribe(:depth, state) do
     channels =
       state.products
       |> stream_symbols
@@ -113,7 +85,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:subscribe, :trades}, state) do
+  def subscribe(:trades, state) do
     channels =
       state.products
       |> stream_symbols
@@ -129,21 +101,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
     state = state |> add_request()
     {:reply, {:text, msg}, state}
-  end
-
-  defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
-    %{state | heartbeat_timer: timer}
-  end
-
-  defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
-    %{state | heartbeat_timeout_timer: timer}
-  end
-
-  defp cancel_heartbeat_timeout(state) do
-    Process.cancel_timer(state.heartbeat_timeout_timer)
-    %{state | heartbeat_timeout_timer: nil}
   end
 
   defp snapshot_order_books(products, depth) do

@@ -36,33 +36,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name, extra_headers: headers)
   end
 
-  def on_connect(_conn, state) do
-    send(self(), {:heartbeat, :start})
-    send(self(), :init_subscriptions)
-    {:ok, state}
-  end
-
-  def handle_pong(:pong, state) do
-    state =
-      state
-      |> cancel_heartbeat_timeout()
-      |> schedule_heartbeat()
-
-    {:ok, state}
-  end
-
-  def handle_info({:heartbeat, :start}, state) do
-    {:ok, schedule_heartbeat(state)}
-  end
-
-  def handle_info({:heartbeat, :ping}, state) do
-    {:reply, :ping, schedule_heartbeat_timeout(state)}
-  end
-
-  def handle_info({:heartbeat, :timeout}, state) do
-    {:close, {1000, "heartbeat timeout"}, state}
-  end
-
   @optional_channels [
     :trades,
     :connected_stats,
@@ -72,9 +45,9 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     :insurance,
     :settlement
   ]
-  def handle_info(:init_subscriptions, state) do
+  def subscribe(:init, state) do
     if state.credential do
-      send(self(), :login)
+      send(self(), {:subscribe, :login})
       send(self(), {:subscribe, :margin})
       send(self(), {:subscribe, :positions})
     end
@@ -99,18 +72,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:ok, state}
   end
 
-  def handle_info(:login, state) do
+  def subscribe(:login, state) do
     msg = %{"op" => "subscribe", "args" => ["order"]} |> Jason.encode!()
-    {:reply, {:text, msg}, state}
-  end
-
-  def handle_info({:send_msg, msg}, state) do
     {:reply, {:text, msg}, state}
   end
 
   # Bitmex has an unpublished limit to websocket message lengths.
   @products_chunk_count 10
-  def handle_info({:subscribe, :depth}, state) do
+  def subscribe(:depth, state) do
     # > 25 quotes are experimental. It has performance issues causing message queue back pressure
     order_book_table = if state.quote_depth <= 25, do: "orderBookL2_25", else: "orderBookL2"
 
@@ -118,65 +87,66 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     |> Enum.chunk_every(@products_chunk_count)
     |> Enum.each(fn products ->
       args = products |> Enum.map(fn p -> "#{order_book_table}:#{p.venue_symbol}" end)
-      msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
+      msg = %{"op" => "subscribe", "args" => args}
       send(self(), {:send_msg, msg})
     end)
 
     {:ok, state}
   end
 
-  def handle_info({:subscribe, :trades}, state) do
+  def subscribe(:trades, state) do
     state.products
     |> Enum.chunk_every(@products_chunk_count)
     |> Enum.each(fn products ->
       args = products |> Enum.map(fn p -> "trade:#{p.venue_symbol}" end)
-      msg = %{"op" => "subscribe", "args" => args} |> Jason.encode!()
+      msg = %{"op" => "subscribe", "args" => args}
       send(self(), {:send_msg, msg})
     end)
 
     {:ok, state}
   end
 
-  def handle_info({:subscribe, :positions}, state) do
+  def subscribe(:positions, state) do
     msg = %{"op" => "subscribe", "args" => ["position"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:subscribe, :margin}, state) do
+  def subscribe(:margin, state) do
     msg = %{"op" => "subscribe", "args" => ["margin"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:subscribe, :connected_stats}, state) do
+  def subscribe(:connected_stats, state) do
     msg = %{"op" => "subscribe", "args" => ["connected"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:subscribe, :liquidations}, state) do
+  def subscribe(:liquidations, state) do
     msg = %{"op" => "subscribe", "args" => ["liquidation"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:subscribe, :notifications}, state) do
+  def subscribe(:notifications, state) do
     msg = %{"op" => "subscribe", "args" => ["publicNotifications"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:subscribe, :funding}, state) do
+  def subscribe(:funding, state) do
     msg = %{"op" => "subscribe", "args" => ["funding"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:subscribe, :insurance}, state) do
+  def subscribe(:insurance, state) do
     msg = %{"op" => "subscribe", "args" => ["insurance"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info({:subscribe, :settlement}, state) do
+  def subscribe(:settlement, state) do
     msg = %{"op" => "subscribe", "args" => ["settlement"]} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
+  # TODO: Figure out how to move this
   def handle_info(
         :ping_autocancel,
         %{
@@ -211,22 +181,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     Process.send_after(self(), :ping_autocancel, after_ms)
   end
 
-  defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
-    %{state | heartbeat_timer: timer}
-  end
-
-  defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
-    %{state | heartbeat_timeout_timer: timer}
-  end
-
-  defp cancel_heartbeat_timeout(state) do
-    Process.cancel_timer(state.heartbeat_timeout_timer)
-    %{state | heartbeat_timeout_timer: nil}
-  end
-
-  defp on_msg(%{"limit" => %{"remaining" => remaining}, "version" => _}, state) do
+  def on_msg(%{"limit" => %{"remaining" => remaining}, "version" => _}, state) do
     TaiEvents.info(%Tai.Events.BitmexStreamConnectionLimitDetails{
       venue_id: state.venue,
       remaining: remaining
@@ -234,24 +189,24 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     {:ok, state}
   end
 
-  defp on_msg(%{"request" => _, "subscribe" => _} = msg, state) do
+  def on_msg(%{"request" => _, "subscribe" => _} = msg, state) do
     msg |> forward(:order_books, state)
     {:ok, state}
   end
 
   @order_book_tables ~w(orderBookL2 orderBookL2_25)
-  defp on_msg(%{"table" => table} = msg, state) when table in @order_book_tables do
+  def on_msg(%{"table" => table} = msg, state) when table in @order_book_tables do
     msg |> forward(:order_books, state)
     {:ok, state}
   end
 
   @auth_tables ~w(position wallet margin order execution transact)
-  defp on_msg(%{"table" => table} = msg, state) when table in @auth_tables do
+  def on_msg(%{"table" => table} = msg, state) when table in @auth_tables do
     msg |> forward(:auth, state)
     {:ok, state}
   end
 
-  defp on_msg(msg, state) do
+  def on_msg(msg, state) do
     msg |> forward(:optional_channels, state)
     {:ok, state}
   end

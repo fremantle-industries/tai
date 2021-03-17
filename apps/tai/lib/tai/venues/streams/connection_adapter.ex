@@ -3,11 +3,13 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
 
   @type state :: ConnectionAdapter.State.t
   @type msg :: term
+  @type phase :: :init | atom
 
   @callback on_terminate(WebSockex.close_reason, state) :: :ok
   @callback on_connect(WebSockex.Conn.t, state) :: :ok
   @callback on_disconnect(WebSockex.connection_status_map, state) :: :ok
   @callback on_msg(msg, state) :: {:ok, state}
+  @callback subscribe(phase, state) :: {:ok, state}
 
   defmodule Requests do
     @type next_request_id :: non_neg_integer
@@ -106,6 +108,8 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
         Process.flag(:trap_exit, true)
         Topics.broadcast(state.venue, :connect)
         Events.connect(state.venue)
+        send(self(), {:heartbeat, :start})
+        send(self(), {:subscribe, :init})
         on_connect(conn, state)
 
         {:ok, state}
@@ -146,11 +150,61 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
         |> on_msg(state)
       end
 
+      def handle_pong(:pong, state) do
+        state =
+          state
+          |> cancel_heartbeat_timeout()
+          |> schedule_heartbeat()
+
+        {:ok, state}
+      end
+
+      def handle_info({:EXIT, pid, :normal}, state) do
+        {:ok, state}
+      end
+
+      def handle_info({:heartbeat, :start}, state) do
+        {:ok, schedule_heartbeat(state)}
+      end
+
+      def handle_info({:heartbeat, :ping}, state) do
+        {:reply, :ping, schedule_heartbeat_timeout(state)}
+      end
+
+      def handle_info({:heartbeat, :timeout}, state) do
+        {:close, {1000, "heartbeat timeout"}, state}
+      end
+
+      def handle_info({:subscribe, phase}, state) do
+        subscribe(phase, state)
+      end
+
+      def handle_info({:send_msg, msg}, state) do
+        json_msg = Jason.encode!(msg)
+        {:reply, {:text, json_msg}, state}
+      end
+
       def on_terminate(_, state), do: {:ok, state}
       def on_connect(_, state), do: {:ok, state}
       def on_disconnect(_, state), do: {:ok, state}
       def on_msg(_, state), do: {:ok, state}
-      defoverridable on_terminate: 2, on_connect: 2, on_disconnect: 2, on_msg: 2
+      def subscribe(_, state), do: {:ok, state}
+      defoverridable on_terminate: 2, on_connect: 2, on_disconnect: 2, on_msg: 2, subscribe: 2
+
+      defp schedule_heartbeat(state) do
+        timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
+        %{state | heartbeat_timer: timer}
+      end
+
+      defp schedule_heartbeat_timeout(state) do
+        timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
+        %{state | heartbeat_timeout_timer: timer}
+      end
+
+      defp cancel_heartbeat_timeout(state) do
+        Process.cancel_timer(state.heartbeat_timeout_timer)
+        %{state | heartbeat_timeout_timer: nil}
+      end
 
       defp add_request(state) do
         pending_requests = Map.put(state.requests, state.requests.next_request_id, System.monotonic_time())
