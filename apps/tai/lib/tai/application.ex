@@ -12,6 +12,7 @@ defmodule Tai.Application do
       Tai.Trading.PositionStore,
       Tai.Trading.OrderStore,
       Tai.Markets.QuoteStore,
+      Tai.Venues.Telemetry,
       Tai.Venues.ProductStore,
       Tai.Venues.FeeStore,
       Tai.Venues.AccountStore,

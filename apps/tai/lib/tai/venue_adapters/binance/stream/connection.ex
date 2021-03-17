@@ -31,9 +31,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
-      connect_total: 0,
-      disconnect_total: 0,
-      terminate_total: 0,
       opts: stream.venue.opts,
       requests: %Tai.Venues.Streams.ConnectionAdapter.Requests{
         next_request_id: 1,
