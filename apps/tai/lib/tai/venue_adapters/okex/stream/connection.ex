@@ -29,6 +29,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
+      compression: :unzip,
       opts: stream.venue.opts
     }
 

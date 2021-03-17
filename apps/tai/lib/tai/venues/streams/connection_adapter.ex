@@ -36,6 +36,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
             heartbeat_timeout: pos_integer,
             heartbeat_timer: reference | nil,
             heartbeat_timeout_timer: reference | nil,
+            compression: :unzip | :gunzip | nil,
             requests: Requests.t | nil,
             opts: map,
           }
@@ -61,6 +62,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       heartbeat_timeout
       heartbeat_timer
       heartbeat_timeout_timer
+      compression
       requests
       opts
     ]a
@@ -130,14 +132,14 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       end
 
       def handle_frame({:binary, <<43, 200, 207, 75, 7, 0>> = pong}, state) do
-        pong
-        |> :zlib.unzip()
+        :zlib
+        |> apply(state.compression, [pong])
         |> on_msg(state)
       end
 
       def handle_frame({:binary, compressed_data}, state) do
-        compressed_data
-        |> :zlib.unzip()
+        :zlib
+        |> apply(state.compression, [compressed_data])
         |> Jason.decode!()
         |> on_msg(state)
       end

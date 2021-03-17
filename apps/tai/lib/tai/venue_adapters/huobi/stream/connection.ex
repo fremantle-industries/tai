@@ -1,41 +1,12 @@
 defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
-  use WebSockex
+  use Tai.Venues.Streams.ConnectionAdapter
   alias Tai.VenueAdapters.Huobi.Stream
-
-  defmodule State do
-    @type product :: Tai.Venues.Product.t()
-    @type venue_id :: Tai.Venue.id()
-    @type credential_id :: Tai.Venue.credential_id()
-    @type channel_name :: atom
-    @type route :: :order_books | :optional_channels
-    @type last_pong :: integer
-    @type request_id :: non_neg_integer
-    @type t :: %State{
-            venue: venue_id,
-            routes: %{required(route) => atom},
-            channels: [channel_name],
-            credential: {credential_id, map},
-            products: [product],
-            last_pong: pos_integer,
-            next_request_id: request_id,
-            requests: %{
-              optional(request_id) => pos_integer
-            },
-            heartbeat_timer: reference | nil,
-            heartbeat_timeout_timer: reference | nil
-          }
-
-    @enforce_keys ~w[venue routes channels credential products last_pong next_request_id requests]a
-    defstruct ~w[venue routes channels credential products last_pong next_request_id requests heartbeat_timer heartbeat_timeout_timer]a
-  end
 
   @type stream :: Tai.Venues.Stream.t()
   @type endpoint :: String.t()
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.account()
-  @type msg :: map | String.t()
-  @type state :: State.t()
 
   @spec start_link(
           endpoint: endpoint,
@@ -48,74 +19,31 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
-    state = %State{
+    state = %Tai.Venues.Streams.ConnectionAdapter.State{
       venue: stream.venue.id,
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
       products: stream.products,
-      last_pong: time_now(),
-      next_request_id: 1,
-      requests: %{}
+      quote_depth: stream.venue.quote_depth,
+      heartbeat_interval: stream.venue.stream_heartbeat_interval,
+      heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
+      compression: :gunzip,
+      opts: stream.venue.opts,
+      requests: %Tai.Venues.Streams.ConnectionAdapter.Requests{
+        next_request_id: 1,
+        pending_requests: %{}
+      }
     }
 
-    name = to_name(stream.venue.id)
+    name = process_name(stream.venue.id)
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
-
-  def handle_connect(_conn, state) do
-    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
-    send(self(), :init_subscriptions)
+  def on_connect(_conn, state) do
+    send(self(), {:heartbeat, :start})
+    send(self(), {:subscribe, :init})
     {:ok, state}
-  end
-
-  def handle_disconnect(conn_status, state) do
-    TaiEvents.warn(%Tai.Events.StreamDisconnect{
-      venue: state.venue,
-      reason: conn_status.reason
-    })
-
-    {:ok, state}
-  end
-
-  def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
-  end
-
-  def handle_info(:init_subscriptions, state) do
-    state.products |> Enum.each(&send(self(), {:subscribe, :depth, &1}))
-    state = state |> schedule_heartbeat()
-    {:ok, state}
-  end
-
-  def handle_info({:subscribe, :depth, product}, state) do
-    with {:ok, sub} <- Stream.Channels.market_depth(product) do
-      msg =
-        %{
-          sub: sub,
-          data_type: "incremental",
-          id: Integer.to_string(state.next_request_id)
-        }
-        |> Jason.encode!()
-
-      state = add_request(state)
-      {:reply, {:text, msg}, state}
-    else
-      _ ->
-        {:noreply, state}
-    end
-  end
-
-  def handle_info(:heartbeat, state) do
-    state = state |> schedule_heartbeat_timeout()
-    {:reply, :ping, state}
-  end
-
-  def handle_info(:heartbeat_timeout, state) do
-    {:close, {1000, "heartbeat timeout"}, state}
   end
 
   def handle_pong(:pong, state) do
@@ -127,24 +55,70 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
     {:ok, state}
   end
 
-  def handle_frame({:binary, compressed_data}, state) do
-    compressed_data
-    |> :zlib.gunzip()
-    |> Jason.decode!()
-    |> handle_msg(state)
+  def handle_info({:heartbeat, :start}, state) do
+    {:ok, schedule_heartbeat(state)}
   end
 
-  def handle_frame({:text, _}, state), do: {:ok, state}
+  def handle_info({:heartbeat, :ping}, state) do
+    state = state |> schedule_heartbeat_timeout()
+    {:reply, :ping, state}
+  end
 
-  @heartbeat_ms 5_000
+  def handle_info({:heartbeat, :timeout}, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
+  end
+
+  def handle_info({:subscribe, :init}, state) do
+    state.products |> Enum.each(&send(self(), {:subscribe, :depth, &1}))
+    {:ok, state}
+  end
+
+  def handle_info({:subscribe, :depth, product}, state) do
+    with {:ok, sub} <- Stream.Channels.market_depth(product) do
+      msg =
+        %{
+          sub: sub,
+          data_type: "incremental",
+          id: Integer.to_string(state.requests.next_request_id)
+        }
+        |> Jason.encode!()
+
+      state = add_request(state)
+      {:reply, {:text, msg}, state}
+    else
+      _ ->
+        {:noreply, state}
+    end
+  end
+
+  def on_msg(%{"ch" => "market." <> _} = msg, state) do
+    msg |> forward(:order_books, state)
+    {:ok, state}
+  end
+
+  def on_msg(%{"ping" => timestamp}, state) do
+    msg = Jason.encode!(%{"pong" => timestamp})
+    {:reply, {:text, msg}, state}
+  end
+
+  def on_msg(%{"id" => id}, state) do
+    requests = Map.delete(state.requests, id)
+    state = %{state | requests: requests}
+    {:ok, state}
+  end
+
+  def on_msg(msg, state) do
+    msg |> forward(:optional_channels, state)
+    {:ok, state}
+  end
+
   defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), :heartbeat, @heartbeat_ms)
+    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
     %{state | heartbeat_timer: timer}
   end
 
-  @heartbeat_timeout_ms 3_000
   defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), :heartbeat_timeout, @heartbeat_timeout_ms)
+    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
     %{state | heartbeat_timeout_timer: timer}
   end
 
@@ -153,39 +127,15 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
     %{state | heartbeat_timeout_timer: nil}
   end
 
-  defp handle_msg(%{"ch" => "market." <> _} = msg, state) do
-    msg |> forward(:order_books, state)
-    {:ok, state}
-  end
-
-  defp handle_msg(%{"ping" => timestamp}, state) do
-    msg = Jason.encode!(%{"pong" => timestamp})
-    {:reply, {:text, msg}, state}
-  end
-
-  defp handle_msg(%{"id" => id}, state) do
-    requests = Map.delete(state.requests, id)
-    state = %{state | requests: requests}
-    {:ok, state}
-  end
-
-  defp handle_msg(msg, state) do
-    msg |> forward(:optional_channels, state)
-    {:ok, state}
-  end
-
   defp add_request(state) do
-    requests = Map.put(state.requests, state.next_request_id, :os.system_time(:millisecond))
-    %{state | next_request_id: state.next_request_id + 1, requests: requests}
+    pending_requests = Map.put(state.requests.pending_requests, state.requests.next_request_id, :os.system_time(:millisecond))
+    requests = %{state.requests | next_request_id: state.requests.next_request_id, pending_requests: pending_requests}
+    %{state | requests: requests}
   end
 
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
     |> GenServer.cast({msg, System.monotonic_time()})
-  end
-
-  defp time_now() do
-    :erlang.system_time(:seconds)
   end
 end
