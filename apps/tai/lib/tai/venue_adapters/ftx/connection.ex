@@ -2,7 +2,6 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   use Tai.Venues.Streams.ConnectionAdapter
   alias Tai.VenueAdapters.Ftx.Stream
 
-
   @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
@@ -39,14 +38,36 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   end
 
   def on_connect(_conn, _state) do
-    send(self(), :init_subscriptions)
+    send(self(), {:heartbeat, :start})
+    send(self(), {:subscribe, :init})
     :ok
+  end
+
+  def handle_pong(:pong, state) do
+    state =
+      state
+      |> cancel_heartbeat_timeout()
+      |> schedule_heartbeat()
+
+    {:ok, state}
+  end
+
+  def handle_info({:heartbeat, :start}, state) do
+    {:ok, schedule_heartbeat(state)}
+  end
+
+  def handle_info({:heartbeat, :ping}, state) do
+    {:reply, :ping, schedule_heartbeat_timeout(state)}
+  end
+
+  def handle_info({:heartbeat, :timeout}, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
   end
 
   @optional_channels [
     :trades,
   ]
-  def handle_info(:init_subscriptions, state) do
+  def handle_info({:subscribe, :init}, state) do
     send(self(), {:subscribe, :orderbook})
 
     state.channels
@@ -62,8 +83,6 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
       end
     end)
 
-    state = state |> schedule_heartbeat()
-
     {:ok, state}
   end
 
@@ -78,44 +97,28 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     {:ok, state}
   end
 
-  def handle_info(:heartbeat, state) do
-    state = state |> schedule_heartbeat_timeout()
-    {:reply, :ping, state}
-  end
-
-  def handle_info(:heartbeat_timeout, state) do
-    {:close, {1000, "heartbeat timeout"}, state}
-  end
-
   def handle_info({:send_msg, msg}, state) do
     json_msg = Jason.encode!(msg)
     {:reply, {:text, json_msg}, state}
   end
 
-  def handle_pong(:pong, state) do
-    state =
-      state
-      |> cancel_heartbeat_timeout()
-      |> schedule_heartbeat()
-
-    {:ok, state}
-  end
-
   def on_msg(%{"channel" => "orderbook"} = msg, state) do
     msg |> forward(:order_books, state)
+    {:ok, state}
   end
 
   def on_msg(msg, state) do
     msg |> forward(:optional_channels, state)
+    {:ok, state}
   end
 
   defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), :heartbeat, state.heartbeat_interval)
+    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
     %{state | heartbeat_timer: timer}
   end
 
   defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), :heartbeat_timeout, state.heartbeat_timeout)
+    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
     %{state | heartbeat_timeout_timer: timer}
   end
 

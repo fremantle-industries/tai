@@ -1,24 +1,36 @@
 defmodule Tai.Venues.Streams.ConnectionAdapter do
-  @type state :: term
+  alias __MODULE__
+
+  @type state :: ConnectionAdapter.State.t
   @type msg :: term
 
   @callback on_terminate(WebSockex.close_reason, state) :: :ok
   @callback on_connect(WebSockex.Conn.t, state) :: :ok
   @callback on_disconnect(WebSockex.connection_status_map, state) :: :ok
-  @callback on_msg(msg, state) :: :ok
+  @callback on_msg(msg, state) :: {:ok, state}
+
+  defmodule Requests do
+    @type next_request_id :: non_neg_integer
+    @type t :: %Requests{
+            next_request_id: next_request_id,
+            pending_requests: %{
+              optional(next_request_id) => pos_integer
+            }
+          }
+
+    @enforce_keys ~w[next_request_id pending_requests]a
+    defstruct ~w[next_request_id pending_requests]a
+  end
 
   defmodule State do
-    @type product :: Tai.Venues.Product.t()
-    @type venue_id :: Tai.Venue.id()
-    @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
     @type route :: :auth | :order_books | :optional_channels
     @type t :: %State{
-            venue: venue_id,
+            venue: Tai.Venue.id,
             routes: %{required(route) => atom},
             channels: [channel_name],
-            credential: {credential_id, map} | nil,
-            products: [product],
+            credential: {Tai.Venue.credential_id, map} | nil,
+            products: [Tai.Venues.Product.t],
             quote_depth: pos_integer,
             heartbeat_interval: pos_integer,
             heartbeat_timeout: pos_integer,
@@ -26,6 +38,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
             heartbeat_timeout_timer: reference | nil,
             connect_total: non_neg_integer,
             disconnect_total: non_neg_integer,
+            requests: Requests.t | nil,
             opts: map,
           }
 
@@ -54,6 +67,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       heartbeat_timeout_timer
       connect_total
       disconnect_total
+      requests
       opts
     ]a
   end
@@ -136,7 +150,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       def on_terminate(_, _), do: :ok
       def on_connect(_, _), do: :ok
       def on_disconnect(_, _), do: :ok
-      def on_msg(_, _), do: :ok
+      def on_msg(_, state), do: {:ok, state}
       defoverridable on_terminate: 2, on_connect: 2, on_disconnect: 2, on_msg: 2
     end
   end

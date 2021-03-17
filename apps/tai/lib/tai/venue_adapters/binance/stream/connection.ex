@@ -1,29 +1,6 @@
 defmodule Tai.VenueAdapters.Binance.Stream.Connection do
-  use WebSockex
+  use Tai.Venues.Streams.ConnectionAdapter
   alias Tai.VenueAdapters.Binance.Stream
-
-  defmodule State do
-    @type product :: Tai.Venues.Product.t()
-    @type venue_id :: Tai.Venue.id()
-    @type channel :: Tai.Venue.channel()
-    @type route :: :order_books | :optional_channels
-    @type request_id :: non_neg_integer
-    @type t :: %State{
-            venue: venue_id,
-            products: [product],
-            channels: [channel],
-            routes: %{required(route) => atom},
-            request_id: request_id,
-            requests: %{
-              optional(request_id) => pos_integer
-            },
-            heartbeat_timer: reference | nil,
-            heartbeat_timeout_timer: reference | nil
-          }
-
-    @enforce_keys ~w[venue products channels routes request_id requests]a
-    defstruct ~w[venue products channels routes request_id requests heartbeat_timer heartbeat_timeout_timer]a
-  end
 
   @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
@@ -37,8 +14,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
           stream: stream,
           credential: {credential_id, credential} | nil
         ) :: {:ok, pid}
-  def start_link(endpoint: endpoint, stream: stream, credential: _) do
-    name = :"#{__MODULE__}_#{stream.venue.id}"
+  def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     snapshot_depth = Map.get(stream.venue.opts, :snapshot_depth, @default_snapshot_depth)
 
     routes = %{
@@ -46,54 +22,63 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
-    state = %State{
+    state = %Tai.Venues.Streams.ConnectionAdapter.State{
       venue: stream.venue.id,
-      products: stream.products,
-      channels: stream.venue.channels,
       routes: routes,
-      request_id: 1,
-      requests: %{}
+      channels: stream.venue.channels,
+      credential: credential,
+      products: stream.products,
+      quote_depth: stream.venue.quote_depth,
+      heartbeat_interval: stream.venue.stream_heartbeat_interval,
+      heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
+      connect_total: 0,
+      disconnect_total: 0,
+      opts: stream.venue.opts,
+      requests: %Tai.Venues.Streams.ConnectionAdapter.Requests{
+        next_request_id: 1,
+        pending_requests: %{}
+      }
     }
 
+    name = stream.venue.id |> process_name()
     {:ok, pid} = WebSockex.start_link(endpoint, __MODULE__, state, name: name)
 
     snapshot_order_books(stream.products, snapshot_depth)
     {:ok, pid}
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue) do
-    :"#{__MODULE__}_#{venue}"
+  def on_connect(_conn, _state) do
+    send(self(), {:heartbeat, :start})
+    send(self(), {:subscribe, :init})
+    :ok
   end
 
-  def handle_connect(_conn, state) do
-    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
-    send(self(), :init_subscriptions)
-    state = state |> schedule_heartbeat()
+  def handle_pong(:pong, state) do
+    state =
+      state
+      |> cancel_heartbeat_timeout()
+      |> schedule_heartbeat()
+
     {:ok, state}
   end
 
-  def handle_disconnect(conn_status, state) do
-    TaiEvents.warn(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
-    {:ok, state}
+  def handle_info({:heartbeat, :start}, state) do
+    {:ok, schedule_heartbeat(state)}
   end
 
-  def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+  def handle_info({:heartbeat, :ping}, state) do
+    state = state |> schedule_heartbeat_timeout()
+    {:reply, :ping, state}
   end
 
-  def handle_frame({:text, msg}, state) do
-    msg
-    |> Jason.decode!()
-    |> handle_msg(state)
+  def handle_info({:heartbeat, :timeout}, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
   end
-
-  def handle_frame(_frame, state), do: {:ok, state}
 
   @optional_channels [
     :trades
   ]
-  def handle_info(:init_subscriptions, state) do
+  def handle_info({:subscribe, :init}, state) do
     send(self(), {:subscribe, :depth})
 
     state.channels
@@ -121,7 +106,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     msg =
       %{
         method: "SUBSCRIBE",
-        id: state.request_id,
+        id: state.requests.next_request_id,
         params: channels
       }
       |> Jason.encode!()
@@ -139,7 +124,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     msg =
       %{
         method: "SUBSCRIBE",
-        id: state.request_id,
+        id: state.requests.next_request_id,
         params: channels
       }
       |> Jason.encode!()
@@ -148,33 +133,13 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
-  def handle_info(:heartbeat, state) do
-    state = state |> schedule_heartbeat_timeout()
-    {:reply, :ping, state}
-  end
-
-  def handle_info(:heartbeat_timeout, state) do
-    {:close, {1000, "heartbeat timeout"}, state}
-  end
-
-  def handle_pong(:pong, state) do
-    state =
-      state
-      |> cancel_heartbeat_timeout()
-      |> schedule_heartbeat()
-
-    {:ok, state}
-  end
-
-  @heartbeat_timer 5_000
   defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), :heartbeat, @heartbeat_timer)
+    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
     %{state | heartbeat_timer: timer}
   end
 
-  @heartbeat_timeout_timer 3_000
   defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), :heartbeat_timeout, @heartbeat_timeout_timer)
+    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
     %{state | heartbeat_timeout_timer: timer}
   end
 
@@ -201,22 +166,23 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   end
 
   defp add_request(state) do
-    requests = Map.put(state.requests, state.request_id, System.monotonic_time())
-    %{state | request_id: state.request_id + 1, requests: requests}
+    pending_requests = Map.put(state.requests, state.requests.next_request_id, System.monotonic_time())
+    requests = %{state.requests | next_request_id: state.requests.next_request_id + 1, pending_requests: pending_requests}
+    %{state | requests: requests}
   end
 
-  defp handle_msg(%{"id" => id, "result" => nil}, state) do
+  defp on_msg(%{"id" => id, "result" => nil}, state) do
     requests = Map.delete(state.requests, id)
     state = %{state | requests: requests}
     {:ok, state}
   end
 
-  defp handle_msg(%{"e" => "depthUpdate"} = msg, state) do
+  defp on_msg(%{"e" => "depthUpdate"} = msg, state) do
     msg |> forward(:order_books, state)
     {:ok, state}
   end
 
-  defp handle_msg(msg, state) do
+  defp on_msg(msg, state) do
     msg |> forward(:optional_channels, state)
     {:ok, state}
   end
