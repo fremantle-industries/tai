@@ -1,34 +1,11 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
-  use WebSockex
+  use Tai.Venues.Streams.ConnectionAdapter
   alias Tai.VenueAdapters.Bitmex.Stream
-
-  defmodule State do
-    @type product :: Tai.Venues.Product.t()
-    @type venue_id :: Tai.Venue.id()
-    @type credential_id :: Tai.Venue.credential_id()
-    @type channel_name :: atom
-    @type route :: :auth | :order_books | :optional_channels
-    @type t :: %State{
-            venue: venue_id,
-            routes: %{required(route) => atom},
-            channels: [channel_name],
-            credential: {credential_id, map} | nil,
-            products: [product],
-            quote_depth: pos_integer,
-            opts: map,
-            heartbeat_timer: reference | nil,
-            heartbeat_timeout_timer: reference | nil
-          }
-
-    @enforce_keys ~w[venue routes channels products quote_depth opts]a
-    defstruct ~w[venue routes channels credential products quote_depth opts heartbeat_timer heartbeat_timeout_timer]a
-  end
 
   @type stream :: Tai.Venues.Stream.t()
   @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.credential()
-  @type venue_msg :: map
 
   @spec start_link(
           endpoint: String.t(),
@@ -42,41 +19,48 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
-    state = %State{
+    state = %Tai.Venues.Streams.ConnectionAdapter.State{
       venue: stream.venue.id,
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
       products: stream.products,
       quote_depth: stream.venue.quote_depth,
+      heartbeat_interval: stream.venue.stream_heartbeat_interval,
+      heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
       opts: stream.venue.opts
     }
 
-    name = to_name(stream.venue.id)
+    name = process_name(stream.venue.id)
     headers = auth_headers(state.credential)
     WebSockex.start_link(endpoint, __MODULE__, state, name: name, extra_headers: headers)
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
-
-  def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
-  end
-
-  def handle_connect(_conn, state) do
-    TaiEvents.info(%Tai.Events.StreamConnect{venue: state.venue})
+  def on_connect(_conn, state) do
+    send(self(), {:heartbeat, :start})
     send(self(), :init_subscriptions)
     {:ok, state}
   end
 
-  def handle_disconnect(conn_status, state) do
-    TaiEvents.warn(%Tai.Events.StreamDisconnect{
-      venue: state.venue,
-      reason: conn_status.reason
-    })
+  def handle_pong(:pong, state) do
+    state =
+      state
+      |> cancel_heartbeat_timeout()
+      |> schedule_heartbeat()
 
     {:ok, state}
+  end
+
+  def handle_info({:heartbeat, :start}, state) do
+    {:ok, schedule_heartbeat(state)}
+  end
+
+  def handle_info({:heartbeat, :ping}, state) do
+    {:reply, :ping, schedule_heartbeat_timeout(state)}
+  end
+
+  def handle_info({:heartbeat, :timeout}, state) do
+    {:close, {1000, "heartbeat timeout"}, state}
   end
 
   @optional_channels [
@@ -111,7 +95,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     end)
 
     schedule_autocancel(0)
-    state = state |> schedule_heartbeat()
 
     {:ok, state}
   end
@@ -211,36 +194,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   def handle_info(:ping_autocancel, state), do: {:ok, state}
 
-  def handle_info(:heartbeat, state) do
-    state = state |> schedule_heartbeat_timeout()
-    {:reply, :ping, state}
-  end
-
-  def handle_info(:heartbeat_timeout, state) do
-    {:close, {1000, "heartbeat timeout"}, state}
-  end
-
-  def handle_pong(:pong, state) do
-    state =
-      state
-      |> cancel_heartbeat_timeout()
-      |> schedule_heartbeat()
-
-    {:ok, state}
-  end
-
-  def handle_frame({:text, msg}, state) do
-    msg
-    |> Jason.decode!()
-    |> handle_msg(state)
-
-    {:ok, state}
-  end
-
-  def handle_frame(_frame, state) do
-    {:ok, state}
-  end
-
   defp auth_headers({_credential_id, %{api_key: api_key, api_secret: api_secret}}) do
     nonce = ExBitmex.Auth.nonce()
     api_signature = ExBitmex.Auth.sign(api_secret, "GET", "/realtime", nonce, "")
@@ -258,15 +211,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     Process.send_after(self(), :ping_autocancel, after_ms)
   end
 
-  @heartbeat_ms 5_000
   defp schedule_heartbeat(state) do
-    timer = Process.send_after(self(), :heartbeat, @heartbeat_ms)
+    timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)
     %{state | heartbeat_timer: timer}
   end
 
-  @heartbeat_timeout_ms 3_000
   defp schedule_heartbeat_timeout(state) do
-    timer = Process.send_after(self(), :heartbeat_timeout, @heartbeat_timeout_ms)
+    timer = Process.send_after(self(), {:heartbeat, :timeout}, state.heartbeat_timeout)
     %{state | heartbeat_timeout_timer: timer}
   end
 
@@ -275,32 +226,34 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     %{state | heartbeat_timeout_timer: nil}
   end
 
-  @spec handle_msg(venue_msg, State.t()) :: no_return
-  defp handle_msg(msg, state)
-
-  defp handle_msg(%{"limit" => %{"remaining" => remaining}, "version" => _}, state) do
+  defp on_msg(%{"limit" => %{"remaining" => remaining}, "version" => _}, state) do
     TaiEvents.info(%Tai.Events.BitmexStreamConnectionLimitDetails{
       venue_id: state.venue,
       remaining: remaining
     })
+    {:ok, state}
   end
 
-  defp handle_msg(%{"request" => _, "subscribe" => _} = msg, state) do
+  defp on_msg(%{"request" => _, "subscribe" => _} = msg, state) do
     msg |> forward(:order_books, state)
+    {:ok, state}
   end
 
   @order_book_tables ~w(orderBookL2 orderBookL2_25)
-  defp handle_msg(%{"table" => table} = msg, state) when table in @order_book_tables do
+  defp on_msg(%{"table" => table} = msg, state) when table in @order_book_tables do
     msg |> forward(:order_books, state)
+    {:ok, state}
   end
 
   @auth_tables ~w(position wallet margin order execution transact)
-  defp handle_msg(%{"table" => table} = msg, state) when table in @auth_tables do
+  defp on_msg(%{"table" => table} = msg, state) when table in @auth_tables do
     msg |> forward(:auth, state)
+    {:ok, state}
   end
 
-  defp handle_msg(msg, state) do
+  defp on_msg(msg, state) do
     msg |> forward(:optional_channels, state)
+    {:ok, state}
   end
 
   defp forward(msg, to, state) do
