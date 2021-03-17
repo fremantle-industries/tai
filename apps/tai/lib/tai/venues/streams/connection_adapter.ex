@@ -5,9 +5,9 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
   @type msg :: term
   @type phase :: :init | atom
 
-  @callback on_terminate(WebSockex.close_reason, state) :: :ok
-  @callback on_connect(WebSockex.Conn.t, state) :: :ok
-  @callback on_disconnect(WebSockex.connection_status_map, state) :: :ok
+  @callback on_terminate(WebSockex.close_reason, state) :: {:ok, state}
+  @callback on_connect(WebSockex.Conn.t, state) :: {:ok, state}
+  @callback on_disconnect(WebSockex.connection_status_map, state) :: {:ok, state}
   @callback on_msg(msg, state) :: {:ok, state}
   @callback subscribe(phase, state) :: {:ok, state}
 
@@ -99,6 +99,8 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
     quote location: :keep do
       use WebSockex
 
+      @behaviour Tai.Venues.Streams.ConnectionAdapter
+
       @type venue :: Tai.Venue.id()
 
       @spec process_name(venue) :: atom
@@ -111,24 +113,18 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
         send(self(), {:heartbeat, :start})
         send(self(), {:subscribe, :init})
         on_connect(conn, state)
-
-        {:ok, state}
       end
 
       def handle_disconnect(conn_status, state) do
         Topics.broadcast(state.venue, :disconnect)
         Events.disconnect(conn_status, state.venue)
         on_disconnect(conn_status, state)
-
-        {:ok, state}
       end
 
       def terminate(close_reason, state) do
         Topics.broadcast(state.venue, :terminate)
         Events.terminate(close_reason, state.venue)
         on_terminate(close_reason, state)
-
-        {:ok, state}
       end
 
       def handle_frame({:binary, <<43, 200, 207, 75, 7, 0>> = pong}, state) do
