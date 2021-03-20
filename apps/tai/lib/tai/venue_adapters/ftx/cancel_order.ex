@@ -14,12 +14,12 @@ defmodule Tai.VenueAdapters.Ftx.CancelOrder do
   def cancel_order(order, credentials) do
     ExFtx.Credentials
     |> struct!(credentials)
-    |> send_to_venue(order.client_id)
+    |> send_to_venue(order.venue_order_id)
     |> parse_response(order.venue_order_id)
   end
 
-  defp send_to_venue(credentials, client_id) do
-    ExFtx.Orders.CancelByClientOrderId.delete(credentials, client_id)
+  defp send_to_venue(credentials, venue_order_id) do
+    ExFtx.Orders.CancelByOrderId.delete(credentials, venue_order_id)
   end
 
   defp parse_response(:ok, venue_order_id) do
