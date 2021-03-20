@@ -7,6 +7,6 @@ defmodule Tai.Events.OrderUpdateNotFound do
           action: atom
         }
 
-  @enforce_keys ~w(client_id action)a
-  defstruct ~w(client_id action)a
+  @enforce_keys ~w[client_id action]a
+  defstruct ~w[client_id action]a
 end

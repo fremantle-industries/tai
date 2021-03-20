@@ -3,6 +3,7 @@ defmodule Tai.VenueAdapters.Ftx.StreamSupervisor do
 
   alias Tai.VenueAdapters.Ftx.Stream.{
     Connection,
+    ProcessAuth,
     ProcessOptionalChannels,
     ProcessOrderBook,
     RouteOrderBooks
@@ -36,6 +37,7 @@ defmodule Tai.VenueAdapters.Ftx.StreamSupervisor do
 
     system = [
       {RouteOrderBooks, [venue: stream.venue.id, products: stream.products]},
+      {ProcessAuth, [venue: stream.venue.id]},
       {ProcessOptionalChannels, [venue: stream.venue.id]},
       {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
     ]

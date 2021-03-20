@@ -14,6 +14,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
         ) :: {:ok, pid} | {:error, term}
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
+      auth: stream.venue.id |> Stream.ProcessAuth.process_name(),
       order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
@@ -34,11 +35,14 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
-  @optional_channels [
-    :trades,
-  ]
+  @optional_channels []
   @impl true
   def subscribe(:init, state) do
+    if state.credential do
+      send(self(), {:subscribe, :login})
+      send(self(), {:subscribe, :orders})
+    end
+
     send(self(), {:subscribe, :orderbook})
 
     state.channels
@@ -57,6 +61,37 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     {:ok, state}
   end
 
+  @impl true
+  def subscribe(:login, state) do
+    {_credential_id, credentials} = state.credential
+    credential = struct!(ExFtx.Credentials, credentials)
+    api_key = credential.api_key
+    api_secret = credential.api_secret
+    ts = ExFtx.Auth.timestamp()
+    signature = ExFtx.Auth.sign(api_secret, ts, "websocket_login", "", "")
+
+    msg = %{
+      "op" => "login",
+      "args" => %{
+        "key" => api_key,
+        "sign" => signature,
+        "time" => ts
+      }
+    }
+
+    json_msg = msg |> Jason.encode!()
+
+    {:reply, {:text, json_msg}, state}
+  end
+
+  @impl true
+  def subscribe(:orders, state) do
+    msg = %{"op" => "subscribe", "channel" => "orders"}
+    json_msg = msg |> Jason.encode!()
+
+    {:reply, {:text, json_msg}, state}
+  end
+
   @subscribe_orderbook_request %{"op" => "subscribe", "channel" => "orderbook"}
   @impl true
   def subscribe(:orderbook, state) do
@@ -72,6 +107,12 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   @impl true
   def on_msg(%{"channel" => "orderbook"} = msg, received_at, state) do
     msg |> forward(:order_books, received_at, state)
+    {:ok, state}
+  end
+
+  @impl true
+  def on_msg(%{"channel" => "orders"} = msg, received_at, state) do
+    msg |> forward(:auth, received_at, state)
     {:ok, state}
   end
 

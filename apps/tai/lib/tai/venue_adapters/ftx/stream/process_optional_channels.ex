@@ -5,8 +5,8 @@ defmodule Tai.VenueAdapters.Ftx.Stream.ProcessOptionalChannels do
     @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue: venue_id}
 
-    @enforce_keys ~w(venue)a
-    defstruct ~w(venue)a
+    @enforce_keys ~w[venue]a
+    defstruct ~w[venue]a
   end
 
   @type venue_id :: Tai.Venue.id()
