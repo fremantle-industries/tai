@@ -33,10 +33,12 @@ Here's an example of an advisor that logs the spread between multiple products o
 | GDAX     |       [x]       |   [x]    |      [ ]      |      [ ]       |   [x]    | [x]  |
 | Huobi    |       [x]       |   [ ]    |      [ ]      |      [ ]       |   [x]    | [ ]  |
 | Bybit    |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| bit.com  |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | Bitfinex |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | BTSE     |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | Kraken   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | KuCoin   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| BitMax   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | MXC      |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | PrimeXBT |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | Gate.io  |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
