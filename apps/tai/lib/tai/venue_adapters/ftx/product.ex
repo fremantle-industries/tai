@@ -14,7 +14,6 @@ defmodule Tai.VenueAdapters.Ftx.Product do
   end
 
   def build(%Market{} = market, venue_id, options) do
-
     %Tai.Venues.Product{
       venue_id: venue_id,
       symbol: market.name |> to_symbol,
@@ -33,7 +32,7 @@ defmodule Tai.VenueAdapters.Ftx.Product do
       price_increment: market.price_increment |> Tai.Utils.Decimal.cast!(),
       size_increment: market.size_increment |> Tai.Utils.Decimal.cast!(),
       min_price: market.price_increment |> Tai.Utils.Decimal.cast!(),
-      min_size: market.size_increment |> Tai.Utils.Decimal.cast!(),
+      min_size: market.min_provide_size |> Tai.Utils.Decimal.cast!(),
       value: value(options.type),
       is_quanto: false,
       is_inverse: false
@@ -52,9 +51,11 @@ defmodule Tai.VenueAdapters.Ftx.Product do
   defp quote_currency(%Market{type: "spot"} = m), do: m.quote_currency |> downcase_and_atom()
   defp quote_currency(_), do: :usd
 
-  # TODO: Figure out what this should be for non-spot
+  # TODO:
+  # Figure out what this should be for non-spot. They have a concept of
+  # quantity steps which is different to value...
   defp value(:spot), do: Decimal.new(1)
-  defp value(_), do: Decimal.new(1_000_000)
+  defp value(_), do: Decimal.new(1)
 
   defp downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 end
