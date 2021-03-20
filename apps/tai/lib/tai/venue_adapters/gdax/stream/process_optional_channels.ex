@@ -34,8 +34,8 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOptionalChannels do
     %Tai.Events.StreamSubscribeOk{
       venue: state.venue,
       channel_name: channel_name,
-      venue_symbols: venue_symbols,
-      received_at: received_at
+      received_at: received_at,
+      meta: %{venue_symbols: venue_symbols}
     }
     |> TaiEvents.info()
 
