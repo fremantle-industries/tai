@@ -1,15 +1,14 @@
 defmodule Tai.Events.StreamSubscribeOk do
   alias __MODULE__
 
-  @type venue_id :: Tai.Venue.id()
-  @type venue_symbol :: Tai.Venues.Product.venue_symbol()
+  @type venue :: Tai.Venue.id()
   @type t :: %StreamSubscribeOk{
-          venue: venue_id,
+          venue: venue,
           channel_name: String.t(),
-          venue_symbols: [venue_symbol],
-          received_at: DateTime.t()
+          received_at: DateTime.t(),
+          meta: map,
         }
 
-  @enforce_keys ~w[venue channel_name venue_symbols received_at]a
-  defstruct ~w[venue channel_name venue_symbols received_at]a
+  @enforce_keys ~w[venue channel_name received_at meta]a
+  defstruct ~w[venue channel_name received_at meta]a
 end
