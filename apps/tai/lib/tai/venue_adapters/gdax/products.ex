@@ -67,6 +67,7 @@ defmodule Tai.VenueAdapters.Gdax.Products do
       min_notional: min_notional,
       max_size: base_max_size,
       value: Decimal.new(1),
+      value_side: :base,
       is_quanto: false,
       is_inverse: false
     }

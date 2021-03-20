@@ -83,6 +83,7 @@ defmodule Tai.VenueAdapters.Huobi.Product do
       min_price: price_increment,
       min_size: min_size,
       value: value,
+      value_side: :quote,
       is_quanto: Keyword.fetch!(args, :is_quanto),
       is_inverse: Keyword.fetch!(args, :is_inverse)
     }

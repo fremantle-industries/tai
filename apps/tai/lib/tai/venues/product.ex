@@ -37,7 +37,12 @@ defmodule Tai.Venues.Product do
   @typedoc """
   The ratio of balance of the quote asset that is used as collateral in the portfolio balance
   """
-  @type collateral_weight :: Decimal.t | nil
+  @type collateral_weight :: Decimal.t() | nil
+
+  @typedoc """
+  The side that the value represents
+  """
+  @type value_side :: :base | :quote
 
   @typedoc """
   A derivative contract where PnL settlement is a different asset to the base or quote assets.
@@ -52,7 +57,7 @@ defmodule Tai.Venues.Product do
   @typedoc """
   The expiration date
   """
-  @type expiry :: DateTime.t | nil
+  @type expiry :: DateTime.t() | nil
 
   @type symbol :: atom
   @type venue_symbol :: String.t()
@@ -80,6 +85,7 @@ defmodule Tai.Venues.Product do
           max_price: Decimal.t() | nil,
           max_size: Decimal.t() | nil,
           value: value,
+          value_side: value_side,
           is_quanto: quanto,
           is_inverse: inverse,
           maker_fee: Decimal.t() | nil,
@@ -104,6 +110,7 @@ defmodule Tai.Venues.Product do
     min_price
     min_size
     value
+    value_side
     is_quanto
     is_inverse
   ]a
@@ -130,6 +137,7 @@ defmodule Tai.Venues.Product do
     max_size
     max_price
     value
+    value_side
     is_quanto
     is_inverse
     maker_fee

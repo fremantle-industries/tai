@@ -21,6 +21,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       venue_price_increment: instrument.tick_size,
       venue_size_increment: instrument.trade_increment,
       value: instrument.contract_val,
+      value_side: :quote,
       is_inverse: is_inverse,
       is_quanto: false
     )
@@ -41,6 +42,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       venue_price_increment: instrument.tick_size,
       venue_size_increment: instrument.size_increment,
       value: instrument.contract_val,
+      value_side: :quote,
       is_inverse: is_inverse,
       is_quanto: false
     )
@@ -57,6 +59,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       venue_size_increment: instrument.size_increment,
       venue_min_size: instrument.min_size,
       value: 1,
+      value_side: :base,
       is_inverse: false,
       is_quanto: false
     )
@@ -80,6 +83,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
     size_increment = venue_size_increment |> Tai.Utils.Decimal.cast!()
     min_size = args |> Keyword.get(:venue_min_size, venue_size_increment) |> Tai.Utils.Decimal.cast!()
     value = args |> Keyword.fetch!(:value) |> Tai.Utils.Decimal.cast!()
+    value_side = args |> Keyword.fetch!(:value_side)
     listing = args |> Keyword.get(:listing)
     expiry = args |> Keyword.get(:expiry)
     base_asset = Keyword.fetch!(args, :base)
@@ -104,6 +108,7 @@ defmodule Tai.VenueAdapters.OkEx.Product do
       min_price: price_increment,
       min_size: min_size,
       value: value,
+      value_side: value_side,
       is_quanto: Keyword.fetch!(args, :is_quanto),
       is_inverse: Keyword.fetch!(args, :is_inverse)
     }

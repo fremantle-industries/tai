@@ -48,6 +48,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
       max_price: max_price,
       max_size: max_size,
       value: Decimal.new(1),
+      value_side: :base,
       is_quanto: false,
       is_inverse: false
     }

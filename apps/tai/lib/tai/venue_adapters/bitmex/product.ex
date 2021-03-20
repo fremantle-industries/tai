@@ -36,6 +36,7 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
       max_price: max_price,
       max_size: max_order_qty,
       value: lot_size,
+      value_side: :quote,
       is_quanto: instrument.is_quanto,
       is_inverse: instrument.is_inverse,
       maker_fee: maker_fee,

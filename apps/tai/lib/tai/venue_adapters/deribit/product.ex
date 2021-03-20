@@ -31,6 +31,7 @@ defmodule Tai.VenueAdapters.Deribit.Product do
       min_price: tick_size,
       min_size: Decimal.new(1),
       value: contract_size,
+      value_side: :quote,
       is_quanto: false,
       is_inverse: true,
       maker_fee: maker_fee,
