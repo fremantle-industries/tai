@@ -50,7 +50,7 @@ defmodule Tai.Mixfile do
       {:timex, "~> 3.6"},
       # Fixes deprecation warnings
       # {:websockex, github: "Azolo/websockex"},
-      {:websockex, "~> 0.4"},
+      {:websockex, "~> 0.4.3"},
       {:confex, "~> 3.4"},
       {:ecto, "~> 3.1"},
       {:jason, "~> 1.1"},
