@@ -34,11 +34,13 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
+  @impl true
   def subscribe(:init, state) do
     send(self(), {:subscribe, :level2})
     {:ok, state}
   end
 
+  @impl true
   def subscribe(:level2, state) do
     product_ids = state.products |> Enum.map(& &1.venue_symbol)
     msg = %{"type" => "subscribe", "channels" => ["level2"], "product_ids" => product_ids}
@@ -47,19 +49,21 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   end
 
   @order_book_msg_types ~w(l2update snapshot)
-  def on_msg(%{"type" => type} = msg, state) when type in @order_book_msg_types do
-    msg |> forward(:order_books, state)
+  @impl true
+  def on_msg(%{"type" => type} = msg, received_at, state) when type in @order_book_msg_types do
+    msg |> forward(:order_books, received_at, state)
     {:ok, state}
   end
 
-  def on_msg(msg, state) do
-    msg |> forward(:optional_channels, state)
+  @impl true
+  def on_msg(msg, received_at, state) do
+    msg |> forward(:optional_channels, received_at, state)
     {:ok, state}
   end
 
-  defp forward(msg, to, state) do
+  defp forward(msg, to, received_at, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, System.monotonic_time()})
+    |> GenServer.cast({msg, received_at})
   end
 end

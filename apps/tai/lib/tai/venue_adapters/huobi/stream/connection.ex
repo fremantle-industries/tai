@@ -40,11 +40,13 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
     WebSockex.start_link(endpoint, __MODULE__, state, name: name)
   end
 
+  @impl true
   def subscribe(:init, state) do
     state.products |> Enum.each(&send(self(), {:subscribe, {:depth, &1}}))
     {:ok, state}
   end
 
+  @impl true
   def subscribe({:depth, product}, state) do
     with {:ok, sub} <- Stream.Channels.market_depth(product) do
       msg =
@@ -63,30 +65,34 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
     end
   end
 
-  def on_msg(%{"ch" => "market." <> _} = msg, state) do
-    msg |> forward(:order_books, state)
+  @impl true
+  def on_msg(%{"ch" => "market." <> _} = msg, received_at, state) do
+    msg |> forward(:order_books, received_at, state)
     {:ok, state}
   end
 
-  def on_msg(%{"ping" => timestamp}, state) do
+  @impl true
+  def on_msg(%{"ping" => timestamp}, _received_at, state) do
     msg = Jason.encode!(%{"pong" => timestamp})
     {:reply, {:text, msg}, state}
   end
 
-  def on_msg(%{"id" => id}, state) do
+  @impl true
+  def on_msg(%{"id" => id}, _received_at, state) do
     requests = Map.delete(state.requests, id)
     state = %{state | requests: requests}
     {:ok, state}
   end
 
-  def on_msg(msg, state) do
-    msg |> forward(:optional_channels, state)
+  @impl true
+  def on_msg(msg, received_at, state) do
+    msg |> forward(:optional_channels, received_at, state)
     {:ok, state}
   end
 
-  defp forward(msg, to, state) do
+  defp forward(msg, to, received_at, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, System.monotonic_time()})
+    |> GenServer.cast({msg, received_at})
   end
 end

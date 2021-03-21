@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
             }
           }
 
-    @enforce_keys ~w(
+    @enforce_keys ~w[
       venue
       routes
       channels
@@ -37,9 +37,10 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       opts
       jsonrpc_id
       jsonrpc_requests
-    )a
-    defstruct ~w(
-      venue routes
+    ]a
+    defstruct ~w[
+      venue
+      routes
       channels
       credential
       products
@@ -49,7 +50,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       last_heartbeat
       jsonrpc_id
       jsonrpc_requests
-    )a
+    ]a
   end
 
   @type stream :: Tai.Venues.Stream.t()
@@ -289,7 +290,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, System.monotonic_time()})
+    |> GenServer.cast({msg, System.monotonic_time(:microsecond)})
   end
 
   defp add_jsonrpc_request(state) do
