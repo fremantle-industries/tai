@@ -48,6 +48,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   @optional_channels [
     :trades
   ]
+  @impl true
   def subscribe(:init, state) do
     send(self(), {:subscribe, :depth})
 
@@ -67,6 +68,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:ok, state}
   end
 
+  @impl true
   def subscribe(:depth, state) do
     channels =
       state.products
@@ -85,6 +87,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:reply, {:text, msg}, state}
   end
 
+  @impl true
   def subscribe(:trades, state) do
     channels =
       state.products
@@ -101,6 +104,25 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
     state = state |> add_request()
     {:reply, {:text, msg}, state}
+  end
+
+  @impl true
+  def on_msg(%{"id" => id, "result" => nil}, _received_at_, state) do
+    requests = Map.delete(state.requests, id)
+    state = %{state | requests: requests}
+    {:ok, state}
+  end
+
+  @impl true
+  def on_msg(%{"e" => "depthUpdate"} = msg, received_at_, state) do
+    msg |> forward(:order_books, received_at_, state)
+    {:ok, state}
+  end
+
+  @impl true
+  def on_msg(msg, received_at_, state) do
+    msg |> forward(:optional_channels, received_at_, state)
+    {:ok, state}
   end
 
   defp snapshot_order_books(products, depth) do
@@ -120,25 +142,9 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     |> Enum.map(&String.downcase/1)
   end
 
-  def on_msg(%{"id" => id, "result" => nil}, state) do
-    requests = Map.delete(state.requests, id)
-    state = %{state | requests: requests}
-    {:ok, state}
-  end
-
-  def on_msg(%{"e" => "depthUpdate"} = msg, state) do
-    msg |> forward(:order_books, state)
-    {:ok, state}
-  end
-
-  def on_msg(msg, state) do
-    msg |> forward(:optional_channels, state)
-    {:ok, state}
-  end
-
-  defp forward(msg, to, state) do
+  defp forward(msg, to, received_at, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, System.monotonic_time()})
+    |> GenServer.cast({msg, received_at})
   end
 end
