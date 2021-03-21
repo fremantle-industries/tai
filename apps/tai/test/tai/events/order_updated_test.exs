@@ -47,9 +47,9 @@ defmodule Tai.Events.OrderUpdatedTest do
 
   test ".to_data/1 transforms datetime data to a string" do
     {:ok, enqueued_at, _} = DateTime.from_iso8601("2013-01-23T23:50:07.123+00:00")
-    {:ok, last_received_at, _} = DateTime.from_iso8601("2014-01-23T23:50:07.123+00:00")
     {:ok, last_venue_timestamp, _} = DateTime.from_iso8601("2016-01-23T23:50:07.123+00:00")
     {:ok, updated_at, _} = DateTime.from_iso8601("2015-01-23T23:50:07.123+00:00")
+    last_received_at = System.monotonic_time(:microsecond)
 
     attrs =
       Map.merge(@base_attrs, %{
@@ -64,7 +64,7 @@ defmodule Tai.Events.OrderUpdatedTest do
     assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.venue_order_id == nil
     assert json.enqueued_at == "2013-01-23T23:50:07.123Z"
-    assert json.last_received_at == "2014-01-23T23:50:07.123Z"
+    assert json.last_received_at == last_received_at
     assert json.updated_at == "2015-01-23T23:50:07.123Z"
     assert json.last_venue_timestamp == "2016-01-23T23:50:07.123Z"
   end

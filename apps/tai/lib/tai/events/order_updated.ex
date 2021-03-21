@@ -23,7 +23,7 @@ defmodule Tai.Events.OrderUpdated do
           leaves_qty: Decimal.t(),
           cumulative_qty: Decimal.t(),
           enqueued_at: DateTime.t(),
-          last_received_at: DateTime.t() | nil,
+          last_received_at: number | nil,
           last_venue_timestamp: DateTime.t() | nil,
           updated_at: DateTime.t() | nil,
           close: boolean | nil
@@ -89,10 +89,6 @@ defimpl TaiEvents.LogEvent, for: Tai.Events.OrderUpdated do
     |> Map.put(
       :enqueued_at,
       event.enqueued_at && event.enqueued_at |> DateTime.to_iso8601()
-    )
-    |> Map.put(
-      :last_received_at,
-      event.last_received_at && event.last_received_at |> DateTime.to_iso8601()
     )
     |> Map.put(
       :last_venue_timestamp,
