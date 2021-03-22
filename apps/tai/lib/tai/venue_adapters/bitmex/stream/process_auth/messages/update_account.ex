@@ -9,11 +9,17 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateAccount do
   defstruct ~w(data)a
 
   defimpl ProcessAuth.Message do
-    def process(%UpdateAccount{data: data}, _received_at, state) do
+    def process(%UpdateAccount{data: %{"marginBalance" => margin} = data}, _received_at, state),
+      do: process_with_margin(data, margin, state)
+
+    def process(%UpdateAccount{data: %{"availableMargin" => margin} = data}, _received_at, state),
+      do: process_with_margin(data, margin, state)
+
+    def process(_update_account, _received_at, _state), do: :ok
+
+    defp process_with_margin(data, margin, state) do
       currency = Map.fetch!(data, "currency")
-      margin_balance = Map.get(data, "marginBalance")
-      available_margin = Map.get(data, "availableMargin")
-      equity = NormalizeAccount.satoshis_to_btc(margin_balance || available_margin)
+      equity = NormalizeAccount.satoshis_to_btc(margin)
 
       with {:ok, key} <- build_key(currency, state),
            {:ok, account} <- Tai.Venues.AccountStore.find(key) do

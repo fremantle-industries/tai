@@ -77,4 +77,25 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateAccountTest
       assert updated_account.locked == Decimal.new("1.11558098")
     end
   end
+
+  describe "with no margin data" do
+    test "skips account update" do
+      assert [:ok] ==
+               %{
+                 "table" => "margin",
+                 "action" => "update",
+                 "data" => [
+                   %{
+                     "account" => 158_677,
+                     "currency" => "XBt",
+                     "grossOpenCost" => 79542,
+                     "riskValue" => 79542,
+                     "timestamp" => "2021-03-16T13:56:53.020Z"
+                   }
+                 ]
+               }
+               |> ProcessAuth.VenueMessage.extract()
+               |> Enum.map(&ProcessAuth.Message.process(&1, Timex.now(), %{}))
+    end
+  end
 end
