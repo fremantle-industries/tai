@@ -6,10 +6,10 @@ defmodule Tai.Trading.OrderResponses.CreateAccepted do
 
   @type t :: %Tai.Trading.OrderResponses.CreateAccepted{
           id: Tai.Trading.Order.venue_order_id(),
-          received_at: DateTime.t(),
+          received_at: integer,
           venue_timestamp: DateTime.t() | nil
         }
 
-  @enforce_keys ~w(id received_at)a
-  defstruct ~w(id received_at venue_timestamp)a
+  @enforce_keys ~w[id received_at]a
+  defstruct ~w[id received_at venue_timestamp]a
 end

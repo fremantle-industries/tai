@@ -8,6 +8,6 @@ defmodule Tai.Trading.OrderResponses.AmendBulk do
           orders: [Amend.t()]
         }
 
-  @enforce_keys ~w(orders)a
-  defstruct ~w(orders)a
+  @enforce_keys ~w[orders]a
+  defstruct ~w[orders]a
 end

@@ -48,6 +48,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
          %ExBitmex.RateLimit{} = _rate_limit
        }) do
     {:ok, venue_timestamp, 0} = DateTime.from_iso8601(venue_order.timestamp)
+    received_at = Tai.Time.monotonic_time()
 
     response = %Tai.Trading.OrderResponses.Amend{
       id: venue_order.order_id,
@@ -55,7 +56,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
       price: Tai.Utils.Decimal.cast!(venue_order.price),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
       cumulative_qty: Decimal.new(venue_order.cum_qty),
-      received_at: Timex.now(),
+      received_at: received_at,
       venue_timestamp: venue_timestamp
     }
 

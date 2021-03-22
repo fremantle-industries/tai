@@ -14,7 +14,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     order_response = %OrderResponses.CreateAccepted{
       id: venue_order_id,
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     match_attrs = %{
@@ -41,7 +41,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       leaves_qty: leaves_qty,
       cumulative_qty: cumulative_qty,
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     match_attrs = %{
@@ -66,7 +66,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       leaves_qty: Decimal.new(0),
       cumulative_qty: Decimal.new(0),
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     match_attrs = %{
@@ -92,7 +92,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       leaves_qty: Decimal.new(0),
       cumulative_qty: submission.qty,
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     match_attrs = %{
@@ -115,7 +115,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       leaves_qty: order.leaves_qty,
       cumulative_qty: Decimal.new(0),
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     match_attrs = %{venue_order_id: order.venue_order_id, price: price}
@@ -133,7 +133,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       leaves_qty: qty,
       cumulative_qty: Decimal.new(0),
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     match_attrs = %{venue_order_id: order.venue_order_id, price: price, qty: qty}
@@ -153,7 +153,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
           leaves_qty: Map.get(attrs, :qty),
           cumulative_qty: Decimal.new(0),
           venue_timestamp: Timex.now(),
-          received_at: Timex.now()
+          received_at: Tai.Time.monotonic_time()
         }
       end)
 
@@ -183,7 +183,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
           leaves_qty: order.leaves_qty,
           cumulative_qty: Decimal.new(0),
           venue_timestamp: Timex.now(),
-          received_at: Timex.now()
+          received_at: Tai.Time.monotonic_time()
         }
       end)
 
@@ -203,7 +203,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     order_response = %OrderResponses.CancelAccepted{
       id: venue_order_id,
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     {:cancel_order, venue_order_id}
@@ -216,6 +216,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
       id: venue_order_id,
       status: :canceled,
       leaves_qty: Decimal.new(0),
+      received_at: Tai.Time.monotonic_time(),
       venue_timestamp: Timex.now()
     }
 

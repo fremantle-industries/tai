@@ -41,7 +41,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
             assert order_response.cumulative_qty == order_response.original_size
             assert order_response.status == :filled
             assert %DateTime{} = order_response.venue_timestamp
-            assert %DateTime{} = order_response.received_at
+            assert order_response.received_at != nil
           end
         end
 
@@ -57,7 +57,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
             assert order_response.cumulative_qty == Decimal.new(0)
             assert order_response.status == :expired
             assert %DateTime{} = order_response.venue_timestamp
-            assert %DateTime{} = order_response.received_at
+            assert order_response.received_at != nil
           end
         end
       end

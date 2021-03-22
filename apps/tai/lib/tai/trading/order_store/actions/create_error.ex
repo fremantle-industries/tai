@@ -7,7 +7,7 @@ defmodule Tai.Trading.OrderStore.Actions.CreateError do
   @type t :: %__MODULE__{
           client_id: client_id,
           reason: term,
-          last_received_at: DateTime.t()
+          last_received_at: integer
         }
 
   @enforce_keys ~w(client_id reason last_received_at)a
@@ -18,11 +18,13 @@ defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.Creat
   def required(_), do: :enqueued
 
   def attrs(action) do
+    {:ok, last_received_at} = Tai.Time.monotonic_to_date_time(action.last_received_at)
+
     %{
       status: :create_error,
       leaves_qty: Decimal.new(0),
       error_reason: action.reason,
-      last_received_at: action.last_received_at
+      last_received_at: last_received_at,
     }
   end
 end

@@ -8,18 +8,21 @@ defmodule Tai.Trading.OrderResponses.Cancel do
           id: venue_order_id,
           status: atom,
           leaves_qty: Decimal.t(),
+          received_at: integer,
           venue_timestamp: DateTime.t() | nil
         }
 
-  @enforce_keys ~w(
+  @enforce_keys ~w[
     id
     status
     leaves_qty
-  )a
-  defstruct ~w(
+    received_at
+  ]a
+  defstruct ~w[
     id
     status
     leaves_qty
+    received_at
     venue_timestamp
-  )a
+  ]a
 end

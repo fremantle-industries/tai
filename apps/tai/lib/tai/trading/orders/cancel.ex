@@ -48,6 +48,7 @@ defmodule Tai.Trading.Orders.Cancel do
   defp parse_response({:ok, %Cancel{} = response}, order, provider) do
     %OrderStore.Actions.Cancel{
       client_id: order.client_id,
+      last_received_at: Tai.Time.monotonic_time(),
       last_venue_timestamp: response.venue_timestamp
     }
     |> provider.update()
@@ -56,6 +57,7 @@ defmodule Tai.Trading.Orders.Cancel do
   defp parse_response({:ok, %CancelAccepted{} = response}, order, provider) do
     %OrderStore.Actions.AcceptCancel{
       client_id: order.client_id,
+      last_received_at: Tai.Time.monotonic_time(),
       last_venue_timestamp: response.venue_timestamp
     }
     |> provider.update()
@@ -65,7 +67,7 @@ defmodule Tai.Trading.Orders.Cancel do
     %OrderStore.Actions.CancelError{
       client_id: order.client_id,
       reason: reason,
-      last_received_at: Timex.now()
+      last_received_at: Tai.Time.monotonic_time()
     }
     |> provider.update()
   end
@@ -74,7 +76,7 @@ defmodule Tai.Trading.Orders.Cancel do
     %OrderStore.Actions.CancelError{
       client_id: order.client_id,
       reason: {:unhandled, reason},
-      last_received_at: Timex.now()
+      last_received_at: Tai.Time.monotonic_time()
     }
     |> provider.update()
   end
@@ -93,12 +95,14 @@ defmodule Tai.Trading.Orders.Cancel do
   end
 
   defp warn_invalid_status(was, required, %action_name{} = action) do
+    last_received_at = Map.get(action, :last_received_at)
+
     TaiEvents.warn(%Tai.Events.OrderUpdateInvalidStatus{
       was: was,
       required: required,
       client_id: action.client_id,
       action: action_name,
-      last_received_at: action |> Map.get(:last_received_at),
+      last_received_at: last_received_at && Tai.Time.monotonic_to_date_time(last_received_at),
       last_venue_timestamp: action |> Map.get(:last_venue_timestamp)
     })
   end

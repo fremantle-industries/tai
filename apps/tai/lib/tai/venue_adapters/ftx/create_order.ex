@@ -35,7 +35,7 @@ defmodule Tai.VenueAdapters.Ftx.CreateOrder do
 
   @date_format "{ISO:Extended}"
   defp parse_response({:ok, %ExFtx.Order{status: "new"} = venue_order}, _) do
-    received_at = Timex.now()
+    received_at = Tai.Time.monotonic_time()
     venue_order_id = venue_order.id
     venue_timestamp = venue_order.created_at |> Timex.parse!(@date_format)
 

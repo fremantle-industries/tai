@@ -44,7 +44,7 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
         assert amend_response.price == amend_price
         assert amend_response.leaves_qty == amend_qty
         assert amend_response.cumulative_qty == enqueued_order.cumulative_qty
-        assert %DateTime{} = amend_response.received_at
+        assert amend_response.received_at != nil
         assert %DateTime{} = amend_response.venue_timestamp
       end
     end

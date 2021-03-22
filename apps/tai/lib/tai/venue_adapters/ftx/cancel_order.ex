@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Ftx.CancelOrder do
   end
 
   defp parse_response(:ok, venue_order_id) do
-    received_at = Timex.now()
+    received_at = Tai.Time.monotonic_time()
     response = %OrderResponses.CancelAccepted{id: venue_order_id, received_at: received_at}
     {:ok, response}
   end

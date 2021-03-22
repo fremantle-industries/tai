@@ -33,7 +33,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   defp leaves_qty(:open, orig_qty, cum_qty), do: orig_qty |> Decimal.sub(cum_qty)
 
   defp parse_response({:ok, %ExBinance.Responses.CreateOrder{} = binance_response}, _) do
-    received_at = Timex.now()
+    received_at = Tai.Time.monotonic_time()
     venue_order_id = binance_response.order_id |> Integer.to_string()
     status = binance_response.status |> OrderStatus.from_venue()
     original_size = binance_response.orig_qty |> Decimal.new() |> Decimal.normalize()

@@ -36,12 +36,14 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
     as: :from
 
   defp parse_response({:ok, %{"result" => true, "order_ids" => [order_id | _]}}) do
-    response = %CancelAccepted{id: order_id, received_at: Timex.now()}
+    received_at = Tai.Time.monotonic_time()
+    response = %CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 
   defp parse_response({:ok, %{"result" => "true", "ids" => [order_id | _]}}) do
-    response = %CancelAccepted{id: order_id, received_at: Timex.now()}
+    received_at = Tai.Time.monotonic_time()
+    response = %CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 

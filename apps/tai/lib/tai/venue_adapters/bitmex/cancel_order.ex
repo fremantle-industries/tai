@@ -33,6 +33,7 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
       id: venue_order.order_id,
       status: venue_order.ord_status |> from_venue_status(:ignore),
       leaves_qty: Decimal.new(venue_order.leaves_qty),
+      received_at: Tai.Time.monotonic_time(),
       venue_timestamp: venue_timestamp
     }
 

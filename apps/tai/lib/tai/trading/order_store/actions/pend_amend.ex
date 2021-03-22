@@ -8,8 +8,8 @@ defmodule Tai.Trading.OrderStore.Actions.PendAmend do
   @type client_id :: Tai.Trading.Order.client_id()
   @type t :: %PendAmend{client_id: client_id}
 
-  @enforce_keys ~w(client_id)a
-  defstruct ~w(client_id)a
+  @enforce_keys ~w[client_id]a
+  defstruct ~w[client_id]a
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PendAmend do

@@ -10,38 +10,40 @@ defmodule Tai.Trading.OrderStore.Actions.Expire do
           venue_order_id: venue_order_id,
           cumulative_qty: Decimal.t(),
           leaves_qty: Decimal.t(),
-          last_received_at: DateTime.t(),
+          last_received_at: integer,
           last_venue_timestamp: DateTime.t() | nil
         }
 
-  @enforce_keys ~w(
+  @enforce_keys ~w[
     client_id
     venue_order_id
     cumulative_qty
     leaves_qty
     last_received_at
     last_venue_timestamp
-  )a
-  defstruct ~w(
+  ]a
+  defstruct ~w[
     client_id
     venue_order_id
     cumulative_qty
     leaves_qty
     last_received_at
     last_venue_timestamp
-  )a
+  ]a
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.Expire do
   def required(_), do: :enqueued
 
   def attrs(action) do
+    {:ok, last_received_at} = Tai.Time.monotonic_to_date_time(action.last_received_at)
+
     %{
       status: :expired,
       venue_order_id: action.venue_order_id,
       cumulative_qty: action.cumulative_qty,
       leaves_qty: action.leaves_qty,
-      last_received_at: action.last_received_at,
+      last_received_at: last_received_at,
       last_venue_timestamp: action.last_venue_timestamp
     }
   end
