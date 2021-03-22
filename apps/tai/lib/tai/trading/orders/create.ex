@@ -122,7 +122,7 @@ defmodule Tai.Trading.Orders.Create do
     %Actions.CreateError{
       client_id: order.client_id,
       reason: reason,
-      last_received_at: Timex.now()
+      last_received_at: Tai.Time.monotonic_time()
     }
     |> OrderStore.update()
   end
@@ -131,7 +131,7 @@ defmodule Tai.Trading.Orders.Create do
     %Actions.CreateError{
       client_id: order.client_id,
       reason: {:unhandled, reason},
-      last_received_at: Timex.now()
+      last_received_at: Tai.Time.monotonic_time()
     }
     |> OrderStore.update()
   end

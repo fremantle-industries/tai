@@ -28,7 +28,7 @@ defmodule Tai.Trading.OrderStore.ActionsTest do
         client_id: pending_amend.client_id,
         price: Decimal.new(1),
         leaves_qty: Decimal.new(1),
-        last_received_at: Timex.now(),
+        last_received_at: Tai.Time.monotonic_time(),
         last_venue_timestamp: Timex.now()
       )
 
@@ -53,6 +53,7 @@ defmodule Tai.Trading.OrderStore.ActionsTest do
       struct!(
         OrderStore.Actions.Cancel,
         client_id: pending_cancel.client_id,
+        last_received_at: Tai.Time.monotonic_time(),
         last_venue_timestamp: Timex.now()
       )
 
@@ -85,7 +86,7 @@ defmodule Tai.Trading.OrderStore.ActionsTest do
       venue_order_id: "venueOrderIdA",
       cumulative_qty: cumulative_qty,
       leaves_qty: leaves_qty,
-      last_received_at: Timex.now(),
+      last_received_at: Tai.Time.monotonic_time(),
       last_venue_timestamp: Timex.now()
     }
     |> OrderStore.update()

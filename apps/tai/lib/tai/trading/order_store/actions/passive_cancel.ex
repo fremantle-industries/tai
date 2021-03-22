@@ -6,12 +6,12 @@ defmodule Tai.Trading.OrderStore.Actions.PassiveCancel do
   @type client_id :: Tai.Trading.Order.client_id()
   @type t :: %__MODULE__{
           client_id: client_id,
-          last_received_at: DateTime.t(),
+          last_received_at: integer,
           last_venue_timestamp: DateTime.t()
         }
 
-  @enforce_keys ~w(client_id last_received_at last_venue_timestamp)a
-  defstruct ~w(client_id last_received_at last_venue_timestamp)a
+  @enforce_keys ~w[client_id last_received_at last_venue_timestamp]a
+  defstruct ~w[client_id last_received_at last_venue_timestamp]a
 end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PassiveCancel do
@@ -30,10 +30,12 @@ defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.Passi
   def required(_), do: @required
 
   def attrs(action) do
+    {:ok, last_received_at} = Tai.Time.monotonic_to_date_time(action.last_received_at)
+
     %{
       status: :canceled,
       leaves_qty: Decimal.new(0),
-      last_received_at: action.last_received_at,
+      last_received_at: last_received_at,
       last_venue_timestamp: action.last_venue_timestamp
     }
   end

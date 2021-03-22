@@ -7,23 +7,25 @@ defmodule Tai.Events.OrderUpdateInvalidStatus do
           client_id: client_id,
           action: atom | module,
           was: status,
-          required: status | [status]
+          required: status | [status],
+          last_received_at: DateTime.t() | nil,
+          last_venue_timestamp: DateTime.t() | nil
         }
 
-  @enforce_keys ~w(
+  @enforce_keys ~w[
     client_id
     action
     was
     required
-  )a
-  defstruct ~w(
+  ]a
+  defstruct ~w[
     client_id
     action
     was
     required
     last_received_at
     last_venue_timestamp
-  )a
+  ]a
 end
 
 defimpl TaiEvents.LogEvent, for: Tai.Events.OrderUpdateInvalidStatus do

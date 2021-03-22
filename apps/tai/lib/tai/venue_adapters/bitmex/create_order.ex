@@ -69,7 +69,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
          {:ok, %ExBitmex.Order{} = venue_order, %ExBitmex.RateLimit{}},
          order
        ) do
-    received_at = Timex.now()
+    received_at = Tai.Time.monotonic_time()
 
     response = %Tai.Trading.OrderResponses.Create{
       id: venue_order.order_id,

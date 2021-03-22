@@ -107,7 +107,8 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
          _
        })
        when venue_order_id != @invalid_venue_order_id do
-    response = %CreateAccepted{id: venue_order_id, received_at: Timex.now()}
+    received_at = Tai.Time.monotonic_time()
+    response = %CreateAccepted{id: venue_order_id, received_at: received_at}
     {:ok, response}
   end
 end

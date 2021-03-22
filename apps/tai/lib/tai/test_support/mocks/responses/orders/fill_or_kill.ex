@@ -18,7 +18,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
       cumulative_qty: Decimal.new(0),
       leaves_qty: Decimal.new(0),
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     match_attrs = %{
@@ -44,7 +44,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
       leaves_qty: Decimal.new(0),
       cumulative_qty: submission.qty,
       venue_timestamp: Timex.now(),
-      received_at: Timex.now()
+      received_at: Tai.Time.monotonic_time()
     }
 
     match_attrs = %{

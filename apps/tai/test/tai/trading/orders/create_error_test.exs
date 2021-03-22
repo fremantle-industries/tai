@@ -47,7 +47,7 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
       }
 
       assert error_order.error_reason == :mock_not_found
-      assert %DateTime{} = error_order.last_received_at
+      assert error_order.last_received_at != nil
     end
 
     test "#{side} rescues adapter errors" do
@@ -69,7 +69,7 @@ defmodule Tai.Trading.Orders.CreateErrorTest do
         %Order{status: :create_error} = error_order
       }
 
-      assert %DateTime{} = error_order.last_received_at
+      assert error_order.last_received_at != nil
       assert {:unhandled, {error, [stack_1 | _]}} = error_order.error_reason
       assert error == %RuntimeError{message: "Venue Adapter Create Raised Error"}
       assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1

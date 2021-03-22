@@ -17,7 +17,8 @@ defmodule Tai.VenueAdapters.Binance.CancelOrder do
     response = %Tai.Trading.OrderResponses.Cancel{
       id: venue_response.order_id,
       status: venue_response.status |> OrderStatus.from_venue(),
-      leaves_qty: Decimal.new(0)
+      leaves_qty: Decimal.new(0),
+      received_at: Tai.Time.monotonic_time()
     }
 
     {:ok, response}

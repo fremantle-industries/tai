@@ -3,7 +3,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
 
   @type state :: ConnectionAdapter.State.t()
   @type msg :: term
-  @type received_at :: number
+  @type received_at :: integer
   @type phase :: :init | atom
 
   @callback on_terminate(WebSockex.close_reason(), state) :: {:ok, state}
@@ -207,8 +207,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       def subscribe(_, state), do: {:ok, state}
       defoverridable on_terminate: 2, on_connect: 2, on_disconnect: 2, on_msg: 3, subscribe: 2
 
-      @received_at_time_unit :microsecond
-      defp received_at, do: System.monotonic_time(@received_at_time_unit)
+      defp received_at, do: Tai.Time.monotonic_time()
 
       defp schedule_heartbeat(state) do
         timer = Process.send_after(self(), {:heartbeat, :ping}, state.heartbeat_interval)

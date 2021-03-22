@@ -48,7 +48,7 @@ defmodule Tai.Trading.Orders.AmendTest do
             venue_order_id: @venue_order_id,
             cumulative_qty: Decimal.new(0),
             leaves_qty: @original_qty,
-            last_received_at: Timex.now(),
+            last_received_at: Tai.Time.monotonic_time(),
             last_venue_timestamp: Timex.now()
           }
           |> Tai.Trading.OrderStore.update()
@@ -97,7 +97,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert amended_order.qty == amend_qty
         assert %DateTime{} = amended_order.updated_at
         assert Timex.compare(amended_order.updated_at, pending_amend_order.updated_at) == 1
-        assert %DateTime{} = amended_order.last_received_at
+        assert amended_order.last_received_at > 0
         assert %DateTime{} = amended_order.last_venue_timestamp
         assert amended_order.last_venue_timestamp != pending_amend_order.last_venue_timestamp
         assert amended_order.last_received_at != pending_amend_order.last_received_at
@@ -122,7 +122,7 @@ defmodule Tai.Trading.Orders.AmendTest do
             venue_order_id: @venue_order_id,
             cumulative_qty: Decimal.new(0),
             leaves_qty: @original_qty,
-            last_received_at: Timex.now(),
+            last_received_at: Tai.Time.monotonic_time(),
             last_venue_timestamp: Timex.now()
           }
           |> Tai.Trading.OrderStore.update()
@@ -135,7 +135,7 @@ defmodule Tai.Trading.Orders.AmendTest do
           %Tai.Trading.OrderStore.Actions.AmendError{
             client_id: enqueued_order.client_id,
             reason: "Invalid nonce",
-            last_received_at: Timex.now()
+            last_received_at: Tai.Time.monotonic_time(),
           }
           |> Tai.Trading.OrderStore.update()
 
@@ -184,7 +184,7 @@ defmodule Tai.Trading.Orders.AmendTest do
         assert amended_order.qty == amend_qty
         assert %DateTime{} = amended_order.updated_at
         assert Timex.compare(amended_order.updated_at, pending_amend_order.updated_at) == 1
-        assert %DateTime{} = amended_order.last_received_at
+        assert amended_order.last_received_at > 0
         assert %DateTime{} = amended_order.last_venue_timestamp
         assert amended_order.last_venue_timestamp != pending_amend_order.last_venue_timestamp
         assert amended_order.last_received_at != pending_amend_order.last_received_at

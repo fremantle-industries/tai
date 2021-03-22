@@ -290,7 +290,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   defp forward(msg, to, state) do
     state.routes
     |> Map.fetch!(to)
-    |> GenServer.cast({msg, System.monotonic_time(:microsecond)})
+    |> GenServer.cast({msg, Tai.Time.monotonic_time()})
   end
 
   defp add_jsonrpc_request(state) do

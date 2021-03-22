@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
   end
 
   @venue_client_id "gtc-TCRG7aPSQsmj1Z8jXfbovg=="
-  @received_at Timex.now()
+  @received_at Tai.Time.monotonic_time()
   @timestamp "2019-09-07T06:00:04.808Z"
   @state struct(ProcessAuth.State)
 
@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
 
     assert {:ok, order} = enqueue()
 
-    action = struct(Tai.Trading.OrderStore.Actions.Reject, client_id: order.client_id)
+    action = struct(Tai.Trading.OrderStore.Actions.Reject, client_id: order.client_id, last_received_at: Tai.Time.monotonic_time())
     assert {:ok, {_old, _updated}} = OrderStore.update(action)
 
     msg =
@@ -64,7 +64,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
 
     assert_event(%Tai.Events.OrderUpdateInvalidStatus{} = invalid_status_event)
     assert invalid_status_event.action == Tai.Trading.OrderStore.Actions.PassiveCancel
-    assert %DateTime{} = invalid_status_event.last_received_at
+    assert invalid_status_event.last_received_at != nil
     assert %DateTime{} = invalid_status_event.last_venue_timestamp
     assert invalid_status_event.was == :skip
 

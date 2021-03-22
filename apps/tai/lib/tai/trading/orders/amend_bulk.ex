@@ -66,7 +66,7 @@ defmodule Tai.Trading.Orders.AmendBulk do
         client_id: order.client_id,
         price: amend_response.price,
         leaves_qty: amend_response.leaves_qty,
-        last_received_at: Timex.now(),
+        last_received_at: Tai.Time.monotonic_time(),
         last_venue_timestamp: amend_response.venue_timestamp
       }
       |> provider.update()
@@ -79,7 +79,7 @@ defmodule Tai.Trading.Orders.AmendBulk do
       %OrderStore.Actions.AmendError{
         client_id: order.client_id,
         reason: reason,
-        last_received_at: Timex.now()
+        last_received_at: Tai.Time.monotonic_time()
       }
       |> provider.update()
     end)
@@ -91,17 +91,19 @@ defmodule Tai.Trading.Orders.AmendBulk do
       %OrderStore.Actions.AmendError{
         client_id: order.client_id,
         reason: reason,
-        last_received_at: Timex.now()
+        last_received_at: Tai.Time.monotonic_time()
       }
       |> provider.update()
     end)
   end
 
   defp warn_invalid_status(was, required, %action_name{} = action) do
+    last_received_at = Map.get(action, :last_received_at)
+
     TaiEvents.warn(%Tai.Events.OrderUpdateInvalidStatus{
       client_id: action.client_id,
       action: action_name,
-      last_received_at: action |> Map.get(:last_received_at),
+      last_received_at: last_received_at && Tai.Time.monotonic_to_date_time(last_received_at),
       last_venue_timestamp: action |> Map.get(:last_venue_timestamp),
       was: was,
       required: required
