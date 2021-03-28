@@ -102,7 +102,7 @@ defmodule Tai.Trading.Orders.Cancel do
       required: required,
       client_id: action.client_id,
       action: action_name,
-      last_received_at: last_received_at && Tai.Time.monotonic_to_date_time(last_received_at),
+      last_received_at: last_received_at && Tai.Time.monotonic_to_date_time!(last_received_at),
       last_venue_timestamp: action |> Map.get(:last_venue_timestamp)
     })
   end
