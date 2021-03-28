@@ -18,7 +18,7 @@ defmodule Tai.IEx.Commands.Positions do
 
   @spec positions :: no_return
   def positions do
-    Tai.Trading.PositionStore.all()
+    Tai.Commander.positions()
     |> Enum.sort(&(&1.venue_id < &2.venue_id))
     |> Enum.map(fn position ->
       [

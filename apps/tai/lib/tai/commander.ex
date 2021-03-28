@@ -25,6 +25,10 @@ defmodule Tai.Commander do
     options |> to_dest() |> GenServer.call(:orders)
   end
 
+  def positions(options \\ []) do
+    options |> to_dest() |> GenServer.call(:positions)
+  end
+
   def venues(options \\ []) do
     options |> to_dest() |> GenServer.call({:venues, options})
   end
@@ -83,6 +87,10 @@ defmodule Tai.Commander do
 
   def handle_call(:orders, _from, state) do
     {:reply, Tai.Commander.Orders.get(), state}
+  end
+
+  def handle_call(:positions, _from, state) do
+    {:reply, Tai.Commander.Positions.get(), state}
   end
 
   def handle_call({:venues, options}, _from, state) do
