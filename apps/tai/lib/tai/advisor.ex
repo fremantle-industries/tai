@@ -40,10 +40,6 @@ defmodule Tai.Advisor do
   @spec process_name(group_id, id) :: advisor_name
   def process_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
 
-  @deprecated "Use Tai.Advisor.process_name/2 instead."
-  @spec to_name(group_id, id) :: advisor_name
-  def to_name(group_id, advisor_id), do: process_name(group_id, advisor_id)
-
   @spec child_spec(advisor_spec) :: Supervisor.child_spec()
   def child_spec(advisor_spec) do
     run_store = advisor_spec.run_store || %{}
