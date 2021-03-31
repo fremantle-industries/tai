@@ -13,23 +13,24 @@ defmodule Examples.PingPong.Advisor do
   import Examples.PingPong.ManageQuoteChange, only: [with_all_quotes: 1, manage_entry_order: 2]
   import Examples.PingPong.ManageOrderUpdate, only: [entry_order_updated: 3]
 
+  @impl true
   def handle_event(market_quote, state) do
     market_quote
     |> with_all_quotes()
     |> manage_entry_order(state)
   end
 
+  @impl true
   def handle_info({:order_updated, prev, updated, :entry_order}, state) do
     {:ok, new_run_store} =
       state.store
       |> update_store_order(:entry_order, updated)
       |> entry_order_updated(prev, state)
 
-    new_state = Map.put(state, :store, new_run_store)
-
-    {:noreply, new_state}
+    {:noreply, %{state | store: new_run_store}}
   end
 
+  @impl true
   def handle_info(_msg, state), do: {:noreply, state}
 
   defp update_store_order(run_store, name, order), do: run_store |> Map.put(name, order)

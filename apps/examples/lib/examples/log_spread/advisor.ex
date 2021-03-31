@@ -1,12 +1,15 @@
 defmodule Examples.LogSpread.Advisor do
   @moduledoc """
-  Log the spread between the bid/ask for a product
+  Log the spread between the bid/ask for a product.
+
+  The advisor discards quote events that don't have both sides of the
+  order book. This can happen when an order book infrequently gets updated.
   """
 
   use Tai.Advisor
 
+  @impl true
   def handle_event(
-        # wait until we have a quote with price points for both sides of the order book
         %Tai.Markets.Quote{bids: [inside_bid | _], asks: [inside_ask | _]} = market_quote,
         state
       ) do
@@ -30,6 +33,6 @@ defmodule Examples.LogSpread.Advisor do
     {:ok, state.store}
   end
 
-  # ignore quotes that don't have both sides of the order book
+  @impl true
   def handle_event(_, state), do: {:ok, state.store}
 end
