@@ -11,9 +11,9 @@ defmodule Tai.AdvisorTest do
 
     def handle_event(_, state), do: {:ok, state.store}
 
-    def after_start(state) do
-      send(Tai.AdvisorTest, :after_start_callback)
-      store = Map.put(state.store, :after_start_store, :is_updatable)
+    def on_start(state) do
+      send(Tai.AdvisorTest, :on_start_callback)
+      store = Map.put(state.store, :on_start_store, :is_updatable)
       {:ok, store}
     end
 
@@ -42,14 +42,14 @@ defmodule Tai.AdvisorTest do
     end
   end
 
-  test "fires the after_start callback" do
+  test "fires the on_start callback" do
     Process.register(self(), __MODULE__)
 
     advisor_pid = start!(CallbackAdvisor, :init_trades, :my_advisor, [])
 
-    assert_receive :after_start_callback
+    assert_receive :on_start_callback
     assert %Tai.Advisor.State{store: store} = :sys.get_state(advisor_pid)
-    assert %{after_start_store: :is_updatable} = store
+    assert %{on_start_store: :is_updatable} = store
 
     Process.exit(advisor_pid, :kill)
   end

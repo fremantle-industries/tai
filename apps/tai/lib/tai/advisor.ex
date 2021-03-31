@@ -36,6 +36,7 @@ defmodule Tai.Advisor do
   @type terminate_reason :: :normal | :shutdown | {:shutdown, term} | term
 
   @callback after_start(state) :: {:ok, run_store}
+  @callback on_start(state) :: {:ok, run_store}
   @callback on_terminate(terminate_reason, state) :: term
   @callback handle_event(event, state) :: {:ok, run_store}
 
@@ -129,7 +130,9 @@ defmodule Tai.Advisor do
       @impl true
       def handle_continue(:started, state) do
         {:ok, new_run_store} = after_start(state)
-        new_state = Map.put(state, :store, new_run_store)
+        new_state = %{state | store: new_run_store}
+        {:ok, new_run_store} = on_start(new_state)
+        new_state = %{new_state | store: new_run_store}
 
         state.products
         |> Enum.each(&Tai.SystemBus.subscribe({:market_quote_store, {&1.venue_id, &1.symbol}}))
@@ -172,8 +175,12 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
 
+      @deprecated "Use Tai.Advisor#on_start/1 instead."
       @impl true
       def after_start(state), do: {:ok, state.store}
+
+      @impl true
+      def on_start(state), do: {:ok, state.store}
 
       @impl true
       def on_terminate(_, _), do: :ok
@@ -181,7 +188,7 @@ defmodule Tai.Advisor do
       @impl true
       def handle_event(_, state), do: {:ok, state.store}
 
-      defoverridable after_start: 1, on_terminate: 2, handle_event: 2
+      defoverridable after_start: 1, on_start: 1, on_terminate: 2, handle_event: 2
     end
   end
 end
