@@ -5,6 +5,7 @@ defmodule Examples.LogSpread.Advisor do
 
   use Tai.Advisor
 
+  @impl true
   def handle_event(
         # wait until we have a quote with price points for both sides of the order book
         %Tai.Markets.Quote{bids: [inside_bid | _], asks: [inside_ask | _]} = market_quote,
@@ -31,5 +32,6 @@ defmodule Examples.LogSpread.Advisor do
   end
 
   # ignore quotes that don't have both sides of the order book
+  @impl true
   def handle_event(_, state), do: {:ok, state.store}
 end

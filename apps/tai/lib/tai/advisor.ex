@@ -33,8 +33,10 @@ defmodule Tai.Advisor do
   @type run_store :: State.run_store()
   @type state :: State.t()
   @type advisor_spec :: Tai.Advisors.Spec.t()
+  @type terminate_reason :: :normal | :shutdown | {:shutdown, term} | term
 
   @callback after_start(state) :: {:ok, run_store}
+  @callback on_terminate(terminate_reason, state) :: term
   @callback handle_event(event, state) :: {:ok, run_store}
 
   @spec process_name(group_id, id) :: advisor_name
@@ -94,8 +96,23 @@ defmodule Tai.Advisor do
         GenServer.start_link(__MODULE__, state, name: name)
       end
 
-      def init(state), do: {:ok, state, {:continue, :started}}
+      @impl true
+      def init(state) do
+        Process.flag(:trap_exit, true)
+        {:ok, state, {:continue, :started}}
+      end
 
+      @impl true
+      def terminate(reason, state) do
+        on_terminate(reason, state)
+      end
+
+      @impl true
+      def handle_info({:EXIT, _pid, _reason}, state) do
+        {:stop, :shutdown, state}
+      end
+
+      @impl true
       def handle_info({:market_quote_store, :after_put, %Quote{} = event}, state) do
         key = {event.venue_id, event.product_symbol}
         new_data = Map.put(state.market_quotes.data, key, event)
@@ -109,6 +126,7 @@ defmodule Tai.Advisor do
         }
       end
 
+      @impl true
       def handle_continue(:started, state) do
         {:ok, new_run_store} = after_start(state)
         new_state = Map.put(state, :store, new_run_store)
@@ -119,6 +137,7 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
 
+      @impl true
       def handle_continue({:execute_event, event}, state) do
         new_state =
           try do
@@ -153,9 +172,16 @@ defmodule Tai.Advisor do
         {:noreply, new_state}
       end
 
+      @impl true
       def after_start(state), do: {:ok, state.store}
+
+      @impl true
+      def on_terminate(_, _), do: :ok
+
+      @impl true
       def handle_event(_, state), do: {:ok, state.store}
-      defoverridable after_start: 1, handle_event: 2
+
+      defoverridable after_start: 1, on_terminate: 2, handle_event: 2
     end
   end
 end
