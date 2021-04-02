@@ -22,8 +22,10 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOptionalChannels do
   @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
+  @impl true
   def init(state), do: {:ok, state}
 
+  @impl true
   def handle_cast(
         {%{"e" => "trade"} = trade, received_at},
         state
@@ -32,13 +34,13 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({msg, received_at}, state) do
-    %Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue_id,
       msg: msg,
-      received_at: received_at
-    }
-    |> TaiEvents.warn()
+      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
+    })
 
     {:noreply, state}
   end

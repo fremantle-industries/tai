@@ -4,6 +4,9 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
   alias Tai.VenueAdapters.OkEx.Stream.ProcessAuth
   alias Tai.VenueAdapters.OkEx.ClientId
 
+
+  @received_at Tai.Time.monotonic_time()
+
   setup do
     on_exit(fn ->
       :ok = Application.stop(:tai_events)
@@ -61,7 +64,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
 
     :my_venue
     |> ProcessAuth.to_name()
-    |> GenServer.cast({%{"table" => "futures/order", "data" => venue_orders}, :ignore})
+    |> GenServer.cast({%{"table" => "futures/order", "data" => venue_orders}, @received_at})
 
     assert_event(
       %Tai.Events.OrderUpdateNotFound{
@@ -110,7 +113,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     :my_venue
     |> ProcessAuth.to_name()
     |> GenServer.cast(
-      {%{"table" => "order", "action" => "update", "data" => [%{"unhandled" => true}]}, :ignore}
+      {%{"table" => "order", "action" => "update", "data" => [%{"unhandled" => true}]}, @received_at}
     )
 
     assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
@@ -131,7 +134,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
 
     :my_venue
     |> ProcessAuth.to_name()
-    |> GenServer.cast({%{"table" => "futures/order", "data" => venue_orders}, :ignore})
+    |> GenServer.cast({%{"table" => "futures/order", "data" => venue_orders}, @received_at})
 
     assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
   end

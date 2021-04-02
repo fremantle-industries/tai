@@ -144,12 +144,11 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   end
 
   defp handle_msg(msg, state) do
-    %Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: Timex.now()
-    }
-    |> TaiEvents.warn()
+    })
   end
 
   defp normalize_snapshot_changes(venue_price_points, side) do

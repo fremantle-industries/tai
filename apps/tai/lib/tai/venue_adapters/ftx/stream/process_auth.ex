@@ -51,7 +51,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.ProcessAuth do
     TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
-      received_at: received_at
+      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
     })
 
     {:noreply, state}

@@ -5,7 +5,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthTest do
 
   @venue :venue_a
   @credential {:main, %{}}
-  @received_at Timex.now()
+  @received_at Tai.Time.monotonic_time()
 
   setup do
     start_supervised!({TaiEvents, 1})
@@ -24,6 +24,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthTest do
     assert_event(%Tai.Events.StreamMessageUnhandled{} = unhandled_event, :warn)
     assert unhandled_event.venue_id == @venue
     assert unhandled_event.msg == %{"table" => "unknown"}
-    assert unhandled_event.received_at == @received_at
+    assert %DateTime{} = unhandled_event.received_at
   end
 end

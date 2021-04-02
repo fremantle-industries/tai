@@ -8,6 +8,6 @@ defmodule Tai.Events.StreamMessageUnhandled do
           received_at: DateTime.t()
         }
 
-  @enforce_keys ~w(venue_id msg received_at)a
-  defstruct ~w(venue_id msg received_at)a
+  @enforce_keys ~w[venue_id msg received_at]a
+  defstruct ~w[venue_id msg received_at]a
 end

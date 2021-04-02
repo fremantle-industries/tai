@@ -6,12 +6,11 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Unha
 
   defimpl ProcessAuth.Message do
     def process(message, received_at, state) do
-      %Tai.Events.StreamMessageUnhandled{
+      TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
         venue_id: state.venue,
         msg: message.data,
-        received_at: received_at
-      }
-      |> TaiEvents.warn()
+        received_at: received_at |> Tai.Time.monotonic_to_date_time!()
+      })
 
       :ok
     end

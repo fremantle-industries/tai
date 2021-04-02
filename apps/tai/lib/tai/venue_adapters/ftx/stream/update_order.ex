@@ -3,7 +3,13 @@ defmodule Tai.VenueAdapters.Ftx.Stream.UpdateOrder do
 
   @date_format "{ISO:Extended}"
 
-  def update(%{"client_id" => nil}, _received_at, _state), do: :ok
+  def update(%{"clientId" => nil} = venue_order, received_at, state) do
+    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
+      venue_id: state.venue,
+      msg: venue_order,
+      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
+    })
+  end
 
   def update(
         %{
@@ -111,7 +117,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.UpdateOrder do
     TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: venue_order,
-      received_at: received_at
+      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
     })
   end
 

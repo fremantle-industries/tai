@@ -19,8 +19,13 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOptionalChannels do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
+  @impl true
   def init(state), do: {:ok, state}
 
+  @impl true
   def handle_cast(
         {
           %{
@@ -42,17 +47,14 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({msg, received_at}, state) do
-    %Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
-      received_at: received_at
-    }
-    |> TaiEvents.warn()
+      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
+    })
 
     {:noreply, state}
   end
-
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
 end

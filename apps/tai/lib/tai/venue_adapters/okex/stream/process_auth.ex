@@ -19,16 +19,19 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
+  @spec to_name(venue_id) :: atom
+  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
+  @impl true
   @spec init(state) :: {:ok, state}
   def init(state) do
     Process.flag(:trap_exit, true)
     {:ok, state}
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
-
   @product_types ["swap/order", "futures/order"]
+
+  @impl true
   def handle_cast(
         {%{"table" => table, "data" => orders}, received_at},
         state
@@ -44,11 +47,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({msg, received_at}, state) do
     TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
-      received_at: received_at
+      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
     })
 
     {:noreply, state}

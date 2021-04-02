@@ -23,8 +23,10 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
   @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
+  @impl true
   def init(state), do: {:ok, state}
 
+  @impl true
   def handle_cast(
         {%{"table" => "publicNotifications", "data" => data, "action" => action}, _received_at},
         state
@@ -38,6 +40,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({%{"table" => "funding", "data" => funding}, received_at}, state) do
     Enum.each(
       funding,
@@ -47,6 +50,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({%{"table" => "settlement", "data" => settlements}, received_at}, state) do
     Enum.each(
       settlements,
@@ -56,6 +60,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({%{"table" => "connected", "data" => stats}, received_at}, state) do
     Enum.each(
       stats,
@@ -65,6 +70,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast(
         {%{"table" => "liquidation", "data" => liquidations, "action" => action}, received_at},
         state
@@ -77,6 +83,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast(
         {%{"table" => "trade", "data" => trades, "action" => "insert"}, received_at},
         state
@@ -89,13 +96,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({msg, received_at}, state) do
-    %Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
-      received_at: received_at
-    }
-    |> TaiEvents.warn()
+      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
+    })
 
     {:noreply, state}
   end
