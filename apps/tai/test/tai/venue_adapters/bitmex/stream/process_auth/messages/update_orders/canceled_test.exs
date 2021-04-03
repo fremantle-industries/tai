@@ -69,6 +69,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
     assert invalid_status_event.was == :skip
 
     assert invalid_status_event.required == [
+             :create_accepted,
              :rejected,
              :open,
              :partially_filled,

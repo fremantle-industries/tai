@@ -16,6 +16,7 @@ end
 
 defimpl Tai.Trading.OrderStore.Action, for: Tai.Trading.OrderStore.Actions.PassiveCancel do
   @required ~w(
+    create_accepted
     rejected
     open
     partially_filled
