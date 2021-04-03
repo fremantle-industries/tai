@@ -65,7 +65,6 @@ defmodule Tai.VenueAdapters.Ftx.Stream.UpdateOrder do
         %{
           "status" => "open",
           "clientId" => client_id,
-          "id" => venue_order_id,
           "createdAt" => created_at,
           "filledSize" => filled_size,
           "remainingSize" => remaining_size
@@ -77,9 +76,8 @@ defmodule Tai.VenueAdapters.Ftx.Stream.UpdateOrder do
     cumulative_qty = filled_size |> Tai.Utils.Decimal.cast!()
     leaves_qty = remaining_size |> Tai.Utils.Decimal.cast!()
 
-    %OrderStore.Actions.Open{
+    %OrderStore.Actions.PassivePartialFill{
       client_id: client_id,
-      venue_order_id: venue_order_id,
       cumulative_qty: cumulative_qty,
       leaves_qty: leaves_qty,
       last_received_at: received_at,
