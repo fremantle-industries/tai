@@ -22,7 +22,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
     venue_config = credentials |> to_venue_config
     params = order |> build_params()
     mod = order |> module_for()
-    {mod.create_order(params, venue_config), order}
+    {mod.create_bulk_orders(params, venue_config), order}
   end
 
   defp module_for(%Tai.Trading.Order{product_type: :future}), do: ExOkex.Futures.Private
