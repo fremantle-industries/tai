@@ -31,32 +31,32 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
       %{
         "client_oid" => accept_create_client_id |> ClientId.to_venue(),
         "order_id" => "submittingOrderA",
-        "status" => "3",
+        "state" => "3",
         "timestamp" => "2019-01-05T02:03:06.309Z"
       },
       %{
         "client_oid" => open_client_id |> ClientId.to_venue(),
         "order_id" => "pendingOrderA",
-        "status" => "0",
+        "state" => "0",
         "filled_qty" => "2",
         "size" => "10",
         "timestamp" => "2019-01-09T02:03:06.309Z"
       },
       %{
         "client_oid" => canceled_client_id |> ClientId.to_venue(),
-        "status" => "-1",
+        "state" => "-1",
         "timestamp" => "2019-01-11T02:03:06.309Z"
       },
       %{
         "client_oid" => partially_filled_client_id |> ClientId.to_venue(),
-        "status" => "1",
+        "state" => "1",
         "size" => 3,
         "filled_qty" => 10,
         "timestamp" => "2018-12-27T05:33:50.832Z"
       },
       %{
         "client_oid" => filled_client_id |> ClientId.to_venue(),
-        "status" => "2",
+        "state" => "2",
         "filled_qty" => "5",
         "timestamp" => "2018-12-27T05:33:50.795Z"
       }
@@ -113,7 +113,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
     :my_venue
     |> ProcessAuth.to_name()
     |> GenServer.cast(
-      {%{"table" => "order", "action" => "update", "data" => [%{"unhandled" => true}]}, @received_at}
+      {%{"table" => "order", "action" => "update", "data" => [%{"unhandled" => true}]},
+       @received_at}
     )
 
     assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
@@ -127,7 +128,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
       %{
         "client_oid" => client_id |> ClientId.to_venue(),
         "order_id" => "submittingOrderA",
-        "status" => "invalid status",
+        "state" => "invalid status",
         "timestamp" => "2019-01-05T02:03:06.309Z"
       }
     ]
