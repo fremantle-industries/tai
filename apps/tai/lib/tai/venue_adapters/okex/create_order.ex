@@ -27,6 +27,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
 
   defp module_for(%Tai.Trading.Order{product_type: :future}), do: ExOkex.Futures.Private
   defp module_for(%Tai.Trading.Order{product_type: :swap}), do: ExOkex.Swap.Private
+  defp module_for(%Tai.Trading.Order{product_type: :spot}), do: ExOkex.Spot.Private
 
   defp build_params(%Tai.Trading.Order{product_type: :future} = order) do
     %{
@@ -46,6 +47,20 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
         order |> build_order_params()
       ]
     }
+  end
+
+  defp build_params(%Tai.Trading.Order{product_type: :spot} = order) do
+    [
+      %{
+        instrument_id: order.venue_product_symbol,
+        client_oid: order.client_id |> ClientId.to_venue(),
+        price: order.price |> to_decimal_string,
+        size: order.qty |> to_decimal_string,
+        type: order.type,
+        side: order.side,
+        order_type: order |> to_venue_order_type
+      }
+    ]
   end
 
   defp build_order_params(order) do
@@ -103,11 +118,27 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
        }),
        do: {:error, :insufficient_position}
 
+  defp parse_response({{:ok, response}, %Tai.Trading.Order{product_type: :spot}}) do
+    response
+    |> Map.values()
+    |> List.flatten()
+    |> parse_spot_response()
+  end
+
   @invalid_venue_order_id "-1"
   defp parse_response({
          {:ok, %{"order_info" => [%{"order_id" => venue_order_id} | _]}},
          _
        })
+       when venue_order_id != @invalid_venue_order_id do
+    received_at = Tai.Time.monotonic_time()
+    response = %CreateAccepted{id: venue_order_id, received_at: received_at}
+    {:ok, response}
+  end
+
+  defp parse_spot_response([%{"error_code" => "33017"} | _]), do: {:error, :insufficient_balance}
+
+  defp parse_spot_response([%{"order_id" => venue_order_id} | _])
        when venue_order_id != @invalid_venue_order_id do
     received_at = Tai.Time.monotonic_time()
     response = %CreateAccepted{id: venue_order_id, received_at: received_at}
