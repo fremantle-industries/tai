@@ -74,7 +74,9 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
   defp to_venue_type(%Tai.Trading.Order{side: :buy}), do: @open_long
   defp to_venue_type(%Tai.Trading.Order{side: :sell}), do: @open_short
 
-  defp to_venue_order_type(%Tai.Trading.Order{post_only: true}), do: 1
+  defp to_venue_order_type(%Tai.Trading.Order{time_in_force: :gtc, post_only: true}), do: 1
+  defp to_venue_order_type(%Tai.Trading.Order{time_in_force: :fok}), do: 2
+  defp to_venue_order_type(%Tai.Trading.Order{time_in_force: :ioc}), do: 3
   defp to_venue_order_type(_), do: 0
 
   defp parse_response({
