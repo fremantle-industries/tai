@@ -11,11 +11,11 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
 
   def update(
         client_id,
-        %{"status" => status, "timestamp" => timestamp},
+        %{"state" => state, "timestamp" => timestamp},
         received_at,
         _state
       )
-      when status == @canceled do
+      when state == @canceled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
 
     %OrderStore.Actions.PassiveCancel{
@@ -30,14 +30,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   def update(
         client_id,
         %{
-          "status" => status,
+          "state" => state,
           "order_id" => venue_order_id,
           "timestamp" => timestamp
         },
         received_at,
         _state
       )
-      when status == @submitting do
+      when state == @submitting do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
 
     %OrderStore.Actions.AcceptCreate{
@@ -53,7 +53,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   def update(
         client_id,
         %{
-          "status" => status,
+          "state" => state,
           "order_id" => venue_order_id,
           "filled_qty" => filled_qty,
           "timestamp" => timestamp,
@@ -62,7 +62,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         received_at,
         _state
       )
-      when status == @pending do
+      when state == @pending do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new() |> Decimal.sub(cumulative_qty)
@@ -82,7 +82,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   def update(
         client_id,
         %{
-          "status" => status,
+          "state" => state,
           "filled_qty" => filled_qty,
           "timestamp" => timestamp,
           "size" => size
@@ -90,7 +90,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         received_at,
         _state
       )
-      when status == @partially_filled do
+      when state == @partially_filled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new() |> Decimal.sub(cumulative_qty)
@@ -109,14 +109,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   def update(
         client_id,
         %{
-          "status" => status,
+          "state" => state,
           "filled_qty" => filled_qty,
           "timestamp" => timestamp
         },
         received_at,
         _state
       )
-      when status == @fully_filled do
+      when state == @fully_filled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
 
