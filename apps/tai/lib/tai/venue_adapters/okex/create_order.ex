@@ -9,7 +9,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
   @type credentials :: Tai.Venues.Adapter.credentials()
   @type order :: Tai.Trading.Order.t()
   @type response :: CreateAccepted.t()
-  @type reason :: :insufficient_balance
+  @type reason :: :insufficient_balance | :insufficient_position
 
   @spec create_order(order, credentials) :: {:ok, response} | {:error, reason}
   def create_order(%Tai.Trading.Order{} = order, credentials) do
