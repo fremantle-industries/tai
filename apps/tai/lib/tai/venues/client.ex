@@ -52,7 +52,7 @@ defmodule Tai.Venues.Client do
     venue.adapter.create_order(order, credentials)
   end
 
-  @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
+  @type amend_attrs :: Tai.Trading.OrderWorker.amend_attrs()
   @type amend_response :: OrderResponses.Amend.t()
   @type amend_order_error_reason :: Adapter.amend_order_error_reason()
 

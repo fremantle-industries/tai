@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
 
   @type credentials :: Tai.Venues.Adapter.credentials()
   @type order :: Tai.Trading.Order.t()
-  @type attrs :: Tai.Trading.Orders.Amend.attrs()
+  @type attrs :: Tai.Trading.OrderWorker.amend_attrs()
   @type response :: Tai.Trading.OrderResponses.Amend.t()
   @type reason ::
           :timeout

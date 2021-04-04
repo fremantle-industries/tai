@@ -9,8 +9,8 @@ defmodule Tai.Trading.Orders do
   @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
   @type create_response :: OrderWorker.create_response()
-  @type amend_attrs :: Orders.Amend.attrs()
-  @type amend_response :: Orders.Amend.response()
+  @type amend_attrs :: OrderWorker.amend_attrs()
+  @type amend_response :: OrderWorker.amend_response()
   @type amend_bulk_response :: Orders.AmendBulk.response()
   @type cancel_response :: OrderWorker.cancel_response()
 
@@ -25,11 +25,15 @@ defmodule Tai.Trading.Orders do
     )
   end
 
-  @spec amend(order, amend_attrs, module) :: amend_response
-  defdelegate amend(order, attrs, provider), to: Orders.Amend
-
   @spec amend(order, amend_attrs) :: amend_response
-  defdelegate amend(order, attrs), to: Orders.Amend
+  @spec amend(order, amend_attrs, module) :: amend_response
+  def amend(order, attrs, provider \\ OrderWorker.Provider) do
+    :poolboy.transaction(
+      :order_worker,
+      & OrderWorker.amend(&1, order, attrs, provider),
+      @timeout
+    )
+  end
 
   @spec amend_bulk([{order, amend_attrs}]) :: amend_bulk_response
   defdelegate amend_bulk(amend_set), to: Orders.AmendBulk

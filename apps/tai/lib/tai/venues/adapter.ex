@@ -14,7 +14,7 @@ defmodule Tai.Venues.Adapter do
   @type amend_response :: OrderResponses.Amend.t()
   @type amend_bulk_response :: [amend_response]
   @type cancel_response :: OrderResponses.Cancel.t() | OrderResponses.CancelAccepted.t()
-  @type amend_attrs :: Tai.Trading.Orders.Amend.attrs()
+  @type amend_attrs :: Tai.Trading.OrderWorker.amend_attrs()
   @type shared_error_reason ::
           :not_implemented
           | :timeout
