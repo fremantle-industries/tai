@@ -92,6 +92,10 @@ defmodule Tai.TestSupport.E2ECase do
         capture_io(fn -> Tai.IEx.start_advisors(args) end)
       end
 
+      def stop_advisors(args) do
+        capture_io(fn -> Tai.IEx.stop_advisors(args) end)
+      end
+
       def start_venue(venue_id) do
         capture_io(fn -> Tai.IEx.start_venue(venue_id) end)
 

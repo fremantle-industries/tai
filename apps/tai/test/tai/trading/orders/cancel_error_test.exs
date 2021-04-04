@@ -1,6 +1,7 @@
 defmodule Tai.Trading.Orders.CancelErrorTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Mock
+  import Support.Orders
   alias Tai.Trading.OrderSubmissions.SellLimitGtc
   alias Tai.Trading.{Order, Orders, OrderStore}
   alias Tai.TestSupport.Mocks
@@ -44,12 +45,7 @@ defmodule Tai.Trading.Orders.CancelErrorTest do
   @submission_attrs %{venue_id: @venue, credential_id: @credential}
 
   setup do
-    start_supervised!(Mocks.Server)
-    start_supervised!({TaiEvents, 1})
-    start_supervised!({Tai.Settings, Tai.Config.parse()})
-    start_supervised!(Tai.Trading.OrderStore)
-    start_supervised!(Tai.Venues.VenueStore)
-
+    setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
     submission = Support.OrderSubmissions.build_with_callback(SellLimitGtc, @submission_attrs)
 

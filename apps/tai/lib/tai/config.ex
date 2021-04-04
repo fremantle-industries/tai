@@ -45,6 +45,8 @@ defmodule Tai.Config do
           after_boot_error: {handler, func_name} | {handler, func_name, boot_args} | nil,
           broadcast_change_set: boolean,
           logger: module,
+          order_workers: pos_integer,
+          order_workers_max_overflow: non_neg_integer,
           send_orders: boolean,
           system_bus_registry_partitions: pos_integer,
           venues: map
@@ -53,6 +55,8 @@ defmodule Tai.Config do
   @enforce_keys ~w[
     adapter_timeout
     advisor_groups
+    order_workers
+    order_workers_max_overflow
     send_orders
     system_bus_registry_partitions
     venues
@@ -64,6 +68,8 @@ defmodule Tai.Config do
     after_boot_error
     broadcast_change_set
     logger
+    order_workers
+    order_workers_max_overflow
     send_orders
     system_bus_registry_partitions
     venues
@@ -79,6 +85,8 @@ defmodule Tai.Config do
       after_boot_error: get(env, :after_boot_error),
       broadcast_change_set: !!get(env, :broadcast_change_set),
       logger: get(env, :logger),
+      order_workers: get(env, :order_workers, 5),
+      order_workers_max_overflow: get(env, :order_workers_max_overflow, 2),
       send_orders: !!get(env, :send_orders),
       system_bus_registry_partitions:
         get(env, :system_bus_registry_partitions, System.schedulers_online()),

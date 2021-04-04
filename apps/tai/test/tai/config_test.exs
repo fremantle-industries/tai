@@ -14,6 +14,8 @@ defmodule Tai.ConfigTest do
       assert config.send_orders == false
       assert config.system_bus_registry_partitions == System.schedulers_online()
       assert config.venues == %{}
+      assert config.order_workers == 5
+      assert config.order_workers_max_overflow == 2
     end
 
     test "can set adapter_timeout" do
@@ -49,6 +51,16 @@ defmodule Tai.ConfigTest do
     test "can set logger" do
       assert config = Tai.Config.parse(logger: CustomLogger)
       assert config.logger == CustomLogger
+    end
+
+    test "can set order_workers" do
+      assert config = Tai.Config.parse(order_workers: 10)
+      assert config.order_workers == 10
+    end
+
+    test "can set order_workers_max_overflow" do
+      assert config = Tai.Config.parse(order_workers_max_overflow: 4)
+      assert config.order_workers_max_overflow == 4
     end
 
     test "can set send_orders" do

@@ -10,7 +10,7 @@ defmodule Tai.Application do
       {Tai.EventsLogger, [logger: config.logger]},
       {Tai.Settings, config},
       Tai.Trading.PositionStore,
-      Tai.Trading.OrderStore,
+      {Tai.Trading.OrdersSupervisor, config},
       Tai.Markets.QuoteStore,
       Tai.Venues.Telemetry,
       Tai.Venues.ProductStore,
