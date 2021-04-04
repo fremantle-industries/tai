@@ -29,7 +29,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
     {:ok, state}
   end
 
-  @product_types ["swap/order", "futures/order"]
+  @product_types ["swap/order", "futures/order", "spot/order"]
 
   @impl true
   def handle_cast(
