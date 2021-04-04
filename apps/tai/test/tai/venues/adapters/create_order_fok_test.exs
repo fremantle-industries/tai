@@ -67,7 +67,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
   defp build_order(venue_id, side, time_in_force, opts) do
     action = Keyword.fetch!(opts, :action)
 
-    struct(Tai.Trading.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       credential_id: :main,

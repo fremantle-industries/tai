@@ -8,7 +8,7 @@ defmodule Tai.Events.OrderUpdateInvalidStatusTest do
     event =
       struct!(Tai.Events.OrderUpdateInvalidStatus,
         client_id: "my_client_id",
-        action: MyAction,
+        transition: TransitionA,
         was: :was_status,
         required: [:required_status_a, :required_status_b],
         last_received_at: last_received_at,
@@ -17,7 +17,7 @@ defmodule Tai.Events.OrderUpdateInvalidStatusTest do
 
     assert %{} = json = TaiEvents.LogEvent.to_data(event)
     assert json.client_id == "my_client_id"
-    assert json.action == MyAction
+    assert json.transition == TransitionA
     assert json.was == :was_status
     assert json.required == [:required_status_a, :required_status_b]
     assert json.last_received_at == "2014-01-23T23:50:07.123Z"

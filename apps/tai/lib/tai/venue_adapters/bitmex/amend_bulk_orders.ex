@@ -1,10 +1,11 @@
 defmodule Tai.VenueAdapters.Bitmex.AmendBulkOrders do
   import Tai.VenueAdapters.Bitmex.OrderStatus
+  alias Tai.Orders
 
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type order :: Tai.Trading.Order.t()
-  @type attrs :: Tai.Trading.OrderWorker.amend_attrs()
-  @type response :: Tai.Trading.OrderResponses.Amend.t()
+  @type order :: Orders.Order.t()
+  @type attrs :: Orders.Worker.amend_attrs()
+  @type response :: Orders.Responses.Amend.t()
   @type reason ::
           :timeout
           | :overloaded
@@ -56,7 +57,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendBulkOrders do
         {:ok, venue_timestamp, 0} = DateTime.from_iso8601(venue_order.timestamp)
         received_at = Tai.Time.monotonic_time()
 
-        %Tai.Trading.OrderResponses.Amend{
+        %Orders.Responses.Amend{
           id: venue_order.order_id,
           status: venue_order.ord_status |> from_venue_status(:ignore),
           price: Tai.Utils.Decimal.cast!(venue_order.price),
@@ -67,7 +68,7 @@ defmodule Tai.VenueAdapters.Bitmex.AmendBulkOrders do
         }
       end)
 
-    response = %Tai.Trading.OrderResponses.AmendBulk{orders: responses}
+    response = %Orders.Responses.AmendBulk{orders: responses}
     {:ok, response}
   end
 

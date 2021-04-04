@@ -4,7 +4,7 @@ defmodule Examples.PingPong.ManageOrderUpdateTest do
 
   defmodule TestOrderProvider do
     def create_exit_order(_advisor_id, _prev_entry_order, _updated_entry_order, _config) do
-      exit_order = struct(Tai.Trading.Order, client_id: "exitOrderA", status: :enqueued)
+      exit_order = struct(Tai.Orders.Order, client_id: "exitOrderA", status: :enqueued)
 
       {:ok, exit_order}
     end
@@ -16,10 +16,10 @@ defmodule Examples.PingPong.ManageOrderUpdateTest do
       config = struct(Examples.PingPong.Config, product: product)
 
       prev_entry_order =
-        struct(Tai.Trading.Order, status: :partially_filled, price: Decimal.new(100))
+        struct(Tai.Orders.Order, status: :partially_filled, price: Decimal.new(100))
 
       updated_entry_order =
-        struct(Tai.Trading.Order, status: :partially_filled, price: Decimal.new(100))
+        struct(Tai.Orders.Order, status: :partially_filled, price: Decimal.new(100))
 
       run_store = %{entry_order: updated_entry_order}
       state = struct(Tai.Advisor.State, config: config, store: run_store)
@@ -32,7 +32,7 @@ defmodule Examples.PingPong.ManageOrderUpdateTest do
                  TestOrderProvider
                )
 
-      assert %Tai.Trading.Order{} = updated_run_store.exit_order
+      assert %Tai.Orders.Order{} = updated_run_store.exit_order
       assert updated_run_store.exit_order.status == :enqueued
     end
   end

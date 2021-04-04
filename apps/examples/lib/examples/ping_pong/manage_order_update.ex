@@ -1,5 +1,5 @@
 defmodule Examples.PingPong.ManageOrderUpdate do
-  alias Tai.Trading.Order
+  alias Tai.Orders.Order
 
   defmodule DefaultOrderProvider do
     alias Examples.PingPong.{CreateEntryOrder, CreateExitOrder}
@@ -13,7 +13,7 @@ defmodule Examples.PingPong.ManageOrderUpdate do
       as: :create
   end
 
-  @type order :: Tai.Trading.Order.t()
+  @type order :: Order.t()
   @type run_store :: Tai.Advisor.run_store()
   @type state :: Tai.Advisor.State.t()
 

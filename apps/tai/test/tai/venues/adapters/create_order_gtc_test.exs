@@ -99,7 +99,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
         use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_gtc_unfilled" do
           assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
-          assert %Tai.Trading.OrderResponses.CreateAccepted{} = order_response
+          assert %Tai.Orders.Responses.CreateAccepted{} = order_response
           assert order_response.id != nil
           assert order_response.received_at != nil
         end
@@ -111,7 +111,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
     action = Keyword.fetch!(opts, :action)
     post_only = Keyword.get(opts, :post_only, false)
 
-    struct(Tai.Trading.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       credential_id: :main,

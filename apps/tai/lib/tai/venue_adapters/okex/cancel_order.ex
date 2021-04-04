@@ -7,11 +7,11 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
   across these products are inconsistent.
   """
 
-  alias Tai.Trading.OrderResponses.CancelAccepted
+  alias Tai.Orders
 
-  @type order :: Tai.Trading.Order.t()
+  @type order :: Tai.Orders.Order.t()
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type response :: CancelAccepted.t()
+  @type response :: Orders.Responses.CancelAccepted.t()
   @type reason :: :timeout | :connect_timeout | :not_found
 
   @spec cancel_order(order, credentials) :: {:ok, response} | {:error, reason}
@@ -28,8 +28,8 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
     mod.cancel_orders(venue_symbol, [order.venue_order_id], %{}, venue_config)
   end
 
-  defp module_for(%Tai.Trading.Order{product_type: :future}), do: ExOkex.Futures.Private
-  defp module_for(%Tai.Trading.Order{product_type: :swap}), do: ExOkex.Swap.Private
+  defp module_for(%Tai.Orders.Order{product_type: :future}), do: ExOkex.Futures.Private
+  defp module_for(%Tai.Orders.Order{product_type: :swap}), do: ExOkex.Swap.Private
 
   defdelegate to_venue_credentials(credentials),
     to: Tai.VenueAdapters.OkEx.Credentials,
@@ -37,13 +37,13 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
 
   defp parse_response({:ok, %{"result" => true, "order_ids" => [order_id | _]}}) do
     received_at = Tai.Time.monotonic_time()
-    response = %CancelAccepted{id: order_id, received_at: received_at}
+    response = %Orders.Responses.CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 
   defp parse_response({:ok, %{"result" => "true", "ids" => [order_id | _]}}) do
     received_at = Tai.Time.monotonic_time()
-    response = %CancelAccepted{id: order_id, received_at: received_at}
+    response = %Orders.Responses.CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 

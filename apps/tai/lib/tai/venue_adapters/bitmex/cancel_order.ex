@@ -1,9 +1,10 @@
 defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
   import Tai.VenueAdapters.Bitmex.OrderStatus
+  alias Tai.Orders
 
-  @type order :: Tai.Trading.Order.t()
+  @type order :: Tai.Orders.Order.t()
   @type credentials :: map
-  @type response :: Tai.Trading.OrderResponses.Cancel.t()
+  @type response :: Orders.Responses.Cancel.t()
   @type reason ::
           :timeout
           | :overloaded
@@ -29,7 +30,7 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
   defp parse_response({:ok, [venue_order | _], %ExBitmex.RateLimit{}}) do
     {:ok, venue_timestamp, 0} = DateTime.from_iso8601(venue_order.timestamp)
 
-    response = %Tai.Trading.OrderResponses.Cancel{
+    response = %Orders.Responses.Cancel{
       id: venue_order.order_id,
       status: venue_order.ord_status |> from_venue_status(:ignore),
       leaves_qty: Decimal.new(venue_order.leaves_qty),

@@ -1,7 +1,7 @@
 defmodule Tai.Venues.Adapters.CancelOrderTest do
   use ExUnit.Case, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  alias Tai.Trading.OrderResponses
+  alias Tai.Orders
 
   setup_all do
     on_exit(fn ->
@@ -57,14 +57,14 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
         open_order = build_open_order(enqueued_order, order_response)
 
         assert {:ok, order_response} = Tai.Venues.Client.cancel_order(open_order)
-        assert %OrderResponses.CancelAccepted{} = order_response
+        assert %Orders.Responses.CancelAccepted{} = order_response
         assert order_response.id != nil
       end
     end
   end)
 
   defp build_enqueued_order(venue_id) do
-    struct(Tai.Trading.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: "f5559e85-7a3c-4c07-94d8-5e7a74079733",
       venue_id: venue_id,
       credential_id: :main,
@@ -81,7 +81,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   end
 
   defp build_open_order(order, order_response) do
-    struct(Tai.Trading.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: order.client_id,
       venue_order_id: order_response.id,
       venue_id: order.venue_id,

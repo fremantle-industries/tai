@@ -1,6 +1,6 @@
 defmodule Tai.VenueAdapters.Bitmex.OrderStatus do
-  @type order :: Tai.Trading.Order.t()
-  @type order_status :: Tai.Trading.Order.status()
+  @type order :: Tai.Orders.Order.t()
+  @type order_status :: Tai.Orders.Order.status()
   @type venue_status :: String.t()
 
   @spec from_venue_status(venue_status, order | :ignore) :: order_status
@@ -10,11 +10,11 @@ defmodule Tai.VenueAdapters.Bitmex.OrderStatus do
   def from_venue_status("PartiallyFilled", _), do: :open
   def from_venue_status("Filled", _), do: :filled
   # https://www.bitmex.com/app/apiChangelog#Jul-5-2016
-  def from_venue_status("Canceled", %Tai.Trading.Order{time_in_force: :gtc, post_only: true}),
+  def from_venue_status("Canceled", %Tai.Orders.Order{time_in_force: :gtc, post_only: true}),
     do: :rejected
 
-  def from_venue_status("Canceled", %Tai.Trading.Order{time_in_force: :ioc}), do: :expired
-  def from_venue_status("Canceled", %Tai.Trading.Order{time_in_force: :fok}), do: :expired
+  def from_venue_status("Canceled", %Tai.Orders.Order{time_in_force: :ioc}), do: :expired
+  def from_venue_status("Canceled", %Tai.Orders.Order{time_in_force: :fok}), do: :expired
   def from_venue_status("Canceled", _), do: :canceled
   # TODO: Unhandled Bitmex order status
   # defp from_venue_status("PendingNew"), do: :pending

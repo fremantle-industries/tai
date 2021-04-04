@@ -1,14 +1,14 @@
 defmodule Examples.PingPong.CreateEntryOrder do
   alias Examples.PingPong.{Config, EntryPrice}
-  alias Tai.Trading.{Orders, OrderSubmissions}
+  alias Tai.Orders.OrderSubmissions
 
   @type advisor_process :: Tai.Advisor.advisor_name()
   @type market_quote :: Tai.Markets.Quote.t()
   @type config :: Config.t()
-  @type order :: Tai.Trading.Order.t()
+  @type order :: Tai.Orders.Order.t()
 
   @spec create(advisor_process, market_quote, config) :: {:ok, order}
-  def create(advisor_process, market_quote, config, orders_provider \\ Orders) do
+  def create(advisor_process, market_quote, config, orders_provider \\ Tai.Orders) do
     price = EntryPrice.calculate(market_quote, config.product)
 
     %OrderSubmissions.BuyLimitGtc{

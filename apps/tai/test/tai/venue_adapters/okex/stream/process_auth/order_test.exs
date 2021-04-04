@@ -4,7 +4,6 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
   alias Tai.VenueAdapters.OkEx.Stream.ProcessAuth
   alias Tai.VenueAdapters.OkEx.ClientId
 
-
   @received_at Tai.Time.monotonic_time()
 
   setup do
@@ -68,7 +67,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
 
     assert_event(
       %Tai.Events.OrderUpdateNotFound{
-        action: Tai.Trading.OrderStore.Actions.AcceptCreate
+        transition: Tai.Orders.Transitions.AcceptCreate
       } = accept_create_not_found_event
     )
 
@@ -76,7 +75,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
 
     assert_event(
       %Tai.Events.OrderUpdateNotFound{
-        action: Tai.Trading.OrderStore.Actions.Open
+        transition: Tai.Orders.Transitions.Open
       } = open_not_found_event
     )
 
@@ -84,7 +83,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
 
     assert_event(
       %Tai.Events.OrderUpdateNotFound{
-        action: Tai.Trading.OrderStore.Actions.PassiveCancel
+        transition: Tai.Orders.Transitions.PassiveCancel
       } = canceled_not_found_event
     )
 
@@ -92,7 +91,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
 
     assert_event(
       %Tai.Events.OrderUpdateNotFound{
-        action: Tai.Trading.OrderStore.Actions.PassivePartialFill
+        transition: Tai.Orders.Transitions.PassivePartialFill
       } = partially_filled_not_found_event
     )
 
@@ -100,7 +99,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrderTest do
 
     assert_event(
       %Tai.Events.OrderUpdateNotFound{
-        action: Tai.Trading.OrderStore.Actions.PassiveFill
+        transition: Tai.Orders.Transitions.PassiveFill
       } = filled_not_found_event
     )
 

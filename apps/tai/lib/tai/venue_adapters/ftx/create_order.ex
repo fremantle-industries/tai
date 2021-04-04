@@ -3,9 +3,9 @@ defmodule Tai.VenueAdapters.Ftx.CreateOrder do
   Create orders for the FTX adapter
   """
 
-  alias Tai.Trading.{OrderResponses, Order}
+  alias Tai.Orders
 
-  def create_order(%Order{type: :limit} = order, credentials) do
+  def create_order(%Orders.Order{type: :limit} = order, credentials) do
     venue_side = order.side |> to_venue_side()
     venue_ioc = order.time_in_force |> to_venue_ioc()
     venue_price = order.price |> Decimal.to_float()
@@ -39,7 +39,7 @@ defmodule Tai.VenueAdapters.Ftx.CreateOrder do
     venue_order_id = venue_order.id
     venue_timestamp = venue_order.created_at |> Timex.parse!(@date_format)
 
-    response = %OrderResponses.CreateAccepted{
+    response = %Orders.Responses.CreateAccepted{
       id: venue_order_id,
       venue_timestamp: venue_timestamp,
       received_at: received_at

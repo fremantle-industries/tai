@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
-  alias Tai.Trading.OrderStore
+  alias Tai.Orders.{OrderStore, Transitions}
 
   @canceled "-1"
   @pending "0"
@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       when state == @canceled do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
 
-    %OrderStore.Actions.PassiveCancel{
+    %Transitions.PassiveCancel{
       client_id: client_id,
       last_received_at: received_at,
       last_venue_timestamp: venue_timestamp
@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
       when state == @submitting do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
 
-    %OrderStore.Actions.AcceptCreate{
+    %Transitions.AcceptCreate{
       client_id: client_id,
       venue_order_id: venue_order_id,
       last_received_at: received_at,
@@ -67,7 +67,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new() |> Decimal.sub(cumulative_qty)
 
-    %OrderStore.Actions.Open{
+    %Transitions.Open{
       client_id: client_id,
       venue_order_id: venue_order_id,
       cumulative_qty: cumulative_qty,
@@ -95,7 +95,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new() |> Decimal.sub(cumulative_qty)
 
-    %OrderStore.Actions.PassivePartialFill{
+    %Transitions.PassivePartialFill{
       client_id: client_id,
       cumulative_qty: cumulative_qty,
       leaves_qty: leaves_qty,
@@ -120,7 +120,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
 
-    %OrderStore.Actions.PassiveFill{
+    %Transitions.PassiveFill{
       client_id: client_id,
       cumulative_qty: cumulative_qty,
       last_received_at: received_at,
@@ -139,22 +139,22 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   end
 
   defp notify({:ok, {old, updated}}) do
-    Tai.Trading.NotifyOrderUpdate.notify!(old, updated)
+    Tai.Orders.Services.NotifyUpdate.notify!(old, updated)
   end
 
-  defp notify({:error, {:invalid_status, was, required, %action_name{} = action}}) do
+  defp notify({:error, {:invalid_status, was, required, %transition_name{} = transition}}) do
     TaiEvents.warn(%Tai.Events.OrderUpdateInvalidStatus{
       was: was,
       required: required,
-      client_id: action.client_id,
-      action: action_name
+      client_id: transition.client_id,
+      transition: transition_name
     })
   end
 
-  defp notify({:error, {:not_found, %action_name{} = action}}) do
+  defp notify({:error, {:not_found, %transition_name{} = transition}}) do
     TaiEvents.warn(%Tai.Events.OrderUpdateNotFound{
-      client_id: action.client_id,
-      action: action_name
+      client_id: transition.client_id,
+      transition: transition_name
     })
   end
 end

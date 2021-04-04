@@ -112,7 +112,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
     action = Keyword.fetch!(opts, :action)
     post_only = Keyword.get(opts, :post_only, false)
 
-    struct(Tai.Trading.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       credential_id: :main,

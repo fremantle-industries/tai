@@ -5,7 +5,7 @@ defmodule Examples.PingPong.CreateExitOrderTest do
   setup do
     config = Tai.Config.parse()
     start_supervised!({TaiEvents, 1})
-    start_supervised!({Tai.Trading.OrdersSupervisor, config})
+    start_supervised!({Tai.Orders.Supervisor, config})
 
     :ok
   end
@@ -14,10 +14,10 @@ defmodule Examples.PingPong.CreateExitOrderTest do
 
   test ".create/4 enqueues an exit order for the newly filled qty" do
     Process.register(self(), @advisor_id)
-    prev_order = struct(Tai.Trading.Order, cumulative_qty: Decimal.new(2))
+    prev_order = struct(Tai.Orders.Order, cumulative_qty: Decimal.new(2))
 
     updated_order =
-      struct(Tai.Trading.Order, price: Decimal.new(100), cumulative_qty: Decimal.new(8))
+      struct(Tai.Orders.Order, price: Decimal.new(100), cumulative_qty: Decimal.new(8))
 
     product = struct(Tai.Venues.Product, price_increment: Decimal.new("0.5"))
     config = struct(Examples.PingPong.Config, product: product)

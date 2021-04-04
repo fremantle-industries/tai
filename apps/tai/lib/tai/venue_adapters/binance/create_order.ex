@@ -4,10 +4,11 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   """
 
   alias Tai.VenueAdapters.Binance.OrderStatus
+  alias Tai.Orders
 
   @limit "LIMIT"
 
-  def create_order(%Tai.Trading.Order{side: side, type: :limit} = order, credentials) do
+  def create_order(%Tai.Orders.Order{side: side, type: :limit} = order, credentials) do
     venue_time_in_force = order.time_in_force |> to_venue_time_in_force
     venue_side = side |> Atom.to_string() |> String.upcase()
     credentials = struct!(ExBinance.Credentials, credentials)
@@ -41,7 +42,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     leaves_qty = leaves_qty(status, original_size, cumulative_qty)
     venue_timestamp = binance_response.transact_time |> DateTime.from_unix!(:millisecond)
 
-    response = %Tai.Trading.OrderResponses.Create{
+    response = %Orders.Responses.Create{
       id: venue_order_id,
       status: status,
       original_size: original_size,

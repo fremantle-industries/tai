@@ -1,11 +1,11 @@
 defmodule Tai.Events.OrderUpdated do
-  @type client_id :: Tai.Trading.Order.client_id()
+  @type client_id :: Tai.Orders.Order.client_id()
   @type venue_id :: Tai.Venues.Adapter.venue_id()
   @type credential_id :: Tai.Venues.Adapter.credential_id()
-  @type side :: Tai.Trading.Order.side()
-  @type type :: Tai.Trading.Order.type()
-  @type time_in_force :: Tai.Trading.Order.time_in_force()
-  @type status :: Tai.Trading.Order.status()
+  @type side :: Tai.Orders.Order.side()
+  @type type :: Tai.Orders.Order.type()
+  @type time_in_force :: Tai.Orders.Order.time_in_force()
+  @type status :: Tai.Orders.Order.status()
   @type product_type :: Tai.Venues.Product.type()
   @type t :: %Tai.Events.OrderUpdated{
           client_id: client_id,

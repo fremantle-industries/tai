@@ -1,17 +1,17 @@
 defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
   alias Tai.TestSupport.Mocks
 
-  @type buy_limit :: Tai.Trading.OrderSubmissions.BuyLimitGtc.t()
-  @type sell_limit :: Tai.Trading.OrderSubmissions.SellLimitGtc.t()
+  @type buy_limit :: Tai.Orders.OrderSubmissions.BuyLimitGtc.t()
+  @type sell_limit :: Tai.Orders.OrderSubmissions.SellLimitGtc.t()
   @type submission :: buy_limit | sell_limit
-  @type venue_order_id :: Tai.Trading.Order.venue_order_id()
-  @type order :: Tai.Trading.Order.t()
+  @type venue_order_id :: Tai.Orders.Order.venue_order_id()
+  @type order :: Tai.Orders.Order.t()
   @type amend_attrs :: map
   @type reason :: term
 
   @spec create_raise(submission, reason) :: :ok
   def create_raise(submission, reason) do
-    order = Tai.Trading.OrderSubmissions.Factory.build!(submission)
+    order = Tai.Orders.OrderSubmissions.Factory.build!(submission)
 
     match_attrs = %{
       symbol: order.product_symbol,
@@ -25,7 +25,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
   end
 
   @spec amend_raise(order, amend_attrs, reason) :: :ok
-  def amend_raise(%Tai.Trading.Order{} = order, attrs, reason) do
+  def amend_raise(%Tai.Orders.Order{} = order, attrs, reason) do
     match_attrs = Map.merge(%{venue_order_id: order.venue_order_id}, attrs)
 
     {:amend_order, match_attrs}
