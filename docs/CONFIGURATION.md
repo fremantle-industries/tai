@@ -23,6 +23,12 @@ config :tai, after_boot_error: {Mod, :func_name, []}
 # [default: false] [optional] Flag which enables the forwarding of each order book change set to the system bus
 config :tai, broadcast_change_set: true
 
+# [default: 5] [optional] Maximum pool size
+config :tai, order_workers: 5
+
+# [default: 2] [optional] Maximum number of workers created if pool is empty
+config :tai, order_workers_max_overflow: 2
+
 # [default: false] [optional] Flag which enables the sending of orders to the venue. When this is `false`, it
 # acts a safety net by enqueueing and skipping the order transmission to the venue. This is useful in
 # development to prevent accidently sending live orders.
