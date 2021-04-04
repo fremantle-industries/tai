@@ -1,47 +1,86 @@
-defmodule Tai.Trading.Orders.Create do
+defmodule Tai.Trading.OrderWorker do
+  use GenServer
+
   alias Tai.Trading.OrderStore.Actions
 
   alias Tai.Trading.{
     NotifyOrderUpdate,
-    OrderStore,
     OrderResponses,
-    Order,
-    OrderSubmissions
+    OrderStore,
+    OrderSubmissions,
+    Orders,
+    Order
   }
 
-  @type order :: Order.t()
-  @type submission :: OrderSubmissions.Factory.submission()
-  @type response :: {:ok, order}
+  defmodule State do
+    defstruct ~w[tasks]a
+  end
 
-  @spec create(submission) :: response
-  def create(submission) do
+  @type submission :: OrderSubmissions.Factory.submission()
+  @type order :: Order.t()
+  @type create_response :: {:ok, order}
+
+  def start_link(_) do
+    state = %State{tasks: %{}}
+    GenServer.start_link(__MODULE__, state)
+  end
+
+  @spec create(pid, submission) :: create_response
+  def create(pid, submission) do
+    GenServer.call(pid, {:create, submission})
+  end
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_call({:create, submission}, _from, state) do
     {:ok, order} = OrderStore.enqueue(submission)
     notify_initial_updated_order(order)
 
-    Task.async(fn ->
-      if Tai.Settings.send_orders?() do
-        try do
-          order
-          |> send_to_venue()
-          |> parse_response()
-          |> notify_updated_order()
-        rescue
-          e ->
-            {e, __STACKTRACE__}
-            |> rescue_venue_adapter_error(order)
+    task =
+      Task.async(fn ->
+        if Tai.Settings.send_orders?() do
+          try do
+            order
+            |> send_to_venue()
+            |> parse_response()
             |> notify_updated_order()
+          rescue
+            e ->
+              {e, __STACKTRACE__}
+              |> rescue_venue_adapter_error(order)
+              |> notify_updated_order()
+          end
+        else
+          order.client_id
+          |> skip!
+          |> notify_updated_order()
         end
-      else
-        order.client_id
-        |> skip!
-        |> notify_updated_order()
-      end
-    end)
+      end)
 
-    {:ok, order}
+    tasks = Map.put(state.tasks, task.ref, task)
+    state = %{state | tasks: tasks}
+    {:reply, {:ok, order}, state}
   end
 
-  defp notify_initial_updated_order(order), do: NotifyOrderUpdate.notify!(nil, order)
+  @impl true
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
+    tasks = Map.delete(state.tasks, ref)
+    state = %{state | tasks: tasks}
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({_ref, _result}, state) do
+    {:noreply, state}
+  end
+
+  defp notify_initial_updated_order(order) do
+    NotifyOrderUpdate.notify!(nil, order)
+  end
 
   defp send_to_venue(order) do
     result = Tai.Venues.Client.create_order(order)
