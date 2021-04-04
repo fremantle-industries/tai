@@ -31,7 +31,7 @@ defmodule Examples.PingPong.Advisor do
   end
 
   @impl true
-  def handle_info(_msg, state), do: {:noreply, state}
+  def handle_info({:order_updated, _, _, :exit_order}, state), do: {:noreply, state}
 
   defp update_store_order(run_store, name, order), do: run_store |> Map.put(name, order)
 end
