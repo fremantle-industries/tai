@@ -4,7 +4,7 @@ defmodule Support.Orders do
     start_supervised!.(Tai.TestSupport.Mocks.Server)
     start_supervised!.({TaiEvents, 1})
     start_supervised!.({Tai.Settings, config})
-    start_supervised!.({Tai.Trading.OrdersSupervisor, config})
+    start_supervised!.({Tai.Orders.Supervisor, config})
     start_supervised!.(Tai.Venues.VenueStore)
   end
 end

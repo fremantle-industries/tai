@@ -14,31 +14,31 @@ defmodule Tai.VenueAdapters.Bitmex.OrderStatusTest do
     test "ioc & fok are expired in tai" do
       assert OrderStatus.from_venue_status(
                "Canceled",
-               struct(Tai.Trading.Order, time_in_force: :ioc)
+               struct(Tai.Orders.Order, time_in_force: :ioc)
              ) == :expired
 
       assert OrderStatus.from_venue_status(
                "Canceled",
-               struct(Tai.Trading.Order, time_in_force: :fok)
+               struct(Tai.Orders.Order, time_in_force: :fok)
              ) == :expired
     end
 
     test "gtc post only is rejected in tai" do
       assert OrderStatus.from_venue_status(
                "Canceled",
-               struct(Tai.Trading.Order, time_in_force: :gtc, post_only: true)
+               struct(Tai.Orders.Order, time_in_force: :gtc, post_only: true)
              ) == :rejected
 
       assert OrderStatus.from_venue_status(
                "Canceled",
-               struct(Tai.Trading.Order, time_in_force: :gtc, post_only: false)
+               struct(Tai.Orders.Order, time_in_force: :gtc, post_only: false)
              ) == :canceled
     end
 
     test "others are also canceled in tai" do
       assert OrderStatus.from_venue_status(
                "Canceled",
-               struct(Tai.Trading.Order)
+               struct(Tai.Orders.Order)
              ) == :canceled
     end
   end

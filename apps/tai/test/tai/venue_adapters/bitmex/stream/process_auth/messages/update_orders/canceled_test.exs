@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.ClientId
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
-  alias Tai.Trading.OrderStore
+  alias Tai.Orders.OrderStore
 
   setup do
     on_exit(fn ->
@@ -12,7 +12,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
 
     {:ok, _} = Application.ensure_all_started(:tzdata)
     start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Trading.OrderStore)
+    start_supervised!(Tai.Orders.OrderStore)
 
     :ok
   end
@@ -27,8 +27,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
 
     assert {:ok, order} = enqueue()
 
-    action = struct(Tai.Trading.OrderStore.Actions.Reject, client_id: order.client_id, last_received_at: Tai.Time.monotonic_time())
-    assert {:ok, {_old, _updated}} = OrderStore.update(action)
+    transition =
+      struct(Tai.Orders.Transitions.Reject,
+        client_id: order.client_id,
+        last_received_at: Tai.Time.monotonic_time()
+      )
+
+    assert {:ok, {_old, _updated}} = OrderStore.update(transition)
 
     msg =
       struct(ProcessAuth.Messages.UpdateOrders.Canceled,
@@ -51,8 +56,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
 
     assert {:ok, order} = enqueue()
 
-    action = struct(Tai.Trading.OrderStore.Actions.Skip, client_id: order.client_id)
-    assert {:ok, {_old, _updated}} = OrderStore.update(action)
+    transition = struct(Tai.Orders.Transitions.Skip, client_id: order.client_id)
+    assert {:ok, {_old, _updated}} = OrderStore.update(transition)
 
     msg =
       struct(ProcessAuth.Messages.UpdateOrders.Canceled,
@@ -63,7 +68,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
     ProcessAuth.Message.process(msg, @received_at, @state)
 
     assert_event(%Tai.Events.OrderUpdateInvalidStatus{} = invalid_status_event)
-    assert invalid_status_event.action == Tai.Trading.OrderStore.Actions.PassiveCancel
+    assert invalid_status_event.transition == Tai.Orders.Transitions.PassiveCancel
     assert invalid_status_event.last_received_at != nil
     assert %DateTime{} = invalid_status_event.last_venue_timestamp
     assert invalid_status_event.was == :skip
@@ -96,13 +101,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.Canc
 
     assert_event(%Tai.Events.OrderUpdateNotFound{} = not_found_event)
     assert not_found_event.client_id != @venue_client_id
-    assert not_found_event.action == Tai.Trading.OrderStore.Actions.PassiveCancel
+    assert not_found_event.transition == Tai.Orders.Transitions.PassiveCancel
   end
 
   defp enqueue, do: build_submission() |> OrderStore.enqueue()
 
   defp build_submission do
-    struct(Tai.Trading.OrderSubmissions.BuyLimitGtc,
+    struct(Tai.Orders.OrderSubmissions.BuyLimitGtc,
       venue_id: :my_venue,
       product_symbol: :btc_usd,
       price: Decimal.new("100.1"),

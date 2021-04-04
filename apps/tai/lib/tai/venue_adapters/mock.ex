@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Mock do
-  alias Tai.Trading.OrderResponses
+  alias Tai.Orders.Responses
   alias Tai.TestSupport.Mocks
   import Mocks.Client
 
@@ -51,7 +51,7 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def create_order(%Tai.Trading.Order{} = order, _credentials) do
+  def create_order(%Tai.Orders.Order{} = order, _credentials) do
     with_mock_server(fn ->
       match_attrs = %{
         symbol: order.product_symbol,
@@ -106,8 +106,8 @@ defmodule Tai.VenueAdapters.Mock do
       {:cancel_order, order.venue_order_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, %OrderResponses.Cancel{}} = response -> response
-        {:ok, %OrderResponses.CancelAccepted{}} = response -> response
+        {:ok, %Responses.Cancel{}} = response -> response
+        {:ok, %Responses.CancelAccepted{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
         {:error, :not_found} -> {:error, :mock_not_found}
       end

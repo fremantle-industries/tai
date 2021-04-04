@@ -7,7 +7,7 @@ defmodule Examples.PingPong.ManageQuoteChangeTest do
       client_id = order.client_id |> String.duplicate(2)
 
       pending_cancel_order =
-        struct(Tai.Trading.Order, client_id: client_id, status: :pending_cancel)
+        struct(Tai.Orders.Order, client_id: client_id, status: :pending_cancel)
 
       {:ok, pending_cancel_order}
     end
@@ -25,7 +25,7 @@ defmodule Examples.PingPong.ManageQuoteChangeTest do
         struct(Tai.Advisors.MarketQuotes, data: %{{:venue_a, :product_a} => market_quote})
 
       entry_order =
-        struct(Tai.Trading.Order,
+        struct(Tai.Orders.Order,
           client_id: "A",
           venue_id: :venue_a,
           product_symbol: :product_a,

@@ -1,6 +1,7 @@
 defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   alias Tai.TestSupport.Mocks
-  alias Tai.Trading.{Order, OrderResponses, OrderSubmissions}
+  alias Tai.Orders.{Order, OrderSubmissions}
+  alias Tai.Orders
 
   @type order :: Order.t()
   @type buy_limit :: OrderSubmissions.BuyLimitGtc.t()
@@ -11,7 +12,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
 
   @spec create_accepted(venue_order_id, submission) :: :ok
   def create_accepted(venue_order_id, submission) do
-    order_response = %OrderResponses.CreateAccepted{
+    order_response = %Orders.Responses.CreateAccepted{
       id: venue_order_id,
       venue_timestamp: Timex.now(),
       received_at: Tai.Time.monotonic_time()
@@ -34,7 +35,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     cumulative_qty = attrs |> Map.get(:cumulative_qty, Decimal.new(0))
     leaves_qty = Decimal.sub(qty, cumulative_qty)
 
-    order_response = %OrderResponses.Create{
+    order_response = %Orders.Responses.Create{
       id: venue_order_id,
       status: :open,
       original_size: qty,
@@ -59,7 +60,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   def rejected(venue_order_id, submission) do
     qty = submission.qty
 
-    order_response = %OrderResponses.Create{
+    order_response = %Orders.Responses.Create{
       id: venue_order_id,
       status: :rejected,
       original_size: qty,
@@ -85,7 +86,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
 
   @spec filled(venue_order_id, submission) :: insert_result
   def filled(venue_order_id, submission) do
-    order_response = %OrderResponses.Create{
+    order_response = %Orders.Responses.Create{
       id: venue_order_id,
       status: :filled,
       original_size: submission.qty,
@@ -108,7 +109,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
 
   @spec amend_price(order, Decimal.t()) :: :ok
   def amend_price(order, price) do
-    order_response = %OrderResponses.Amend{
+    order_response = %Orders.Responses.Amend{
       id: order.venue_order_id,
       status: :open,
       price: price,
@@ -126,7 +127,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
 
   @spec amend_price_and_qty(order, Decimal.t(), Decimal.t()) :: :ok
   def amend_price_and_qty(order, price, qty) do
-    order_response = %OrderResponses.Amend{
+    order_response = %Orders.Responses.Amend{
       id: order.venue_order_id,
       status: :open,
       price: price,
@@ -146,7 +147,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   def amend_bulk_price_and_qty(orders_and_attrs) do
     order_responses =
       Enum.map(orders_and_attrs, fn {order, attrs} ->
-        %OrderResponses.Amend{
+        %Orders.Responses.Amend{
           id: order.venue_order_id,
           status: :open,
           price: Map.get(attrs, :price),
@@ -157,7 +158,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
         }
       end)
 
-    response = %OrderResponses.AmendBulk{orders: order_responses}
+    response = %Orders.Responses.AmendBulk{orders: order_responses}
 
     match_attrs =
       Enum.map(orders_and_attrs, fn {order, attrs} ->
@@ -176,7 +177,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   def amend_bulk_price(orders_and_attrs) do
     order_responses =
       Enum.map(orders_and_attrs, fn {order, attrs} ->
-        %OrderResponses.Amend{
+        %Orders.Responses.Amend{
           id: order.venue_order_id,
           status: :open,
           price: Map.get(attrs, :price),
@@ -187,7 +188,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
         }
       end)
 
-    response = %OrderResponses.AmendBulk{orders: order_responses}
+    response = %Orders.Responses.AmendBulk{orders: order_responses}
 
     match_attrs =
       Enum.map(orders_and_attrs, fn {order, attrs} ->
@@ -200,7 +201,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
 
   @spec cancel_accepted(venue_order_id) :: :ok
   def cancel_accepted(venue_order_id) do
-    order_response = %OrderResponses.CancelAccepted{
+    order_response = %Orders.Responses.CancelAccepted{
       id: venue_order_id,
       venue_timestamp: Timex.now(),
       received_at: Tai.Time.monotonic_time()
@@ -212,7 +213,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
 
   @spec canceled(venue_order_id) :: :ok
   def canceled(venue_order_id) do
-    order_response = %Tai.Trading.OrderResponses.Cancel{
+    order_response = %Orders.Responses.Cancel{
       id: venue_order_id,
       status: :canceled,
       leaves_qty: Decimal.new(0),

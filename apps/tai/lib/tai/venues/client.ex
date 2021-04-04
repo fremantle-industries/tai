@@ -1,6 +1,7 @@
 defmodule Tai.Venues.Client do
   alias Tai.Venues.Adapter
-  alias Tai.Trading.{Order, OrderResponses}
+  alias Tai.Orders
+  alias Tai.Orders.Order
 
   @type venue :: Tai.Venue.t()
   @type credential_id :: Tai.Venue.credential_id()
@@ -42,7 +43,7 @@ defmodule Tai.Venues.Client do
     venue.adapter.maker_taker_fees(venue.id, credential_id, credentials)
   end
 
-  @type create_response :: OrderResponses.Create.t() | OrderResponses.CreateAccepted.t()
+  @type create_response :: Orders.Responses.Create.t() | Orders.Responses.CreateAccepted.t()
   @type create_order_error_reason :: Adapter.create_order_error_reason()
 
   @spec create_order(order) :: {:ok, create_response} | {:error, create_order_error_reason}
@@ -52,8 +53,8 @@ defmodule Tai.Venues.Client do
     venue.adapter.create_order(order, credentials)
   end
 
-  @type amend_attrs :: Tai.Trading.OrderWorker.amend_attrs()
-  @type amend_response :: OrderResponses.Amend.t()
+  @type amend_attrs :: Orders.Worker.amend_attrs()
+  @type amend_response :: Orders.Responses.Amend.t()
   @type amend_order_error_reason :: Adapter.amend_order_error_reason()
 
   @spec amend_order(order, amend_attrs) ::
@@ -64,8 +65,8 @@ defmodule Tai.Venues.Client do
     venue.adapter.amend_order(order, attrs, credentials)
   end
 
-  @type amend_bulk_attrs :: Tai.Trading.OrderWorker.amend_attrs()
-  @type amend_bulk_response :: OrderResponses.AmendBulk.t()
+  @type amend_bulk_attrs :: Orders.Worker.amend_attrs()
+  @type amend_bulk_response :: Orders.Responses.AmendBulk.t()
   @type amend_bulk_order_error_reason :: Adapter.amend_order_error_reason()
 
   @spec amend_bulk_orders([{order, amend_bulk_attrs}]) ::
@@ -79,7 +80,7 @@ defmodule Tai.Venues.Client do
     venue.adapter.amend_bulk_orders(orders_and_attributes, credentials)
   end
 
-  @type cancel_response :: OrderResponses.Cancel.t() | OrderResponses.CancelAccepted.t()
+  @type cancel_response :: Orders.Responses.Cancel.t() | Orders.Responses.CancelAccepted.t()
   @type cancel_order_error_reason :: Adapter.cancel_order_error_reason()
 
   @spec cancel_order(order) :: {:ok, cancel_response} | {:error, cancel_order_error_reason}

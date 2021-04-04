@@ -30,14 +30,14 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
         leaves_qty = message.leaves_qty |> Tai.Utils.Decimal.cast!()
         cumulative_qty = message.cum_qty |> Tai.Utils.Decimal.cast!()
 
-        %Tai.Trading.OrderStore.Actions.PassivePartialFill{
+        %Tai.Orders.Transitions.PassivePartialFill{
           client_id: client_id,
           cumulative_qty: cumulative_qty,
           leaves_qty: leaves_qty,
           last_received_at: received_at,
           last_venue_timestamp: venue_timestamp
         }
-        |> Tai.Trading.OrderStore.update()
+        |> Tai.Orders.OrderStore.update()
         |> notify()
 
       _ ->
@@ -48,24 +48,24 @@ defimpl Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Message,
   end
 
   defp notify({:ok, {old, updated}}) do
-    Tai.Trading.NotifyOrderUpdate.notify!(old, updated)
+    Tai.Orders.Services.NotifyUpdate.notify!(old, updated)
   end
 
-  defp notify({:error, {:invalid_status, was, required, %action_name{} = action}}) do
+  defp notify({:error, {:invalid_status, was, required, %transition_name{} = transition}}) do
     TaiEvents.warn(%Tai.Events.OrderUpdateInvalidStatus{
-      client_id: action.client_id,
-      action: action_name,
+      client_id: transition.client_id,
+      transition: transition_name,
       was: was,
       required: required,
-      last_received_at: action.last_received_at,
-      last_venue_timestamp: action.last_venue_timestamp
+      last_received_at: transition.last_received_at,
+      last_venue_timestamp: transition.last_venue_timestamp
     })
   end
 
-  defp notify({:error, {:not_found, %action_name{} = action}}) do
+  defp notify({:error, {:not_found, %transition_name{} = transition}}) do
     TaiEvents.warn(%Tai.Events.OrderUpdateNotFound{
-      client_id: action.client_id,
-      action: action_name
+      client_id: transition.client_id,
+      transition: transition_name
     })
   end
 end

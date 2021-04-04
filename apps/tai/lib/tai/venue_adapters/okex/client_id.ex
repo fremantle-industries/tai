@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.OkEx.ClientId do
-  @type client_id :: Tai.Trading.Order.client_id()
+  @type client_id :: Tai.Orders.Order.client_id()
 
   @spec to_venue(client_id) :: String.t()
   def to_venue(client_id) do

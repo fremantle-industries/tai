@@ -158,7 +158,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
 
   defp build_not_found_order(venue_id) do
     struct(
-      Tai.Trading.Order,
+      Tai.Orders.Order,
       venue_id: venue_id,
       credential_id: :main,
       venue_product_symbol: venue_id |> venue_product_symbol,
@@ -169,7 +169,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   end
 
   defp build_enqueued_order(venue_id) do
-    struct(Tai.Trading.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue_id: venue_id,
       credential_id: :main,
@@ -186,7 +186,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   end
 
   defp build_open_order(order, order_response) do
-    struct(Tai.Trading.Order, %{
+    struct(Tai.Orders.Order, %{
       venue_order_id: order_response.id,
       venue_id: order.venue_id,
       credential_id: :main,

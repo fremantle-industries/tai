@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   use WebSockex
-  alias Tai.Trading.OrderStore
   alias Tai.Markets.OrderBook
+  alias Tai.Orders.{OrderStore, Transitions}
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
@@ -91,7 +91,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     leaves_qty = raw_leaves_qty |> Tai.Utils.Decimal.cast!()
 
     {:ok, {prev_order, updated_order}} =
-      %OrderStore.Actions.PassivePartialFill{
+      %Transitions.PassivePartialFill{
         client_id: client_id,
         cumulative_qty: cumulative_qty,
         leaves_qty: leaves_qty,
@@ -100,7 +100,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
       }
       |> OrderStore.update()
 
-    Tai.Trading.NotifyOrderUpdate.notify!(prev_order, updated_order)
+    Tai.Orders.Services.NotifyUpdate.notify!(prev_order, updated_order)
   end
 
   defp handle_msg(
@@ -114,7 +114,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.cast!()
 
     {:ok, {prev_order, updated_order}} =
-      %OrderStore.Actions.PassiveFill{
+      %Transitions.PassiveFill{
         client_id: client_id,
         cumulative_qty: cumulative_qty,
         last_received_at: Tai.Time.monotonic_time(),
@@ -122,7 +122,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
       }
       |> OrderStore.update()
 
-    Tai.Trading.NotifyOrderUpdate.notify!(prev_order, updated_order)
+    Tai.Orders.Services.NotifyUpdate.notify!(prev_order, updated_order)
   end
 
   defp handle_msg(
@@ -133,14 +133,14 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          _state
        ) do
     {:ok, {prev_order, updated_order}} =
-      %OrderStore.Actions.PassiveCancel{
+      %Transitions.PassiveCancel{
         client_id: client_id,
         last_received_at: Tai.Time.monotonic_time(),
         last_venue_timestamp: Timex.now()
       }
       |> OrderStore.update()
 
-    Tai.Trading.NotifyOrderUpdate.notify!(prev_order, updated_order)
+    Tai.Orders.Services.NotifyUpdate.notify!(prev_order, updated_order)
   end
 
   defp handle_msg(msg, state) do

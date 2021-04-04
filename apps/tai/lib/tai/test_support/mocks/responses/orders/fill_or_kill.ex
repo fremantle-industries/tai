@@ -1,17 +1,18 @@
 defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
   alias Tai.TestSupport.Mocks
+  alias Tai.Orders
 
-  @type buy_limit :: Tai.Trading.OrderSubmissions.BuyLimitFok.t()
-  @type sell_limit :: Tai.Trading.OrderSubmissions.SellLimitFok.t()
+  @type buy_limit :: Tai.Orders.OrderSubmissions.BuyLimitFok.t()
+  @type sell_limit :: Tai.Orders.OrderSubmissions.SellLimitFok.t()
   @type submission :: buy_limit | sell_limit
-  @type venue_order_id :: Tai.Trading.Order.venue_order_id()
+  @type venue_order_id :: Tai.Orders.Order.venue_order_id()
   @type insert_result :: :ok
 
   @spec expired(venue_order_id, submission) :: insert_result
   def expired(venue_order_id, submission) do
     qty = submission.qty
 
-    order_response = %Tai.Trading.OrderResponses.Create{
+    order_response = %Orders.Responses.Create{
       id: venue_order_id,
       status: :expired,
       original_size: qty,
@@ -37,7 +38,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.FillOrKill do
 
   @spec filled(venue_order_id, submission) :: insert_result
   def filled(venue_order_id, submission) do
-    order_response = %Tai.Trading.OrderResponses.Create{
+    order_response = %Orders.Responses.Create{
       id: venue_order_id,
       status: :filled,
       original_size: submission.qty,

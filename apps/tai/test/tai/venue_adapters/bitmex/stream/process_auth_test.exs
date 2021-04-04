@@ -9,7 +9,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthTest do
 
   setup do
     start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Trading.OrderStore)
+    start_supervised!(Tai.Orders.OrderStore)
     start_supervised!({ProcessAuth, [venue: @venue, credential: @credential]})
     :ok
   end

@@ -1,11 +1,11 @@
 defmodule Tai.Events.OrderUpdateInvalidStatus do
   alias __MODULE__
 
-  @type status :: Tai.Trading.Order.status()
-  @type client_id :: Tai.Trading.Order.client_id()
+  @type status :: Tai.Orders.Order.status()
+  @type client_id :: Tai.Orders.Order.client_id()
   @type t :: %OrderUpdateInvalidStatus{
           client_id: client_id,
-          action: atom | module,
+          transition: atom | module,
           was: status,
           required: status | [status],
           last_received_at: DateTime.t() | nil,
@@ -14,13 +14,13 @@ defmodule Tai.Events.OrderUpdateInvalidStatus do
 
   @enforce_keys ~w[
     client_id
-    action
+    transition
     was
     required
   ]a
   defstruct ~w[
     client_id
-    action
+    transition
     was
     required
     last_received_at

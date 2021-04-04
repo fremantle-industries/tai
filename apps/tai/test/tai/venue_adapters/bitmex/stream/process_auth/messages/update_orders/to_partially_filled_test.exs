@@ -3,12 +3,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPa
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.ClientId
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
-  alias Tai.Trading.OrderStore
+  alias Tai.Orders.OrderStore
 
   setup do
     {:ok, _} = Application.ensure_all_started(:tzdata)
     start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Trading.OrderStore)
+    start_supervised!(Tai.Orders.OrderStore)
 
     :ok
   end
@@ -23,15 +23,15 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPa
 
     assert {:ok, order} = enqueue()
 
-    action =
-      struct(Tai.Trading.OrderStore.Actions.Open,
+    transition =
+      struct(Tai.Orders.Transitions.Open,
         client_id: order.client_id,
         cumulative_qty: Decimal.new(0),
         leaves_qty: Decimal.new(20),
         last_received_at: @received_at
       )
 
-    assert {:ok, {_old, _updated}} = OrderStore.update(action)
+    assert {:ok, {_old, _updated}} = OrderStore.update(transition)
 
     msg =
       struct(ProcessAuth.Messages.UpdateOrders.ToPartiallyFilled,
@@ -58,8 +58,8 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPa
 
     assert {:ok, order} = enqueue()
 
-    action = struct(Tai.Trading.OrderStore.Actions.Skip, client_id: order.client_id)
-    assert {:ok, {_old, _updated}} = OrderStore.update(action)
+    transition = struct(Tai.Orders.Transitions.Skip, client_id: order.client_id)
+    assert {:ok, {_old, _updated}} = OrderStore.update(transition)
 
     msg =
       struct(ProcessAuth.Messages.UpdateOrders.ToPartiallyFilled,
@@ -72,7 +72,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPa
     ProcessAuth.Message.process(msg, @received_at, @state)
 
     assert_event(%Tai.Events.OrderUpdateInvalidStatus{} = invalid_status_event)
-    assert invalid_status_event.action == Tai.Trading.OrderStore.Actions.PassivePartialFill
+    assert invalid_status_event.transition == Tai.Orders.Transitions.PassivePartialFill
     assert invalid_status_event.was == :skip
 
     assert invalid_status_event.required == [
@@ -101,13 +101,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPa
 
     assert_event(%Tai.Events.OrderUpdateNotFound{} = not_found_event)
     assert not_found_event.client_id != @venue_client_id
-    assert not_found_event.action == Tai.Trading.OrderStore.Actions.PassivePartialFill
+    assert not_found_event.transition == Tai.Orders.Transitions.PassivePartialFill
   end
 
   defp enqueue, do: build_submission() |> OrderStore.enqueue()
 
   defp build_submission do
-    struct(Tai.Trading.OrderSubmissions.BuyLimitGtc,
+    struct(Tai.Orders.OrderSubmissions.BuyLimitGtc,
       venue_id: :my_venue,
       product_symbol: :btc_usd,
       price: Decimal.new("100.1"),

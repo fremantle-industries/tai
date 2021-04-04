@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.Binance.CancelOrder do
   alias Tai.VenueAdapters.Binance.OrderStatus
+  alias Tai.Orders
 
   def cancel_order(order, credentials) do
     venue_credentials = struct!(ExBinance.Credentials, credentials)
@@ -14,7 +15,7 @@ defmodule Tai.VenueAdapters.Binance.CancelOrder do
     as: :cancel_order_by_order_id
 
   defp parse_response({:ok, %ExBinance.Responses.CancelOrder{} = venue_response}) do
-    response = %Tai.Trading.OrderResponses.Cancel{
+    response = %Orders.Responses.Cancel{
       id: venue_response.order_id,
       status: venue_response.status |> OrderStatus.from_venue(),
       leaves_qty: Decimal.new(0),
