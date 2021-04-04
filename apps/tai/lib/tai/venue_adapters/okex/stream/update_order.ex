@@ -55,14 +55,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         %{
           "state" => state,
           "order_id" => venue_order_id,
-          "filled_qty" => filled_qty,
           "timestamp" => timestamp,
           "size" => size
-        },
+        } = msg,
         received_at,
         _state
       )
       when state == @pending do
+    filled_qty = Map.get(msg, "filled_size") || Map.fetch!(msg, "filled_qty")
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new() |> Decimal.sub(cumulative_qty)
@@ -83,14 +83,14 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         client_id,
         %{
           "state" => state,
-          "filled_qty" => filled_qty,
           "timestamp" => timestamp,
           "size" => size
-        },
+        } = msg,
         received_at,
         _state
       )
       when state == @partially_filled do
+    filled_qty = Map.get(msg, "filled_size") || Map.fetch!(msg, "filled_qty")
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
     leaves_qty = size |> Decimal.new() |> Decimal.sub(cumulative_qty)
@@ -110,13 +110,13 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
         client_id,
         %{
           "state" => state,
-          "filled_qty" => filled_qty,
           "timestamp" => timestamp
-        },
+        } = msg,
         received_at,
         _state
       )
       when state == @fully_filled do
+    filled_qty = Map.get(msg, "filled_size") || Map.fetch!(msg, "filled_qty")
     {:ok, venue_timestamp} = Timex.parse(timestamp, @date_format)
     cumulative_qty = filled_qty |> Decimal.new()
 
