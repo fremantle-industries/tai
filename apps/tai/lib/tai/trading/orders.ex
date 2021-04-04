@@ -1,7 +1,6 @@
 defmodule Tai.Trading.Orders do
   alias Tai.Trading.{
     Order,
-    Orders,
     OrderSubmissions,
     OrderWorker
   }
@@ -9,10 +8,10 @@ defmodule Tai.Trading.Orders do
   @type submission :: OrderSubmissions.Factory.submission()
   @type order :: Order.t()
   @type create_response :: OrderWorker.create_response()
+  @type cancel_response :: OrderWorker.cancel_response()
   @type amend_attrs :: OrderWorker.amend_attrs()
   @type amend_response :: OrderWorker.amend_response()
-  @type amend_bulk_response :: Orders.AmendBulk.response()
-  @type cancel_response :: OrderWorker.cancel_response()
+  @type amend_bulk_response :: OrderWorker.amend_bulk_response()
 
   @timeout 5_000
 
@@ -36,10 +35,14 @@ defmodule Tai.Trading.Orders do
   end
 
   @spec amend_bulk([{order, amend_attrs}]) :: amend_bulk_response
-  defdelegate amend_bulk(amend_set), to: Orders.AmendBulk
-
   @spec amend_bulk([{order, amend_attrs}], module) :: amend_bulk_response
-  defdelegate amend_bulk(amend_set, provider), to: Orders.AmendBulk
+  def amend_bulk(amend_set, provider \\ OrderWorker.Provider) do
+    :poolboy.transaction(
+      :order_worker,
+      & OrderWorker.amend_bulk(&1, amend_set, provider),
+      @timeout
+    )
+  end
 
   @spec cancel(order) :: cancel_response
   @spec cancel(order, module) :: cancel_response

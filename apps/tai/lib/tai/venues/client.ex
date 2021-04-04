@@ -64,7 +64,7 @@ defmodule Tai.Venues.Client do
     venue.adapter.amend_order(order, attrs, credentials)
   end
 
-  @type amend_bulk_attrs :: Tai.Trading.Orders.AmendBulk.attrs()
+  @type amend_bulk_attrs :: Tai.Trading.OrderWorker.amend_attrs()
   @type amend_bulk_response :: OrderResponses.AmendBulk.t()
   @type amend_bulk_order_error_reason :: Adapter.amend_order_error_reason()
 
