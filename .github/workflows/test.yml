@@ -9,74 +9,14 @@ on:
       - '*'
 
 jobs:
-  test-elixir-lt-1-11:
-    runs-on: ubuntu-latest
-    name: Test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
-
-    strategy:
-      matrix:
-        otp: [21.x, 22.x, 23.x]
-        elixir: [1.8.x, 1.9.x, 1.10.x]
-
-    steps:
-      - uses: actions/checkout@v2.3.4
-
-      - uses: erlef/setup-elixir@v1.7
-        with:
-          otp-version: ${{matrix.otp}}
-          elixir-version: ${{matrix.elixir}}
-
-      - name: Cache Dependencies
-        uses: actions/cache@v2.1.4
-        with:
-          path: |
-            deps
-            _build/dev
-            _build/test
-          key: elixir-cache-${{secrets.CACHE_VERSION}}-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-${{hashFiles('mix.lock')}}-${{github.ref}}
-          restore-keys: |
-            elixir-cache-${{secrets.CACHE_VERSION}}-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-${{hashFiles('mix.lock')}}-
-            elixir-cache-${{secrets.CACHE_VERSION}}-${{matrix.elixir}}-otp-${{matrix.otp}}-${{runner.os}}-
-
-      - name: Install Dependencies
-        run: mix deps.get
-
-      - name: Test
-        env:
-          BINANCE_API_KEY: ../../secrets/ci/binance_api_key
-          BINANCE_API_SECRET: ../../secrets/ci/binance_api_secret
-          BITMEX_API_KEY: ../../secrets/ci/bitmex_api_key
-          BITMEX_API_SECRET: ../../secrets/ci/bitmex_api_secret
-          GDAX_API_KEY: ../../secrets/ci/gdax_api_key
-          GDAX_API_PASSPHRASE: ../../secrets/ci/gdax_api_passphrase
-          GDAX_API_SECRET: ../../secrets/ci/gdax_api_secret
-          OKEX_API_KEY: ../../secrets/ci/okex_api_key
-          OKEX_API_PASSPHRASE: ../../secrets/ci/okex_api_passphrase
-          OKEX_API_SECRET: ../../secrets/ci/okex_api_secret
-          DERIBIT_CLIENT_ID: ../../secrets/ci/deribit_client_id
-          DERIBIT_CLIENT_SECRET: ../../secrets/ci/deribit_client_secret
-          FTX_API_KEY: ../../secrets/ci/ftx_api_key
-          FTX_API_SECRET: ../../secrets/ci/ftx_api_secret
-        run: mix test
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: log artifacts
-          path: |
-            apps/tai/log
-            apps/examples/log
-
-      - name: Dialyzer
-        run: mix dialyzer
-
-  test-elixir-gte-1-11:
+  test-elixir:
     runs-on: ubuntu-latest
     name: Test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
 
     strategy:
       matrix:
         otp: [22.x, 23.x]
-        elixir: [1.11.x]
+        elixir: [1.10.x, 1.11.x]
 
     steps:
       - uses: actions/checkout@v2.3.4

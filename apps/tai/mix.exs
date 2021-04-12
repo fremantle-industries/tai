@@ -5,11 +5,11 @@ defmodule Tai.Mixfile do
     [
       app: :tai,
       version: "0.0.64",
+      elixir: "~> 1.10",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.8",
       package: package(),
       start_permanent: Mix.env() == :prod,
       description: description(),
