@@ -1,0 +1,41 @@
+[
+  {
+    "request": {
+      "body": "[{\"client_oid\":\"ALZNOS73HNDLRPEU4AJKRDHII4\",\"instrument_id\":\"ETH-USDT\",\"order_type\":0,\"price\":\"70000.0\",\"side\":\"sell\",\"size\":\"0.0001\",\"type\":\"limit\"}]",
+      "headers": {
+        "Content-Type": "application/json",
+        "OK-ACCESS-KEY": "***",
+        "OK-ACCESS-SIGN": "***",
+        "OK-ACCESS-TIMESTAMP": "***",
+        "OK-ACCESS-PASSPHRASE": "***"
+      },
+      "method": "post",
+      "options": [],
+      "request_body": "",
+      "url": "https://www.okex.com/api/spot/v3/batch_orders"
+    },
+    "response": {
+      "binary": false,
+      "body": "{\"btc-usdt\":[{\"client_oid\":\"ALZNOS73HNDLRPEU4AJKRDHII4\",\"code\":\"0\",\"error_code\":\"0\",\"error_message\":\"\",\"message\":\"\",\"order_id\":\"6782976323314688\",\"result\":true}]}",
+      "headers": {
+        "Date": "Mon, 12 Apr 2021 14:00:04 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "162",
+        "Connection": "keep-alive",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Frame-Options": "DENY",
+        "X-BrokerID": "0",
+        "Strict-Transport-Security": "max-age=63072000; includeSubdomains; preload",
+        "CF-Cache-Status": "DYNAMIC",
+        "Expect-CT": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+        "Server": "cloudflare"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

@@ -130,16 +130,19 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
   defp venue_product_symbol(:bitmex), do: "XBTH19"
   defp venue_product_symbol(:okex_futures), do: "ETH-USD-190628"
   defp venue_product_symbol(:okex_swap), do: "ETH-USD-SWAP"
+  defp venue_product_symbol(:okex_spot), do: "ETH-USDT"
   defp venue_product_symbol(:ftx), do: "BTC/USD"
   defp venue_product_symbol(_), do: "LTC-BTC"
 
   defp product_symbol(:bitmex), do: :xbth19
   defp product_symbol(:okex_futures), do: :eth_usd_190628
   defp product_symbol(:okex_swap), do: :eth_usd_swap
+  defp product_symbol(:okex_spot), do: :eth_usdt
   defp product_symbol(:ftx), do: :"btc/usd"
   defp product_symbol(_), do: :ltc_btc
 
   defp product_type(:okex_swap), do: :swap
+  defp product_type(:okex_spot), do: :spot
   defp product_type(_), do: :future
 
   defp price(:bitmex, :buy, :gtc, :filled), do: Decimal.new("4455")
@@ -150,6 +153,8 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
   defp price(:okex_futures, :sell, :gtc, :unfilled), do: Decimal.new("290.5")
   defp price(:okex_swap, :buy, :gtc, :unfilled), do: Decimal.new("70.5")
   defp price(:okex_swap, :sell, :gtc, :unfilled), do: Decimal.new("290.5")
+  defp price(:okex_spot, :buy, :gtc, :unfilled), do: Decimal.new("70.5")
+  defp price(:okex_spot, :sell, :gtc, :unfilled), do: Decimal.new("290.5")
   defp price(:ftx, :buy, :gtc, :unfilled), do: Decimal.new("25000.5")
   defp price(:ftx, :sell, :gtc, :unfilled), do: Decimal.new("75000.5")
   defp price(:bitmex, :buy, :gtc, :partially_filled), do: Decimal.new("4130")
@@ -168,6 +173,8 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
   defp qty(:okex_futures, :sell, _, _), do: Decimal.new(1)
   defp qty(:okex_swap, :buy, _, _), do: Decimal.new(1)
   defp qty(:okex_swap, :sell, _, _), do: Decimal.new(1)
+  defp qty(:okex_spot, :buy, _, _), do: Decimal.new(1)
+  defp qty(:okex_spot, :sell, _, _), do: Decimal.new(1)
   defp qty(:ftx, :buy, :gtc, :unfilled), do: Decimal.new("0.0001")
   defp qty(:ftx, :sell, :gtc, :unfilled), do: Decimal.new("0.0001")
   defp qty(_, _, :gtc, :insufficient_balance), do: Decimal.new(1_000)

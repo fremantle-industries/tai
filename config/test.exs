@@ -167,7 +167,14 @@ config(:tai, :test_venue_adapters_accounts, [
 config(:tai, :test_venue_adapters_accounts_error, [:bitmex])
 config(:tai, :test_venue_adapters_maker_taker_fees, [:mock, :binance, :gdax, :okex, :ftx])
 config(:tai, :test_venue_adapters_create_order_gtc_open, [:bitmex, :binance])
-config(:tai, :test_venue_adapters_create_order_gtc_accepted, [:okex_futures, :okex_swap, :ftx])
+
+config(:tai, :test_venue_adapters_create_order_gtc_accepted, [
+  :okex_futures,
+  :okex_spot,
+  :okex_swap,
+  :ftx
+])
+
 config(:tai, :test_venue_adapters_create_order_fok, [:bitmex, :binance])
 config(:tai, :test_venue_adapters_create_order_ioc, [:bitmex, :binance])
 config(:tai, :test_venue_adapters_create_order_ioc_accepted, [:ftx])
