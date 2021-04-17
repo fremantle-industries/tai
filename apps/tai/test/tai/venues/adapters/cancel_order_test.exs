@@ -101,29 +101,34 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   defp venue_product_symbol(:bitmex), do: "XBTH19"
   defp venue_product_symbol(:okex_swap), do: "ETH-USD-SWAP"
   defp venue_product_symbol(:okex_futures), do: "ETH-USD-190426"
+  defp venue_product_symbol(:okex_spot), do: "BTC-USDT"
   defp venue_product_symbol(:ftx), do: "BTC/USD"
   defp venue_product_symbol(_), do: "LTC-BTC"
 
   defp product_symbol(:bitmex), do: :xbth19
   defp product_symbol(:okex_swap), do: :eth_usd_swap
   defp product_symbol(:okex_futures), do: :eth_usd_190426
+  defp product_symbol(:okex_spot), do: :btc_usdt
   defp product_symbol(:ftx), do: :btc_usd
   defp product_symbol(_), do: :ltc_btc
 
   defp product_type(:bitmex), do: :future
   defp product_type(:okex_swap), do: :swap
   defp product_type(:okex_futures), do: :future
+  defp product_type(:okex_spot), do: :spot
   defp product_type(_), do: :spot
 
   defp price(:bitmex), do: Decimal.new("100.5")
   defp price(:okex_swap), do: Decimal.new("100.5")
   defp price(:okex_futures), do: Decimal.new("100.5")
+  defp price(:okex_spot), do: Decimal.new("61000.0")
   defp price(:ftx), do: Decimal.new("25000.5")
   defp price(_), do: Decimal.new("0.007")
 
   defp qty(:bitmex), do: Decimal.new(1)
   defp qty(:okex_swap), do: Decimal.new(5)
   defp qty(:okex_futures), do: Decimal.new(5)
+  defp qty(:okex_spot), do: Decimal.new("0.0001")
   defp qty(:ftx), do: Decimal.new("0.0001")
   defp qty(_), do: Decimal.new("0.5")
 end
