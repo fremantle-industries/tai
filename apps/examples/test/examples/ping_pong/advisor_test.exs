@@ -44,5 +44,9 @@ defmodule Examples.PingPong.AdvisorTest do
     assert_event(%OrderUpdated{side: :sell, status: :open} = open_exit)
     assert open_exit.price == Decimal.new("5504.5")
     assert open_exit.qty == Decimal.new(10)
+
+    stop_advisors(where: [group_id: @scenario])
+
+    assert_event(%OrderUpdated{side: :sell, status: :canceled})
   end
 end

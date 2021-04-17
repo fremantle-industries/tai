@@ -137,6 +137,8 @@ defmodule ExamplesSupport.E2E.PingPong do
       cumulative_qty: 10,
       leaves_qty: 0
     })
+
+    Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel.canceled(@exit_venue_order_id)
   end
 
   def advisor_group_config(:ping_pong) do
