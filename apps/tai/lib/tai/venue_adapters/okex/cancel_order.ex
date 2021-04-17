@@ -25,36 +25,50 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
     venue_config = credentials |> to_venue_credentials
     venue_symbol = order.venue_product_symbol
     mod = order |> module_for()
-    mod.cancel_orders(venue_symbol, [order.venue_order_id], %{}, venue_config)
+    {mod.cancel_orders(venue_symbol, [order.venue_order_id], %{}, venue_config), order}
   end
 
   defp module_for(%Tai.Orders.Order{product_type: :future}), do: ExOkex.Futures.Private
   defp module_for(%Tai.Orders.Order{product_type: :swap}), do: ExOkex.Swap.Private
+  defp module_for(%Tai.Orders.Order{product_type: :spot}), do: ExOkex.Spot.Private
 
   defdelegate to_venue_credentials(credentials),
     to: Tai.VenueAdapters.OkEx.Credentials,
     as: :from
 
-  defp parse_response({:ok, %{"result" => true, "order_ids" => [order_id | _]}}) do
+  defp parse_response({{:ok, %{"result" => true, "order_ids" => [order_id | _]}}, _order}) do
     received_at = Tai.Time.monotonic_time()
     response = %Orders.Responses.CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 
-  defp parse_response({:ok, %{"result" => "true", "ids" => [order_id | _]}}) do
+  defp parse_response({{:ok, %{"result" => "true", "ids" => [order_id | _]}}, _order}) do
     received_at = Tai.Time.monotonic_time()
     response = %Orders.Responses.CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 
-  defp parse_response({:ok, %{"result" => false, "error_message" => "error order_ids"}}) do
+  defp parse_response({{:ok, response}, %Tai.Orders.Order{product_type: :spot}}) do
+    response
+    |> Map.values()
+    |> List.flatten()
+    |> parse_spot_response()
+  end
+
+  defp parse_response({{:ok, %{"result" => false, "error_message" => "error order_ids"}}, _order}) do
     {:error, :not_found}
   end
 
-  defp parse_response({:ok, %{"result" => "false"}}) do
+  defp parse_response({{:ok, %{"result" => "false"}}, _order}) do
     {:error, :not_found}
   end
 
-  defp parse_response({:error, :timeout}), do: {:error, :timeout}
-  defp parse_response({:error, :connect_timeout}), do: {:error, :connect_timeout}
+  defp parse_response({{:error, :timeout}, _order}), do: {:error, :timeout}
+  defp parse_response({{:error, :connect_timeout}, _order}), do: {:error, :connect_timeout}
+
+  defp parse_spot_response([%{"result" => true, "error_code" => "0", "order_id" => order_id} | _]) do
+    received_at = Tai.Time.monotonic_time()
+    response = %Orders.Responses.CancelAccepted{id: order_id, received_at: received_at}
+    {:ok, response}
+  end
 end
