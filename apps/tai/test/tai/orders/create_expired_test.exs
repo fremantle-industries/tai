@@ -3,7 +3,7 @@ defmodule Tai.Orders.CreateExpiredTest do
   import Tai.TestSupport.Mock
   import Support.Orders
   alias Tai.TestSupport.Mocks
-  alias Tai.Orders.{Order, OrderSubmissions}
+  alias Tai.Orders.{Order, Submissions}
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
   @venue :venue_a
@@ -18,8 +18,8 @@ defmodule Tai.Orders.CreateExpiredTest do
   end
 
   [
-    {:buy, OrderSubmissions.BuyLimitIoc},
-    {:sell, OrderSubmissions.SellLimitIoc}
+    {:buy, Submissions.BuyLimitIoc},
+    {:sell, Submissions.SellLimitIoc}
   ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
@@ -29,7 +29,7 @@ defmodule Tai.Orders.CreateExpiredTest do
       cumulative_qty = Decimal.new(3)
 
       submission =
-        Support.OrderSubmissions.build_with_callback(@submission_type, %{
+        Support.Orders.Submissions.build_with_callback(@submission_type, %{
           venue_id: @venue,
           credential_id: @credential,
           qty: original_qty

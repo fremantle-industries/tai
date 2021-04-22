@@ -1,4 +1,4 @@
-defmodule Tai.Orders.OrderSubmissions.SellLimitFok do
+defmodule Tai.Orders.Submissions.SellLimitFok do
   alias __MODULE__
 
   @type venue_id :: Tai.Venue.id()

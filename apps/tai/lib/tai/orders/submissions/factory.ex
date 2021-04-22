@@ -1,7 +1,7 @@
-defmodule Tai.Orders.OrderSubmissions.Factory do
+defmodule Tai.Orders.Submissions.Factory do
   alias Tai.Orders.Order
 
-  alias Tai.Orders.OrderSubmissions.{
+  alias Tai.Orders.Submissions.{
     BuyLimitGtc,
     BuyLimitFok,
     BuyLimitIoc,

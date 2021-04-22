@@ -1,8 +1,8 @@
 defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
   alias Tai.TestSupport.Mocks
 
-  @type buy_limit :: Tai.Orders.OrderSubmissions.BuyLimitGtc.t()
-  @type sell_limit :: Tai.Orders.OrderSubmissions.SellLimitGtc.t()
+  @type buy_limit :: Tai.Orders.Submissions.BuyLimitGtc.t()
+  @type sell_limit :: Tai.Orders.Submissions.SellLimitGtc.t()
   @type submission :: buy_limit | sell_limit
   @type venue_order_id :: Tai.Orders.Order.venue_order_id()
   @type order :: Tai.Orders.Order.t()
@@ -11,7 +11,7 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.Error do
 
   @spec create_raise(submission, reason) :: :ok
   def create_raise(submission, reason) do
-    order = Tai.Orders.OrderSubmissions.Factory.build!(submission)
+    order = Tai.Orders.Submissions.Factory.build!(submission)
 
     match_attrs = %{
       symbol: order.product_symbol,

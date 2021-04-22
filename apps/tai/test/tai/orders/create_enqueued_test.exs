@@ -3,7 +3,7 @@ defmodule Tai.Orders.CreateEnqueuedTest do
   import Tai.TestSupport.Mock
   import Support.Orders
   alias Tai.TestSupport.Mocks
-  alias Tai.Orders.OrderSubmissions
+  alias Tai.Orders.Submissions
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
   @venue :venue_a
@@ -19,15 +19,15 @@ defmodule Tai.Orders.CreateEnqueuedTest do
   end
 
   [
-    {:buy, OrderSubmissions.BuyLimitGtc},
-    {:sell, OrderSubmissions.SellLimitGtc}
+    {:buy, Submissions.BuyLimitGtc},
+    {:sell, Submissions.SellLimitGtc}
   ]
   |> Enum.each(fn {side, submission_type} ->
     @side side
     @submission_type submission_type
 
     test "#{side} enqueues the order" do
-      submission = Support.OrderSubmissions.build(@submission_type, @submission_attrs)
+      submission = Support.Orders.Submissions.build(@submission_type, @submission_attrs)
       Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 
       assert {:ok, order} = Tai.Orders.create(submission)

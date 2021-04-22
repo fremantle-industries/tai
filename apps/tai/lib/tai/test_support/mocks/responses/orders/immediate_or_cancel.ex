@@ -2,8 +2,8 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.ImmediateOrCancel do
   alias Tai.TestSupport.Mocks
   alias Tai.Orders
 
-  @type buy_limit :: Tai.Orders.OrderSubmissions.BuyLimitIoc.t()
-  @type sell_limit :: Tai.Orders.OrderSubmissions.SellLimitIoc.t()
+  @type buy_limit :: Tai.Orders.Submissions.BuyLimitIoc.t()
+  @type sell_limit :: Tai.Orders.Submissions.SellLimitIoc.t()
   @type submission :: buy_limit | sell_limit
   @type venue_order_id :: Tai.Orders.Order.venue_order_id()
   @type insert_result :: :ok

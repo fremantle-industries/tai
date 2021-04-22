@@ -1,7 +1,7 @@
 defmodule Tai.Orders.CreateSkipTest do
   use ExUnit.Case, async: false
   import Support.Orders
-  alias Tai.Orders.{Order, OrderSubmissions}
+  alias Tai.Orders.{Order, Submissions}
 
   setup do
     setup_orders(&start_supervised!/1)
@@ -11,14 +11,14 @@ defmodule Tai.Orders.CreateSkipTest do
   end
 
   [
-    {:buy, OrderSubmissions.BuyLimitGtc},
-    {:sell, OrderSubmissions.SellLimitGtc}
+    {:buy, Submissions.BuyLimitGtc},
+    {:sell, Submissions.SellLimitGtc}
   ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
 
     test "#{side} updates the leaves qty" do
-      submission = Support.OrderSubmissions.build_with_callback(@submission_type)
+      submission = Support.Orders.Submissions.build_with_callback(@submission_type)
 
       {:ok, _} = Tai.Orders.create(submission)
 

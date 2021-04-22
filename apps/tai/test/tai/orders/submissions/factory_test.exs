@@ -1,7 +1,7 @@
-defmodule Tai.Orders.OrderSubmissions.FactoryTest do
+defmodule Tai.Orders.Submissions.FactoryTest do
   use ExUnit.Case, async: true
-  doctest Tai.Orders.OrderSubmissions.Factory
-  alias Tai.Orders.OrderSubmissions.Factory
+  doctest Tai.Orders.Submissions.Factory
+  alias Tai.Orders.Submissions.Factory
 
   describe ".build!" do
     [:buy, :sell]
@@ -83,7 +83,7 @@ defmodule Tai.Orders.OrderSubmissions.FactoryTest do
   end
 
   def build_submission(:buy, :gtc, post_only: post_only) do
-    %Tai.Orders.OrderSubmissions.BuyLimitGtc{
+    %Tai.Orders.Submissions.BuyLimitGtc{
       venue_id: :test_exchange_a,
       credential_id: :main,
       venue_product_symbol: "BTC-USD",
@@ -97,7 +97,7 @@ defmodule Tai.Orders.OrderSubmissions.FactoryTest do
   end
 
   def build_submission(:sell, :gtc, post_only: post_only) do
-    %Tai.Orders.OrderSubmissions.SellLimitGtc{
+    %Tai.Orders.Submissions.SellLimitGtc{
       venue_id: :test_exchange_a,
       credential_id: :main,
       venue_product_symbol: "BTC-USD",
@@ -111,7 +111,7 @@ defmodule Tai.Orders.OrderSubmissions.FactoryTest do
   end
 
   def build_submission(:buy, :fok) do
-    %Tai.Orders.OrderSubmissions.BuyLimitFok{
+    %Tai.Orders.Submissions.BuyLimitFok{
       venue_id: :test_exchange_a,
       credential_id: :main,
       venue_product_symbol: "BTC-USD",
@@ -124,7 +124,7 @@ defmodule Tai.Orders.OrderSubmissions.FactoryTest do
   end
 
   def build_submission(:sell, :fok) do
-    %Tai.Orders.OrderSubmissions.SellLimitFok{
+    %Tai.Orders.Submissions.SellLimitFok{
       venue_id: :test_exchange_a,
       credential_id: :main,
       venue_product_symbol: "BTC-USD",
@@ -137,7 +137,7 @@ defmodule Tai.Orders.OrderSubmissions.FactoryTest do
   end
 
   def build_submission(:buy, :ioc) do
-    %Tai.Orders.OrderSubmissions.BuyLimitIoc{
+    %Tai.Orders.Submissions.BuyLimitIoc{
       venue_id: :test_exchange_a,
       credential_id: :main,
       venue_product_symbol: "BTC-USD",
@@ -150,7 +150,7 @@ defmodule Tai.Orders.OrderSubmissions.FactoryTest do
   end
 
   def build_submission(:sell, :ioc) do
-    %Tai.Orders.OrderSubmissions.SellLimitIoc{
+    %Tai.Orders.Submissions.SellLimitIoc{
       venue_id: :test_exchange_a,
       credential_id: :main,
       venue_product_symbol: "BTC-USD",

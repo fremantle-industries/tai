@@ -1,11 +1,11 @@
 defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
   alias Tai.TestSupport.Mocks
-  alias Tai.Orders.{Order, OrderSubmissions}
+  alias Tai.Orders.{Order, Submissions}
   alias Tai.Orders
 
   @type order :: Order.t()
-  @type buy_limit :: OrderSubmissions.BuyLimitGtc.t()
-  @type sell_limit :: OrderSubmissions.SellLimitGtc.t()
+  @type buy_limit :: Submissions.BuyLimitGtc.t()
+  @type sell_limit :: Submissions.SellLimitGtc.t()
   @type submission :: buy_limit | sell_limit
   @type venue_order_id :: String.t()
   @type insert_result :: :ok

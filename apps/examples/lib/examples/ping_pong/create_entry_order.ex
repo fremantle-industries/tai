@@ -1,6 +1,6 @@
 defmodule Examples.PingPong.CreateEntryOrder do
   alias Examples.PingPong.{Config, EntryPrice}
-  alias Tai.Orders.OrderSubmissions
+  alias Tai.Orders.Submissions
 
   @type advisor_process :: Tai.Advisor.advisor_name()
   @type market_quote :: Tai.Markets.Quote.t()
@@ -11,7 +11,7 @@ defmodule Examples.PingPong.CreateEntryOrder do
   def create(advisor_process, market_quote, config, orders_provider \\ Tai.Orders) do
     price = EntryPrice.calculate(market_quote, config.product)
 
-    %OrderSubmissions.BuyLimitGtc{
+    %Submissions.BuyLimitGtc{
       venue_id: market_quote.venue_id,
       credential_id: config.fee.credential_id,
       venue_product_symbol: config.product.venue_symbol,

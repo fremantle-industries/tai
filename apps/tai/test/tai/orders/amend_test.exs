@@ -18,8 +18,8 @@ defmodule Tai.Orders.AmendTest do
   end
 
   [
-    {:buy, Tai.Orders.OrderSubmissions.BuyLimitGtc},
-    {:sell, Tai.Orders.OrderSubmissions.SellLimitGtc}
+    {:buy, Tai.Orders.Submissions.BuyLimitGtc},
+    {:sell, Tai.Orders.Submissions.SellLimitGtc}
   ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
@@ -30,7 +30,7 @@ defmodule Tai.Orders.AmendTest do
       setup do
         {:ok, enqueued_order} =
           @submission_type
-          |> Support.OrderSubmissions.build_with_callback(%{
+          |> Support.Orders.Submissions.build_with_callback(%{
             venue_id: @venue,
             credential_id: @credential,
             price: @original_price,
@@ -104,7 +104,7 @@ defmodule Tai.Orders.AmendTest do
       setup do
         {:ok, enqueued_order} =
           @submission_type
-          |> Support.OrderSubmissions.build_with_callback(%{
+          |> Support.Orders.Submissions.build_with_callback(%{
             venue_id: @venue,
             credential_id: @credential,
             price: @original_price,

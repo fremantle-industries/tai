@@ -2,7 +2,7 @@ defmodule Tai.Orders.CancelTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Mock
   import Support.Orders
-  alias Tai.Orders.{Order, OrderSubmissions}
+  alias Tai.Orders.{Order, Submissions}
   alias Tai.TestSupport.Mocks
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
@@ -19,15 +19,15 @@ defmodule Tai.Orders.CancelTest do
   end
 
   [
-    {:buy, OrderSubmissions.BuyLimitGtc},
-    {:sell, OrderSubmissions.SellLimitGtc}
+    {:buy, Submissions.BuyLimitGtc},
+    {:sell, Submissions.SellLimitGtc}
   ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
 
     test "#{side} cancels the order on the venue" do
       submission =
-        Support.OrderSubmissions.build_with_callback(@submission_type, @submission_attrs)
+        Support.Orders.Submissions.build_with_callback(@submission_type, @submission_attrs)
 
       Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 

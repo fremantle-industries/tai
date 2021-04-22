@@ -14,7 +14,7 @@ defmodule Tai.IEx.Commands.OrdersTest do
 
   test "shows items in ascending order from when they were enqueued" do
     {:ok, btc_usd_order} =
-      %Tai.Orders.OrderSubmissions.BuyLimitFok{
+      %Tai.Orders.Submissions.BuyLimitFok{
         venue_id: :test_exchange_a,
         credential_id: :main,
         venue_product_symbol: "BTC-USD",
@@ -28,7 +28,7 @@ defmodule Tai.IEx.Commands.OrdersTest do
     btc_usd_order_client_id = "#{btc_usd_order.client_id |> String.slice(0..5)}..."
 
     {:ok, ltc_usd_order} =
-      %Tai.Orders.OrderSubmissions.SellLimitFok{
+      %Tai.Orders.Submissions.SellLimitFok{
         venue_id: :test_exchange_b,
         credential_id: :main,
         venue_product_symbol: "LTC-USD",

@@ -67,7 +67,7 @@ defmodule Tai.Orders.TransitionsTest do
   end
 
   defp build_submission do
-    struct(Tai.Orders.OrderSubmissions.BuyLimitGtc,
+    struct(Tai.Orders.Submissions.BuyLimitGtc,
       venue_id: :test_exchange_a,
       product_symbol: :btc_usd,
       price: Decimal.new("100.1"),

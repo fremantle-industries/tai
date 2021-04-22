@@ -77,7 +77,7 @@ defmodule Tai.Orders.OrderStoreTest do
   defp enqueue(store_id \\ @store_id), do: build_submission() |> OrderStore.enqueue(store_id)
 
   defp build_submission do
-    struct(Tai.Orders.OrderSubmissions.BuyLimitGtc,
+    struct(Tai.Orders.Submissions.BuyLimitGtc,
       venue_id: :test_exchange_a,
       product_symbol: :btc_usd,
       price: Decimal.new("100.1"),

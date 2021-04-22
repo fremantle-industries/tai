@@ -1,11 +1,11 @@
 defmodule Tai.Trading.Orders do
   alias Tai.Orders.{
     Order,
-    OrderSubmissions,
+    Submissions,
     Worker
   }
 
-  @type submission :: OrderSubmissions.Factory.submission()
+  @type submission :: Submissions.Factory.submission()
   @type order :: Order.t()
   @type create_response :: Worker.create_response()
   @type cancel_response :: Worker.cancel_response()

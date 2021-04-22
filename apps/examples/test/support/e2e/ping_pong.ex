@@ -44,7 +44,7 @@ defmodule ExamplesSupport.E2E.PingPong do
 
     Mocks.Responses.Orders.GoodTillCancel.open(
       @entry_venue_order_id_1,
-      %Tai.Orders.OrderSubmissions.BuyLimitGtc{
+      %Tai.Orders.Submissions.BuyLimitGtc{
         venue_id: @venue,
         credential_id: @credential,
         venue_product_symbol: @venue_product,
@@ -60,7 +60,7 @@ defmodule ExamplesSupport.E2E.PingPong do
 
     Mocks.Responses.Orders.GoodTillCancel.open(
       @entry_venue_order_id_2,
-      %Tai.Orders.OrderSubmissions.BuyLimitGtc{
+      %Tai.Orders.Submissions.BuyLimitGtc{
         venue_id: @venue,
         credential_id: @credential,
         venue_product_symbol: @venue_product,
@@ -117,7 +117,7 @@ defmodule ExamplesSupport.E2E.PingPong do
         client_id
       )
       when venue_id == @venue and product_symbol == @product do
-    submission = %Tai.Orders.OrderSubmissions.SellLimitGtc{
+    submission = %Tai.Orders.Submissions.SellLimitGtc{
       venue_id: @venue,
       credential_id: @credential,
       venue_product_symbol: @venue_product,

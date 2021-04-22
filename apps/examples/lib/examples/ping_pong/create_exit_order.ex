@@ -1,6 +1,6 @@
 defmodule Examples.PingPong.CreateExitOrder do
   alias Examples.PingPong.Config
-  alias Tai.Orders.OrderSubmissions
+  alias Tai.Orders.Submissions
 
   @type advisor_name :: Tai.Advisor.advisor_name()
   @type config :: Config.t()
@@ -11,7 +11,7 @@ defmodule Examples.PingPong.CreateExitOrder do
     price = exit_price(updated_entry_order, config.product)
     qty = Decimal.sub(updated_entry_order.cumulative_qty, prev_entry_order.cumulative_qty)
 
-    %OrderSubmissions.SellLimitGtc{
+    %Submissions.SellLimitGtc{
       venue_id: updated_entry_order.venue_id,
       credential_id: updated_entry_order.credential_id,
       venue_product_symbol: updated_entry_order.venue_product_symbol,

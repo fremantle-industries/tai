@@ -2,7 +2,7 @@ defmodule Tai.Orders.AmendErrorTest do
   use ExUnit.Case, async: false
   import Tai.TestSupport.Mock
   import Support.Orders
-  alias Tai.Orders.OrderSubmissions.SellLimitGtc
+  alias Tai.Orders.Submissions.SellLimitGtc
   alias Tai.Orders.{Order, Transitions}
   alias Tai.TestSupport.Mocks
 
@@ -47,7 +47,7 @@ defmodule Tai.Orders.AmendErrorTest do
   setup do
     setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
-    submission = Support.OrderSubmissions.build_with_callback(SellLimitGtc, @submission_attrs)
+    submission = Support.Orders.Submissions.build_with_callback(SellLimitGtc, @submission_attrs)
 
     {:ok, %{submission: submission}}
   end

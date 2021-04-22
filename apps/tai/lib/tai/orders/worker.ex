@@ -4,7 +4,7 @@ defmodule Tai.Orders.Worker do
   alias Tai.Orders.{
     Order,
     OrderStore,
-    OrderSubmissions,
+    Submissions,
     Responses,
     Transition,
     Transitions
@@ -20,7 +20,7 @@ defmodule Tai.Orders.Worker do
     defdelegate update(transition), to: OrderStore
   end
 
-  @type submission :: OrderSubmissions.Factory.submission()
+  @type submission :: Submissions.Factory.submission()
   @type order :: Order.t()
   @type status :: Tai.Orders.Order.status()
   @type status_required :: status | [status]

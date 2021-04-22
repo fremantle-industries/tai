@@ -1,4 +1,4 @@
-defmodule Support.OrderSubmissions do
+defmodule Support.Orders.Submissions do
   import Tai.TestSupport.Helpers
 
   def build(type, extra_attrs \\ %{}) do

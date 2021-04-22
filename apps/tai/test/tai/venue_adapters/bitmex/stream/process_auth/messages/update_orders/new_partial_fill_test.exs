@@ -111,7 +111,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.NewP
   defp enqueue, do: build_submission() |> OrderStore.enqueue()
 
   defp build_submission do
-    struct(Tai.Orders.OrderSubmissions.BuyLimitGtc,
+    struct(Tai.Orders.Submissions.BuyLimitGtc,
       venue_id: :my_venue,
       product_symbol: :btc_usd,
       price: Decimal.new("100.1"),

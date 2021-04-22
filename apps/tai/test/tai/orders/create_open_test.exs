@@ -3,7 +3,7 @@ defmodule Tai.Orders.CreateOpenTest do
   import Tai.TestSupport.Mock
   import Support.Orders
   alias Tai.TestSupport.Mocks
-  alias Tai.Orders.{Order, OrderSubmissions}
+  alias Tai.Orders.{Order, Submissions}
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
   @venue :venue_a
@@ -18,8 +18,8 @@ defmodule Tai.Orders.CreateOpenTest do
   end
 
   [
-    {:buy, OrderSubmissions.BuyLimitGtc},
-    {:sell, OrderSubmissions.SellLimitGtc}
+    {:buy, Submissions.BuyLimitGtc},
+    {:sell, Submissions.SellLimitGtc}
   ]
   |> Enum.each(fn {side, submission_type} ->
     @submission_type submission_type
@@ -29,7 +29,7 @@ defmodule Tai.Orders.CreateOpenTest do
       original_qty = Decimal.new(10)
 
       submission =
-        Support.OrderSubmissions.build_with_callback(@submission_type, %{
+        Support.Orders.Submissions.build_with_callback(@submission_type, %{
           venue_id: @venue,
           credential_id: @credential,
           price: original_price,

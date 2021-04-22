@@ -7,12 +7,12 @@ defmodule Tai.Orders.OrderStore do
 
   alias Tai.Orders.{
     Order,
-    OrderSubmissions,
+    Submissions,
     Transition,
     Transitions
   }
 
-  @type submission :: OrderSubmissions.Factory.submission()
+  @type submission :: Submissions.Factory.submission()
   @type order :: Order.t()
   @type status :: Order.status()
   @type client_id :: Order.client_id()
@@ -43,7 +43,7 @@ defmodule Tai.Orders.OrderStore do
   end
 
   def handle_call({:enqueue, submission}, _from, state) do
-    order = OrderSubmissions.Factory.build!(submission)
+    order = Submissions.Factory.build!(submission)
     response = state.backend.insert(order, state.name)
     {:reply, response, state}
   end
