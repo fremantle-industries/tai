@@ -25,7 +25,7 @@ defmodule Tai.Orders.CreateErrorTest do
     @submission_type submission_type
 
     test "#{side} records the error reason" do
-      submission = Support.Orders.Submissions.build_with_callback(@submission_type, @submission_attrs)
+      submission = build_submission_with_callback(@submission_type, @submission_attrs)
 
       {:ok, _} = Tai.Orders.create(submission)
 
@@ -46,7 +46,7 @@ defmodule Tai.Orders.CreateErrorTest do
     end
 
     test "#{side} rescues adapter errors" do
-      submission = Support.Orders.Submissions.build_with_callback(@submission_type, @submission_attrs)
+      submission = build_submission_with_callback(@submission_type, @submission_attrs)
 
       Mocks.Responses.Orders.Error.create_raise(submission, "Venue Adapter Create Raised Error")
       {:ok, _} = Tai.Orders.create(submission)

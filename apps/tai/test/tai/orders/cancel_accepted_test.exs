@@ -26,10 +26,9 @@ defmodule Tai.Orders.CancelAcceptedTest do
     @submission_type submission_type
 
     test "cancels #{side} order on venue and locally records that it was accepted" do
-      submission =
-        Support.Orders.Submissions.build_with_callback(@submission_type, @submission_attrs)
-
+      submission = build_submission_with_callback(@submission_type, @submission_attrs)
       Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
+
       {:ok, order} = Tai.Orders.create(submission)
 
       assert_receive {

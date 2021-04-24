@@ -47,7 +47,7 @@ defmodule Tai.Orders.CancelErrorTest do
   setup do
     setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
-    submission = Support.Orders.Submissions.build_with_callback(SellLimitGtc, @submission_attrs)
+    submission = build_submission_with_callback(SellLimitGtc, @submission_attrs)
 
     {:ok, %{submission: submission}}
   end

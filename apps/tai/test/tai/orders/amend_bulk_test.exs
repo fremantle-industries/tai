@@ -32,7 +32,7 @@ defmodule Tai.Orders.AmendBulkTest do
       setup do
         {:ok, enqueued_order} =
           @submission_type
-          |> Support.Orders.Submissions.build_with_callback(%{
+          |> build_submission_with_callback(%{
             venue_id: @venue,
             credential_id: @credential,
             price: @original_price,
@@ -53,7 +53,7 @@ defmodule Tai.Orders.AmendBulkTest do
 
         {:ok, enqueued_pend_order} =
           @submission_type
-          |> Support.Orders.Submissions.build(%{
+          |> build_submission_with_callback(%{
             price: @original_price,
             qty: @original_qty,
             order_updated_callback: fire_order_callback(self())

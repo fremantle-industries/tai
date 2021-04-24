@@ -29,7 +29,7 @@ defmodule Tai.Orders.CreateExpiredTest do
       cumulative_qty = Decimal.new(3)
 
       submission =
-        Support.Orders.Submissions.build_with_callback(@submission_type, %{
+        build_submission_with_callback(@submission_type, %{
           venue_id: @venue,
           credential_id: @credential,
           qty: original_qty

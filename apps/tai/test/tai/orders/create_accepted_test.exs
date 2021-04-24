@@ -26,10 +26,9 @@ defmodule Tai.Orders.CreateAcceptedTest do
     @submission_type submission_type
 
     test "#{side} records the venue order id & timestamp" do
-      submission =
-        Support.Orders.Submissions.build_with_callback(@submission_type, @submission_attrs)
-
+      submission = build_submission_with_callback(@submission_type, @submission_attrs)
       Mocks.Responses.Orders.GoodTillCancel.create_accepted(@venue_order_id, submission)
+
       {:ok, _} = Tai.Orders.create(submission)
 
       assert_receive {

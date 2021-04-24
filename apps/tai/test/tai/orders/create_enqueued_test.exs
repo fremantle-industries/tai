@@ -27,7 +27,7 @@ defmodule Tai.Orders.CreateEnqueuedTest do
     @submission_type submission_type
 
     test "#{side} enqueues the order" do
-      submission = Support.Orders.Submissions.build(@submission_type, @submission_attrs)
+      submission = build_submission(@submission_type, @submission_attrs)
       Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 
       assert {:ok, order} = Tai.Orders.create(submission)

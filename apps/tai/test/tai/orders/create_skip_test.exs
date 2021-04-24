@@ -18,7 +18,7 @@ defmodule Tai.Orders.CreateSkipTest do
     @submission_type submission_type
 
     test "#{side} updates the leaves qty" do
-      submission = Support.Orders.Submissions.build_with_callback(@submission_type)
+      submission = build_submission_with_callback(@submission_type)
 
       {:ok, _} = Tai.Orders.create(submission)
 

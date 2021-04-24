@@ -26,9 +26,7 @@ defmodule Tai.Orders.CancelTest do
     @submission_type submission_type
 
     test "#{side} cancels the order on the venue" do
-      submission =
-        Support.Orders.Submissions.build_with_callback(@submission_type, @submission_attrs)
-
+      submission = build_submission_with_callback(@submission_type, @submission_attrs)
       Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 
       {:ok, order} = Tai.Orders.create(submission)

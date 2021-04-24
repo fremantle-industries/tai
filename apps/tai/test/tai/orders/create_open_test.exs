@@ -29,7 +29,7 @@ defmodule Tai.Orders.CreateOpenTest do
       original_qty = Decimal.new(10)
 
       submission =
-        Support.Orders.Submissions.build_with_callback(@submission_type, %{
+        build_submission_with_callback(@submission_type, %{
           venue_id: @venue,
           credential_id: @credential,
           price: original_price,
