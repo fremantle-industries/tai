@@ -1,6 +1,5 @@
 defmodule Tai.Orders.AmendBulkTest do
   use ExUnit.Case, async: false
-  import Tai.TestSupport.Helpers
   import Tai.TestSupport.Mock
   import Support.Orders
   alias Tai.TestSupport.Mocks
@@ -53,11 +52,7 @@ defmodule Tai.Orders.AmendBulkTest do
 
         {:ok, enqueued_pend_order} =
           @submission_type
-          |> build_submission_with_callback(%{
-            price: @original_price,
-            qty: @original_qty,
-            order_updated_callback: fire_order_callback(self())
-          })
+          |> build_submission_with_callback(%{price: @original_price, qty: @original_qty})
           |> Tai.Orders.OrderStore.enqueue()
 
         {:ok, {_, open_pend_order}} =
