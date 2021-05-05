@@ -44,8 +44,8 @@ defmodule Tai.IEx.Commands.Orders do
         order.cumulative_qty,
         order.time_in_force,
         order.status,
-        order.client_id |> trunc_id(),
-        order.venue_order_id && order.venue_order_id |> trunc_id(),
+        order.client_id |> Tai.Utils.String.truncate(6),
+        order.venue_order_id && order.venue_order_id |> Tai.Utils.String.truncate(6),
         Timex.from_now(order.enqueued_at),
         order.last_received_at && Timex.from_now(order.last_received_at),
         order.last_venue_timestamp && Timex.from_now(order.last_venue_timestamp),
@@ -55,6 +55,4 @@ defmodule Tai.IEx.Commands.Orders do
     end)
     |> render!(@header)
   end
-
-  defp trunc_id(val), do: "#{val |> String.slice(0..5)}..."
 end
