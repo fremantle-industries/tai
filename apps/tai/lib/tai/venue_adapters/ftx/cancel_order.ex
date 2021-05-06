@@ -28,4 +28,8 @@ defmodule Tai.VenueAdapters.Ftx.CancelOrder do
     response = %Orders.Responses.CancelAccepted{id: venue_order_id, received_at: received_at}
     {:ok, response}
   end
+
+  defp parse_response({:error, "Order not found"}, _venue_order_id) do
+    {:error, :not_found}
+  end
 end
