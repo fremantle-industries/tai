@@ -202,7 +202,8 @@ config(:tai, :test_venue_adapters_cancel_order_accepted, [
 config(:tai, :test_venue_adapters_cancel_order_error_not_found, [
   :binance,
   :okex_futures,
-  :okex_swap
+  :okex_swap,
+  :ftx
 ])
 
 config(:tai, :test_venue_adapters_cancel_order_error_timeout, [:bitmex, :okex_futures, :okex_swap])

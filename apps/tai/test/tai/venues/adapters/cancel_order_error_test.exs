@@ -159,6 +159,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   defp build_not_found_order(venue_id) do
     struct(
       Tai.Orders.Order,
+      client_id: "6b677ec7-4b92-41e9-9a02-171fe99a2192",
       venue_id: venue_id,
       credential_id: :main,
       venue_product_symbol: venue_id |> venue_product_symbol,
