@@ -33,7 +33,7 @@ defmodule Tai.Venues.Adapter do
           | :insufficient_position
           | :not_found
           | :not_supported
-  @type cancel_order_error_reason :: shared_error_reason | :not_found
+  @type cancel_order_error_reason :: shared_error_reason | :not_found | :already_closed | :already_queued_for_cancelation
 
   @callback stream_supervisor :: module
   @callback products(venue_id) :: {:ok, [product]} | {:error, shared_error_reason}

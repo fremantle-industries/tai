@@ -32,4 +32,12 @@ defmodule Tai.VenueAdapters.Ftx.CancelOrder do
   defp parse_response({:error, "Order not found"}, _venue_order_id) do
     {:error, :not_found}
   end
+
+  defp parse_response({:error, "Order already closed"}, _venue_order_id) do
+    {:error, :already_closed}
+  end
+
+  defp parse_response({:error, "Order already queued for cancellation"}, _venue_order_id) do
+    {:error, :already_queued_for_cancelation}
+  end
 end
