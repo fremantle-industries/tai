@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.Binance.CancelOrder do
     to: ExBinance.Private,
     as: :cancel_order_by_order_id
 
-  defp parse_response({:ok, %ExBinance.Responses.CancelOrder{} = venue_response}) do
+  defp parse_response({:ok, %ExBinance.Rest.Responses.CancelOrderResponse{} = venue_response}) do
     response = %Orders.Responses.Cancel{
       id: venue_response.order_id,
       status: venue_response.status |> OrderStatus.from_venue(),
