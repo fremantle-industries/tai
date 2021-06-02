@@ -1,16 +1,10 @@
 defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   import Mock
+  alias Tai.NewOrders
 
   setup_all do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
-
-    {:ok, _} = Application.ensure_all_started(:tai)
-    start_supervised!(Tai.TestSupport.Mocks.Server)
     HTTPoison.start()
   end
 
@@ -157,73 +151,77 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   end)
 
   defp build_not_found_order(venue_id) do
+    venue = venue_id |> Atom.to_string()
+
     struct(
-      Tai.Orders.Order,
+      NewOrders.Order,
       client_id: "6b677ec7-4b92-41e9-9a02-171fe99a2192",
-      venue_id: venue_id,
-      credential_id: :main,
-      venue_product_symbol: venue_id |> venue_product_symbol,
-      product_symbol: venue_id |> product_symbol,
-      product_type: venue_id |> product_type,
+      venue: venue,
+      credential: "main",
+      venue_product_symbol: venue |> venue_product_symbol,
+      product_symbol: venue |> product_symbol,
+      product_type: venue |> product_type,
       venue_order_id: "1"
     )
   end
 
   defp build_enqueued_order(venue_id) do
-    struct(Tai.Orders.Order, %{
+    venue = venue_id |> Atom.to_string()
+
+    struct(NewOrders.Order, %{
       client_id: Ecto.UUID.generate(),
-      venue_id: venue_id,
-      credential_id: :main,
-      venue_product_symbol: venue_id |> venue_product_symbol,
-      product_symbol: venue_id |> product_symbol,
-      product_type: venue_id |> product_type,
+      venue: venue,
+      credential: "main",
+      venue_product_symbol: venue |> venue_product_symbol,
+      product_symbol: venue |> product_symbol,
+      product_type: venue |> product_type,
       side: :buy,
       type: :limit,
-      price: venue_id |> price(),
-      qty: venue_id |> qty(),
+      price: venue |> price(),
+      qty: venue |> qty(),
       time_in_force: :gtc,
       post_only: true
     })
   end
 
   defp build_open_order(order, order_response) do
-    struct(Tai.Orders.Order, %{
+    struct(NewOrders.Order, %{
       venue_order_id: order_response.id,
-      venue_id: order.venue_id,
-      credential_id: :main,
-      venue_product_symbol: order.venue_id |> venue_product_symbol,
-      product_symbol: order.venue_id |> product_symbol,
-      product_type: order.venue_id |> product_type,
+      venue: order.venue,
+      credential: "main",
+      venue_product_symbol: order.venue |> venue_product_symbol,
+      product_symbol: order.venue |> product_symbol,
+      product_type: order.venue |> product_type,
       side: :buy,
       type: :limit,
-      price: order.venue_id |> price(),
-      qty: order.venue_id |> qty(),
+      price: order.venue |> price(),
+      qty: order.venue |> qty(),
       time_in_force: :gtc,
       post_only: true
     })
   end
 
-  defp venue_product_symbol(:bitmex), do: "XBTH19"
-  defp venue_product_symbol(:okex_futures), do: "ETH-USD-190628"
-  defp venue_product_symbol(:okex_swap), do: "ETH-USD-SWAP"
+  defp venue_product_symbol("bitmex"), do: "XBTH19"
+  defp venue_product_symbol("okex_futures"), do: "ETH-USD-190628"
+  defp venue_product_symbol("okex_swap"), do: "ETH-USD-SWAP"
   defp venue_product_symbol(_), do: "LTC-BTC"
 
-  defp product_symbol(:bitmex), do: :xbth19
-  defp product_symbol(:okex_futures), do: :eth_usd_190628
-  defp product_symbol(:okex_swap), do: :eth_usd_swap
-  defp product_symbol(_), do: :ltc_btc
+  defp product_symbol("bitmex"), do: "xbth19"
+  defp product_symbol("okex_futures"), do: "eth_usd_190628"
+  defp product_symbol("okex_swap"), do: "eth_usd_swap"
+  defp product_symbol(_), do: "ltc_btc"
 
-  defp product_type(:okex_swap), do: :swap
-  defp product_type(:binance), do: :spot
+  defp product_type("okex_swap"), do: :swap
+  defp product_type("binance"), do: :spot
   defp product_type(_), do: :future
 
-  defp price(:bitmex), do: Decimal.new("100.5")
-  defp price(:okex_futures), do: Decimal.new("100.5")
-  defp price(:okex_swap), do: Decimal.new("100.5")
-  defp price(:binance), do: Decimal.new("0.007")
+  defp price("bitmex"), do: Decimal.new("100.5")
+  defp price("okex_futures"), do: Decimal.new("100.5")
+  defp price("okex_swap"), do: Decimal.new("100.5")
+  defp price("binance"), do: Decimal.new("0.007")
 
-  defp qty(:bitmex), do: Decimal.new(1)
-  defp qty(:okex_futures), do: Decimal.new(1)
-  defp qty(:okex_swap), do: Decimal.new(1)
-  defp qty(:binance), do: Decimal.new(1)
+  defp qty("bitmex"), do: Decimal.new(1)
+  defp qty("okex_futures"), do: Decimal.new(1)
+  defp qty("okex_swap"), do: Decimal.new(1)
+  defp qty("binance"), do: Decimal.new(1)
 end

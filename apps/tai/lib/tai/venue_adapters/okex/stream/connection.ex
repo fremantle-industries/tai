@@ -15,7 +15,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
         ) :: {:ok, pid}
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      auth: stream.venue.id |> Stream.ProcessAuth.to_name(),
+      auth: stream.venue.id |> Stream.ProcessAuth.process_name(),
       order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }

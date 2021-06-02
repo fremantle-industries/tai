@@ -1,19 +1,13 @@
 defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
+  alias Tai.NewOrders
 
   setup_all do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
-
-    {:ok, _} = Application.ensure_all_started(:tai)
-    start_supervised!(Tai.TestSupport.Mocks.Server)
     HTTPoison.start()
   end
 
-  Tai.TestSupport.Helpers.test_venue_adapters_amend_bulk_order()
+  Tai.TestSupport.Helpers.test_venue_adapters_amend_bulk_order_accepted()
   |> Enum.map(fn venue ->
     @venue venue
 
@@ -37,13 +31,9 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
                  Tai.Venues.Client.amend_bulk_orders([{open_order, attrs}])
 
         assert Enum.count(amend_bulk_response.orders) == 1
-
         amend_response = Enum.at(amend_bulk_response.orders, 0)
+        assert %NewOrders.Responses.AmendAccepted{} = amend_response
         assert amend_response.id == open_order.venue_order_id
-        assert amend_response.status == :open
-        assert amend_response.price == amend_price
-        assert amend_response.leaves_qty == amend_qty
-        assert amend_response.cumulative_qty == enqueued_order.cumulative_qty
         assert amend_response.received_at != nil
         assert %DateTime{} = amend_response.venue_timestamp
       end
@@ -51,14 +41,16 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
   end)
 
   defp build_enqueued_order(venue_id, side) do
-    struct(Tai.Orders.Order, %{
+    venue = venue_id |> Atom.to_string()
+
+    struct(NewOrders.Order, %{
       client_id: Ecto.UUID.generate(),
-      venue_id: venue_id,
-      credential_id: :main,
-      product_symbol: venue_id |> product_symbol,
+      venue: venue,
+      credential: "main",
+      product_symbol: venue |> product_symbol,
       side: side,
-      price: venue_id |> price(side),
-      qty: venue_id |> qty(side),
+      price: venue |> price(side),
+      qty: venue |> qty(side),
       cumulative_qty: Decimal.new(0),
       time_in_force: :gtc,
       post_only: true
@@ -66,28 +58,28 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
   end
 
   defp build_open_order(order, amend_response) do
-    struct(Tai.Orders.Order, %{
+    struct(NewOrders.Order, %{
       venue_order_id: amend_response.id,
-      venue_id: order.venue_id,
-      credential_id: :main,
-      symbol: order.venue_id |> product_symbol,
+      venue: order.venue,
+      credential: "main",
+      symbol: order.venue |> product_symbol,
       side: order.side,
-      price: order.venue_id |> price(order.side),
-      qty: order.venue_id |> qty(order.side),
+      price: order.venue |> price(order.side),
+      qty: order.venue |> qty(order.side),
       cumulative_qty: Decimal.new(0),
       time_in_force: :gtc,
       post_only: true
     })
   end
 
-  defp product_symbol(:bitmex), do: :xbtusd
-  defp product_symbol(_), do: :btc_usd
+  defp product_symbol("bitmex"), do: "xbtusd"
+  defp product_symbol(_), do: "btc_usd"
 
-  defp price(:bitmex, :buy), do: Decimal.new("2001.5")
+  defp price("bitmex", :buy), do: Decimal.new("2001.5")
+
+  defp qty("bitmex", _), do: Decimal.new(2)
 
   defp amend_price(:bitmex, :buy), do: Decimal.new("2300.5")
-
-  defp qty(:bitmex, _), do: Decimal.new(2)
 
   defp amend_qty(:bitmex, :buy), do: Decimal.new(10)
 

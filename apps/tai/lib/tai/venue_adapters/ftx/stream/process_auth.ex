@@ -30,7 +30,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.ProcessAuth do
 
   @impl true
   def handle_cast({%{"channel" => "orders", "type" => "update", "data" => venue_order}, received_at}, state) do
-    Stream.UpdateOrder.update(venue_order, received_at, state)
+    Stream.UpdateOrder.apply(venue_order, received_at, state)
     {:noreply, state}
   end
 
@@ -48,10 +48,12 @@ defmodule Tai.VenueAdapters.Ftx.Stream.ProcessAuth do
 
   @impl true
   def handle_cast({msg, received_at}, state) do
+    {:ok, last_received_at} = received_at |> Tai.Time.monotonic_to_date_time()
+
     TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
-      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
+      received_at: last_received_at
     })
 
     {:noreply, state}

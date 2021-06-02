@@ -1,4 +1,4 @@
-defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthTest do
+defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.UnhandledTest do
   use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
@@ -16,7 +16,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthTest do
     TaiEvents.firehose_subscribe()
 
     @venue
-    |> ProcessAuth.to_name()
+    |> ProcessAuth.process_name()
     |> GenServer.cast({%{"table" => "unknown"}, @received_at})
 
     assert_event(%Tai.Events.StreamMessageUnhandled{} = unhandled_event, :warn)

@@ -7,11 +7,11 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
   across these products are inconsistent.
   """
 
-  alias Tai.Orders
+  alias Tai.NewOrders
 
-  @type order :: Tai.Orders.Order.t()
+  @type order :: NewOrders.Order.t()
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type response :: Orders.Responses.CancelAccepted.t()
+  @type response :: NewOrders.Responses.CancelAccepted.t()
   @type reason :: :timeout | :connect_timeout | :not_found
 
   @spec cancel_order(order, credentials) :: {:ok, response} | {:error, reason}
@@ -28,9 +28,9 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
     {mod.cancel_orders(venue_symbol, [order.venue_order_id], %{}, venue_config), order}
   end
 
-  defp module_for(%Tai.Orders.Order{product_type: :future}), do: ExOkex.Futures.Private
-  defp module_for(%Tai.Orders.Order{product_type: :swap}), do: ExOkex.Swap.Private
-  defp module_for(%Tai.Orders.Order{product_type: :spot}), do: ExOkex.Spot.Private
+  defp module_for(%NewOrders.Order{product_type: :future}), do: ExOkex.Futures.Private
+  defp module_for(%NewOrders.Order{product_type: :swap}), do: ExOkex.Swap.Private
+  defp module_for(%NewOrders.Order{product_type: :spot}), do: ExOkex.Spot.Private
 
   defdelegate to_venue_credentials(credentials),
     to: Tai.VenueAdapters.OkEx.Credentials,
@@ -38,17 +38,17 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
 
   defp parse_response({{:ok, %{"result" => true, "order_ids" => [order_id | _]}}, _order}) do
     received_at = Tai.Time.monotonic_time()
-    response = %Orders.Responses.CancelAccepted{id: order_id, received_at: received_at}
+    response = %NewOrders.Responses.CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 
   defp parse_response({{:ok, %{"result" => "true", "ids" => [order_id | _]}}, _order}) do
     received_at = Tai.Time.monotonic_time()
-    response = %Orders.Responses.CancelAccepted{id: order_id, received_at: received_at}
+    response = %NewOrders.Responses.CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 
-  defp parse_response({{:ok, response}, %Tai.Orders.Order{product_type: :spot}}) do
+  defp parse_response({{:ok, response}, %NewOrders.Order{product_type: :spot}}) do
     response
     |> Map.values()
     |> List.flatten()
@@ -63,12 +63,17 @@ defmodule Tai.VenueAdapters.OkEx.CancelOrder do
     {:error, :not_found}
   end
 
-  defp parse_response({{:error, :timeout}, _order}), do: {:error, :timeout}
-  defp parse_response({{:error, :connect_timeout}, _order}), do: {:error, :connect_timeout}
+  defp parse_response({{:error, :timeout}, _order}) do
+    {:error, :timeout}
+  end
+
+  defp parse_response({{:error, :connect_timeout}, _order}) do
+    {:error, :connect_timeout}
+  end
 
   defp parse_spot_response([%{"result" => true, "error_code" => "0", "order_id" => order_id} | _]) do
     received_at = Tai.Time.monotonic_time()
-    response = %Orders.Responses.CancelAccepted{id: order_id, received_at: received_at}
+    response = %NewOrders.Responses.CancelAccepted{id: order_id, received_at: received_at}
     {:ok, response}
   end
 end

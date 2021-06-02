@@ -1,5 +1,5 @@
 defmodule Tai.Venues.Adapter do
-  alias Tai.Orders
+  alias Tai.NewOrders
 
   @type t :: module
   @type venue_id :: Tai.Venue.id()
@@ -9,12 +9,12 @@ defmodule Tai.Venues.Adapter do
   @type funding_rate :: Tai.Venues.FundingRate.t()
   @type account :: Tai.Venues.Account.t()
   @type position :: Tai.Trading.Position.t()
-  @type order :: Tai.Orders.Order.t()
-  @type create_response :: Orders.Responses.Create.t() | Orders.Responses.CreateAccepted.t()
-  @type amend_response :: Orders.Responses.Amend.t()
+  @type order :: NewOrders.Order.t()
+  @type create_response :: NewOrders.Responses.CreateAccepted.t()
+  @type amend_response :: NewOrders.Responses.AmendAccepted.t()
   @type amend_bulk_response :: [amend_response]
-  @type cancel_response :: Orders.Responses.Cancel.t() | Orders.Responses.CancelAccepted.t()
-  @type amend_attrs :: Tai.Orders.Worker.amend_attrs()
+  @type cancel_response :: NewOrders.Responses.CancelAccepted.t()
+  @type amend_attrs :: NewOrders.Worker.amend_attrs()
   @type shared_error_reason ::
           :not_implemented
           | :timeout

@@ -1,11 +1,10 @@
 defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
-  import Tai.VenueAdapters.Bitmex.OrderStatus
-  alias Tai.Orders
+  alias Tai.NewOrders
 
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type order :: Orders.Order.t()
-  @type attrs :: Orders.Worker.amend_attrs()
-  @type response :: Orders.Responses.Amend.t()
+  @type order :: NewOrders.Order.t()
+  @type attrs :: NewOrders.Worker.amend_attrs()
+  @type response :: NewOrders.Responses.AmendAccepted.t()
   @type reason ::
           :timeout
           | :overloaded
@@ -43,31 +42,34 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
     |> Map.put(:orderID, venue_order_id)
   end
 
-  defp parse_response({
-         :ok,
-         %ExBitmex.Order{} = venue_order,
-         %ExBitmex.RateLimit{} = _rate_limit
-       }) do
+  defp parse_response({:ok, venue_order, _rate_limit}) do
     {:ok, venue_timestamp, 0} = DateTime.from_iso8601(venue_order.timestamp)
     received_at = Tai.Time.monotonic_time()
-
-    response = %Orders.Responses.Amend{
-      id: venue_order.order_id,
-      status: venue_order.ord_status |> from_venue_status(:ignore),
-      price: Tai.Utils.Decimal.cast!(venue_order.price),
-      leaves_qty: Decimal.new(venue_order.leaves_qty),
-      cumulative_qty: Decimal.new(venue_order.cum_qty),
-      received_at: received_at,
-      venue_timestamp: venue_timestamp
-    }
-
+    response = %NewOrders.Responses.AmendAccepted{id: venue_order.order_id, received_at: received_at, venue_timestamp: venue_timestamp}
     {:ok, response}
   end
 
-  defp parse_response({:error, :timeout, nil}), do: {:error, :timeout}
-  defp parse_response({:error, :connect_timeout, nil}), do: {:error, :connect_timeout}
-  defp parse_response({:error, :overloaded, _}), do: {:error, :overloaded}
-  defp parse_response({:error, :rate_limited, _}), do: {:error, :rate_limited}
-  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}), do: {:error, reason}
-  defp parse_response({:error, reason, _}), do: {:error, {:unhandled, reason}}
+  defp parse_response({:error, :timeout, nil}) do
+    {:error, :timeout}
+  end
+
+  defp parse_response({:error, :connect_timeout, nil}) do
+    {:error, :connect_timeout}
+  end
+
+  defp parse_response({:error, :overloaded, _}) do
+    {:error, :overloaded}
+  end
+
+  defp parse_response({:error, :rate_limited, _}) do
+    {:error, :rate_limited}
+  end
+
+  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}) do
+    {:error, reason}
+  end
+
+  defp parse_response({:error, reason, _}) do
+    {:error, {:unhandled, reason}}
+  end
 end

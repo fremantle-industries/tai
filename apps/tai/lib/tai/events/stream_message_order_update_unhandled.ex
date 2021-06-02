@@ -1,7 +1,7 @@
-defmodule Tai.Events.StreamMessageUnhandled do
+defmodule Tai.Events.StreamMessageOrderUpdateUnhandled do
   alias __MODULE__
 
-  @type t :: %StreamMessageUnhandled{
+  @type t :: %StreamMessageOrderUpdateUnhandled{
           venue_id: Tai.Venue.id(),
           msg: map,
           received_at: DateTime.t()

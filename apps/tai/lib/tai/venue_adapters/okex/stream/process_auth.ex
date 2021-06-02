@@ -6,26 +6,25 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
     @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue: atom}
 
-    @enforce_keys ~w(venue)a
-    defstruct ~w(venue)a
+    @enforce_keys ~w[venue]a
+    defstruct ~w[venue]a
   end
 
   @type venue_id :: Tai.Venue.id()
   @type state :: State.t()
 
+  @spec start_link(list) :: GenServer.on_start()
   def start_link(venue: venue) do
     state = %State{venue: venue}
-    name = venue |> to_name()
+    name = process_name(venue)
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+  @spec process_name(venue_id) :: atom
+  def process_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   @impl true
-  @spec init(state) :: {:ok, state}
   def init(state) do
-    Process.flag(:trap_exit, true)
     {:ok, state}
   end
 
@@ -38,10 +37,10 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
       )
       when table in @product_types do
     orders
-    |> Enum.each(fn %{"client_oid" => venue_client_id} = venue_order ->
+    |> Enum.each(fn %{"client_oid" => venue_client_id} = order_msg ->
       venue_client_id
       |> ClientId.from_base32()
-      |> Stream.UpdateOrder.update(venue_order, received_at, state)
+      |> Stream.UpdateOrder.apply(order_msg, received_at, state)
     end)
 
     {:noreply, state}
@@ -49,10 +48,12 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth do
 
   @impl true
   def handle_cast({msg, received_at}, state) do
+    {:ok, last_received_at} = received_at |> Tai.Time.monotonic_to_date_time()
+
     TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
-      received_at: received_at |> Tai.Time.monotonic_to_date_time!()
+      received_at: last_received_at
     })
 
     {:noreply, state}

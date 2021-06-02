@@ -3,12 +3,12 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   Create orders for the Bitmex adapter
   """
 
-  alias Tai.VenueAdapters.Bitmex.{ClientId, OrderStatus}
-  alias Tai.Orders
+  alias Tai.VenueAdapters.Bitmex.ClientId
+  alias Tai.NewOrders
 
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type order :: Tai.Orders.Order.t()
-  @type response :: Orders.Responses.Create.t()
+  @type order :: NewOrders.Order.t()
+  @type response :: NewOrders.Responses.CreateAccepted.t()
   @type reason ::
           :timeout
           | :connect_timeout
@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
           | {:unhandled, term}
 
   @spec create_order(order, credentials) :: {:ok, response} | {:error, reason}
-  def create_order(%Tai.Orders.Order{} = order, credentials) do
+  def create_order(%NewOrders.Order{} = order, credentials) do
     params = build_params(order)
 
     credentials
@@ -66,33 +66,44 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   defp to_venue_time_in_force(:fok), do: "FillOrKill"
 
   @format "{ISO:Extended}"
-  defp parse_response(
-         {:ok, %ExBitmex.Order{} = venue_order, %ExBitmex.RateLimit{}},
-         order
-       ) do
+  defp parse_response({:ok, venue_order, _rate_limit}, _order) do
     received_at = Tai.Time.monotonic_time()
+    venue_timestamp = Timex.parse!(venue_order.timestamp, @format)
 
-    response = %Orders.Responses.Create{
+    response = %NewOrders.Responses.CreateAccepted{
       id: venue_order.order_id,
-      status: OrderStatus.from_venue_status(venue_order.ord_status, order),
-      original_size: Decimal.new(venue_order.order_qty),
-      leaves_qty: Decimal.new(venue_order.leaves_qty),
-      cumulative_qty: Decimal.new(venue_order.cum_qty),
-      venue_timestamp: Timex.parse!(venue_order.timestamp, @format),
+      venue_timestamp: venue_timestamp,
       received_at: received_at
     }
 
     {:ok, response}
   end
 
-  defp parse_response({:error, :timeout, nil}, _), do: {:error, :timeout}
-  defp parse_response({:error, :connect_timeout, nil}, _), do: {:error, :connect_timeout}
-  defp parse_response({:error, :overloaded, _}, _), do: {:error, :overloaded}
-  defp parse_response({:error, :rate_limited, _}, _), do: {:error, :rate_limited}
-  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _), do: {:error, reason}
+  defp parse_response({:error, :timeout, nil}, _) do
+    {:error, :timeout}
+  end
 
-  defp parse_response({:error, {:insufficient_balance, _}, _}, _),
-    do: {:error, :insufficient_balance}
+  defp parse_response({:error, :connect_timeout, nil}, _) do
+    {:error, :connect_timeout}
+  end
 
-  defp parse_response({:error, reason, _}, _), do: {:error, {:unhandled, reason}}
+  defp parse_response({:error, :overloaded, _}, _) do
+    {:error, :overloaded}
+  end
+
+  defp parse_response({:error, :rate_limited, _}, _) do
+    {:error, :rate_limited}
+  end
+
+  defp parse_response({:error, {:nonce_not_increasing, _} = reason, _}, _) do
+    {:error, reason}
+  end
+
+  defp parse_response({:error, {:insufficient_balance, _}, _}, _) do
+    {:error, :insufficient_balance}
+  end
+
+  defp parse_response({:error, reason, _}, _) do
+    {:error, {:unhandled, reason}}
+  end
 end

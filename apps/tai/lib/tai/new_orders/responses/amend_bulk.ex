@@ -3,10 +3,10 @@ defmodule Tai.NewOrders.Responses.AmendBulk do
   Return from venue adapters when amending orders in bulk
   """
 
-  alias Tai.Orders.Responses.Amend
+  alias Tai.NewOrders.Responses.AmendAccepted
 
   @type t :: %__MODULE__{
-          orders: [Amend.t()]
+          orders: [AmendAccepted.t()]
         }
 
   @enforce_keys ~w[orders]a

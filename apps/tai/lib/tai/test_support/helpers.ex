@@ -19,10 +19,6 @@ defmodule Tai.TestSupport.Helpers do
     :test_venue_adapters_maker_taker_fees |> filter()
   end
 
-  def test_venue_adapters_create_order_gtc_open do
-    :test_venue_adapters_create_order_gtc_open |> filter()
-  end
-
   def test_venue_adapters_create_order_gtc_accepted do
     :test_venue_adapters_create_order_gtc_accepted |> filter()
   end
@@ -55,16 +51,12 @@ defmodule Tai.TestSupport.Helpers do
     :test_venue_adapters_create_order_error_insufficient_balance |> filter()
   end
 
-  def test_venue_adapters_amend_order do
-    :test_venue_adapters_amend_order |> filter()
+  def test_venue_adapters_amend_order_accepted do
+    :test_venue_adapters_amend_order_accepted |> filter()
   end
 
-  def test_venue_adapters_amend_bulk_order do
-    :test_venue_adapters_amend_bulk_order |> filter()
-  end
-
-  def test_venue_adapters_cancel_order do
-    :test_venue_adapters_cancel_order |> filter()
+  def test_venue_adapters_amend_bulk_order_accepted do
+    :test_venue_adapters_amend_bulk_order_accepted |> filter()
   end
 
   def test_venue_adapters_cancel_order_accepted do

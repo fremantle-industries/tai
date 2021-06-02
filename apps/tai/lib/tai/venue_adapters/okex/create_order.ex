@@ -4,15 +4,15 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
   """
 
   alias Tai.VenueAdapters.OkEx.ClientId
-  alias Tai.Orders
+  alias Tai.NewOrders
 
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type order :: Orders.Order.t()
-  @type response :: Orders.Responses.CreateAccepted.t()
+  @type order :: NewOrders.Order.t()
+  @type response :: NewOrders.Responses.CreateAccepted.t()
   @type reason :: :insufficient_balance | :insufficient_position
 
   @spec create_order(order, credentials) :: {:ok, response} | {:error, reason}
-  def create_order(%Orders.Order{} = order, credentials) do
+  def create_order(%NewOrders.Order{} = order, credentials) do
     {order, credentials}
     |> send_to_venue()
     |> parse_response()
@@ -25,11 +25,12 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
     {mod.create_bulk_orders(params, venue_config), order}
   end
 
-  defp module_for(%Orders.Order{product_type: :future}), do: ExOkex.Futures.Private
-  defp module_for(%Orders.Order{product_type: :swap}), do: ExOkex.Swap.Private
-  defp module_for(%Orders.Order{product_type: :spot}), do: ExOkex.Spot.Private
+  defp module_for(%NewOrders.Order{product_type: :future}), do: ExOkex.Futures.Private
+  defp module_for(%NewOrders.Order{product_type: :swap}), do: ExOkex.Swap.Private
+  defp module_for(%NewOrders.Order{product_type: :spot}), do: ExOkex.Spot.Private
 
-  defp build_params(%Orders.Order{product_type: :future} = order) do
+
+  defp build_params(%NewOrders.Order{product_type: :future} = order) do
     %{
       instrument_id: order.venue_product_symbol,
       leverage: 20,
@@ -39,7 +40,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
     }
   end
 
-  defp build_params(%Orders.Order{product_type: :swap} = order) do
+  defp build_params(%NewOrders.Order{product_type: :swap} = order) do
     %{
       instrument_id: order.venue_product_symbol,
       leverage: 20,
@@ -49,7 +50,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
     }
   end
 
-  defp build_params(%Orders.Order{product_type: :spot} = order) do
+  defp build_params(%NewOrders.Order{product_type: :spot} = order) do
     [
       %{
         instrument_id: order.venue_product_symbol,
@@ -84,41 +85,45 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
   @open_short 2
   @close_long 3
   @close_short 4
-  defp to_venue_type(%Orders.Order{side: :buy, close: true}), do: @close_short
-  defp to_venue_type(%Orders.Order{side: :sell, close: true}), do: @close_long
-  defp to_venue_type(%Orders.Order{side: :buy}), do: @open_long
-  defp to_venue_type(%Orders.Order{side: :sell}), do: @open_short
+  defp to_venue_type(%NewOrders.Order{side: :buy, close: true}), do: @close_short
+  defp to_venue_type(%NewOrders.Order{side: :sell, close: true}), do: @close_long
+  defp to_venue_type(%NewOrders.Order{side: :buy}), do: @open_long
+  defp to_venue_type(%NewOrders.Order{side: :sell}), do: @open_short
 
-  defp to_venue_order_type(%Orders.Order{time_in_force: :gtc, post_only: true}), do: 1
-  defp to_venue_order_type(%Orders.Order{time_in_force: :fok}), do: 2
-  defp to_venue_order_type(%Orders.Order{time_in_force: :ioc}), do: 3
+  defp to_venue_order_type(%NewOrders.Order{time_in_force: :gtc, post_only: true}), do: 1
+  defp to_venue_order_type(%NewOrders.Order{time_in_force: :fok}), do: 2
+  defp to_venue_order_type(%NewOrders.Order{time_in_force: :ioc}), do: 3
   defp to_venue_order_type(_), do: 0
 
   defp parse_response({
-         {:ok, %{"order_info" => [%{"error_code" => "35008", "error_message" => _} | _]}},
-         %Orders.Order{product_type: :swap}
-       }),
-       do: {:error, :insufficient_balance}
+    {:ok, %{"order_info" => [%{"error_code" => "35008", "error_message" => _} | _]}},
+    %NewOrders.Order{product_type: :swap}
+  }) do
+    {:error, :insufficient_balance}
+  end
 
   defp parse_response({
-         {:ok, %{"order_info" => [%{"error_code" => "35010", "error_message" => _} | _]}},
-         %Orders.Order{product_type: :swap}
-       }),
-       do: {:error, :insufficient_position}
+    {:ok, %{"order_info" => [%{"error_code" => "35010", "error_message" => _} | _]}},
+    %NewOrders.Order{product_type: :swap}
+  }) do
+    {:error, :insufficient_position}
+  end
 
   defp parse_response({
-         {:ok, %{"order_info" => [%{"error_code" => "32015", "error_message" => _} | _]}},
-         %Orders.Order{product_type: :future}
-       }),
-       do: {:error, :insufficient_balance}
+    {:ok, %{"order_info" => [%{"error_code" => "32015", "error_message" => _} | _]}},
+    %NewOrders.Order{product_type: :future}
+  }) do
+    {:error, :insufficient_balance}
+  end
 
   defp parse_response({
-         {:ok, %{"order_info" => [%{"error_code" => "32019", "error_message" => _} | _]}},
-         %Orders.Order{product_type: :future}
-       }),
-       do: {:error, :insufficient_position}
+    {:ok, %{"order_info" => [%{"error_code" => "32019", "error_message" => _} | _]}},
+    %NewOrders.Order{product_type: :future}
+  }) do
+    {:error, :insufficient_position}
+  end
 
-  defp parse_response({{:ok, response}, %Orders.Order{product_type: :spot}}) do
+  defp parse_response({{:ok, response}, %NewOrders.Order{product_type: :spot}}) do
     response
     |> Map.values()
     |> List.flatten()
@@ -132,7 +137,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
        })
        when venue_order_id != @invalid_venue_order_id do
     received_at = Tai.Time.monotonic_time()
-    response = %Orders.Responses.CreateAccepted{id: venue_order_id, received_at: received_at}
+    response = %NewOrders.Responses.CreateAccepted{id: venue_order_id, received_at: received_at}
     {:ok, response}
   end
 
@@ -141,7 +146,7 @@ defmodule Tai.VenueAdapters.OkEx.CreateOrder do
   defp parse_spot_response([%{"order_id" => venue_order_id} | _])
        when venue_order_id != @invalid_venue_order_id do
     received_at = Tai.Time.monotonic_time()
-    response = %Orders.Responses.CreateAccepted{id: venue_order_id, received_at: received_at}
+    response = %NewOrders.Responses.CreateAccepted{id: venue_order_id, received_at: received_at}
     {:ok, response}
   end
 end
