@@ -155,11 +155,14 @@ defmodule Tai.BootTest do
 
   test "stops the process when boot is complete" do
     TaiEvents.firehose_subscribe()
-
     pid = start_supervised!({Tai.Boot, [id: @test_id, config: @config]})
+    ref = Process.monitor(pid)
 
     assert Tai.Boot.close_registration(@test_id) == :ok
+
     assert_event(%Tai.Events.BootAdvisors{} , :info, 1000)
+    assert_receive {:DOWN, ^ref, :process, _object, :normal}
+    assert Process.demonitor(ref) == true
     assert Process.alive?(pid) == false
   end
 end

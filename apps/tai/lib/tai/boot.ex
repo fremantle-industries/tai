@@ -2,8 +2,8 @@ defmodule Tai.Boot do
   use GenServer
 
   defmodule State do
-    @enforce_keys ~w(config venues venue_replies)a
-    defstruct ~w(config venues venue_replies)a
+    @enforce_keys ~w[config venues venue_replies]a
+    defstruct ~w[config venues venue_replies]a
   end
 
   @type id :: atom
