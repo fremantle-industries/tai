@@ -1,17 +1,6 @@
 defmodule Tai.IEx.Commands.FeesTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
-  import Tai.TestSupport.Mock
-
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
-
-    {:ok, _} = Application.ensure_all_started(:tai)
-    :ok
-  end
 
   test "show the maker/taker fees for every product on each exchange" do
     mock_fee_info(%{

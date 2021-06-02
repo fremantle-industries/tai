@@ -1,5 +1,5 @@
 defmodule Support.Advisors do
-  def insert_spec(attrs, store_id) when is_map(attrs) do
+  def insert_spec(attrs, store_id \\ Tai.Advisors.SpecStore.default_store_id()) when is_map(attrs) do
     required_attrs = build_attrs(attrs)
 
     Tai.Advisors.Spec

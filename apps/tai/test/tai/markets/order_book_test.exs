@@ -1,5 +1,5 @@
 defmodule Tai.Markets.OrderBookTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.Markets.{OrderBook, PricePoint}
 
   @product struct(Tai.Venues.Product, venue_id: :venue_a, symbol: :btc_usd)
@@ -11,8 +11,6 @@ defmodule Tai.Markets.OrderBookTest do
   @quote_depth 2
 
   setup do
-    start_supervised!(Tai.Markets.QuoteStore)
-    start_supervised!({Tai.SystemBus, 1})
     start_supervised!(OrderBook.child_spec(@product, @quote_depth, false))
     :ok
   end

@@ -16,6 +16,7 @@ defmodule Tai.ConfigTest do
       assert config.venues == %{}
       assert config.order_workers == 5
       assert config.order_workers_max_overflow == 2
+      assert config.order_transition_workers == 5
     end
 
     test "can set adapter_timeout" do
@@ -61,6 +62,11 @@ defmodule Tai.ConfigTest do
     test "can set order_workers_max_overflow" do
       assert config = Tai.Config.parse(order_workers_max_overflow: 4)
       assert config.order_workers_max_overflow == 4
+    end
+
+    test "can set order_transition_workers" do
+      assert config = Tai.Config.parse(order_transition_workers: 10)
+      assert config.order_transition_workers == 10
     end
 
     test "can set send_orders" do

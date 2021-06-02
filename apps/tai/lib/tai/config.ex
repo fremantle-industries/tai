@@ -53,6 +53,7 @@ defmodule Tai.Config do
           logger: module,
           order_workers: pos_integer,
           order_workers_max_overflow: non_neg_integer,
+          order_transition_workers: pos_integer,
           send_orders: boolean,
           system_bus_registry_partitions: pos_integer,
           venues: map
@@ -76,6 +77,7 @@ defmodule Tai.Config do
     logger
     order_workers
     order_workers_max_overflow
+    order_transition_workers
     send_orders
     system_bus_registry_partitions
     venues
@@ -92,6 +94,7 @@ defmodule Tai.Config do
       broadcast_change_set: !!get(env, :broadcast_change_set),
       logger: get(env, :logger),
       order_workers: get(env, :order_workers, 5),
+      order_transition_workers: get(env, :order_transition_workers, 5),
       order_workers_max_overflow: get(env, :order_workers_max_overflow, 2),
       send_orders: !!get(env, :send_orders),
       system_bus_registry_partitions:

@@ -1,8 +1,7 @@
 defmodule Tai.Commands.StopVenueTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
   import Tai.TestSupport.Assertions.Event
-  import Tai.TestSupport.Mock
 
   @venue :venue_b
 
@@ -11,12 +10,6 @@ defmodule Tai.Commands.StopVenueTest do
   end
 
   setup do
-    start_supervised!(Tai.TestSupport.Mocks.Server)
-    start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Venues.VenueStore)
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    start_supervised!(Tai.Venues.Supervisor)
-
     mock_venue(
       id: @venue,
       adapter: StartVenueAdapter,

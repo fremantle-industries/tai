@@ -1,6 +1,4 @@
 defmodule Support.Orders do
-  import Tai.TestSupport.Helpers
-
   def setup_orders(start_supervised!) do
     config = Tai.Config.parse()
     start_supervised!.(Tai.TestSupport.Mocks.Server)
@@ -26,5 +24,11 @@ defmodule Support.Orders do
   def build_submission_with_callback(type, extra_attrs \\ %{}) do
     attrs = %{order_updated_callback: fire_order_callback(self())} |> Map.merge(extra_attrs)
     build_submission(type, attrs)
+  end
+
+  def fire_order_callback(pid) do
+    fn previous_order, updated_order ->
+      send(pid, {:callback_fired, previous_order, updated_order})
+    end
   end
 end

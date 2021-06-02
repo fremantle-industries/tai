@@ -1,12 +1,7 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.UnhandledTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
-
-  setup do
-    start_supervised!({TaiEvents, 1})
-    :ok
-  end
 
   test ".process/3 broadcasts an unhandled message warning" do
     msg = struct(ProcessAuth.Messages.UpdateOrders.Unhandled, data: "my-msg")

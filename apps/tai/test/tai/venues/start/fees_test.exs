@@ -1,5 +1,5 @@
 defmodule Tai.Venues.Start.FeesTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
 
   defmodule ProductWithFeesAdapter do
@@ -85,16 +85,6 @@ defmodule Tai.Venues.Start.FeesTest do
                 products: "*",
                 timeout: 1_000
               )
-
-  setup do
-    start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Venues.ProductStore)
-    start_supervised!(Tai.Venues.AccountStore)
-    start_supervised!(Tai.Venues.FeeStore)
-    start_supervised!(Tai.Trading.PositionStore)
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    :ok
-  end
 
   test "uses the min fee from the product or schedule" do
     venue = @base_venue |> Map.put(:adapter, ProductWithFeesAdapter)

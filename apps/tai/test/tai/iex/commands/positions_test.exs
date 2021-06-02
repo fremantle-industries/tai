@@ -1,16 +1,6 @@
 defmodule Tai.IEx.Commands.PositionsTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
-
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
-
-    {:ok, _} = Application.ensure_all_started(:tai)
-    :ok
-  end
 
   test "shows positions ordered by venue & credential" do
     {:ok, _} =

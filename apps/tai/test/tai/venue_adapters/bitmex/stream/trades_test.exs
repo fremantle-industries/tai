@@ -1,10 +1,9 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.TradeTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessOptionalChannels
 
   setup do
-    start_supervised!({TaiEvents, 1})
     start_supervised!({ProcessOptionalChannels, [venue_id: :my_venue]})
     :ok
   end

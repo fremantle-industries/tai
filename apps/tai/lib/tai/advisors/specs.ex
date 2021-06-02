@@ -16,7 +16,7 @@ defmodule Tai.Advisors.Specs do
   end
 
   @spec where(list, store_id) :: [spec]
-  def where(filters, store_id) do
+  def where(filters, store_id \\ SpecStore.default_store_id()) do
     store_id
     |> SpecStore.all()
     |> Enumerati.filter(filters)

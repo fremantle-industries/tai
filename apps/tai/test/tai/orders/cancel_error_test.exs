@@ -1,10 +1,6 @@
 defmodule Tai.Orders.CancelErrorTest do
-  use ExUnit.Case, async: false
-  import Tai.TestSupport.Mock
-  import Support.Orders
-  alias Tai.Orders.Submissions.SellLimitGtc
-  alias Tai.Orders.{Order, Transitions}
-  alias Tai.TestSupport.Mocks
+  use Tai.TestSupport.DataCase, async: false
+  alias Tai.Orders.{Order, Submissions, Transitions}
 
   defmodule TestFilledProvider do
     @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
@@ -45,9 +41,8 @@ defmodule Tai.Orders.CancelErrorTest do
   @submission_attrs %{venue_id: @venue, credential_id: @credential}
 
   setup do
-    setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
-    submission = build_submission_with_callback(SellLimitGtc, @submission_attrs)
+    submission = Support.Orders.build_submission_with_callback(Submissions.SellLimitGtc, @submission_attrs)
 
     {:ok, %{submission: submission}}
   end

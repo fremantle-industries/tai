@@ -1,5 +1,5 @@
 defmodule Tai.Venues.Start.AccountsTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
 
   defmodule TestAdapter do
@@ -53,17 +53,6 @@ defmodule Tai.Venues.Start.AccountsTest do
                 products: "*",
                 timeout: 1_000
               )
-
-  setup do
-    start_supervised!({TaiEvents, 1})
-    start_supervised!({Tai.SystemBus, 1})
-    start_supervised!(Tai.Venues.ProductStore)
-    start_supervised!(Tai.Venues.AccountStore)
-    start_supervised!(Tai.Venues.FeeStore)
-    start_supervised!(Tai.Trading.PositionStore)
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    :ok
-  end
 
   test "can filter accounts with a juice query" do
     venue = @base_venue |> Map.put(:accounts, "eth")

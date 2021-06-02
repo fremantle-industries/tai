@@ -1,5 +1,5 @@
 defmodule Tai.BootTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
 
   @test_id __MODULE__
@@ -43,10 +43,6 @@ defmodule Tai.BootTest do
   end
 
   setup do
-    start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Venues.ProductStore)
-    start_supervised!(Tai.Advisors.SpecStore)
-    start_supervised!(Tai.Advisors.Supervisor)
     :ok = Tai.Venues.ProductStore.upsert(@product_a)
     :ok = Tai.Venues.ProductStore.upsert(@product_b)
     :ok

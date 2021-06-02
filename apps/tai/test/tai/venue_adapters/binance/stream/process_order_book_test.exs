@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.VenueAdapters.Binance.Stream.ProcessOrderBook
   alias Tai.Markets.{OrderBook, PricePoint}
 
@@ -14,8 +14,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
 
   setup do
     Process.register(self(), @order_book_name)
-    start_supervised!({Tai.SystemBus, 1})
-    start_supervised!(Tai.Markets.QuoteStore)
     start_supervised!(OrderBook.child_spec(@product, @quote_depth, false))
     {:ok, pid} = start_supervised({ProcessOrderBook, @product})
 

@@ -1,5 +1,5 @@
 defmodule Tai.Venues.Start.SuccessTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
 
   defmodule TestVenueAdapter do
@@ -63,17 +63,6 @@ defmodule Tai.Venues.Start.SuccessTest do
            products: "*",
            timeout: 100
          )
-
-  setup do
-    start_supervised!({TaiEvents, 1})
-    start_supervised!({Tai.SystemBus, 1})
-    start_supervised!(Tai.Venues.ProductStore)
-    start_supervised!(Tai.Venues.AccountStore)
-    start_supervised!(Tai.Venues.FeeStore)
-    start_supervised!(Tai.Trading.PositionStore)
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    :ok
-  end
 
   test "hydrates venue data and starts the stream" do
     TaiEvents.firehose_subscribe()

@@ -1,8 +1,5 @@
 defmodule Tai.Orders.CreateExpiredTest do
-  use ExUnit.Case, async: false
-  import Tai.TestSupport.Mock
-  import Support.Orders
-  alias Tai.TestSupport.Mocks
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.Orders.{Order, Submissions}
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
@@ -11,7 +8,6 @@ defmodule Tai.Orders.CreateExpiredTest do
   @credentials Map.put(%{}, @credential, %{})
 
   setup do
-    setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
 
     :ok
@@ -29,7 +25,7 @@ defmodule Tai.Orders.CreateExpiredTest do
       cumulative_qty = Decimal.new(3)
 
       submission =
-        build_submission_with_callback(@submission_type, %{
+        Support.Orders.build_submission_with_callback(@submission_type, %{
           venue_id: @venue,
           credential_id: @credential,
           qty: original_qty

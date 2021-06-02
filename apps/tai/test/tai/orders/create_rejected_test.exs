@@ -1,8 +1,5 @@
 defmodule Tai.Orders.CreateRejectedTest do
-  use ExUnit.Case, async: false
-  import Tai.TestSupport.Mock
-  import Support.Orders
-  alias Tai.TestSupport.Mocks
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.Orders.{Order, Submissions}
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
@@ -12,7 +9,6 @@ defmodule Tai.Orders.CreateRejectedTest do
   @submission_attrs %{venue_id: @venue, credential_id: @credential}
 
   setup do
-    setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
 
     :ok
@@ -26,7 +22,7 @@ defmodule Tai.Orders.CreateRejectedTest do
     @submission_type submission_type
 
     test "#{side} updates the relevant attributes" do
-      submission = build_submission_with_callback(@submission_type, @submission_attrs)
+      submission = Support.Orders.build_submission_with_callback(@submission_type, @submission_attrs)
       Mocks.Responses.Orders.GoodTillCancel.rejected(@venue_order_id, submission)
 
       {:ok, _} = Tai.Orders.create(submission)

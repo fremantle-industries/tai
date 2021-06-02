@@ -1,19 +1,15 @@
 defmodule Tai.Advisors.SpecsTest do
-  use ExUnit.Case, async: false
-  import Support.Advisors, only: [insert_spec: 2]
-
-  @test_store_id __MODULE__
+  use Tai.TestSupport.DataCase, async: false
+  import Support.Advisors, only: [insert_spec: 1]
 
   setup do
-    start_supervised!({Tai.Advisors.Supervisor, []})
-    start_supervised!({Tai.Advisors.SpecStore, id: @test_store_id})
-    insert_spec(%{group_id: :group_a, advisor_id: :main}, @test_store_id)
-    insert_spec(%{group_id: :group_b, advisor_id: :main}, @test_store_id)
+    insert_spec(%{group_id: :group_a, advisor_id: :main})
+    insert_spec(%{group_id: :group_b, advisor_id: :main})
     :ok
   end
 
   test ".where filters instances from the store" do
-    specs = Tai.Advisors.Specs.where([group_id: :group_a], @test_store_id)
+    specs = Tai.Advisors.Specs.where([group_id: :group_a])
 
     assert Enum.count(specs) == 1
     assert [spec | _] = specs

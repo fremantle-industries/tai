@@ -1,18 +1,6 @@
 defmodule Tai.Transforms.ProductSymbolsByVenueTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   doctest Tai.Transforms.ProductSymbolsByVenue
-
-  import Tai.TestSupport.Mock
-
-  setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
-
-    {:ok, _} = Application.ensure_all_started(:tai)
-    :ok
-  end
 
   test ".all returns a map keyed by venue with a list product symbols" do
     assert Tai.Transforms.ProductSymbolsByVenue.all() == %{}

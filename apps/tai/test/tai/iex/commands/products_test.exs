@@ -1,13 +1,6 @@
 defmodule Tai.IEx.Commands.ProductsTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
-  import Tai.TestSupport.Mock
-
-  setup do
-    start_supervised!(Tai.Venues.ProductStore)
-    start_supervised!(Tai.Commander)
-    :ok
-  end
 
   test "show products and their trade restrictions for configured exchanges" do
     mock_product(

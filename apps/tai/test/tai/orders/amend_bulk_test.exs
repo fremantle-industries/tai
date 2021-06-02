@@ -1,8 +1,5 @@
 defmodule Tai.Orders.AmendBulkTest do
-  use ExUnit.Case, async: false
-  import Tai.TestSupport.Mock
-  import Support.Orders
-  alias Tai.TestSupport.Mocks
+  use Tai.TestSupport.DataCase, async: false
   alias Mocks.Responses.Orders.GoodTillCancel
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
@@ -12,7 +9,6 @@ defmodule Tai.Orders.AmendBulkTest do
   @credentials Map.put(%{}, @credential, %{})
 
   setup do
-    setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
 
     :ok
@@ -31,7 +27,7 @@ defmodule Tai.Orders.AmendBulkTest do
       setup do
         {:ok, enqueued_order} =
           @submission_type
-          |> build_submission_with_callback(%{
+          |> Support.Orders.build_submission_with_callback(%{
             venue_id: @venue,
             credential_id: @credential,
             price: @original_price,
@@ -52,7 +48,7 @@ defmodule Tai.Orders.AmendBulkTest do
 
         {:ok, enqueued_pend_order} =
           @submission_type
-          |> build_submission_with_callback(%{price: @original_price, qty: @original_qty})
+          |> Support.Orders.build_submission_with_callback(%{price: @original_price, qty: @original_qty})
           |> Tai.Orders.OrderStore.enqueue()
 
         {:ok, {_, open_pend_order}} =

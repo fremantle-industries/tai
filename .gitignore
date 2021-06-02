@@ -37,3 +37,9 @@ secrets/*
 # logs
 log/*
 apps/*/log/*
+
+# DB migrations
+apps/tai/priv/order_repo/migrations
+
+# SQLite DB's
+apps/tai/priv/tai/*.db*

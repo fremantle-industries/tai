@@ -1,5 +1,5 @@
 defmodule Tai.IEx.Commands.StartVenueTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
   import ExUnit.CaptureIO
 
@@ -10,23 +10,14 @@ defmodule Tai.IEx.Commands.StartVenueTest do
   end
 
   setup do
-    start_supervised!(Tai.TestSupport.Mocks.Server)
-    start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Venues.VenueStore)
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    start_supervised!(Tai.Venues.Supervisor)
-
-    {:ok, _} =
-      Tai.Venue
-      |> struct(
-        id: @venue,
-        adapter: StartVenueAdapter,
-        credentials: %{},
-        accounts: "*",
-        products: "*",
-        timeout: 1_000
-      )
-      |> Tai.Venues.VenueStore.put()
+    mock_venue(
+      id: @venue,
+      adapter: StartVenueAdapter,
+      credentials: %{},
+      accounts: "*",
+      products: "*",
+      timeout: 1_000
+    )
 
     :ok
   end

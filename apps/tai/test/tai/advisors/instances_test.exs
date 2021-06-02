@@ -1,19 +1,15 @@
 defmodule Tai.Advisors.InstancesTest do
-  use ExUnit.Case, async: false
-  import Support.Advisors, only: [insert_spec: 2]
-
-  @test_store_id __MODULE__
+  use Tai.TestSupport.DataCase, async: false
+  import Support.Advisors, only: [insert_spec: 1]
 
   setup do
-    start_supervised!({Tai.Advisors.Supervisor, []})
-    start_supervised!({Tai.Advisors.SpecStore, id: @test_store_id})
-    insert_spec(%{group_id: :group_a, advisor_id: :main}, @test_store_id)
-    insert_spec(%{group_id: :group_b, advisor_id: :main}, @test_store_id)
+    insert_spec(%{group_id: :group_a, advisor_id: :main})
+    insert_spec(%{group_id: :group_b, advisor_id: :main})
     :ok
   end
 
   test ".where filters instances from the store" do
-    instances = Tai.Advisors.Instances.where([group_id: :group_a], @test_store_id)
+    instances = Tai.Advisors.Instances.where([group_id: :group_a])
 
     assert Enum.count(instances) == 1
     assert [instance | _] = instances
@@ -21,19 +17,19 @@ defmodule Tai.Advisors.InstancesTest do
   end
 
   test ".start supervises the unstarted instances" do
-    instances = Tai.Advisors.Instances.where([], @test_store_id)
+    instances = Tai.Advisors.Instances.where([])
 
     assert Tai.Advisors.Instances.start(instances) == {2, 0}
     assert Tai.Advisors.Instances.start(instances) == {0, 2}
   end
 
   test ".stop terminates the supervised instances" do
-    unstarted_instances = Tai.Advisors.Instances.where([], @test_store_id)
+    unstarted_instances = Tai.Advisors.Instances.where([])
     assert Tai.Advisors.Instances.stop(unstarted_instances) == {0, 2}
 
     Tai.Advisors.Instances.start(unstarted_instances)
 
-    instances = Tai.Advisors.Instances.where([], @test_store_id)
+    instances = Tai.Advisors.Instances.where([])
     assert Tai.Advisors.Instances.stop(instances) == {2, 0}
     assert Tai.Advisors.Instances.stop(instances) == {0, 2}
   end

@@ -1,8 +1,5 @@
 defmodule Tai.Orders.CreateErrorTest do
-  use ExUnit.Case, async: false
-  import Tai.TestSupport.Mock
-  import Support.Orders
-  alias Tai.TestSupport.Mocks
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.Orders.{Order, Submissions}
 
   @venue :venue_a
@@ -11,7 +8,6 @@ defmodule Tai.Orders.CreateErrorTest do
   @submission_attrs %{venue_id: @venue, credential_id: @credential}
 
   setup do
-    setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
 
     :ok
@@ -25,7 +21,7 @@ defmodule Tai.Orders.CreateErrorTest do
     @submission_type submission_type
 
     test "#{side} records the error reason" do
-      submission = build_submission_with_callback(@submission_type, @submission_attrs)
+      submission = Support.Orders.build_submission_with_callback(@submission_type, @submission_attrs)
 
       {:ok, _} = Tai.Orders.create(submission)
 
@@ -46,7 +42,7 @@ defmodule Tai.Orders.CreateErrorTest do
     end
 
     test "#{side} rescues adapter errors" do
-      submission = build_submission_with_callback(@submission_type, @submission_attrs)
+      submission = Support.Orders.build_submission_with_callback(@submission_type, @submission_attrs)
 
       Mocks.Responses.Orders.Error.create_raise(submission, "Venue Adapter Create Raised Error")
       {:ok, _} = Tai.Orders.create(submission)

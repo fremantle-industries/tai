@@ -1,18 +1,25 @@
 defmodule Tai.IEx.Commands.EnableSendOrdersTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
 
-  setup do
-    config =
-      Tai.Config.parse()
-      |> Map.put(:send_orders, false)
-
-    start_supervised!({Tai.Settings, config})
-    start_supervised!(Tai.Commander)
-    :ok
-  end
-
   test "enable_send_orders sets the value to true" do
+    assert capture_io(&Tai.IEx.disable_send_orders/0) == "ok\n"
+    assert capture_io(&Tai.IEx.settings/0) == """
+           +-------------+-------+
+           |        Name | Value |
+           +-------------+-------+
+           | send_orders | false |
+           +-------------+-------+\n
+           """
+
     assert capture_io(&Tai.IEx.enable_send_orders/0) == "ok\n"
+
+    assert capture_io(&Tai.IEx.settings/0) == """
+           +-------------+-------+
+           |        Name | Value |
+           +-------------+-------+
+           | send_orders |  true |
+           +-------------+-------+\n
+           """
   end
 end

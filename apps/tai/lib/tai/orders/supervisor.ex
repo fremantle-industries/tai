@@ -5,7 +5,7 @@ defmodule Tai.Orders.Supervisor do
 
   @spec start_link(config) :: Supervisor.on_start()
   def start_link(config) do
-    Supervisor.start_link(__MODULE__, config)
+    Supervisor.start_link(__MODULE__, config, name: __MODULE__)
   end
 
   @impl true

@@ -1,14 +1,6 @@
 defmodule Tai.IEx.Commands.AccountsTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
-  import Tai.TestSupport.Mock
-
-  setup do
-    start_supervised!({Tai.SystemBus, 1})
-    start_supervised!(Tai.Venues.AccountStore)
-    start_supervised!(Tai.Commander)
-    :ok
-  end
 
   test "shows each account" do
     mock_account(:test_exchange_a, :main, :btc, 0.1, 1.81227740)

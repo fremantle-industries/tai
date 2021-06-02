@@ -1,5 +1,5 @@
 defmodule Tai.Venues.StatusTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
 
   defmodule VenueAdapter do
@@ -14,7 +14,6 @@ defmodule Tai.Venues.StatusTest do
     end
   end
 
-  @test_store_id __MODULE__
   @venue struct(
            Tai.Venue,
            id: :status_venue,
@@ -24,13 +23,6 @@ defmodule Tai.Venues.StatusTest do
            products: "*",
            timeout: 100
          )
-
-  setup do
-    start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    start_supervised!({Tai.Venues.VenueStore, id: @test_store_id})
-    :ok
-  end
 
   test ".status/1 is :stopped when there is no start process or stream" do
     assert Tai.Venues.Status.status(@venue) == :stopped

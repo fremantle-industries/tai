@@ -1,10 +1,9 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.TradeTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.OkEx.Stream.ProcessOptionalChannels
 
   setup do
-    start_supervised!({TaiEvents, 1})
     start_supervised!({ProcessOptionalChannels, [venue: :my_venue]})
     TaiEvents.firehose_subscribe()
     %{venue_trade_id: Ecto.UUID.generate()}

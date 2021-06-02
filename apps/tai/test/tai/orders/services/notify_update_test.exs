@@ -1,12 +1,7 @@
 defmodule Tai.Orders.Services.NotifyUpdateTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.Orders.Order
-
-  setup do
-    start_supervised!({TaiEvents, 1})
-    :ok
-  end
 
   describe ".notify!" do
     test "broadcasts an order update event" do

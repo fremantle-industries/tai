@@ -1,17 +1,9 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdateOrders.ToPartiallyFilledTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.ClientId
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
   alias Tai.Orders.OrderStore
-
-  setup do
-    {:ok, _} = Application.ensure_all_started(:tzdata)
-    start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Orders.OrderStore)
-
-    :ok
-  end
 
   @venue_client_id "gtc-TCRG7aPSQsmj1Z8jXfbovg=="
   @received_at Tai.Time.monotonic_time()

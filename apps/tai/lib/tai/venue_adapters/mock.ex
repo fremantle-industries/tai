@@ -1,5 +1,6 @@
 defmodule Tai.VenueAdapters.Mock do
-  alias Tai.Orders.Responses
+  alias Tai.Orders
+  alias Tai.NewOrders
   alias Tai.TestSupport.Mocks
   import Mocks.Client
 
@@ -51,7 +52,7 @@ defmodule Tai.VenueAdapters.Mock do
     end)
   end
 
-  def create_order(%Tai.Orders.Order{} = order, _credentials) do
+  def create_order(order, _credentials) do
     with_mock_server(fn ->
       match_attrs = %{
         symbol: order.product_symbol,
@@ -77,20 +78,19 @@ defmodule Tai.VenueAdapters.Mock do
       {:amend_order, match_attrs}
       |> Mocks.Server.eject()
       |> case do
+        {:ok, %Orders.Responses.Amend{}} = response -> response
+        {:ok, %NewOrders.Responses.AmendAccepted{}} = response -> response
+        {:ok, %NewOrders.Responses.Amend{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
-        {:ok, _} = response -> response
         {:error, :not_found} -> {:error, :mock_not_found}
       end
     end)
   end
 
-  def amend_bulk_orders(orders_with_attrs, _credentials) do
-    with_mock_server(fn ->
-      match_attrs =
-        Enum.map(orders_with_attrs, fn {order, attrs} ->
-          Map.merge(attrs, %{venue_order_id: order.venue_order_id})
-        end)
+  def amend_bulk_orders(amend_set, _credentials) do
+    match_attrs = Enum.map(amend_set, fn {o, a} -> Map.merge(a, %{venue_order_id: o.venue_order_id}) end)
 
+    with_mock_server(fn ->
       {:amend_bulk_orders, match_attrs}
       |> Mocks.Server.eject()
       |> case do
@@ -106,8 +106,10 @@ defmodule Tai.VenueAdapters.Mock do
       {:cancel_order, order.venue_order_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, %Responses.Cancel{}} = response -> response
-        {:ok, %Responses.CancelAccepted{}} = response -> response
+        {:ok, %Orders.Responses.Cancel{}} = response -> response
+        {:ok, %Orders.Responses.CancelAccepted{}} = response -> response
+        {:ok, %NewOrders.Responses.Cancel{}} = response -> response
+        {:ok, %NewOrders.Responses.CancelAccepted{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
         {:error, :not_found} -> {:error, :mock_not_found}
       end

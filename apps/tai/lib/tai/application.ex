@@ -6,11 +6,13 @@ defmodule Tai.Application do
     config = Tai.Config.parse()
 
     children = [
+      {Phoenix.PubSub, name: Tai.PubSub},
       {Tai.SystemBus, config.system_bus_registry_partitions},
       {Tai.EventsLogger, [logger: config.logger]},
-      {Tai.Settings, config},
+      {Tai.Settings, [config: config]},
       Tai.Trading.PositionStore,
       {Tai.Orders.Supervisor, config},
+      {Tai.NewOrders.Supervisor, config},
       Tai.Markets.QuoteStore,
       Tai.Venues.Telemetry,
       Tai.Venues.ProductStore,

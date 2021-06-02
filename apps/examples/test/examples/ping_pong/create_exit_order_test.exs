@@ -1,14 +1,6 @@
 defmodule Examples.PingPong.CreateExitOrderTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   alias Examples.PingPong.CreateExitOrder
-
-  setup do
-    config = Tai.Config.parse()
-    start_supervised!({TaiEvents, 1})
-    start_supervised!({Tai.Orders.Supervisor, config})
-
-    :ok
-  end
 
   @advisor_id __MODULE__
 

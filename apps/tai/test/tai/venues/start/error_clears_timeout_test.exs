@@ -1,5 +1,5 @@
 defmodule Tai.Venues.Start.ErrorClearsTimeoutTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
 
   defmodule VenueAdapter do
@@ -19,13 +19,6 @@ defmodule Tai.Venues.Start.ErrorClearsTimeoutTest do
            products: "*",
            timeout: 1_000
          )
-
-  setup do
-    start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    start_supervised!(Tai.Venues.ProductStore)
-    :ok
-  end
 
   test "broadcasts an error when the venue hasn't started within the timeout" do
     TaiEvents.firehose_subscribe()

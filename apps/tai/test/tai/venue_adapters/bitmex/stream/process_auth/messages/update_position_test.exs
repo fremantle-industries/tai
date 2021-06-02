@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdatePositionTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
 
   @venue :venue_a
@@ -7,8 +7,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.Messages.UpdatePositionTes
   @credential {@credential_id, %{}}
 
   setup do
-    start_supervised!({Tai.SystemBus, 1})
-    start_supervised!(Tai.Trading.PositionStore)
     start_supervised!({ProcessAuth, [venue: @venue, credential: @credential]})
     :ok
   end

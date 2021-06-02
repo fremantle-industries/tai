@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
 
@@ -8,8 +8,6 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuthTest do
   @received_at Tai.Time.monotonic_time()
 
   setup do
-    start_supervised!({TaiEvents, 1})
-    start_supervised!(Tai.Orders.OrderStore)
     start_supervised!({ProcessAuth, [venue: @venue, credential: @credential]})
     :ok
   end

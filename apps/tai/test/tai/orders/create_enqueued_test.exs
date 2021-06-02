@@ -1,8 +1,5 @@
 defmodule Tai.Orders.CreateEnqueuedTest do
-  use ExUnit.Case, async: false
-  import Tai.TestSupport.Mock
-  import Support.Orders
-  alias Tai.TestSupport.Mocks
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.Orders.Submissions
 
   @venue_order_id "df8e6bd0-a40a-42fb-8fea-b33ef4e34f14"
@@ -12,7 +9,6 @@ defmodule Tai.Orders.CreateEnqueuedTest do
   @submission_attrs %{venue_id: @venue, credential_id: @credential}
 
   setup do
-    setup_orders(&start_supervised!/1)
     mock_venue(id: @venue, credentials: @credentials, adapter: Tai.VenueAdapters.Mock)
 
     :ok
@@ -27,7 +23,7 @@ defmodule Tai.Orders.CreateEnqueuedTest do
     @submission_type submission_type
 
     test "#{side} enqueues the order" do
-      submission = build_submission(@submission_type, @submission_attrs)
+      submission = Support.Orders.build_submission(@submission_type, @submission_attrs)
       Mocks.Responses.Orders.GoodTillCancel.open(@venue_order_id, submission)
 
       assert {:ok, order} = Tai.Orders.create(submission)

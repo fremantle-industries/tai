@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         otp: [22.x, 23.x, 24.x]
-        elixir: [1.10.x, 1.11.x, 1.12.x]
+        elixir: [1.11.x, 1.12.x]
 
     steps:
       - uses: actions/checkout@v2.3.4
@@ -43,21 +43,23 @@ jobs:
 
       - name: Test
         env:
-          BINANCE_API_KEY: ../../secrets/ci/binance_api_key
-          BINANCE_API_SECRET: ../../secrets/ci/binance_api_secret
-          BITMEX_API_KEY: ../../secrets/ci/bitmex_api_key
-          BITMEX_API_SECRET: ../../secrets/ci/bitmex_api_secret
-          GDAX_API_KEY: ../../secrets/ci/gdax_api_key
-          GDAX_API_PASSPHRASE: ../../secrets/ci/gdax_api_passphrase
-          GDAX_API_SECRET: ../../secrets/ci/gdax_api_secret
-          OKEX_API_KEY: ../../secrets/ci/okex_api_key
-          OKEX_API_PASSPHRASE: ../../secrets/ci/okex_api_passphrase
-          OKEX_API_SECRET: ../../secrets/ci/okex_api_secret
-          DERIBIT_CLIENT_ID: ../../secrets/ci/deribit_client_id
-          DERIBIT_CLIENT_SECRET: ../../secrets/ci/deribit_client_secret
-          FTX_API_KEY: ../../secrets/ci/ftx_api_key
-          FTX_API_SECRET: ../../secrets/ci/ftx_api_secret
-        run: mix test
+          BINANCE_API_KEY: ./secrets/ci/binance_api_key
+          BINANCE_API_SECRET: ./secrets/ci/binance_api_secret
+          BITMEX_API_KEY: ./secrets/ci/bitmex_api_key
+          BITMEX_API_SECRET: ./secrets/ci/bitmex_api_secret
+          GDAX_API_KEY: ./secrets/ci/gdax_api_key
+          GDAX_API_PASSPHRASE: ./secrets/ci/gdax_api_passphrase
+          GDAX_API_SECRET: ./secrets/ci/gdax_api_secret
+          OKEX_API_KEY: ./secrets/ci/okex_api_key
+          OKEX_API_PASSPHRASE: ./secrets/ci/okex_api_passphrase
+          OKEX_API_SECRET: ./secrets/ci/okex_api_secret
+          DERIBIT_CLIENT_ID: ./secrets/ci/deribit_client_id
+          DERIBIT_CLIENT_SECRET: ./secrets/ci/deribit_client_secret
+          FTX_API_KEY: ./secrets/ci/ftx_api_key
+          FTX_API_SECRET: ./secrets/ci/ftx_api_secret
+        run: |
+          mix tai.gen.migration
+          mix test
 
       - uses: actions/upload-artifact@v2
         with:

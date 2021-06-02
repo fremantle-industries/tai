@@ -1,14 +1,8 @@
 defmodule Tai.EventsLoggerTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureLog
 
   @event %Support.CustomEvent{hello: "world"}
-
-  setup do
-    start_supervised!({TaiEvents, 1})
-
-    :ok
-  end
 
   test "can start multiple loggers with different ids" do
     {:ok, a} = Tai.EventsLogger.start_link(id: :a)

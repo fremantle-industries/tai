@@ -1,15 +1,6 @@
 defmodule Tai.IEx.Commands.VenuesTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
-
-  @test_store_id __MODULE__
-
-  setup do
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    start_supervised!({Tai.Venues.VenueStore, id: @test_store_id})
-    start_supervised!(Tai.Commander)
-    :ok
-  end
 
   test "shows a table of all venues" do
     {:ok, _} =
@@ -22,7 +13,7 @@ defmodule Tai.IEx.Commands.VenuesTest do
         timeout: 1_000,
         start_on_boot: false
       )
-      |> Tai.Venues.VenueStore.put(@test_store_id)
+      |> Tai.Venues.VenueStore.put()
 
     {:ok, _} =
       struct(
@@ -34,9 +25,9 @@ defmodule Tai.IEx.Commands.VenuesTest do
         timeout: 1_000,
         start_on_boot: false
       )
-      |> Tai.Venues.VenueStore.put(@test_store_id)
+      |> Tai.Venues.VenueStore.put()
 
-    assert capture_io(fn -> Tai.IEx.venues(store_id: @test_store_id) end) == """
+    assert capture_io(&Tai.IEx.venues/0) == """
            +---------+--------------------+---------+----------------------+-------------+---------+---------------+
            |      ID |        Credentials |  Status |             Channels | Quote Depth | Timeout | Start On Boot |
            +---------+--------------------+---------+----------------------+-------------+---------+---------------+
@@ -57,7 +48,7 @@ defmodule Tai.IEx.Commands.VenuesTest do
         timeout: 1_000,
         start_on_boot: false
       )
-      |> Tai.Venues.VenueStore.put(@test_store_id)
+      |> Tai.Venues.VenueStore.put()
 
     {:ok, _} =
       struct(
@@ -69,14 +60,9 @@ defmodule Tai.IEx.Commands.VenuesTest do
         timeout: 1_000,
         start_on_boot: false
       )
-      |> Tai.Venues.VenueStore.put(@test_store_id)
+      |> Tai.Venues.VenueStore.put()
 
-    assert capture_io(fn ->
-             Tai.IEx.venues(
-               where: [id: :venue_a],
-               store_id: @test_store_id
-             )
-           end) == """
+    assert capture_io(fn -> Tai.IEx.venues(where: [id: :venue_a]) end) == """
            +---------+--------------------+---------+----------------------+-------------+---------+---------------+
            |      ID |        Credentials |  Status |             Channels | Quote Depth | Timeout | Start On Boot |
            +---------+--------------------+---------+----------------------+-------------+---------+---------------+
@@ -96,7 +82,7 @@ defmodule Tai.IEx.Commands.VenuesTest do
         timeout: 1_000,
         start_on_boot: false
       )
-      |> Tai.Venues.VenueStore.put(@test_store_id)
+      |> Tai.Venues.VenueStore.put()
 
     {:ok, _} =
       struct(
@@ -108,14 +94,9 @@ defmodule Tai.IEx.Commands.VenuesTest do
         timeout: 1_000,
         start_on_boot: false
       )
-      |> Tai.Venues.VenueStore.put(@test_store_id)
+      |> Tai.Venues.VenueStore.put()
 
-    assert capture_io(fn ->
-             Tai.IEx.venues(
-               order: [:quote_depth],
-               store_id: @test_store_id
-             )
-           end) == """
+    assert capture_io(fn -> Tai.IEx.venues(order: [:quote_depth]) end) == """
            +---------+--------------------+---------+----------------------+-------------+---------+---------------+
            |      ID |        Credentials |  Status |             Channels | Quote Depth | Timeout | Start On Boot |
            +---------+--------------------+---------+----------------------+-------------+---------+---------------+
@@ -126,7 +107,7 @@ defmodule Tai.IEx.Commands.VenuesTest do
   end
 
   test "shows an empty table when there are no venues" do
-    assert capture_io(fn -> Tai.IEx.venues(store_id: @test_store_id) end) == """
+    assert capture_io(&Tai.IEx.venues/0) == """
            +----+-------------+--------+----------+-------------+---------+---------------+
            | ID | Credentials | Status | Channels | Quote Depth | Timeout | Start On Boot |
            +----+-------------+--------+----------+-------------+---------+---------------+

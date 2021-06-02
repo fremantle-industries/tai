@@ -1,5 +1,5 @@
 defmodule Tai.AdvisorTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
 
   defmodule NoOpAdvisor do
     use Tai.Advisor
@@ -90,8 +90,6 @@ defmodule Tai.AdvisorTest do
     config = Keyword.get(opts, :config, %{})
     trades = Keyword.get(opts, :trades, [])
     run_store = Keyword.get(opts, :store, %{})
-
-    start_supervised!({TaiEvents, 1})
 
     {:ok, pid} = advisor.start_link(
       group_id: group_id,

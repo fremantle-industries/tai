@@ -1,14 +1,7 @@
 defmodule Tai.IEx.MarketsTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
   alias Tai.Markets.{Quote, PricePoint}
-
-  setup do
-    start_supervised!({Tai.SystemBus, 1})
-    start_supervised!(Tai.Markets.QuoteStore)
-    start_supervised!(Tai.Commander)
-    :ok
-  end
 
   test "shows all inside quotes and the time they were last processed and changed" do
     %Quote{

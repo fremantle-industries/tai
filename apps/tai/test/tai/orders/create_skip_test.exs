@@ -1,10 +1,8 @@
 defmodule Tai.Orders.CreateSkipTest do
-  use ExUnit.Case, async: false
-  import Support.Orders
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.Orders.{Order, Submissions}
 
   setup do
-    setup_orders(&start_supervised!/1)
     Tai.Settings.disable_send_orders!()
 
     :ok
@@ -18,7 +16,7 @@ defmodule Tai.Orders.CreateSkipTest do
     @submission_type submission_type
 
     test "#{side} updates the leaves qty" do
-      submission = build_submission_with_callback(@submission_type)
+      submission = Support.Orders.build_submission_with_callback(@submission_type)
 
       {:ok, _} = Tai.Orders.create(submission)
 

@@ -3,12 +3,23 @@ defmodule Tai.TestSupport.E2ECase do
 
   using do
     quote do
+      alias Tai.NewOrders.OrderRepo
+      alias Tai.TestSupport.Mocks
+
       import ExUnit.CaptureIO
+      import Ecto
+      import Ecto.Changeset
+      import Ecto.Query
+      import Tai.TestSupport.DataCase
+      import Tai.TestSupport.Mock
       import Tai.TestSupport.Assertions.Event
+      import Tai.TestSupport.Factories.NewOrderSubmissionFactory
+      import Tai.TestSupport.Factories.NewOrderFactory
+      import Tai.TestSupport.Factories.OrderTransitionFactory
+      import Tai.TestSupport.Factories.FailedOrderTransitionFactory
 
       setup do
-        on_exit(fn -> stop_app() end)
-
+        stop_app()
         start_mock_server()
         before_start_app()
         start_app()
@@ -27,33 +38,23 @@ defmodule Tai.TestSupport.E2ECase do
         :ok
       end
 
-      @spec before_start_app :: no_return
-      def before_start_app, do: nil
-
-      @spec after_start_app :: no_return
-      def after_start_app, do: nil
-
-      @spec after_boot_app :: no_return
-      def after_boot_app, do: nil
-
-      @spec after_boot_app_error(error :: struct) :: no_return
-      def after_boot_app_error(_error), do: nil
-
       def start_mock_server do
         start_supervised!(Tai.TestSupport.Mocks.Server)
       end
 
       def start_app do
         {:ok, _} = Application.ensure_all_started(:echo_boy)
-        {:ok, _} = Application.ensure_all_started(:tai_events)
         TaiEvents.firehose_subscribe()
+        {:ok, _} = Application.ensure_all_started(:tai)
+
+        :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tai.NewOrders.OrderRepo)
+        Ecto.Adapters.SQL.Sandbox.mode(Tai.NewOrders.OrderRepo, {:shared, self()})
+
         {:ok, _} = e2e_app() |> Application.ensure_all_started()
         Tai.Settings.enable_send_orders!()
       end
 
       def stop_app do
-        :ok = Application.stop(:echo_boy)
-        :ok = Application.stop(:tai_events)
         :ok = Application.stop(:tai)
         :ok = e2e_app() |> Application.stop()
       end
@@ -117,6 +118,18 @@ defmodule Tai.TestSupport.E2ECase do
         |> Application.get_env(:e2e_mappings, %{})
         |> Map.fetch!(scenario_name)
       end
+
+      @spec before_start_app :: no_return
+      def before_start_app, do: nil
+
+      @spec after_start_app :: no_return
+      def after_start_app, do: nil
+
+      @spec after_boot_app :: no_return
+      def after_boot_app, do: nil
+
+      @spec after_boot_app_error(error :: struct) :: no_return
+      def after_boot_app_error(_error), do: nil
 
       defoverridable before_start_app: 0,
                      after_start_app: 0,

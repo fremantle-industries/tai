@@ -5,7 +5,7 @@ defmodule Tai.Advisors.Instances do
   @type instance :: Instance.t()
 
   @spec where(list, store_id) :: [instance]
-  def where(filters, store_id) do
+  def where(filters, store_id \\ SpecStore.default_store_id()) do
     store_id
     |> SpecStore.all()
     |> Enum.map(&Instance.from_spec/1)

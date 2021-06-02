@@ -1,22 +1,14 @@
 defmodule Tai.IEx.Commands.AdvisorsTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
-  import Support.Advisors, only: [insert_spec: 2]
-
-  @test_store_id __MODULE__
-
-  setup do
-    start_supervised!({Tai.Advisors.SpecStore, id: @test_store_id})
-    start_supervised!(Tai.Commander)
-    :ok
-  end
+  import Support.Advisors, only: [insert_spec: 1]
 
   test "shows all advisors in all groups ordered group id, advisor id by default" do
-    insert_spec(%{group_id: :log_spread, advisor_id: :a}, @test_store_id)
-    insert_spec(%{group_id: :log_spread, advisor_id: :b}, @test_store_id)
-    insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
+    insert_spec(%{group_id: :log_spread, advisor_id: :a})
+    insert_spec(%{group_id: :log_spread, advisor_id: :b})
+    insert_spec(%{group_id: :trade_spread, advisor_id: :a})
 
-    assert capture_io(fn -> Tai.IEx.advisors(store_id: @test_store_id) end) == """
+    assert capture_io(&Tai.IEx.advisors/0) == """
            +--------------+------------+-----------+-----+
            |     Group ID | Advisor ID |    Status | PID |
            +--------------+------------+-----------+-----+
@@ -28,7 +20,7 @@ defmodule Tai.IEx.Commands.AdvisorsTest do
   end
 
   test "shows an empty table when there are no advisors" do
-    assert capture_io(fn -> Tai.IEx.advisors(store_id: @test_store_id) end) == """
+    assert capture_io(&Tai.IEx.advisors/0) == """
            +----------+------------+--------+-----+
            | Group ID | Advisor ID | Status | PID |
            +----------+------------+--------+-----+
@@ -38,16 +30,11 @@ defmodule Tai.IEx.Commands.AdvisorsTest do
   end
 
   test "can filter by struct attributes" do
-    insert_spec(%{group_id: :log_spread, advisor_id: :a}, @test_store_id)
-    insert_spec(%{group_id: :log_spread, advisor_id: :b}, @test_store_id)
-    insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
+    insert_spec(%{group_id: :log_spread, advisor_id: :a})
+    insert_spec(%{group_id: :log_spread, advisor_id: :b})
+    insert_spec(%{group_id: :trade_spread, advisor_id: :a})
 
-    assert capture_io(fn ->
-             Tai.IEx.advisors(
-               where: [group_id: :log_spread],
-               store_id: @test_store_id
-             )
-           end) == """
+    assert capture_io(fn -> Tai.IEx.advisors(where: [group_id: :log_spread]) end) == """
            +------------+------------+-----------+-----+
            |   Group ID | Advisor ID |    Status | PID |
            +------------+------------+-----------+-----+
@@ -58,16 +45,11 @@ defmodule Tai.IEx.Commands.AdvisorsTest do
   end
 
   test "can order ascending by struct attributes" do
-    insert_spec(%{group_id: :log_spread, advisor_id: :a}, @test_store_id)
-    insert_spec(%{group_id: :log_spread, advisor_id: :b}, @test_store_id)
-    insert_spec(%{group_id: :trade_spread, advisor_id: :a}, @test_store_id)
+    insert_spec(%{group_id: :log_spread, advisor_id: :a})
+    insert_spec(%{group_id: :log_spread, advisor_id: :b})
+    insert_spec(%{group_id: :trade_spread, advisor_id: :a})
 
-    assert capture_io(fn ->
-             Tai.IEx.advisors(
-               order: [:advisor_id, :group_id],
-               store_id: @test_store_id
-             )
-           end) == """
+    assert capture_io(fn -> Tai.IEx.advisors(order: [:advisor_id, :group_id]) end) == """
            +--------------+------------+-----------+-----+
            |     Group ID | Advisor ID |    Status | PID |
            +--------------+------------+-----------+-----+

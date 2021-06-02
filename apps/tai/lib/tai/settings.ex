@@ -6,38 +6,57 @@ defmodule Tai.Settings do
   use GenServer
   alias __MODULE__
 
+  defmodule State do
+    @enforce_keys ~w[send_orders name]a
+    defstruct ~w[send_orders name]a
+  end
+
   @type t :: %Settings{
           send_orders: boolean
         }
 
-  @enforce_keys ~w(send_orders)a
-  defstruct ~w(send_orders)a
+  @enforce_keys ~w[send_orders]a
+  defstruct ~w[send_orders]a
 
-  def start_link(%Tai.Config{} = config) do
-    state = %Settings{
-      send_orders: config.send_orders
-    }
+  @default_id :default
 
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  def start_link(opts) do
+    config = Keyword.fetch!(opts, :config)
+    id = Keyword.get(opts, :id, @default_id)
+    name = process_name(id)
+    state = %State{send_orders: config.send_orders, name: name}
+
+    GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  def disable_send_orders! do
-    GenServer.call(__MODULE__, {:set_send_orders, false})
+  def process_name(id), do: :"#{__MODULE__}_#{id}"
+
+  def disable_send_orders!(id \\ @default_id) do
+    id
+    |> process_name()
+    |> GenServer.call({:set_send_orders, false})
   end
 
-  def enable_send_orders! do
-    GenServer.call(__MODULE__, {:set_send_orders, true})
+  def enable_send_orders!(id \\ @default_id) do
+    id
+    |> process_name()
+    |> GenServer.call({:set_send_orders, true})
   end
 
-  def send_orders? do
-    [{:send_orders, send_orders}] = :ets.lookup(__MODULE__, :send_orders)
+  def send_orders?(id \\ @default_id) do
+    [{:send_orders, send_orders}] =
+      id
+      |> process_name()
+      |> :ets.lookup(:send_orders)
+
     send_orders
   end
 
-  def all do
-    %Settings{send_orders: send_orders?()}
+  def all(id \\ @default_id) do
+    %Settings{send_orders: send_orders?(id)}
   end
 
+  @impl true
   def init(state) do
     {
       :ok,
@@ -46,25 +65,29 @@ defmodule Tai.Settings do
     }
   end
 
+  @impl true
   def handle_continue(:create_ets_table, state) do
-    create_ets_table()
+    create_ets_table(state.name)
     upsert_items(state)
     {:noreply, state}
   end
 
+  @impl true
   def handle_call({:set_send_orders, val}, _from, state) do
-    :ets.insert(__MODULE__, {:send_orders, val})
+    state.name
+    |> :ets.insert({:send_orders, val})
+
     {:reply, :ok, state}
   end
 
-  defp create_ets_table do
-    :ets.new(__MODULE__, [:set, :protected, :named_table])
+  defp create_ets_table(name) do
+    :ets.new(name, [:set, :protected, :named_table])
   end
 
-  defp upsert_items(settings) do
-    settings
+  defp upsert_items(state) do
+    state
     |> Map.to_list()
     |> Enum.filter(fn {k, _} -> k != :__struct__ end)
-    |> Enum.each(fn item -> :ets.insert(__MODULE__, item) end)
+    |> Enum.each(fn item -> :ets.insert(state.name, item) end)
   end
 end

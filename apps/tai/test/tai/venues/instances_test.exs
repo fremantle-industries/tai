@@ -1,5 +1,5 @@
 defmodule Tai.Venues.InstancesTest do
-  use ExUnit.Case, async: false
+  use Tai.TestSupport.DataCase, async: false
 
   defmodule VenueAdapter do
     use Support.StartVenueAdapter
@@ -16,12 +16,6 @@ defmodule Tai.Venues.InstancesTest do
 
   @venue struct(Tai.Venue, id: :venue_a, adapter: VenueAdapter)
   @stream struct(Tai.Venues.Stream, venue: @venue)
-
-  setup do
-    start_supervised!(Tai.Venues.StreamsSupervisor)
-    start_supervised!(Tai.Venues.Supervisor)
-    :ok
-  end
 
   describe ".find/1" do
     test "returns the pid of the start venue process" do
