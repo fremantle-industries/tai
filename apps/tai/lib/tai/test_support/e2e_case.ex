@@ -44,6 +44,7 @@ defmodule Tai.TestSupport.E2ECase do
 
       def start_app do
         {:ok, _} = Application.ensure_all_started(:echo_boy)
+        {:ok, _} = Application.ensure_all_started(:tai_events)
         TaiEvents.firehose_subscribe()
         {:ok, _} = Application.ensure_all_started(:tai)
 
@@ -55,8 +56,8 @@ defmodule Tai.TestSupport.E2ECase do
       end
 
       def stop_app do
-        :ok = Application.stop(:tai)
-        :ok = e2e_app() |> Application.stop()
+        Application.stop(:tai)
+        e2e_app() |> Application.stop()
       end
 
       def seed_mock_responses(scenario_name) do
