@@ -33,6 +33,8 @@ defmodule Tai.NewOrders.Transitions.PartialFill do
 
   def attrs(transition) do
     [
+      status: :open,
+      venue_order_id: transition.venue_order_id,
       cumulative_qty: transition.cumulative_qty,
       leaves_qty: transition.leaves_qty,
       qty: Decimal.add(transition.cumulative_qty, transition.leaves_qty),
