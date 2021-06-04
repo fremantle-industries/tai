@@ -14,6 +14,7 @@ defmodule Tai.NewOrders.Transitions.PartialFill do
   @primary_key false
 
   embedded_schema do
+    field(:venue_order_id, :string)
     field(:cumulative_qty, :decimal)
     field(:leaves_qty, :decimal)
     field(:last_received_at, :utc_datetime_usec)
@@ -22,11 +23,13 @@ defmodule Tai.NewOrders.Transitions.PartialFill do
 
   def changeset(transition, params) do
     transition
-    |> cast(params, [:leaves_qty, :last_received_at, :last_venue_timestamp])
+    |> cast(params, [:venue_order_id, :cumulative_qty, :leaves_qty, :last_received_at, :last_venue_timestamp])
     |> validate_required([:leaves_qty, :last_received_at])
   end
 
-  def from, do: ~w[open pending_cancel cancel_accepted pending_amend amend_accepted]a
+  def from do
+    ~w[enqueued create_accepted open pending_cancel cancel_accepted pending_amend amend_accepted]a
+  end
 
   def attrs(transition) do
     [
