@@ -45,6 +45,17 @@ defmodule Tai.TestSupport.Factories.OrderTransitionFactory do
     {:ok, attrs}
   end
 
+  defp generate_order_transition_attrs(:fill = type) do
+    attrs = %{
+      cumulative_qty: Decimal.new(1),
+      leaves_qty: Decimal.new(0),
+      last_venue_timestamp: DateTime.utc_now(),
+      last_received_at: DateTime.utc_now(),
+      __type__: type
+    }
+    {:ok, attrs}
+  end
+
   defp generate_order_transition_attrs(:partial_fill = type) do
     attrs = %{
       last_venue_timestamp: DateTime.utc_now(),
