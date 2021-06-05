@@ -39,7 +39,6 @@ defmodule Tai.NewOrders.Transitions.Open do
     qty = Decimal.add(transition.cumulative_qty, transition.leaves_qty)
 
     [
-      status: :open,
       venue_order_id: transition.venue_order_id,
       cumulative_qty: transition.cumulative_qty,
       leaves_qty: transition.leaves_qty,
@@ -47,5 +46,9 @@ defmodule Tai.NewOrders.Transitions.Open do
       last_received_at: transition.last_received_at,
       last_venue_timestamp: transition.last_venue_timestamp
     ]
+  end
+
+  def status(_current) do
+    :open
   end
 end

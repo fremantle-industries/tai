@@ -28,9 +28,12 @@ defmodule Tai.NewOrders.Transitions.AcceptAmend do
 
   def attrs(transition) do
     [
-      status: :amend_accepted,
       last_received_at: transition.last_received_at,
       last_venue_timestamp: transition.last_venue_timestamp
     ]
+  end
+
+  def status(_current) do
+    :amend_accepted
   end
 end

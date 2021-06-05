@@ -29,8 +29,11 @@ defmodule Tai.NewOrders.Transitions.RescueCreateError do
 
   def attrs(_transition) do
     [
-      status: :create_error,
       leaves_qty: Decimal.new(0)
     ]
+  end
+
+  def status(_current) do
+    :create_error
   end
 end

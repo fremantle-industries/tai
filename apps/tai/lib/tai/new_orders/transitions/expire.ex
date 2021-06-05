@@ -30,12 +30,15 @@ defmodule Tai.NewOrders.Transitions.Expire do
 
   def attrs(transition) do
     [
-      status: :expired,
       venue_order_id: transition.venue_order_id,
       cumulative_qty: transition.cumulative_qty,
       leaves_qty: transition.leaves_qty,
       last_received_at: transition.last_received_at,
       last_venue_timestamp: transition.last_venue_timestamp
     ]
+  end
+
+  def status(_current) do
+    :expired
   end
 end

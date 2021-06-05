@@ -27,10 +27,13 @@ defmodule Tai.NewOrders.Transitions.Cancel do
 
   def attrs(transition) do
     [
-      status: :canceled,
       leaves_qty: Decimal.new(0),
       last_received_at: transition.last_received_at,
       last_venue_timestamp: transition.last_venue_timestamp
     ]
+  end
+
+  def status(_current) do
+    :canceled
   end
 end

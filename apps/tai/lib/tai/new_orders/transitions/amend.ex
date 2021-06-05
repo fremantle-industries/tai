@@ -29,11 +29,14 @@ defmodule Tai.NewOrders.Transitions.Amend do
 
   def attrs(transition) do
     [
-      status: :open,
       price: transition.price,
       leaves_qty: transition.leaves_qty,
       last_received_at: transition.last_received_at,
       last_venue_timestamp: transition.last_venue_timestamp
     ]
+  end
+
+  def status(_current) do
+    :open
   end
 end

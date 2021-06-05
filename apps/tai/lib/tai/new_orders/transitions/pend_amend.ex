@@ -22,9 +22,9 @@ defmodule Tai.NewOrders.Transitions.PendAmend do
 
   def from, do: ~w[open]a
 
-  def attrs(_transition) do
-    [
-      status: :pending_amend
-    ]
+  def attrs(_transition), do: []
+
+  def status(_current) do
+    :pending_amend
   end
 end

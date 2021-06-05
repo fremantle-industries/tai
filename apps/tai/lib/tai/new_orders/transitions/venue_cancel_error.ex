@@ -25,9 +25,9 @@ defmodule Tai.NewOrders.Transitions.VenueCancelError do
 
   def from, do: ~w[pending_cancel]a
 
-  def attrs(_transition) do
-    [
-      status: :open
-    ]
+  def attrs(_transition), do: []
+
+  def status(_current) do
+    :open
   end
 end

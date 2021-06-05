@@ -64,19 +64,23 @@ defmodule Tai.NewOrders.Services.ApplyOrderTransition do
   end
 
   defp update_order_and_save_transition(client_id, %transition_mod{} = transition, order_transition_changeset) do
-    from_status = transition_mod.from()
-    attrs = transition_mod.attrs(transition)
-    update_order_query = build_update_order_query(client_id, from_status, attrs)
-
     # The previous order needs to be selected outside of the transaction to
     # prevent a possible deadlock.
     case OrderRepo.get(Order, client_id) do
       %Order{} = previous_order_before_update ->
+        from_status = transition_mod.from()
+        current_status = previous_order_before_update.status
+
         # Check if the existing order has a status that supports this
         # transition in memory and only rely on the transaction rollback
         # as a fallback. There is a performance penalty to rolling back
         # a transaction.
-        if Enum.member?(from_status, previous_order_before_update.status) do
+        if Enum.member?(from_status, current_status) do
+          attrs = transition_mod.attrs(transition)
+          new_status = transition_mod.status(current_status)
+          update_attrs = Keyword.put(attrs, :status, new_status)
+          update_order_query = build_update_order_query(client_id, from_status, update_attrs)
+
           fn ->
             case OrderRepo.update_all(update_order_query, []) do
               {0, []} ->

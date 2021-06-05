@@ -22,9 +22,9 @@ defmodule Tai.NewOrders.Transitions.PendCancel do
 
   def from, do: ~w[open]a
 
-  def attrs(_transition) do
-    [
-      status: :pending_cancel
-    ]
+  def attrs(_transition), do: []
+
+  def status(_current) do
+    :pending_cancel
   end
 end

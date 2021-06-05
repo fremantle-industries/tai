@@ -25,9 +25,9 @@ defmodule Tai.NewOrders.Transitions.VenueAmendError do
 
   def from, do: ~w[pending_amend]a
 
-  def attrs(_transition) do
-    [
-      status: :open
-    ]
+  def attrs(_transition), do: []
+
+  def status(_current) do
+    :open
   end
 end

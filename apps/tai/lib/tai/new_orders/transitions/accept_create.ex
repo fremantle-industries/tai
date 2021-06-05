@@ -30,10 +30,13 @@ defmodule Tai.NewOrders.Transitions.AcceptCreate do
 
   def attrs(transition) do
     [
-      status: :create_accepted,
       venue_order_id: transition.venue_order_id,
       last_received_at: transition.last_received_at,
       last_venue_timestamp: transition.last_venue_timestamp
     ]
+  end
+
+  def status(_current) do
+    :create_accepted
   end
 end

@@ -24,8 +24,11 @@ defmodule Tai.NewOrders.Transitions.Skip do
 
   def attrs(_) do
     [
-      status: :skipped,
       leaves_qty: Decimal.new(0)
     ]
+  end
+
+  def status(_current) do
+    :skipped
   end
 end
