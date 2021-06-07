@@ -58,7 +58,7 @@ defmodule Tai.Commander do
   end
 
   def delete_all_orders(options \\ []) do
-    options |> to_dest() |> GenServer.call(:delete_all_orders)
+    options |> to_dest() |> GenServer.call(:delete_all_orders, 60_000)
   end
 
   def positions(options \\ []) do

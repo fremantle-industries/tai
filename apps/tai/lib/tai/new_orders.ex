@@ -127,6 +127,6 @@ defmodule Tai.NewOrders do
 
   @spec delete_all() :: {non_neg_integer, nil}
   def delete_all do
-    OrderRepo.delete_all(Order)
+    OrderRepo.delete_all(Order, timeout: 60_000)
   end
 end
