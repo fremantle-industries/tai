@@ -124,4 +124,9 @@ defmodule Tai.NewOrders do
     |> Queries.SearchFailedOrderTransitionsQuery.call(query)
     |> OrderRepo.aggregate(:count)
   end
+
+  @spec delete_all() :: {non_neg_integer, nil}
+  def delete_all do
+    OrderRepo.delete_all(Order)
+  end
 end

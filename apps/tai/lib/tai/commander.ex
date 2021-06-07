@@ -57,6 +57,10 @@ defmodule Tai.Commander do
     options |> to_dest() |> GenServer.call({:failed_order_transitions_count, client_id, query})
   end
 
+  def delete_all_orders(options \\ []) do
+    options |> to_dest() |> GenServer.call(:delete_all_orders)
+  end
+
   def positions(options \\ []) do
     options |> to_dest() |> GenServer.call(:positions)
   end
@@ -151,6 +155,10 @@ defmodule Tai.Commander do
 
   def handle_call({:failed_order_transitions_count, client_id, query}, _from, state) do
     {:reply, Tai.Commander.FailedOrderTransitionsCount.get(client_id, query), state}
+  end
+
+  def handle_call(:delete_all_orders, _from, state) do
+    {:reply, Tai.Commander.DeleteAllOrders.execute(), state}
   end
 
   def handle_call(:positions, _from, state) do
