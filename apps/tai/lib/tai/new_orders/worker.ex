@@ -1,6 +1,8 @@
 defmodule Tai.NewOrders.Worker do
   use GenServer
 
+  alias Tai.Venues.Adapter
+
   alias Tai.NewOrders.{
     Order,
     OrderTransitionWorker,
@@ -19,9 +21,8 @@ defmodule Tai.NewOrders.Worker do
   @type status :: atom
   @type status_required :: status | [status]
   @type transition :: Transition.t()
-  @type create_response :: {:ok, order}
-  @type cancel_error_reason :: {:invalid_status, was :: status, status_required, transition}
-  @type cancel_response :: {:ok, order} | {:error, cancel_error_reason}
+  @type create_response :: {:ok, order} | {:error, Adapter.create_order_error_reason()}
+  @type cancel_response :: {:ok, order} | {:error, Adapter.cancel_order_error_reason()}
   @type amend_attrs :: %{
           optional(:price) => Decimal.t(),
           optional(:qty) => Decimal.t()

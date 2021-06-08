@@ -233,6 +233,9 @@ if config_env() == :test do
   config :tai, :test_venue_adapters_create_order_ioc_accepted, [:ftx]
   config :tai, :test_venue_adapters_create_order_close, [:okex_futures, :okex_swap]
 
+  config :tai, :test_venue_adapters_create_order_error, [:bitmex]
+  config :tai, :test_venue_adapters_create_order_error_size_too_small, [:ftx]
+
   config :tai, :test_venue_adapters_create_order_error_insufficient_balance, [
     :bitmex,
     :okex_futures,
@@ -240,7 +243,6 @@ if config_env() == :test do
     :binance
   ]
 
-  config :tai, :test_venue_adapters_create_order_error, [:bitmex]
   config :tai, :test_venue_adapters_amend_order, [:bitmex]
   config :tai, :test_venue_adapters_amend_bulk_order, [:bitmex]
   config :tai, :test_venue_adapters_cancel_order, [:bitmex, :binance]
@@ -259,7 +261,11 @@ if config_env() == :test do
     :ftx
   ]
 
-  config :tai, :test_venue_adapters_cancel_order_error_timeout, [:bitmex, :okex_futures, :okex_swap]
+  config :tai, :test_venue_adapters_cancel_order_error_timeout, [
+    :bitmex,
+    :okex_futures,
+    :okex_swap
+  ]
 
   config :tai, :test_venue_adapters_cancel_order_error_overloaded, [:bitmex]
   config :tai, :test_venue_adapters_cancel_order_error_nonce_not_increasing, [:bitmex]

@@ -47,6 +47,10 @@ defmodule Tai.TestSupport.Helpers do
     :test_venue_adapters_create_order_error |> filter()
   end
 
+  def test_venue_adapters_create_order_error_size_too_small do
+    :test_venue_adapters_create_order_error_size_too_small |> filter()
+  end
+
   def test_venue_adapters_create_order_error_insufficient_balance do
     :test_venue_adapters_create_order_error_insufficient_balance |> filter()
   end

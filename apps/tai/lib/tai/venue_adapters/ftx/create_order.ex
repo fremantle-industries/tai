@@ -48,5 +48,7 @@ defmodule Tai.VenueAdapters.Ftx.CreateOrder do
     {:ok, response}
   end
 
+  defp parse_response({:error, "Size too small for provide"}, _), do: {:error, :size_too_small}
+
   defp parse_response({:error, reason}, _), do: {:error, {:unhandled, reason}}
 end

@@ -13,25 +13,6 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
     HTTPoison.start()
   end
 
-  Tai.TestSupport.Helpers.test_venue_adapters_create_order_error_insufficient_balance()
-  |> Enum.map(fn venue ->
-    @venue venue
-
-    setup do
-      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
-      :ok
-    end
-
-    test "#{venue.id} insufficient balance" do
-      order = build_order(@venue.id, :buy, :gtc, action: :insufficient_balance)
-
-      use_cassette "venue_adapters/shared/orders/#{@venue.id}/create_order_insufficient_balance" do
-        assert {:error, reason} = Tai.Venues.Client.create_order(order)
-        assert reason == :insufficient_balance
-      end
-    end
-  end)
-
   Tai.TestSupport.Helpers.test_venue_adapters_create_order_error()
   |> Enum.map(fn venue ->
     @venue venue
@@ -108,6 +89,44 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
     end
   end)
 
+  Tai.TestSupport.Helpers.test_venue_adapters_create_order_error_size_too_small()
+  |> Enum.map(fn venue ->
+    @venue venue
+
+    setup do
+      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
+      :ok
+    end
+
+    test "#{venue.id} size too small" do
+      order = build_order(@venue.id, :buy, :gtc, action: :size_too_small)
+
+      use_cassette "venue_adapters/shared/orders/#{@venue.id}/create_order_size_too_small" do
+        assert {:error, reason} = Tai.Venues.Client.create_order(order)
+        assert reason == :size_too_small
+      end
+    end
+  end)
+
+  Tai.TestSupport.Helpers.test_venue_adapters_create_order_error_insufficient_balance()
+  |> Enum.map(fn venue ->
+    @venue venue
+
+    setup do
+      {:ok, _} = Tai.Venues.VenueStore.put(@venue)
+      :ok
+    end
+
+    test "#{venue.id} insufficient balance" do
+      order = build_order(@venue.id, :buy, :gtc, action: :insufficient_balance)
+
+      use_cassette "venue_adapters/shared/orders/#{@venue.id}/create_order_insufficient_balance" do
+        assert {:error, reason} = Tai.Venues.Client.create_order(order)
+        assert reason == :insufficient_balance
+      end
+    end
+  end)
+
   defp build_order(venue_id, side, time_in_force, opts) do
     action = Keyword.fetch!(opts, :action)
     post_only = Keyword.get(opts, :post_only, false)
@@ -149,6 +168,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
   defp qty(:bitmex, :buy, _, _), do: Decimal.new(1)
   defp qty(:okex_futures, :buy, _, _), do: Decimal.new(5)
   defp qty(:okex_swap, :buy, _, _), do: Decimal.new(5)
+  defp qty(_, :buy, :gtc, :size_too_small), do: Decimal.new("0.000001")
   defp qty(_, :buy, :gtc, :insufficient_balance), do: Decimal.new(1_000)
   defp qty(_, :buy, _, _), do: Decimal.new("0.2")
 end

@@ -26,7 +26,7 @@ defmodule Tai.Venues.Adapter do
           | {:unhandled, reason :: term}
   @type positions_error_reason :: shared_error_reason | :not_supported
   @type create_order_error_reason ::
-          shared_error_reason | :insufficient_balance | :insufficient_position
+          shared_error_reason | :size_too_small | :insufficient_balance | :insufficient_position
   @type amend_order_error_reason ::
           shared_error_reason
           | :insufficient_balance
