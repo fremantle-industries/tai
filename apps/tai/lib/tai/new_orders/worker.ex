@@ -29,7 +29,7 @@ defmodule Tai.NewOrders.Worker do
         }
   @type amend_response ::
           {:ok, updated :: order}
-          | {:error, invalid_status_error_reason}
+          | {:error, invalid_status_error_reason | Adapter.amend_order_error_reason()}
   @type amend_bulk_reject_reason :: invalid_status_error_reason
   @type amend_bulk_response :: [{:ok, updated :: order} | {:error, amend_bulk_reject_reason}]
 
@@ -53,7 +53,7 @@ defmodule Tai.NewOrders.Worker do
     GenServer.call(pid, {:amend, order, attrs})
   end
 
-  @spec amend_bulk(pid, [{order, amend_attrs}]) :: amend_response
+  @spec amend_bulk(pid, [{order, amend_attrs}]) :: amend_bulk_response()
   def amend_bulk(pid, amend_set) do
     GenServer.call(pid, {:amend_bulk, amend_set})
   end
