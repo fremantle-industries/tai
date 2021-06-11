@@ -10,17 +10,17 @@ defmodule Tai.NewOrders do
   @type submission :: SubmissionFactory.submission()
   @type client_id :: Order.client_id()
   @type order :: Order.t()
-  @type create_response :: Worker.create_response()
-  @type cancel_response :: Worker.cancel_response()
+  @type create_result :: Worker.create_result()
+  @type cancel_result :: Worker.cancel_result()
   @type amend_attrs :: Worker.amend_attrs()
-  @type amend_response :: Worker.amend_response()
-  @type amend_bulk_response :: Worker.amend_bulk_response()
+  @type amend_result :: Worker.amend_result()
+  @type amend_bulk_result :: Worker.amend_bulk_result()
   @type search_term :: String.t() | nil
 
   @order_worker :new_order_worker
   @timeout 5_000
 
-  @spec create(submission) :: create_response
+  @spec create(submission) :: create_result
   def create(submission) do
     :poolboy.transaction(
       @order_worker,
@@ -29,7 +29,7 @@ defmodule Tai.NewOrders do
     )
   end
 
-  @spec cancel(order) :: cancel_response
+  @spec cancel(order) :: cancel_result
   def cancel(order) do
     :poolboy.transaction(
       @order_worker,
@@ -38,7 +38,7 @@ defmodule Tai.NewOrders do
     )
   end
 
-  @spec amend(order, amend_attrs) :: amend_response
+  @spec amend(order, amend_attrs) :: amend_result
   def amend(order, attrs) do
     :poolboy.transaction(
       @order_worker,
@@ -47,7 +47,7 @@ defmodule Tai.NewOrders do
     )
   end
 
-  @spec amend_bulk([{order, amend_attrs}]) :: amend_bulk_response
+  @spec amend_bulk([{order, amend_attrs}]) :: amend_bulk_result
   def amend_bulk(amend_set) do
     :poolboy.transaction(
       @order_worker,

@@ -21,39 +21,39 @@ defmodule Tai.NewOrders.Worker do
   @type status :: atom
   @type transition :: Transition.t()
   @type invalid_status_error_reason :: {:invalid_status, was :: status, transition}
-  @type create_response :: {:ok, order} | {:error, Adapter.create_order_error_reason()}
-  @type cancel_response :: {:ok, order} | {:error, invalid_status_error_reason | Adapter.cancel_order_error_reason()}
+  @type create_result :: {:ok, order} | {:error, Adapter.create_order_error_reason()}
+  @type cancel_result :: {:ok, order} | {:error, invalid_status_error_reason | Adapter.cancel_order_error_reason()}
   @type amend_attrs :: %{
           optional(:price) => Decimal.t(),
           optional(:qty) => Decimal.t()
         }
-  @type amend_response ::
+  @type amend_result ::
           {:ok, updated :: order}
           | {:error, invalid_status_error_reason | Adapter.amend_order_error_reason()}
   @type amend_bulk_reject_reason :: invalid_status_error_reason
-  @type amend_bulk_response :: [{:ok, updated :: order} | {:error, amend_bulk_reject_reason}]
+  @type amend_bulk_result :: [{:ok, updated :: order} | {:error, amend_bulk_reject_reason}]
 
   def start_link(_) do
     state = %State{tasks: %{}}
     GenServer.start_link(__MODULE__, state)
   end
 
-  @spec create(pid, submission) :: create_response
+  @spec create(pid, submission) :: create_result
   def create(pid, submission) do
     GenServer.call(pid, {:create, submission})
   end
 
-  @spec cancel(pid, order) :: cancel_response
+  @spec cancel(pid, order) :: cancel_result
   def cancel(pid, order) do
     GenServer.call(pid, {:cancel, order})
   end
 
-  @spec amend(pid, order, amend_attrs) :: amend_response
+  @spec amend(pid, order, amend_attrs) :: amend_result
   def amend(pid, order, attrs) do
     GenServer.call(pid, {:amend, order, attrs})
   end
 
-  @spec amend_bulk(pid, [{order, amend_attrs}]) :: amend_bulk_response()
+  @spec amend_bulk(pid, [{order, amend_attrs}]) :: amend_bulk_result()
   def amend_bulk(pid, amend_set) do
     GenServer.call(pid, {:amend_bulk, amend_set})
   end
