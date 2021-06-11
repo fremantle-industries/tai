@@ -7,7 +7,7 @@ defmodule Tai.NewOrders.OrderRepo.Migrations.CreateOrderTransitions do
       add(:order_client_id, references(:orders, column: :client_id, type: :uuid, on_delete: :delete_all))
       add(:transition, :map, null: false)
 
-      timestamps()
+      timestamps([type: :utc_datetime_usec])
     end
   end
 end

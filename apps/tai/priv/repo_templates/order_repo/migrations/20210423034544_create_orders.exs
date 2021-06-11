@@ -23,7 +23,7 @@ defmodule Tai.NewOrders.OrderRepo.Migrations.CreateOrders do
       add(:venue_order_id, :string)
       add(:venue_product_symbol, :string, null: false)
 
-      timestamps()
+      timestamps([type: :utc_datetime_usec])
     end
 
     # Used to lookup the order when applying an order transition

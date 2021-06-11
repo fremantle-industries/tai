@@ -7,7 +7,7 @@ defmodule Tai.NewOrders.OrderRepo.Migrations.CreateFailedOrderTransitions do
       add(:type, :string)
       add(:error, :binary, null: false)
 
-      timestamps()
+      timestamps([type: :utc_datetime_usec])
     end
   end
 end
