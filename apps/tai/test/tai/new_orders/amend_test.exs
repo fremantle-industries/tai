@@ -123,9 +123,23 @@ defmodule Tai.NewOrders.AmendTest do
 
       assert updated_order.status == :open
     end
+
+    test "#{side} returns an error and records a failed transition when the order has an invalid status for pend amend" do
+      {:ok, filled_order} = create_filled_order(%{side: @side})
+
+      assert {:error, reason} = NewOrders.amend(filled_order, %{price: @amend_price, qty: @amend_qty})
+      assert {:invalid_status, status_was, transition} = reason
+      assert status_was == :filled
+      assert %NewOrders.Transitions.PendAmend{} = transition
+
+      failed_order_transitions = NewOrders.OrderRepo.all(NewOrders.FailedOrderTransition)
+      assert length(failed_order_transitions) == 1
+      failed_order_transition = Enum.at(failed_order_transitions, 0)
+      assert failed_order_transition.type == "pend_amend"
+    end
   end)
 
-  defp create_open_order(attrs) do
+  defp create_test_order(attrs) do
     %{
       venue_order_id: @venue_order_id,
       venue: @venue |> Atom.to_string(),
@@ -134,11 +148,22 @@ defmodule Tai.NewOrders.AmendTest do
       qty: @original_qty,
       leaves_qty: @original_qty,
       cumulative_qty: Decimal.new(0),
-      status: :open,
       time_in_force: :gtc,
       type: :limit,
     }
     |> Map.merge(attrs)
     |> create_order_with_callback()
+  end
+
+  defp create_open_order(attrs) do
+    %{status: :open}
+    |> Map.merge(attrs)
+    |> create_test_order()
+  end
+
+  defp create_filled_order(attrs) do
+    %{status: :filled}
+    |> Map.merge(attrs)
+    |> create_test_order()
   end
 end

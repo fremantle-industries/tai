@@ -19,18 +19,18 @@ defmodule Tai.NewOrders.Worker do
   @type submission :: SubmissionFactory.submission()
   @type order :: Order.t()
   @type status :: atom
-  @type status_required :: status | [status]
   @type transition :: Transition.t()
+  @type invalid_status_error_reason :: {:invalid_status, was :: status, transition}
   @type create_response :: {:ok, order} | {:error, Adapter.create_order_error_reason()}
-  @type cancel_response :: {:ok, order} | {:error, Adapter.cancel_order_error_reason()}
+  @type cancel_response :: {:ok, order} | {:error, invalid_status_error_reason | Adapter.cancel_order_error_reason()}
   @type amend_attrs :: %{
           optional(:price) => Decimal.t(),
           optional(:qty) => Decimal.t()
         }
   @type amend_response ::
           {:ok, updated :: order}
-          | {:error, {:invalid_status, was :: status, status_required, transition}}
-  @type amend_bulk_reject_reason :: {:invalid_status, was :: status, status_required, transition}
+          | {:error, invalid_status_error_reason}
+  @type amend_bulk_reject_reason :: invalid_status_error_reason
   @type amend_bulk_response :: [{:ok, updated :: order} | {:error, amend_bulk_reject_reason}]
 
   def start_link(_) do
@@ -121,7 +121,7 @@ defmodule Tai.NewOrders.Worker do
 
         {:reply, {:ok, order_pending_cancel}, state}
 
-      {:error, {:invalid_status, _, _, _}} = error ->
+      {:error, {:invalid_status, _, _}} = error ->
         {:reply, error, state}
     end
   end
@@ -150,7 +150,7 @@ defmodule Tai.NewOrders.Worker do
 
         {:reply, {:ok, order_pending_amend}, state}
 
-      {:error, {:invalid_status, _, _, _}} = error ->
+      {:error, {:invalid_status, _, _}} = error ->
         {:reply, error, state}
     end
   end

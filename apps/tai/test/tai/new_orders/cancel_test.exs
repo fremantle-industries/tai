@@ -66,7 +66,10 @@ defmodule Tai.NewOrders.CancelTest do
 
     test "#{side} records a failed transition and doesn't execute the callback when the adapter returns an invalid response" do
       {:ok, open_order} = create_open_order(%{side: @side})
-      Mocks.Responses.NewOrders.GoodTillCancel.cancel_accepted(@venue_order_id, %{venue_timestamp: "invalid date"})
+
+      Mocks.Responses.NewOrders.GoodTillCancel.cancel_accepted(@venue_order_id, %{
+        venue_timestamp: "invalid date"
+      })
 
       assert {:ok, _} = NewOrders.cancel(open_order)
 
@@ -114,18 +117,43 @@ defmodule Tai.NewOrders.CancelTest do
 
       assert updated_order.status == :open
     end
+
+    test "#{side} returns an error and records a failed transition when the order is in an invalid status for pend cancel" do
+      {:ok, filled_order} = create_filled_order(%{side: @side})
+
+      assert {:error, reason} = NewOrders.cancel(filled_order)
+      assert {:invalid_status, status_was, transition} = reason
+      assert status_was == :filled
+      assert %NewOrders.Transitions.PendCancel{} = transition
+
+      failed_order_transitions = NewOrders.OrderRepo.all(NewOrders.FailedOrderTransition)
+      assert length(failed_order_transitions) == 1
+      failed_order_transition = Enum.at(failed_order_transitions, 0)
+      assert failed_order_transition.type == "pend_cancel"
+    end
   end)
 
-  defp create_open_order(attrs) do
+  defp create_test_order(attrs) do
     %{
       venue_order_id: @venue_order_id,
-      status: :open,
       time_in_force: :gtc,
       type: :limit,
       venue: @venue |> Atom.to_string(),
-      credential: @credential |> Atom.to_string(),
+      credential: @credential |> Atom.to_string()
     }
     |> Map.merge(attrs)
     |> create_order_with_callback()
+  end
+
+  defp create_open_order(attrs) do
+    %{status: :open}
+    |> Map.merge(attrs)
+    |> create_test_order()
+  end
+
+  defp create_filled_order(attrs) do
+    %{status: :filled}
+    |> Map.merge(attrs)
+    |> create_test_order()
   end
 end

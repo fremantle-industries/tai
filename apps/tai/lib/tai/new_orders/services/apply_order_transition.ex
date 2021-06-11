@@ -85,7 +85,7 @@ defmodule Tai.NewOrders.Services.ApplyOrderTransition do
             case OrderRepo.update_all(update_order_query, []) do
               {0, []} ->
                 status_was = previous_order_before_update.status
-                reason = {:invalid_status, status_was}
+                reason = {:invalid_status, status_was, transition}
                 OrderRepo.rollback(reason)
 
               {1, [current_order]} ->
@@ -101,7 +101,7 @@ defmodule Tai.NewOrders.Services.ApplyOrderTransition do
           |> OrderRepo.transaction()
         else
           status_was = previous_order_before_update.status
-          reason = {:invalid_status, status_was}
+          reason = {:invalid_status, status_was, transition}
           {:error, reason}
         end
 

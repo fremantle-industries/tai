@@ -29,7 +29,8 @@ defmodule Tai.NewOrders.Services.ApplyOrderTransitionTest do
 
     with_mock NewOrders.Services.ExecuteOrderCallback, call: fn _previous, _current, _transition -> :ok end do
       assert {:error, reason} = NewOrders.Services.ApplyOrderTransition.call(enqueued_order.client_id, %{__type__: :skip})
-      assert reason == {:invalid_status, :canceled}
+      assert {:invalid_status, :canceled, transition} = reason
+      assert %NewOrders.Transitions.Skip{} = transition
 
       assert_not_called NewOrders.Services.ExecuteOrderCallback.call(:_, :_, :_)
 
