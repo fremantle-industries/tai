@@ -23,7 +23,7 @@ defmodule Tai.NewOrders.Transitions.Cancel do
     |> validate_required(:last_received_at)
   end
 
-  def from, do: ~w[create_accepted open pending_cancel cancel_accepted]a
+  def from, do: ~w[enqueued create_accepted open pending_cancel cancel_accepted]a
 
   def attrs(transition) do
     [
