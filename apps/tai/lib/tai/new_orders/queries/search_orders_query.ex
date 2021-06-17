@@ -13,8 +13,7 @@ defmodule Tai.NewOrders.Queries.SearchOrdersQuery do
       where(
         query,
         [o],
-        like(fragment("LOWER(CAST(? AS VARCHAR))", o.client_id), ^"%#{search_term}%")
-        or like(o.venue_order_id, ^"%#{search_term}%")
+        like(o.venue_order_id, ^"%#{search_term}%")
         or like(o.venue, ^"%#{search_term}%")
         or like(o.credential, ^"%#{search_term}%")
         or like(o.product_symbol, ^"%#{search_term}%")
