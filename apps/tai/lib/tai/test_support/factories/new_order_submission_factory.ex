@@ -2,6 +2,8 @@ defmodule Tai.TestSupport.Factories.NewOrderSubmissionFactory do
   def build_submission(type, extra_attrs \\ %{}) do
     attrs =
       %{
+        venue: "venue_a",
+        credential: "credential_a",
         product_symbol: "btc_usd",
         venue_product_symbol: "BTC-USD",
         product_type: :spot,
