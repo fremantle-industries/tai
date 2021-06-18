@@ -1,5 +1,4 @@
 defmodule Tai.VenueAdapters.Mock do
-  alias Tai.Orders
   alias Tai.NewOrders
   alias Tai.TestSupport.Mocks
   import Mocks.Client
@@ -78,9 +77,7 @@ defmodule Tai.VenueAdapters.Mock do
       {:amend_order, match_attrs}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, %Orders.Responses.Amend{}} = response -> response
         {:ok, %NewOrders.Responses.AmendAccepted{}} = response -> response
-        {:ok, %NewOrders.Responses.Amend{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
         {:error, :not_found} -> {:error, :mock_not_found}
       end
@@ -94,8 +91,8 @@ defmodule Tai.VenueAdapters.Mock do
       {:amend_bulk_orders, match_attrs}
       |> Mocks.Server.eject()
       |> case do
+        {:ok, %NewOrders.Responses.AmendBulk{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
-        {:ok, _} = response -> response
         {:error, :not_found} -> {:error, :mock_not_found}
       end
     end)
@@ -106,9 +103,6 @@ defmodule Tai.VenueAdapters.Mock do
       {:cancel_order, order.venue_order_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, %Orders.Responses.Cancel{}} = response -> response
-        {:ok, %Orders.Responses.CancelAccepted{}} = response -> response
-        {:ok, %NewOrders.Responses.Cancel{}} = response -> response
         {:ok, %NewOrders.Responses.CancelAccepted{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
         {:error, :not_found} -> {:error, :mock_not_found}

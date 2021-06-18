@@ -9,18 +9,9 @@ defmodule Tai.Orders.Supervisor do
   end
 
   @impl true
-  def init(config) do
+  def init(_config) do
     [
       Tai.Orders.OrderStore,
-      :poolboy.child_spec(
-        :worker,
-        [
-          {:name, {:local, :order_worker}},
-          {:worker_module, Tai.Orders.Worker},
-          {:size, config.order_workers},
-          {:max_overflow, config.order_workers_max_overflow}
-        ]
-      )
     ]
     |> Supervisor.init(strategy: :one_for_one)
   end

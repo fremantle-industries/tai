@@ -125,42 +125,6 @@ defmodule Tai.TestSupport.Mocks.Responses.NewOrders.GoodTillCancel do
     |> Mocks.Server.insert(order_response)
   end
 
-  @spec amend_price(order, Decimal.t()) :: :ok
-  def amend_price(order, price) do
-    order_response = %NewOrders.Responses.Amend{
-      id: order.venue_order_id,
-      status: :open,
-      price: price,
-      leaves_qty: order.leaves_qty,
-      cumulative_qty: Decimal.new(0),
-      venue_timestamp: DateTime.utc_now(),
-      received_at: Tai.Time.monotonic_time()
-    }
-
-    match_attrs = %{venue_order_id: order.venue_order_id, price: price}
-
-    {:amend_order, match_attrs}
-    |> Mocks.Server.insert(order_response)
-  end
-
-  @spec amend_price_and_qty(String.t() | order, Decimal.t(), Decimal.t()) :: :ok
-  def amend_price_and_qty(venue_order_id, price, qty) when is_bitstring(venue_order_id) do
-    order_response = %NewOrders.Responses.Amend{
-      id: venue_order_id,
-      status: :open,
-      price: price,
-      leaves_qty: qty,
-      cumulative_qty: Decimal.new(0),
-      venue_timestamp: DateTime.utc_now(),
-      received_at: Tai.Time.monotonic_time()
-    }
-
-    match_attrs = %{venue_order_id: venue_order_id, price: price, qty: qty}
-
-    {:amend_order, match_attrs}
-    |> Mocks.Server.insert(order_response)
-  end
-
   @deprecated "Use amend_price_and_qty with venue_order_id instead."
   def amend_price_and_qty(order, price, qty) do
     amend_price_and_qty(order.venue_order_id, price, qty)
@@ -200,13 +164,9 @@ defmodule Tai.TestSupport.Mocks.Responses.NewOrders.GoodTillCancel do
   @spec amend_bulk_price_and_qty([{order, %{}}]) :: :ok
   def amend_bulk_price_and_qty(amend_set) do
     order_responses =
-      Enum.map(amend_set, fn {order, attrs} ->
-        %NewOrders.Responses.Amend{
+      Enum.map(amend_set, fn {order, _attrs} ->
+        %NewOrders.Responses.AmendAccepted{
           id: order.venue_order_id,
-          status: :open,
-          price: Map.get(attrs, :price),
-          leaves_qty: Map.get(attrs, :qty),
-          cumulative_qty: Decimal.new(0),
           venue_timestamp: DateTime.utc_now(),
           received_at: Tai.Time.monotonic_time()
         }
@@ -230,13 +190,9 @@ defmodule Tai.TestSupport.Mocks.Responses.NewOrders.GoodTillCancel do
   @spec amend_bulk_price([{order, %{}}]) :: :ok
   def amend_bulk_price(orders_and_attrs) do
     order_responses =
-      Enum.map(orders_and_attrs, fn {order, attrs} ->
-        %NewOrders.Responses.Amend{
+      Enum.map(orders_and_attrs, fn {order, _attrs} ->
+        %NewOrders.Responses.AmendAccepted{
           id: order.venue_order_id,
-          status: :open,
-          price: Map.get(attrs, :price),
-          leaves_qty: order.leaves_qty,
-          cumulative_qty: Decimal.new(0),
           venue_timestamp: DateTime.utc_now(),
           received_at: Tai.Time.monotonic_time()
         }
@@ -262,20 +218,6 @@ defmodule Tai.TestSupport.Mocks.Responses.NewOrders.GoodTillCancel do
     }, attrs)
 
     order_response = struct!(NewOrders.Responses.CancelAccepted, merged_attrs)
-
-    {:cancel_order, venue_order_id}
-    |> Mocks.Server.insert(order_response)
-  end
-
-  @spec canceled(venue_order_id) :: :ok
-  def canceled(venue_order_id) do
-    order_response = %NewOrders.Responses.Cancel{
-      id: venue_order_id,
-      status: :canceled,
-      leaves_qty: Decimal.new(0),
-      received_at: Tai.Time.monotonic_time(),
-      venue_timestamp: DateTime.utc_now(),
-    }
 
     {:cancel_order, venue_order_id}
     |> Mocks.Server.insert(order_response)
