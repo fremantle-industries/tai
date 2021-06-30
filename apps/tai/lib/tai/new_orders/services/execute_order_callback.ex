@@ -1,4 +1,5 @@
 defmodule Tai.NewOrders.Services.ExecuteOrderCallback do
+  require Logger
   alias Tai.NewOrders.{Order, OrderCallbackStore, Transition}
 
   @type order :: Order.t()
@@ -25,7 +26,6 @@ defmodule Tai.NewOrders.Services.ExecuteOrderCallback do
     else
       {:error, :not_found} ->
         fn _, current, _ -> 
-          require Logger
           Logger.warn "order callback not found for client_id: #{current.client_id}"
         end
     end

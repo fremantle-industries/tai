@@ -1,4 +1,11 @@
 defmodule Tai.NewOrders.OrderCallback do
+  @type server :: GenServer.server()
+  @type callback :: function | server | {server, term}
+  @type t :: %__MODULE__{
+    client_id: term,
+    callback: callback
+  }
+
   @enforce_keys ~w[client_id callback]a
   defstruct ~w[client_id callback]a
 

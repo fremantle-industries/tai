@@ -2,6 +2,7 @@ defmodule Tai.NewOrders.Submissions.BuyLimitFok do
   alias __MODULE__
 
   @type product_type :: Tai.Venues.Product.type()
+  @type callback :: Tai.NewOrders.OrderCallback.callback()
   @type t :: %BuyLimitFok{
           venue: String.t(),
           credential: String.t(),
@@ -11,7 +12,7 @@ defmodule Tai.NewOrders.Submissions.BuyLimitFok do
           price: Decimal.t(),
           qty: Decimal.t(),
           close: boolean | nil,
-          order_updated_callback: function | nil
+          order_updated_callback: callback | nil
         }
 
   @enforce_keys ~w[

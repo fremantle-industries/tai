@@ -2,6 +2,7 @@ defmodule Tai.NewOrders.Submissions.SellLimitGtc do
   alias __MODULE__
 
   @type product_type :: Tai.Venues.Product.type()
+  @type callback :: Tai.NewOrders.OrderCallback.callback()
   @type t :: %SellLimitGtc{
           venue: String.t(),
           credential: String.t(),
@@ -12,7 +13,7 @@ defmodule Tai.NewOrders.Submissions.SellLimitGtc do
           qty: Decimal.t(),
           close: boolean | nil,
           post_only: boolean,
-          order_updated_callback: function | nil
+          order_updated_callback: callback | nil
         }
 
   @enforce_keys ~w[
