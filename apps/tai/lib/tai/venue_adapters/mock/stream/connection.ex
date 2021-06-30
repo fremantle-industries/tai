@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   use WebSockex
   alias Tai.Markets.OrderBook
-  alias Tai.Orders.{OrderStore, Transitions}
+  alias Tai.NewOrders
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
@@ -48,9 +48,11 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   end
 
   def handle_frame({:text, msg}, state) do
+    received_at = Tai.Time.monotonic_time()
+
     msg
     |> Jason.decode!()
-    |> handle_msg(state)
+    |> handle_msg(received_at, state)
 
     {:ok, state}
   end
@@ -64,6 +66,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
            "bids" => bids,
            "asks" => asks
          },
+         received_at,
          state
        ) do
     normalized_bids = bids |> normalize_snapshot_changes(:bid)
@@ -72,7 +75,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     %OrderBook.ChangeSet{
       venue: state.venue,
       symbol: String.to_atom(symbol_str),
-      last_received_at: Tai.Time.monotonic_time(),
+      last_received_at: received_at,
       changes: Enum.concat(normalized_bids, normalized_asks)
     }
     |> OrderBook.replace()
@@ -82,25 +85,25 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
          %{
            "status" => "open",
            "client_id" => client_id,
+           "venue_order_id" => venue_order_id,
            "cumulative_qty" => raw_cumulative_qty,
            "leaves_qty" => raw_leaves_qty
          },
+         received_at,
          _state
        ) do
+    last_received_at = Tai.Time.monotonic_to_date_time!(received_at)
     cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.cast!()
     leaves_qty = raw_leaves_qty |> Tai.Utils.Decimal.cast!()
 
-    {:ok, {prev_order, updated_order}} =
-      %Transitions.PassivePartialFill{
-        client_id: client_id,
-        cumulative_qty: cumulative_qty,
-        leaves_qty: leaves_qty,
-        last_received_at: Tai.Time.monotonic_time(),
-        last_venue_timestamp: Timex.now()
-      }
-      |> OrderStore.update()
-
-    Tai.Orders.Services.NotifyUpdate.notify!(prev_order, updated_order)
+    NewOrders.OrderTransitionWorker.apply(client_id, %{
+      venue_order_id: venue_order_id,
+      cumulative_qty: cumulative_qty,
+      leaves_qty: leaves_qty,
+      last_received_at: last_received_at,
+      last_venue_timestamp: Timex.now(),
+      __type__: :open
+    })
   end
 
   defp handle_msg(
@@ -109,20 +112,18 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
            "client_id" => client_id,
            "cumulative_qty" => raw_cumulative_qty
          },
+         received_at,
          _state
        ) do
+    last_received_at = Tai.Time.monotonic_to_date_time!(received_at)
     cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.cast!()
 
-    {:ok, {prev_order, updated_order}} =
-      %Transitions.PassiveFill{
-        client_id: client_id,
-        cumulative_qty: cumulative_qty,
-        last_received_at: Tai.Time.monotonic_time(),
-        last_venue_timestamp: Timex.now()
-      }
-      |> OrderStore.update()
-
-    Tai.Orders.Services.NotifyUpdate.notify!(prev_order, updated_order)
+    NewOrders.OrderTransitionWorker.apply(client_id, %{
+      cumulative_qty: cumulative_qty,
+      last_received_at: last_received_at,
+      last_venue_timestamp: Timex.now(),
+      __type__: :fill
+    })
   end
 
   defp handle_msg(
@@ -130,20 +131,19 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
            "status" => "canceled",
            "client_id" => client_id
          },
+         received_at,
          _state
        ) do
-    {:ok, {prev_order, updated_order}} =
-      %Transitions.PassiveCancel{
-        client_id: client_id,
-        last_received_at: Tai.Time.monotonic_time(),
-        last_venue_timestamp: Timex.now()
-      }
-      |> OrderStore.update()
+    last_received_at = Tai.Time.monotonic_to_date_time!(received_at)
 
-    Tai.Orders.Services.NotifyUpdate.notify!(prev_order, updated_order)
+    NewOrders.OrderTransitionWorker.apply(client_id, %{
+      last_received_at: last_received_at,
+      last_venue_timestamp: Timex.now(),
+      __type__: :cancel
+    })
   end
 
-  defp handle_msg(msg, state) do
+  defp handle_msg(msg, _received_at, state) do
     TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,

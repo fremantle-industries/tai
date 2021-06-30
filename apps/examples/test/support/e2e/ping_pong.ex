@@ -1,6 +1,7 @@
 defmodule ExamplesSupport.E2E.PingPong do
-  alias Tai.TestSupport.Mocks
   import Tai.TestSupport.Mock
+  alias Tai.TestSupport.Mocks
+  alias Tai.NewOrders
 
   @venue :test_exchange_a
   @credential :main
@@ -14,7 +15,12 @@ defmodule ExamplesSupport.E2E.PingPong do
 
   def seed_mock_responses(:ping_pong) do
     Mocks.Responses.Products.for_venue(@venue, [
-      %{symbol: @product, type: @product_type, price_increment: @price_increment}
+      %{
+        symbol: @product,
+        venue_symbol: @venue_product,
+        type: @product_type,
+        price_increment: @price_increment
+      }
     ])
 
     Tai.TestSupport.Mocks.Responses.Accounts.for_venue_and_credential(
@@ -42,13 +48,13 @@ defmodule ExamplesSupport.E2E.PingPong do
       {Decimal.new("0.0005"), Decimal.new("0.0005")}
     )
 
-    Mocks.Responses.Orders.GoodTillCancel.open(
+    Mocks.Responses.NewOrders.GoodTillCancel.create_accepted(
       @entry_venue_order_id_1,
-      %Tai.Orders.Submissions.BuyLimitGtc{
-        venue_id: @venue,
-        credential_id: @credential,
+      %NewOrders.Submissions.BuyLimitGtc{
+        venue: @venue |> Atom.to_string(),
+        credential: @credential |> Atom.to_string(),
+        product_symbol: @product |> Atom.to_string(),
         venue_product_symbol: @venue_product,
-        product_symbol: @product,
         product_type: @product_type,
         price: Decimal.new("5500.5"),
         qty: Decimal.new(10),
@@ -56,15 +62,15 @@ defmodule ExamplesSupport.E2E.PingPong do
       }
     )
 
-    Mocks.Responses.Orders.GoodTillCancel.canceled(@entry_venue_order_id_1)
+    Mocks.Responses.NewOrders.GoodTillCancel.cancel_accepted(@entry_venue_order_id_1)
 
-    Mocks.Responses.Orders.GoodTillCancel.open(
+    Mocks.Responses.NewOrders.GoodTillCancel.create_accepted(
       @entry_venue_order_id_2,
-      %Tai.Orders.Submissions.BuyLimitGtc{
-        venue_id: @venue,
-        credential_id: @credential,
+      %NewOrders.Submissions.BuyLimitGtc{
+        venue: @venue |> Atom.to_string(),
+        credential: @credential |> Atom.to_string(),
+        product_symbol: @product |> Atom.to_string(),
         venue_product_symbol: @venue_product,
-        product_symbol: @product,
         product_type: @product_type,
         price: Decimal.new("5504.0"),
         qty: Decimal.new(10),
@@ -113,22 +119,65 @@ defmodule ExamplesSupport.E2E.PingPong do
   end
 
   def push_stream_order_update(
+        {:ping_pong, :entry_order_1_open, venue_id, product_symbol},
+        client_id
+      )
+      when venue_id == @venue and product_symbol == @product do
+    @venue
+    |> push_order_update(%{
+      client_id: client_id,
+      venue_order_id: @entry_venue_order_id_1,
+      status: :open,
+      cumulative_qty: 0,
+      leaves_qty: 10
+    })
+  end
+
+  def push_stream_order_update(
+        {:ping_pong, :entry_order_1_cancel, venue_id, product_symbol},
+        client_id
+      )
+      when venue_id == @venue and product_symbol == @product do
+    @venue
+    |> push_order_update(%{
+      client_id: client_id,
+      venue_order_id: @entry_venue_order_id_1,
+      status: :canceled
+    })
+  end
+
+  def push_stream_order_update(
+        {:ping_pong, :entry_order_2_open, venue_id, product_symbol},
+        client_id
+      )
+      when venue_id == @venue and product_symbol == @product do
+    @venue
+    |> push_order_update(%{
+      client_id: client_id,
+      venue_order_id: @entry_venue_order_id_2,
+      status: :open,
+      cumulative_qty: 0,
+      leaves_qty: 10
+    })
+  end
+
+  def push_stream_order_update(
         {:ping_pong, :order_update_filled, venue_id, product_symbol},
         client_id
       )
       when venue_id == @venue and product_symbol == @product do
-    submission = %Tai.Orders.Submissions.SellLimitGtc{
-      venue_id: @venue,
-      credential_id: @credential,
+    submission = %NewOrders.Submissions.SellLimitGtc{
+      venue: @venue |> Atom.to_string(),
+      credential: @credential |> Atom.to_string(),
+      product_symbol: @product |> Atom.to_string(),
       venue_product_symbol: @venue_product,
-      product_symbol: @product,
       product_type: @product_type,
       post_only: true,
       price: Decimal.new("5504.5"),
       qty: Decimal.new(10)
     }
 
-    Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel.open(@exit_venue_order_id, submission)
+    Mocks.Responses.NewOrders.GoodTillCancel.create_accepted(@exit_venue_order_id, submission)
 
     @venue
     |> push_order_update(%{
@@ -138,7 +187,7 @@ defmodule ExamplesSupport.E2E.PingPong do
       leaves_qty: 0
     })
 
-    Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel.canceled(@exit_venue_order_id)
+    Mocks.Responses.NewOrders.GoodTillCancel.cancel_accepted(@exit_venue_order_id)
   end
 
   def advisor_group_config(:ping_pong) do

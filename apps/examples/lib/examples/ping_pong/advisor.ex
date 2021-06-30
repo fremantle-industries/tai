@@ -13,7 +13,7 @@ defmodule Examples.PingPong.Advisor do
   use Tai.Advisor
   import Examples.PingPong.ManageQuoteChange, only: [with_all_quotes: 1, manage_entry_order: 2]
   import Examples.PingPong.ManageOrderUpdate, only: [entry_order_updated: 3]
-  alias Tai.Orders.Order
+  alias Tai.NewOrders
 
   @impl true
   def handle_event(market_quote, state) do
@@ -23,7 +23,7 @@ defmodule Examples.PingPong.Advisor do
   end
 
   @impl true
-  def handle_info({:order_updated, prev, updated, :entry_order}, state) do
+  def handle_info({:order_updated, prev, updated, _transition, :entry_order}, state) do
     {:ok, new_run_store} =
       state.store
       |> update_store_order(:entry_order, updated)
@@ -33,26 +33,26 @@ defmodule Examples.PingPong.Advisor do
   end
 
   @impl true
-  def handle_info({:order_updated, _prev, updated, :exit_order}, state) do
+  def handle_info({:order_updated, _prev, updated, _transition, :exit_order}, state) do
     new_run_store = update_store_order(state.store, :exit_order, updated)
     {:noreply, %{state | store: new_run_store}}
   end
 
-  @cancel_on_terminate ~w[open partially_filled]a
+  @cancel_on_terminate ~w[create_accepted open]a
 
   @impl true
   def on_terminate(_reason, state) do
     case state.store do
-      %{entry_order: %Order{status: status} = entry_order} when status in @cancel_on_terminate ->
-        Tai.Orders.cancel(entry_order)
+      %{entry_order: %NewOrders.Order{status: status} = entry_order} when status in @cancel_on_terminate ->
+        NewOrders.cancel(entry_order)
 
       _ ->
         :ok
     end
 
     case state.store do
-      %{exit_order: %Order{status: status} = exit_order} when status in @cancel_on_terminate ->
-        Tai.Orders.cancel(exit_order)
+      %{exit_order: %NewOrders.Order{status: status} = exit_order} when status in @cancel_on_terminate ->
+        NewOrders.cancel(exit_order)
 
       _ ->
         :ok

@@ -47,6 +47,7 @@ defmodule Tai.TestSupport.E2ECase do
         {:ok, _} = Application.ensure_all_started(:tai_events)
         TaiEvents.firehose_subscribe()
         {:ok, _} = Application.ensure_all_started(:tai)
+        Phoenix.PubSub.subscribe(Tai.PubSub, "order_updated:*")
 
         :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tai.NewOrders.OrderRepo)
         Ecto.Adapters.SQL.Sandbox.mode(Tai.NewOrders.OrderRepo, {:shared, self()})

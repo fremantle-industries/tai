@@ -20,7 +20,7 @@ defmodule Tai.NewOrders.Transitions.PendCancel do
     |> cast(params, [])
   end
 
-  def from, do: ~w[open]a
+  def from, do: ~w[create_accepted open]a
 
   def attrs(_transition), do: []
 
