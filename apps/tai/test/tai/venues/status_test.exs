@@ -29,14 +29,19 @@ defmodule Tai.Venues.StatusTest do
   end
 
   test ".status/1 is :starting when there is a start process but no stream" do
+    assert Tai.Venues.Status.status(@venue) == :stopped
+
     start_supervised!({Tai.Venues.Start, @venue})
     assert Tai.Venues.Status.status(@venue) == :starting
   end
 
   test ".status/1 is :running when there is a stream" do
     stream = struct(Tai.Venues.Stream, venue: @venue)
-    Tai.Venues.StreamsSupervisor.start(stream)
+
+    {:ok, pid} = Tai.Venues.StreamsSupervisor.start(stream)
     assert Tai.Venues.Status.status(@venue) == :running
+
+    assert Tai.Venues.StreamsSupervisor.stop(pid) == :ok
   end
 
   test ".status/1 is :error when the venue could not be started" do
