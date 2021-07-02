@@ -27,9 +27,6 @@ defmodule Tai.IEx do
   @spec positions :: no_return
   defdelegate positions, to: Commands.Positions
 
-  @spec orders :: no_return
-  defdelegate orders, to: Commands.Orders
-
   @spec new_orders :: no_return
   defdelegate new_orders, to: Commands.NewOrders
 

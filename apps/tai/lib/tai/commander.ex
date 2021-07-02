@@ -21,10 +21,6 @@ defmodule Tai.Commander do
     options |> to_dest() |> GenServer.call(:markets)
   end
 
-  def orders(options \\ []) do
-    options |> to_dest() |> GenServer.call(:orders)
-  end
-
   def new_orders(query \\ nil, options \\ []) do
     options |> to_dest() |> GenServer.call({:new_orders, query, options})
   end
@@ -119,10 +115,6 @@ defmodule Tai.Commander do
 
   def handle_call(:markets, _from, state) do
     {:reply, Tai.Commander.Markets.get(), state}
-  end
-
-  def handle_call(:orders, _from, state) do
-    {:reply, Tai.Commander.Orders.get(), state}
   end
 
   def handle_call({:new_orders, query, options}, _from, state) do

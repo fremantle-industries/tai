@@ -9,7 +9,6 @@ defmodule Tai.IEx.Commands.Help do
     * products
     * fees
     * markets
-    * orders
     * new_orders
     * new_order :order_client_id
     * order_transitions :order_client_id

@@ -11,7 +11,6 @@ defmodule Tai.Application do
       {Tai.EventsLogger, [logger: config.logger]},
       {Tai.Settings, [config: config]},
       Tai.Trading.PositionStore,
-      {Tai.Orders.Supervisor, config},
       {Tai.NewOrders.Supervisor, config},
       Tai.Markets.QuoteStore,
       Tai.Venues.Telemetry,

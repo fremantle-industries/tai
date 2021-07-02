@@ -4,6 +4,7 @@ defmodule Tai.NewOrders.Order do
 
   @type client_id :: Ecto.UUID.t()
   @type venue_order_id :: String.t()
+  @type status :: atom
   @type t :: %__MODULE__{}
 
   @product_type ~w[spot future swap option]a
