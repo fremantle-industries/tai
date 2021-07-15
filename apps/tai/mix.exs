@@ -23,7 +23,15 @@ defmodule Tai.Mixfile do
     [
       mod: {Tai.Application, []},
       start_phases: [venues: []],
-      extra_applications: [:phoenix_pubsub, :logger, :iex, :jason, :tai_events, :ecto_term, :postgrex]
+      extra_applications: [
+        :phoenix_pubsub,
+        :logger,
+        :iex,
+        :jason,
+        :tai_events,
+        :ecto_term,
+        :postgrex
+      ]
     ]
   end
 
@@ -45,7 +53,7 @@ defmodule Tai.Mixfile do
       # {:ex_deribit, github: "fremantle-capital/ex_deribit", branch: "main"},
       {:ex_deribit, "~> 0.0.9"},
       # {:ex_ftx, github: "fremantle-capital/ex_ftx", branch: "main"},
-      {:ex_ftx, "~> 0.0.11"},
+      {:ex_ftx, "~> 0.0.13"},
       # {:ex_okex, github: "fremantle-capital/ex_okex", branch: "main"},
       {:ex_okex, "~> 0.6"},
       {:ex_gdax, "~> 0.2"},
