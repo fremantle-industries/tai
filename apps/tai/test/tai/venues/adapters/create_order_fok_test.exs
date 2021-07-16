@@ -1,7 +1,7 @@
 defmodule Tai.Venues.Adapters.CreateOrderFokTest do
   use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
   setup_all do
     HTTPoison.start()
@@ -30,7 +30,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
             assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
             assert order_response.id != nil
-            assert %NewOrders.Responses.CreateAccepted{} = order_response
+            assert %Responses.CreateAccepted{} = order_response
             # assert %Decimal{} = order_response.original_size
             # assert %Decimal{} = order_response.cumulative_qty
             # assert order_response.leaves_qty == Decimal.new(0)
@@ -48,7 +48,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
             assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
             assert order_response.id != nil
-            assert %NewOrders.Responses.CreateAccepted{} = order_response
+            assert %Responses.CreateAccepted{} = order_response
             # assert %Decimal{} = order_response.original_size
             # assert order_response.leaves_qty == Decimal.new(0)
             # assert order_response.cumulative_qty == Decimal.new(0)
@@ -65,7 +65,7 @@ defmodule Tai.Venues.Adapters.CreateOrderFokTest do
     venue = venue_id |> Atom.to_string()
     action = Keyword.fetch!(opts, :action)
 
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue: venue,
       credential: "main",

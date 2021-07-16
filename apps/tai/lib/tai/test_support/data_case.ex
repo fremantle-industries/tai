@@ -18,7 +18,7 @@ defmodule Tai.TestSupport.DataCase do
 
   using do
     quote do
-      alias Tai.NewOrders.OrderRepo
+      alias Tai.Orders.OrderRepo
       alias Tai.TestSupport.Mocks
 
       import Ecto
@@ -26,8 +26,8 @@ defmodule Tai.TestSupport.DataCase do
       import Ecto.Query
       import Tai.TestSupport.DataCase
       import Tai.TestSupport.Mock
-      import Tai.TestSupport.Factories.NewOrderSubmissionFactory
-      import Tai.TestSupport.Factories.NewOrderFactory
+      import Tai.TestSupport.Factories.OrderSubmissionFactory
+      import Tai.TestSupport.Factories.OrderFactory
       import Tai.TestSupport.Factories.OrderTransitionFactory
       import Tai.TestSupport.Factories.FailedOrderTransitionFactory
     end
@@ -37,10 +37,10 @@ defmodule Tai.TestSupport.DataCase do
     Application.stop(:tai)
     {:ok, _} = Application.ensure_all_started(:tai)
 
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tai.NewOrders.OrderRepo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tai.Orders.OrderRepo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Tai.NewOrders.OrderRepo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Tai.Orders.OrderRepo, {:shared, self()})
     end
 
     start_supervised!(Tai.TestSupport.Mocks.Server)

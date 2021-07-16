@@ -1,4 +1,4 @@
-defmodule Tai.NewOrders.OrderRepo.Migrations.CreateFailedOrderTransitions do
+defmodule Tai.Orders.OrderRepo.Migrations.CreateFailedOrderTransitions do
   use Ecto.Migration
 
   def change do

@@ -1,6 +1,6 @@
 defmodule Examples.PingPong.ManageQuoteChange do
   alias Examples.PingPong.{CreateEntryOrder, EntryPrice}
-  alias Tai.NewOrders.Order
+  alias Tai.Orders.Order
   alias Tai.Markets.Quote
   alias Tai.Advisor.State
 
@@ -36,7 +36,7 @@ defmodule Examples.PingPong.ManageQuoteChange do
     if Decimal.compare(entry_order.price, entry_price) == :eq do
       {:ok, state.store}
     else
-      {:ok, pending_cancel_order} = Tai.NewOrders.cancel(entry_order)
+      {:ok, pending_cancel_order} = Tai.Orders.cancel(entry_order)
       new_run_store = Map.put(state.store, :entry_order, pending_cancel_order)
       {:ok, new_run_store}
     end
@@ -52,8 +52,7 @@ defmodule Examples.PingPong.ManageQuoteChange do
   def manage_entry_order({:ok, market_quote}, state) do
     advisor_id = Tai.Advisor.process_name(state.group_id, state.advisor_id)
 
-    {:ok, entry_order} =
-      CreateEntryOrder.create(advisor_id, market_quote, state.config)
+    {:ok, entry_order} = CreateEntryOrder.create(advisor_id, market_quote, state.config)
 
     new_run_store = Map.put(state.store, :entry_order, entry_order)
 

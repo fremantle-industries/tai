@@ -2,7 +2,6 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
   use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   import Mock
-  alias Tai.NewOrders
 
   setup_all do
     HTTPoison.start()
@@ -128,7 +127,7 @@ defmodule Tai.Venues.Adapters.CreateOrderErrorTest do
     action = Keyword.fetch!(opts, :action)
     post_only = Keyword.get(opts, :post_only, false)
 
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue: venue,
       credential: "main",

@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Tai.Gen.Migration do
   @moduledoc """
   Generates database migrations for tai repos:
 
-  - Tai.NewOrders.OrderRepo
+  - Tai.Orders.OrderRepo
   """
   use Mix.Task
 
@@ -40,7 +40,7 @@ defmodule Mix.Tasks.Tai.Gen.Migration do
     end)
   end
 
-  @tai_repos [Tai.NewOrders.OrderRepo]
+  @tai_repos [Tai.Orders.OrderRepo]
   defp tai_repos(args) do
     args
     |> parse_repo()

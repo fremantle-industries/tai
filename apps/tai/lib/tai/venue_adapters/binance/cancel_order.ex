@@ -1,5 +1,5 @@
 defmodule Tai.VenueAdapters.Binance.CancelOrder do
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
   def cancel_order(order, credentials) do
     venue_credentials = struct!(ExBinance.Credentials, credentials)
@@ -15,7 +15,12 @@ defmodule Tai.VenueAdapters.Binance.CancelOrder do
 
   defp parse_response({:ok, %ExBinance.Rest.Responses.CancelOrderResponse{} = venue_response}) do
     received_at = Tai.Time.monotonic_time()
-    response = %NewOrders.Responses.CancelAccepted{id: venue_response.order_id, received_at: received_at}
+
+    response = %Responses.CancelAccepted{
+      id: venue_response.order_id,
+      received_at: received_at
+    }
+
     {:ok, response}
   end
 

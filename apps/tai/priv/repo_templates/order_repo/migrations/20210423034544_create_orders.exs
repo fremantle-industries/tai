@@ -1,4 +1,4 @@
-defmodule Tai.NewOrders.OrderRepo.Migrations.CreateOrders do
+defmodule Tai.Orders.OrderRepo.Migrations.CreateOrders do
   use Ecto.Migration
 
   def change do

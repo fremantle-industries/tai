@@ -1,6 +1,11 @@
 defmodule Examples.PingPong.AdvisorTest do
   use Tai.TestSupport.E2ECase, async: false
-  alias Tai.NewOrders.{OrderRepo, Order, Transitions}
+
+  alias Tai.Orders.{
+    OrderRepo,
+    Order,
+    Transitions
+  }
 
   @scenario :ping_pong
   @venue :test_exchange_a
@@ -32,6 +37,7 @@ defmodule Examples.PingPong.AdvisorTest do
       {@scenario, :entry_order_1_open, @venue, @product},
       entry_order_1_client_id
     )
+
     assert_receive {:order_updated, ^entry_order_1_client_id, %Transitions.Open{}}
     open_entry_order_1 = OrderRepo.get!(Order, entry_order_1_client_id)
     assert open_entry_order_1.status == :open
@@ -46,6 +52,7 @@ defmodule Examples.PingPong.AdvisorTest do
       {@scenario, :entry_order_1_cancel, @venue, @product},
       entry_order_1_client_id
     )
+
     assert_receive {:order_updated, ^entry_order_1_client_id, %Transitions.Cancel{}}
 
     assert_receive {:order_updated, order_2_client_id, %Transitions.AcceptCreate{}}
@@ -59,6 +66,7 @@ defmodule Examples.PingPong.AdvisorTest do
       {@scenario, :entry_order_2_open, @venue, @product},
       order_2_client_id
     )
+
     assert_receive {:order_updated, ^order_2_client_id, %Transitions.Open{}}
 
     # create an exit maker limit order when the entry is filled
@@ -66,6 +74,7 @@ defmodule Examples.PingPong.AdvisorTest do
       {@scenario, :order_update_filled, @venue, @product},
       order_2_client_id
     )
+
     assert_receive {:order_updated, ^order_2_client_id, %Transitions.Fill{}}
     filled_entry_order = OrderRepo.get!(Order, order_2_client_id)
     assert filled_entry_order.status == :filled

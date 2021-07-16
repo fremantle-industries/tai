@@ -1,5 +1,5 @@
 defmodule Tai.TestSupport.Factories.OrderTransitionFactory do
-  alias Tai.NewOrders.{OrderRepo, OrderTransition}
+  alias Tai.Orders.{OrderRepo, OrderTransition}
 
   def create_order_transition(order_client_id, attrs, type) do
     with {:ok, generated_attrs} <- generate_order_transition_attrs(type),
@@ -17,6 +17,7 @@ defmodule Tai.TestSupport.Factories.OrderTransitionFactory do
       last_received_at: DateTime.utc_now(),
       __type__: type
     }
+
     {:ok, attrs}
   end
 
@@ -25,6 +26,7 @@ defmodule Tai.TestSupport.Factories.OrderTransitionFactory do
       reason: :some_error,
       __type__: type
     }
+
     {:ok, attrs}
   end
 
@@ -34,6 +36,7 @@ defmodule Tai.TestSupport.Factories.OrderTransitionFactory do
       last_received_at: DateTime.utc_now(),
       __type__: type
     }
+
     {:ok, attrs}
   end
 
@@ -42,6 +45,7 @@ defmodule Tai.TestSupport.Factories.OrderTransitionFactory do
       reason: :some_error,
       __type__: type
     }
+
     {:ok, attrs}
   end
 
@@ -53,6 +57,7 @@ defmodule Tai.TestSupport.Factories.OrderTransitionFactory do
       last_received_at: DateTime.utc_now(),
       __type__: type
     }
+
     {:ok, attrs}
   end
 
@@ -62,6 +67,7 @@ defmodule Tai.TestSupport.Factories.OrderTransitionFactory do
       last_received_at: DateTime.utc_now(),
       __type__: type
     }
+
     {:ok, attrs}
   end
 

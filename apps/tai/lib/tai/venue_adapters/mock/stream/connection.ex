@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   use WebSockex
   alias Tai.Markets.OrderBook
-  alias Tai.NewOrders
+  alias Tai.Orders
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
@@ -96,7 +96,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.cast!()
     leaves_qty = raw_leaves_qty |> Tai.Utils.Decimal.cast!()
 
-    NewOrders.OrderTransitionWorker.apply(client_id, %{
+    Orders.OrderTransitionWorker.apply(client_id, %{
       venue_order_id: venue_order_id,
       cumulative_qty: cumulative_qty,
       leaves_qty: leaves_qty,
@@ -118,7 +118,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     last_received_at = Tai.Time.monotonic_to_date_time!(received_at)
     cumulative_qty = raw_cumulative_qty |> Tai.Utils.Decimal.cast!()
 
-    NewOrders.OrderTransitionWorker.apply(client_id, %{
+    Orders.OrderTransitionWorker.apply(client_id, %{
       cumulative_qty: cumulative_qty,
       last_received_at: last_received_at,
       last_venue_timestamp: Timex.now(),
@@ -136,7 +136,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
        ) do
     last_received_at = Tai.Time.monotonic_to_date_time!(received_at)
 
-    NewOrders.OrderTransitionWorker.apply(client_id, %{
+    Orders.OrderTransitionWorker.apply(client_id, %{
       last_received_at: last_received_at,
       last_venue_timestamp: Timex.now(),
       __type__: :cancel

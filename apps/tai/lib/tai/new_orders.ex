@@ -1,8 +1,6 @@
 defmodule Tai.NewOrders do
-  alias Tai.NewOrders.{
+  alias Tai.Orders.{
     Order,
-    OrderRepo,
-    Queries,
     SubmissionFactory,
     Worker
   }
@@ -17,116 +15,81 @@ defmodule Tai.NewOrders do
   @type amend_bulk_result :: Worker.amend_bulk_result()
   @type search_term :: String.t() | nil
 
-  @order_worker :new_order_worker
-  @timeout 5_000
-
+  @deprecated "Use Tai.Orders.create/1 instead."
   @spec create(submission) :: create_result
   def create(submission) do
-    :poolboy.transaction(
-      @order_worker,
-      &Worker.create(&1, submission),
-      @timeout
-    )
+    Tai.Orders.create(submission)
   end
 
+  @deprecated "Use Tai.Orders.cancel/1 instead."
   @spec cancel(order) :: cancel_result
   def cancel(order) do
-    :poolboy.transaction(
-      @order_worker,
-      &Worker.cancel(&1, order),
-      @timeout
-    )
+    Tai.Orders.cancel(order)
   end
 
+  @deprecated "Use Tai.Orders.amend/2 instead."
   @spec amend(order, amend_attrs) :: amend_result
   def amend(order, attrs) do
-    :poolboy.transaction(
-      @order_worker,
-      & Worker.amend(&1, order, attrs),
-      @timeout
-    )
+    Tai.Orders.amend(order, attrs)
   end
 
+  @deprecated "Use Tai.Orders.amend_bulk/1 instead."
   @spec amend_bulk([{order, amend_attrs}]) :: amend_bulk_result
   def amend_bulk(amend_set) do
-    :poolboy.transaction(
-      @order_worker,
-      & Worker.amend_bulk(&1, amend_set),
-      @timeout
-    )
+    Tai.Orders.amend_bulk(amend_set)
   end
 
-  @default_page 1
-  @default_page_size 25
-
+  @deprecated "Use Tai.Orders.search/2 instead."
   @spec search(search_term, list) :: [term]
   def search(query, opts \\ []) do
-    page = (opts[:page] || @default_page) - 1
-    page_size = opts[:page_size] || @default_page_size
-
-    query
-    |> Queries.SearchOrdersQuery.call()
-    |> PagedQuery.call(page, page_size)
-    |> OrderRepo.all()
+    Tai.Orders.search(query, opts)
   end
 
+  @deprecated "Use Tai.Orders.search_count/1 instead."
   @spec search_count(search_term) :: non_neg_integer
   def search_count(query) do
-    query
-    |> Queries.SearchOrdersQuery.call()
-    |> OrderRepo.aggregate(:count)
+    Tai.Orders.search_count(query)
   end
 
+  @deprecated "Use Tai.Orders.get_by_client_id/1 instead."
   @spec get_by_client_id(client_id) :: order | nil
   def get_by_client_id(client_id) do
-    OrderRepo.get_by(Order, client_id: client_id)
+    Tai.Orders.get_by_client_id(client_id)
   end
 
+  @deprecated "Use Tai.Orders.get_by_client_ids/1 instead."
   @spec get_by_client_ids([client_id]) :: [order]
   def get_by_client_ids(client_ids) do
-    client_ids
-    |> Queries.GetByClientIdsQuery.call()
-    |> OrderRepo.all()
+    Tai.Orders.get_by_client_ids(client_ids)
   end
 
+  @deprecated "Use Tai.Orders.search_transitions/3 instead."
   @spec search_transitions(client_id, search_term, list) :: [term]
   def search_transitions(client_id, query, opts \\ []) do
-    page = (opts[:page] || @default_page) - 1
-    page_size = opts[:page_size] || @default_page_size
-
-    client_id
-    |> Queries.SearchOrderTransitionsQuery.call(query)
-    |> PagedQuery.call(page, page_size)
-    |> OrderRepo.all()
+    Tai.Orders.search_transitions(client_id, query, opts)
   end
 
+  @deprecated "Use Tai.Orders.search_transition_count/2 instead."
   @spec search_transitions_count(client_id, search_term) :: non_neg_integer
   def search_transitions_count(client_id, query) do
-    client_id
-    |> Queries.SearchOrderTransitionsQuery.call(query)
-    |> OrderRepo.aggregate(:count)
+    Tai.Orders.search_transitions_count(client_id, query)
   end
 
+  @deprecated "Use Tai.Orders.search_failed_transitions/3 instead."
   @spec search_failed_transitions(client_id, search_term, list) :: [term]
   def search_failed_transitions(client_id, query, opts \\ []) do
-    page = (opts[:page] || @default_page) - 1
-    page_size = opts[:page_size] || @default_page_size
-
-    client_id
-    |> Queries.SearchFailedOrderTransitionsQuery.call(query)
-    |> PagedQuery.call(page, page_size)
-    |> OrderRepo.all()
+    Tai.Orders.search_failed_transitions(client_id, query, opts)
   end
 
+  @deprecated "Use Tai.Orders.search_failed_transitions_count/2 instead."
   @spec search_failed_transitions_count(client_id, search_term) :: non_neg_integer
   def search_failed_transitions_count(client_id, query) do
-    client_id
-    |> Queries.SearchFailedOrderTransitionsQuery.call(query)
-    |> OrderRepo.aggregate(:count)
+    Tai.Orders.search_failed_transitions_count(client_id, query)
   end
 
+  @deprecated "Use Tai.Orders.delete_all/0 instead."
   @spec delete_all() :: {non_neg_integer, nil}
   def delete_all do
-    OrderRepo.delete_all(Order, timeout: 60_000)
+    Tai.Orders.delete_all()
   end
 end

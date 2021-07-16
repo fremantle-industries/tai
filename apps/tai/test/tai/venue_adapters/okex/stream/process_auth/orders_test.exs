@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrdersTest do
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.OkEx.Stream.ProcessAuth
   alias Tai.VenueAdapters.OkEx.ClientId
-  alias Tai.NewOrders
+  alias Tai.Orders
 
   @venue :my_venue
   @received_at Tai.Time.monotonic_time()
@@ -19,14 +19,17 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrdersTest do
     {:ok, open_order} = create_open_order()
     open_order_client_id = open_order.client_id
     venue_client_id = open_order_client_id |> to_venue_client_id()
-    venue_order_data = build_venue_order(%{
-      "client_oid" => venue_client_id, "state" => "-1"
-    })
+
+    venue_order_data =
+      build_venue_order(%{
+        "client_oid" => venue_client_id,
+        "state" => "-1"
+      })
 
     cast_order_msg(%{"table" => "futures/order", "data" => [venue_order_data]})
 
-    assert_receive {:order_updated, ^open_order_client_id, %NewOrders.Transitions.Cancel{}}
-    order = NewOrders.OrderRepo.get!(NewOrders.Order, open_order_client_id)
+    assert_receive {:order_updated, ^open_order_client_id, %Orders.Transitions.Cancel{}}
+    order = Orders.OrderRepo.get!(Orders.Order, open_order_client_id)
     assert order.status == :canceled
   end
 
@@ -34,30 +37,40 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrdersTest do
     {:ok, enqueued_order_1} = create_enqueued_order()
     enqueued_order_1_client_id = enqueued_order_1.client_id
     venue_client_id_1 = enqueued_order_1_client_id |> to_venue_client_id()
-    venue_order_data_1 = build_venue_order(%{
-      "client_oid" => venue_client_id_1, "state" => "0", "size" => "1", "filled_qty" => "0"
-    })
+
+    venue_order_data_1 =
+      build_venue_order(%{
+        "client_oid" => venue_client_id_1,
+        "state" => "0",
+        "size" => "1",
+        "filled_qty" => "0"
+      })
 
     {:ok, enqueued_order_2} = create_enqueued_order()
     enqueued_order_2_client_id = enqueued_order_2.client_id
     venue_client_id_2 = enqueued_order_2_client_id |> to_venue_client_id()
-    venue_order_data_2 = build_venue_order(%{
-      "client_oid" => venue_client_id_2, "state" => "0", "size" => "1", "filled_size" => "0"
-    })
+
+    venue_order_data_2 =
+      build_venue_order(%{
+        "client_oid" => venue_client_id_2,
+        "state" => "0",
+        "size" => "1",
+        "filled_size" => "0"
+      })
 
     cast_order_msg(%{
       "table" => "futures/order",
       "data" => [venue_order_data_1, venue_order_data_2]
     })
 
-    assert_receive {:order_updated, ^enqueued_order_1_client_id, %NewOrders.Transitions.Open{}}
-    order_1 = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_1_client_id)
+    assert_receive {:order_updated, ^enqueued_order_1_client_id, %Orders.Transitions.Open{}}
+    order_1 = Orders.OrderRepo.get!(Orders.Order, enqueued_order_1_client_id)
     assert order_1.status == :open
     assert order_1.cumulative_qty == Decimal.new(0)
     assert order_1.leaves_qty == Decimal.new(1)
 
-    assert_receive {:order_updated, ^enqueued_order_2_client_id, %NewOrders.Transitions.Open{}}
-    order_2 = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_2_client_id)
+    assert_receive {:order_updated, ^enqueued_order_2_client_id, %Orders.Transitions.Open{}}
+    order_2 = Orders.OrderRepo.get!(Orders.Order, enqueued_order_2_client_id)
     assert order_2.status == :open
     assert order_2.cumulative_qty == Decimal.new(0)
     assert order_2.leaves_qty == Decimal.new(1)
@@ -67,30 +80,44 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrdersTest do
     {:ok, enqueued_order_1} = create_enqueued_order()
     enqueued_order_1_client_id = enqueued_order_1.client_id
     venue_client_id_1 = enqueued_order_1_client_id |> to_venue_client_id()
-    venue_order_data_1 = build_venue_order(%{
-      "client_oid" => venue_client_id_1, "state" => "1", "size" => "1", "filled_qty" => "0.3"
-    })
+
+    venue_order_data_1 =
+      build_venue_order(%{
+        "client_oid" => venue_client_id_1,
+        "state" => "1",
+        "size" => "1",
+        "filled_qty" => "0.3"
+      })
 
     {:ok, enqueued_order_2} = create_enqueued_order()
     enqueued_order_2_client_id = enqueued_order_2.client_id
     venue_client_id_2 = enqueued_order_2_client_id |> to_venue_client_id()
-    venue_order_data_2 = build_venue_order(%{
-      "client_oid" => venue_client_id_2, "state" => "1", "size" => "1", "filled_size" => "0.6"
-    })
+
+    venue_order_data_2 =
+      build_venue_order(%{
+        "client_oid" => venue_client_id_2,
+        "state" => "1",
+        "size" => "1",
+        "filled_size" => "0.6"
+      })
 
     cast_order_msg(%{
       "table" => "futures/order",
       "data" => [venue_order_data_1, venue_order_data_2]
     })
 
-    assert_receive {:order_updated, ^enqueued_order_1_client_id, %NewOrders.Transitions.PartialFill{}}
-    order_1 = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_1_client_id)
+    assert_receive {:order_updated, ^enqueued_order_1_client_id,
+                    %Orders.Transitions.PartialFill{}}
+
+    order_1 = Orders.OrderRepo.get!(Orders.Order, enqueued_order_1_client_id)
     assert order_1.status == :open
     assert order_1.cumulative_qty == Decimal.new("0.3")
     assert order_1.leaves_qty == Decimal.new("0.7")
 
-    assert_receive {:order_updated, ^enqueued_order_2_client_id, %NewOrders.Transitions.PartialFill{}}
-    order_2 = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_2_client_id)
+    assert_receive {:order_updated, ^enqueued_order_2_client_id,
+                    %Orders.Transitions.PartialFill{}}
+
+    order_2 = Orders.OrderRepo.get!(Orders.Order, enqueued_order_2_client_id)
     assert order_2.status == :open
     assert order_2.cumulative_qty == Decimal.new("0.6")
     assert order_2.leaves_qty == Decimal.new("0.4")
@@ -100,30 +127,40 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrdersTest do
     {:ok, enqueued_order_1} = create_enqueued_order()
     enqueued_order_1_client_id = enqueued_order_1.client_id
     venue_client_id_1 = enqueued_order_1_client_id |> to_venue_client_id()
-    venue_order_data_1 = build_venue_order(%{
-      "client_oid" => venue_client_id_1, "state" => "2", "size" => "2", "filled_qty" => "2"
-    })
+
+    venue_order_data_1 =
+      build_venue_order(%{
+        "client_oid" => venue_client_id_1,
+        "state" => "2",
+        "size" => "2",
+        "filled_qty" => "2"
+      })
 
     {:ok, enqueued_order_2} = create_enqueued_order()
     enqueued_order_2_client_id = enqueued_order_2.client_id
     venue_client_id_2 = enqueued_order_2_client_id |> to_venue_client_id()
-    venue_order_data_2 = build_venue_order(%{
-      "client_oid" => venue_client_id_2, "state" => "2", "size" => "1", "filled_size" => "1"
-    })
+
+    venue_order_data_2 =
+      build_venue_order(%{
+        "client_oid" => venue_client_id_2,
+        "state" => "2",
+        "size" => "1",
+        "filled_size" => "1"
+      })
 
     cast_order_msg(%{
       "table" => "futures/order",
       "data" => [venue_order_data_1, venue_order_data_2]
     })
 
-    assert_receive {:order_updated, ^enqueued_order_1_client_id, %NewOrders.Transitions.Fill{}}
-    order_1 = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_1_client_id)
+    assert_receive {:order_updated, ^enqueued_order_1_client_id, %Orders.Transitions.Fill{}}
+    order_1 = Orders.OrderRepo.get!(Orders.Order, enqueued_order_1_client_id)
     assert order_1.status == :filled
     assert order_1.cumulative_qty == Decimal.new("2")
     assert order_1.leaves_qty == Decimal.new("0")
 
-    assert_receive {:order_updated, ^enqueued_order_2_client_id, %NewOrders.Transitions.Fill{}}
-    order_2 = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_2_client_id)
+    assert_receive {:order_updated, ^enqueued_order_2_client_id, %Orders.Transitions.Fill{}}
+    order_2 = Orders.OrderRepo.get!(Orders.Order, enqueued_order_2_client_id)
     assert order_2.status == :filled
     assert order_2.cumulative_qty == Decimal.new("1")
     assert order_2.leaves_qty == Decimal.new("0")

@@ -2,7 +2,6 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   import Mock
-  alias Tai.NewOrders
 
   setup_all do
     HTTPoison.start()
@@ -154,7 +153,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
     venue = venue_id |> Atom.to_string()
 
     struct(
-      NewOrders.Order,
+      Tai.Orders.Order,
       client_id: "6b677ec7-4b92-41e9-9a02-171fe99a2192",
       venue: venue,
       credential: "main",
@@ -168,7 +167,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   defp build_enqueued_order(venue_id) do
     venue = venue_id |> Atom.to_string()
 
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue: venue,
       credential: "main",
@@ -185,7 +184,7 @@ defmodule Tai.Venues.Adapters.CancelOrderErrorTest do
   end
 
   defp build_open_order(order, order_response) do
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       venue_order_id: order_response.id,
       venue: order.venue,
       credential: "main",

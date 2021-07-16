@@ -1,13 +1,13 @@
 import Config
 
 # OrderRepo
-config :tai, Tai.NewOrders.OrderRepo, pool_size: 10
+config :tai, Tai.Orders.OrderRepo, pool_size: 10
 
 if System.get_env("ORDER_REPO_ADAPTER") == "postgres" do
   default_database_url = "postgres://postgres:postgres@localhost:5432/tai_?"
   configured_database_url = System.get_env("DATABASE_URL") || default_database_url
   database_url = String.replace(configured_database_url, "?", "dev")
-  config :tai, Tai.NewOrders.OrderRepo, url: database_url
+  config :tai, Tai.Orders.OrderRepo, url: database_url
 end
 
 # Toolkit
@@ -32,7 +32,7 @@ if config_env() == :dev do
       ]
     ]
 
-  config :tai, Tai.NewOrders.OrderRepo, show_sensitive_data_on_connection_error: true
+  config :tai, Tai.Orders.OrderRepo, show_sensitive_data_on_connection_error: true
 
   config :tai,
     advisor_groups: %{
@@ -64,7 +64,7 @@ if config_env() == :test do
     ping_pong: ExamplesSupport.E2E.PingPong
   }
 
-  config :tai, Tai.NewOrders.OrderRepo,
+  config :tai, Tai.Orders.OrderRepo,
     pool: Ecto.Adapters.SQL.Sandbox,
     show_sensitive_data_on_connection_error: true
 

@@ -1,7 +1,7 @@
 defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
   use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
   setup_all do
     HTTPoison.start()
@@ -32,7 +32,7 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
 
         assert Enum.count(amend_bulk_response.orders) == 1
         amend_response = Enum.at(amend_bulk_response.orders, 0)
-        assert %NewOrders.Responses.AmendAccepted{} = amend_response
+        assert %Responses.AmendAccepted{} = amend_response
         assert amend_response.id == open_order.venue_order_id
         assert amend_response.received_at != nil
         assert %DateTime{} = amend_response.venue_timestamp
@@ -43,7 +43,7 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
   defp build_enqueued_order(venue_id, side) do
     venue = venue_id |> Atom.to_string()
 
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue: venue,
       credential: "main",
@@ -58,7 +58,7 @@ defmodule Tai.Venues.Adapters.AmendBulkOrderTest do
   end
 
   defp build_open_order(order, amend_response) do
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       venue_order_id: amend_response.id,
       venue: order.venue,
       credential: "main",

@@ -2,7 +2,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
   use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
   import Mock
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
   setup_all do
     HTTPoison.start()
@@ -29,7 +29,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
         open_order = build_open_order(enqueued_order, amend_response)
 
         assert {:ok, amend_response} = Tai.Venues.Client.amend_order(open_order, attrs)
-        assert %NewOrders.Responses.AmendAccepted{} = amend_response
+        assert %Responses.AmendAccepted{} = amend_response
         assert amend_response.id == open_order.venue_order_id
         assert amend_response.received_at != nil
         assert %DateTime{} = amend_response.venue_timestamp
@@ -47,7 +47,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
         open_order = build_open_order(enqueued_order, amend_response)
 
         assert {:ok, amend_response} = Tai.Venues.Client.amend_order(open_order, attrs)
-        assert %NewOrders.Responses.AmendAccepted{} = amend_response
+        assert %Responses.AmendAccepted{} = amend_response
         assert amend_response.id == open_order.venue_order_id
         assert amend_response.received_at != nil
         assert %DateTime{} = amend_response.venue_timestamp
@@ -65,7 +65,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
         open_order = build_open_order(enqueued_order, amend_response)
 
         assert {:ok, amend_response} = Tai.Venues.Client.amend_order(open_order, attrs)
-        assert %NewOrders.Responses.AmendAccepted{} = amend_response
+        assert %Responses.AmendAccepted{} = amend_response
         assert amend_response.id == open_order.venue_order_id
         assert amend_response.received_at != nil
         assert %DateTime{} = amend_response.venue_timestamp
@@ -163,7 +163,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
   defp build_enqueued_order(venue_id, side) do
     venue = venue_id |> Atom.to_string()
 
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue: venue,
       credential: "main",
@@ -178,7 +178,7 @@ defmodule Tai.Venues.Adapters.AmendOrderTest do
   end
 
   defp build_open_order(order, amend_response) do
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       venue_order_id: amend_response.id,
       venue: order.venue,
       credential: order.credential,

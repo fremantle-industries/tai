@@ -3,7 +3,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrdersTest do
   import Tai.TestSupport.Assertions.Event
   alias Tai.VenueAdapters.Bitmex.Stream.ProcessAuth
   alias Tai.VenueAdapters.Bitmex.ClientId
-  alias Tai.NewOrders
+  alias Tai.Orders
 
   @venue :my_venue
   @credential :main
@@ -20,14 +20,17 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrdersTest do
     {:ok, open_order} = create_open_order()
     open_order_client_id = open_order.client_id
     venue_client_id = open_order_client_id |> to_venue_client_id()
-    venue_order_data = build_venue_order(%{
-      "clOrdID" => venue_client_id, "ordStatus" => "Canceled"
-    })
+
+    venue_order_data =
+      build_venue_order(%{
+        "clOrdID" => venue_client_id,
+        "ordStatus" => "Canceled"
+      })
 
     cast_order_msg([venue_order_data], "update")
 
-    assert_receive {:order_updated, ^open_order_client_id, %NewOrders.Transitions.Cancel{}}
-    order = NewOrders.OrderRepo.get!(NewOrders.Order, open_order_client_id)
+    assert_receive {:order_updated, ^open_order_client_id, %Orders.Transitions.Cancel{}}
+    order = Orders.OrderRepo.get!(Orders.Order, open_order_client_id)
     assert order.status == :canceled
     assert %DateTime{} = order.last_venue_timestamp
     assert %DateTime{} = order.last_received_at
@@ -37,14 +40,19 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrdersTest do
     {:ok, enqueued_order} = create_enqueued_order()
     enqueued_order_client_id = enqueued_order.client_id
     venue_client_id = enqueued_order_client_id |> to_venue_client_id()
-    venue_order_data = build_venue_order(%{
-      "clOrdID" => venue_client_id, "ordStatus" => "New", "leavesQty" => 1, "cumQty" => 0
-    })
+
+    venue_order_data =
+      build_venue_order(%{
+        "clOrdID" => venue_client_id,
+        "ordStatus" => "New",
+        "leavesQty" => 1,
+        "cumQty" => 0
+      })
 
     cast_order_msg([venue_order_data], "update")
 
-    assert_receive {:order_updated, ^enqueued_order_client_id, %NewOrders.Transitions.Open{}}
-    order = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_client_id)
+    assert_receive {:order_updated, ^enqueued_order_client_id, %Orders.Transitions.Open{}}
+    order = Orders.OrderRepo.get!(Orders.Order, enqueued_order_client_id)
     assert order.status == :open
     assert order.cumulative_qty == Decimal.new(0)
     assert order.leaves_qty == Decimal.new(1)
@@ -56,14 +64,19 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrdersTest do
     {:ok, enqueued_order} = create_enqueued_order()
     enqueued_order_client_id = enqueued_order.client_id
     venue_client_id = enqueued_order_client_id |> to_venue_client_id()
-    venue_order_data = build_venue_order(%{
-      "clOrdID" => venue_client_id, "ordStatus" => "PartiallyFilled", "leavesQty" => 5, "cumQty" => 10
-    })
+
+    venue_order_data =
+      build_venue_order(%{
+        "clOrdID" => venue_client_id,
+        "ordStatus" => "PartiallyFilled",
+        "leavesQty" => 5,
+        "cumQty" => 10
+      })
 
     cast_order_msg([venue_order_data], "update")
 
-    assert_receive {:order_updated, ^enqueued_order_client_id, %NewOrders.Transitions.PartialFill{}}
-    order = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_client_id)
+    assert_receive {:order_updated, ^enqueued_order_client_id, %Orders.Transitions.PartialFill{}}
+    order = Orders.OrderRepo.get!(Orders.Order, enqueued_order_client_id)
     assert order.status == :open
     assert order.cumulative_qty == Decimal.new(10)
     assert order.leaves_qty == Decimal.new(5)
@@ -75,14 +88,18 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrdersTest do
     {:ok, enqueued_order} = create_enqueued_order()
     enqueued_order_client_id = enqueued_order.client_id
     venue_client_id = enqueued_order_client_id |> to_venue_client_id()
-    venue_order_data = build_venue_order(%{
-      "clOrdID" => venue_client_id, "ordStatus" => "Filled", "cumQty" => 2
-    })
+
+    venue_order_data =
+      build_venue_order(%{
+        "clOrdID" => venue_client_id,
+        "ordStatus" => "Filled",
+        "cumQty" => 2
+      })
 
     cast_order_msg([venue_order_data], "update")
 
-    assert_receive {:order_updated, ^enqueued_order_client_id, %NewOrders.Transitions.Fill{}}
-    order = NewOrders.OrderRepo.get!(NewOrders.Order, enqueued_order_client_id)
+    assert_receive {:order_updated, ^enqueued_order_client_id, %Orders.Transitions.Fill{}}
+    order = Orders.OrderRepo.get!(Orders.Order, enqueued_order_client_id)
     assert order.status == :filled
     assert order.cumulative_qty == Decimal.new("2")
     assert order.leaves_qty == Decimal.new("0")
@@ -94,9 +111,13 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrdersTest do
     {:ok, enqueued_order} = create_enqueued_order()
     enqueued_order_client_id = enqueued_order.client_id
     venue_client_id = enqueued_order_client_id |> to_venue_client_id()
-    venue_order_data = build_venue_order(%{
-      "clOrdID" => venue_client_id, "ordStatus" => "Filled", "cumQty" => 2
-    })
+
+    venue_order_data =
+      build_venue_order(%{
+        "clOrdID" => venue_client_id,
+        "ordStatus" => "Filled",
+        "cumQty" => 2
+      })
 
     cast_order_msg([venue_order_data], "partial")
     refute_receive {:order_updated, _, _}

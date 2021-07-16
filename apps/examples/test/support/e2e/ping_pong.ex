@@ -1,7 +1,7 @@
 defmodule ExamplesSupport.E2E.PingPong do
   import Tai.TestSupport.Mock
   alias Tai.TestSupport.Mocks
-  alias Tai.NewOrders
+  alias Tai.Orders
 
   @venue :test_exchange_a
   @credential :main
@@ -48,9 +48,9 @@ defmodule ExamplesSupport.E2E.PingPong do
       {Decimal.new("0.0005"), Decimal.new("0.0005")}
     )
 
-    Mocks.Responses.NewOrders.GoodTillCancel.create_accepted(
+    Mocks.Responses.Orders.GoodTillCancel.create_accepted(
       @entry_venue_order_id_1,
-      %NewOrders.Submissions.BuyLimitGtc{
+      %Orders.Submissions.BuyLimitGtc{
         venue: @venue |> Atom.to_string(),
         credential: @credential |> Atom.to_string(),
         product_symbol: @product |> Atom.to_string(),
@@ -62,11 +62,11 @@ defmodule ExamplesSupport.E2E.PingPong do
       }
     )
 
-    Mocks.Responses.NewOrders.GoodTillCancel.cancel_accepted(@entry_venue_order_id_1)
+    Mocks.Responses.Orders.GoodTillCancel.cancel_accepted(@entry_venue_order_id_1)
 
-    Mocks.Responses.NewOrders.GoodTillCancel.create_accepted(
+    Mocks.Responses.Orders.GoodTillCancel.create_accepted(
       @entry_venue_order_id_2,
-      %NewOrders.Submissions.BuyLimitGtc{
+      %Orders.Submissions.BuyLimitGtc{
         venue: @venue |> Atom.to_string(),
         credential: @credential |> Atom.to_string(),
         product_symbol: @product |> Atom.to_string(),
@@ -166,7 +166,7 @@ defmodule ExamplesSupport.E2E.PingPong do
         client_id
       )
       when venue_id == @venue and product_symbol == @product do
-    submission = %NewOrders.Submissions.SellLimitGtc{
+    submission = %Orders.Submissions.SellLimitGtc{
       venue: @venue |> Atom.to_string(),
       credential: @credential |> Atom.to_string(),
       product_symbol: @product |> Atom.to_string(),
@@ -177,7 +177,7 @@ defmodule ExamplesSupport.E2E.PingPong do
       qty: Decimal.new(10)
     }
 
-    Mocks.Responses.NewOrders.GoodTillCancel.create_accepted(@exit_venue_order_id, submission)
+    Mocks.Responses.Orders.GoodTillCancel.create_accepted(@exit_venue_order_id, submission)
 
     @venue
     |> push_order_update(%{
@@ -187,7 +187,7 @@ defmodule ExamplesSupport.E2E.PingPong do
       leaves_qty: 0
     })
 
-    Mocks.Responses.NewOrders.GoodTillCancel.cancel_accepted(@exit_venue_order_id)
+    Mocks.Responses.Orders.GoodTillCancel.cancel_accepted(@exit_venue_order_id)
   end
 
   def advisor_group_config(:ping_pong) do

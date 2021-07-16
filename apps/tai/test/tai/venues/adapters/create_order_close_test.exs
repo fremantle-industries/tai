@@ -1,7 +1,6 @@
 defmodule Tai.Venues.Adapters.CreateOrderCloseTest do
   use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  alias Tai.NewOrders
 
   setup_all do
     HTTPoison.start()
@@ -37,7 +36,7 @@ defmodule Tai.Venues.Adapters.CreateOrderCloseTest do
     action = Keyword.fetch!(opts, :action)
     post_only = Keyword.get(opts, :post_only, false)
 
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue: venue,
       credential: "main",

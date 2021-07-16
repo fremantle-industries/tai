@@ -1,5 +1,4 @@
 defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
-  alias Tai.NewOrders.OrderTransitionWorker
 
   @date_format "{ISO:Extended:Z}"
 
@@ -19,7 +18,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
                      |> Map.put(:last_venue_timestamp, venue_timestamp)
                      |> Map.put(:__type__, type)
 
-      OrderTransitionWorker.apply(client_id, merged_attrs)
+      Tai.Orders.OrderTransitionWorker.apply(client_id, merged_attrs)
     else
       # TODO: Need to write unit test for :invalid_client_id
       {:error, :invalid_state} ->

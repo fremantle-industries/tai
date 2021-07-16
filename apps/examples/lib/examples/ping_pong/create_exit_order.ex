@@ -1,10 +1,10 @@
 defmodule Examples.PingPong.CreateExitOrder do
   alias Examples.PingPong.Config
-  alias Tai.NewOrders.Submissions
+  alias Tai.Orders.Submissions
 
   @type advisor_name :: Tai.Advisor.advisor_name()
   @type config :: Config.t()
-  @type order :: Tai.NewOrders.Order.t()
+  @type order :: Tai.Orders.Order.t()
 
   @spec create(advisor_name, prev :: order, updated :: order, config) :: {:ok, order}
   def create(advisor_name, prev_entry_order, updated_entry_order, config) do
@@ -24,7 +24,7 @@ defmodule Examples.PingPong.CreateExitOrder do
       post_only: true,
       order_updated_callback: {advisor_name, :exit_order}
     }
-    |> Tai.NewOrders.create()
+    |> Tai.Orders.create()
   end
 
   defp exit_price(updated_entry_order, product) do

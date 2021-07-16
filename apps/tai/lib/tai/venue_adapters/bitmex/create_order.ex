@@ -4,11 +4,11 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
   """
 
   alias Tai.VenueAdapters.Bitmex.ClientId
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type order :: NewOrders.Order.t()
-  @type response :: NewOrders.Responses.CreateAccepted.t()
+  @type order :: Tai.Orders.Order.t()
+  @type response :: Responses.CreateAccepted.t()
   @type reason ::
           :timeout
           | :connect_timeout
@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
           | {:unhandled, term}
 
   @spec create_order(order, credentials) :: {:ok, response} | {:error, reason}
-  def create_order(%NewOrders.Order{} = order, credentials) do
+  def create_order(%Tai.Orders.Order{} = order, credentials) do
     params = build_params(order)
 
     credentials
@@ -70,7 +70,7 @@ defmodule Tai.VenueAdapters.Bitmex.CreateOrder do
     received_at = Tai.Time.monotonic_time()
     venue_timestamp = Timex.parse!(venue_order.timestamp, @format)
 
-    response = %NewOrders.Responses.CreateAccepted{
+    response = %Responses.CreateAccepted{
       id: venue_order.order_id,
       venue_timestamp: venue_timestamp,
       received_at: received_at

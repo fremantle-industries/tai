@@ -13,7 +13,6 @@ defmodule Examples.PingPong.Advisor do
   use Tai.Advisor
   import Examples.PingPong.ManageQuoteChange, only: [with_all_quotes: 1, manage_entry_order: 2]
   import Examples.PingPong.ManageOrderUpdate, only: [entry_order_updated: 3]
-  alias Tai.NewOrders
 
   @impl true
   def handle_event(market_quote, state) do
@@ -43,16 +42,16 @@ defmodule Examples.PingPong.Advisor do
   @impl true
   def on_terminate(_reason, state) do
     case state.store do
-      %{entry_order: %NewOrders.Order{status: status} = entry_order} when status in @cancel_on_terminate ->
-        NewOrders.cancel(entry_order)
+      %{entry_order: %Tai.Orders.Order{status: status} = entry_order} when status in @cancel_on_terminate ->
+        Tai.Orders.cancel(entry_order)
 
       _ ->
         :ok
     end
 
     case state.store do
-      %{exit_order: %NewOrders.Order{status: status} = exit_order} when status in @cancel_on_terminate ->
-        NewOrders.cancel(exit_order)
+      %{exit_order: %Tai.Orders.Order{status: status} = exit_order} when status in @cancel_on_terminate ->
+        Tai.Orders.cancel(exit_order)
 
       _ ->
         :ok

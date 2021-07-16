@@ -3,11 +3,11 @@ defmodule Tai.VenueAdapters.Ftx.CancelOrder do
   Sends a cancel order request to FTX
   """
 
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
-  @type order :: NewOrders.Order.t()
+  @type order :: Tai.Orders.Order.t()
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type response :: NewOrders.Responses.CancelAccepted.t()
+  @type response :: Responses.CancelAccepted.t()
   @type reason :: term
 
   @spec cancel_order(order, credentials) :: {:ok, response} | {:error, reason}
@@ -24,7 +24,7 @@ defmodule Tai.VenueAdapters.Ftx.CancelOrder do
 
   defp parse_response(:ok, venue_order_id) do
     received_at = Tai.Time.monotonic_time()
-    response = %NewOrders.Responses.CancelAccepted{id: venue_order_id, received_at: received_at}
+    response = %Responses.CancelAccepted{id: venue_order_id, received_at: received_at}
     {:ok, response}
   end
 

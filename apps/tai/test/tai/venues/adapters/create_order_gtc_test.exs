@@ -1,7 +1,7 @@
 defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
   use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
   setup_all do
     HTTPoison.start()
@@ -29,7 +29,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
         use_cassette "venue_adapters/shared/orders/#{@venue.id}/#{@side}_limit_gtc_unfilled" do
           assert {:ok, order_response} = Tai.Venues.Client.create_order(order)
 
-          assert %NewOrders.Responses.CreateAccepted{} = order_response
+          assert %Responses.CreateAccepted{} = order_response
           assert order_response.id != nil
           assert order_response.received_at != nil
         end
@@ -41,7 +41,7 @@ defmodule Tai.Venues.Adapters.CreateOrderGtcTest do
     venue = venue_id |> Atom.to_string()
     post_only = Keyword.get(opts, :post_only, false)
 
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: Ecto.UUID.generate(),
       venue: venue,
       credential: "main",

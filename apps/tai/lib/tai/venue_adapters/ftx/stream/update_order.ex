@@ -1,6 +1,4 @@
 defmodule Tai.VenueAdapters.Ftx.Stream.UpdateOrder do
-  alias Tai.NewOrders.OrderTransitionWorker
-
   @date_format "{ISO:Extended}"
 
   def apply(
@@ -18,7 +16,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.UpdateOrder do
                      |> Map.put(:last_venue_timestamp, venue_timestamp)
                      |> Map.put(:__type__, type)
 
-      OrderTransitionWorker.apply(client_id, merged_attrs)
+      Tai.Orders.OrderTransitionWorker.apply(client_id, merged_attrs)
     else
       {:error, :invalid_state} ->
         warn_unhandled(msg, last_received_at, state)

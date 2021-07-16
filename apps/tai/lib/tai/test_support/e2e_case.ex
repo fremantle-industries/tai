@@ -3,7 +3,7 @@ defmodule Tai.TestSupport.E2ECase do
 
   using do
     quote do
-      alias Tai.NewOrders.OrderRepo
+      alias Tai.Orders.OrderRepo
       alias Tai.TestSupport.Mocks
 
       import ExUnit.CaptureIO
@@ -13,8 +13,8 @@ defmodule Tai.TestSupport.E2ECase do
       import Tai.TestSupport.DataCase
       import Tai.TestSupport.Mock
       import Tai.TestSupport.Assertions.Event
-      import Tai.TestSupport.Factories.NewOrderSubmissionFactory
-      import Tai.TestSupport.Factories.NewOrderFactory
+      import Tai.TestSupport.Factories.OrderSubmissionFactory
+      import Tai.TestSupport.Factories.OrderFactory
       import Tai.TestSupport.Factories.OrderTransitionFactory
       import Tai.TestSupport.Factories.FailedOrderTransitionFactory
 
@@ -49,8 +49,8 @@ defmodule Tai.TestSupport.E2ECase do
         {:ok, _} = Application.ensure_all_started(:tai)
         Phoenix.PubSub.subscribe(Tai.PubSub, "order_updated:*")
 
-        :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tai.NewOrders.OrderRepo)
-        Ecto.Adapters.SQL.Sandbox.mode(Tai.NewOrders.OrderRepo, {:shared, self()})
+        :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tai.Orders.OrderRepo)
+        Ecto.Adapters.SQL.Sandbox.mode(Tai.Orders.OrderRepo, {:shared, self()})
 
         {:ok, _} = e2e_app() |> Application.ensure_all_started()
         Tai.Settings.enable_send_orders!()

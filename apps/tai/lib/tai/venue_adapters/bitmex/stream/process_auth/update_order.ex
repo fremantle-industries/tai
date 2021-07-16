@@ -1,6 +1,5 @@
 defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateOrder do
   alias Tai.VenueAdapters.Bitmex.ClientId
-  alias Tai.NewOrders.OrderTransitionWorker
 
   def apply(
     %{"clOrdID" => cl_ord_id, "ordStatus" => order_status, "timestamp" => venue_timestamp} = msg,
@@ -17,7 +16,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateOrder do
                      |> Map.put(:last_venue_timestamp, venue_timestamp)
                      |> Map.put(:__type__, type)
 
-      OrderTransitionWorker.apply(client_id, merged_attrs)
+      Tai.Orders.OrderTransitionWorker.apply(client_id, merged_attrs)
     else
       {:error, :invalid_client_id} ->
         warn_invalid_client_id(cl_ord_id, last_received_at, state)

@@ -21,20 +21,20 @@ defmodule Tai.Commander do
     options |> to_dest() |> GenServer.call(:markets)
   end
 
-  def new_orders(query \\ nil, options \\ []) do
-    options |> to_dest() |> GenServer.call({:new_orders, query, options})
+  def orders(query \\ nil, options \\ []) do
+    options |> to_dest() |> GenServer.call({:orders, query, options})
   end
 
-  def new_orders_count(query \\ nil, options \\ []) do
-    options |> to_dest() |> GenServer.call({:new_orders_count, query})
+  def orders_count(query \\ nil, options \\ []) do
+    options |> to_dest() |> GenServer.call({:orders_count, query})
   end
 
-  def get_new_order_by_client_id(client_id, options \\ []) do
-    options |> to_dest() |> GenServer.call({:get_new_order_by_client_id, client_id})
+  def get_order_by_client_id(client_id, options \\ []) do
+    options |> to_dest() |> GenServer.call({:get_order_by_client_id, client_id})
   end
 
-  def get_new_orders_by_client_ids(client_ids, options \\ []) do
-    options |> to_dest() |> GenServer.call({:get_new_orders_by_client_ids, client_ids})
+  def get_orders_by_client_ids(client_ids, options \\ []) do
+    options |> to_dest() |> GenServer.call({:get_orders_by_client_ids, client_ids})
   end
 
   def order_transitions(client_id, query \\ nil, options \\ []) do
@@ -117,20 +117,20 @@ defmodule Tai.Commander do
     {:reply, Tai.Commander.Markets.get(), state}
   end
 
-  def handle_call({:new_orders, query, options}, _from, state) do
-    {:reply, Tai.Commander.NewOrders.get(query, options), state}
+  def handle_call({:orders, query, options}, _from, state) do
+    {:reply, Tai.Commander.Orders.get(query, options), state}
   end
 
-  def handle_call({:new_orders_count, query}, _from, state) do
-    {:reply, Tai.Commander.NewOrdersCount.get(query), state}
+  def handle_call({:orders_count, query}, _from, state) do
+    {:reply, Tai.Commander.OrdersCount.get(query), state}
   end
 
-  def handle_call({:get_new_order_by_client_id, client_id}, _from, state) do
-    {:reply, Tai.Commander.GetNewOrderByClientId.get(client_id), state}
+  def handle_call({:get_order_by_client_id, client_id}, _from, state) do
+    {:reply, Tai.Commander.GetOrderByClientId.get(client_id), state}
   end
 
-  def handle_call({:get_new_orders_by_client_ids, client_ids}, _from, state) do
-    {:reply, Tai.Commander.GetNewOrdersByClientIds.get(client_ids), state}
+  def handle_call({:get_orders_by_client_ids, client_ids}, _from, state) do
+    {:reply, Tai.Commander.GetOrdersByClientIds.get(client_ids), state}
   end
 
   def handle_call({:order_transitions, client_id, query, options}, _from, state) do

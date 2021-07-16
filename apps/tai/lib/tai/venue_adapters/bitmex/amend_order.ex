@@ -1,10 +1,10 @@
 defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
   @type credentials :: Tai.Venues.Adapter.credentials()
-  @type order :: NewOrders.Order.t()
-  @type attrs :: NewOrders.Worker.amend_attrs()
-  @type response :: NewOrders.Responses.AmendAccepted.t()
+  @type order :: Tai.Orders.Order.t()
+  @type attrs :: Tai.Orders.Worker.amend_attrs()
+  @type response :: Responses.AmendAccepted.t()
   @type reason ::
           :timeout
           | :overloaded
@@ -45,7 +45,13 @@ defmodule Tai.VenueAdapters.Bitmex.AmendOrder do
   defp parse_response({:ok, venue_order, _rate_limit}) do
     {:ok, venue_timestamp, 0} = DateTime.from_iso8601(venue_order.timestamp)
     received_at = Tai.Time.monotonic_time()
-    response = %NewOrders.Responses.AmendAccepted{id: venue_order.order_id, received_at: received_at, venue_timestamp: venue_timestamp}
+
+    response = %Responses.AmendAccepted{
+      id: venue_order.order_id,
+      received_at: received_at,
+      venue_timestamp: venue_timestamp
+    }
+
     {:ok, response}
   end
 

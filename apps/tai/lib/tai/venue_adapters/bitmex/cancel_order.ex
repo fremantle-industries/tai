@@ -1,9 +1,9 @@
 defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
-  @type order :: NewOrders.Order.t()
+  @type order :: Tai.Orders.Order.t()
   @type credentials :: map
-  @type response :: NewOrders.Responses.CancelAccepted.t()
+  @type response :: Responses.CancelAccepted.t()
   @type reason ::
           :timeout
           | :overloaded
@@ -30,7 +30,7 @@ defmodule Tai.VenueAdapters.Bitmex.CancelOrder do
     received_at = Tai.Time.monotonic_time()
     {:ok, venue_timestamp, 0} = DateTime.from_iso8601(venue_order.timestamp)
 
-    response = %NewOrders.Responses.CancelAccepted{
+    response = %Responses.CancelAccepted{
       id: venue_order.order_id,
       received_at: received_at,
       venue_timestamp: venue_timestamp

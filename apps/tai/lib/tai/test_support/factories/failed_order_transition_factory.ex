@@ -1,5 +1,5 @@
 defmodule Tai.TestSupport.Factories.FailedOrderTransitionFactory do
-  alias Tai.NewOrders.{OrderRepo, FailedOrderTransition}
+  alias Tai.Orders.{FailedOrderTransition, OrderRepo}
 
   def create_failed_order_transition(order_client_id, error, type) do
     %FailedOrderTransition{}

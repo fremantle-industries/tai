@@ -8,7 +8,7 @@ defmodule Tai.IEx.Commands.OrderTransitionsTest do
 
     @date_times [
       DateTime.from_naive!(~N[2016-05-24 13:00:00.000000], "Etc/UTC"),
-      DateTime.from_naive!(~N[2016-05-24 13:00:01.000000], "Etc/UTC"),
+      DateTime.from_naive!(~N[2016-05-24 13:00:01.000000], "Etc/UTC")
     ]
 
     def start_link(_) do
@@ -30,17 +30,18 @@ defmodule Tai.IEx.Commands.OrderTransitionsTest do
       display_client_id = "#{order.client_id |> String.slice(0..5)}..."
 
       assert capture_io(fn -> Tai.IEx.order_transitions(order.client_id) end) == """
-        +-----------+-----------------------------+-----------------------------------------------+
-        | Client ID |                  Created At |                                          Type |
-        +-----------+-----------------------------+-----------------------------------------------+
-        | #{display_client_id} | 2016-05-24 13:00:01.000000Z | Elixir.Tai.NewOrders.Transitions.AcceptCreate |
-        +-----------+-----------------------------+-----------------------------------------------+\n
-        """
+             +-----------+-----------------------------+--------------------------------------------+
+             | Client ID |                  Created At |                                       Type |
+             +-----------+-----------------------------+--------------------------------------------+
+             | #{display_client_id} | 2016-05-24 13:00:01.000000Z | Elixir.Tai.Orders.Transitions.AcceptCreate |
+             +-----------+-----------------------------+--------------------------------------------+\n
+             """
     end
   end
 
   test "shows an empty table when there are no order transitions" do
     client_id = Ecto.UUID.generate()
+
     assert capture_io(fn -> Tai.IEx.order_transitions(client_id) end) == """
            +-----------+------------+------+
            | Client ID | Created At | Type |

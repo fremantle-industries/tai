@@ -1,7 +1,7 @@
 defmodule Tai.Venues.Adapters.CancelOrderTest do
   use Tai.TestSupport.DataCase, async: false
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
-  alias Tai.NewOrders
+  alias Tai.Orders.Responses
 
   setup_all do
     HTTPoison.start()
@@ -25,7 +25,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
         open_order = build_open_order(enqueued_order, order_response)
 
         assert {:ok, order_response} = Tai.Venues.Client.cancel_order(open_order)
-        assert %NewOrders.Responses.CancelAccepted{} = order_response
+        assert %Responses.CancelAccepted{} = order_response
         assert order_response.id != nil
       end
     end
@@ -34,7 +34,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   defp build_enqueued_order(venue_id) do
     venue = venue_id |> Atom.to_string()
 
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: "f5559e85-7a3c-4c07-94d8-5e7a74079733",
       status: :enqueued,
       venue: venue,
@@ -52,7 +52,7 @@ defmodule Tai.Venues.Adapters.CancelOrderTest do
   end
 
   defp build_open_order(order, order_response) do
-    struct(NewOrders.Order, %{
+    struct(Tai.Orders.Order, %{
       client_id: order.client_id,
       status: :open,
       venue_order_id: order_response.id,

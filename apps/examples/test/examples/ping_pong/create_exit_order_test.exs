@@ -28,6 +28,6 @@ defmodule Examples.PingPong.CreateExitOrderTest do
   ]
   defp build_order(attrs) do
     merged_attrs = Keyword.merge(@base_attrs, attrs)
-    struct(Tai.NewOrders.Order, merged_attrs)
+    struct(Tai.Orders.Order, merged_attrs)
   end
 end

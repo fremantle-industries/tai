@@ -7,7 +7,7 @@ defmodule Tai.IEx do
 
   @type venue :: Tai.Venue.id()
   @type venue_store_id :: Tai.Venues.VenueStore.store_id()
-  @type order_client_id :: Tai.NewOrders.Order.client_id()
+  @type order_client_id :: Tai.Orders.Order.client_id()
 
   @spec help :: no_return
   defdelegate help, to: Commands.Help
@@ -27,11 +27,11 @@ defmodule Tai.IEx do
   @spec positions :: no_return
   defdelegate positions, to: Commands.Positions
 
-  @spec new_orders :: no_return
-  defdelegate new_orders, to: Commands.NewOrders
+  @spec orders :: no_return
+  defdelegate orders, to: Commands.Orders
 
-  @spec new_order(order_client_id) :: no_return
-  defdelegate new_order(client_id), to: Commands.NewOrder
+  @spec order(order_client_id) :: no_return
+  defdelegate order(client_id), to: Commands.Order
 
   @spec order_transitions(order_client_id) :: no_return
   defdelegate order_transitions(client_id), to: Commands.OrderTransitions

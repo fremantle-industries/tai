@@ -9,10 +9,16 @@ defmodule Tai.IEx.Commands.Help do
     * products
     * fees
     * markets
-    * new_orders
-    * new_order :order_client_id
+    * orders
+    * orders_count
+    * order :order_client_id
+    * get_order_by_client_id :order_client_id
+    * get_orders_by_client_ids :order_client_ids
     * order_transitions :order_client_id
+    * order_transitions_count :order_client_id
     * failed_order_transitions :order_client_id
+    * failed_order_transitions_count :order_client_id
+    * delete_all_orders
     * venues [where: [...], order: [...]]
     * start_venue :venue_id
     * stop_venue :venue_id

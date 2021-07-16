@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Mock do
-  alias Tai.NewOrders
+  import Tai.TestSupport.Mocks.Client
+  alias Tai.Orders.Responses
   alias Tai.TestSupport.Mocks
-  import Mocks.Client
 
   @behaviour Tai.Venues.Adapter
 
@@ -77,7 +77,7 @@ defmodule Tai.VenueAdapters.Mock do
       {:amend_order, match_attrs}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, %NewOrders.Responses.AmendAccepted{}} = response -> response
+        {:ok, %Responses.AmendAccepted{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
         {:error, :not_found} -> {:error, :mock_not_found}
       end
@@ -85,13 +85,14 @@ defmodule Tai.VenueAdapters.Mock do
   end
 
   def amend_bulk_orders(amend_set, _credentials) do
-    match_attrs = Enum.map(amend_set, fn {o, a} -> Map.merge(a, %{venue_order_id: o.venue_order_id}) end)
+    match_attrs =
+      Enum.map(amend_set, fn {o, a} -> Map.merge(a, %{venue_order_id: o.venue_order_id}) end)
 
     with_mock_server(fn ->
       {:amend_bulk_orders, match_attrs}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, %NewOrders.Responses.AmendBulk{}} = response -> response
+        {:ok, %Responses.AmendBulk{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
         {:error, :not_found} -> {:error, :mock_not_found}
       end
@@ -103,7 +104,7 @@ defmodule Tai.VenueAdapters.Mock do
       {:cancel_order, order.venue_order_id}
       |> Mocks.Server.eject()
       |> case do
-        {:ok, %NewOrders.Responses.CancelAccepted{}} = response -> response
+        {:ok, %Responses.CancelAccepted{}} = response -> response
         {:ok, {:raise, reason}} -> raise reason
         {:error, :not_found} -> {:error, :mock_not_found}
       end

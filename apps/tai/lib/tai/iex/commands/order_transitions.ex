@@ -4,9 +4,8 @@ defmodule Tai.IEx.Commands.OrderTransitions do
   """
 
   import Tai.IEx.Commands.Table, only: [render!: 2]
-  alias Tai.NewOrders.Order
 
-  @type client_id :: Order.client_id()
+  @type client_id :: Tai.Orders.Order.client_id()
 
   @header [
     "Client ID",

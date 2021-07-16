@@ -4,14 +4,13 @@ defmodule Tai.IEx.Commands.FailedOrderTransitions do
   """
 
   import Tai.IEx.Commands.Table, only: [render!: 2]
-  alias Tai.NewOrders.Order
 
-  @type client_id :: Order.client_id()
+  @type client_id :: Tai.Orders.Order.client_id()
 
   @header [
     "Client ID",
     "Created At",
-    "Type",
+    "Type"
   ]
 
   @spec failed_order_transitions(client_id) :: no_return
@@ -22,7 +21,7 @@ defmodule Tai.IEx.Commands.FailedOrderTransitions do
       [
         f.order_client_id |> Tai.Utils.String.truncate(6),
         f.inserted_at,
-        f.type,
+        f.type
       ]
     end)
     |> render!(@header)
