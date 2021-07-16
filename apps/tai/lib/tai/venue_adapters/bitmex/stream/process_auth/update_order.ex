@@ -59,6 +59,12 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateOrder do
     end
   end
 
+  # DEV NOTE: Currently unhandled but not required possible BitMEX order status
+  # "PendingNew"
+  # "DoneForDay"
+  # "Stopped"
+  # "PendingCancel"
+  # "Expired"
   @canceled "Canceled"
   @new "New"
   @filled "Filled"
