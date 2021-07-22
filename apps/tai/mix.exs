@@ -40,9 +40,7 @@ defmodule Tai.Mixfile do
       {:confex, "~> 3.4"},
       {:ecto, "~> 3.6"},
       {:ecto_sql, "~> 3.6"},
-      # ecto_sqlite3 needs new release > 0.5.5 with support for update_all no rows returning 0
-      # {:ecto_sqlite3, "~> 0.5"},
-      {:ecto_sqlite3, github: "elixir-sqlite/ecto_sqlite3", optional: true},
+      {:ecto_sqlite3, "~> 0.5.6"},
       # {:ecto_term, github: "fremantle-industries/ecto_term"},
       {:ecto_term, "~> 0.0.1"},
       {:enumerati, "~> 0.0.8"},
