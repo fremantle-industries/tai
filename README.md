@@ -52,7 +52,9 @@ Here's an example of an advisor that logs the spread between multiple products o
 
 ```elixir
 def deps do
-  [{:tai, "~> 0.0.66"}]
+  [
+    {:tai, "~> 0.0.66"}
+  ]
 end
 ```
 
@@ -65,6 +67,17 @@ Application.put_env(:elixir, :ansi_enabled, true)
 import Tai.IEx
 ```
 
+Run the `setup` mix task to:
+
+* Download dependencies
+* Create an orders database
+* Generate tai migrations for the orders database
+* Run migrations
+
+```bash
+$ mix setup
+```
+
 ## Usage
 
 `tai` runs as an OTP application.
@@ -74,6 +87,26 @@ interactive Elixir shell that imports the set of `tai` helper [commands](./docs/
 
 ```bash
 iex -S mix
+```
+
+## Upgrading Tai
+
+Bump the required version number in `mix.exs` and download the dependencies.
+
+```bash
+$ mix deps.update tai
+```
+
+Regenerate new or updated migrations
+
+```bash
+$ mix tai.gen.migration
+```
+
+Rerun ecto migrations
+
+```bash
+$ mix ecto.migrate
 ```
 
 ## Help Wanted :)
