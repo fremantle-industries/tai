@@ -3,11 +3,15 @@ import Config
 # OrderRepo
 config :tai, Tai.Orders.OrderRepo, pool_size: 10
 
-if System.get_env("ORDER_REPO_ADAPTER") == "postgres" do
-  default_database_url = "postgres://postgres:postgres@localhost:5432/tai_?"
-  configured_database_url = System.get_env("DATABASE_URL") || default_database_url
-  database_url = String.replace(configured_database_url, "?", "dev")
-  config :tai, Tai.Orders.OrderRepo, url: database_url
+case System.get_env("ORDER_REPO_ADAPTER") do
+  "postgres" ->
+    default_database_url = "postgres://postgres:postgres@localhost:5432/tai_?"
+    configured_database_url = System.get_env("DATABASE_URL") || default_database_url
+    database_url = String.replace(configured_database_url, "?", "dev")
+    config :tai, Tai.Orders.OrderRepo, url: database_url
+
+  _ ->
+    nil
 end
 
 # Toolkit
