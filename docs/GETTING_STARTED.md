@@ -36,3 +36,11 @@
 
 * [https://github.com/fremantle-industries/tai#install](https://github.com/fremantle-industries/tai#install)
 * [https://github.com/fremantle-industries/tai/blob/main/docs/CONFIGURATION.md](https://github.com/fremantle-industries/tai/blob/main/docs/CONFIGURATION.md)
+
+## Streaming Order Book & Trade Data to Advisors
+
+* [https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/log_spread](https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/log_spread)
+
+## Creating and Managing Orders with Advisors
+
+* [https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/ping_pong](https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/ping_pong)
