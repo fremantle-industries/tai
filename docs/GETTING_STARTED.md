@@ -2,6 +2,10 @@
 
 [Getting Started](./GETTING_STARTED.md) | [Built with Tai](./BUILT_WITH_TAI.md) | [Commands](./COMMANDS.md) | [Architecture](./ARCHITECTURE.md) | [Examples](../apps/examples/README.md) | [Configuration](./CONFIGURATION.md) | [Observability](./OBSERVABILITY.md)
 
+## Install Elixir & Erlang
+
+* We recommend installing [Elixir](https://github.com/asdf-vm/asdf-elixir) & [Erlang](https://github.com/asdf-vm/asdf-erlang) with [asdf](https://github.com/asdf-vm/asdf). A tool to manage the versions of multiple runtimes.
+
 ## Learn Elixir & OTP
 
 * [Power of the BEAM Runtime & OTP Distribution - The Soul of Erlang and Elixir](https://www.youtube.com/watch?v=JvBT4XBdoUE) (conference talk video 42 mins)
@@ -27,10 +31,6 @@
   * [Proper](https://github.com/proper-testing/proper) (erlang library for property based testing)
   * [Propcheck](https://github.com/alfert/propcheck) (elixir library for property based testing)
 * Fun - [Erlang: The Movie](https://www.youtube.com/watch?v=uKfKtXYLG78) (10 mins)
-
-## Install Elixir & Erlang
-
-* We recommend installing [Elixir](https://github.com/asdf-vm/asdf-elixir) & [Erlang](https://github.com/asdf-vm/asdf-erlang) with [asdf](https://github.com/asdf-vm/asdf). A tool to manage the versions of multiple runtimes.
 
 ## Install & Configure Tai
 
