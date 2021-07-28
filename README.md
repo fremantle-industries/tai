@@ -37,6 +37,7 @@ Here's an example of an advisor that logs the spread between multiple products o
 | Bitfinex |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | Kraken   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | CME      |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
+| Phemex   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | BTSE     |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | KuCoin   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
 | BitMax   |       [ ]       |   [ ]    |      [ ]      |      [ ]       |   [ ]    | [ ]  |
