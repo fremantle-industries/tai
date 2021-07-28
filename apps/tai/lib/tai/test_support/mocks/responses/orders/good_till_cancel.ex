@@ -129,9 +129,14 @@ defmodule Tai.TestSupport.Mocks.Responses.Orders.GoodTillCancel do
     |> Mocks.Server.insert(order_response)
   end
 
-  @deprecated "Use amend_price_and_qty with venue_order_id instead."
-  def amend_price_and_qty(order, price, qty) do
-    amend_price_and_qty(order.venue_order_id, price, qty)
+  @deprecated "Use amend_accepted/3 with venue_order_id instead."
+  def amend_price_and_qty(%Order{} = order, price, qty) do
+    amend_accepted(order.venue_order_id, %{price: price, qty: qty})
+  end
+
+  @deprecated "Use amend_accepted/3."
+  def amend_price_and_qty(venue_order_id, price, qty) do
+    amend_accepted(venue_order_id, %{price: price, qty: qty})
   end
 
   @spec amend_bulk_accepted([{order, %{}}], [map]) :: :ok
