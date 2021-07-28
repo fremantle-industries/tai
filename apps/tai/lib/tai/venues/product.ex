@@ -30,6 +30,11 @@ defmodule Tai.Venues.Product do
   @type value :: Decimal.t()
 
   @typedoc """
+  The side that the value represents
+  """
+  @type value_side :: :base | :quote
+
+  @typedoc """
   Whether or not the product can be used as collateral for a portfolios balance
   """
   @type collateral :: true | false
@@ -38,11 +43,6 @@ defmodule Tai.Venues.Product do
   The ratio of balance of the quote asset that is used as collateral in the portfolio balance
   """
   @type collateral_weight :: Decimal.t() | nil
-
-  @typedoc """
-  The side that the value represents
-  """
-  @type value_side :: :base | :quote
 
   @typedoc """
   A derivative contract where PnL settlement is a different asset to the base or quote assets.

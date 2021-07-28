@@ -32,7 +32,7 @@ Here's an example of an advisor that logs the spread between multiple products o
 | Deribit  |       [x]       |   [x]    |   [ ]  |   [x]    | [x]  |
 | GDAX     |       [x]       |   [x]    |   [ ]  |   [x]    | [x]  |
 | Huobi    |       [x]       |   [ ]    |   [ ]  |   [x]    | [ ]  |
-| Bybit    |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Bybit    |       [ ]       |   [ ]    |   [ ]  |   [x]    | [ ]  |
 | bit.com  |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
 | Bitfinex |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
 | Kraken   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |

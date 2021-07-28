@@ -54,6 +54,11 @@ if config_env() == :dev do
         start_on_boot: true,
         adapter: Tai.VenueAdapters.Binance,
         products: "btc_usdt ltc_usdt eth_usdt"
+      ],
+      bybit: [
+        start_on_boot: true,
+        adapter: Tai.VenueAdapters.Bybit,
+        products: "*"
       ]
     }
 end
@@ -95,6 +100,10 @@ if config_env() == :test do
         opts: %{
           autocancel: %{ping_interval_ms: 15_000, cancel_after_ms: 60_000}
         }
+      ],
+      bybit: [
+        enabled: true,
+        adapter: Tai.VenueAdapters.Bybit
       ],
       okex: [
         enabled: true,
@@ -201,6 +210,7 @@ if config_env() == :test do
   config :tai, :test_venue_adapters_products, [
     :binance,
     :bitmex,
+    :bybit,
     :deribit,
     :gdax,
     :mock,
