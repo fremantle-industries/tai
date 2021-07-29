@@ -4,7 +4,6 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
 
   @type stream :: Tai.Venues.Stream.t()
   @type endpoint :: String.t()
-  @type venue_id :: Tai.Venue.id()
   @type credential_id :: Tai.Venue.credential_id()
   @type credential :: Tai.Venue.account()
 

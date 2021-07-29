@@ -44,3 +44,18 @@
 ## Creating and Managing Orders with Advisors
 
 * [https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/ping_pong](https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/ping_pong)
+
+## Create and Test a New Venue Adapter
+
+* Create or use an [existing Elixir client library](https://github.com/fremantle-industries/ex_ftx) for the venue. This will help with mocks when testing
+* Copy the [stub venue adapter](../apps/tai/lib/tai/venue_adapters/stub.ex), [stream supervisor](../apps/tai/lib/tai/venue_adapters/stub/stream_supervisor.ex) and [stream connection](../apps/tai/lib/tai/venue_adapters/stub/stream/connection.ex) for your venue
+* Implement the [products](../apps/tai/lib/tai/venue_adapters/stub.ex#L10) callback to fetch the list available on the venue
+* Implement the [stream connection](../apps/tai/lib/tai/venue_adapters/stub/stream_supervisor.ex) in the [stream supervisor](../apps/tai/lib/tai/venue_adapters/stub/stream_supervisor.ex) to receive real time order book market data
+* Implement the [accounts](../apps/tai/lib/tai/venue_adapters/stub.ex#L16) and [maker/taker fees](../apps/tai/lib/tai/venue_adapters/stub.ex#L19) to retrieve balances stored on the venue
+* Implement [positions](../apps/tai/lib/tai/venue_adapters/stub.ex#L22) if the venue supports derivatives
+* Implement [create order](../apps/tai/lib/tai/venue_adapters/stub.ex#L25) to place an order on the venue
+* Implement [cancel order](../apps/tai/lib/tai/venue_adapters/stub.ex#L28) to cancel a resting order on the venue
+* Implement [amend order](../apps/tai/lib/tai/venue_adapters/stub.ex#L31) if the venue supports changing an order in place
+* Implement [amend bulk orders](../apps/tai/lib/tai/venue_adapters/stub.ex#L34) if the venue supports changing multiple orders in place
+* Configure the new venue for [market data streaming](../config/runtime.exs#L51)
+* Configure the [account credentials](../config/runtime.exs#L86) to receive balances and manage orders
