@@ -37,6 +37,18 @@
 * [https://github.com/fremantle-industries/tai#install](https://github.com/fremantle-industries/tai#install)
 * [https://github.com/fremantle-industries/tai/blob/main/docs/CONFIGURATION.md](https://github.com/fremantle-industries/tai/blob/main/docs/CONFIGURATION.md)
 
+## Tai Components & Data Flow
+
+* [https://github.com/fremantle-industries/tai/blob/main/docs/ARCHITECTURE.md#tai-components--data-flow](https://github.com/fremantle-industries/tai/blob/main/docs/ARCHITECTURE.md#tai-components--data-flow)
+
+## Daily Developer Workflow
+
+* Coming soon...
+
+## Mapping Tai to OTP Concepts
+
+* Coming soon...
+
 ## Streaming Order Book & Trade Data to Advisors
 
 * [https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/log_spread](https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/log_spread)
@@ -44,6 +56,14 @@
 ## Creating and Managing Orders with Advisors
 
 * [https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/ping_pong](https://github.com/fremantle-industries/tai/tree/main/apps/examples/lib/examples/ping_pong)
+
+## Receiving Custom Data in Advisors
+
+* Coming soon...
+
+## Testing Advisors
+
+* Coming soon...
 
 ## Create and Test a New Venue Adapter
 
@@ -59,3 +79,11 @@
 * Implement [amend bulk orders](../apps/tai/lib/tai/venue_adapters/stub.ex#L34) if the venue supports changing multiple orders in place
 * Configure the new venue for [market data streaming](../config/runtime.exs#L51)
 * Configure the [account credentials](../config/runtime.exs#L86) to receive balances and manage orders
+
+## Coordinate Multiple Instances of Tai within an OTP Distribution Cluster
+
+* Coming soon...
+
+## Build an OTP Release and Deploy to the Cloud
+
+* Coming soon...
