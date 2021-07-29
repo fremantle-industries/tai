@@ -27,7 +27,7 @@
 * Testing
   * https://elixirschool.com/en/lessons/basics/testing/ (wiki)
   * https://medium.com/very-big-things/towards-maintainable-elixir-testing-b32ac0604b99 (blog)
-  * [Testing Elixir: Effective and Robust Testing for Elixir and its Ecosystem](https://www.amazon.com/Testing-Elixir-Effective-Robust-Ecosystem/dp/1680507826) (upcoming book from core team members)
+  * [Testing Elixir: Effective and Robust Testing for Elixir and its Ecosystem](https://www.amazon.com/Testing-Elixir-Effective-Robust-Ecosystem/dp/1680507826) (book)
   * [Proper](https://github.com/proper-testing/proper) (erlang library for property based testing)
   * [Propcheck](https://github.com/alfert/propcheck) (elixir library for property based testing)
 * Fun - [Erlang: The Movie](https://www.youtube.com/watch?v=uKfKtXYLG78) (10 mins)
