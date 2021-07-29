@@ -219,8 +219,6 @@ if config_env() == :test do
     :ftx
   ]
 
-  config :tai, :test_venue_adapters_funding_rates, [:mock, :ftx]
-
   config :tai, :test_venue_adapters_accounts, [
     :binance,
     :bitmex,

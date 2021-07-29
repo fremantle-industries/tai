@@ -10,9 +10,6 @@ defmodule Tai.VenueAdapters.Stub do
   def products(_venue_id), do: {:error, :not_implemented}
 
   @impl true
-  def funding_rates(_venue_id), do: {:error, :not_implemented}
-
-  @impl true
   def accounts(_venue_id, _credential_id, _credentials), do: {:error, :not_implemented}
 
   @impl true

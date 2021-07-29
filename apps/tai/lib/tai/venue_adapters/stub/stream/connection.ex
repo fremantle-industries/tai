@@ -20,11 +20,6 @@ defmodule Tai.VenueAdapters.Stub.Stream.Connection do
   end
 
   @impl true
-  def subscribe({:depth, _product}, state) do
-    {:noreply, state}
-  end
-
-  @impl true
   def on_msg(_msg, _received_at, state) do
     {:ok, state}
   end

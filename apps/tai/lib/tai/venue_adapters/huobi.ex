@@ -8,7 +8,6 @@ defmodule Tai.VenueAdapters.Huobi do
 
   def stream_supervisor, do: StreamSupervisor
   defdelegate products(venue_id), to: Products
-  def funding_rates(_venue_id), do: {:error, :not_implemented}
   def accounts(_venue_id, _credential_id, _credentials), do: {:error, :not_implemented}
   def maker_taker_fees(_venue_id, _credential_id, _credentials), do: {:error, :not_implemented}
   def positions(_venue_id, _credential_id, _credentials), do: {:error, :not_implemented}
