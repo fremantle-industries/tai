@@ -30,6 +30,6 @@ config :tai,
     gdax: [
       start_on_boot: true,
       adapter: Tai.VenueAdapters.Gdax,
-      products: "btc_usd ltc_usd eth_usd",
+      products: "btc_usd ltc_usd eth_usd"
     ]
   }
