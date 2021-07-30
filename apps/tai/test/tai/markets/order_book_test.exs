@@ -67,7 +67,7 @@ defmodule Tai.Markets.OrderBookTest do
       OrderBook.replace(change_set)
 
       assert_receive {:market_quote_store, :after_put, market_quote}
-      assert Enum.count(market_quote.bids) == 0
+      assert Enum.empty?(market_quote.bids)
       assert Enum.count(market_quote.asks) == 2
       assert %PricePoint{} = Enum.at(market_quote.asks, 0)
       assert %PricePoint{} = Enum.at(market_quote.asks, 1)
@@ -92,7 +92,7 @@ defmodule Tai.Markets.OrderBookTest do
       assert Enum.count(market_quote.bids) == 2
       assert %PricePoint{} = Enum.at(market_quote.bids, 0)
       assert %PricePoint{} = Enum.at(market_quote.bids, 1)
-      assert Enum.count(market_quote.asks) == 0
+      assert Enum.empty?(market_quote.asks)
     end
 
     test "broadcasts change_set when enabled" do
@@ -275,8 +275,8 @@ defmodule Tai.Markets.OrderBookTest do
       OrderBook.apply(change_set_2)
 
       assert_receive {:market_quote_store, :after_put, market_quote}
-      assert Enum.count(market_quote.bids) == 0
-      assert Enum.count(market_quote.asks) == 0
+      assert Enum.empty?(market_quote.bids)
+      assert Enum.empty?(market_quote.asks)
     end
 
     test "broadcasts change_set when enabled" do

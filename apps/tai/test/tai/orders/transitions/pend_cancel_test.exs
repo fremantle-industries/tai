@@ -6,6 +6,6 @@ defmodule Tai.Orders.Transitions.PendCancelTest do
     transition = %Transitions.PendCancel{}
 
     attrs = Transitions.PendCancel.attrs(transition)
-    assert length(attrs) == 0
+    assert Enum.empty?(attrs)
   end
 end

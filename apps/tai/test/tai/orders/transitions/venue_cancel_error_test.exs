@@ -6,6 +6,6 @@ defmodule Tai.Orders.Transitions.VenueCancelErrorTest do
     transition = %Transitions.VenueCancelError{}
 
     attrs = Transitions.VenueCancelError.attrs(transition)
-    assert length(attrs) == 0
+    assert Enum.empty?(attrs)
   end
 end

@@ -6,6 +6,6 @@ defmodule Tai.Orders.Transitions.PendAmendTest do
     transition = %Transitions.PendAmend{}
 
     attrs = Transitions.PendAmend.attrs(transition)
-    assert length(attrs) == 0
+    assert Enum.empty?(attrs)
   end
 end
