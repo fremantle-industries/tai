@@ -112,7 +112,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateOrder do
   end
 
   defp leaves_qty!(msg) do
-    {:ok, leaves_qty} = msg |> Map.fetch!( "leavesQty") |> Decimal.cast()
+    {:ok, leaves_qty} = msg |> Map.fetch!("leavesQty") |> Decimal.cast()
     leaves_qty
   end
 end

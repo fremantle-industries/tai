@@ -103,8 +103,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
     GenServer.cast(pid, {:update, data, Timex.now()})
 
     assert_receive {:market_quote_store, :after_put, market_quote}
-    assert Enum.count(market_quote.bids) == 0
-    assert Enum.count(market_quote.asks) == 0
+    assert Enum.empty?(market_quote.bids)
+    assert Enum.empty?(market_quote.asks)
     assert %DateTime{} = market_quote.last_venue_timestamp
     assert market_quote.last_received_at != nil
   end

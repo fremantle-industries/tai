@@ -6,6 +6,6 @@ defmodule Tai.Orders.Transitions.RescueAmendErrorTest do
     transition = %Transitions.RescueAmendError{}
 
     attrs = Transitions.RescueAmendError.attrs(transition)
-    assert length(attrs) == 0
+    assert Enum.empty?(attrs)
   end
 end

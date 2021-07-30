@@ -177,8 +177,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
       GenServer.cast(pid, {:update, data, Timex.now()})
 
       assert_receive {:market_quote_store, :after_put, market_quote}
-      assert Enum.count(market_quote.bids) == 0
-      assert Enum.count(market_quote.asks) == 0
+      assert Enum.empty?(market_quote.bids)
+      assert Enum.empty?(market_quote.asks)
     end
 
     test "can delete existing price points from the order book with liquidations", %{pid: pid} do
@@ -203,8 +203,8 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessOrderBookTest do
       GenServer.cast(pid, {:update, data, Timex.now()})
 
       assert_receive {:market_quote_store, :after_put, market_quote}
-      assert Enum.count(market_quote.bids) == 0
-      assert Enum.count(market_quote.asks) == 0
+      assert Enum.empty?(market_quote.bids)
+      assert Enum.empty?(market_quote.asks)
     end
   end
 end
