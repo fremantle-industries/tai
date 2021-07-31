@@ -3,6 +3,7 @@ defmodule Tai.VenueAdapters.Bybit.Product do
 
   def build(%Derivatives.Symbol{} = symbol, venue_id) do
     type = symbol.name |> to_type()
+    expiry = symbol |> to_expiry(type)
 
     %Tai.Venues.Product{
       venue_id: venue_id,
@@ -15,6 +16,7 @@ defmodule Tai.VenueAdapters.Bybit.Product do
       venue_quote: symbol.quote_currency,
       status: symbol.status |> to_status(),
       type: type,
+      expiry: expiry,
       collateral: false,
       price_increment: Decimal.new(symbol.price_filter.tick_size),
       size_increment: Tai.Utils.Decimal.cast!(symbol.lot_size_filter.qty_step),
@@ -38,6 +40,25 @@ defmodule Tai.VenueAdapters.Bybit.Product do
     case String.match?(name, ~r/.+\d+$/) do
       true -> :future
       false -> :swap
+    end
+  end
+
+  @expiry_year ~r/.+(?<year>\d{2,2})$/
+  @expiry_month_and_day ~r/.+(?<month>\d{2,2})(?<day>\d{2,2})$/
+  @expiry_time Time.new!(8, 0, 0, 0)
+  defp to_expiry(symbol, type) do
+    case type do
+      :future ->
+        %{"year" => year_str} = Regex.named_captures(@expiry_year, symbol.name)
+        %{"month" => month_str, "day" => day_str} = Regex.named_captures(@expiry_month_and_day, symbol.alias)
+        {year, _} = "20#{year_str}" |> Integer.parse() # TODO: This is only going to work until 2099
+        {month, _} = month_str |> Integer.parse()
+        {day, _} = day_str |> Integer.parse()
+        date = Date.new!(year, month, day)
+        DateTime.new!(date, @expiry_time)
+
+      _ ->
+        nil
     end
   end
 

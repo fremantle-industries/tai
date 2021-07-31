@@ -43,7 +43,7 @@ defmodule Tai.VenuesAdapters.Bybit.ProductTest do
     end
 
     test "sets type to :future when it ends with digits and :swap otherwise" do
-      future_derivative_attrs = Map.merge(@base_derivative_attrs, %{name: "BTCUSDZ21"})
+      future_derivative_attrs = Map.merge(@base_derivative_attrs, %{name: "BTCUSDZ21", alias: "BTCUSD1231"})
       future_derivative_symbol = struct(Derivatives.Symbol, future_derivative_attrs)
       future_product = build(future_derivative_symbol, :venue_a)
       assert future_product.type == :future
@@ -55,7 +55,7 @@ defmodule Tai.VenuesAdapters.Bybit.ProductTest do
     end
 
     test "sets is_inverse to true for futures and swaps with USD quote currency" do
-      future_derivative_attrs = Map.merge(@base_derivative_attrs, %{name: "BTCUSDZ21"})
+      future_derivative_attrs = Map.merge(@base_derivative_attrs, %{name: "BTCUSDZ21", alias: "BTCUSD1231"})
       future_derivative_symbol = struct(Derivatives.Symbol, future_derivative_attrs)
       future_product = build(future_derivative_symbol, :venue_a)
       assert future_product.is_inverse == true
@@ -69,6 +69,18 @@ defmodule Tai.VenuesAdapters.Bybit.ProductTest do
       linear_swap_derivative_symbol = struct(Derivatives.Symbol, linear_swap_derivative_attrs)
       linear_swap_product = build(linear_swap_derivative_symbol, :venue_a)
       assert linear_swap_product.is_inverse == false
+    end
+
+    test "sets expiry for futures" do
+      future_derivative_attrs = Map.merge(@base_derivative_attrs, %{name: "BTCUSDZ21", alias: "BTCUSD1231"})
+      future_derivative_symbol = struct(Derivatives.Symbol, future_derivative_attrs)
+      future_product = build(future_derivative_symbol, :venue_a)
+      assert future_product.expiry == ~U[2021-12-31 08:00:00.000000Z]
+
+      swap_derivative_attrs = Map.merge(@base_derivative_attrs, %{name: "BTCUSD"})
+      swap_derivative_symbol = struct(Derivatives.Symbol, swap_derivative_attrs)
+      swap_product = build(swap_derivative_symbol, :venue_a)
+      assert swap_product.expiry == nil
     end
   end
 
