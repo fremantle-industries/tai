@@ -3,6 +3,8 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   Create orders for the Binance adapter
   """
 
+  alias ExBinance.Spot.Private
+
   @limit "LIMIT"
 
   def create_order(%Tai.Orders.Order{side: side, type: :limit} = order, credentials) do
@@ -10,7 +12,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     venue_side = side |> Atom.to_string() |> String.upcase()
     credentials = struct!(ExBinance.Credentials, credentials)
 
-    %ExBinance.Rest.Requests.CreateOrderRequest{
+    %Private.Requests.CreateOrderRequest{
       new_client_order_id: order.client_id,
       symbol: order.venue_product_symbol,
       side: venue_side,
@@ -20,7 +22,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
       price: order.price,
       time_in_force: venue_time_in_force
     }
-    |> ExBinance.Private.create_order(credentials)
+    |> Private.create_order(credentials)
     |> parse_response(order)
   end
 
@@ -29,11 +31,14 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
   defp to_venue_time_in_force(:ioc), do: "IOC"
 
   defp parse_response(
-         {:ok, %ExBinance.Rest.Responses.CreateOrderResponse{} = binance_response},
+         {:ok, %Private.Responses.CreateOrderResponse{} = binance_response},
          _
        ) do
     received_at = Tai.Time.monotonic_time()
-    venue_timestamp = binance_response.transact_time |> DateTime.from_unix!(:millisecond)
+
+    venue_timestamp =
+      binance_response.transact_time |> DateTime.from_unix!(:millisecond)
+
     venue_order_id = binance_response.order_id |> Integer.to_string()
 
     response = %Tai.Orders.Responses.CreateAccepted{
@@ -53,7 +58,7 @@ defmodule Tai.VenueAdapters.Binance.CreateOrder do
     error
   end
 
-  defp parse_response({:error, {:insufficient_balance, _}}, _) do
+  defp parse_response({:error, {:new_order_rejected, "Account has insufficient balance" <> _}}, _) do
     {:error, :insufficient_balance}
   end
 

@@ -2,7 +2,7 @@ defmodule Tai.VenueAdapters.Binance.Accounts do
   def accounts(venue_id, credential_id, credentials) do
     venue_credentials = struct!(ExBinance.Credentials, credentials)
 
-    with {:ok, venue_account} <- ExBinance.Private.account(venue_credentials) do
+    with {:ok, venue_account} <- ExBinance.Spot.Private.account(venue_credentials) do
       accounts = venue_account.balances |> Enum.map(&build(&1, venue_id, credential_id))
       {:ok, accounts}
     else
