@@ -45,7 +45,7 @@ defmodule Tai.Mixfile do
       {:ecto_term, "~> 0.0.1"},
       {:enumerati, "~> 0.0.8"},
       {:ex2ms, "~> 1.0"},
-      {:ex_binance, "~> 0.0.8"},
+      {:ex_binance, "~> 0.0.10"},
       # {:ex_bitmex, github: "fremantle-industries/ex_bitmex", branch: "main"},
       {:ex_bitmex, "~> 0.6.1"},
       # {:ex_bybit, "~> 0.0.1"},

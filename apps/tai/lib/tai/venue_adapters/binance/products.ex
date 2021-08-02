@@ -1,7 +1,7 @@
 defmodule Tai.VenueAdapters.Binance.Products do
   def products(venue_id) do
     with {:ok, %ExBinance.ExchangeInfo{symbols: venue_products}} <-
-           ExBinance.Public.exchange_info() do
+           ExBinance.Spot.Public.exchange_info() do
       products = Enum.map(venue_products, &build(&1, venue_id))
       {:ok, products}
     else
