@@ -45,12 +45,6 @@ if config_env() == :dev do
 
   config :tai,
     venues: %{
-      ftx: [
-        start_on_boot: true,
-        adapter: Tai.VenueAdapters.Ftx,
-        products: "btc/usd btc-perp btc-0924",
-        order_books: "* -btc-perp"
-      ],
       binance: [
         start_on_boot: true,
         adapter: Tai.VenueAdapters.Binance,
@@ -60,6 +54,18 @@ if config_env() == :dev do
         start_on_boot: true,
         adapter: Tai.VenueAdapters.Bybit,
         products: "*"
+      ],
+      gdax: [
+        start_on_boot: true,
+        adapter: Tai.VenueAdapters.Gdax,
+        products: "btc_usd eth_usd",
+        order_books: "* -eth_usd"
+      ],
+      ftx: [
+        start_on_boot: true,
+        adapter: Tai.VenueAdapters.Ftx,
+        products: "btc/usd btc-perp btc-0924",
+        order_books: "* -btc-perp"
       ]
     }
 end

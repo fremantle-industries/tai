@@ -70,40 +70,48 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
   @impl true
   def subscribe(:depth, state) do
-    channels =
-      state.order_books
-      |> stream_symbols
-      |> Enum.map(&"#{&1}@depth@100ms")
+    if Enum.any?(state.order_books) do
+      channels =
+        state.order_books
+        |> stream_symbols
+        |> Enum.map(&"#{&1}@depth@100ms")
 
-    msg =
-      %{
-        method: "SUBSCRIBE",
-        id: state.requests.next_request_id,
-        params: channels
-      }
-      |> Jason.encode!()
+      msg =
+        %{
+          method: "SUBSCRIBE",
+          id: state.requests.next_request_id,
+          params: channels
+        }
+        |> Jason.encode!()
 
-    state = state |> add_request()
-    {:reply, {:text, msg}, state}
+      state = state |> add_request()
+      {:reply, {:text, msg}, state}
+    else
+      {:ok, state}
+    end
   end
 
   @impl true
   def subscribe(:trades, state) do
-    channels =
-      state.order_books
-      |> stream_symbols
-      |> Enum.map(&"#{&1}@trade")
+    if Enum.any?(state.order_books) do
+      channels =
+        state.order_books
+        |> stream_symbols
+        |> Enum.map(&"#{&1}@trade")
 
-    msg =
-      %{
-        method: "SUBSCRIBE",
-        id: state.requests.next_request_id,
-        params: channels
-      }
-      |> Jason.encode!()
+      msg =
+        %{
+          method: "SUBSCRIBE",
+          id: state.requests.next_request_id,
+          params: channels
+        }
+        |> Jason.encode!()
 
-    state = state |> add_request()
-    {:reply, {:text, msg}, state}
+      state = state |> add_request()
+      {:reply, {:text, msg}, state}
+    else
+      {:ok, state}
+    end
   end
 
   @impl true

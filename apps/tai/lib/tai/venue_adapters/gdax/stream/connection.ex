@@ -42,10 +42,19 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
 
   @impl true
   def subscribe(:level2, state) do
-    product_ids = state.order_books |> Enum.map(& &1.venue_symbol)
-    msg = %{"type" => "subscribe", "channels" => ["level2"], "product_ids" => product_ids}
-    send(self(), {:send_msg, msg})
-    {:ok, state}
+    if Enum.any?(state.order_books) do
+      product_ids = state.order_books |> Enum.map(& &1.venue_symbol)
+      msg = %{
+        "type" => "subscribe",
+        "channels" => ["level2"],
+        "product_ids" => product_ids
+      }
+      |> Jason.encode!()
+
+      {:reply, {:text, msg}, state}
+    else
+      {:ok, state}
+    end
   end
 
   @order_book_msg_types ~w(l2update snapshot)
