@@ -98,6 +98,7 @@ defmodule Tai.Venues.Start.PositionsTest do
                 credentials: %{main: %{}},
                 accounts: "*",
                 products: "*",
+                order_books: "*",
                 timeout: 1_000
               )
 

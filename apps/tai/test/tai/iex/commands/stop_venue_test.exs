@@ -16,6 +16,7 @@ defmodule Tai.Commands.StopVenueTest do
       credentials: %{},
       accounts: "*",
       products: "*",
+      order_books: "*",
       timeout: 1_000
     )
 

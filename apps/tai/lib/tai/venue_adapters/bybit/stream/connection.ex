@@ -37,7 +37,7 @@ defmodule Tai.VenueAdapters.Bybit.Stream.Connection do
       routes: %{},
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
+      order_books: stream.order_books,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,

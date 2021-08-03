@@ -16,9 +16,9 @@ defmodule Tai.VenueAdapters.Gdax.Stream.RouteOrderBooks do
   @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
 
-  @spec start_link(venue_id: venue_id, products: [product]) :: GenServer.on_start()
-  def start_link(venue_id: venue_id, products: products) do
-    stores = products |> build_stores(venue_id)
+  @spec start_link(venue_id: venue_id, order_books: [product]) :: GenServer.on_start()
+  def start_link(venue_id: venue_id, order_books: order_books) do
+    stores = order_books |> build_stores(venue_id)
     state = %State{venue_id: venue_id, stores: stores}
     name = venue_id |> to_name()
 
@@ -56,8 +56,8 @@ defmodule Tai.VenueAdapters.Gdax.Stream.RouteOrderBooks do
   @spec to_name(venue_id) :: atom
   def to_name(venue_id), do: :"#{__MODULE__}_#{venue_id}"
 
-  defp build_stores(products, venue_id) do
-    products
+  defp build_stores(order_books, venue_id) do
+    order_books
     |> Enum.reduce(
       %{},
       &Map.put(&2, &1.venue_symbol, venue_id |> ProcessOrderBook.to_name(&1.venue_symbol))

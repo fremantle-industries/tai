@@ -16,6 +16,7 @@ defmodule Tai.IEx.Commands.StartVenueTest do
       credentials: %{},
       accounts: "*",
       products: "*",
+      order_books: "*",
       timeout: 1_000
     )
 

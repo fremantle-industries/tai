@@ -27,15 +27,15 @@ defmodule Tai.VenueAdapters.Huobi.StreamSupervisor do
 
     order_book_children =
       order_book_children(
-        stream.products,
+        stream.order_books,
         stream.venue.quote_depth,
         stream.venue.broadcast_change_set
       )
 
-    process_order_book_children = process_order_book_children(stream.products)
+    process_order_book_children = process_order_book_children(stream.order_books)
 
     system = [
-      {RouteOrderBooks, [venue: stream.venue.id, products: stream.products]},
+      {RouteOrderBooks, [venue: stream.venue.id, order_books: stream.order_books]},
       {ProcessOptionalChannels, [venue: stream.venue.id]},
       {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
     ]
@@ -47,13 +47,13 @@ defmodule Tai.VenueAdapters.Huobi.StreamSupervisor do
   # TODO: Make this configurable
   defp endpoint, do: "wss://www.hbdm.com/ws"
 
-  defp order_book_children(products, quote_depth, broadcast_change_set) do
-    products
+  defp order_book_children(order_books, quote_depth, broadcast_change_set) do
+    order_books
     |> Enum.map(&OrderBook.child_spec(&1, quote_depth, broadcast_change_set))
   end
 
-  defp process_order_book_children(products) do
-    products
+  defp process_order_book_children(order_books) do
+    order_books
     |> Enum.map(fn p ->
       %{
         id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),

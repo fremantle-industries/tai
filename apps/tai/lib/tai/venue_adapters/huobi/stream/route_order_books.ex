@@ -17,9 +17,9 @@ defmodule Tai.VenueAdapters.Huobi.Stream.RouteOrderBooks do
   @type product :: Tai.Venues.Product.t()
   @type state :: State.t()
 
-  @spec start_link(venue: venue_id, products: [product]) :: GenServer.on_start()
-  def start_link(venue: venue, products: products) do
-    stores = products |> build_stores()
+  @spec start_link(venue: venue_id, order_books: [product]) :: GenServer.on_start()
+  def start_link(venue: venue, order_books: order_books) do
+    stores = order_books |> build_stores()
     state = %State{venue: venue, stores: stores}
     name = venue |> to_name()
     GenServer.start_link(__MODULE__, state, name: name)
@@ -59,8 +59,8 @@ defmodule Tai.VenueAdapters.Huobi.Stream.RouteOrderBooks do
     {:noreply, state}
   end
 
-  defp build_stores(products) do
-    products
+  defp build_stores(order_books) do
+    order_books
     |> Enum.reduce(
       %{},
       fn p, acc ->

@@ -88,6 +88,7 @@ defmodule ExamplesSupport.E2E.PingPong do
         credentials: Map.put(%{}, @credential, %{}),
         accounts: "*",
         products: "*",
+        order_books: "*",
         quote_depth: 1,
         timeout: 1000
       )

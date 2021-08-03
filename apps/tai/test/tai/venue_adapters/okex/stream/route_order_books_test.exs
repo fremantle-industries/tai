@@ -10,7 +10,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.RouteOrderBooksTest do
   setup do
     name = ProcessOrderBook.to_name(@venue, @venue_symbol)
     Process.register(self(), name)
-    {:ok, pid} = start_supervised({RouteOrderBooks, [venue: @venue, products: [@product]]})
+    {:ok, pid} = start_supervised({RouteOrderBooks, [venue: @venue, order_books: [@product]]})
 
     {:ok, %{pid: pid}}
   end

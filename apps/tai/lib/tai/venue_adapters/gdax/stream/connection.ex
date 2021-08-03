@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
+      order_books: stream.order_books,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -42,7 +42,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
 
   @impl true
   def subscribe(:level2, state) do
-    product_ids = state.products |> Enum.map(& &1.venue_symbol)
+    product_ids = state.order_books |> Enum.map(& &1.venue_symbol)
     msg = %{"type" => "subscribe", "channels" => ["level2"], "product_ids" => product_ids}
     send(self(), {:send_msg, msg})
     {:ok, state}

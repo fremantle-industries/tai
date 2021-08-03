@@ -24,7 +24,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
+      order_books: stream.order_books,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -80,16 +80,16 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   end
 
   # Bitmex has an unpublished limit to websocket message lengths.
-  @products_chunk_count 10
+  @order_books_chunk_count 10
   @impl true
   def subscribe(:depth, state) do
     # > 25 quotes are experimental. It has performance issues causing message queue back pressure
     order_book_table = if state.quote_depth <= 25, do: "orderBookL2_25", else: "orderBookL2"
 
-    state.products
-    |> Enum.chunk_every(@products_chunk_count)
-    |> Enum.each(fn products ->
-      args = products |> Enum.map(fn p -> "#{order_book_table}:#{p.venue_symbol}" end)
+    state.order_books
+    |> Enum.chunk_every(@order_books_chunk_count)
+    |> Enum.each(fn order_books ->
+      args = order_books |> Enum.map(fn p -> "#{order_book_table}:#{p.venue_symbol}" end)
       msg = %{"op" => "subscribe", "args" => args}
       send(self(), {:send_msg, msg})
     end)
@@ -99,10 +99,10 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   @impl true
   def subscribe(:trades, state) do
-    state.products
-    |> Enum.chunk_every(@products_chunk_count)
-    |> Enum.each(fn products ->
-      args = products |> Enum.map(fn p -> "trade:#{p.venue_symbol}" end)
+    state.order_books
+    |> Enum.chunk_every(@order_books_chunk_count)
+    |> Enum.each(fn order_books ->
+      args = order_books |> Enum.map(fn p -> "trade:#{p.venue_symbol}" end)
       msg = %{"op" => "subscribe", "args" => args}
       send(self(), {:send_msg, msg})
     end)

@@ -24,6 +24,7 @@ defmodule ExamplesSupport.E2E.LogSpread do
         credentials: %{},
         accounts: "*",
         products: "*",
+        order_books: "*",
         quote_depth: 1,
         timeout: 1000
       )

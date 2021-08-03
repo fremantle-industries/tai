@@ -21,7 +21,8 @@ defmodule Tai.BootTest do
               log_spread: [
                 advisor: Examples.LogSpread.Advisor,
                 factory: Tai.Advisors.Factories.OnePerProduct,
-                products: "venue_a.btc_usdt venue_b.btc_usdt"
+                products: "venue_a.btc_usdt venue_b.btc_usdt",
+                order_books: "*"
               ]
             }
           )

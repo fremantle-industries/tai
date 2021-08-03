@@ -33,10 +33,10 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     children =
       []
       |> Enum.concat(
-        order_book_children(stream.products, venue.quote_depth, venue.broadcast_change_set)
+        order_book_children(stream.order_books, venue.quote_depth, venue.broadcast_change_set)
       )
-      |> Enum.concat(process_order_book_children(stream.products))
-      |> Enum.concat([{RouteOrderBooks, [venue_id: venue.id, products: stream.products]}])
+      |> Enum.concat(process_order_book_children(stream.order_books))
+      |> Enum.concat([{RouteOrderBooks, [venue_id: venue.id, order_books: stream.order_books]}])
 
     children =
       if credential != nil do
@@ -56,13 +56,13 @@ defmodule Tai.VenueAdapters.Bitmex.StreamSupervisor do
     |> Supervisor.init(strategy: :one_for_one)
   end
 
-  defp order_book_children(products, quote_depth, broadcast_change_set) do
-    products
+  defp order_book_children(order_books, quote_depth, broadcast_change_set) do
+    order_books
     |> Enum.map(&OrderBook.child_spec(&1, quote_depth, broadcast_change_set))
   end
 
-  defp process_order_book_children(products) do
-    products
+  defp process_order_book_children(order_books) do
+    order_books
     |> Enum.map(fn p ->
       %{
         id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),

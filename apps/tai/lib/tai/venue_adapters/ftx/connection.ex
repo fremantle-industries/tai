@@ -24,7 +24,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
+      order_books: stream.order_books,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -95,7 +95,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   @subscribe_orderbook_request %{"op" => "subscribe", "channel" => "orderbook"}
   @impl true
   def subscribe(:orderbook, state) do
-    state.products
+    state.order_books
     |> Enum.each(fn p ->
       msg = @subscribe_orderbook_request |> Map.put("market", p.venue_symbol)
       send(self(), {:send_msg, msg})

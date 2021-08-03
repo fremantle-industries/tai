@@ -48,7 +48,8 @@ if config_env() == :dev do
       ftx: [
         start_on_boot: true,
         adapter: Tai.VenueAdapters.Ftx,
-        products: "btc/usd btc-perp btc-0326"
+        products: "btc/usd btc-perp btc-0924",
+        order_books: "* -btc-perp"
       ],
       binance: [
         start_on_boot: true,

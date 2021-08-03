@@ -51,6 +51,7 @@ defmodule Tai.Venues.Start.AccountsTest do
                 credentials: %{main_a: %{}, main_b: %{}},
                 accounts: "*",
                 products: "*",
+                order_books: "*",
                 timeout: 1_000
               )
 

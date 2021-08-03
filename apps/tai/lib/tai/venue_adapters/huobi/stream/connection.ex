@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
+      order_books: stream.order_books,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -41,7 +41,7 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
 
   @impl true
   def subscribe(:init, state) do
-    state.products |> Enum.each(&send(self(), {:subscribe, {:depth, &1}}))
+    state.order_books |> Enum.each(&send(self(), {:subscribe, {:depth, &1}}))
     {:ok, state}
   end
 

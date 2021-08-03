@@ -16,6 +16,10 @@ defmodule Tai.Venue do
             String.t()
             | {module, func_name :: atom}
             | {module, func_name :: atom, func_args :: list},
+          order_books:
+            String.t()
+            | {module, func_name :: atom}
+            | {module, func_name :: atom, func_args :: list},
           accounts: String.t() | {module, func_name :: atom},
           credentials: credentials,
           quote_depth: pos_integer,
@@ -32,6 +36,7 @@ defmodule Tai.Venue do
     adapter
     channels
     products
+    order_books
     accounts
     credentials
     quote_depth
@@ -46,6 +51,7 @@ defmodule Tai.Venue do
     adapter
     channels
     products
+    order_books
     accounts
     credentials
     quote_depth

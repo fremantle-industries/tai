@@ -61,6 +61,7 @@ defmodule Tai.Venues.Start.SuccessTest do
            credentials: %{main_a: %{}, main_b: %{}, main_c: %{}},
            accounts: "*",
            products: "*",
+           order_books: "*",
            timeout: 100
          )
 

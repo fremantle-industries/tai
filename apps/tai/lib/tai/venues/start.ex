@@ -99,10 +99,11 @@ defmodule Tai.Venues.Start do
     {:ok, products} = state.products_reply
     {:ok, accounts} = state.accounts_reply
     {:ok, positions} = state.positions_reply
+    order_books = products |> filter_order_books(state.venue.order_books)
 
     stream = %Tai.Venues.Stream{
       venue: state.venue,
-      products: products,
+      order_books: order_books,
       accounts: accounts,
       positions: positions
     }
@@ -256,5 +257,13 @@ defmodule Tai.Venues.Start do
         {task, {:error, reason}}, acc -> [{task, reason} | acc]
       end
     )
+  end
+
+  defp filter_order_books(products, query) do
+    products
+    |> Enum.group_by(& &1.symbol)
+    |> Juice.squeeze(query)
+    |> Map.values()
+    |> Enum.flat_map(& &1)
   end
 end

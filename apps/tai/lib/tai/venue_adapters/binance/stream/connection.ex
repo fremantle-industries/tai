@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
+      order_books: stream.order_books,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -41,7 +41,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     name = stream.venue.id |> process_name()
     {:ok, pid} = WebSockex.start_link(endpoint, __MODULE__, state, name: name)
 
-    snapshot_order_books(stream.products, snapshot_depth)
+    snapshot_order_books(stream.order_books, snapshot_depth)
     {:ok, pid}
   end
 
@@ -71,7 +71,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   @impl true
   def subscribe(:depth, state) do
     channels =
-      state.products
+      state.order_books
       |> stream_symbols
       |> Enum.map(&"#{&1}@depth@100ms")
 
@@ -90,7 +90,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
   @impl true
   def subscribe(:trades, state) do
     channels =
-      state.products
+      state.order_books
       |> stream_symbols
       |> Enum.map(&"#{&1}@trade")
 
@@ -125,8 +125,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:ok, state}
   end
 
-  defp snapshot_order_books(products, depth) do
-    products
+  defp snapshot_order_books(order_books, depth) do
+    order_books
     |> Enum.map(fn product ->
       with {:ok, change_set} <- Stream.Snapshot.fetch(product, depth) do
         change_set |> Tai.Markets.OrderBook.replace()
@@ -136,8 +136,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     end)
   end
 
-  defp stream_symbols(products) do
-    products
+  defp stream_symbols(order_books) do
+    order_books
     |> Enum.map(& &1.venue_symbol)
     |> Enum.map(&String.downcase/1)
   end

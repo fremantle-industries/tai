@@ -33,7 +33,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
             routes: %{required(route) => atom},
             channels: [channel_name],
             credential: {Tai.Venue.credential_id(), map} | nil,
-            products: [Tai.Venues.Product.t()],
+            order_books: [Tai.Venues.Product.t()],
             quote_depth: pos_integer,
             heartbeat_interval: pos_integer,
             heartbeat_timeout: pos_integer,
@@ -48,7 +48,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       venue
       routes
       channels
-      products
+      order_books
       quote_depth
       heartbeat_interval
       heartbeat_timeout
@@ -59,7 +59,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       routes
       channels
       credential
-      products
+      order_books
       quote_depth
       heartbeat_interval
       heartbeat_timeout

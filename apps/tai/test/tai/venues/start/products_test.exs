@@ -60,6 +60,7 @@ defmodule Tai.Venues.Start.ProductsTest do
                 credentials: %{},
                 accounts: "*",
                 products: "*",
+                order_books: "*",
                 timeout: 1_000
               )
 

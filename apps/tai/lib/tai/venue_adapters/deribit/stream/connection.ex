@@ -16,7 +16,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
             routes: %{required(route) => atom},
             channels: [channel_name],
             credential: {credential_id, map} | nil,
-            products: [product],
+            order_books: [product],
             account_channels: %{optional(portfolio_channel) => account},
             quote_depth: pos_integer,
             opts: map,
@@ -31,7 +31,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       venue
       routes
       channels
-      products
+      order_books
       account_channels
       quote_depth
       opts
@@ -43,7 +43,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       routes
       channels
       credential
-      products
+      order_books
       account_channels
       quote_depth
       opts
@@ -74,7 +74,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
+      order_books: stream.order_books,
       account_channels: account_channels(stream.accounts),
       quote_depth: stream.venue.quote_depth,
       opts: stream.venue.opts,
@@ -137,7 +137,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   end
 
   def handle_info({:subscribe, :depth}, state) do
-    channels = state.products |> Enum.map(&"book.#{&1.venue_symbol}.none.20.100ms")
+    channels = state.order_books |> Enum.map(&"book.#{&1.venue_symbol}.none.20.100ms")
 
     msg =
       %{

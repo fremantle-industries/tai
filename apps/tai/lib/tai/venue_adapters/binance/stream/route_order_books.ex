@@ -16,9 +16,9 @@ defmodule Tai.VenueAdapters.Binance.Stream.RouteOrderBooks do
   @type venue_id :: Tai.Venue.id()
   @type product :: Tai.Venues.Product.t()
 
-  @spec start_link(venue_id: venue_id, products: [product]) :: GenServer.on_start()
-  def start_link(venue_id: venue_id, products: products) do
-    stores = products |> build_stores()
+  @spec start_link(venue_id: venue_id, order_books: [product]) :: GenServer.on_start()
+  def start_link(venue_id: venue_id, order_books: order_books) do
+    stores = order_books |> build_stores()
     state = %State{venue: venue_id, stores: stores}
     name = venue_id |> to_name()
 
@@ -45,8 +45,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.RouteOrderBooks do
     {:noreply, state}
   end
 
-  defp build_stores(products) do
-    products
+  defp build_stores(order_books) do
+    order_books
     |> Enum.reduce(
       %{},
       &Map.put(&2, &1.venue_symbol, &1.venue_id |> ProcessOrderBook.to_name(&1.venue_symbol))

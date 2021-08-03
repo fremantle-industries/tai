@@ -35,6 +35,13 @@ defmodule Tai.Venues.ConfigTest do
       assert Enum.at(venues, 0).products == "*"
     end
 
+    test "assigns all order books when not provided" do
+      config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).order_books == "*"
+    end
+
     test "assigns all accounts when not provided" do
       config = Tai.Config.parse(venues: %{venue_a: [enabled: true, adapter: MyAdapterA]})
 
@@ -112,6 +119,22 @@ defmodule Tai.Venues.ConfigTest do
 
       venues = Tai.Venues.Config.parse(config)
       assert Enum.at(venues, 0).products == "-btc_usd"
+    end
+
+    test "can provide an order book filter" do
+      config =
+        Tai.Config.parse(
+          venues: %{
+            venue_a: [
+              enabled: true,
+              adapter: MyAdapterA,
+              order_books: "-ltc_usd"
+            ]
+          }
+        )
+
+      venues = Tai.Venues.Config.parse(config)
+      assert Enum.at(venues, 0).order_books == "-ltc_usd"
     end
 
     test "can provide an accounts filter" do

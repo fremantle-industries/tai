@@ -25,7 +25,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      products: stream.products,
+      order_books: stream.order_books,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -71,21 +71,21 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   @impl true
   def subscribe(:orders, state) do
-    args = state.products |> Enum.map(&Stream.Channels.order/1)
+    args = state.order_books |> Enum.map(&Stream.Channels.order/1)
     msg = %{op: "subscribe", args: args} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
   @impl true
   def subscribe(:depth, state) do
-    args = state.products |> Enum.map(&Stream.Channels.depth/1)
+    args = state.order_books |> Enum.map(&Stream.Channels.depth/1)
     msg = %{op: "subscribe", args: args} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
   @impl true
   def subscribe(:trades, state) do
-    args = state.products |> Enum.map(&Stream.Channels.trade/1)
+    args = state.order_books |> Enum.map(&Stream.Channels.trade/1)
     msg = %{op: "subscribe", args: args} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
