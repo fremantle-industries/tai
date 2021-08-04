@@ -18,7 +18,7 @@
 * OTP application architecture best practices
   * [The Do’s and Don’ts of Error Handling](https://www.youtube.com/watch?v=TTM_b7EJg5E) (conference talk video 45 mins)
   * [Designing Elixir Systems With OTP: Write Highly Scalable, Self-healing Software with Layers](https://www.amazon.com/Designing-Elixir-Systems-OTP-Self-healing-ebook/dp/B084NRSQB4) (book)
-  * [Concurrent Data Processing in Elixir: Fast, Resilient Applications with OTP, GenStage, Flow, and Broadway](https://www.amazon.com/Concurrent-Data-Processing-Elixir-Applications/dp/1680508199/ref=sr_1_3?dchild=1&keywords=concurrent+data+processing+in+elixir&qid=1626638685&sr=8-3) (upcoming book)
+  * [Concurrent Data Processing in Elixir: Fast, Resilient Applications with OTP, GenStage, Flow, and Broadway](https://www.amazon.com/Concurrent-Data-Processing-Elixir-Applications/dp/1680508199/ref=sr_1_3?dchild=1&keywords=concurrent+data+processing+in+elixir&qid=1626638685&sr=8-3) (book)
 * Static analysis & type checking
   * https://elixirschool.com/en/lessons/advanced/typespec/ (wiki)
   * https://elixirschool.com/en/lessons/specifics/debugging/#dialyxir-and-dialyzer (wiki)
