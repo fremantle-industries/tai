@@ -54,7 +54,7 @@ Here's an example of an advisor that logs the spread between multiple products o
 ```elixir
 def deps do
   [
-    {:tai, "~> 0.0.67"}
+    {:tai, "~> 0.0.68"}
   ]
 end
 ```
