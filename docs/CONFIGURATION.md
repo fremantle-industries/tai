@@ -71,6 +71,11 @@ config :tai,
       # https://github.com/rupurt/juice#usage
       products: "eth_usd_200925 eth_usd_bi_quarter",
 
+      # [default: "*"] [optional] A `juice` query matching on alias and symbol, or `{module, func_name}`
+      # to filter streaming order books from available products. Juice query syntax is described in more
+      # detail at https://github.com/rupurt/juice#usage
+      order_books: "* -eth_usd_200925",
+
       # [default: 1] [optional] The number of streaming order book levels to maintain. This
       # value has adapter specific support. For example some venues may only allow you to
       # subscribe in blocks of 5 price points. So supported values for that venue
