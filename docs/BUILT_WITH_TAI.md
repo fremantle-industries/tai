@@ -6,7 +6,13 @@
 
 Manage & explore your trading operation across a globally distributed cluster.
 
-[![back-office-chart](https://github.com/fremantle-industries/workbench/blob/main/docs/live-balance-snapshots.png)](https://github.com/fremantle-industries/workbench)
+[![workbench-balances](https://github.com/fremantle-industries/workbench/blob/main/docs/live-balance-snapshots.png)](https://github.com/fremantle-industries/workbench)
+
+## [History](https://github.com/fremantle-industries/history)
+
+Download and warehouse historical trading data
+
+[![history-jobs](https://github.com/fremantle-industries/history/blob/main/docs/predicted-funding-rate-download.png)](https://github.com/fremantle-industries/history)
 
 ## [Oliya](https://github.com/blacksmith-capital/oliya)
 
