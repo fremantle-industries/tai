@@ -1,6 +1,6 @@
 # Examples
 
-[Built with Tai](../../docs/BUILT_WITH_TAI.md) | [Commands](../../docs/COMMANDS.md) | [Architecture](../../docs/ARCHITECTURE.md) | [Examples](./README.md) | [Configuration](../../docs/CONFIGURATION.md) | [Observability](../../docs/OBSERVABILITY.md)
+[Getting Started](../../docs/GETTING_STARTED.md) | [Built with Tai](../../docs/BUILT_WITH_TAI.md) | [Commands](../../docs/COMMANDS.md) | [Architecture](../../docs/ARCHITECTURE.md) | [Examples](./README.md) | [Configuration](../../docs/CONFIGURATION.md) | [Observability](../../docs/OBSERVABILITY.md)
 
 
 
