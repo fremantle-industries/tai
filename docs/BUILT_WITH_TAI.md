@@ -2,6 +2,12 @@
 
 [Getting Started](./GETTING_STARTED.md) | [Built with Tai](./BUILT_WITH_TAI.md) | [Commands](./COMMANDS.md) | [Architecture](./ARCHITECTURE.md) | [Examples](../apps/examples/README.md) | [Configuration](./CONFIGURATION.md) | [Observability](./OBSERVABILITY.md)
 
+## [Prop](https://github.com/fremantle-industries/prop)
+
+An open and opinionated trading platform using productive & familiar open source libraries and tools for strategy research, execution and operation.
+
+[![prop-station](https://github.com/fremantle-industries/prop/blob/main/docs/prop-station.png)](https://github.com/fremantle-industries/prop)
+
 ## [Workbench](https://github.com/fremantle-industries/workbench)
 
 Manage & explore your trading operation across a globally distributed cluster.
