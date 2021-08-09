@@ -49,7 +49,7 @@ defmodule Tai.Mixfile do
       # {:ex_bitmex, github: "fremantle-industries/ex_bitmex", branch: "main"},
       {:ex_bitmex, "~> 0.6.1"},
       # {:ex_bybit, github: "fremantle-industries/ex_bybit", branch: "main"},
-      {:ex_bybit, "~> 0.0.1"},
+      {:ex_bybit, "~> 0.1.0"},
       # {:ex_deribit, github: "fremantle-industries/ex_deribit", branch: "main"},
       {:ex_deribit, "~> 0.0.9"},
       # {:ex_ftx, github: "fremantle-industries/ex_ftx", branch: "main"},
