@@ -76,7 +76,7 @@ defmodule Tai.Markets.OrderBook do
   @spec child_spec(product, quote_depth, boolean) :: Supervisor.child_spec()
   def child_spec(product, quote_depth, broadcast_change_set) do
     %{
-      id: to_name(product.venue_id, product.symbol),
+      id: process_name(product.venue_id, product.symbol),
       start: {
         __MODULE__,
         :start_link,
@@ -92,7 +92,7 @@ defmodule Tai.Markets.OrderBook do
         quote_depth: quote_depth,
         broadcast_change_set: broadcast_change_set
       ) do
-    name = to_name(product.venue_id, product.symbol)
+    name = process_name(product.venue_id, product.symbol)
 
     state = %State{
       venue: product.venue_id,
@@ -108,20 +108,24 @@ defmodule Tai.Markets.OrderBook do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
+  @spec process_name(venue_id, product_symbol) :: atom
+  def process_name(venue, symbol), do: :"#{__MODULE__}_#{venue}_#{symbol}"
+
+  @deprecated "Use Tai.Markets.OrderBook.process_name/2 instead."
   @spec to_name(venue_id, product_symbol) :: atom
-  def to_name(venue, symbol), do: :"#{__MODULE__}_#{venue}_#{symbol}"
+  def to_name(venue, symbol), do: process_name(venue, symbol)
 
   @spec replace(ChangeSet.t()) :: :ok
   def replace(%OrderBook.ChangeSet{} = change_set) do
     change_set.venue
-    |> OrderBook.to_name(change_set.symbol)
+    |> OrderBook.process_name(change_set.symbol)
     |> GenServer.cast({:replace, change_set})
   end
 
   @spec apply(ChangeSet.t()) :: term
   def apply(%ChangeSet{} = change_set) do
     change_set.venue
-    |> OrderBook.to_name(change_set.symbol)
+    |> OrderBook.process_name(change_set.symbol)
     |> GenServer.cast({:apply, change_set})
   end
 

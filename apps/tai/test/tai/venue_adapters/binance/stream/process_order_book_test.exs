@@ -9,7 +9,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
              venue_symbol: "XBTUSD"
            )
   @topic {@product.venue_id, @product.symbol}
-  @order_book_name OrderBook.to_name(@product.venue_id, @product.venue_symbol)
+  @order_book_name OrderBook.process_name(@product.venue_id, @product.venue_symbol)
   @quote_depth 1
 
   setup do
