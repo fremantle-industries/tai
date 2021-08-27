@@ -13,6 +13,12 @@ defmodule Tai.VenueAdapters.Ftx.Product do
     defstruct ~w[type collateral collateral_weight expiry]a
   end
 
+  @type venue :: Tai.Venue.id()
+  @type product :: Tai.Venues.Product.t()
+  @type options :: Options.t()
+  @type market :: Market.t()
+
+  @spec build(market, venue, options) :: product
   def build(%Market{} = market, venue_id, options) do
     %Tai.Venues.Product{
       venue_id: venue_id,
@@ -24,7 +30,7 @@ defmodule Tai.VenueAdapters.Ftx.Product do
       venue_base: market.base_currency,
       venue_quote: market.quote_currency,
       status: market |> status(),
-      type: options.type,
+      type: {market, options} |> type(),
       listing: nil,
       expiry: options.expiry,
       collateral: options.collateral,
@@ -51,6 +57,19 @@ defmodule Tai.VenueAdapters.Ftx.Product do
 
   defp quote_currency(%Market{type: "spot"} = m), do: m.quote_currency |> downcase_and_atom()
   defp quote_currency(_), do: :usd
+
+  defp type({market, options}) do
+    cond do
+      market.type == "spot" -> :spot
+      String.ends_with?(market.name, "-PERP") -> :swap
+      String.ends_with?(market.name, "/USD") -> :leveraged_token
+      String.ends_with?(market.name, "/USDT") -> :leveraged_token
+      String.starts_with?(market.name, "BVOL") -> :bvol
+      String.starts_with?(market.name, "IBVOL") -> :ibvol
+      String.contains?(market.name, "-MOVE-") -> :move
+      true -> options.type || :future
+    end
+  end
 
   defp downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 end

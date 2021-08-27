@@ -61,7 +61,7 @@ defmodule Tai.Venues.Product do
 
   @type symbol :: atom
   @type venue_symbol :: String.t()
-  @type type :: :spot | :future | :swap | :option
+  @type type :: :spot | :future | :swap | :option | :leveraged_token | :bvol | :ibvol | :move
   @type t :: %Tai.Venues.Product{
           venue_id: Tai.Venue.id(),
           symbol: symbol,
