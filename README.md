@@ -41,6 +41,7 @@ Here's an example of an advisor that logs the spread between multiple products o
 | BTSE     |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
 | KuCoin   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
 | BitMax   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Bitget   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
 | MEXC     |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
 | PrimeXBT |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
 | Gate.io  |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
