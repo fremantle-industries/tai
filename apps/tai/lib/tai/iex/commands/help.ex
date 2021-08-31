@@ -22,6 +22,7 @@ defmodule Tai.IEx.Commands.Help do
     * venues [where: [...], order: [...]]
     * start_venue :venue_id
     * stop_venue :venue_id
+    * fleets [where: [...], order: [...]]
     * advisors [where: [...], order: [...]]
     * start_advisors [where: [...]]
     * stop_advisors [where: [...]]

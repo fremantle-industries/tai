@@ -55,6 +55,10 @@ defmodule Tai.IEx do
     to: Commands.StopVenue,
     as: :stop
 
+  @spec fleets() :: no_return
+  @spec fleets(Commands.Fleets.options()) :: no_return
+  defdelegate fleets(options \\ []), to: Commands.Fleets, as: :list
+
   @spec advisors() :: no_return
   @spec advisors(Commands.Advisors.options()) :: no_return
   defdelegate advisors(options \\ []), to: Commands.Advisors, as: :list

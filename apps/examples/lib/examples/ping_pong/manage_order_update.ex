@@ -1,10 +1,10 @@
 defmodule Examples.PingPong.ManageOrderUpdate do
-  alias Tai.{Advisor, Advisors}
+  alias Tai.{NewAdvisor, Advisors}
   alias Examples.PingPong
 
   @type order :: Tai.Orders.Order.t()
-  @type run_store :: Advisor.run_store()
-  @type state :: Advisor.State.t()
+  @type run_store :: NewAdvisor.run_store()
+  @type state :: NewAdvisor.State.t()
 
   @spec entry_order_updated(run_store, prev :: order, state) :: {:ok, run_store}
   def entry_order_updated(run_store, prev, state)
@@ -31,10 +31,6 @@ defmodule Examples.PingPong.ManageOrderUpdate do
     {:ok, run_store}
   end
 
-  defp advisor_process(state) do
-    Advisor.process_name(state.group_id, state.advisor_id)
-  end
-
   defp recreate_entry_order(entry_order, run_store, state) do
     venue = entry_order.venue |> String.to_atom()
     product_symbol = entry_order.product_symbol |> String.to_atom()
@@ -55,5 +51,9 @@ defmodule Examples.PingPong.ManageOrderUpdate do
       |> PingPong.CreateExitOrder.create(prev, entry_order, state.config)
 
     Map.put(run_store, :exit_order, exit_order)
+  end
+
+  defp advisor_process(state) do
+    NewAdvisor.process_name(state.fleet_id, state.advisor_id)
   end
 end

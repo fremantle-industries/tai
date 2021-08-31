@@ -191,11 +191,11 @@ defmodule ExamplesSupport.E2E.PingPong do
     Mocks.Responses.Orders.GoodTillCancel.cancel_accepted(@exit_venue_order_id)
   end
 
-  def advisor_group_config(:ping_pong) do
-    [
+  def fleet_config(:ping_pong) do
+    %{
       advisor: Examples.PingPong.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "test_exchange_a.btc_usd",
+      quotes: "test_exchange_a.btc_usd",
       config:
         {Examples.PingPong.Config,
          %{
@@ -203,6 +203,6 @@ defmodule ExamplesSupport.E2E.PingPong do
            fee: {{@venue, @product, @credential}, :fee},
            max_qty: {10, :decimal}
          }}
-    ]
+    }
   end
 end

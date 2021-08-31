@@ -10,12 +10,12 @@ defmodule Examples.PingPong.Advisor do
   real funds.
   """
 
-  use Tai.Advisor
+  use Tai.NewAdvisor
   import Examples.PingPong.ManageQuoteChange, only: [with_all_quotes: 1, manage_entry_order: 2]
   import Examples.PingPong.ManageOrderUpdate, only: [entry_order_updated: 3]
 
   @impl true
-  def handle_event(market_quote, state) do
+  def handle_market_quote(market_quote, state) do
     market_quote
     |> with_all_quotes()
     |> manage_entry_order(state)

@@ -1,6 +1,6 @@
 defmodule Examples.PingPong.ManageQuoteChangeTest do
   use Tai.TestSupport.DataCase, async: false
-  alias Tai.{Advisor, Advisors, Markets, Venues}
+  alias Tai.{NewAdvisor, Advisors, Markets, Venues}
   alias Examples.PingPong.ManageQuoteChange
 
   @venue :venue_a
@@ -30,7 +30,7 @@ defmodule Examples.PingPong.ManageQuoteChangeTest do
       })
 
       state_1 =
-        struct(Advisor.State,
+        struct(NewAdvisor.State,
           market_quotes: original_market_quotes,
           config: config,
           store: %{entry_order: entry_order}
@@ -51,7 +51,7 @@ defmodule Examples.PingPong.ManageQuoteChangeTest do
       changed_market_quotes = struct(Advisors.MarketQuotes, data: changed_market_quote_data)
 
       state_2 =
-        struct(Advisor.State,
+        struct(NewAdvisor.State,
           market_quotes: changed_market_quotes,
           config: config,
           store: %{entry_order: entry_order}

@@ -11,8 +11,8 @@ defmodule Examples.LogSpread.AdvisorTest do
 
   def after_boot_app do
     start_venue(@venue)
-    configure_advisor_group(@scenario)
-    start_advisors(where: [group_id: @scenario])
+    configure_fleet(@scenario)
+    start_advisors(where: [fleet_id: @scenario])
   end
 
   test "logs the bid/ask spread via a custom event" do

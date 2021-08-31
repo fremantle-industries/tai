@@ -12,12 +12,12 @@ config :libcluster,
 config :tai, send_orders: false
 
 config :tai,
-  advisor_groups: %{
-    log_spread: [
+  fleets: %{
+    log_spread: %{
       advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
       products: "binance.btc_usdt gdax.btc_usd"
-    ]
+    }
   }
 
 config :tai,

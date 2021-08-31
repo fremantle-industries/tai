@@ -6,24 +6,20 @@ defmodule Tai.BootTest do
 
   @venue_a struct(Tai.Venue, id: :venue_a)
   @venue_b struct(Tai.Venue, id: :venue_b)
-  @product_a struct(
-               Tai.Venues.Product,
-               venue_id: @venue_a.id,
-               symbol: :btc_usdt
-             )
-  @product_b struct(
-               Tai.Venues.Product,
-               venue_id: @venue_b.id,
-               symbol: :btc_usdt
-             )
   @config struct(Tai.Config,
-            advisor_groups: %{
-              log_spread: [
+            fleets: %{
+              log_spread_on_boot: %{
+                start_on_boot: true,
                 advisor: Examples.LogSpread.Advisor,
                 factory: Tai.Advisors.Factories.OnePerProduct,
-                products: "venue_a.btc_usdt venue_b.btc_usdt",
-                order_books: "*"
-              ]
+                quotes: "venue_a.btc_usdt"
+              },
+              log_spread_no_boot: %{
+                start_on_boot: false,
+                advisor: Examples.LogSpread.Advisor,
+                factory: Tai.Advisors.Factories.OnePerProduct,
+                quotes: "venue_b.btc_usdt"
+              }
             }
           )
 
@@ -44,8 +40,8 @@ defmodule Tai.BootTest do
   end
 
   setup do
-    :ok = Tai.Venues.ProductStore.upsert(@product_a)
-    :ok = Tai.Venues.ProductStore.upsert(@product_b)
+    mock_product(%{venue_id: :venue_a, symbol: :btc_usdt})
+    mock_product(%{venue_id: :venue_b, symbol: :btc_usdt})
     :ok
   end
 
@@ -60,7 +56,7 @@ defmodule Tai.BootTest do
   end
 
   describe "when all venues successfully start" do
-    test "initializes advisor specs" do
+    test "parses advisor fleets and starts those configured to boot" do
       TaiEvents.firehose_subscribe()
       start_supervised!({Tai.Boot, [id: @test_id, config: @config]})
 
@@ -72,7 +68,9 @@ defmodule Tai.BootTest do
 
       %Tai.Events.VenueStart{venue: @venue_b.id} |> TaiEvents.broadcast(:info)
       assert_event(%Tai.Events.BootAdvisors{} = event, :info, 1000)
-      assert event.total == 2
+      assert event.loaded_fleets == 2
+      assert event.loaded_advisors == 2
+      assert event.started_advisors == 1
     end
 
     test "calls the {module, func_name} after_boot hook from config" do

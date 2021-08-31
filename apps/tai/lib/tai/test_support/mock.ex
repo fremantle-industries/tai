@@ -65,6 +65,51 @@ defmodule Tai.TestSupport.Mock do
     |> Tai.Venues.AccountStore.put()
   end
 
+  @spec mock_fleet_config(map) :: {:ok, {record_key, record}}
+  def mock_fleet_config(attrs) do
+    factory = Map.get(attrs, :factory, Tai.Advisors.Factories.OnePerProduct)
+    advisor = Map.get(attrs, :advisor, Support.NoopAdvisor)
+    quotes = Map.get(attrs, :quotes, "")
+    config = Map.get(attrs, :config, %{})
+    start_on_boot = Map.get(attrs, :start_on_boot, false)
+    restart = Map.get(attrs, :restart, :temporary)
+    shutdown = Map.get(attrs, :shutdown, 5000)
+
+    required_attrs = attrs
+                     |> Map.put(:factory, factory)
+                     |> Map.put(:advisor, advisor)
+                     |> Map.put(:start_on_boot, start_on_boot)
+                     |> Map.put(:config, config)
+                     |> Map.put(:quotes, quotes)
+                     |> Map.put(:start_on_boot, start_on_boot)
+                     |> Map.put(:restart, restart)
+                     |> Map.put(:shutdown, shutdown)
+
+    fleet_config = struct(Tai.Fleets.FleetConfig, required_attrs)
+    Tai.Fleets.FleetConfigStore.put(fleet_config)
+  end
+
+  @spec mock_advisor_config(map) :: {:ok, {record_key, record}}
+  def mock_advisor_config(attrs) do
+    mod = Map.get(attrs, :mod, Support.NoopAdvisor)
+    quote_keys = Map.get(attrs, :quote_keys, [])
+    config = Map.get(attrs, :config, %{})
+    start_on_boot = Map.get(attrs, :start_on_boot, false)
+    restart = Map.get(attrs, :restart, :temporary)
+    shutdown = Map.get(attrs, :shutdown, 5000)
+
+    required_attrs = attrs
+                     |> Map.put(:mod, mod)
+                     |> Map.put(:config, config)
+                     |> Map.put(:quote_keys, quote_keys)
+                     |> Map.put(:start_on_boot, start_on_boot)
+                     |> Map.put(:restart, restart)
+                     |> Map.put(:shutdown, shutdown)
+
+    advisor_config = struct(Tai.Fleets.AdvisorConfig, required_attrs)
+    Tai.Fleets.AdvisorConfigStore.put(advisor_config)
+  end
+
   @spec push_market_data_snapshot(location :: location, bids :: map, asks :: map) :: no_return
   def push_market_data_snapshot(location, bids, asks) do
     :ok =
