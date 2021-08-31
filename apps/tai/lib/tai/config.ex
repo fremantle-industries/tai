@@ -41,6 +41,7 @@ defmodule Tai.Config do
   ```
   """
 
+  @type env :: [{Application.key(), Application.value()}]
   @type handler :: module
   @type func_name :: atom
   @type boot_args :: term
@@ -84,24 +85,37 @@ defmodule Tai.Config do
   ]a
 
   @spec parse() :: t
-  @spec parse([{Application.key(), Application.value()}]) :: t
+  @spec parse(env) :: t
   def parse(env \\ Application.get_all_env(:tai)) do
     %Tai.Config{
-      adapter_timeout: get(env, :adapter_timeout, 10_000),
-      advisor_groups: get(env, :advisor_groups, %{}),
+      adapter_timeout: get(env, :adapter_timeout),
+      advisor_groups: get(env, :advisor_groups),
       after_boot: get(env, :after_boot),
       after_boot_error: get(env, :after_boot_error),
       broadcast_change_set: !!get(env, :broadcast_change_set),
       logger: get(env, :logger),
-      order_workers: get(env, :order_workers, 5),
-      order_transition_workers: get(env, :order_transition_workers, 5),
-      order_workers_max_overflow: get(env, :order_workers_max_overflow, 2),
+      order_workers: get(env, :order_workers),
+      order_transition_workers: get(env, :order_transition_workers),
+      order_workers_max_overflow: get(env, :order_workers_max_overflow),
       send_orders: !!get(env, :send_orders),
-      system_bus_registry_partitions:
-        get(env, :system_bus_registry_partitions, System.schedulers_online()),
+      system_bus_registry_partitions: get(env, :system_bus_registry_partitions),
       venues: get(env, :venues, %{})
     }
   end
 
-  defp get(env, key, default \\ nil), do: Keyword.get(env, key, default)
+  @spec get(atom) :: term
+  def get(key), do: get(Application.get_all_env(:tai), key)
+
+  @spec get(env, atom) :: term
+  def get(env, :adapter_timeout = key), do: get(env, key, 10_000)
+  def get(env, :advisor_groups = key), do: get(env, key, %{})
+  def get(env, :order_transition_workers = key), do: get(env, key, 5)
+  def get(env, :order_workers = key), do: get(env, key, 5)
+  def get(env, :order_workers_max_overflow = key), do: get(env, key, 2)
+  def get(env, :system_bus_registry_partitions = key), do: get(env, key, System.schedulers_online())
+  def get(env, :venues = key), do: Keyword.get(env, key, %{})
+  def get(env, key), do: Keyword.get(env, key)
+
+  @spec get(env, atom, term) :: term
+  def get(env, key, default), do: Keyword.get(env, key, default)
 end

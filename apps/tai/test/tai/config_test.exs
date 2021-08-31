@@ -79,4 +79,38 @@ defmodule Tai.ConfigTest do
       assert config.venues == :venues
     end
   end
+
+  describe ".get/2" do
+    test ":adapter_timeout returns a default" do
+      assert Tai.Config.get([], :adapter_timeout) == 10_000
+    end
+
+    test ":advisor_groups returns a default" do
+      assert Tai.Config.get([], :advisor_groups) == %{}
+    end
+
+    test ":order_workers returns a default" do
+      assert Tai.Config.get([], :order_workers) == 5
+    end
+
+    test ":order_transition_workers returns a default" do
+      assert Tai.Config.get([], :order_transition_workers) == 5
+    end
+
+    test ":order_workers_max_overflow returns a default" do
+      assert Tai.Config.get([], :order_workers_max_overflow) == 2
+    end
+
+    test ":system_bus_registry_partitions returns a default" do
+      assert Tai.Config.get([], :system_bus_registry_partitions) == System.schedulers_online()
+    end
+
+    test ":venues returns a default" do
+      assert Tai.Config.get([], :venues) == %{}
+    end
+  end
+
+  test ".get/1 uses the tai application env" do
+    assert Tai.Config.get(:adapter_timeout) == 10_000
+  end
 end
