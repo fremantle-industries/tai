@@ -21,8 +21,6 @@ defmodule Tai.Application do
       Tai.Venues.VenueStore,
       Tai.Venues.StreamsSupervisor,
       Tai.Venues.Supervisor,
-      Tai.Advisors.SpecStore,
-      Tai.Advisors.Supervisor,
       Tai.NewAdvisors.Supervisor,
       Tai.Fleets.Supervisor,
       Tai.Commander,

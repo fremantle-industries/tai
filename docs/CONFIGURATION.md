@@ -42,9 +42,6 @@ config :tai, venues: %{}
 
 # [default: %{}] [optional] Map of configured fleets. See below for more details.
 config :tai, fleets: %{}
-
-# [default: %{}] [optional] Map of configured advisor groups. See below for more details.
-config :tai, advisor_groups: %{}
 ```
 
 ## Venues

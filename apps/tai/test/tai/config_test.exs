@@ -6,7 +6,6 @@ defmodule Tai.ConfigTest do
     test "returns a default representation" do
       assert %Tai.Config{} = config = Tai.Config.parse([])
       assert config.adapter_timeout == 10_000
-      assert config.advisor_groups == %{}
       assert config.after_boot == nil
       assert config.after_boot_error == nil
       assert config.broadcast_change_set == false
@@ -23,11 +22,6 @@ defmodule Tai.ConfigTest do
     test "can set adapter_timeout" do
       assert config = Tai.Config.parse(adapter_timeout: 5000)
       assert config.adapter_timeout == 5000
-    end
-
-    test "can set advisor_groups" do
-      assert config = Tai.Config.parse(advisor_groups: :advisor_groups)
-      assert config.advisor_groups == :advisor_groups
     end
 
     test "can set fleets" do
@@ -89,10 +83,6 @@ defmodule Tai.ConfigTest do
   describe ".get/2" do
     test ":adapter_timeout returns a default" do
       assert Tai.Config.get([], :adapter_timeout) == 10_000
-    end
-
-    test ":advisor_groups returns a default" do
-      assert Tai.Config.get([], :advisor_groups) == %{}
     end
 
     test ":fleets returns a default" do

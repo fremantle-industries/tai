@@ -38,9 +38,6 @@ defmodule Tai.Config do
 
   # [default: %{}] [optional] Map of configured fleets. See below for more details.
   config :tai, fleets: %{}
-
-  # [default: %{}] [optional] Map of configured fleets. See below for more details.
-  config :tai, advisor_groups: %{}
   ```
   """
 
@@ -51,7 +48,6 @@ defmodule Tai.Config do
   @type t :: %Tai.Config{
           adapter_timeout: pos_integer,
           fleets: map,
-          advisor_groups: map,
           after_boot: {handler, func_name} | {handler, func_name, boot_args} | nil,
           after_boot_error: {handler, func_name} | {handler, func_name, boot_args} | nil,
           broadcast_change_set: boolean,
@@ -67,7 +63,6 @@ defmodule Tai.Config do
   @enforce_keys ~w[
     adapter_timeout
     fleets
-    advisor_groups
     order_workers
     order_workers_max_overflow
     send_orders
@@ -77,7 +72,6 @@ defmodule Tai.Config do
   defstruct ~w[
     adapter_timeout
     fleets
-    advisor_groups
     after_boot
     after_boot_error
     broadcast_change_set
@@ -96,7 +90,6 @@ defmodule Tai.Config do
     %Tai.Config{
       adapter_timeout: get(env, :adapter_timeout),
       fleets: get(env, :fleets),
-      advisor_groups: get(env, :advisor_groups),
       after_boot: get(env, :after_boot),
       after_boot_error: get(env, :after_boot_error),
       broadcast_change_set: !!get(env, :broadcast_change_set),
@@ -116,7 +109,6 @@ defmodule Tai.Config do
   @spec get(env, atom) :: term
   def get(env, :adapter_timeout = key), do: get(env, key, 10_000)
   def get(env, :fleets = key), do: get(env, key, %{})
-  def get(env, :advisor_groups = key), do: get(env, key, %{})
   def get(env, :order_transition_workers = key), do: get(env, key, 5)
   def get(env, :order_workers = key), do: get(env, key, 5)
   def get(env, :order_workers_max_overflow = key), do: get(env, key, 2)
