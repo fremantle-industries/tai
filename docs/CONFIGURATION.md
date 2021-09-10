@@ -7,7 +7,7 @@ To quickly get started, take a look at the [example dev configuration](../config
 ## Global
 
 `tai` is configured with standard [Elixir](https://elixir-lang.org/getting-started/mix-otp/config-and-releases.html)
-constructs under the `:tai` key. Details for each configuration option are provided below:
+constructs under the `:tai` application key. Details for each configuration option are provided below:
 
 ```elixir
 # [default: 10_000] [optional] Adapter start timeout in milliseconds
@@ -121,8 +121,8 @@ end
 And configure it's log location:
 
 ```elixir
-# config/config.exs
-use Mix.Config
+# config/runtime.exs
+import Mix.Config
 
 config :logger, :file_log, path: "./log/#{Mix.env()}.log"
 config :logger, backends: [{LoggerFileBackend, :file_log}]
@@ -137,8 +137,8 @@ defp deps do
   {:logger_json, "~> 2.0.1"}
 end
 
-# config/config.exs
-use Mix.Config
+# config/runtime.exs
+import Mix.Config
 
 config :logger_json, :backend, metadata: :all
 config :logger, backends: [LoggerJSON]
