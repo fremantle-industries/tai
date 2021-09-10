@@ -5,6 +5,6 @@ defmodule Tai.Commander.StartAdvisors do
 
   @spec execute([opt]) :: {started :: non_neg_integer, already_started :: non_neg_integer}
   def execute(options) do
-    Tai.NewAdvisors.start(options)
+    Tai.Advisors.start(options)
   end
 end

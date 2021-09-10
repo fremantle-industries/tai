@@ -1,4 +1,4 @@
-defmodule Tai.NewAdvisor do
+defmodule Tai.Advisor do
   @moduledoc """
   A behavior for implementing a server that receives events such as market quotes.
 
@@ -36,16 +36,16 @@ defmodule Tai.NewAdvisor do
   @callback handle_market_quote(market_quote, state) :: {:ok, run_store}
 
   @spec process_name(fleet_id, advisor_id) :: advisor_name
-  def process_name(fleet_id, advisor_id), do: :"new_advisor_#{fleet_id}_#{advisor_id}"
+  def process_name(fleet_id, advisor_id), do: :"advisor_#{fleet_id}_#{advisor_id}"
 
   defmacro __using__(_) do
     quote location: :keep do
       use GenServer
 
-      @behaviour Tai.NewAdvisor
+      @behaviour Tai.Advisor
 
       def start_link(advisor_id: advisor_id, fleet_id: fleet_id, quote_keys: quote_keys, config: config, store: store) do
-        name = Tai.NewAdvisor.process_name(fleet_id, advisor_id)
+        name = Tai.Advisor.process_name(fleet_id, advisor_id)
         market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
 
         state = %State{
@@ -105,7 +105,7 @@ defmodule Tai.NewAdvisor do
               %{state | store: new_store}
             else
               unhandled ->
-                %Tai.Events.NewAdvisorHandleMarketQuoteInvalidReturn{
+                %Tai.Events.AdvisorHandleMarketQuoteInvalidReturn{
                   advisor_id: state.advisor_id,
                   fleet_id: state.fleet_id,
                   event: market_quote,
@@ -117,7 +117,7 @@ defmodule Tai.NewAdvisor do
             end
           rescue
             e ->
-              %Tai.Events.NewAdvisorHandleMarketQuoteError{
+              %Tai.Events.AdvisorHandleMarketQuoteError{
                 advisor_id: state.advisor_id,
                 fleet_id: state.fleet_id,
                 event: market_quote,

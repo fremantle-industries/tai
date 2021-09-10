@@ -5,6 +5,6 @@ defmodule Tai.Commander.StopAdvisors do
 
   @spec execute([opt]) :: {stopped :: non_neg_integer, already_stopped :: non_neg_integer}
   def execute(options) do
-    Tai.NewAdvisors.stop(options)
+    Tai.Advisors.stop(options)
   end
 end

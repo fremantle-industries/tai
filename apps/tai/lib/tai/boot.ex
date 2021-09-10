@@ -124,7 +124,7 @@ defmodule Tai.Boot do
     |> case do
       true ->
         {:ok, {loaded_fleets, loaded_advisors}} = Tai.Fleets.load(state.config.fleets)
-        {advisors_started, _} = Tai.NewAdvisors.start(where: [start_on_boot: true])
+        {advisors_started, _} = Tai.Advisors.start(where: [start_on_boot: true])
 
         %Tai.Events.BootAdvisors{
           loaded_fleets: loaded_fleets,

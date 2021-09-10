@@ -36,7 +36,7 @@ if config_env() == :dev do
   config :tai,
     fleets: %{
       new_log_spread: %{
-        advisor: Examples.LogSpread.NewAdvisor,
+        advisor: Examples.LogSpread.Advisor,
         factory: Tai.Advisors.Factories.OnePerProduct,
         quotes: "binance.btc_usdt ftx.btc-perp"
       }

@@ -1,9 +1,9 @@
-defmodule Tai.NewAdvisors.HandleMarketQuoteTest do
+defmodule Tai.Advisors.HandleMarketQuoteTest do
   use Tai.TestSupport.DataCase, async: false
   alias Tai.Markets.{Quote, PricePoint}
 
   defmodule MyAdvisor do
-    use Tai.NewAdvisor
+    use Tai.Advisor
 
     def handle_market_quote(market_quote, state) do
       if Map.has_key?(state.config, :error) do
@@ -26,7 +26,7 @@ defmodule Tai.NewAdvisors.HandleMarketQuoteTest do
   @symbol :btc_usd
   @fleet_id :fleet_a
   @advisor_id :my_advisor
-  @advisor_process Tai.NewAdvisor.process_name(@fleet_id, @advisor_id)
+  @advisor_process Tai.Advisor.process_name(@fleet_id, @advisor_id)
   @market_quote %Quote{
     venue_id: @venue,
     product_symbol: @symbol,
@@ -82,7 +82,7 @@ defmodule Tai.NewAdvisors.HandleMarketQuoteTest do
 
     assert_receive {
       TaiEvents.Event,
-      %Tai.Events.NewAdvisorHandleMarketQuoteInvalidReturn{} = event,
+      %Tai.Events.AdvisorHandleMarketQuoteInvalidReturn{} = event,
       :warn
     }
 
@@ -93,7 +93,7 @@ defmodule Tai.NewAdvisors.HandleMarketQuoteTest do
 
     send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
 
-    assert_receive {TaiEvents.Event, %Tai.Events.NewAdvisorHandleMarketQuoteInvalidReturn{} = event_2, _}
+    assert_receive {TaiEvents.Event, %Tai.Events.AdvisorHandleMarketQuoteInvalidReturn{} = event_2, _}
     assert event_2.return_value == {:unknown, :return_val}
   end
 
@@ -105,7 +105,7 @@ defmodule Tai.NewAdvisors.HandleMarketQuoteTest do
 
     assert_receive {
       TaiEvents.Event,
-      %Tai.Events.NewAdvisorHandleMarketQuoteError{} = event_1,
+      %Tai.Events.AdvisorHandleMarketQuoteError{} = event_1,
       :warn
     }
 
@@ -116,7 +116,7 @@ defmodule Tai.NewAdvisors.HandleMarketQuoteTest do
     assert [stack_1 | _] = event_1.stacktrace
 
     assert {
-             Tai.NewAdvisors.HandleMarketQuoteTest.MyAdvisor,
+             Tai.Advisors.HandleMarketQuoteTest.MyAdvisor,
              :handle_market_quote,
              2,
              [file: _, line: _]
@@ -126,7 +126,7 @@ defmodule Tai.NewAdvisors.HandleMarketQuoteTest do
 
     assert_receive {
       TaiEvents.Event,
-      %Tai.Events.NewAdvisorHandleMarketQuoteError{} = event_2,
+      %Tai.Events.AdvisorHandleMarketQuoteError{} = event_2,
       :warn
     }
 

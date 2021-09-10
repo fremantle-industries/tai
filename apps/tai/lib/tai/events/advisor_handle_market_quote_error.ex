@@ -1,4 +1,4 @@
-defmodule Tai.Events.NewAdvisorHandleMarketQuoteError do
+defmodule Tai.Events.AdvisorHandleMarketQuoteError do
   @type fleet_id :: Tai.Fleets.FleetConfig.id()
   @type advisor_id :: Tai.Fleets.AdvisorConfig.advisor_id()
   @type t :: %__MODULE__{

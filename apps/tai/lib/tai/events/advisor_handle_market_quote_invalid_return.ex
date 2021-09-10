@@ -1,9 +1,9 @@
-defmodule Tai.Events.NewAdvisorHandleMarketQuoteInvalidReturn do
+defmodule Tai.Events.AdvisorHandleMarketQuoteInvalidReturn do
   alias __MODULE__
 
   @type fleet_id :: Tai.Fleets.FleetConfig.id()
   @type advisor_id :: Tai.Fleets.AdvisorConfig.advisor_id()
-  @type t :: %NewAdvisorHandleMarketQuoteInvalidReturn{
+  @type t :: %AdvisorHandleMarketQuoteInvalidReturn{
           advisor_id: advisor_id,
           fleet_id: fleet_id,
           event: term,

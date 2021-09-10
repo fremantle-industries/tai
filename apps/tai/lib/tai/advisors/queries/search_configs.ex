@@ -1,4 +1,4 @@
-defmodule Tai.NewAdvisors.Queries.SearchConfigs do
+defmodule Tai.Advisors.Queries.SearchConfigs do
   @type store_id_opt :: {:store_id, atom}
   @type where_opt :: {:where, list}
   @type order_opt :: {:order, list}

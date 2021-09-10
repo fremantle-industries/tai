@@ -1,3 +1,3 @@
 defmodule Support.NoopAdvisor do
-  use Tai.NewAdvisor
+  use Tai.Advisor
 end

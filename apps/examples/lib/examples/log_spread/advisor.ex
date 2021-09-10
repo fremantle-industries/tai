@@ -6,7 +6,7 @@ defmodule Examples.LogSpread.Advisor do
   order book. This can happen when an order book infrequently gets updated.
   """
 
-  use Tai.NewAdvisor
+  use Tai.Advisor
 
   @impl true
   def handle_market_quote(

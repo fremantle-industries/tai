@@ -1,10 +1,10 @@
 defmodule Examples.PingPong.ManageOrderUpdate do
-  alias Tai.{NewAdvisor, Advisors}
+  alias Tai.{Advisor, Advisors}
   alias Examples.PingPong
 
   @type order :: Tai.Orders.Order.t()
-  @type run_store :: NewAdvisor.run_store()
-  @type state :: NewAdvisor.State.t()
+  @type run_store :: Advisor.run_store()
+  @type state :: Advisor.State.t()
 
   @spec entry_order_updated(run_store, prev :: order, state) :: {:ok, run_store}
   def entry_order_updated(run_store, prev, state)
@@ -54,6 +54,6 @@ defmodule Examples.PingPong.ManageOrderUpdate do
   end
 
   defp advisor_process(state) do
-    NewAdvisor.process_name(state.fleet_id, state.advisor_id)
+    Advisor.process_name(state.fleet_id, state.advisor_id)
   end
 end

@@ -1,17 +1,17 @@
-defmodule Tai.NewAdvisors.Queries.SearchInstances do
-  alias Tai.NewAdvisors
+defmodule Tai.Advisors.Queries.SearchInstances do
+  alias Tai.Advisors
 
-  @type result :: [NewAdvisors.Instance.t()]
+  @type result :: [Advisors.Instance.t()]
 
   @spec call(term) :: result
   def call(query) do
     query
-    |> NewAdvisors.Queries.SearchConfigs.call()
+    |> Advisors.Queries.SearchConfigs.call()
     |> Enum.map(fn c ->
       pid = whereis(c)
       status = to_status(pid)
 
-      %NewAdvisors.Instance{
+      %Advisors.Instance{
         advisor_id: c.advisor_id,
         fleet_id: c.fleet_id,
         start_on_boot: c.start_on_boot,
@@ -26,7 +26,7 @@ defmodule Tai.NewAdvisors.Queries.SearchInstances do
 
   defp whereis(advisor_config) do
     advisor_config
-    |> NewAdvisors.InstanceSupervisor.process_name()
+    |> Advisors.InstanceSupervisor.process_name()
     |> Process.whereis()
   end
 

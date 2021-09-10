@@ -1,4 +1,4 @@
-defmodule Tai.NewAdvisors.Supervisor do
+defmodule Tai.Advisors.Supervisor do
   use DynamicSupervisor
 
   @type advisor_config :: Tai.Fleets.AdvisorConfig.t()
@@ -12,7 +12,7 @@ defmodule Tai.NewAdvisors.Supervisor do
   @spec start_advisor(advisor_config) :: DynamicSupervisor.on_start_child()
   def start_advisor(advisor_config) do
     # TODO: Need the ability to set the instance supervisor on advisors
-    instance_supervisor = advisor_config.instance_supervisor || Tai.NewAdvisors.InstanceSupervisor
+    instance_supervisor = advisor_config.instance_supervisor || Tai.Advisors.InstanceSupervisor
     # TODO: Is this really the correct name?
     name = :"#{instance_supervisor}_#{advisor_config.fleet_id}_#{advisor_config.advisor_id}"
     spec = %{

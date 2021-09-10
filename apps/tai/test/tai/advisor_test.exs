@@ -1,15 +1,15 @@
-defmodule Tai.NewAdvisorTest do
+defmodule Tai.AdvisorTest do
   use Tai.TestSupport.DataCase, async: false
 
   defmodule NoOpAdvisor do
-    use Tai.NewAdvisor
+    use Tai.Advisor
     def handle_event(_, state), do: {:ok, state.store}
   end
 
   defmodule CallbackAdvisor do
-    use Tai.NewAdvisor
+    use Tai.Advisor
 
-    @registered_name Tai.NewAdvisorTest
+    @registered_name Tai.AdvisorTest
 
     def handle_event(_, state), do: {:ok, state.store}
 
@@ -41,7 +41,7 @@ defmodule Tai.NewAdvisorTest do
     advisor_pid = start!(CallbackAdvisor, :after_start, :my_advisor, [])
 
     assert_receive :after_start_callback
-    assert %Tai.NewAdvisor.State{store: store} = :sys.get_state(advisor_pid)
+    assert %Tai.Advisor.State{store: store} = :sys.get_state(advisor_pid)
     assert %{after_start_store: :is_updatable} = store
 
     Process.exit(advisor_pid, :kill)

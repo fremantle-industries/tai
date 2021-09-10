@@ -1,4 +1,4 @@
-defmodule Tai.NewAdvisors.InstanceSupervisor do
+defmodule Tai.Advisors.InstanceSupervisor do
   use Supervisor
 
   @moduledoc """
@@ -21,7 +21,7 @@ defmodule Tai.NewAdvisors.InstanceSupervisor do
 
   @spec advisor_child_spec(advisor_config) :: Supervisor.child_spec()
   def advisor_child_spec(advisor_config) do
-    name = Tai.NewAdvisor.process_name(advisor_config.fleet_id, advisor_config.advisor_id)
+    name = Tai.Advisor.process_name(advisor_config.fleet_id, advisor_config.advisor_id)
     start_args = [
       advisor_id: advisor_config.advisor_id,
       fleet_id: advisor_config.fleet_id,
