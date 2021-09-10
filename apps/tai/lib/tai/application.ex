@@ -1,5 +1,6 @@
 defmodule Tai.Application do
   use Application
+  require Logger
 
   def start(_type, _args) do
     Confex.resolve_env!(:tai)
@@ -20,8 +21,8 @@ defmodule Tai.Application do
       Tai.Venues.VenueStore,
       Tai.Venues.StreamsSupervisor,
       Tai.Venues.Supervisor,
-      Tai.Advisors.SpecStore,
       Tai.Advisors.Supervisor,
+      Tai.Fleets.Supervisor,
       Tai.Commander,
       Tai.Boot
     ]

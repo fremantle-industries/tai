@@ -6,7 +6,7 @@ defmodule Tai.IEx.Commands.StartAdvisors do
   @spec start(options) :: no_return
   def start(options) do
     {started, already_started} = Tai.Commander.start_advisors(options)
-    IO.puts("Started advisors: #{started} new, #{already_started} already running")
+    IO.puts("started advisors new=#{started}, already_running=#{already_started}")
     IEx.dont_display_result()
   end
 end

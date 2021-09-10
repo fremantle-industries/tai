@@ -31,10 +31,6 @@ defmodule Examples.PingPong.ManageOrderUpdate do
     {:ok, run_store}
   end
 
-  defp advisor_process(state) do
-    Advisor.process_name(state.group_id, state.advisor_id)
-  end
-
   defp recreate_entry_order(entry_order, run_store, state) do
     venue = entry_order.venue |> String.to_atom()
     product_symbol = entry_order.product_symbol |> String.to_atom()
@@ -55,5 +51,9 @@ defmodule Examples.PingPong.ManageOrderUpdate do
       |> PingPong.CreateExitOrder.create(prev, entry_order, state.config)
 
     Map.put(run_store, :exit_order, exit_order)
+  end
+
+  defp advisor_process(state) do
+    Advisor.process_name(state.fleet_id, state.advisor_id)
   end
 end

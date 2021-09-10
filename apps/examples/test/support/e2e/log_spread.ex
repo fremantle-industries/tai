@@ -43,11 +43,11 @@ defmodule ExamplesSupport.E2E.LogSpread do
     )
   end
 
-  def advisor_group_config(:log_spread) do
-    [
+  def fleet_config(:log_spread) do
+    %{
       advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "*"
-    ]
+      quotes: "*"
+    }
   end
 end

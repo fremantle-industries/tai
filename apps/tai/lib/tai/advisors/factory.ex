@@ -1,6 +1,6 @@
 defmodule Tai.Advisors.Factory do
-  @type group :: Tai.AdvisorGroup.t()
-  @type spec :: Tai.Advisors.Spec.t()
+  @type fleet_config :: Tai.Fleets.FleetConfig.t()
+  @type advisor_config :: Tai.Fleets.AdvisorConfig.t()
 
-  @callback advisor_specs(group) :: [spec]
+  @callback advisor_configs(fleet_config) :: [advisor_config]
 end

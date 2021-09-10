@@ -13,7 +13,6 @@ end
 # Toolkit
 config :tai, send_orders: false
 config :tai, broadcast_change_set: true
-config :tai, advisor_groups: %{}
 config :tai, venues: %{}
 
 # Logger
@@ -35,12 +34,12 @@ if config_env() == :dev do
   config :tai, Tai.Orders.OrderRepo, show_sensitive_data_on_connection_error: true
 
   config :tai,
-    advisor_groups: %{
-      log_spread: [
+    fleets: %{
+      new_log_spread: %{
         advisor: Examples.LogSpread.Advisor,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        products: "binance.btc_usdt ftx.btc_usd"
-      ]
+        quotes: "binance.btc_usdt ftx.btc-perp"
+      }
     }
 
   config :tai,
@@ -49,11 +48,6 @@ if config_env() == :dev do
         start_on_boot: true,
         adapter: Tai.VenueAdapters.Binance,
         products: "btc_usdt ltc_usdt eth_usdt"
-      ],
-      bybit: [
-        start_on_boot: true,
-        adapter: Tai.VenueAdapters.Bybit,
-        products: "*"
       ],
       gdax: [
         start_on_boot: true,
@@ -65,7 +59,7 @@ if config_env() == :dev do
         start_on_boot: true,
         adapter: Tai.VenueAdapters.Ftx,
         products: "btc/usd btc-perp btc-0924",
-        order_books: "* -btc-perp"
+        order_books: "* -btc/usd"
       ]
     }
 end

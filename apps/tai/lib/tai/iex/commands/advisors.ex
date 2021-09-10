@@ -2,10 +2,11 @@ defmodule Tai.IEx.Commands.Advisors do
   import Tai.IEx.Commands.Table, only: [render!: 2]
 
   @header [
-    "Group ID",
+    "Fleet ID",
     "Advisor ID",
     "Status",
-    "PID"
+    "PID",
+    "Config"
   ]
 
   @type store_id_opt :: {:store_id, atom}
@@ -25,10 +26,11 @@ defmodule Tai.IEx.Commands.Advisors do
     instances
     |> Enum.map(fn i ->
       [
-        i.group_id,
+        i.fleet_id,
         i.advisor_id,
         i.status,
-        i.pid
+        i.pid,
+        i.config
       ]
       |> Enum.map(&format_col/1)
     end)

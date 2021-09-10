@@ -81,14 +81,11 @@ defmodule Tai.TestSupport.E2ECase do
         scenario.push_stream_order_update(scenario_args, client_id)
       end
 
-      def configure_advisor_group(scenario_name) do
+      def configure_fleet(scenario_name) do
         scenario = fetch_mod!(scenario_name)
-        advisor_group_config = scenario.advisor_group_config(scenario_name)
-
-        Tai.Config
-        |> struct(advisor_groups: Map.put(%{}, scenario_name, advisor_group_config))
-        |> Tai.Advisors.Specs.from_config()
-        |> Enum.map(&Tai.Advisors.SpecStore.put/1)
+        scenario_fleet_config = scenario.fleet_config(scenario_name)
+        fleet_configs = Map.put(%{}, scenario_name, scenario_fleet_config)
+        Tai.Fleets.load(fleet_configs)
       end
 
       def start_advisors(args) do

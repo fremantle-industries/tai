@@ -1,5 +1,6 @@
 defmodule Tai.Boot do
   use GenServer
+  require Logger
 
   defmodule State do
     @enforce_keys ~w[config venues venue_replies]a
@@ -122,23 +123,13 @@ defmodule Tai.Boot do
     |> all_venue_replies_started?()
     |> case do
       true ->
-        advisor_specs =
-          state.config
-          |> Tai.Advisors.Specs.from_config()
-          |> Enum.map(&Tai.Advisors.SpecStore.put/1)
-          |> Enum.map(fn {:ok, {_, s}} -> s end)
-          |> Enum.map(&Tai.Advisors.Instance.from_spec/1)
-
-        start_on_boot_advisor_specs =
-          advisor_specs
-          |> Enumerati.filter(start_on_boot: true)
-
-        start_on_boot_advisor_specs
-        |> Tai.Advisors.Instances.start()
+        {:ok, {loaded_fleets, loaded_advisors}} = Tai.Fleets.load(state.config.fleets)
+        {advisors_started, _} = Tai.Advisors.start(where: [start_on_boot: true])
 
         %Tai.Events.BootAdvisors{
-          total: Enum.count(advisor_specs),
-          started: Enum.count(start_on_boot_advisor_specs)
+          loaded_fleets: loaded_fleets,
+          loaded_advisors: loaded_advisors,
+          started_advisors: advisors_started
         }
         |> TaiEvents.info()
 

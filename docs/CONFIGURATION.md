@@ -40,8 +40,8 @@ config :tai, system_bus_registry_partitions: 2
 # [default: %{}] [optional] Map of configured venues. See below for more details.
 config :tai, venues: %{}
 
-# [default: %{}] [optional] Map of configured advisor groups. See below for more details.
-config :tai, advisor_groups: %{}
+# [default: %{}] [optional] Map of configured fleets. See below for more details.
+config :tai, fleets: %{}
 ```
 
 ## Venues

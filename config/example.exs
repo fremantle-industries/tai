@@ -4,16 +4,16 @@ config :tai, send_orders: false
 config :tai, :broadcast_change_set, true
 
 config :tai,
-  advisor_groups: %{
-    log_spread: [
+  fleets: %{
+    log_spread: %{
       advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "binance.btc_usdt gdax.btc_usd"
-    ],
-    ping_pong: [
+      quotes: "binance.btc_usdt gdax.btc_usd"
+    },
+    ping_pong: %{
       advisor: Examples.PingPong.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "bitmex.xbtusd",
+      quotes: "bitmex.xbtusd",
       config:
         {Examples.PingPong.Config,
          %{
@@ -21,7 +21,7 @@ config :tai,
            fee: {{:bitmex, :xbtusd, :main}, :fee},
            max_qty: {5, :decimal}
          }}
-    ]
+    }
   }
 
 config :tai,

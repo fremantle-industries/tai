@@ -2,11 +2,11 @@ defmodule Examples.PingPong.ManageQuoteChange do
   alias Examples.PingPong.{CreateEntryOrder, EntryPrice}
   alias Tai.Orders.Order
   alias Tai.Markets.Quote
-  alias Tai.Advisor.State
+  alias Tai.Advisor
 
   @type market_quote :: Tai.Markets.Quote.t()
-  @type state :: Tai.Advisor.State.t()
-  @type run_store :: Tai.Advisor.run_store()
+  @type state :: Advisor.State.t()
+  @type run_store :: Advisor.run_store()
 
   @spec with_all_quotes(market_quote) ::
           {:ok, market_quote} | {:error, :no_bid | :no_ask | :no_bid_or_ask}
@@ -22,7 +22,7 @@ defmodule Examples.PingPong.ManageQuoteChange do
 
   def manage_entry_order(
         {:ok, _},
-        %State{store: %{entry_order: %Order{status: :open} = entry_order}} = state
+        %Advisor.State{store: %{entry_order: %Order{status: :open} = entry_order}} = state
       ) do
     {:ok, market_quote} =
       Tai.Advisors.MarketQuotes.for(
@@ -44,13 +44,13 @@ defmodule Examples.PingPong.ManageQuoteChange do
 
   def manage_entry_order(
         {:ok, _},
-        %State{store: %{entry_order: %Order{}}} = state
+        %Advisor.State{store: %{entry_order: %Order{}}} = state
       ) do
     {:ok, state.store}
   end
 
   def manage_entry_order({:ok, market_quote}, state) do
-    advisor_id = Tai.Advisor.process_name(state.group_id, state.advisor_id)
+    advisor_id = Advisor.process_name(state.fleet_id, state.advisor_id)
 
     {:ok, entry_order} = CreateEntryOrder.create(advisor_id, market_quote, state.config)
 

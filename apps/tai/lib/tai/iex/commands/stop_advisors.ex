@@ -6,7 +6,7 @@ defmodule Tai.IEx.Commands.StopAdvisors do
   @spec stop(options) :: no_return
   def stop(options) do
     {stopped, already_stopped} = Tai.Commander.stop_advisors(options)
-    IO.puts("Stopped advisors: #{stopped} new, #{already_stopped} already stopped")
+    IO.puts("stopped advisors new=#{stopped}, already_stopped=#{already_stopped}")
     IEx.dont_display_result()
   end
 end

@@ -9,7 +9,7 @@ defmodule Examples.LogSpread.Advisor do
   use Tai.Advisor
 
   @impl true
-  def handle_event(
+  def handle_market_quote(
         %Tai.Markets.Quote{bids: [inside_bid | _], asks: [inside_ask | _]} = market_quote,
         state
       ) do
@@ -34,5 +34,7 @@ defmodule Examples.LogSpread.Advisor do
   end
 
   @impl true
-  def handle_event(_, state), do: {:ok, state.store}
+  def handle_market_quote(_, state) do
+    {:ok, state.store}
+  end
 end

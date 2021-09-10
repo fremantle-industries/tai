@@ -1,11 +1,10 @@
 defmodule Tai.IEx.Commands.StopAdvisorsTest do
   use Tai.TestSupport.DataCase, async: false
   import ExUnit.CaptureIO
-  import Support.Advisors, only: [insert_spec: 1]
 
   setup do
-    insert_spec(%{group_id: :group_a, advisor_id: :main})
-    insert_spec(%{group_id: :group_b, advisor_id: :main})
+    mock_advisor_config(%{fleet_id: :fleet_a, advisor_id: :main})
+    mock_advisor_config(%{fleet_id: :fleet_b, advisor_id: :main})
 
     capture_io(&Tai.IEx.start_advisors/0)
 
@@ -14,21 +13,21 @@ defmodule Tai.IEx.Commands.StopAdvisorsTest do
 
   test "can stop all advisors" do
     assert capture_io(&Tai.IEx.stop_advisors/0) ==
-             "Stopped advisors: 2 new, 0 already stopped\n"
+             "stopped advisors new=2, already_stopped=0\n"
 
     output = capture_io(&Tai.IEx.advisors/0)
 
-    assert output =~ ~r/\|\s+group_a \|\s+main \|\s+unstarted \|\s+- \|/
-    assert output =~ ~r/\|\s+group_b \|\s+main \|\s+unstarted \|\s+- \|/
+    assert output =~ ~r/\|\s+fleet_a \|\s+main \|\s+unstarted \|\s+- \|/
+    assert output =~ ~r/\|\s+fleet_b \|\s+main \|\s+unstarted \|\s+- \|/
   end
 
   test "can filter advisors to stop by struct attributes" do
-    assert capture_io(fn -> Tai.IEx.stop_advisors(where: [group_id: :group_a]) end) ==
-             "Stopped advisors: 1 new, 0 already stopped\n"
+    assert capture_io(fn -> Tai.IEx.stop_advisors(where: [fleet_id: :fleet_a]) end) ==
+             "stopped advisors new=1, already_stopped=0\n"
 
     output = capture_io(&Tai.IEx.advisors/0)
 
-    assert output =~ ~r/\|\s+group_a \|\s+main \|\s+unstarted \|\s+- \|/
-    assert output =~ ~r/\|\s+group_b \|\s+main \|\s+running \|\s+#PID<.+> \|/
+    assert output =~ ~r/\|\s+fleet_a \|\s+main \|\s+unstarted \|\s+- \|/
+    assert output =~ ~r/\|\s+fleet_b \|\s+main \|\s+running \|\s+#PID<.+> \|/
   end
 end

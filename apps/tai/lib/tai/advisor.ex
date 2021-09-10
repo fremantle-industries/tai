@@ -6,65 +6,37 @@ defmodule Tai.Advisor do
   """
 
   defmodule State do
-    @type group_id :: Tai.AdvisorGroup.id()
-    @type id :: atom
-    @type product :: Tai.Venues.Product.t()
+    @type fleet_id :: Tai.Fleets.FleetConfig.id()
+    @type advisor_id :: Tai.Fleets.AdvisorConfig.advisor_id()
     @type config :: struct | map
     @type run_store :: map
     @type t :: %State{
-            group_id: group_id,
-            advisor_id: id,
-            products: [product],
+            fleet_id: fleet_id,
+            advisor_id: advisor_id,
             config: config,
-            store: run_store,
-            trades: list
+            store: run_store
           }
 
-    @enforce_keys ~w[advisor_id config group_id products store trades]a
-    defstruct ~w[advisor_id config group_id market_quotes products store trades]a
+    @enforce_keys ~w[advisor_id config fleet_id store]a
+    defstruct ~w[advisor_id config fleet_id store market_quotes]a
   end
 
   alias Tai.Markets.Quote
 
-  @type group_id :: Tai.AdvisorGroup.id()
-  @type id :: State.id()
+  @type fleet_id :: Tai.Fleets.FleetConfig.id()
+  @type advisor_id :: Tai.Fleets.AdvisorConfig.advisor_id()
   @type advisor_name :: atom
-  @type event :: term
+  @type market_quote :: Tai.Markets.Quote.t()
   @type run_store :: State.run_store()
   @type state :: State.t()
-  @type advisor_spec :: Tai.Advisors.Spec.t()
   @type terminate_reason :: :normal | :shutdown | {:shutdown, term} | term
 
   @callback after_start(state) :: {:ok, run_store}
   @callback on_terminate(terminate_reason, state) :: term
-  @callback handle_event(event, state) :: {:ok, run_store}
+  @callback handle_market_quote(market_quote, state) :: {:ok, run_store}
 
-  @spec process_name(group_id, id) :: advisor_name
-  def process_name(group_id, advisor_id), do: :"advisor_#{group_id}_#{advisor_id}"
-
-  @spec child_spec(advisor_spec) :: Supervisor.child_spec()
-  def child_spec(advisor_spec) do
-    run_store = advisor_spec.run_store || %{}
-    trades = advisor_spec.trades || []
-    name = process_name(advisor_spec.group_id, advisor_spec.advisor_id)
-
-    start_opts = [
-      group_id: advisor_spec.group_id,
-      advisor_id: advisor_spec.advisor_id,
-      products: advisor_spec.products,
-      config: advisor_spec.config,
-      store: run_store,
-      trades: trades
-    ]
-
-    %{
-      id: name,
-      start: {advisor_spec.mod, :start_link, [start_opts]},
-      restart: advisor_spec.restart,
-      shutdown: advisor_spec.shutdown,
-      type: :worker
-    }
-  end
+  @spec process_name(fleet_id, advisor_id) :: advisor_name
+  def process_name(fleet_id, advisor_id), do: :"advisor_#{fleet_id}_#{advisor_id}"
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -72,34 +44,25 @@ defmodule Tai.Advisor do
 
       @behaviour Tai.Advisor
 
-      def start_link(
-            group_id: group_id,
-            advisor_id: advisor_id,
-            products: products,
-            config: config,
-            store: store,
-            trades: trades
-          ) do
-        name = Tai.Advisor.process_name(group_id, advisor_id)
+      def start_link(advisor_id: advisor_id, fleet_id: fleet_id, quote_keys: quote_keys, config: config, store: store) do
+        name = Tai.Advisor.process_name(fleet_id, advisor_id)
         market_quotes = %Tai.Advisors.MarketQuotes{data: %{}}
 
         state = %State{
-          group_id: group_id,
           advisor_id: advisor_id,
-          products: products,
-          market_quotes: market_quotes,
+          fleet_id: fleet_id,
           config: config,
           store: store,
-          trades: trades
+          market_quotes: market_quotes
         }
 
-        GenServer.start_link(__MODULE__, state, name: name)
+        GenServer.start_link(__MODULE__, {state, quote_keys}, name: name)
       end
 
       @impl true
-      def init(state) do
+      def init({state, quote_keys}) do
         Process.flag(:trap_exit, true)
-        {:ok, state, {:continue, :started}}
+        {:ok, state, {:continue, {:subscribe, quote_keys}}}
       end
 
       @impl true
@@ -108,42 +71,44 @@ defmodule Tai.Advisor do
       end
 
       @impl true
-      def handle_info({:market_quote_store, :after_put, %Quote{} = event}, state) do
-        key = {event.venue_id, event.product_symbol}
-        new_data = Map.put(state.market_quotes.data, key, event)
+      def handle_info({:market_quote_store, :after_put, %Quote{} = market_quote}, state) do
+        key = {market_quote.venue_id, market_quote.product_symbol}
+        new_data = Map.put(state.market_quotes.data, key, market_quote)
         new_market_quotes = Map.put(state.market_quotes, :data, new_data)
         new_state = Map.put(state, :market_quotes, new_market_quotes)
 
         {
           :noreply,
           new_state,
-          {:continue, {:execute_event, event}}
+          {:continue, {:handle_market_quote, market_quote}}
         }
       end
 
       @impl true
-      def handle_continue(:started, state) do
+      def handle_continue({:subscribe, quote_keys}, state) do
+        quote_keys |> Enum.each(&Tai.SystemBus.subscribe({:market_quote_store, &1}))
+        {:noreply, state, {:continue, :after_start}}
+      end
+
+      @impl true
+      def handle_continue(:after_start, state) do
         {:ok, new_run_store} = after_start(state)
         new_state = Map.put(state, :store, new_run_store)
-
-        state.products
-        |> Enum.each(&Tai.SystemBus.subscribe({:market_quote_store, {&1.venue_id, &1.symbol}}))
-
         {:noreply, new_state}
       end
 
       @impl true
-      def handle_continue({:execute_event, event}, state) do
+      def handle_continue({:handle_market_quote, market_quote}, state) do
         new_state =
           try do
-            with {:ok, new_store} <- handle_event(event, state) do
-              Map.put(state, :store, new_store)
+            with {:ok, new_store} <- handle_market_quote(market_quote, state) do
+              %{state | store: new_store}
             else
               unhandled ->
-                %Tai.Events.AdvisorHandleEventInvalidReturn{
+                %Tai.Events.AdvisorHandleMarketQuoteInvalidReturn{
                   advisor_id: state.advisor_id,
-                  group_id: state.group_id,
-                  event: event,
+                  fleet_id: state.fleet_id,
+                  event: market_quote,
                   return_value: unhandled
                 }
                 |> TaiEvents.warn()
@@ -152,10 +117,10 @@ defmodule Tai.Advisor do
             end
           rescue
             e ->
-              %Tai.Events.AdvisorHandleEventError{
+              %Tai.Events.AdvisorHandleMarketQuoteError{
                 advisor_id: state.advisor_id,
-                group_id: state.group_id,
-                event: event,
+                fleet_id: state.fleet_id,
+                event: market_quote,
                 error: e,
                 stacktrace: __STACKTRACE__
               }
@@ -174,9 +139,9 @@ defmodule Tai.Advisor do
       def on_terminate(_, _), do: :ok
 
       @impl true
-      def handle_event(_, state), do: {:ok, state.store}
+      def handle_market_quote(_, state), do: {:ok, state.store}
 
-      defoverridable after_start: 1, on_terminate: 2, handle_event: 2
+      defoverridable after_start: 1, on_terminate: 2, handle_market_quote: 2
     end
   end
 end

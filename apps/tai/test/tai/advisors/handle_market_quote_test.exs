@@ -1,11 +1,11 @@
-defmodule Tai.Advisors.HandleEventTest do
-  use ExUnit.Case, async: false
+defmodule Tai.Advisors.HandleMarketQuoteTest do
+  use Tai.TestSupport.DataCase, async: false
   alias Tai.Markets.{Quote, PricePoint}
 
   defmodule MyAdvisor do
     use Tai.Advisor
 
-    def handle_event(market_quote, state) do
+    def handle_market_quote(market_quote, state) do
       if Map.has_key?(state.config, :error) do
         raise state.config.error
       end
@@ -24,10 +24,9 @@ defmodule Tai.Advisors.HandleEventTest do
 
   @venue :my_venue
   @symbol :btc_usd
-  @group_id :group_a
+  @fleet_id :fleet_a
   @advisor_id :my_advisor
-  @advisor_process Tai.Advisor.process_name(@group_id, @advisor_id)
-  @product struct(Tai.Venues.Product, %{venue_id: @venue, symbol: @symbol})
+  @advisor_process Tai.Advisor.process_name(@fleet_id, @advisor_id)
   @market_quote %Quote{
     venue_id: @venue,
     product_symbol: @symbol,
@@ -40,24 +39,18 @@ defmodule Tai.Advisors.HandleEventTest do
     start_supervised!({
       advisor,
       [
-        group_id: @group_id,
         advisor_id: @advisor_id,
-        products: [@product],
+        fleet_id: @fleet_id,
+        quote_keys: [{@venue, @symbol}],
         config: config,
-        store: %{event_counter: 0},
-        trades: []
+        store: %{event_counter: 0}
       ]
     })
   end
 
   setup do
-    on_exit(fn ->
-      :ok = Application.stop(:tai_events)
-      :ok = Application.stop(:tai)
-    end)
-
     Process.register(self(), :test)
-    {:ok, _} = Application.ensure_all_started(:tai)
+    mock_product(%{venue_id: @venue, symbol: @symbol})
 
     :ok
   end
@@ -89,18 +82,18 @@ defmodule Tai.Advisors.HandleEventTest do
 
     assert_receive {
       TaiEvents.Event,
-      %Tai.Events.AdvisorHandleEventInvalidReturn{} = event,
+      %Tai.Events.AdvisorHandleMarketQuoteInvalidReturn{} = event,
       :warn
     }
 
     assert event.advisor_id == :my_advisor
-    assert event.group_id == :group_a
+    assert event.fleet_id == :fleet_a
     assert event.event == @market_quote
     assert event.return_value == {:unknown, :return_val}
 
     send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
 
-    assert_receive {TaiEvents.Event, %Tai.Events.AdvisorHandleEventInvalidReturn{} = event_2, _}
+    assert_receive {TaiEvents.Event, %Tai.Events.AdvisorHandleMarketQuoteInvalidReturn{} = event_2, _}
     assert event_2.return_value == {:unknown, :return_val}
   end
 
@@ -112,19 +105,19 @@ defmodule Tai.Advisors.HandleEventTest do
 
     assert_receive {
       TaiEvents.Event,
-      %Tai.Events.AdvisorHandleEventError{} = event_1,
+      %Tai.Events.AdvisorHandleMarketQuoteError{} = event_1,
       :warn
     }
 
     assert event_1.advisor_id == :my_advisor
-    assert event_1.group_id == :group_a
+    assert event_1.fleet_id == :fleet_a
     assert event_1.event == @market_quote
     assert event_1.error == %RuntimeError{message: "!!!This is an ERROR!!!"}
     assert [stack_1 | _] = event_1.stacktrace
 
     assert {
-             Tai.Advisors.HandleEventTest.MyAdvisor,
-             :handle_event,
+             Tai.Advisors.HandleMarketQuoteTest.MyAdvisor,
+             :handle_market_quote,
              2,
              [file: _, line: _]
            } = stack_1
@@ -133,7 +126,7 @@ defmodule Tai.Advisors.HandleEventTest do
 
     assert_receive {
       TaiEvents.Event,
-      %Tai.Events.AdvisorHandleEventError{} = event_2,
+      %Tai.Events.AdvisorHandleMarketQuoteError{} = event_2,
       :warn
     }
 

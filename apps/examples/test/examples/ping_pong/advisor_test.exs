@@ -17,8 +17,8 @@ defmodule Examples.PingPong.AdvisorTest do
 
   def after_boot_app do
     start_venue(@venue)
-    configure_advisor_group(@scenario)
-    start_advisors(where: [group_id: @scenario])
+    configure_fleet(@scenario)
+    start_advisors(where: [fleet_id: @scenario])
   end
 
   test "create a passive buy entry order and flip it to a passive sell order upon fill" do
@@ -91,7 +91,7 @@ defmodule Examples.PingPong.AdvisorTest do
     assert exit_order_1.leaves_qty == Decimal.new(10)
 
     # clean up unfilled entry/exit orders when the advisor shuts down
-    stop_advisors(where: [group_id: @scenario])
+    stop_advisors(where: [fleet_id: @scenario])
     assert_receive {:order_updated, ^exit_order_1_client_id, %Transitions.AcceptCancel{}}
   end
 end

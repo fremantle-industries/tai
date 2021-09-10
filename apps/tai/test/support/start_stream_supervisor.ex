@@ -2,14 +2,17 @@ defmodule Support.StartStreamSupervisor do
   use Supervisor
 
   def start_link(stream) do
-    name = stream.venue.id |> to_name()
+    name = process_name(stream.venue.id)
     Supervisor.start_link(__MODULE__, stream, name: name)
   end
 
-  def init(_) do
-    []
-    |> Supervisor.init(strategy: :one_for_one)
-  end
+  def process_name(venue), do: :"#{__MODULE__}_#{venue}"
 
+  @deprecated "Use Support.StartStreamSupervisor.process_name/1 instead."
   def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+
+  def init(_) do
+    children = []
+    Supervisor.init(children, strategy: :one_for_one)
+  end
 end
