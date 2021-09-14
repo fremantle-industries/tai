@@ -12,13 +12,13 @@ defmodule Tai.BootTest do
                 start_on_boot: true,
                 advisor: Examples.LogSpread.Advisor,
                 factory: Tai.Advisors.Factories.OnePerProduct,
-                quotes: "venue_a.btc_usdt"
+                market_streams: "venue_a.btc_usdt"
               },
               log_spread_no_boot: %{
                 start_on_boot: false,
                 advisor: Examples.LogSpread.Advisor,
                 factory: Tai.Advisors.Factories.OnePerProduct,
-                quotes: "venue_b.btc_usdt"
+                market_streams: "venue_b.btc_usdt"
               }
             }
           )

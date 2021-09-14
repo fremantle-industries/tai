@@ -25,16 +25,16 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
     credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
     order_book_children =
-      order_book_children(
-        stream.order_books,
+      build_order_book_children(
+        stream.market_streams,
         stream.venue.quote_depth,
         stream.venue.broadcast_change_set
       )
 
-    process_order_book_children = process_order_book_children(stream.order_books)
+    process_order_book_children = build_process_order_book_children(stream.market_streams)
 
     system = [
-      {RouteOrderBooks, [venue_id: stream.venue.id, order_books: stream.order_books]},
+      {RouteOrderBooks, [venue_id: stream.venue.id, order_books: stream.market_streams]},
       {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
     ]
 
@@ -45,13 +45,13 @@ defmodule Tai.VenueAdapters.Deribit.StreamSupervisor do
   # TODO: Make this configurable
   defp endpoint, do: "wss://#{ExDeribit.HTTPClient.domain()}/ws#{ExDeribit.HTTPClient.api_path()}"
 
-  defp order_book_children(order_books, quote_depth, broadcast_change_set) do
-    order_books
+  defp build_order_book_children(market_streams, quote_depth, broadcast_change_set) do
+    market_streams
     |> Enum.map(&OrderBook.child_spec(&1, quote_depth, broadcast_change_set))
   end
 
-  defp process_order_book_children(order_books) do
-    order_books
+  defp build_process_order_book_children(market_streams) do
+    market_streams
     |> Enum.map(fn p ->
       %{
         id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),

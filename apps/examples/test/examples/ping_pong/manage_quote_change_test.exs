@@ -20,7 +20,7 @@ defmodule Examples.PingPong.ManageQuoteChangeTest do
       original_asks = [struct(Markets.PricePoint, price: 100.5)]
       original_market_quote = struct(Markets.Quote, asks: original_asks)
       original_market_quote_data = %{{@venue, @product_symbol} => original_market_quote}
-      original_market_quotes = struct(Advisors.MarketQuotes, data: original_market_quote_data)
+      original_market_quotes = struct(Advisors.MarketMap, data: original_market_quote_data)
 
       {:ok, entry_order} = create_open_order(%{
         price: Decimal.new(100),
@@ -48,7 +48,7 @@ defmodule Examples.PingPong.ManageQuoteChangeTest do
       changed_asks = [struct(Markets.PricePoint, price: 120)]
       changed_market_quote = struct(Markets.Quote, asks: changed_asks)
       changed_market_quote_data = %{{@venue, @product_symbol} => changed_market_quote}
-      changed_market_quotes = struct(Advisors.MarketQuotes, data: changed_market_quote_data)
+      changed_market_quotes = struct(Advisors.MarketMap, data: changed_market_quote_data)
 
       state_2 =
         struct(Advisor.State,

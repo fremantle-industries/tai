@@ -47,7 +47,7 @@ defmodule Tai.Fleets.Services.Load do
   defp build_fleet_config(fleet_id, attrs) do
     factory = fetch!(attrs, :factory)
     advisor = fetch!(attrs, :advisor)
-    quotes = fetch!(attrs, :quotes)
+    market_streams = get(attrs, :market_streams)
     start_on_boot = get(attrs, :start_on_boot)
     restart = get(attrs, :restart)
     shutdown = get(attrs, :shutdown)
@@ -57,7 +57,7 @@ defmodule Tai.Fleets.Services.Load do
       id: fleet_id,
       factory: factory,
       advisor: advisor,
-      quotes: quotes,
+      market_streams: market_streams,
       start_on_boot: start_on_boot,
       restart: restart,
       shutdown: shutdown,
@@ -74,6 +74,7 @@ defmodule Tai.Fleets.Services.Load do
   defp get(attrs, :start_on_boot = key), do: Map.get(attrs, key, false)
   defp get(attrs, :restart = key), do: Map.get(attrs, key, :temporary)
   defp get(attrs, :shutdown = key), do: Map.get(attrs, key, 5_000)
+  defp get(attrs, :market_streams = key), do: Map.get(attrs, key, "")
   defp get(attrs, :config = key) do
     case Map.get(attrs, key, %{}) do
       {s, c} -> struct!(s, c |> Tai.Advisors.Groups.RichConfig.parse())

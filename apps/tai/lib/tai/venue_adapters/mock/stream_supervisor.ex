@@ -19,8 +19,8 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
     credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
     order_book_children =
-      order_book_children(
-        stream.order_books,
+      build_order_book_children(
+        stream.markets,
         stream.venue.quote_depth,
         stream.venue.broadcast_change_set
       )
@@ -36,8 +36,8 @@ defmodule Tai.VenueAdapters.Mock.StreamSupervisor do
   # TODO: Make this configurable
   defp endpoint, do: "ws://localhost:#{EchoBoy.Config.port()}/ws"
 
-  defp order_book_children(order_books, quote_depth, broadcast_change_set) do
-    order_books
+  defp build_order_book_children(markets, quote_depth, broadcast_change_set) do
+    markets
     |> Enum.map(&OrderBook.child_spec(&1, quote_depth, broadcast_change_set))
   end
 end

@@ -69,7 +69,7 @@ defmodule Tai.TestSupport.Mock do
   def mock_fleet_config(attrs) do
     factory = Map.get(attrs, :factory, Tai.Advisors.Factories.OnePerProduct)
     advisor = Map.get(attrs, :advisor, Support.NoopAdvisor)
-    quotes = Map.get(attrs, :quotes, "")
+    market_streams = Map.get(attrs, :market_streams, "")
     config = Map.get(attrs, :config, %{})
     start_on_boot = Map.get(attrs, :start_on_boot, false)
     restart = Map.get(attrs, :restart, :temporary)
@@ -80,7 +80,7 @@ defmodule Tai.TestSupport.Mock do
                      |> Map.put(:advisor, advisor)
                      |> Map.put(:start_on_boot, start_on_boot)
                      |> Map.put(:config, config)
-                     |> Map.put(:quotes, quotes)
+                     |> Map.put(:market_streams, market_streams)
                      |> Map.put(:start_on_boot, start_on_boot)
                      |> Map.put(:restart, restart)
                      |> Map.put(:shutdown, shutdown)
@@ -92,7 +92,7 @@ defmodule Tai.TestSupport.Mock do
   @spec mock_advisor_config(map) :: {:ok, {record_key, record}}
   def mock_advisor_config(attrs) do
     mod = Map.get(attrs, :mod, Support.NoopAdvisor)
-    quote_keys = Map.get(attrs, :quote_keys, [])
+    market_stream_keys = Map.get(attrs, :market_stream_keys, [])
     config = Map.get(attrs, :config, %{})
     start_on_boot = Map.get(attrs, :start_on_boot, false)
     restart = Map.get(attrs, :restart, :temporary)
@@ -101,7 +101,7 @@ defmodule Tai.TestSupport.Mock do
     required_attrs = attrs
                      |> Map.put(:mod, mod)
                      |> Map.put(:config, config)
-                     |> Map.put(:quote_keys, quote_keys)
+                     |> Map.put(:market_stream_keys, market_stream_keys)
                      |> Map.put(:start_on_boot, start_on_boot)
                      |> Map.put(:restart, restart)
                      |> Map.put(:shutdown, shutdown)
@@ -110,16 +110,41 @@ defmodule Tai.TestSupport.Mock do
     Tai.Fleets.AdvisorConfigStore.put(advisor_config)
   end
 
-  @spec push_market_data_snapshot(location :: location, bids :: map, asks :: map) :: no_return
-  def push_market_data_snapshot(location, bids, asks) do
+  @spec push_order_book_snapshot(location, bids, asks) :: no_return
+        when bids: map, asks: map
+  def push_order_book_snapshot(location, bids, asks) do
     :ok =
       location.venue_id
       |> whereis_stream_connection
       |> send_json_msg(%{
-        type: :snapshot,
-        symbol: location.product_symbol,
+        type: :order_book_snapshot,
+        product_symbol: location.product_symbol,
         bids: bids,
         asks: asks
+      })
+  end
+
+  @deprecated "Use Tai.TestSupport.Mock.push_order_book_snapshot/3 instead."
+  @spec push_market_data_snapshot(location, bids, asks) :: no_return
+        when bids: map, asks: map
+  def push_market_data_snapshot(location, bids, asks) do
+    push_order_book_snapshot(location, bids, asks)
+  end
+
+  @spec push_trade(Tai.Markets.Trade.t()) :: no_return
+  def push_trade(trade) do
+    :ok =
+      trade.venue
+      |> whereis_stream_connection
+      |> send_json_msg(%{
+        type: :trade,
+        id: trade.id,
+        liquidation: trade.liquidation,
+        price: trade.price,
+        product_symbol: trade.product_symbol,
+        qty: trade.qty,
+        side: trade.side,
+        venue_timestamp: trade.venue_timestamp |> DateTime.to_iso8601()
       })
   end
 

@@ -16,7 +16,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
       auth: stream.venue.id |> Stream.ProcessAuth.process_name(),
-      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      markets: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
@@ -25,7 +25,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -71,21 +71,21 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   @impl true
   def subscribe(:orders, state) do
-    args = state.order_books |> Enum.map(&Stream.Channels.order/1)
+    args = state.markets |> Enum.map(&Stream.Channels.order/1)
     msg = %{op: "subscribe", args: args} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
   @impl true
   def subscribe(:depth, state) do
-    args = state.order_books |> Enum.map(&Stream.Channels.depth/1)
+    args = state.markets |> Enum.map(&Stream.Channels.depth/1)
     msg = %{op: "subscribe", args: args} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
 
   @impl true
   def subscribe(:trades, state) do
-    args = state.order_books |> Enum.map(&Stream.Channels.trade/1)
+    args = state.markets |> Enum.map(&Stream.Channels.trade/1)
     msg = %{op: "subscribe", args: args} |> Jason.encode!()
     {:reply, {:text, msg}, state}
   end
@@ -110,7 +110,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
 
   @impl true
   def on_msg(%{"table" => table} = msg, received_at, state) when table in @depth_tables do
-    msg |> forward(:order_books, received_at, state)
+    msg |> forward(:markets, received_at, state)
     {:ok, state}
   end
 

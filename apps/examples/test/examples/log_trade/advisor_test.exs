@@ -15,14 +15,18 @@ defmodule Examples.LogTrade.AdvisorTest do
     start_advisors(where: [fleet_id: @scenario])
   end
 
-  test "logs the bid/ask spread via a custom event" do
-    push_stream_market_data({@scenario, :snapshot, @venue, @product})
+  test "log streaming trades via a custom event" do
+    push_stream_trade({@scenario, :trade, @venue, @product})
 
-    assert_receive {TaiEvents.Event, %Examples.LogSpread.Events.Spread{} = event, _}
-    assert event.venue_id == @venue
+    assert_receive {TaiEvents.Event, %Examples.LogTrade.Events.Trade{} = event, _}
+    assert event.id != nil
+    assert event.venue == @venue
     assert event.product_symbol == @product
-    assert event.bid_price == Decimal.new("6500.1")
-    assert event.ask_price == Decimal.new("6500.11")
-    assert event.spread == Decimal.new("0.01")
+    assert event.price == Decimal.new("100.1")
+    assert event.qty == Decimal.new("7.0")
+    assert event.side == "buy"
+    assert event.liquidation == false
+    assert event.received_at != nil
+    assert %DateTime{} = event.venue_timestamp
   end
 end

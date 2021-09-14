@@ -9,8 +9,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.RouteOrderBooks do
     @type stores :: %{optional(venue_symbol) => store_name}
     @type t :: %State{venue: venue_id, stores: stores}
 
-    @enforce_keys ~w(venue stores)a
-    defstruct ~w(venue stores)a
+    @enforce_keys ~w[venue stores]a
+    defstruct ~w[venue stores]a
   end
 
   @type venue_id :: Tai.Venue.id()

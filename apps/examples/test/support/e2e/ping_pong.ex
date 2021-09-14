@@ -88,7 +88,7 @@ defmodule ExamplesSupport.E2E.PingPong do
         credentials: Map.put(%{}, @credential, %{}),
         accounts: "*",
         products: "*",
-        order_books: "*",
+        market_streams: "*",
         quote_depth: 1,
         timeout: 1000
       )
@@ -97,7 +97,7 @@ defmodule ExamplesSupport.E2E.PingPong do
 
   def push_stream_market_data({:ping_pong, :snapshot, venue_id, product_symbol})
       when venue_id == @venue and product_symbol == @product do
-    push_market_data_snapshot(
+    push_order_book_snapshot(
       %Tai.Markets.Location{
         venue_id: @venue,
         product_symbol: @product
@@ -109,7 +109,7 @@ defmodule ExamplesSupport.E2E.PingPong do
 
   def push_stream_market_data({:ping_pong, :change_1, venue_id, product_symbol})
       when venue_id == @venue and product_symbol == @product do
-    push_market_data_snapshot(
+    push_order_book_snapshot(
       %Tai.Markets.Location{
         venue_id: @venue,
         product_symbol: @product
@@ -195,7 +195,7 @@ defmodule ExamplesSupport.E2E.PingPong do
     %{
       advisor: Examples.PingPong.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      quotes: "test_exchange_a.btc_usd",
+      market_streams: "test_exchange_a.btc_usd",
       config:
         {Examples.PingPong.Config,
          %{

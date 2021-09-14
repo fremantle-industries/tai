@@ -16,7 +16,7 @@ defmodule Tai.Venue do
             String.t()
             | {module, func_name :: atom}
             | {module, func_name :: atom, func_args :: list},
-          order_books:
+          market_streams:
             String.t()
             | {module, func_name :: atom}
             | {module, func_name :: atom, func_args :: list},
@@ -36,7 +36,7 @@ defmodule Tai.Venue do
     adapter
     channels
     products
-    order_books
+    market_streams
     accounts
     credentials
     quote_depth
@@ -51,7 +51,7 @@ defmodule Tai.Venue do
     adapter
     channels
     products
-    order_books
+    market_streams
     accounts
     credentials
     quote_depth

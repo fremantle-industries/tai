@@ -23,13 +23,13 @@ defmodule Tai.VenueAdapters.Ftx.Stream.ProcessOrderBook do
   @spec start_link(product) :: GenServer.on_start()
   def start_link(product) do
     state = %State{venue: product.venue_id, symbol: product.symbol, table: %{}}
-    name = to_name(product.venue_id, product.venue_symbol)
+    name = process_name(product.venue_id, product.venue_symbol)
 
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  @spec to_name(venue_id, venue_symbol) :: atom
-  def to_name(venue, symbol), do: :"#{__MODULE__}_#{venue}_#{symbol}"
+  @spec process_name(venue_id, venue_symbol) :: atom
+  def process_name(venue, symbol), do: :"#{__MODULE__}_#{venue}_#{symbol}"
 
   @impl true
   def init(state), do: {:ok, state}

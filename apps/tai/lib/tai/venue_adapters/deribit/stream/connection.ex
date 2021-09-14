@@ -9,14 +9,14 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
     @type credential_id :: Tai.Venue.credential_id()
     @type channel_name :: atom
     @type portfolio_channel :: String.t()
-    @type route :: :order_books
+    @type route :: :markets
     @type jsonrpc_id :: non_neg_integer
     @type t :: %State{
             venue: venue,
             routes: %{required(route) => atom},
             channels: [channel_name],
             credential: {credential_id, map} | nil,
-            order_books: [product],
+            markets: [product],
             account_channels: %{optional(portfolio_channel) => account},
             quote_depth: pos_integer,
             opts: map,
@@ -31,7 +31,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       venue
       routes
       channels
-      order_books
+      markets
       account_channels
       quote_depth
       opts
@@ -43,7 +43,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       routes
       channels
       credential
-      order_books
+      markets
       account_channels
       quote_depth
       opts
@@ -66,7 +66,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
         ) :: {:ok, pid} | {:error, term}
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name()
+      markets: stream.venue.id |> Stream.RouteOrderBooks.to_name()
     }
 
     state = %State{
@@ -74,7 +74,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       account_channels: account_channels(stream.accounts),
       quote_depth: stream.venue.quote_depth,
       opts: stream.venue.opts,
@@ -137,7 +137,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   end
 
   def handle_info({:subscribe, :depth}, state) do
-    channels = state.order_books |> Enum.map(&"book.#{&1.venue_symbol}.none.20.100ms")
+    channels = state.markets |> Enum.map(&"book.#{&1.venue_symbol}.none.20.100ms")
 
     msg =
       %{
@@ -224,7 +224,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
          } = msg,
          state
        ) do
-    msg |> forward(:order_books, state)
+    msg |> forward(:markets, state)
     {:ok, state}
   end
 

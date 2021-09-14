@@ -4,7 +4,7 @@ defmodule Tai.IEx.Commands.Fleets do
   @header [
     "ID",
     "Start on Boot",
-    "Quotes",
+    "Market Streams",
     "Factory",
     "Advisor"
   ]
@@ -28,7 +28,7 @@ defmodule Tai.IEx.Commands.Fleets do
       [
         f.id,
         f.start_on_boot,
-        f.quotes,
+        f.market_streams,
         f.factory,
         f.advisor
       ]

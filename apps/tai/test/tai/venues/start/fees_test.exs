@@ -83,7 +83,7 @@ defmodule Tai.Venues.Start.FeesTest do
                 credentials: %{main: %{}},
                 accounts: "*",
                 products: "*",
-                order_books: "*",
+                market_streams: "*",
                 timeout: 1_000
               )
 

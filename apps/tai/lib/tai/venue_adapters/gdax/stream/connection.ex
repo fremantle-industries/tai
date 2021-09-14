@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
         ) :: {:ok, pid} | {:error, term}
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      markets: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -42,8 +42,8 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
 
   @impl true
   def subscribe(:level2, state) do
-    if Enum.any?(state.order_books) do
-      product_ids = state.order_books |> Enum.map(& &1.venue_symbol)
+    if Enum.any?(state.markets) do
+      product_ids = state.markets |> Enum.map(& &1.venue_symbol)
       msg = %{
         "type" => "subscribe",
         "channels" => ["level2"],
@@ -60,7 +60,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.Connection do
   @order_book_msg_types ~w(l2update snapshot)
   @impl true
   def on_msg(%{"type" => type} = msg, received_at, state) when type in @order_book_msg_types do
-    msg |> forward(:order_books, received_at, state)
+    msg |> forward(:markets, received_at, state)
     {:ok, state}
   end
 

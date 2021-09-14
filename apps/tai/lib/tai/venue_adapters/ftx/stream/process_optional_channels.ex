@@ -15,12 +15,12 @@ defmodule Tai.VenueAdapters.Ftx.Stream.ProcessOptionalChannels do
   @spec start_link(venue: venue_id) :: GenServer.on_start()
   def start_link(venue: venue) do
     state = %State{venue: venue}
-    name = venue |> to_name()
+    name = venue |> process_name()
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  @spec to_name(venue_id) :: atom
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
+  @spec process_name(venue_id) :: atom
+  def process_name(venue), do: :"#{__MODULE__}_#{venue}"
 
   @impl true
   def init(state), do: {:ok, state}

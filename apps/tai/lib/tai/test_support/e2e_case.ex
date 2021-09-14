@@ -76,6 +76,11 @@ defmodule Tai.TestSupport.E2ECase do
         scenario.push_stream_market_data(args)
       end
 
+      def push_stream_trade({scenario_name, _, _, _} = args) do
+        scenario = fetch_mod!(scenario_name)
+        scenario.push_stream_trade(args)
+      end
+
       def push_stream_order_update({scenario_name, _, _, _} = scenario_args, client_id) do
         scenario = fetch_mod!(scenario_name)
         scenario.push_stream_order_update(scenario_args, client_id)

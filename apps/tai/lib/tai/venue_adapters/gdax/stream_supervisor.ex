@@ -26,16 +26,16 @@ defmodule Tai.VenueAdapters.Gdax.StreamSupervisor do
     credential = stream.venue.credentials |> Map.to_list() |> List.first()
 
     order_book_children =
-      order_book_children(
-        stream.order_books,
+      build_order_book_children(
+        stream.markets,
         stream.venue.quote_depth,
         stream.venue.broadcast_change_set
       )
 
-    process_order_book_children = process_order_book_children(stream.order_books)
+    process_order_book_children = build_process_order_book_children(stream.markets)
 
     system = [
-      {RouteOrderBooks, [venue_id: stream.venue.id, order_books: stream.order_books]},
+      {RouteOrderBooks, [venue_id: stream.venue.id, order_books: stream.markets]},
       {ProcessOptionalChannels, [venue_id: stream.venue.id]},
       {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
     ]
@@ -47,13 +47,13 @@ defmodule Tai.VenueAdapters.Gdax.StreamSupervisor do
   # TODO: Make this configurable
   defp endpoint, do: "wss://ws-feed.pro.coinbase.com/"
 
-  defp order_book_children(order_books, quote_depth, broadcast_change_set) do
-    order_books
+  defp build_order_book_children(markets, quote_depth, broadcast_change_set) do
+    markets
     |> Enum.map(&OrderBook.child_spec(&1, quote_depth, broadcast_change_set))
   end
 
-  defp process_order_book_children(order_books) do
-    order_books
+  defp build_process_order_book_children(markets) do
+    markets
     |> Enum.map(fn p ->
       %{
         id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),
