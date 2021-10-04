@@ -1,10 +1,8 @@
 defmodule Tai.Advisors.MarketQuotes do
-  alias Tai.Advisors.MarketQuotes
-
   @type venue_id :: Tai.Venue.id()
   @type product_symbol :: Tai.Venues.Product.symbol()
   @type market_quote :: Tai.Markets.Quote.t()
-  @type t :: %MarketQuotes{
+  @type t :: %__MODULE__{
           data: %{
             {venue_id, product_symbol} => market_quote
           }
