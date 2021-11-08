@@ -60,10 +60,16 @@ defmodule Tai.VenueAdapters.Ftx.Product do
 
   defp type({market, options}) do
     cond do
+      String.ends_with?(market.name, "BULL/USD") -> :leveraged_token
+      String.ends_with?(market.name, "BULL/USDT") -> :leveraged_token
+      String.ends_with?(market.name, "BEAR/USD") -> :leveraged_token
+      String.ends_with?(market.name, "BEAR/USDT") -> :leveraged_token
+      String.ends_with?(market.name, "HEDGE/USD") -> :leveraged_token
+      String.ends_with?(market.name, "HEDGE/USDT") -> :leveraged_token
+      String.ends_with?(market.name, "HALF/USD") -> :leveraged_token
+      String.ends_with?(market.name, "HALF/USDT") -> :leveraged_token
       market.type == "spot" -> :spot
       String.ends_with?(market.name, "-PERP") -> :swap
-      String.ends_with?(market.name, "/USD") -> :leveraged_token
-      String.ends_with?(market.name, "/USDT") -> :leveraged_token
       String.starts_with?(market.name, "BVOL") -> :bvol
       String.starts_with?(market.name, "IBVOL") -> :ibvol
       String.contains?(market.name, "-MOVE-") -> :move
