@@ -43,6 +43,7 @@ jobs:
 
       - name: Test
         env:
+          CI: true
           BINANCE_API_KEY: ./secrets/ci/binance_api_key
           BINANCE_API_SECRET: ./secrets/ci/binance_api_secret
           BITMEX_API_KEY: ./secrets/ci/bitmex_api_key
