@@ -60,6 +60,13 @@ if config_env() == :dev do
         adapter: Tai.VenueAdapters.Ftx,
         products: "btc/usd btc-perp btc-0924",
         order_books: "* -btc/usd"
+      ],
+      delta_exchange: [
+        start_on_boot: true,
+        adapter: Tai.VenueAdapters.DeltaExchange,
+        products: "*",
+        order_books: "*"
+        # order_books: "btcusdt"
       ]
     }
 end
@@ -205,6 +212,16 @@ if config_env() == :test do
             api_secret: {:system_file, "FTX_API_SECRET"}
           }
         }
+      ],
+      delta_exchange: [
+        enabled: true,
+        adapter: Tai.VenueAdapters.DeltaExchange,
+        credentials: %{
+          main: %{
+            api_key: {:system_file, "DELTA_EXCHANGE_API_KEY"},
+            api_secret: {:system_file, "DELTA_EXCHANGE_API_SECRET"}
+          }
+        }
       ]
     }
 
@@ -217,7 +234,8 @@ if config_env() == :test do
     :mock,
     :okex,
     :huobi,
-    :ftx
+    :ftx,
+    :delta_exchange
   ]
 
   config :tai, :test_venue_adapters_accounts, [
@@ -311,7 +329,11 @@ if config_env() == :test do
       # FTX
       "FTX-KEY",
       "FTX-SIGN",
-      "FTX-TS"
+      "FTX-TS",
+      # Delta Exchange
+      "api-key",
+      "signature",
+      "timestamp"
     ],
     filter_sensitive_data: [
       # GDAX

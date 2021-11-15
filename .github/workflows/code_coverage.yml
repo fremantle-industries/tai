@@ -42,16 +42,22 @@ jobs:
         env:
           MIX_ENV: test
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          BINANCE_API_KEY: ../../secrets/ci/binance_api_key
-          BINANCE_API_SECRET: ../../secrets/ci/binance_api_secret
-          BITMEX_API_KEY: ../../secrets/ci/bitmex_api_key
-          BITMEX_API_SECRET: ../../secrets/ci/bitmex_api_secret
-          GDAX_API_KEY: ../../secrets/ci/gdax_api_key
-          GDAX_API_PASSPHRASE: ../../secrets/ci/gdax_api_passphrase
-          GDAX_API_SECRET: ../../secrets/ci/gdax_api_secret
-          OKEX_API_KEY: ../../secrets/ci/okex_api_key
-          OKEX_API_PASSPHRASE: ../../secrets/ci/okex_api_passphrase
-          OKEX_API_SECRET: ../../secrets/ci/okex_api_secret
-          DERIBIT_CLIENT_ID: ../../secrets/ci/deribit_client_id
-          DERIBIT_CLIENT_SECRET: ../../secrets/ci/deribit_client_secret
-        run: mix coveralls.github --umbrella
+          BINANCE_API_KEY: ./secrets/ci/binance_api_key
+          BINANCE_API_SECRET: ./secrets/ci/binance_api_secret
+          BITMEX_API_KEY: ./secrets/ci/bitmex_api_key
+          BITMEX_API_SECRET: ./secrets/ci/bitmex_api_secret
+          GDAX_API_KEY: ./secrets/ci/gdax_api_key
+          GDAX_API_PASSPHRASE: ./secrets/ci/gdax_api_passphrase
+          GDAX_API_SECRET: ./secrets/ci/gdax_api_secret
+          OKEX_API_KEY: ./secrets/ci/okex_api_key
+          OKEX_API_PASSPHRASE: ./secrets/ci/okex_api_passphrase
+          OKEX_API_SECRET: ./secrets/ci/okex_api_secret
+          DERIBIT_CLIENT_ID: ./secrets/ci/deribit_client_id
+          DERIBIT_CLIENT_SECRET: ./secrets/ci/deribit_client_secret
+          FTX_API_KEY: ./secrets/ci/ftx_api_key
+          FTX_API_SECRET: ./secrets/ci/ftx_api_secret
+          DELTA_EXCHANGE_API_KEY: ./secrets/ci/delta_exchange_api_key
+          DELTA_EXCHANGE_API_SECRET: ./secrets/ci/delta_exchange_api_secret
+        run: |
+          mix tai.gen.migration
+          mix coveralls.github --umbrella

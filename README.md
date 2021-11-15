@@ -26,27 +26,28 @@ Here's an example of an advisor that logs the spread between multiple products o
 
 ## Venues In Progress
 
-| Venue    | Live Order Book | Accounts | Orders | Products | Fees |
-| -------- | :-------------: | :------: | :----: | :------: | :--: |
-| Binance  |       [x]       |   [x]    |   [ ]  |   [x]    | [x]  |
-| Deribit  |       [x]       |   [x]    |   [ ]  |   [x]    | [x]  |
-| GDAX     |       [x]       |   [x]    |   [ ]  |   [x]    | [x]  |
-| Huobi    |       [x]       |   [ ]    |   [ ]  |   [x]    | [ ]  |
-| Bybit    |       [ ]       |   [ ]    |   [ ]  |   [x]    | [ ]  |
-| bit.com  |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| Bitfinex |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| Kraken   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| CME      |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| Phemex   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| BTSE     |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| KuCoin   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| BitMax   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| Bitget   |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| MEXC     |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| PrimeXBT |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| Gate.io  |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| Coinflex |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
-| bitFlyer |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Venue             | Live Order Book | Accounts | Orders | Products | Fees |
+| ----------------- | :-------------: | :------: | :----: | :------: | :--: |
+| Binance           |       [x]       |   [x]    |   [ ]  |   [x]    | [x]  |
+| Deribit           |       [x]       |   [x]    |   [ ]  |   [x]    | [x]  |
+| GDAX              |       [x]       |   [x]    |   [ ]  |   [x]    | [x]  |
+| Huobi             |       [x]       |   [ ]    |   [ ]  |   [x]    | [ ]  |
+| Delta Exchange    |       [x]       |   [ ]    |   [ ]  |   [x]    | [x]  |
+| Bybit             |       [ ]       |   [ ]    |   [ ]  |   [x]    | [ ]  |
+| bit.com           |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Bitfinex          |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Kraken            |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| CME               |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Phemex            |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| BTSE              |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| KuCoin            |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| BitMax            |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Bitget            |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| MEXC              |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| PrimeXBT          |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Gate.io           |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| Coinflex          |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
+| bitFlyer          |       [ ]       |   [ ]    |   [ ]  |   [ ]    | [ ]  |
 
 ## Install
 

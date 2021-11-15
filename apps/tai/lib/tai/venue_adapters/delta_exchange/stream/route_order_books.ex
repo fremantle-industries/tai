@@ -1,16 +1,21 @@
-defmodule Tai.VenueAdapters.Ftx.Stream.RouteOrderBooks do
+defmodule Tai.VenueAdapters.DeltaExchange.Stream.RouteOrderBooks do
   use GenServer
-  alias Tai.VenueAdapters.Ftx.Stream.ProcessOrderBook
+  alias Tai.VenueAdapters.DeltaExchange.Stream.ProcessOrderBook
 
   defmodule State do
     @type venue_id :: Tai.Venue.id()
     @type venue_symbol :: Tai.Venues.Product.symbol()
     @type store_name :: atom
     @type stores :: %{optional(venue_symbol) => store_name}
-    @type t :: %State{venue: venue_id, stores: stores}
+    @type sequence_numbers :: %{optional(venue_symbol) => non_neg_integer | nil}
+    @type t :: %State{
+      venue: venue_id,
+      stores: stores,
+      sequence_numbers: sequence_numbers
+    }
 
-    @enforce_keys ~w[venue stores]a
-    defstruct ~w[venue stores]a
+    @enforce_keys ~w[venue stores sequence_numbers]a
+    defstruct ~w[venue stores sequence_numbers]a
   end
 
   @type venue_id :: Tai.Venue.id()
@@ -20,7 +25,8 @@ defmodule Tai.VenueAdapters.Ftx.Stream.RouteOrderBooks do
   @spec start_link(venue: venue_id, order_books: [product]) :: GenServer.on_start()
   def start_link(venue: venue, order_books: order_books) do
     stores = order_books |> build_stores()
-    state = %State{venue: venue, stores: stores}
+    sequence_numbers = order_books |> build_sequence_numbers()
+    state = %State{venue: venue, stores: stores, sequence_numbers: sequence_numbers}
     name = venue |> to_name()
 
     GenServer.start_link(__MODULE__, state, name: name)
@@ -34,34 +40,35 @@ defmodule Tai.VenueAdapters.Ftx.Stream.RouteOrderBooks do
 
   @impl true
   def handle_cast(
-        {%{"type" => "partial", "market" => venue_symbol, "data" => data}, received_at},
-        state
-      ) do
+    {
+      %{"type" => "l2_orderbook", "last_sequence_no" => last_sequence_no, "symbol" => venue_symbol, "buy" => buy, "sell" => sell},
+      received_at
+    },
+    state
+  ) do
+    data = {buy, sell}
+
     {state, venue_symbol}
     |> forward({:snapshot, data, received_at})
 
+    sequence_numbers = state.sequence_numbers |> Map.put(venue_symbol, last_sequence_no)
+    state = %{state | sequence_numbers: sequence_numbers}
     {:noreply, state}
   end
-
-  @impl true
-  def handle_cast(
-        {%{"type" => "update", "market" => venue_symbol, "data" => data}, received_at},
-        state
-      ) do
-    {state, venue_symbol}
-    |> forward({:update, data, received_at})
-
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast({%{"type" => "subscribed"}, _}, state), do: {:noreply, state}
 
   defp build_stores(order_books) do
     order_books
     |> Enum.reduce(
       %{},
       &Map.put(&2, &1.venue_symbol, &1.venue_id |> ProcessOrderBook.to_name(&1.venue_symbol))
+    )
+  end
+
+  defp build_sequence_numbers(order_books) do
+    order_books
+    |> Enum.reduce(
+      %{},
+      &Map.put(&2, &1.venue_symbol, nil)
     )
   end
 

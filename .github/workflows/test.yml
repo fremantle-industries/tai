@@ -58,6 +58,8 @@ jobs:
           DERIBIT_CLIENT_SECRET: ./secrets/ci/deribit_client_secret
           FTX_API_KEY: ./secrets/ci/ftx_api_key
           FTX_API_SECRET: ./secrets/ci/ftx_api_secret
+          DELTA_EXCHANGE_API_KEY: ./secrets/ci/delta_exchange_api_key
+          DELTA_EXCHANGE_API_SECRET: ./secrets/ci/delta_exchange_api_secret
         run: |
           mix tai.gen.migration
           mix test
