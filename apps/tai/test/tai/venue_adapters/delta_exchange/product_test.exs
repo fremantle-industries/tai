@@ -49,6 +49,13 @@ defmodule Tai.VenueAdapters.DeltaExchange.ProductTest do
     assert product.type == :move
   end
 
+  # test ".build/2 can parse listing" do
+  #   venue_product = build_venue_product(symbol: "BTCUSD_31Dec", contract_type: "futures", launch_time: "2021-06-23T10:07:14Z")
+  #   product = VenueAdapters.DeltaExchange.Product.build(venue_product, @venue)
+
+  #   assert product.listing != nil
+  # end
+
   @quoting_asset struct(ExDeltaExchange.Product.Asset, symbol: "USDT")
   @default_attrs [
     contract_unit_currency: "BTC",

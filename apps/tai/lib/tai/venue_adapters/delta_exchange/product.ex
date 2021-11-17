@@ -16,6 +16,8 @@ defmodule Tai.VenueAdapters.DeltaExchange.Product do
       venue_quote: venue_product.quoting_asset.symbol,
       status: venue_product |> status(),
       type: venue_product |> type(),
+      # listing: venue_product.launch_time |> listing(),
+      # expiry: options.expiry,
       collateral: false,
       price_increment: venue_product.tick_size |> Decimal.new(),
       size_increment: venue_product.tick_size |> Decimal.new(),
@@ -52,6 +54,13 @@ defmodule Tai.VenueAdapters.DeltaExchange.Product do
       true -> :unknown
     end
   end
+
+  # defp listing(launch_time) do
+  #   case launch_time do
+  #     nil -> nil
+  #     l -> Timex.parse!(l, "{ISO:Extended}")
+  #   end
+  # end
 
   defp downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
 end
