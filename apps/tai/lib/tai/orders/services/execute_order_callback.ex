@@ -4,11 +4,11 @@ defmodule Tai.Orders.Services.ExecuteOrderCallback do
   alias Tai.Orders.{
     Order,
     OrderCallbackStore,
-    Transition
+    Transitions
   }
 
   @type order :: Order.t()
-  @type transition :: Transition.t()
+  @type transition :: Transitions.transition()
 
   @spec call(order | nil, order, transition | nil) :: :ok | {:error, :noproc}
   def call(previous, current, transition) do
