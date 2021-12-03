@@ -73,7 +73,7 @@ defmodule Tai.Mixfile do
       {:table_rex, "~> 3.0"},
       # {:tai_events, path: "../../packages/tai_events"},
       {:tai_events, "~> 0.0.1"},
-      {:telemetry, "~> 0.4"},
+      {:telemetry, "~> 0.4 or ~> 1.0"},
       {:timex, "~> 3.6"},
       {:stored, "~> 0.0.8"},
       {:vex, "~> 0.7"},
