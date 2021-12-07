@@ -20,13 +20,16 @@ defmodule Tai.EventsLoggerTest do
            end) =~ "[error] {\"data\":{\"hello\":\"custom\"},\"type\":\"Support.CustomEvent\"}"
   end
 
-  test "logs warn events" do
+  test "logs warning events" do
     logger = start_supervised!({Tai.EventsLogger, id: __MODULE__})
 
-    assert capture_log(fn ->
-             send(logger, {TaiEvents.Event, @event, :warn})
+    log = capture_log(fn ->
+             send(logger, {TaiEvents.Event, @event, :warning})
              :timer.sleep(100)
-           end) =~ "[warn]  {\"data\":{\"hello\":\"custom\"},\"type\":\"Support.CustomEvent\"}"
+    end)
+
+    assert log =~ "[warn"
+    assert log =~ "{\"data\":{\"hello\":\"custom\"},\"type\":\"Support.CustomEvent\"}"
   end
 
   test "logs info events" do

@@ -34,7 +34,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   end
 
   def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+    TaiEvents.warning(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
   end
 
   def handle_connect(_conn, state) do
@@ -43,7 +43,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   end
 
   def handle_disconnect(conn_status, state) do
-    TaiEvents.warn(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
+    TaiEvents.warning(%Tai.Events.StreamDisconnect{venue: state.venue, reason: conn_status.reason})
     {:ok, state}
   end
 
@@ -144,7 +144,7 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
   end
 
   defp handle_msg(msg, _received_at, state) do
-    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warning(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: Timex.now()

@@ -97,7 +97,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   end
 
   def handle_disconnect(conn_status, state) do
-    TaiEvents.warn(%Tai.Events.StreamDisconnect{
+    TaiEvents.warning(%Tai.Events.StreamDisconnect{
       venue: state.venue,
       reason: conn_status.reason
     })
@@ -106,7 +106,7 @@ defmodule Tai.VenueAdapters.Deribit.Stream.Connection do
   end
 
   def terminate(close_reason, state) do
-    TaiEvents.warn(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
+    TaiEvents.warning(%Tai.Events.StreamTerminate{venue: state.venue, reason: close_reason})
   end
 
   def handle_info(:init_subscriptions, state) do

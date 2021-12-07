@@ -16,21 +16,21 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.NoOpTablesTest do
   test "ignores messages for the 'transact' table", %{pid: pid} do
     cast_noop_msg("transact")
 
-    refute_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
+    refute_event(%Tai.Events.StreamMessageUnhandled{}, :warning)
     assert Process.alive?(pid) == true
   end
 
   test "ignores messages for the 'execution' table", %{pid: pid} do
     cast_noop_msg("execution")
 
-    refute_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
+    refute_event(%Tai.Events.StreamMessageUnhandled{}, :warning)
     assert Process.alive?(pid) == true
   end
 
   test "ignores messages for the 'wallet' table", %{pid: pid} do
     cast_noop_msg("wallet")
 
-    refute_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
+    refute_event(%Tai.Events.StreamMessageUnhandled{}, :warning)
     assert Process.alive?(pid) == true
   end
 

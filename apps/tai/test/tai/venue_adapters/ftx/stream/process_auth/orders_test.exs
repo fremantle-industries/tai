@@ -109,14 +109,14 @@ defmodule Tai.VenueAdapters.Ftx.Stream.ProcessAuth.OrdersTest do
     data = [build_venue_order(%{"clientId" => nil})]
     cast_order_msg(data, "update")
 
-    assert_event(%Tai.Events.StreamMessageOrderUpdateUnhandled{}, :warn)
+    assert_event(%Tai.Events.StreamMessageOrderUpdateUnhandled{}, :warning)
   end
 
   test "logs a warning event when the order message doesn't include require attributes" do
     data = [build_venue_order(%{})]
     cast_order_msg(data, "update")
 
-    assert_event(%Tai.Events.StreamMessageOrderUpdateUnhandled{}, :warn)
+    assert_event(%Tai.Events.StreamMessageOrderUpdateUnhandled{}, :warning)
   end
 
   defp cast_order_msg(data, type) do

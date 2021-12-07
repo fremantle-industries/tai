@@ -131,7 +131,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrdersTest do
 
     cast_order_msg(data, "update")
 
-    assert_event(%Tai.Events.StreamMessageInvalidOrderClientId{} = event, :warn)
+    assert_event(%Tai.Events.StreamMessageInvalidOrderClientId{} = event, :warning)
     assert event.client_id == "abc123"
   end
 
@@ -139,14 +139,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.OrdersTest do
     data = [build_venue_order(%{"ordStatus" => "invalid state"})]
 
     cast_order_msg(data, "update")
-    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
+    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warning)
   end
 
   test "logs a warning event when the order message doesn't include require attributes" do
     data = [build_venue_order(%{})]
     cast_order_msg(data, "update")
 
-    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
+    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warning)
   end
 
   defp to_venue_client_id(client_id, time_in_force \\ "gtc") do

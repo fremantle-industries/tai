@@ -53,8 +53,8 @@ defmodule Tai.EventsLogger.DefaultLogger do
     event |> TaiEvents.Event.encode!() |> Logger.error()
   end
 
-  def log(:warn, event) do
-    event |> TaiEvents.Event.encode!() |> Logger.warn()
+  def log(:warning, event) do
+    event |> TaiEvents.Event.encode!() |> Logger.warning()
   end
 
   def log(:info, event) do

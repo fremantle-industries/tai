@@ -32,7 +32,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateOrder do
   end
 
   defp warn_unhandled(msg, last_received_at, state) do
-    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warning(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: last_received_at
@@ -40,7 +40,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.UpdateOrder do
   end
 
   defp warn_invalid_client_id(client_id, last_received_at, state) do
-    TaiEvents.warn(%Tai.Events.StreamMessageInvalidOrderClientId{
+    TaiEvents.warning(%Tai.Events.StreamMessageInvalidOrderClientId{
       venue_id: state.venue,
       client_id: client_id,
       received_at: last_received_at

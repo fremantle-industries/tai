@@ -172,7 +172,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrdersTest do
       "data" => [build_venue_order(%{"state" => "invalid state"})]
     })
 
-    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
+    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warning)
   end
 
   test "logs a warning event when the order message doesn't include require attributes" do
@@ -181,7 +181,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.ProcessAuth.OrdersTest do
       "data" => [build_venue_order(%{})]
     })
 
-    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warn)
+    assert_event(%Tai.Events.StreamMessageUnhandled{}, :warning)
   end
 
   defp to_venue_client_id(client_id) do

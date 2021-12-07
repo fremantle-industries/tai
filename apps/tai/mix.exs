@@ -72,7 +72,7 @@ defmodule Tai.Mixfile do
       {:postgrex, "~> 0.15", optional: true},
       {:table_rex, "~> 3.0"},
       # {:tai_events, path: "../../packages/tai_events"},
-      {:tai_events, "~> 0.0.1"},
+      {:tai_events, "~> 0.0.2"},
       {:telemetry, "~> 0.4 or ~> 1.0"},
       {:timex, "~> 3.6"},
       {:stored, "~> 0.0.8"},

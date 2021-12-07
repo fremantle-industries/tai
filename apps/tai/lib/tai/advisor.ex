@@ -111,7 +111,7 @@ defmodule Tai.Advisor do
                   event: market_quote,
                   return_value: unhandled
                 }
-                |> TaiEvents.warn()
+                |> TaiEvents.warning()
 
                 state
             end
@@ -124,7 +124,7 @@ defmodule Tai.Advisor do
                 error: e,
                 stacktrace: __STACKTRACE__
               }
-              |> TaiEvents.warn()
+              |> TaiEvents.warning()
 
               state
           end

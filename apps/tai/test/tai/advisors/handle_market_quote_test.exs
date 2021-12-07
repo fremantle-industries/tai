@@ -83,7 +83,7 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
     assert_receive {
       TaiEvents.Event,
       %Tai.Events.AdvisorHandleMarketQuoteInvalidReturn{} = event,
-      :warn
+      :warning
     }
 
     assert event.advisor_id == :my_advisor
@@ -106,7 +106,7 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
     assert_receive {
       TaiEvents.Event,
       %Tai.Events.AdvisorHandleMarketQuoteError{} = event_1,
-      :warn
+      :warning
     }
 
     assert event_1.advisor_id == :my_advisor
@@ -114,20 +114,16 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
     assert event_1.event == @market_quote
     assert event_1.error == %RuntimeError{message: "!!!This is an ERROR!!!"}
     assert [stack_1 | _] = event_1.stacktrace
-
-    assert {
-             Tai.Advisors.HandleMarketQuoteTest.MyAdvisor,
-             :handle_market_quote,
-             2,
-             [file: _, line: _]
-           } = stack_1
+    assert {Tai.Advisors.HandleMarketQuoteTest.MyAdvisor, :handle_market_quote, 2, stack_1_location} = stack_1
+    assert Keyword.fetch!(stack_1_location, :file) != nil
+    assert Keyword.fetch!(stack_1_location, :line) != nil
 
     send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
 
     assert_receive {
       TaiEvents.Event,
       %Tai.Events.AdvisorHandleMarketQuoteError{} = event_2,
-      :warn
+      :warning
     }
 
     assert event_2.error == %RuntimeError{message: "!!!This is an ERROR!!!"}

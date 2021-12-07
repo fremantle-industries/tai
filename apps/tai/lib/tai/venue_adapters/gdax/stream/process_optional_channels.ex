@@ -49,7 +49,7 @@ defmodule Tai.VenueAdapters.Gdax.Stream.ProcessOptionalChannels do
 
   @impl true
   def handle_cast({msg, received_at}, state) do
-    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warning(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: received_at |> Tai.Time.monotonic_to_date_time!()

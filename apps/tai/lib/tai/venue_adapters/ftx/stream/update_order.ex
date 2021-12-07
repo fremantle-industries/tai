@@ -29,7 +29,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.UpdateOrder do
   end
 
   defp warn_unhandled(venue_order, last_received_at, state) do
-    TaiEvents.warn(%Tai.Events.StreamMessageOrderUpdateUnhandled{
+    TaiEvents.warning(%Tai.Events.StreamMessageOrderUpdateUnhandled{
       venue_id: state.venue,
       msg: venue_order,
       received_at: last_received_at

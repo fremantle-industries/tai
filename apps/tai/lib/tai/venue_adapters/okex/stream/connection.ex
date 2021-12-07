@@ -51,7 +51,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.Connection do
       if Enum.member?(@optional_channels, c) do
         send(self(), {:subscribe, c})
       else
-        TaiEvents.warn(%Tai.Events.StreamChannelInvalid{
+        TaiEvents.warning(%Tai.Events.StreamChannelInvalid{
           venue: state.venue,
           name: c,
           available: @optional_channels

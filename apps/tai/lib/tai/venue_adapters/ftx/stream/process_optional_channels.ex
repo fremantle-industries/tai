@@ -32,7 +32,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.ProcessOptionalChannels do
       msg: msg,
       received_at: received_at |> Tai.Time.monotonic_to_date_time!()
     }
-    |> TaiEvents.warn()
+    |> TaiEvents.warning()
 
     {:noreply, state}
   end

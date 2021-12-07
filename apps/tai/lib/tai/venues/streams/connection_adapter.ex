@@ -77,14 +77,14 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
     end
 
     def disconnect(conn_status, venue) do
-      TaiEvents.warn(%Tai.Events.StreamDisconnect{
+      TaiEvents.warning(%Tai.Events.StreamDisconnect{
         venue: venue,
         reason: conn_status.reason
       })
     end
 
     def terminate(close_reason, venue) do
-      TaiEvents.warn(%Tai.Events.StreamTerminate{venue: venue, reason: close_reason})
+      TaiEvents.warning(%Tai.Events.StreamTerminate{venue: venue, reason: close_reason})
     end
   end
 

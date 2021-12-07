@@ -73,7 +73,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth do
   def handle_cast({msg, received_at}, state) do
     {:ok, last_received_at} = received_at |> Tai.Time.monotonic_to_date_time()
 
-    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warning(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: last_received_at

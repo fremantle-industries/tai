@@ -133,7 +133,9 @@ defmodule Tai.Orders.CreateTest do
       assert %Orders.Transitions.RescueCreateError{} = transition
       assert transition.error == %RuntimeError{message: "Venue Adapter Create Raised Error"}
       assert [stack_1 | _] = transition.stacktrace
-      assert {Tai.VenueAdapters.Mock, _, _, [file: _, line: _]} = stack_1
+      assert {Tai.VenueAdapters.Mock, _, _, stack_1_location} = stack_1
+      assert Keyword.fetch!(stack_1_location, :file) != nil
+      assert Keyword.fetch!(stack_1_location, :line) != nil
 
       assert updated_order.status == :create_error
     end

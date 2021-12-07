@@ -32,7 +32,7 @@ defmodule Tai.VenueAdapters.OkEx.Stream.UpdateOrder do
   end
 
   defp warn_unhandled(msg, last_received_at, state) do
-    TaiEvents.warn(%Tai.Events.StreamMessageUnhandled{
+    TaiEvents.warning(%Tai.Events.StreamMessageUnhandled{
       venue_id: state.venue,
       msg: msg,
       received_at: last_received_at

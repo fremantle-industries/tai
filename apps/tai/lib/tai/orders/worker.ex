@@ -5,10 +5,10 @@ defmodule Tai.Orders.Worker do
 
   alias Tai.Orders.{
     OrderTransitionWorker,
+    Responses,
     Services,
     SubmissionFactory,
-    Responses,
-    Transition
+    Transitions
   }
 
   defmodule State do
@@ -18,7 +18,7 @@ defmodule Tai.Orders.Worker do
   @type submission :: SubmissionFactory.submission()
   @type order :: Tai.Orders.Order.t()
   @type status :: atom
-  @type transition :: Transition.t()
+  @type transition :: Transitions.transition()
   @type invalid_status_error_reason :: {:invalid_status, was :: status, transition}
   @type create_result :: {:ok, order} | {:error, Adapter.create_order_error_reason()}
   @type cancel_result ::
