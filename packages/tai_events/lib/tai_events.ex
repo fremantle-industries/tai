@@ -2,7 +2,7 @@ defmodule TaiEvents do
   @type event :: TaiEvents.Event.t()
   @type event_type :: module
   @type partitions :: pos_integer
-  @type level :: :debug | :info | :warn | :error
+  @type level :: :debug | :info | :warning | :error
   @type subscribe_error_reasons :: {:already_registered, pid} | :event_not_registered
 
   @spec child_spec(opts :: term) :: Supervisor.child_spec()
@@ -33,8 +33,8 @@ defmodule TaiEvents do
 
   @spec error(event) :: :ok
   def error(event), do: event |> broadcast(:error)
-  @spec warn(event) :: :ok
-  def warn(event), do: event |> broadcast(:warn)
+  @spec warning(event) :: :ok
+  def warning(event), do: event |> broadcast(:warning)
   @spec info(event) :: :ok
   def info(event), do: event |> broadcast(:info)
   @spec debug(event) :: :ok

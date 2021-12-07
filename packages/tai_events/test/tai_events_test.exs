@@ -44,7 +44,7 @@ defmodule TaiEventsTest do
     end
   end
 
-  [:debug, :info, :warn, :error]
+  [:debug, :info, :warning, :error]
   |> Enum.each(fn level ->
     describe ".#{level}/1" do
       @level level

@@ -4,12 +4,12 @@ defmodule TaiEvents.MixProject do
   def project do
     [
       app: :tai_events,
-      version: "0.0.1",
+      version: "0.0.2",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.8",
+      elixir: "~> 1.11",
       package: package(),
       start_permanent: Mix.env() == :prod,
       description: description(),
