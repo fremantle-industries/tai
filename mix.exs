@@ -4,7 +4,7 @@ defmodule TaiMonorepo.MixProject do
   def project do
     [
       apps_path: "apps",
-      version: "0.0.73",
+      version: "0.0.74",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),

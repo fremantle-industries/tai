@@ -4,7 +4,7 @@ defmodule Tai.Mixfile do
   def project do
     [
       app: :tai,
-      version: "0.0.73",
+      version: "0.0.74",
       elixir: "~> 1.11",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
