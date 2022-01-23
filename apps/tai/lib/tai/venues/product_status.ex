@@ -7,5 +7,5 @@ defmodule Tai.Venues.ProductStatus do
   def auction_match, do: :auction_match
   def break, do: :break
   def settled, do: :settled
-  def unlisted, do: :unlisted
+  def delisted, do: :delisted
 end

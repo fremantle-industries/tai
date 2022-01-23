@@ -10,7 +10,7 @@ defmodule Tai.Venues.Product do
           | :auction_match
           | :break
           | :settled
-          | :unlisted
+          | :delisted
 
   @typedoc """
   The product to buy/sell or the underlying product used to buy/sell. For the product BTCUSD
