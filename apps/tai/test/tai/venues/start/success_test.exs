@@ -66,9 +66,13 @@ defmodule Tai.Venues.Start.SuccessTest do
          )
 
   test "hydrates venue data and starts the stream" do
+    Tai.SystemBus.subscribe({:venue, :start})
     TaiEvents.firehose_subscribe()
 
     start_supervised!({Tai.Venues.Start, @venue})
+
+    assert_receive {{:venue, :start}, started_venue}
+    assert started_venue == @venue.id
 
     assert_event(%Tai.Events.VenueStart{} = start_event, :info)
     assert start_event.venue == @venue.id

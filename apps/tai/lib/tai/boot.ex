@@ -51,9 +51,9 @@ defmodule Tai.Boot do
     |> GenServer.cast(:close_registration)
   end
 
-  @events [Tai.Events.VenueStart, Tai.Events.VenueStartError]
+  @events [{:venue, :start}, {:venue, :start_error}]
   def init(state) do
-    Enum.each(@events, &TaiEvents.subscribe/1)
+    Enum.each(@events, &Tai.SystemBus.subscribe/1)
     {:ok, state}
   end
 
@@ -74,10 +74,10 @@ defmodule Tai.Boot do
     }
   end
 
-  def handle_info({TaiEvents.Event, %Tai.Events.VenueStart{} = event, :info}, state) do
+  def handle_info({{:venue, :start} = topic, venue}, state) do
     state = %{
       state
-      | venue_replies: Map.put(state.venue_replies, event.venue, event)
+      | venue_replies: Map.put(state.venue_replies, venue, topic)
     }
 
     {
@@ -87,10 +87,10 @@ defmodule Tai.Boot do
     }
   end
 
-  def handle_info({TaiEvents.Event, %Tai.Events.VenueStartError{} = event, :error}, state) do
+  def handle_info({{:venue, :start_error} = topic, venue, reasons}, state) do
     state = %{
       state
-      | venue_replies: Map.put(state.venue_replies, event.venue, event)
+      | venue_replies: Map.put(state.venue_replies, venue, {topic, reasons})
     }
 
     {
@@ -159,18 +159,15 @@ defmodule Tai.Boot do
   defp all_venue_replies_started?(venue_replies) do
     venue_replies
     |> Enum.all?(fn
-      {_, %r{}} -> r == Tai.Events.VenueStart
+      {_, r} -> r == {:venue, :start}
     end)
   end
 
   defp venue_errors(venue_replies) do
     venue_replies
     |> Enum.map(fn
-      {venue_id, %Tai.Events.VenueStartError{reason: reason}} ->
-        {venue_id, reason}
-
-      {_venue_id, %Tai.Events.VenueStart{}} ->
-        nil
+      {venue_id, {{:venue, :start_error}, reason}} -> {venue_id, reason}
+      {_venue_id, {:venue, :start}} -> nil
     end)
     |> Enum.filter(& &1)
   end

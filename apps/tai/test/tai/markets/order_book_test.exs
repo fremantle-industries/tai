@@ -96,7 +96,7 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "broadcasts change_set when enabled" do
-      Tai.SystemBus.subscribe(:change_set)
+      :ok = Tai.SystemBus.subscribe(:change_set)
       start_supervised!(OrderBook.child_spec(@broadcast_enabled_product, @quote_depth, true))
 
       broadcast_enabled_change_set =
@@ -280,7 +280,7 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "broadcasts change_set when enabled" do
-      Tai.SystemBus.subscribe(:change_set)
+      :ok = Tai.SystemBus.subscribe(:change_set)
       start_supervised!(OrderBook.child_spec(@broadcast_enabled_product, @quote_depth, true))
 
       broadcast_enabled_change_set =

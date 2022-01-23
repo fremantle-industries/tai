@@ -22,9 +22,14 @@ defmodule Tai.Venues.Start.ErrorFromTimeoutTest do
          )
 
   test "broadcasts an error when the venue hasn't started within the timeout" do
+    Tai.SystemBus.subscribe({:venue, :start_error})
     TaiEvents.firehose_subscribe()
 
     start_supervised!({Tai.Venues.Start, @venue})
+
+    assert_receive {{:venue, :start_error}, start_error_venue, start_error_reason}
+    assert start_error_venue == @venue.id
+    assert start_error_reason == :timeout
 
     assert_event(%Tai.Events.VenueStartError{} = start_event, :error)
     assert start_event.venue == @venue.id

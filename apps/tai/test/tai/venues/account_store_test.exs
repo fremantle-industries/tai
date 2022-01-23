@@ -4,7 +4,7 @@ defmodule Tai.Venues.AccountStoreTest do
   @venue :venue_a
 
   test "broadcasts a message after the record is stored" do
-    Tai.SystemBus.subscribe(:account_store)
+    :ok = Tai.SystemBus.subscribe(:account_store)
     account = struct(Tai.Venues.Account, venue_id: @venue)
 
     assert {:ok, _} = Tai.Venues.AccountStore.put(account)

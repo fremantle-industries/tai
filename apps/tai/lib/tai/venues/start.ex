@@ -145,25 +145,28 @@ defmodule Tai.Venues.Start do
     {:noreply, state}
   end
 
+  @venue_start_topic {:venue, :start}
   def handle_info({:ok, {:fees, :stream}}, state) do
     Process.cancel_timer(state.timer)
+    topic_msg = {@venue_start_topic, state.venue.id}
+    :ok = Tai.SystemBus.broadcast(@venue_start_topic, topic_msg)
 
     %Tai.Events.VenueStart{
       venue: state.venue.id
     }
     |> TaiEvents.info()
 
-    state = %{
-      state
-      | status: :success
-    }
-
+    state = %{state | status: :success}
     {:noreply, state}
   end
+
+  @venue_start_error_topic {:venue, :start_error}
 
   def handle_info({:error, {:products, :accounts, :positions}}, state) do
     Process.cancel_timer(state.timer)
     reasons = [:products, :accounts, :positions] |> collect_error_reasons(state)
+    topic_msg = {@venue_start_error_topic, state.venue.id, reasons}
+    :ok = Tai.SystemBus.broadcast(@venue_start_error_topic, topic_msg)
 
     %Tai.Events.VenueStartError{
       venue: state.venue.id,
@@ -171,17 +174,15 @@ defmodule Tai.Venues.Start do
     }
     |> TaiEvents.error()
 
-    state = %{
-      state
-      | status: {:error, reasons}
-    }
-
+    state = %{state | status: {:error, reasons}}
     {:noreply, state}
   end
 
   def handle_info({:error, {:fees, :stream}}, state) do
     Process.cancel_timer(state.timer)
     reasons = [:fees, :stream] |> collect_error_reasons(state)
+    topic_msg = {@venue_start_error_topic, state.venue.id, reasons}
+    :ok = Tai.SystemBus.broadcast(@venue_start_error_topic, topic_msg)
 
     %Tai.Events.VenueStartError{
       venue: state.venue.id,
@@ -189,26 +190,22 @@ defmodule Tai.Venues.Start do
     }
     |> TaiEvents.error()
 
-    state = %{
-      state
-      | status: {:error, reasons}
-    }
-
+    state = %{state | status: {:error, reasons}}
     {:noreply, state}
   end
 
   def handle_info(:timeout, state) do
+    reason = :timeout
+    topic_msg = {@venue_start_error_topic, state.venue.id, reason}
+    :ok = Tai.SystemBus.broadcast(@venue_start_error_topic, topic_msg)
+
     %Tai.Events.VenueStartError{
       venue: state.venue.id,
-      reason: :timeout
+      reason: reason
     }
     |> TaiEvents.error()
 
-    state = %{
-      state
-      | status: {:error, :timeout}
-    }
-
+    state = %{state | status: {:error, :timeout}}
     {:noreply, state}
   end
 

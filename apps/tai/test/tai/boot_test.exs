@@ -55,6 +55,8 @@ defmodule Tai.BootTest do
     assert_event(%Tai.Events.BootAdvisors{} , :info, 1000)
   end
 
+  @venue_start_topic {:venue, :start}
+
   describe "when all venues successfully start" do
     test "parses advisor fleets and starts those configured to boot" do
       TaiEvents.firehose_subscribe()
@@ -63,10 +65,10 @@ defmodule Tai.BootTest do
       {:ok, _} = Tai.Boot.register_venue(@venue_a, @test_id)
       {:ok, _} = Tai.Boot.register_venue(@venue_b, @test_id)
 
-      %Tai.Events.VenueStart{venue: @venue_a.id} |> TaiEvents.broadcast(:info)
+      :ok = Tai.SystemBus.broadcast(@venue_start_topic, {@venue_start_topic, @venue_a.id})
       refute_event(%Tai.Events.BootAdvisors{}, :info)
 
-      %Tai.Events.VenueStart{venue: @venue_b.id} |> TaiEvents.broadcast(:info)
+      :ok = Tai.SystemBus.broadcast(@venue_start_topic, {@venue_start_topic, @venue_b.id})
       assert_event(%Tai.Events.BootAdvisors{} = event, :info, 1000)
       assert event.loaded_fleets == 2
       assert event.loaded_advisors == 2
@@ -82,7 +84,7 @@ defmodule Tai.BootTest do
       {:ok, _} = Tai.Boot.register_venue(@venue_a, @test_id)
       refute_event(%Tai.Events.BootAdvisors{}, :info)
 
-      %Tai.Events.VenueStart{venue: @venue_a.id} |> TaiEvents.broadcast(:info)
+      :ok = Tai.SystemBus.broadcast(@venue_start_topic, {@venue_start_topic, @venue_a.id})
       assert_event(%Tai.Events.BootAdvisors{} , :info, 1000)
       assert_receive :after_boot_no_args_hook
     end
@@ -99,11 +101,13 @@ defmodule Tai.BootTest do
       {:ok, _} = Tai.Boot.register_venue(@venue_a, @test_id)
       refute_event(%Tai.Events.BootAdvisors{}, :info)
 
-      %Tai.Events.VenueStart{venue: @venue_a.id} |> TaiEvents.broadcast(:info)
+      :ok = Tai.SystemBus.broadcast(@venue_start_topic, {@venue_start_topic, @venue_a.id})
       assert_event(%Tai.Events.BootAdvisors{}, :info, 1000)
       assert_receive {:after_boot_args_hook, arg1: :hello, arg2: :world}
     end
   end
+
+  @venue_start_error_topic {:venue, :start_error}
 
   describe "when any of the venues error on start" do
     test "broadcasts an event" do
@@ -113,16 +117,11 @@ defmodule Tai.BootTest do
       {:ok, _} = Tai.Boot.register_venue(@venue_a, @test_id)
       {:ok, _} = Tai.Boot.register_venue(@venue_b, @test_id)
 
-      %Tai.Events.VenueStartError{venue: @venue_a.id, reason: [products: :maintenance]}
-      |> TaiEvents.broadcast(:error)
-
+      :ok = Tai.SystemBus.broadcast(@venue_start_error_topic, {@venue_start_error_topic, @venue_a.id, [products: :maintenance]})
       refute_event(%Tai.Events.BootAdvisorsError{}, :error)
 
-      %Tai.Events.VenueStartError{venue: @venue_b.id, reason: [products: :maintenance]}
-      |> TaiEvents.broadcast(:error)
-
+      :ok = Tai.SystemBus.broadcast(@venue_start_error_topic, {@venue_start_error_topic, @venue_b.id, [products: :maintenance]})
       assert_event(%Tai.Events.BootAdvisorsError{} = event, :error, 1000)
-
       assert event.reason == [
                venue_a: [products: :maintenance],
                venue_b: [products: :maintenance]
@@ -139,8 +138,7 @@ defmodule Tai.BootTest do
       {:ok, _} = Tai.Boot.register_venue(@venue_a, @test_id)
       refute_event(%Tai.Events.BootAdvisors{}, :info)
 
-      %Tai.Events.VenueStartError{venue: @venue_a.id, reason: [products: :maintenance]}
-      |> TaiEvents.broadcast(:error)
+      :ok = Tai.SystemBus.broadcast(@venue_start_error_topic, {@venue_start_error_topic, @venue_a.id, [products: :maintenance]})
 
       assert_event(%Tai.Events.BootAdvisorsError{}, :error, 1000)
       assert_receive {:after_boot_error_args_hook, event}

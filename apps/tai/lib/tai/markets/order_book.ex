@@ -176,12 +176,8 @@ defmodule Tai.Markets.OrderBook do
 
   def handle_continue({:broadcast_change_set, change_set}, state) do
     msg = {:change_set, change_set}
-
-    {:change_set, state.venue, state.symbol}
-    |> Tai.SystemBus.broadcast(msg)
-
-    :change_set
-    |> Tai.SystemBus.broadcast(msg)
+    :ok = Tai.SystemBus.broadcast({:change_set, state.venue, state.symbol}, msg)
+    :ok = Tai.SystemBus.broadcast(:change_set, msg)
 
     {:noreply, state}
   end

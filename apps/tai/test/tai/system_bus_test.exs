@@ -10,7 +10,7 @@ defmodule Tai.SystemBusTest do
     end
 
     def init(state) do
-      Tai.SystemBus.subscribe([
+      :ok = Tai.SystemBus.subscribe([
         :my_topic_a,
         :my_topic_b
       ])
@@ -19,7 +19,7 @@ defmodule Tai.SystemBusTest do
     end
 
     def handle_call(:unsubscribe, _from, state) do
-      Tai.SystemBus.unsubscribe([
+      :ok = Tai.SystemBus.unsubscribe([
         :my_topic_a,
         :my_topic_b
       ])
@@ -49,8 +49,8 @@ defmodule Tai.SystemBusTest do
   end
 
   test "subscribe can take a single topic" do
-    Tai.SystemBus.subscribe(:my_topic)
-    Tai.SystemBus.broadcast(:my_topic, :my_msg)
+    :ok = Tai.SystemBus.subscribe(:my_topic)
+    :ok = Tai.SystemBus.broadcast(:my_topic, :my_msg)
 
     assert_receive :my_msg
   end
@@ -60,25 +60,25 @@ defmodule Tai.SystemBusTest do
     start_supervised!({MultiSubscriber, id: :a, test: :subscribe}, id: :subscribe_a)
     start_supervised!({MultiSubscriber, id: :b, test: :subscribe}, id: :subscribe_b)
 
-    Tai.SystemBus.broadcast(:my_topic_a, :my_topic_a_msg)
+    :ok = Tai.SystemBus.broadcast(:my_topic_a, :my_topic_a_msg)
 
     assert_receive {:my_topic_a_msg, [id: :a, test: :subscribe]}
     assert_receive {:my_topic_a_msg, [id: :b, test: :subscribe]}
 
-    Tai.SystemBus.broadcast(:my_topic_b, :my_topic_b_msg)
+    :ok = Tai.SystemBus.broadcast(:my_topic_b, :my_topic_b_msg)
 
     assert_receive {:my_topic_b_msg, [id: :a, test: :subscribe]}
     assert_receive {:my_topic_b_msg, [id: :b, test: :subscribe]}
   end
 
   test "unsubscribe can take a single topic" do
-    Tai.SystemBus.subscribe(:my_topic)
-    Tai.SystemBus.broadcast(:my_topic, :my_msg)
+    :ok = Tai.SystemBus.subscribe(:my_topic)
+    :ok = Tai.SystemBus.broadcast(:my_topic, :my_msg)
 
     assert_receive :my_msg
 
-    Tai.SystemBus.unsubscribe(:my_topic)
-    Tai.SystemBus.broadcast(:my_topic, :my_msg)
+    :ok = Tai.SystemBus.unsubscribe(:my_topic)
+    :ok = Tai.SystemBus.broadcast(:my_topic, :my_msg)
 
     refute_receive :my_msg
   end
@@ -88,8 +88,8 @@ defmodule Tai.SystemBusTest do
     start_supervised!({MultiSubscriber, id: :a, test: :unsubscribe}, id: :subscribe_a)
     start_supervised!({MultiSubscriber, id: :b, test: :unsubscribe}, id: :subscribe_b)
 
-    Tai.SystemBus.broadcast(:my_topic_a, :my_topic_a_msg)
-    Tai.SystemBus.broadcast(:my_topic_b, :my_topic_b_msg)
+    :ok = Tai.SystemBus.broadcast(:my_topic_a, :my_topic_a_msg)
+    :ok = Tai.SystemBus.broadcast(:my_topic_b, :my_topic_b_msg)
 
     assert_receive {:my_topic_a_msg, [id: :a, test: :unsubscribe]}
     assert_receive {:my_topic_a_msg, [id: :b, test: :unsubscribe]}
@@ -98,8 +98,8 @@ defmodule Tai.SystemBusTest do
 
     MultiSubscriber.unsubscribe(:b)
 
-    Tai.SystemBus.broadcast(:my_topic_a, :my_topic_a_msg)
-    Tai.SystemBus.broadcast(:my_topic_b, :my_topic_b_msg)
+    :ok = Tai.SystemBus.broadcast(:my_topic_a, :my_topic_a_msg)
+    :ok = Tai.SystemBus.broadcast(:my_topic_b, :my_topic_b_msg)
 
     assert_receive {:my_topic_a_msg, [id: :a, test: :unsubscribe]}
     refute_receive {:my_topic_a_msg, [id: :b, test: :unsubscribe]}

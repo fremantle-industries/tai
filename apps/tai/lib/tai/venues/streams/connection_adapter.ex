@@ -92,7 +92,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
     @topic {:venues, :stream}
 
     def broadcast(venue, status) do
-      Tai.SystemBus.broadcast(@topic, {:venues, :stream, status, venue})
+      :ok = Tai.SystemBus.broadcast(@topic, {@topic, status, venue})
     end
   end
 

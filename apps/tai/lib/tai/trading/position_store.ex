@@ -4,9 +4,7 @@ defmodule Tai.Trading.PositionStore do
   @topic_namespace :position_store
 
   def after_put(position) do
-    Tai.SystemBus.broadcast(
-      @topic_namespace,
-      {@topic_namespace, :after_put, position}
-    )
+    msg = {@topic_namespace, :after_put, position}
+    :ok = Tai.SystemBus.broadcast(@topic_namespace, msg)
   end
 end
