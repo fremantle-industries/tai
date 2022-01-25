@@ -41,7 +41,7 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
       [
         advisor_id: @advisor_id,
         fleet_id: @fleet_id,
-        quote_keys: [{@venue, @symbol}],
+        market_stream_keys: [{@venue, @symbol}],
         config: config,
         store: %{event_counter: 0}
       ]
@@ -58,7 +58,7 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
   test "fires the handle_event callback for market quotes" do
     start_advisor!(MyAdvisor)
 
-    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, @market_quote)
 
     assert_receive {:handle_event_called, received_market_quote}
 
@@ -78,7 +78,7 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
     TaiEvents.firehose_subscribe()
     start_advisor!(MyAdvisor, %{return_val: {:unknown, :return_val}})
 
-    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, @market_quote)
 
     assert_receive {
       TaiEvents.Event,
@@ -91,7 +91,7 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
     assert event.event == @market_quote
     assert event.return_value == {:unknown, :return_val}
 
-    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, @market_quote)
 
     assert_receive {TaiEvents.Event, %Tai.Events.AdvisorHandleMarketQuoteInvalidReturn{} = event_2, _}
     assert event_2.return_value == {:unknown, :return_val}
@@ -101,7 +101,7 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
     TaiEvents.firehose_subscribe()
     start_advisor!(MyAdvisor, %{error: "!!!This is an ERROR!!!"})
 
-    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, @market_quote)
 
     assert_receive {
       TaiEvents.Event,
@@ -118,7 +118,7 @@ defmodule Tai.Advisors.HandleMarketQuoteTest do
     assert Keyword.fetch!(stack_1_location, :file) != nil
     assert Keyword.fetch!(stack_1_location, :line) != nil
 
-    send(@advisor_process, {:market_quote_store, :after_put, @market_quote})
+    send(@advisor_process, @market_quote)
 
     assert_receive {
       TaiEvents.Event,

@@ -1,14 +1,13 @@
 defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
   use Tai.TestSupport.DataCase, async: false
   alias Tai.VenueAdapters.Binance.Stream.ProcessOrderBook
-  alias Tai.Markets.{OrderBook, PricePoint}
+  alias Tai.Markets.{OrderBook, PricePoint, Quote}
 
   @product struct(Tai.Venues.Product,
              venue_id: :venue_a,
              symbol: :xbtusd,
              venue_symbol: "XBTUSD"
            )
-  @topic {@product.venue_id, @product.symbol}
   @order_book_name OrderBook.to_name(@product.venue_id, @product.venue_symbol)
   @quote_depth 1
 
@@ -16,13 +15,12 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
     Process.register(self(), @order_book_name)
     start_supervised!(OrderBook.child_spec(@product, @quote_depth, false))
     {:ok, pid} = start_supervised({ProcessOrderBook, @product})
+    Tai.Markets.subscribe_quote(@product.venue_id)
 
     {:ok, %{pid: pid}}
   end
 
   test "can insert new price points into the order book", %{pid: pid} do
-    Tai.SystemBus.subscribe({:market_quote_store, @topic})
-
     data = %{
       "E" => 1_569_054_255_636,
       "s" => @product.venue_symbol,
@@ -32,7 +30,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
 
     GenServer.cast(pid, {:update, data, Timex.now()})
 
-    assert_receive {:market_quote_store, :after_put, market_quote}
+    assert_receive %Quote{} = market_quote
     assert Enum.count(market_quote.bids) == 1
     assert Enum.at(market_quote.bids, 0) == %PricePoint{price: 100.0, size: 15.0}
     assert Enum.count(market_quote.asks) == 1
@@ -42,8 +40,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
   end
 
   test "can update existing price points in the order book", %{pid: pid} do
-    Tai.SystemBus.subscribe({:market_quote_store, @topic})
-
     snapshot =
       struct(OrderBook.ChangeSet,
         venue: @product.venue_id,
@@ -56,7 +52,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
 
     OrderBook.replace(snapshot)
 
-    assert_receive {:market_quote_store, :after_put, _}
+    assert_receive %Quote{} = _
 
     data = %{
       "E" => 1_569_054_255_636,
@@ -67,7 +63,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
 
     GenServer.cast(pid, {:update, data, Timex.now()})
 
-    assert_receive {:market_quote_store, :after_put, market_quote}
+    assert_receive %Quote{} = market_quote
     assert Enum.count(market_quote.bids) == 1
     assert Enum.at(market_quote.bids, 0) == %PricePoint{price: 100.0, size: 15.0}
     assert Enum.count(market_quote.asks) == 1
@@ -77,8 +73,6 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
   end
 
   test "can delete existing price points from the order book", %{pid: pid} do
-    Tai.SystemBus.subscribe({:market_quote_store, @topic})
-
     snapshot =
       struct(OrderBook.ChangeSet,
         venue: @product.venue_id,
@@ -91,7 +85,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
 
     OrderBook.replace(snapshot)
 
-    assert_receive {:market_quote_store, :after_put, _}
+    assert_receive %Quote{} = _
 
     data = %{
       "E" => 1_569_054_255_636,
@@ -102,7 +96,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.ProcessOrderBookTest do
 
     GenServer.cast(pid, {:update, data, Timex.now()})
 
-    assert_receive {:market_quote_store, :after_put, market_quote}
+    assert_receive %Quote{} = market_quote
     assert Enum.empty?(market_quote.bids)
     assert Enum.empty?(market_quote.asks)
     assert %DateTime{} = market_quote.last_venue_timestamp

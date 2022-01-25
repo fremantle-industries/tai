@@ -16,7 +16,7 @@ defmodule Tai.Fleets.LoadTest do
         shutdown: 1000,
         advisor: AdvisorA,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        quotes: "*",
+        market_streams: "*",
         config: %{min_profit: 0.1},
       }
     }
@@ -32,7 +32,7 @@ defmodule Tai.Fleets.LoadTest do
     assert fleet_config.start_on_boot == true
     assert fleet_config.restart == :permanent
     assert fleet_config.shutdown == 1000
-    assert fleet_config.quotes == "*"
+    assert fleet_config.market_streams == "*"
     assert fleet_config.config == %{min_profit: 0.1}
 
     assert {:ok, _} = Tai.Fleets.AdvisorConfigStore.find({:venue_a_btc_usd, :fleet_a})
@@ -46,7 +46,7 @@ defmodule Tai.Fleets.LoadTest do
       fleet_a: %{
         advisor: AdvisorA,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        quotes: "*",
+        market_streams: "*",
       }
     }
 
@@ -63,7 +63,7 @@ defmodule Tai.Fleets.LoadTest do
       fleet_a: %{
         advisor: AdvisorA,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        quotes: "*",
+        market_streams: "*",
       }
     }
 
@@ -80,7 +80,7 @@ defmodule Tai.Fleets.LoadTest do
       fleet_a: %{
         advisor: AdvisorA,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        quotes: "*",
+        market_streams: "*",
       }
     }
 
@@ -97,7 +97,7 @@ defmodule Tai.Fleets.LoadTest do
       fleet_a: %{
         advisor: AdvisorA,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        quotes: "*",
+        market_streams: "*",
       }
     }
 
@@ -114,7 +114,7 @@ defmodule Tai.Fleets.LoadTest do
       fleet_a: %{
         advisor: AdvisorA,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        quotes: "*",
+        market_streams: "*",
         config: {TestConfig, %{
           my_product: :custom_config
         }}
@@ -134,7 +134,7 @@ defmodule Tai.Fleets.LoadTest do
       fleet_a: %{
         advisor: AdvisorA,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        quotes: "*",
+        market_streams: "*",
         config: {TestConfig, %{
           my_product: {{:venue_a, :btc_usd}, :product}
         }}

@@ -1,5 +1,19 @@
 defmodule Tai.SystemBus do
+  @moduledoc """
+  A core pubsub bus for async message communication. The following subsystems depend on this module.
+
+  - boot
+  - stream connection
+  - product, fees, position & account hydration
+  - order book changesets
+  - metrics
+
+  NOTE: To ensure maximum performance you should not publish custom messages or subscribe to system topics
+  """
+
   @type partitions :: pos_integer
+  @type topic :: atom | tuple
+  @type topics :: [topic]
 
   @spec child_spec(opts :: term) :: Supervisor.child_spec()
   def child_spec(opts) do
@@ -21,6 +35,9 @@ defmodule Tai.SystemBus do
     )
   end
 
+  @spec subscribe(topic | topics) :: :ok
+  def subscribe(topics)
+
   def subscribe([]), do: :ok
 
   def subscribe([topic | tail]) do
@@ -33,6 +50,9 @@ defmodule Tai.SystemBus do
     |> List.wrap()
     |> subscribe
   end
+
+  @spec unsubscribe(topic | topics) :: :ok
+  def unsubscribe(topics)
 
   def unsubscribe([]), do: :ok
 
@@ -47,6 +67,7 @@ defmodule Tai.SystemBus do
     |> unsubscribe
   end
 
+  @spec broadcast(topic, term) :: :ok
   def broadcast(topic, message) do
     Registry.dispatch(__MODULE__, topic, fn entries ->
       for {pid, _} <- entries, do: send(pid, message)

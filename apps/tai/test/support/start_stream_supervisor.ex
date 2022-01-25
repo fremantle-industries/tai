@@ -8,9 +8,6 @@ defmodule Support.StartStreamSupervisor do
 
   def process_name(venue), do: :"#{__MODULE__}_#{venue}"
 
-  @deprecated "Use Support.StartStreamSupervisor.process_name/1 instead."
-  def to_name(venue), do: :"#{__MODULE__}_#{venue}"
-
   def init(_) do
     children = []
     Supervisor.init(children, strategy: :one_for_one)

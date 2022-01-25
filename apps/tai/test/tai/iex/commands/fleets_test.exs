@@ -3,12 +3,12 @@ defmodule Tai.IEx.Commands.FleetsTest do
   import ExUnit.CaptureIO
 
   test "shows all advisors in all fleets ordered fleet id, advisor id by default" do
-    mock_fleet_config(%{id: :log_spread, quotes: "venue_a.btc_usd"})
-    mock_fleet_config(%{id: :trade_spread, quotes: "venue_b.eth_usd"})
+    mock_fleet_config(%{id: :log_spread, market_streams: "venue_a.btc_usd"})
+    mock_fleet_config(%{id: :trade_spread, market_streams: "venue_b.eth_usd"})
 
     assert capture_io(&Tai.IEx.fleets/0) == """
            +--------------+---------------+-----------------+---------------------------------------------+----------------------------+
-           |           ID | Start on Boot |          Quotes |                                     Factory |                    Advisor |
+           |           ID | Start on Boot |  Market Streams |                                     Factory |                    Advisor |
            +--------------+---------------+-----------------+---------------------------------------------+----------------------------+
            |   log_spread |         false | venue_a.btc_usd | Elixir.Tai.Advisors.Factories.OnePerProduct | Elixir.Support.NoopAdvisor |
            | trade_spread |         false | venue_b.eth_usd | Elixir.Tai.Advisors.Factories.OnePerProduct | Elixir.Support.NoopAdvisor |
@@ -18,21 +18,21 @@ defmodule Tai.IEx.Commands.FleetsTest do
 
   test "shows an empty table when there are no fleets" do
     assert capture_io(&Tai.IEx.fleets/0) == """
-           +----+---------------+--------+---------+---------+
-           | ID | Start on Boot | Quotes | Factory | Advisor |
-           +----+---------------+--------+---------+---------+
-           |  - |             - |      - |       - |       - |
-           +----+---------------+--------+---------+---------+\n
+           +----+---------------+----------------+---------+---------+
+           | ID | Start on Boot | Market Streams | Factory | Advisor |
+           +----+---------------+----------------+---------+---------+
+           |  - |             - |              - |       - |       - |
+           +----+---------------+----------------+---------+---------+\n
            """
   end
 
   test "can filter by struct attributes" do
-    mock_fleet_config(%{id: :log_spread, quotes: "venue_a.btc_usd"})
-    mock_fleet_config(%{id: :trade_spread, quotes: "venue_b.eth_usd"})
+    mock_fleet_config(%{id: :log_spread, market_streams: "venue_a.btc_usd"})
+    mock_fleet_config(%{id: :trade_spread, market_streams: "venue_b.eth_usd"})
 
     assert capture_io(fn -> Tai.IEx.fleets(where: [id: :log_spread]) end) == """
            +------------+---------------+-----------------+---------------------------------------------+----------------------------+
-           |         ID | Start on Boot |          Quotes |                                     Factory |                    Advisor |
+           |         ID | Start on Boot |  Market Streams |                                     Factory |                    Advisor |
            +------------+---------------+-----------------+---------------------------------------------+----------------------------+
            | log_spread |         false | venue_a.btc_usd | Elixir.Tai.Advisors.Factories.OnePerProduct | Elixir.Support.NoopAdvisor |
            +------------+---------------+-----------------+---------------------------------------------+----------------------------+\n
@@ -40,12 +40,12 @@ defmodule Tai.IEx.Commands.FleetsTest do
   end
 
   test "can order ascending by struct attributes" do
-    mock_fleet_config(%{id: :log_spread_b, quotes: "venue_b.eth_usd"})
-    mock_fleet_config(%{id: :log_spread_a, quotes: "venue_a.btc_usd"})
+    mock_fleet_config(%{id: :log_spread_b, market_streams: "venue_b.eth_usd"})
+    mock_fleet_config(%{id: :log_spread_a, market_streams: "venue_a.btc_usd"})
 
     assert capture_io(fn -> Tai.IEx.fleets(order: [:id]) end) == """
            +--------------+---------------+-----------------+---------------------------------------------+----------------------------+
-           |           ID | Start on Boot |          Quotes |                                     Factory |                    Advisor |
+           |           ID | Start on Boot |  Market Streams |                                     Factory |                    Advisor |
            +--------------+---------------+-----------------+---------------------------------------------+----------------------------+
            | log_spread_a |         false | venue_a.btc_usd | Elixir.Tai.Advisors.Factories.OnePerProduct | Elixir.Support.NoopAdvisor |
            | log_spread_b |         false | venue_b.eth_usd | Elixir.Tai.Advisors.Factories.OnePerProduct | Elixir.Support.NoopAdvisor |

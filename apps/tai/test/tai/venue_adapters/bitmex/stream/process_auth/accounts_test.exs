@@ -10,7 +10,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.AccountsTest do
     start_supervised!({ProcessAuth, [venue: @venue, credential: {@credential, %{}}]})
     {:ok, _} = insert_account(%{asset: :btc, type: "default"})
     TaiEvents.firehose_subscribe()
-    Tai.SystemBus.subscribe(:account_store)
+    :ok = Tai.SystemBus.subscribe(:account_store)
     :ok
   end
 

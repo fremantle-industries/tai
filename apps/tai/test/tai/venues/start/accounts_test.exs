@@ -51,7 +51,7 @@ defmodule Tai.Venues.Start.AccountsTest do
                 credentials: %{main_a: %{}, main_b: %{}},
                 accounts: "*",
                 products: "*",
-                order_books: "*",
+                market_streams: "*",
                 timeout: 1_000
               )
 
@@ -107,13 +107,17 @@ defmodule Tai.Venues.Start.AccountsTest do
 
   test "broadcasts a start error event when the adapter raises an error" do
     venue = @base_venue |> Map.put(:adapter, RaiseErrorAdapter)
+    Tai.SystemBus.subscribe({:venue, :start_error})
     TaiEvents.firehose_subscribe()
 
     start_supervised!({Tai.Venues.Start, venue})
 
+    assert_receive {{:venue, :start_error}, start_error_venue, start_error_reasons}
+    assert start_error_venue == @base_venue.id
+    assert [accounts: _] = start_error_reasons
+
     assert_event(%Tai.Events.VenueStartError{} = event, :error)
     assert event.venue == venue.id
-
     assert [accounts: account_errors] = event.reason
     assert Enum.count(account_errors) == 2
     assert [{_, {error, stacktrace}} | _] = account_errors

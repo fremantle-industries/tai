@@ -25,7 +25,7 @@ defmodule Examples.PingPong.ManageQuoteChange do
         %Advisor.State{store: %{entry_order: %Order{status: :open} = entry_order}} = state
       ) do
     {:ok, market_quote} =
-      Tai.Advisors.MarketQuotes.for(
+      Tai.Advisors.MarketMap.for(
         state.market_quotes,
         entry_order.venue |> String.to_atom(),
         entry_order.product_symbol |> String.to_atom()

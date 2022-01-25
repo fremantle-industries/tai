@@ -16,7 +16,7 @@ config :tai,
     log_spread: %{
       advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      products: "binance.btc_usdt gdax.btc_usd"
+      market_streams: "binance.btc_usdt gdax.btc_usd"
     }
   }
 
@@ -31,5 +31,6 @@ config :tai,
       start_on_boot: true,
       adapter: Tai.VenueAdapters.Gdax,
       products: "btc_usd ltc_usd eth_usd",
+      market_streams: "* -ltc_usd"
     ]
   }

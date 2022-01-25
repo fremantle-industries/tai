@@ -27,13 +27,13 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
 
   defmodule State do
     @type channel_name :: atom
-    @type route :: :auth | :order_books | :optional_channels
+    @type route :: :auth | :markets | :optional_channels
     @type t :: %State{
             venue: Tai.Venue.id(),
             routes: %{required(route) => atom},
             channels: [channel_name],
             credential: {Tai.Venue.credential_id(), map} | nil,
-            order_books: [Tai.Venues.Product.t()],
+            markets: [Tai.Venues.Product.t()],
             quote_depth: pos_integer,
             heartbeat_interval: pos_integer,
             heartbeat_timeout: pos_integer,
@@ -48,7 +48,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       venue
       routes
       channels
-      order_books
+      markets
       quote_depth
       heartbeat_interval
       heartbeat_timeout
@@ -59,7 +59,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
       routes
       channels
       credential
-      order_books
+      markets
       quote_depth
       heartbeat_interval
       heartbeat_timeout
@@ -92,7 +92,7 @@ defmodule Tai.Venues.Streams.ConnectionAdapter do
     @topic {:venues, :stream}
 
     def broadcast(venue, status) do
-      Tai.SystemBus.broadcast(@topic, {:venues, :stream, status, venue})
+      :ok = Tai.SystemBus.broadcast(@topic, {@topic, status, venue})
     end
   end
 

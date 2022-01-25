@@ -25,7 +25,7 @@ defmodule Tai.Advisors.InstanceSupervisor do
     start_args = [
       advisor_id: advisor_config.advisor_id,
       fleet_id: advisor_config.fleet_id,
-      quote_keys: advisor_config.quote_keys,
+      market_stream_keys: advisor_config.market_stream_keys,
       config: advisor_config.config,
       store: %{}
     ]

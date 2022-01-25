@@ -18,7 +18,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     snapshot_depth = Map.get(stream.venue.opts, :snapshot_depth, @default_snapshot_depth)
 
     routes = %{
-      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      markets: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
@@ -27,7 +27,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -41,7 +41,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     name = stream.venue.id |> process_name()
     {:ok, pid} = WebSockex.start_link(endpoint, __MODULE__, state, name: name)
 
-    snapshot_order_books(stream.order_books, snapshot_depth)
+    snapshot_order_books(stream.markets, snapshot_depth)
     {:ok, pid}
   end
 
@@ -70,9 +70,9 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
   @impl true
   def subscribe(:depth, state) do
-    if Enum.any?(state.order_books) do
+    if Enum.any?(state.markets) do
       channels =
-        state.order_books
+        state.markets
         |> stream_symbols
         |> Enum.map(&"#{&1}@depth@100ms")
 
@@ -93,9 +93,9 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
   @impl true
   def subscribe(:trades, state) do
-    if Enum.any?(state.order_books) do
+    if Enum.any?(state.markets) do
       channels =
-        state.order_books
+        state.markets
         |> stream_symbols
         |> Enum.map(&"#{&1}@trade")
 
@@ -123,7 +123,7 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
 
   @impl true
   def on_msg(%{"e" => "depthUpdate"} = msg, received_at_, state) do
-    msg |> forward(:order_books, received_at_, state)
+    msg |> forward(:markets, received_at_, state)
     {:ok, state}
   end
 
@@ -133,8 +133,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     {:ok, state}
   end
 
-  defp snapshot_order_books(order_books, depth) do
-    order_books
+  defp snapshot_order_books(markets, depth) do
+    markets
     |> Enum.map(fn product ->
       with {:ok, change_set} <- Stream.Snapshot.fetch(product, depth) do
         change_set |> Tai.Markets.OrderBook.replace()
@@ -144,8 +144,8 @@ defmodule Tai.VenueAdapters.Binance.Stream.Connection do
     end)
   end
 
-  defp stream_symbols(order_books) do
-    order_books
+  defp stream_symbols(markets) do
+    markets
     |> Enum.map(& &1.venue_symbol)
     |> Enum.map(&String.downcase/1)
   end

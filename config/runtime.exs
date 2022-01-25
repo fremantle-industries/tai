@@ -35,10 +35,24 @@ if config_env() == :dev do
 
   config :tai,
     fleets: %{
-      new_log_spread: %{
+      log_spread: %{
         advisor: Examples.LogSpread.Advisor,
         factory: Tai.Advisors.Factories.OnePerProduct,
-        quotes: "binance.btc_usdt ftx.btc-perp"
+        # TODO: Support other types of streams e.g...
+        # index_streams: "btc_usd",
+        # candle_streams: %{
+        #   min_1: "binance.btc_usdt ftx.btc-perp"
+        # },
+        # indicator_streams: %{
+        #   distance_from_mean_avg_fast: "binance.btc_usdt ftx.btc-perp",
+        #   distance_from_mean_avg_slow: "binance.btc_usdt ftx.btc-perp"
+        # }
+        market_streams: "binance.btc_usdt ftx.btc-perp"
+      },
+      log_trade: %{
+        advisor: Examples.LogTrade.Advisor,
+        factory: Tai.Advisors.Factories.OnePerProduct,
+        market_streams: "ftx.btc-perp"
       }
     }
 
@@ -53,27 +67,39 @@ if config_env() == :dev do
         start_on_boot: true,
         adapter: Tai.VenueAdapters.Gdax,
         products: "btc_usd eth_usd",
-        order_books: "* -eth_usd"
+        market_streams: "* -eth_usd"
       ],
       ftx: [
         start_on_boot: true,
         adapter: Tai.VenueAdapters.Ftx,
         products: "btc/usd btc-perp btc-0924",
-        order_books: "* -btc/usd"
+        market_streams: "* -btc/usd"
       ],
       delta_exchange: [
         start_on_boot: true,
         adapter: Tai.VenueAdapters.DeltaExchange,
         products: "*",
-        order_books: "*"
-        # order_books: "btcusdt"
+        # market_streams: "btcusdt"
+        market_streams: "*"
       ]
     }
+
+  # TODO: Calculate an index value on each tick
+  # config :tai, indexes: %{
+  #   btc_usd: []
+  # }
+
+  # TODO: Calculate an indicator value on each tick
+  # config :tai, indicators: %{
+  #   distance_from_mean_avg_fast: {Examples.Indicators.DistanceFromMean, :calculate, [period: :min_1, avg_periods: 1440]},
+  #   distance_from_mean_avg_slow: {Examples.Indicators.DistanceFromMean, :calculate, [period: :min_1, avg_periods: 10080]},
+  # }
 end
 
 if config_env() == :test do
   config :examples, :e2e_mappings, %{
     log_spread: ExamplesSupport.E2E.LogSpread,
+    log_trade: ExamplesSupport.E2E.LogTrade,
     ping_pong: ExamplesSupport.E2E.PingPong
   }
 

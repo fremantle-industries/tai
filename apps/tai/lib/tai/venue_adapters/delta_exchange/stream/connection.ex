@@ -15,7 +15,7 @@ defmodule Tai.VenueAdapters.DeltaExchange.Stream.Connection do
         ) :: {:ok, pid} | {:error, term}
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      markets: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
     }
 
     state = %Tai.Venues.Streams.ConnectionAdapter.State{
@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.DeltaExchange.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -47,7 +47,7 @@ defmodule Tai.VenueAdapters.DeltaExchange.Stream.Connection do
   @order_books_chunk_count 100
   @impl true
   def subscribe(:orderbook, state) do
-    state.order_books
+    state.markets
     |> Enum.map(& &1.venue_symbol)
     |> Enum.chunk_every(@order_books_chunk_count)
     |> Enum.each(fn chunk_symbols ->
@@ -66,7 +66,7 @@ defmodule Tai.VenueAdapters.DeltaExchange.Stream.Connection do
 
   @impl true
   def on_msg(%{"type" => "l2_orderbook"} = msg, received_at, state) do
-    msg |> forward(:order_books, received_at, state)
+    msg |> forward(:markets, received_at, state)
     {:ok, state}
   end
 

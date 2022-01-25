@@ -7,11 +7,11 @@ defmodule Tai.Venues.Stream do
   @type position :: Tai.Trading.Position.t()
   @type t :: %Stream{
           venue: venue,
-          order_books: [product],
+          markets: [product],
           accounts: [account],
           positions: [position]
         }
 
-  @enforce_keys ~w[venue order_books accounts positions]a
-  defstruct ~w[venue order_books accounts positions]a
+  @enforce_keys ~w[venue markets accounts positions]a
+  defstruct ~w[venue markets accounts positions]a
 end

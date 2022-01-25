@@ -22,10 +22,10 @@ defmodule Tai.VenueAdapters.DeltaExchange.Stream.RouteOrderBooks do
   @type product :: Tai.Venues.Product.t()
   @type state :: State.t()
 
-  @spec start_link(venue: venue_id, order_books: [product]) :: GenServer.on_start()
-  def start_link(venue: venue, order_books: order_books) do
-    stores = order_books |> build_stores()
-    sequence_numbers = order_books |> build_sequence_numbers()
+  @spec start_link(venue: venue_id, products: [product]) :: GenServer.on_start()
+  def start_link(venue: venue, products: products) do
+    stores = products |> build_stores()
+    sequence_numbers = products |> build_sequence_numbers()
     state = %State{venue: venue, stores: stores, sequence_numbers: sequence_numbers}
     name = venue |> to_name()
 
@@ -56,16 +56,16 @@ defmodule Tai.VenueAdapters.DeltaExchange.Stream.RouteOrderBooks do
     {:noreply, state}
   end
 
-  defp build_stores(order_books) do
-    order_books
+  defp build_stores(products) do
+    products
     |> Enum.reduce(
       %{},
       &Map.put(&2, &1.venue_symbol, &1.venue_id |> ProcessOrderBook.to_name(&1.venue_symbol))
     )
   end
 
-  defp build_sequence_numbers(order_books) do
-    order_books
+  defp build_sequence_numbers(products) do
+    products
     |> Enum.reduce(
       %{},
       &Map.put(&2, &1.venue_symbol, nil)

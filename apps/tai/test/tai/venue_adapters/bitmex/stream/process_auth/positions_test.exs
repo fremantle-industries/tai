@@ -10,7 +10,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.ProcessAuth.PositionsTest do
     start_supervised!({ProcessAuth, [venue: @venue, credential: {@credential, %{}}]})
     {:ok, _} = insert_position(%{product_symbol: :xbtusd, qty: Decimal.new(1)})
     TaiEvents.firehose_subscribe()
-    Tai.SystemBus.subscribe(:position_store)
+    :ok = Tai.SystemBus.subscribe(:position_store)
     :ok
   end
 

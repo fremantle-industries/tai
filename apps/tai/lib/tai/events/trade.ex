@@ -10,7 +10,7 @@ defmodule Tai.Events.Trade do
           venue_trade_id: String.t()
         }
 
-  @enforce_keys ~w(
+  @enforce_keys ~w[
     venue_id
     symbol
     received_at
@@ -18,8 +18,8 @@ defmodule Tai.Events.Trade do
     price
     qty
     taker_side
-  )a
-  defstruct ~w(
+  ]a
+  defstruct ~w[
     venue_id
     symbol
     received_at
@@ -28,5 +28,5 @@ defmodule Tai.Events.Trade do
     qty
     taker_side
     venue_trade_id
-  )a
+  ]a
 end

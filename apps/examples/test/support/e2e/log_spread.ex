@@ -24,7 +24,7 @@ defmodule ExamplesSupport.E2E.LogSpread do
         credentials: %{},
         accounts: "*",
         products: "*",
-        order_books: "*",
+        market_streams: "*",
         quote_depth: 1,
         timeout: 1000
       )
@@ -33,7 +33,7 @@ defmodule ExamplesSupport.E2E.LogSpread do
 
   def push_stream_market_data({:log_spread, :snapshot, venue_id, product_symbol})
       when venue_id == @venue and product_symbol == @product_symbol do
-    push_market_data_snapshot(
+    push_order_book_snapshot(
       %Tai.Markets.Location{
         venue_id: @venue,
         product_symbol: @product_symbol
@@ -47,7 +47,7 @@ defmodule ExamplesSupport.E2E.LogSpread do
     %{
       advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      quotes: "*"
+      market_streams: "*"
     }
   end
 end

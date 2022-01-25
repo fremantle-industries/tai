@@ -14,7 +14,7 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
         ) :: {:ok, pid}
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
-      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      markets: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
@@ -23,7 +23,7 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -41,7 +41,7 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
 
   @impl true
   def subscribe(:init, state) do
-    state.order_books |> Enum.each(&send(self(), {:subscribe, {:depth, &1}}))
+    state.markets |> Enum.each(&send(self(), {:subscribe, {:depth, &1}}))
     {:ok, state}
   end
 
@@ -66,7 +66,7 @@ defmodule Tai.VenueAdapters.Huobi.Stream.Connection do
 
   @impl true
   def on_msg(%{"ch" => "market." <> _} = msg, received_at, state) do
-    msg |> forward(:order_books, received_at, state)
+    msg |> forward(:markets, received_at, state)
     {:ok, state}
   end
 

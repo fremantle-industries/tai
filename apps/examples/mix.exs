@@ -20,7 +20,7 @@ defmodule Examples.MixProject do
   def application do
     [
       mod: {Examples.Application, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :tai]
     ]
   end
 

@@ -8,12 +8,12 @@ config :tai,
     log_spread: %{
       advisor: Examples.LogSpread.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      quotes: "binance.btc_usdt gdax.btc_usd"
+      market_streams: "binance.btc_usdt gdax.btc_usd"
     },
     ping_pong: %{
       advisor: Examples.PingPong.Advisor,
       factory: Tai.Advisors.Factories.OnePerProduct,
-      quotes: "bitmex.xbtusd",
+      market_streams: "bitmex.xbtusd",
       config:
         {Examples.PingPong.Config,
          %{

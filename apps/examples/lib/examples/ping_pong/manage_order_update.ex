@@ -34,7 +34,7 @@ defmodule Examples.PingPong.ManageOrderUpdate do
   defp recreate_entry_order(entry_order, run_store, state) do
     venue = entry_order.venue |> String.to_atom()
     product_symbol = entry_order.product_symbol |> String.to_atom()
-    {:ok, market_quote} = Advisors.MarketQuotes.for(state.market_quotes, venue, product_symbol)
+    {:ok, market_quote} = Advisors.MarketMap.for(state.market_quotes, venue, product_symbol)
 
     {:ok, entry_order} =
       state

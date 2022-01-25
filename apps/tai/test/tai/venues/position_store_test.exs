@@ -4,7 +4,7 @@ defmodule Tai.Venues.PositionStoreTest do
   @venue :venue_a
 
   test "broadcasts a message after the record is stored" do
-    Tai.SystemBus.subscribe(:position_store)
+    :ok = Tai.SystemBus.subscribe(:position_store)
     position = struct(Tai.Trading.Position, venue_id: @venue)
 
     assert {:ok, _} = Tai.Trading.PositionStore.put(position)

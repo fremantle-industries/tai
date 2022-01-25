@@ -26,15 +26,15 @@ defmodule Tai.VenueAdapters.DeltaExchange.StreamSupervisor do
 
     order_book_children =
       order_book_children(
-        stream.order_books,
+        stream.markets,
         stream.venue.quote_depth,
         stream.venue.broadcast_change_set
       )
 
-    process_order_book_children = process_order_book_children(stream.order_books)
+    process_order_book_children = process_order_book_children(stream.markets)
 
     system = [
-      {RouteOrderBooks, [venue: stream.venue.id, order_books: stream.order_books]},
+      {RouteOrderBooks, [venue: stream.venue.id, products: stream.markets]},
       {Connection, [endpoint: endpoint(), stream: stream, credential: credential]}
     ]
 
@@ -45,13 +45,13 @@ defmodule Tai.VenueAdapters.DeltaExchange.StreamSupervisor do
   # TODO: Make this configurable
   defp endpoint, do: "wss://socket.delta.exchange"
 
-  defp order_book_children(order_books, quote_depth, broadcast_change_set) do
-    order_books
+  defp order_book_children(markets, quote_depth, broadcast_change_set) do
+    markets
     |> Enum.map(&OrderBook.child_spec(&1, quote_depth, broadcast_change_set))
   end
 
-  defp process_order_book_children(order_books) do
-    order_books
+  defp process_order_book_children(markets) do
+    markets
     |> Enum.map(fn p ->
       %{
         id: ProcessOrderBook.to_name(p.venue_id, p.venue_symbol),

@@ -1,23 +1,23 @@
 defmodule Tai.Markets.OrderBookTest do
   use Tai.TestSupport.DataCase, async: false
-  alias Tai.Markets.{OrderBook, PricePoint}
+  alias Tai.Markets.{OrderBook, PricePoint, Quote}
 
-  @product struct(Tai.Venues.Product, venue_id: :venue_a, symbol: :btc_usd)
+  @quote_depth 2
+  @venue :venue_a
+  @product struct(Tai.Venues.Product, venue_id: @venue, symbol: :btc_usd)
   @broadcast_enabled_product struct(Tai.Venues.Product,
                                venue_id: :other_venue,
                                symbol: :other_symbol
                              )
-  @topic {@product.venue_id, @product.symbol}
-  @quote_depth 2
 
   setup do
     start_supervised!(OrderBook.child_spec(@product, @quote_depth, false))
+    Tai.Markets.subscribe_quote(@venue)
     :ok
   end
 
   describe ".replace/1" do
     test "saves the market quote from the change set" do
-      Tai.SystemBus.subscribe({:market_quote_store, @topic})
       last_venue_timestamp = Timex.now()
       last_received_at = System.monotonic_time()
 
@@ -38,7 +38,7 @@ defmodule Tai.Markets.OrderBookTest do
 
       OrderBook.replace(change_set)
 
-      assert_receive {:market_quote_store, :after_put, market_quote}
+      assert_receive %Quote{} = market_quote
       assert market_quote.last_received_at == last_received_at
       assert market_quote.last_venue_timestamp == last_venue_timestamp
       assert market_quote.product_symbol == @product.symbol
@@ -52,8 +52,6 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "can quote a nil bid" do
-      Tai.SystemBus.subscribe({:market_quote_store, @topic})
-
       change_set =
         struct(OrderBook.ChangeSet,
           venue: @product.venue_id,
@@ -66,7 +64,7 @@ defmodule Tai.Markets.OrderBookTest do
 
       OrderBook.replace(change_set)
 
-      assert_receive {:market_quote_store, :after_put, market_quote}
+      assert_receive %Quote{} = market_quote
       assert Enum.empty?(market_quote.bids)
       assert Enum.count(market_quote.asks) == 2
       assert %PricePoint{} = Enum.at(market_quote.asks, 0)
@@ -74,8 +72,6 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "can quote a nil ask" do
-      Tai.SystemBus.subscribe({:market_quote_store, @topic})
-
       change_set =
         struct(OrderBook.ChangeSet,
           venue: @product.venue_id,
@@ -88,7 +84,7 @@ defmodule Tai.Markets.OrderBookTest do
 
       OrderBook.replace(change_set)
 
-      assert_receive {:market_quote_store, :after_put, market_quote}
+      assert_receive %Quote{} = market_quote
       assert Enum.count(market_quote.bids) == 2
       assert %PricePoint{} = Enum.at(market_quote.bids, 0)
       assert %PricePoint{} = Enum.at(market_quote.bids, 1)
@@ -96,7 +92,7 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "broadcasts change_set when enabled" do
-      Tai.SystemBus.subscribe(:change_set)
+      :ok = Tai.SystemBus.subscribe(:change_set)
       start_supervised!(OrderBook.child_spec(@broadcast_enabled_product, @quote_depth, true))
 
       broadcast_enabled_change_set =
@@ -132,8 +128,6 @@ defmodule Tai.Markets.OrderBookTest do
 
   describe ".apply/1" do
     test "saves a market quote when the change set results in a new quote after replace" do
-      Tai.SystemBus.subscribe({:market_quote_store, @topic})
-
       change_set_1 = %OrderBook.ChangeSet{
         venue: @product.venue_id,
         symbol: @product.symbol,
@@ -146,7 +140,7 @@ defmodule Tai.Markets.OrderBookTest do
       }
 
       OrderBook.replace(change_set_1)
-      assert_receive {:market_quote_store, :after_put, _}
+      assert_receive %Quote{} = _
 
       venue_timestamp_2 = Timex.now()
       received_at_2 = Timex.now()
@@ -163,8 +157,8 @@ defmodule Tai.Markets.OrderBookTest do
       }
 
       OrderBook.apply(change_set_2)
-      assert_receive {:market_quote_store, :after_put, market_quote_2}
 
+      assert_receive %Quote{} = market_quote_2
       assert market_quote_2.last_venue_timestamp == venue_timestamp_2
       assert market_quote_2.last_received_at == received_at_2
       assert Enum.count(market_quote_2.bids) == 1
@@ -181,8 +175,6 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "saves a market quote when the change set results in a new quote after apply" do
-      Tai.SystemBus.subscribe({:market_quote_store, @topic})
-
       venue_timestamp_1 = Timex.now()
       received_at_1 = System.monotonic_time()
 
@@ -199,7 +191,7 @@ defmodule Tai.Markets.OrderBookTest do
 
       OrderBook.apply(change_set_1)
 
-      assert_receive {:market_quote_store, :after_put, market_quote_1}
+      assert_receive %Quote{} = market_quote_1
       assert market_quote_1.last_venue_timestamp == venue_timestamp_1
       assert market_quote_1.last_received_at == received_at_1
       assert Enum.count(market_quote_1.bids) == 1
@@ -227,7 +219,7 @@ defmodule Tai.Markets.OrderBookTest do
 
       OrderBook.apply(change_set_2)
 
-      assert_receive {:market_quote_store, :after_put, market_quote_2}
+      assert_receive %Quote{} = market_quote_2
       assert market_quote_2.last_venue_timestamp == venue_timestamp_2
       assert market_quote_2.last_received_at == received_at_2
       assert Enum.count(market_quote_2.bids) == 1
@@ -245,8 +237,6 @@ defmodule Tai.Markets.OrderBookTest do
     end
 
     test "can delete existing bids & asks" do
-      Tai.SystemBus.subscribe({:market_quote_store, @topic})
-
       change_set_1 = %OrderBook.ChangeSet{
         venue: @product.venue_id,
         symbol: @product.symbol,
@@ -259,8 +249,7 @@ defmodule Tai.Markets.OrderBookTest do
       }
 
       OrderBook.apply(change_set_1)
-
-      assert_receive {:market_quote_store, :after_put, _}
+      assert_receive %Quote{} = _
 
       change_set_2 =
         struct(OrderBook.ChangeSet,
@@ -274,13 +263,13 @@ defmodule Tai.Markets.OrderBookTest do
 
       OrderBook.apply(change_set_2)
 
-      assert_receive {:market_quote_store, :after_put, market_quote}
+      assert_receive %Quote{} = market_quote
       assert Enum.empty?(market_quote.bids)
       assert Enum.empty?(market_quote.asks)
     end
 
     test "broadcasts change_set when enabled" do
-      Tai.SystemBus.subscribe(:change_set)
+      :ok = Tai.SystemBus.subscribe(:change_set)
       start_supervised!(OrderBook.child_spec(@broadcast_enabled_product, @quote_depth, true))
 
       broadcast_enabled_change_set =

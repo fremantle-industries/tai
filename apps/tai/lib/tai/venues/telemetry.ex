@@ -9,7 +9,7 @@ defmodule Tai.Venues.Telemetry do
 
   @impl true
   def init(state) do
-    Tai.SystemBus.subscribe({:venues, :stream})
+    :ok = Tai.SystemBus.subscribe({:venues, :stream})
     {:ok, state}
   end
 
@@ -21,7 +21,7 @@ defmodule Tai.Venues.Telemetry do
 
   @counters ~w(connect disconnect terminate)a
   @impl true
-  def handle_info({:venues, :stream, counter_type, venue} = key, state) when counter_type in @counters do
+  def handle_info({{:venues, :stream}, counter_type, venue} = key, state) when counter_type in @counters do
     count = :ets.update_counter(__MODULE__, key, 1, {key, 0})
     :telemetry.execute(
       [:tai, :venues, :stream, counter_type],

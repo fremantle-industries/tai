@@ -7,8 +7,8 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
     @type venue_id :: Tai.Venue.id()
     @type t :: %State{venue: venue_id}
 
-    @enforce_keys ~w(venue)a
-    defstruct ~w(venue)a
+    @enforce_keys ~w[venue]a
+    defstruct ~w[venue]a
   end
 
   @type stream :: Tai.Venues.Stream.t()
@@ -61,8 +61,8 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
   defp handle_msg(
          %{
-           "type" => "snapshot",
-           "symbol" => symbol_str,
+           "type" => "order_book_snapshot",
+           "product_symbol" => product_symbol,
            "bids" => bids,
            "asks" => asks
          },
@@ -74,11 +74,40 @@ defmodule Tai.VenueAdapters.Mock.Stream.Connection do
 
     %OrderBook.ChangeSet{
       venue: state.venue,
-      symbol: String.to_atom(symbol_str),
+      symbol: String.to_atom(product_symbol),
       last_received_at: received_at,
       changes: Enum.concat(normalized_bids, normalized_asks)
     }
     |> OrderBook.replace()
+  end
+
+  defp handle_msg(
+         %{
+           "type" => "trade",
+           "id" => id,
+           "liquidation" => liquidation,
+           "price" => price,
+           "product_symbol" => product_symbol,
+           "qty" => qty,
+           "side" => side,
+           "venue_timestamp" => raw_venue_timestamp
+         },
+         received_at,
+         state
+       ) do
+    {:ok, venue_timestamp, _} = DateTime.from_iso8601(raw_venue_timestamp)
+    trade = %Tai.Markets.Trade{
+      id: id,
+      liquidation: liquidation,
+      price: Decimal.new(price),
+      product_symbol: String.to_atom(product_symbol),
+      qty: Decimal.new(qty),
+      received_at: received_at,
+      side: side,
+      venue: state.venue,
+      venue_timestamp: venue_timestamp
+    }
+    Tai.Markets.publish_trade(trade)
   end
 
   defp handle_msg(

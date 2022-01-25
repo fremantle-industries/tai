@@ -15,7 +15,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
       auth: stream.venue.id |> Stream.ProcessAuth.process_name(),
-      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
+      markets: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
       optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
     }
 
@@ -24,7 +24,7 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -86,10 +86,10 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
     # > 25 quotes are experimental. It has performance issues causing message queue back pressure
     order_book_table = if state.quote_depth <= 25, do: "orderBookL2_25", else: "orderBookL2"
 
-    state.order_books
+    state.markets
     |> Enum.chunk_every(@order_books_chunk_count)
-    |> Enum.each(fn order_books ->
-      args = order_books |> Enum.map(fn p -> "#{order_book_table}:#{p.venue_symbol}" end)
+    |> Enum.each(fn markets ->
+      args = markets |> Enum.map(fn p -> "#{order_book_table}:#{p.venue_symbol}" end)
       msg = %{"op" => "subscribe", "args" => args}
       send(self(), {:send_msg, msg})
     end)
@@ -99,10 +99,10 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   @impl true
   def subscribe(:trades, state) do
-    state.order_books
+    state.markets
     |> Enum.chunk_every(@order_books_chunk_count)
-    |> Enum.each(fn order_books ->
-      args = order_books |> Enum.map(fn p -> "trade:#{p.venue_symbol}" end)
+    |> Enum.each(fn markets ->
+      args = markets |> Enum.map(fn p -> "trade:#{p.venue_symbol}" end)
       msg = %{"op" => "subscribe", "args" => args}
       send(self(), {:send_msg, msg})
     end)
@@ -189,14 +189,14 @@ defmodule Tai.VenueAdapters.Bitmex.Stream.Connection do
 
   @impl true
   def on_msg(%{"request" => _, "subscribe" => _} = msg, received_at, state) do
-    msg |> forward(:order_books, received_at, state)
+    msg |> forward(:markets, received_at, state)
     {:ok, state}
   end
 
   @order_book_tables ~w(orderBookL2 orderBookL2_25)
   @impl true
   def on_msg(%{"table" => table} = msg, received_at, state) when table in @order_book_tables do
-    msg |> forward(:order_books, received_at, state)
+    msg |> forward(:markets, received_at, state)
     {:ok, state}
   end
 

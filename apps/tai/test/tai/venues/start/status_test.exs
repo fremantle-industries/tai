@@ -13,7 +13,7 @@ defmodule Tai.Venues.Start.StatusTest do
            credentials: %{},
            accounts: "*",
            products: "*",
-           order_books: "*",
+           market_streams: "*",
            timeout: 1_000
          )
 

@@ -60,7 +60,7 @@ defmodule Tai.Venues.Start.ProductsTest do
                 credentials: %{},
                 accounts: "*",
                 products: "*",
-                order_books: "*",
+                market_streams: "*",
                 timeout: 1_000
               )
 
@@ -138,9 +138,14 @@ defmodule Tai.Venues.Start.ProductsTest do
 
   test "broadcasts a start error event when the adapter raises an error" do
     venue = @base_venue |> Map.put(:adapter, RaiseErrorAdapter)
+    Tai.SystemBus.subscribe({:venue, :start_error})
     TaiEvents.firehose_subscribe()
 
     start_supervised!({Tai.Venues.Start, venue})
+
+    assert_receive {{:venue, :start_error}, start_error_venue, start_error_reasons}
+    assert start_error_venue == @base_venue.id
+    assert [products: _] = start_error_reasons
 
     assert_event(%Tai.Events.VenueStartError{} = event, :error)
     assert event.venue == venue.id

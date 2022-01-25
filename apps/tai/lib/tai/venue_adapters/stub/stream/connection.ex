@@ -32,7 +32,7 @@ defmodule Tai.VenueAdapters.Stub.Stream.Connection do
       routes: %{},
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,

@@ -15,8 +15,9 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   def start_link(endpoint: endpoint, stream: stream, credential: credential) do
     routes = %{
       auth: stream.venue.id |> Stream.ProcessAuth.process_name(),
-      order_books: stream.venue.id |> Stream.RouteOrderBooks.to_name(),
-      optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.to_name()
+      markets: stream.venue.id |> Stream.RouteOrderBooks.process_name(),
+      trades: stream.venue.id |> Stream.ProcessTrades.process_name(),
+      optional_channels: stream.venue.id |> Stream.ProcessOptionalChannels.process_name()
     }
 
     state = %Tai.Venues.Streams.ConnectionAdapter.State{
@@ -24,7 +25,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
       routes: routes,
       channels: stream.venue.channels,
       credential: credential,
-      order_books: stream.order_books,
+      markets: stream.markets,
       quote_depth: stream.venue.quote_depth,
       heartbeat_interval: stream.venue.stream_heartbeat_interval,
       heartbeat_timeout: stream.venue.stream_heartbeat_timeout,
@@ -44,6 +45,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     end
 
     send(self(), {:subscribe, :orderbook})
+    send(self(), {:subscribe, :trades})
 
     state.channels
     |> Enum.each(fn c ->
@@ -95,7 +97,7 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
   @subscribe_orderbook_request %{"op" => "subscribe", "channel" => "orderbook"}
   @impl true
   def subscribe(:orderbook, state) do
-    state.order_books
+    state.markets
     |> Enum.each(fn p ->
       msg = @subscribe_orderbook_request |> Map.put("market", p.venue_symbol)
       send(self(), {:send_msg, msg})
@@ -104,9 +106,27 @@ defmodule Tai.VenueAdapters.Ftx.Stream.Connection do
     {:ok, state}
   end
 
+  @subscribe_trades_request %{"op" => "subscribe", "channel" => "trades"}
+  @impl true
+  def subscribe(:trades, state) do
+    state.markets
+    |> Enum.each(fn p ->
+      msg = @subscribe_trades_request |> Map.put("market", p.venue_symbol)
+      send(self(), {:send_msg, msg})
+    end)
+
+    {:ok, state}
+  end
+
   @impl true
   def on_msg(%{"channel" => "orderbook"} = msg, received_at, state) do
-    msg |> forward(:order_books, received_at, state)
+    msg |> forward(:markets, received_at, state)
+    {:ok, state}
+  end
+
+  @impl true
+  def on_msg(%{"channel" => "trades"} = msg, received_at, state) do
+    msg |> forward(:trades, received_at, state)
     {:ok, state}
   end
 

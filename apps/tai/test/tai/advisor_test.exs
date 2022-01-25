@@ -79,14 +79,14 @@ defmodule Tai.AdvisorTest do
   end
 
   defp start!(advisor, fleet_id, advisor_id, opts) do
-    quote_keys = Keyword.get(opts, :quote_keys, [])
+    market_stream_keys = Keyword.get(opts, :market_stream_keys, [])
     config = Keyword.get(opts, :config, %{})
     run_store = Keyword.get(opts, :store, %{})
 
     {:ok, pid} = advisor.start_link(
       advisor_id: advisor_id,
       fleet_id: fleet_id,
-      quote_keys: quote_keys,
+      market_stream_keys: market_stream_keys,
       config: config,
       store: run_store
     )
