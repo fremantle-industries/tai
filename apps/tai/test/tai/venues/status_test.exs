@@ -15,15 +15,15 @@ defmodule Tai.Venues.StatusTest do
   end
 
   @venue struct(
-           Tai.Venue,
-           id: :status_venue,
-           adapter: VenueAdapter,
-           credentials: %{main: %{}},
-           accounts: "*",
-           products: "*",
-           order_books: "*",
-           timeout: 100
-         )
+    Tai.Venue,
+    id: :status_venue,
+    adapter: VenueAdapter,
+    credentials: %{main: %{}},
+    accounts: "*",
+    products: "*",
+    market_streams: "*",
+    timeout: 100
+  )
 
   test ".status/1 is :stopped when there is no start process or stream" do
     assert Tai.Venues.Status.status(@venue) == :stopped
