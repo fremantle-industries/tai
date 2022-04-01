@@ -19,7 +19,7 @@ jobs:
         elixir: [1.11.x, 1.12.x, 1.13.x]
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
 
       - uses: erlef/setup-elixir@v1.11
         with:
