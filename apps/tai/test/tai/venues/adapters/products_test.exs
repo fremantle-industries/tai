@@ -30,6 +30,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
         assert product.venue_id == @venue.id
         assert product.symbol != nil
         assert product.status != nil
+        assert product.type != nil
         assert %Decimal{} = product.min_size
         assert %Decimal{} = product.min_price
         assert %Decimal{} = product.size_increment
@@ -50,6 +51,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
           min_price: Decimal.new("0.01"),
           size_increment: Decimal.new("0.001"),
           price_increment: Decimal.new("0.01"),
+          type: :spot
         },
         %{
           symbol: :ltc_usd,
@@ -59,6 +61,7 @@ defmodule Tai.Venues.Adapters.ProductsTest do
           min_price: Decimal.new("0.01"),
           size_increment: Decimal.new("0.001"),
           price_increment: Decimal.new("0.01"),
+          type: :spot
         }
       ]
     )

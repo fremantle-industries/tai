@@ -17,7 +17,8 @@ defmodule Tai.VenuesAdapters.Bitmex.ProductTest do
       quote_currency: "USD",
       state: "Open",
       lot_size: 1,
-      tick_size: 0.5
+      tick_size: 0.5,
+      typ: "FFWCSX"
     }
 
     test "returns a product struct from a venue instrument" do
@@ -28,26 +29,11 @@ defmodule Tai.VenuesAdapters.Bitmex.ProductTest do
       assert product.symbol == :xbtusd
       assert product.venue_symbol == "XBTUSD"
       assert product.status == :trading
+      assert product.type == :swap
       assert product.price_increment == Decimal.new("0.5")
       assert product.min_price == Decimal.new("0.5")
       assert product.size_increment == Decimal.new(1)
       assert product.value == Decimal.new(1)
-    end
-
-    test "type is :future when there is an expiry" do
-      attrs = Map.merge(@base_attrs, %{expiry: "2020-06-26T12:00:00.000Z"})
-      instrument = struct(ExBitmex.Instrument, attrs)
-
-      product = Tai.VenueAdapters.Bitmex.Product.build(instrument, :venue_a)
-      assert product.type == :future
-    end
-
-    test "type is :swap when there is no expiry" do
-      attrs = Map.merge(@base_attrs, %{expiry: nil})
-      instrument = struct(ExBitmex.Instrument, attrs)
-
-      product = Tai.VenueAdapters.Bitmex.Product.build(instrument, :venue_a)
-      assert product.type == :swap
     end
 
     test "assigns maker/taker fee when present" do
