@@ -10,18 +10,19 @@ on:
 
 jobs:
   test-elixir:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
 
     strategy:
+      fail-fast: false
       matrix:
-        otp: [22.x, 23.x, 24.x]
-        elixir: [1.11.x, 1.12.x, 1.13.x]
+        otp: [24.x, 25.x]
+        elixir: [1.13.x, 1.14.x, 1.15.x]
 
     steps:
       - uses: actions/checkout@v3
 
-      - uses: erlef/setup-elixir@v1.12
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}

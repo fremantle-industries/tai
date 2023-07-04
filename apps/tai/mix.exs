@@ -84,7 +84,9 @@ defmodule Tai.Mixfile do
       {:logger_file_backend_with_formatters_stackdriver, "~> 0.0.4", only: [:dev, :test]},
       {:echo_boy, "~> 0.6", runtime: false, optional: true},
       {:mock, "~> 0.3", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+
+      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false} # TODO: remove after dialyzer umbrella support is added
     ]
   end
 

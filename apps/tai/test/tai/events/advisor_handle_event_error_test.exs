@@ -17,6 +17,6 @@ defmodule Tai.Events.AdvisorHandleMarketQuoteErrorTest do
     assert json.error == "%RuntimeError{message: \"!!!This is an ERROR!!!\"}"
 
     assert json.stacktrace ==
-             "[{MyAdvisor, :execute_handle_market_quote, 2, [file: 'lib/tai/advisor.ex', line: 226]}]"
+             inspect([{MyAdvisor, :execute_handle_market_quote, 2, [file: 'lib/tai/advisor.ex', line: 226]}])
   end
 end

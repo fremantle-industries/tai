@@ -1,19 +1,23 @@
-name: code-coverage
+name: Test Legacy
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - '*'
 
 jobs:
-  test:
-    runs-on: ubuntu-22.04
+  test-elixir-legacy:
+    runs-on: ubuntu-20.04
     name: Test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
 
     strategy:
+      fail-fast: false
       matrix:
-        otp: [24.x]
-        elixir: [1.13.x]
+        otp: [22.x, 23.x]
+        elixir: [1.11.x, 1.12.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -38,10 +42,9 @@ jobs:
       - name: Install Dependencies
         run: mix deps.get
 
-      - name: Coveralls
+      - name: Test
         env:
-          MIX_ENV: test
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          CI: true
           BINANCE_API_KEY: ./secrets/ci/binance_api_key
           BINANCE_API_SECRET: ./secrets/ci/binance_api_secret
           BITMEX_API_KEY: ./secrets/ci/bitmex_api_key
@@ -60,4 +63,14 @@ jobs:
           DELTA_EXCHANGE_API_SECRET: ./secrets/ci/delta_exchange_api_secret
         run: |
           mix tai.gen.migration
-          mix coveralls.github --umbrella
+          mix test
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: log artifacts
+          path: |
+            apps/tai/log
+            apps/examples/log
+
+      - name: Dialyzer
+        run: mix dialyzer
