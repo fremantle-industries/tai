@@ -8,7 +8,7 @@ defmodule Tai.Fleets.Queries.Search do
   @type result :: [Tai.Fleets.FleetConfig.t()]
 
   @default_filters []
-  @default_order [:fleet_id]
+  @default_order [:id]
   @default_store_id Tai.Fleets.FleetConfigStore.default_store_id()
 
   @spec call([opt]) :: result
