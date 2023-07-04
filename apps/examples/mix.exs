@@ -27,7 +27,9 @@ defmodule Examples.MixProject do
   defp deps do
     [
       {:tai, in_umbrella: true},
-      {:libcluster, "~> 3.2"}
+      {:libcluster, "~> 3.2"},
+
+      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false} # TODO: remove after dialyzer umbprella support is added
     ]
   end
 
