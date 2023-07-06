@@ -80,7 +80,7 @@ defmodule Tai.VenueAdapters.Binance.Products do
     end
   end
 
-  @notional_filter "MIN_NOTIONAL"
+  @notional_filter "NOTIONAL"
   defp notional_filter(filters) do
     with %{"minNotional" => notional} <- find_filter(filters, @notional_filter) do
       notional |> to_decimal()
