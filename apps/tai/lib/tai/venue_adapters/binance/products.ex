@@ -27,7 +27,12 @@ defmodule Tai.VenueAdapters.Binance.Products do
     {:ok, status} = Tai.VenueAdapters.Binance.ProductStatus.normalize(exchange_status)
     {min_price, max_price, tick_size} = filters |> price_filter
     {min_size, max_size, step_size} = filters |> size_filter
-    %Decimal{} = min_notional = filters |> notional_filter
+
+    min_notional =
+      case filters |> notional_filter do
+        nil -> %Decimal{}
+        %Decimal{} = res -> res
+      end
 
     %Tai.Venues.Product{
       venue_id: venue_id,
