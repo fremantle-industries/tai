@@ -30,7 +30,7 @@ defmodule TaiMonorepo.MixProject do
     [
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_unit_notifier, "~> 1.0", only: :test},
-      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:licensir, "~> 0.6", only: :dev, runtime: false}
     ]
