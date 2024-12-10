@@ -5,7 +5,7 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
 
   def build(instrument, venue_id) do
     symbol = instrument.symbol |> downcase_and_atom
-    type = instrument.expiry |> type()
+    type = Tai.VenueAdapters.Bitmex.ProductType.normalize(instrument.typ)
     status = Tai.VenueAdapters.Bitmex.ProductStatus.normalize(instrument.state)
     listing = instrument.listing && Timex.parse!(instrument.listing, @format)
     expiry = instrument.expiry && Timex.parse!(instrument.expiry, @format)
@@ -45,7 +45,4 @@ defmodule Tai.VenueAdapters.Bitmex.Product do
   end
 
   def downcase_and_atom(str), do: str |> String.downcase() |> String.to_atom()
-
-  defp type(nil), do: :swap
-  defp type(_), do: :future
 end
